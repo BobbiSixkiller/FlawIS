@@ -1,0 +1,51 @@
+html, body {
+    height: 100vh;
+}
+
+#root {
+	height: 100%;
+}
+
+#App {
+	height: 100%;
+}
+
+.autoInput {
+	position: relative !important;
+}
+
+.dropDown {
+	position: absolute !important;
+	border: 1px solid #ced4da;
+	border-radius: .25rem;
+	color: #495057;
+	background-color: white;
+	height: 200px;
+	overflow: auto;
+	top: 90%;
+	right: 0;
+	left: 0;
+	z-index: 999;
+	padding: 0 !important;
+}
+
+.dropDown div {
+	cursor: pointer;
+  	background-color: white;
+  	height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem; 
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.dropDown div:hover {
+  	background-color: #007bff; 
+  	color: white;
+}
+
+.dropDownActive {
+  background-color: #007bff; 
+  color: white; 
+}
