@@ -44,6 +44,7 @@ services:
 
 networks:
   internal:
+    driver: bridge
 
 volumes:
   mongo_data: {}
