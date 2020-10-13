@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import api from '../api';
 
 async function getCurrentUser(accessToken) {
-  const response = await fetch("http://localhost:5000/api/user/me", {
-    method: "GET",
+  const res = await api.get("user/me", {
     headers: {
-      'authToken': accessToken
+      authToken: accessToken
     }
   });
-  const data = await response.json();
-  return data;
+  return res.data;
 }
 
 const initialState = {

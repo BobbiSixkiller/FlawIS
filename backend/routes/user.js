@@ -178,8 +178,12 @@ router.get('/', verify, async (req, res) => {
 router.get('/me', verify, async (req, res) => {
 	const user = req.user[0];
 	try {
-		const aggregate = await User.getMyGrantsAggregation(user._id);
-		res.send(aggregate[0]);
+		const match = await User.getMyGrantsAggregation(user._id);
+		if (match.length !== 0) {
+			res.status(200).send(match[0]);
+		} else {
+			res.status(404).send({error: "Používateľ nebol nájdený!"});
+		}
 	} catch(err) {
 		res.status(500).send({error: err.message});
 	}
@@ -190,7 +194,7 @@ router.get('/:id', verify, async (req, res) => {
 	if (user) {
 		try {
 			const match = await User.getMyGrantsAggregation(req.params.id);
-			if (match !== null) {
+			if (match.length !== 0) {
 				res.status(200).send(match[0]);
 			} else {
 				res.status(404).send({error: "Používateľ nebol nájdený!"});
