@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import api from "../api";
 
 import { useUser } from '../hooks/useUser';
 
@@ -18,7 +19,7 @@ import {
   Spinner
 } from 'reactstrap';
 
-export default function Header(props) {
+function Header(props) {
   const history = useHistory();
   const location = useLocation();
 
@@ -29,26 +30,27 @@ export default function Header(props) {
   //authentication handlers
   const register = () => history.push("/register");
   const login = () => history.push("/login");
-  const logOut = async () => {
-    await fetch("http://localhost:5000/api/user/logout", {
-      method: 'POST',
+
+  async function logOut() {
+    await api.post("user/logout", {}, {
       headers: {
-        'authToken': accessToken
+        authToken: accessToken
       }
     }).then(() => {
       setAccessToken(null);
-    });
-  };
-  const logOutAll = async () => {
-    await fetch("http://localhost:5000/api/user/logoutall", {
-      method: 'POST',
+    });   
+  }
+
+  async function logOutAll() {
+    const res = await api.post("user/logoutall", {}, {
       headers: {
-        'authToken': accessToken
+        authToken: accessToken
       }
     }).then(() => {
       setAccessToken(null);
-    });
-  };
+    });  
+  }
+
   const changePassword = () => {
     logOut();
     history.push("/forgotPassword");
@@ -136,3 +138,5 @@ export default function Header(props) {
       </Navbar>
   );
 }
+
+export default Header;

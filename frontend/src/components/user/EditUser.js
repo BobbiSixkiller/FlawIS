@@ -31,7 +31,7 @@ function EditUser(props) {
         values,
         {
           headers: {
-            "authToken": accessToken
+            authToken: accessToken
           }
         }
       );
