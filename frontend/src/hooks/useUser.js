@@ -2,12 +2,16 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api';
 
 async function getCurrentUser(accessToken) {
-  const res = await api.get("user/me", {
-    headers: {
-      authToken: accessToken
-    }
-  });
-  return res.data;
+  try {
+    const res = await api.get("user/me", {
+      headers: {
+        authToken: accessToken
+      }
+    });
+    return res.data;
+  } catch(err) {
+    return err.response.data;
+  } 
 }
 
 const initialState = {
@@ -31,7 +35,6 @@ export function UserProvider({ children }) {
       const user = await getCurrentUser(accessToken);
       setUser(user);
       setLoading(false);
-      console.log(user);
     } else if (!accessToken) {
       // Log Out
       localStorage.removeItem('authToken');

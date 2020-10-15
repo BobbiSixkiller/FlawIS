@@ -63,7 +63,11 @@ function Home(props) {
 		return (
 			<Container>
 	    		<h1 className="text-center">Prosím prihláste sa</h1>
-	    		{user.error && <Alert color="danger">{user.error}</Alert>}
+	    		{user.error && 
+					<Col className="my-5">
+						<Alert className="text-center" color="danger">{user.error}</Alert>
+					</Col>
+				}
 			</Container>
 		);
 	}
