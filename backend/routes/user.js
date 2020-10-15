@@ -142,7 +142,7 @@ router.post('/logout', verify, async (req, res) => {
 			return token.token !== req.token
 		});
 		await user.save();
-		res.send("Deleted token: " + req.token);
+		res.send({msg: `Deleted token: ${req.token}`});
 	} catch(err) {
 		res.status(500).send({error: err.message});
 	}
