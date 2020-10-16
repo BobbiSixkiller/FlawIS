@@ -30,15 +30,6 @@ function GrantDetail() {
 	const [ loading, setLoading ] = React.useState(false);
 
 	const [ modal, setModal ] = React.useState({show: false, data: null, action: ""});
-
-	const [ editBudgetModal, setEditBudgetModal ] = React.useState({show: false, data: {}});
-	const [ editMemberModal, setEditMemberModal ] = React.useState({show: false, data: {}});
-	const [ addMemberModal, setAddMemberModal ] = React.useState({show: false, data: {}});
-	const [ addAnnouncementModal, setAddAnnouncementModal ] = React.useState({show: false, grant: null}); 
-	const [ addFileModal, setAddFileModal ] = React.useState({show: false, grant: null});
-	const [ deleteFileModal, setDeleteFileModal ] = React.useState({show: false, grant: null, file: null});
-	const [ deleteFilesModal, setDeleteFilesModal ] = React.useState({show: false, grant: null});
-	const [ deleteAnnouncementModal, setDeleteAnnouncementModal ] = React.useState({show: false, announcement: null});
 	
 	const users = getUsers("user/", "GET", accessToken);
 
@@ -181,8 +172,6 @@ function GrantDetail() {
 								budget={grant.budget} 
 								modal={modal} 
 								setModal={setModal} 
-								setEditMemberModal={setEditMemberModal} 
-								setAddMemberModal={setAddMemberModal} 
 							/>
 						</>
 			       	}

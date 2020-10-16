@@ -2,8 +2,9 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import api from '../../api';
 
-import { Container, Fade, Form, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
+import { Fade, Form, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
 
+import { useUser } from "../../hooks/useUser";
 import useFormValidation from "../../hooks/useFormValidation";
 import validateUser from "../../validation/validateRegister";
 
@@ -17,15 +18,23 @@ const INITIAL_STATE = {
 }
 
 function AddUser(props) {
+  const { getData } = props;
+  const { accessToken } = useUser();
+
   async function Register() {
     delete values.repeatPass;
     try {
-      await api.post(
-        "user/register",
-        values
+      const res = await api.post(
+        "user/add",
+        values,
+        {
+          headers: {
+            authToken: accessToken
+          }
+        }
       );
-      props.getData(props.token);
-      history.push("/users");
+      setBackendMsg(res.data.msg);
+      getData(accessToken);
     } catch(err) {
       err.response.data.error && setBackendError(err.response.data.error);
     }
@@ -33,6 +42,7 @@ function AddUser(props) {
 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateUser, Register);
   const [ backendError, setBackendError ] = React.useState(null);
+  const [ backendMsg, setBackendMsg ] = React.useState(null);
   const history = useHistory();
 
   return (
@@ -144,6 +154,13 @@ function AddUser(props) {
             <FormFeedback valid>{valid.repeatPass}</FormFeedback>
           </Col>
         </FormGroup>
+        {backendMsg && 
+          <FormGroup row className="justify-content-center">
+            <Col sm={6}>
+              <Alert color="success">{backendMsg}<Button close onClick={() => {setBackendMsg(null); history.goBack()}} /></Alert>
+            </Col>
+          </FormGroup>
+        }
         {backendError && 
           <FormGroup row className="justify-content-center">
             <Col sm={6}>

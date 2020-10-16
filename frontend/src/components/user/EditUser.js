@@ -12,8 +12,10 @@ function EditUser(props) {
   const { form, getData } = props;
   const url = useParams();
   const history = useHistory();
+
   const { user, accessToken } = useUser();
   const [ backendError, setBackendError ] = React.useState(null);
+  const [ backendMsg, setBackendMsg ] = React.useState(null);
   const [ isOpen, setIsOpen ] = React.useState(false);
 
   const INITIAL_STATE = {
@@ -24,10 +26,9 @@ function EditUser(props) {
   }
 
   async function Update() {
-    delete values.repeatPass;
     try {
-      await api.put(
-        "user/" + url.id,
+      const res = await api.put(
+        `user/${url.id}`,
         values,
         {
           headers: {
@@ -35,8 +36,8 @@ function EditUser(props) {
           }
         }
       );
+      setBackendMsg(res.data.msg);
       getData(accessToken);
-      history.push("/users");
     } catch(err) {
       err.response.data.error && setBackendError(err.response.data.error);
     }
@@ -171,6 +172,13 @@ function EditUser(props) {
               </Col> 
             </FormGroup>
           </>
+        }
+        {backendMsg && 
+          <FormGroup row className="justify-content-center">
+            <Col sm={6}>
+              <Alert color="success">{backendMsg}<Button close onClick={() => {setBackendMsg(null); history.goBack();}} /></Alert>
+            </Col>
+          </FormGroup>
         }
         {backendError && 
           <FormGroup row className="justify-content-center">
