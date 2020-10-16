@@ -12,24 +12,24 @@ const INITIAL_STATE = {
   password: "",
   repeatPass: "",
   firstName: "",
-  lastName: "",
-  role: "basic"
+  lastName: ""
 }
 
 function Register(props) {
   const Register = async () => {
     try {
-      await api.post(
+      const res = await api.post(
         "user/register",
         values
       );
-      history.push("/");
+      setBackendMsg(res.data.msg);
     } catch(err) {
       err.response.data.error && setBackendError(err.response.data.error);
     }
   } 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateRegister, Register);
   const [ backendError, setBackendError ] = React.useState(null);
+  const [ backendMsg, setBackendMsg ] = React.useState(null);
   const history = useHistory();
 
   return (
@@ -131,11 +131,17 @@ function Register(props) {
             <FormFeedback valid>{valid.repeatPass}</FormFeedback>
           </Col> 
         </FormGroup>
+        {backendMsg && 
+          <FormGroup row className="justify-content-center">
+            <Col sm={6}>
+              <Alert color="success">{backendMsg}<Button close onClick={() => {setBackendMsg(null); history.push("/login")}} /></Alert>
+            </Col>
+          </FormGroup>
+        }
         {backendError && 
           <FormGroup row className="justify-content-center">
             <Col sm={6}>
-              <Alert color="danger">{backendError}</Alert>
-              <Button close onClick={() => setBackendError(null)} />
+              <Alert color="danger">{backendError}<Button close onClick={() => setBackendError(null)} /></Alert>
             </Col>
           </FormGroup>
         }

@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-const {registerValidation, loginValidation, userUpdateValidation, forgotPasswordValidation, resetPasswordValidation} = require('../validation');
+const {registerValidation, userAddValidation, loginValidation, userUpdateValidation, forgotPasswordValidation, resetPasswordValidation} = require('../validation');
 const verify = require('../middleware/verifyToken');
 
 router.post('/register', async (req, res) => {
@@ -30,14 +30,49 @@ router.post('/register', async (req, res) => {
 		lastName: req.body.lastName,
 		email: req.body.email,
 		password: hashedPassword,
-		role: `${init.length === 0 ? ("admin") : (req.body.role)}`
+		role: `${init.length === 0 ? ("admin") : ("basic")}`
 	});
 
 	try {
 		const savedUser = await user.save();
-		res.send(savedUser);
+		res.status(200).send({msg: "Registrácia prebehla úspešne."});
 	} catch(err) {
 		res.status(500).send({error: err.message});
+	}
+});
+
+router.post('/add', verify, async (req, res) => {
+	const user = req.user[0];
+	if (user.role === "admin" || user.role === "supervisor") {
+		//validation
+		const {error} = await userAddValidation(req.body);
+		if (error) return res.status(400).send({error: error.details[0].message});
+		
+		//check for duplicates
+		const emailExist = await User.findOne({email: req.body.email});
+		if (emailExist) return res.status(400).send({error: 'Zadaný email je už zaregistrovaný!'});
+
+		//password hashing
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+		//create a new user
+		const user = new User({
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			email: req.body.email,
+			password: hashedPassword,
+			role: req.body.role
+		});
+		
+		try {
+			const savedUser = await user.save();
+			res.status(200).send({msg: `Používateľ ${savedUser.fullName} bol pridaný.`});
+		} catch(err) {
+			res.status(500).send({error: err.message});
+		}
+	} else {
+		res.status(401).send({error: "Prístup zamietnutý!"});
 	}
 });
 
@@ -220,18 +255,15 @@ router.put('/:id', verify, async (req, res) => {
 
 		try {
 			const userAct = await User.find({_id: req.params.id});
-			console.log(userAct);
 			if (userAct[0].email !== req.body.email) {
 				const emailExist = await User.findOne({email: req.body.email});
 				if (emailExist) return res.status(400).send({error: 'Zadaný email je už zaregistrovaný!'});
 
 				const update = await User.findOneAndUpdate({_id: req.params.id}, {$set: req.body}, {new: true});
-				console.log("novy email");
-				res.send(update);
+				return res.status(200).send({msg: `Používateľ ${update.fullName} aktualizovaný.`});
 			} else {
 				const update = await User.findOneAndUpdate({_id: req.params.id}, {$set: req.body}, {new: true});
-				console.log("email ostava stary");
-				res.send(update);
+				return res.status(200).send({msg: `Používateľ ${update.fullName} aktualizovaný.`});
 			}
 		} catch(err) {
 			res.status(500).send({error: err.message});

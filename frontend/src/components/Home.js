@@ -1,8 +1,6 @@
 import React from 'react';
-import { useHistory, Redirect, Route } from "react-router-dom";
-import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Card, CardDeck, CardTitle, CardText, Button } from 'reactstrap';
-
-import UserGrants from './user/UserGrants';
+import { useHistory } from "react-router-dom";
+import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Card, CardDeck, CardText, Button } from 'reactstrap';
 
 import { useUser } from '../hooks/useUser';
 
@@ -61,14 +59,17 @@ function Home(props) {
 		);
 	} else {
 		return (
-			<Container>
+			<div>
+				<Row className="justify-content-center mb-3">
+					<img src={process.env.PUBLIC_URL + '/Praf-UK-logo.png'} alt="Logo main" width="200" height="200"></img>
+				</Row>
 	    		<h1 className="text-center">Prosím prihláste sa</h1>
 	    		{user.error && 
 					<Col className="my-5">
 						<Alert className="text-center" color="danger">{user.error}</Alert>
 					</Col>
 				}
-			</Container>
+			</div>
 		);
 	}
 }

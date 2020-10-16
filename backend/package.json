@@ -1,7 +1,8 @@
 {
   "name": "FlawIS-API",
+  "author": "Matus Muransky",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend service based on Express API with mongoose adapter",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",

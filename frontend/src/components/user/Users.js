@@ -23,8 +23,7 @@ function Users() {
 	const [ pagesCount, setPagesCount ] = React.useState();
 	const [ currentPage, setCurrentPage ] = React.useState(0);
 
-	const [ modal, setModal ] = React.useState(false);
-	const [ userDelete, setUserDelete ] = React.useState({show: false, user: null});
+	const [ modal, setModal ] = React.useState({show: false, data: null, action: ""});
 
 	React.useEffect(() => {
 		if (user._id && user.role !== "basic") {
@@ -120,7 +119,7 @@ function Users() {
 													<ButtonGroup>
 														<Button color="info" onClick={() => history.push("/users/" + user._id)}>Detail</Button>
 														<Button color="warning" onClick={() => editUser(user._id, accessToken)}>Upraviť</Button>	
-														{role === "admin" && <Button color="danger" onClick={() => {setUserDelete({show: true, user: user});setModal(!modal);}}>Zmazať</Button>}																																				
+														{role === "admin" && <Button color="danger" onClick={() => setModal({show: true, data: user, action: "deleteUser"})}>Zmazať</Button>}																																				
 													</ButtonGroup>
 												</td>
 											</tr>
@@ -146,14 +145,14 @@ function Users() {
 		  						</Pagination>
 							</Row>
 							<Button outline color="primary" onClick={() => {history.push("/")}}>Späť</Button>
-							<Modal isOpen={modal} toggle={() => setModal(!modal)} >
-								{userDelete.show && <DeleteUser getData={getData} modal={modal} setModal={setModal} userDelete={userDelete} setUserDelete={setUserDelete}/>}
+							<Modal isOpen={modal.show} toggle={() => setModal(!modal.show)} >
+								{modal.show && <DeleteUser getData={getData} modal={modal} setModal={setModal}/>}
 							</Modal>
 						</Container>
 					</Fade>
 				</Route>
 				<Route path={`${path}/add`}>
-					<AddUser getData={getData} token={accessToken}/>
+					<AddUser getData={getData}/>
 				</Route>
 				<Route path={`${path}/update/:id`}>
 					<EditUser form={form} getData={getData}/>
