@@ -41,7 +41,7 @@ function AddGrant(props) {
     }
   }
 
-  const users = getUsers("http://localhost:5000/api/user/", "GET", accessToken);
+  const users = getUsers("user/", "GET", accessToken);
 
   const renderBudgets = years.map((year, i) => {
     return (<GrantBudget 

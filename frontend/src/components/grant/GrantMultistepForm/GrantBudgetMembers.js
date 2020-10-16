@@ -4,8 +4,6 @@ import { Pagination, PaginationItem, PaginationLink, Spinner, Fade, Row, FormGro
 
 import validateMember from "../../../validation/validateMember";
 import useFormValidation from "../../../hooks/useFormValidation";
-import { useUser } from "../../../hooks/useUser";
-import getMembers from "../../../hooks/useAPI";
 
 import { IDtoName } from "../../../util/helperFunctions";
 
