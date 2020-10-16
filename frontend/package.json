@@ -3,6 +3,7 @@
   "author": "Matus Muransky",
   "version": "1.0.0",
   "description": "Frontend/cliet React application",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -35,8 +36,7 @@
     ],
     "development": [
       "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 firefox version"
     ]
   }
 }

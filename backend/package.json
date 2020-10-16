@@ -3,13 +3,14 @@
   "author": "Matus Muransky",
   "version": "1.0.0",
   "description": "Backend service based on Express API with mongoose adapter",
+  "license": "MIT",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
-  "author": "Matus Muransky",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@hapi/joi": "^16.1.7",
     "bcryptjs": "^2.4.3",
