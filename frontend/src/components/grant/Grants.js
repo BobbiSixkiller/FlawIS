@@ -2,7 +2,7 @@ import React from 'react';
 import api from '../../api';
 import { Switch, Route, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
 
-import { Fade, Alert, Button, ButtonGroup, Spinner, Container, Table, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Fade, Alert, Button, ButtonGroup, Spinner, Container, Table, Row, Col, Modal, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 import { useUser } from '../../hooks/useUser';
 
@@ -20,8 +20,7 @@ function Grants() {
 	const [ loading, setLoading ] = React.useState(false);
 	const [ backendError, setBackendError ] = React.useState(null);
 
-	const [ modal, setModal ] = React.useState(false);
-	const [ grantDelete, setGrantDelete ] = React.useState({show: false, grant: null});
+	const [ modal, setModal ] = React.useState({show: false, data: null});
 
 	const [ pageSize, setPageSize ] = React.useState(5);
 	const [ pagesCount, setPagesCount ] = React.useState();
@@ -125,7 +124,7 @@ function Grants() {
 															<td>
 																<ButtonGroup>
 																	<Button color="info" onClick={() => {history.push("/grants/" + grant._id)}}>Detail</Button>
-																	{user.role === "admin" && <Button color="danger" onClick={() => {setGrantDelete({show: true, grant: grant});setModal(!modal);}}>Zmazať</Button>}
+																	{user.role === "admin" && <Button color="danger" onClick={() => setModal({show: true, data: grant})}>Zmazať</Button>}
 																</ButtonGroup>
 															</td>
 														</tr>	
@@ -154,8 +153,8 @@ function Grants() {
 					       		)
 					       	}
 							<Button outline color="primary" onClick={() => {history.push("/")}}>Späť</Button>
-							<Modal isOpen={modal} toggle={() => setModal(!modal)} >
-								{grantDelete.show && <DeleteGrant getData={getData} modal={modal} setModal={setModal} grantDelete={grantDelete} setGrantDelete={setGrantDelete} />}
+							<Modal isOpen={modal.show} toggle={() => setModal(!modal)} >
+								{modal.show && <DeleteGrant getData={getData} modal={modal} setModal={setModal} />}
 							</Modal>
 						</Container>
 					</Fade>

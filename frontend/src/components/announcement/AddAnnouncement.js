@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import api from '../../api';
 
-import { Container, Fade, Form, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
+import { Fade, Form, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
 
 import { useUser } from '../../hooks/useUser';
 import useFormValidation from "../../hooks/useFormValidation";

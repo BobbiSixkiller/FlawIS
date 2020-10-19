@@ -13,6 +13,7 @@ import GrantBudget from "./GrantMultistepForm/GrantBudget";
 import GrantCheckOut from "./GrantMultistepForm/GrantCheckOut";
 
 function AddGrant(props) {
+  const { getData } = props;
   const { accessToken } = useUser();
   const history = useHistory();
 
@@ -33,7 +34,7 @@ function AddGrant(props) {
           } 
         }
       );
-      props.getData(accessToken);
+      getData(accessToken);
       history.push("/grants");
     } catch(err) {
       console.log(err);

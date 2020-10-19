@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory, useParams, Redirect } from 'react-router-dom';
 import api from '../../api';
 
-import { FileEarmark, Pencil } from 'react-bootstrap-icons';
+import { FileEarmark } from 'react-bootstrap-icons';
 
 import { Jumbotron, Fade, Button, ButtonGroup, Spinner, Container, Row, Col, FormGroup, Input, Label, Modal, Alert, NavLink } from 'reactstrap';
 

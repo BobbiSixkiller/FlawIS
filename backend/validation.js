@@ -57,7 +57,7 @@ const userUpdateValidation = data => {
 		lastName: Joi.string().max(50).required(),
 		email: Joi.string().required().email(),
 		password: Joi.string().min(8).pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
-		repeatPass: Joi.ref('password').required(),
+		repeatPass: Joi.ref('password'),
 		role: Joi.string().required().valid('basic', 'supervisor', 'admin')
 	});
 

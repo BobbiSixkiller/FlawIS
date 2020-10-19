@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 
-function Footer(props) {
+function Footer() {
 
 	return(
 		<Container fluid>

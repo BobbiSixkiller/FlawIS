@@ -15,7 +15,7 @@ function GrantBudget(props) {
 		members: props.form.budget[props.i] ? props.form.budget[props.i].members : []
 	}
 
-	const { handleSubmit, handleChange, handleBlur, values, setValues, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateBudget, addBudget);
+	const { handleSubmit, handleChange, handleBlur, values, setValues, errors, valid } = useFormValidation(INITIAL_STATE, validateBudget, addBudget);
 
 	async function addBudget() {
 		const form = {...props.form};

@@ -1,7 +1,7 @@
 import React from 'react';
 import api from '../../api';
 import { Redirect, Switch, Route, useHistory, useRouteMatch } from 'react-router-dom';
-import { Fade, Button, Input, ButtonGroup, Spinner, Container, Table, Row, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Fade, Button, ButtonGroup, Spinner, Container, Table, Row, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 import User from './User';
 import AddUser from './AddUser';

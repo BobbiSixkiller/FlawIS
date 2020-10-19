@@ -3,6 +3,7 @@ import React from "react";
 import { Input, Label, FormGroup, FormFeedback, Col } from "reactstrap";
 
 function AutoInput(props) {
+	const { handleChange, handleBlur, valid, errors, values, setValues, users  } = props;
 	const [display, setDisplay] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const autoWrapRef = React.useRef(null); 
@@ -22,14 +23,14 @@ function AutoInput(props) {
 	}
 
 	function handleDropdownChange(e) {
-		props.handleChange(e);
+		handleChange(e);
 		setSearch(e.target.value);
 		setDisplay(true);
 	}
 
 	function handleDropdownClick(memberObj) {
 		const member = {...memberObj};
-		props.setValues({...props.values, member: member._id});
+		setValues({...values, member: member._id});
 		setSearch(member.firstName + " " + member.lastName);
 		setDisplay(false);
 	}
@@ -46,16 +47,16 @@ function AutoInput(props) {
 					value={search}
 					onClick={() => setDisplay(!display)} 
 					onChange={(e) => handleDropdownChange(e)} 
-					onBlur={props.handleBlur}
-					valid={props.valid.member && true}
-					invalid={props.errors.member && true}
+					onBlur={handleBlur}
+					valid={valid.member && true}
+					invalid={errors.member && true}
 					autoComplete="off"
 				/>
-				<FormFeedback invalid>{props.errors.member}</FormFeedback>
-				<FormFeedback valid>{props.valid.member}</FormFeedback>
+				<FormFeedback invalid>{errors.member}</FormFeedback>
+				<FormFeedback valid>{valid.member}</FormFeedback>
 				{display && (
 					<Col className="dropDown">
-						{props.users
+						{users
 							.filter(({firstName, lastName}) => (firstName + " " + lastName).toLowerCase().indexOf(search.toLowerCase()) > - 1)
 							.map((member, i) => {
 								return <div tabIndex="0" onClick={() => handleDropdownClick(member)} key={i}>{member.firstName + " " + member.lastName}</div>
