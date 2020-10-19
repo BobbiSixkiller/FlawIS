@@ -1,12 +1,12 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Container, Row, Col, Fade, Card, CardDeck, CardTitle, CardText, Table, Nav, NavItem, NavLink, TabContent, TabPane, Button, ButtonGroup, Label, Input, FormGroup } from 'reactstrap';
+import { Container, Col, Fade, Card, CardDeck, CardTitle, CardText, Table, Nav, NavItem, NavLink, TabContent, TabPane, Button, ButtonGroup, Label, Input, FormGroup } from 'reactstrap';
 
 import { IDtoName } from "../../util/helperFunctions";
 import { useUser } from "../../hooks/useUser";
 
 function Budget(props) {
 	const { user } = useUser();
-	const { modal, setModal, grant } = props;
+	const { setModal, grant } = props;
 
 	const budgetAct = new Date(props.budget.find(budget => new Date(budget.year).getFullYear() === new Date().getFullYear()).year).getFullYear();
 	const [activeTab, setActiveTab] = React.useState(budgetAct);

@@ -7,7 +7,7 @@ import GrantDetail from './grant/GrantDetail';
 
 import { useUser } from '../hooks/useUser';
 
-function MyGrants(props) {
+function MyGrants() {
 	const { user, loading } = useUser();
 	const { path } = useRouteMatch();
 	const history = useHistory();

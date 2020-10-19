@@ -5,24 +5,26 @@ import validateGrantID from "../../../validation/validateGrantID";
 import useFormValidation from "../../../hooks/useFormValidation";
 
 function GrantID(props) {
+	const { form, setForm, step, setStep, setYears, history } = props;
+
 	const INITIAL_STATE = {
-	  name: props.form.name ? props.form.name : "",
-	  idNumber: props.form.idNumber ? props.form.idNumber : "",
-	  type: props.form.type ? props.form.type : "APVV",
-	  start: props.form.start ? props.form.start: "",
-	  end: props.form.end ? props.form.end: "",
-	  budget: props.form.budget ? props.form.budget : []
+	  name: form.name ? form.name : "",
+	  idNumber: form.idNumber ? form.idNumber : "",
+	  type: form.type ? form.type : "APVV",
+	  start: form.start ? form.start: "",
+	  end: form.end ? form.end: "",
+	  budget: form.budget ? form.budget : []
 	}
 
 	function addGrantID() {
-		props.setForm(values);
-		props.setStep(props.step + 1);
+		setForm(values);
+		setStep(step + 1);
 	}
 
-	const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateGrantID, addGrantID);
+	const { handleSubmit, handleChange, handleBlur, values, errors, valid } = useFormValidation(INITIAL_STATE, validateGrantID, addGrantID);
 
 	React.useEffect(() => {
-		props.setYears(getYears(values));
+		setYears(getYears(values));
 	}, [values.start, values.end]);
 
 	function getYears(values) {
@@ -129,7 +131,7 @@ function GrantID(props) {
 		        <FormGroup row className="justify-content-center">
 	                <Col sm={6}>
 	                  <FormGroup row className="justify-content-between">
-	                    <Button className="ml-3" outline color="primary" onClick={() => props.history.goBack()}>Späť</Button>
+	                    <Button className="ml-3" outline color="primary" onClick={() => history.goBack()}>Späť</Button>
 	                    <Button className="mr-3" outline color="success" type="submit" disabled={Object.keys(errors).length !== 0}>Ďalej</Button>
 	                  </FormGroup>
 	                </Col>

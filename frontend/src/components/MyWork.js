@@ -1,9 +1,9 @@
 import React from "react";
-import { useHistory, Redirect, Route } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { Container, Button } from "reactstrap";
 
-function MyWork(props) {
+function MyWork() {
 	const history = useHistory();
 	
 	return(

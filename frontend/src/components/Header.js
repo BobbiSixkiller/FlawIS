@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import api from "../api";
 
@@ -10,12 +10,13 @@ import {
   NavbarToggler,
   NavbarBrand,
   Nav,
-  UncontrolledButtonDropdown,
+  UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   Button,
-  Input
+  Input,
+  NavItem
 } from 'reactstrap';
 
 function Header() {
@@ -67,11 +68,11 @@ function Header() {
   let adminNav;
   if (user.role === "supervisor" || user.role === "admin") {
     adminNav = <Nav className="mr-auto" navbar>
-                <UncontrolledButtonDropdown  inNavbar>
+                <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>
                     Zdroje
                   </DropdownToggle>
-                  <DropdownMenu down="true">
+                  <DropdownMenu down>
                     <DropdownItem onClick={() => history.push("/users")}>
                       Používatelia
                     </DropdownItem>
@@ -79,15 +80,17 @@ function Header() {
                       Granty
                     </DropdownItem>
                   </DropdownMenu>
-                </UncontrolledButtonDropdown>
-                <Input 
-                  placeholder="Vyhľadávanie"
-                  name="search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  autoComplete="off"
-                  className="mx-md-1"
-                />
+                </UncontrolledDropdown >
+                <NavItem>
+                  <Input 
+                    placeholder="Vyhľadávanie"
+                    name="search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    autoComplete="off"
+                    className="mx-md-1"
+                  />
+                </NavItem>
               </Nav>
   } 
 
@@ -101,11 +104,11 @@ function Header() {
               <>
                 { adminNav }
                 <Nav className="ml-auto" navbar>
-                  <UncontrolledButtonDropdown nav inNavbar>
+                  <UncontrolledDropdown  nav inNavbar>
                     <DropdownToggle nav caret>
                       Prihlásený {user.firstName + ' ' + user.lastName}
                     </DropdownToggle>
-                    <DropdownMenu down="true">
+                    <DropdownMenu right>
                       {/* dorobit upravit profil 
                       <DropdownItem>
                         Upraviť údaje
@@ -121,15 +124,19 @@ function Header() {
                         Odhlásiť všetky
                       </DropdownItem>
                     </DropdownMenu>
-                  </UncontrolledButtonDropdown>
+                  </UncontrolledDropdown >
                 </Nav>
               </>
             ) 
               : 
             (
               <Nav className="ml-auto" navbar>
-                <Button color="success" className="mx-md-2 my-2 my-md-0" onClick={login}>Prihlásiť sa</Button>
-                <Button  onClick={register}>Registrácia</Button>
+                <NavItem className="mx-md-2 my-2 my-md-0">
+                  <Button block color="success" onClick={login}>Prihlásiť sa</Button>
+                </NavItem>
+                <NavItem>
+                  <Button block onClick={register}>Registrácia</Button>  
+                </NavItem>
               </Nav>
             )
           } 

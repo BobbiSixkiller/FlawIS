@@ -10,7 +10,7 @@ import AddAnnouncement from './AddAnnouncement';
 import EditAnnouncement from './EditAnnouncement';
 import DeleteAnnouncement from './DeleteAnnouncement';
 
-function Announcements(props) {
+function Announcements() {
 	const { path } = useRouteMatch();
 	const history = useHistory();
 	const { user, accessToken, search } = useUser();

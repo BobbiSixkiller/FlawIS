@@ -4,7 +4,7 @@ import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jum
 
 import { useUser } from '../hooks/useUser';
 
-function Home(props) {
+function Home() {
 	const { user, loading } = useUser();
 	const history = useHistory();
 
