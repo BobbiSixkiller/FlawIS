@@ -15,15 +15,14 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  Input,
-  Spinner
+  Input
 } from 'reactstrap';
 
-function Header(props) {
+function Header() {
   const history = useHistory();
   const location = useLocation();
 
-  const { user, loading, setAccessToken, accessToken, search, setSearch } = useUser();
+  const { user, setAccessToken, accessToken, search, setSearch } = useUser();
   const [ isOpen, setIsOpen ] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
@@ -130,8 +129,8 @@ function Header(props) {
               : 
             (
               <Nav className="ml-auto" navbar>
-                <Button color="success" className="my-2 my-md-0" onClick={login}>Prihlásiť sa</Button>
-                <Button className="mx-lg-2 mx-md-2 my-2 my-md-0" onClick={register}>Registrácia</Button>
+                <Button color="success" className="mx-md-2 my-2 my-md-0" onClick={login}>Prihlásiť sa</Button>
+                <Button  onClick={register}>Registrácia</Button>
               </Nav>
             )
           } 
