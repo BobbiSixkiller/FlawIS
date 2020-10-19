@@ -15,7 +15,7 @@ const INITIAL_STATE = {
   lastName: ""
 }
 
-function Register(props) {
+function Register() {
   const Register = async () => {
     try {
       const res = await api.post(

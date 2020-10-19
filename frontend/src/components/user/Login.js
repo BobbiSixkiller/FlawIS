@@ -13,7 +13,7 @@ const INITIAL_STATE = {
   password: ""
 }
 
-function Login(props) {
+function Login() {
   const { setAccessToken } = useUser();
   const history = useHistory();
 

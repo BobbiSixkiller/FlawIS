@@ -18,7 +18,7 @@ export default function validateLogin(values) {
     } else if (
         !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/i.test(values.password)
     ) {
-    	errors.password = 'Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo';
+    	errors.password = 'Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo, bez znakov!';
     } else {
         valid.password = 'Formát hesla OK';
     }
