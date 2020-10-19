@@ -50,7 +50,7 @@ function Header() {
     });  
   }
 
-  const changePassword = () => {
+  function changePassword() {
     logOut();
     history.push("/forgotPassword");
   }
