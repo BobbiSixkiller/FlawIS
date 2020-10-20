@@ -8,9 +8,13 @@ import GrantDetail from './grant/GrantDetail';
 import { useUser } from '../hooks/useUser';
 
 function MyGrants() {
-	const { user, loading } = useUser();
+	const { user, loading, year, setYear } = useUser();
 	const { path } = useRouteMatch();
 	const history = useHistory();
+
+	React.useEffect(() => {
+		console.log(year);
+	}, []);
 
 	if (loading === true) {
 		return <Container className="text-center"><Spinner/></Container>
@@ -44,6 +48,20 @@ function MyGrants() {
 									<Col>
 										<Label for="devices">Prihlásené zariadenia:</Label>
 										<Input id="devices" plaintext readOnly value={user.tokens.length} />
+									</Col>
+								</FormGroup>
+							</Row>
+							<Row form>
+								<FormGroup>
+									<Col>
+										<Label for="year">Rok:</Label>
+										<Input type="select" name="year" id="year" value={year} onChange={(e) => setYear(e.target.value)}>
+											<option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
+											<option value={new Date().getFullYear() + 1}>{new Date().getFullYear() + 1}</option>
+											<option value={new Date().getFullYear() + 2}>{new Date().getFullYear() + 2}</option>
+											<option value={new Date().getFullYear() + 3}>{new Date().getFullYear() + 3}</option>
+											<option value={new Date().getFullYear() + 4}>{new Date().getFullYear() + 4}</option>
+										</Input>
 									</Col>
 								</FormGroup>
 								<FormGroup>

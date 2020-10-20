@@ -1,7 +1,7 @@
 {
   "name": "FlawIS-API",
   "author": "Matus Muransky",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend service based on Express API with mongoose adapter",
   "license": "MIT",
   "private": true,

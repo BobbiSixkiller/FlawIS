@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-//refactor, prefindOneAndRemove middleware co pomaze referencie v ramci member pola v budgetoch
 const userSchema = new mongoose.Schema({
 	firstName: {
 		type: String,
@@ -200,7 +199,7 @@ userSchema.statics.getUsersGrantsAggregation = function () {
 	]).exec();
 }
 
-userSchema.statics.getMyGrantsAggregation = function (id) {
+userSchema.statics.getMyGrantsAggregation = function (id, year) {
 	return this.aggregate([
     	{
 	      $match: {
@@ -228,8 +227,8 @@ userSchema.statics.getMyGrantsAggregation = function (id) {
 	    		$or: [
      				{ 
      					$and: [
-     						{ $expr: {$eq: ["$_id", "$groupGrants.budget.members.member"]} }, 
-     						{ $expr: {$eq: [new Date().getFullYear(), {$year: "$groupGrants.budget.year"}] } }
+							 { $expr: {$eq: ["$_id", "$groupGrants.budget.members.member"]} }, 
+							 { $expr: {$eq: [new Date(year).getFullYear(), {$year: "$groupGrants.budget.year"}] } }
      					] 
      				},
       				{ groupGrants: { $eq: null } },
@@ -370,13 +369,13 @@ userSchema
 	return fullName;
 })
 
-/* userSchema
+userSchema
 .virtual('grants', {
 	ref: 'Grant',
 	localField: '_id',
-	foreignField: 'members.member',
+	foreignField: 'budget.members.member',
 	justOne: false
-}); */
+}); 
 
 userSchema.pre("remove", function(next) {
   	const user = this;

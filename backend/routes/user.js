@@ -198,8 +198,7 @@ router.get('/', verify, async (req, res) => {
 	if (user.role === "admin" || user.role === "supervisor") {
 		try {
 			const aggregate = await User.getUsersGrantsAggregation();			
-			//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
-				    
+			//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});	    
 			res.status(200).send(aggregate);
 		} catch(err) {
 			res.status(500).send(err.message);
@@ -209,10 +208,10 @@ router.get('/', verify, async (req, res) => {
 	}
 });
 
-router.get('/me', verify, async (req, res) => {
+router.get('/me/:year', verify, async (req, res) => {
 	const user = req.user[0];
 	try {
-		const match = await User.getMyGrantsAggregation(user._id);
+		const match = await User.getMyGrantsAggregation(user._id, req.params.year);
 		if (match.length !== 0) {
 			res.status(200).send(match[0]);
 		} else {
@@ -227,7 +226,8 @@ router.get('/:id', verify, async (req, res) => {
 	const user = req.user[0];
 	if (user) {
 		try {
-			const match = await User.getMyGrantsAggregation(req.params.id);
+			//const match = await User.getMyGrantsAggregation(req.params.id, 2020);
+			const match = await User.find({_id: req.params.id}).populate({path: 'grants', populate: {path: 'members.member'}});
 			if (match.length !== 0) {
 				res.status(200).send(match[0]);
 			} else {
