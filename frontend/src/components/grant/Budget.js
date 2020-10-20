@@ -44,16 +44,16 @@ function Budget(props) {
 			    			<Fade in={fadeIn}>
 			    				<CardDeck>
 				    				<Card body inverse={budgetYear === currentYear ? true : false} outline={budgetYear !== currentYear ? true : false} color="primary" className="text-center">
-				    					<CardTitle>Material budget</CardTitle>
-				    					<CardText className="font-weight-bold">{budget.material + " €"}</CardText>
+				    					<CardTitle>Cestovné</CardTitle>
+				    					<CardText className="font-weight-bold">{budget.travel + " €"}</CardText>
 				    				</Card>
 				    				<Card body inverse={budgetYear === currentYear ? true : false} outline={budgetYear !== currentYear ? true : false} color="primary" className="text-center">
-				    					<CardTitle>Services budget</CardTitle>
+				    					<CardTitle>Služby</CardTitle>
 				    					<CardText className="font-weight-bold">{budget.services + " €"}</CardText>
 				    				</Card>
 				    				<Card body inverse={budgetYear === currentYear ? true : false} outline={budgetYear !== currentYear ? true : false} color="primary" className="text-center">
-				    					<CardTitle>Travel budget</CardTitle>
-				    					<CardText className="font-weight-bold">{budget.travel + " €"}</CardText>
+				    					<CardTitle>Materiál</CardTitle>
+				    					<CardText className="font-weight-bold">{budget.material + " €"}</CardText>
 				    				</Card>
 				    			</CardDeck>
 								{user.role !== "basic" && !props.checkout &&

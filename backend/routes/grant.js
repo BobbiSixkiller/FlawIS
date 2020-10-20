@@ -346,7 +346,7 @@ router.delete('/:grant_id/budget/:budget_id', verify, async (req, res) => {
 
 router.delete('/:grant_id/budget/:budget_id/member/:member_id', verify, async (req, res) => {
 	const user = req.user[0];
-	if (user.role === "admin") {
+	if (user.role === "admin" || user.role === "supervisor") {
 		const grant = await Grant.findOne({_id: req.params.grant_id, "budget._id": req.params.budget_id, "budget.members._id": req.params.member_id});
 		if (!grant) return res.status(404).send({error: "Grant, rozpočet alebo riešiteľ nebol nájdený!"});
 		try {

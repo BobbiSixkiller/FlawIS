@@ -112,8 +112,7 @@ router.post('/forgotPassword', async (req, res) => {
 	user.resetToken = token;
 
 	const resetURL = `http://localhost:3000/resetPassword/${token}`;
-	//const resetURL = `http://flawis.flaw.uniba.sk/resetPassword/${token}`;
-
+	
 	try {
 		await mail.send({
 			user,
