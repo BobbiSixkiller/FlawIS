@@ -237,20 +237,15 @@ router.get('/me', verify, async (req, res) => {
 });
 
 router.get('/:id', verify, async (req, res) => {
-	const user = req.user[0];
-	if (user) {
-		try {
-			const match = await User.find({_id: req.params.id}).populate({path: 'grants', populate: {path: 'members.member'}});
-			if (match.length !== 0) {
-				res.status(200).send(match[0]);
-			} else {
-				res.status(404).send({error: "Používateľ nebol nájdený!"});
-			}
-		} catch(err) {
-			res.status(500).send({error: err.message});
+	try {
+		const match = await User.find({_id: req.params.id}).populate({path: 'grants', populate: {path: 'members.member'}});
+		if (match.length !== 0) {
+			res.status(200).send(match[0]);
+		} else {
+			res.status(404).send({error: "Používateľ nebol nájdený!"});
 		}
-	} else {
-		res.status(401).send({error: "Prístup zamietnutý!"});
+	} catch(err) {
+		res.status(500).send({error: err.message});
 	}
 });
 

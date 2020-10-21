@@ -73,7 +73,7 @@ function User() {
 						</FormGroup>
 					</Row>
 					<hr />
-					<UserGrants user={result._id} year={year} setHours={setHours} />
+					<UserGrants user={url.id} year={year} setHours={setHours} />
 				</Jumbotron>
 				<Button onClick={() => history.goBack()} outline color="primary">Back</Button>
 			</Fade>

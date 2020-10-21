@@ -71,7 +71,7 @@ function MyGrants() {
 								</FormGroup>
 							</Row>
 							<hr />
-							{"_id" in user.grants[0] && <UserGrants data={user} year={year} setHours={setHours} />}
+							<UserGrants user={user._id} year={year} setHours={setHours} />
 							<Container>
 								<Button onClick={() => history.push("/")} outline color="primary">Späť</Button>
 							</Container>

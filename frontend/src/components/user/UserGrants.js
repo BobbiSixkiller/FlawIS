@@ -71,14 +71,14 @@ function UserGrants(props) {
 					<Table responsive hover>
 						<thead>
 							<tr>
-							<th>#</th>
-							<th>Názov</th>
-							<th>Typ</th>
-							<th>Cestovné</th>
-							<th>Služby</th>
-							<th>Materiál</th>
-							<th>Hodiny</th>
-							<th>Akcia</th>
+								<th>#</th>
+								<th>Názov</th>
+								<th>Typ</th>
+								<th>Cestovné</th>
+								<th>Služby</th>
+								<th>Materiál</th>
+								<th>Hodiny</th>
+								<th>Akcia</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -86,7 +86,6 @@ function UserGrants(props) {
 								.filter(({name}) => (name).toLowerCase().indexOf(search.toLowerCase()) > - 1)
 								.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
 								.map((grant, index) => {
-									const selectedYear = new Date(year).getFullYear();
 									return (
 										<tr key={index}>
 											<td>{index}</td>
@@ -94,24 +93,24 @@ function UserGrants(props) {
 											<td>{grant.type}</td>
 											<td>
 												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() === selectedYear) return <p>{budget.travel + " €"}</p>
+													if (new Date(budget.year).getFullYear() == year) return budget.travel + " €"
 												})}
 											</td>
 											<td>
 												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() === selectedYear) return <p>{budget.services + " €"}</p>
+													if (new Date(budget.year).getFullYear() == year) return budget.services + " €"
 												})}
 											</td>
 											<td>
 												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() === selectedYear) return <p>{budget.material + " €"}</p>
+													if (new Date(budget.year).getFullYear() == year) return budget.material + " €"
 												})}
 											</td>
 											<td>
 												{grant.budget.map(budget => {
-													if (new Date(budget.year).getFullYear() === selectedYear) {
+													if (new Date(budget.year).getFullYear() == year) {
 														return budget.members.map((member) => {
-															if (member.member._id === user) return <p>{member.hours}</p>
+															if (member.member._id === user) return member.hours
 														})
 													}
 												})}
