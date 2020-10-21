@@ -208,16 +208,30 @@ router.get('/', verify, async (req, res) => {
 	}
 });
 
-router.get('/me/:year', verify, async (req, res) => {
+router.get('/:id/:year', verify, async (req, res) => {
 	const user = req.user[0];
 	try {
-		const match = await User.getMyGrantsAggregation(user._id, req.params.year);
+		const match = await User.getUserGrantsAggregation(req.params.id, req.params.year);
+		if (match.length !== 0) {
+			res.status(200).send(match[0]);
+		} else {
+			res.status(404).send({error: "Používateľove granty pre zadaný rok neboli nájdené!"});
+		}
+	} catch(err) {
+		res.status(500).send({error: err.message});
+	}
+});
+
+router.get('/me', verify, async (req, res) => {
+	const user = req.user[0];
+	try {
+		const match = await User.find({_id: user._id});
 		if (match.length !== 0) {
 			res.status(200).send(match[0]);
 		} else {
 			res.status(404).send({error: "Používateľ nebol nájdený!"});
 		}
-	} catch(err) {
+	} catch (err) {
 		res.status(500).send({error: err.message});
 	}
 });
@@ -226,7 +240,6 @@ router.get('/:id', verify, async (req, res) => {
 	const user = req.user[0];
 	if (user) {
 		try {
-			//const match = await User.getMyGrantsAggregation(req.params.id, 2020);
 			const match = await User.find({_id: req.params.id}).populate({path: 'grants', populate: {path: 'members.member'}});
 			if (match.length !== 0) {
 				res.status(200).send(match[0]);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory, useRouteMatch, Redirect, Route, Switch } from "react-router-dom";
-import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Card, CardDeck, CardTitle, CardText, Button } from 'reactstrap';
+import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Button } from 'reactstrap';
 
 import UserGrants from './user/UserGrants';
 import GrantDetail from './grant/GrantDetail';
@@ -8,13 +8,12 @@ import GrantDetail from './grant/GrantDetail';
 import { useUser } from '../hooks/useUser';
 
 function MyGrants() {
-	const { user, loading, year, setYear } = useUser();
+	const { user, accessToken, loading } = useUser();
 	const { path } = useRouteMatch();
 	const history = useHistory();
 
-	React.useEffect(() => {
-		console.log(year);
-	}, []);
+	const [ year, setYear ] = React.useState(new Date().getFullYear());
+	const [ hours, setHours ] = React.useState();
 
 	if (loading === true) {
 		return <Container className="text-center"><Spinner/></Container>
@@ -67,12 +66,12 @@ function MyGrants() {
 								<FormGroup>
 									<Col>
 										<Label for="hoursTotal">Hodiny za rok {new Date().getFullYear()}:</Label>
-										<h3 id="hoursTotal">{user.hoursTotal}</h3>
+										<h3 id="hoursTotal">{hours}</h3>
 									</Col>
 								</FormGroup>
 							</Row>
 							<hr />
-							{"_id" in user.grants[0] && <UserGrants data={user} />}
+							{"_id" in user.grants[0] && <UserGrants data={user} year={year} setHours={setHours} />}
 							<Container>
 								<Button onClick={() => history.push("/")} outline color="primary">Späť</Button>
 							</Container>

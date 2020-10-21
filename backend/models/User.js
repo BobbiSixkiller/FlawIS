@@ -166,7 +166,12 @@ userSchema.statics.getUsersGrantsAggregation = function () {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    },
+		},
+		{
+	    	$sort: {
+	    		"grants.updatedAt": -1
+	    	}
+		},
 	    {
 	      $group: {
 	        _id: "$_id._id",
@@ -190,16 +195,11 @@ userSchema.statics.getUsersGrantsAggregation = function () {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    },
-	    {
-	    	$sort: {
-	    		"lastName": 1
-	    	}
-		}
+	    }
 	]).exec();
 }
 
-userSchema.statics.getMyGrantsAggregation = function (id, year) {
+userSchema.statics.getUserGrantsAggregation = function (id, year) {
 	return this.aggregate([
     	{
 	      $match: {
@@ -327,7 +327,12 @@ userSchema.statics.getMyGrantsAggregation = function (id, year) {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    },
+		},
+		{
+	    	$sort: {
+	    		"grants.updatedAt": -1
+	    	}
+		},
 	    {
 	      $group: {
 	        _id: "$_id._id",
@@ -353,12 +358,7 @@ userSchema.statics.getMyGrantsAggregation = function (id, year) {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    },
-	    {
-	    	$sort: {
-	    		"grants.updatedAt": -1
-	    	}
-		}
+	    }
 	]).exec();
 }
 

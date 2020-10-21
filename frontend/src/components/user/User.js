@@ -4,7 +4,7 @@ import { Jumbotron, Fade, Col, Row, Label, Input, FormGroup, Button, Container, 
 
 import UserGrants from "./UserGrants";
 
-import getUser from "../../hooks/useAPI";
+import useAPI from "../../hooks/useAPI";
 import { useUser } from "../../hooks/useUser";
 
 function User() {
@@ -12,7 +12,10 @@ function User() {
 	const url = useParams();
 	const { user, accessToken } = useUser();
 
-	const result = getUser(`user/${url.id}`, "GET", accessToken);
+	const [ year, setYear ] = React.useState(new Date().getFullYear());
+	const [ hours, setHours ] = React.useState();
+
+	const result = useAPI(`user/${url.id}`, "GET", accessToken);
 
 	if (!user._id || user.role === "basic") {
 		return <Redirect to={{path: "/"}}/>
@@ -22,7 +25,7 @@ function User() {
 		return(
 			<Fade>
 				<Jumbotron>
-					<h1>Informácie o používateľovi</h1>	
+					<h1 className="mb-5">Profil používateľa</h1>	
 					<Row form>
 						<FormGroup>
 							<Col>
@@ -48,19 +51,29 @@ function User() {
 								<Input plaintext readOnly value={result.tokens.length} />
 							</Col>
 						</FormGroup>
+					</Row>	
+					<Row form>
 						<FormGroup>
 							<Col>
-								<Label for="hours">Hodiny za rok {new Date().getFullYear()}:</Label>
-								<h3>{result.hoursTotal}</h3>
+								<Label for="year">Rok:</Label>
+								<Input type="select" name="year" id="year" value={year} onChange={(e) => setYear(e.target.value)}>
+									<option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
+									<option value={new Date().getFullYear() + 1}>{new Date().getFullYear() + 1}</option>
+									<option value={new Date().getFullYear() + 2}>{new Date().getFullYear() + 2}</option>
+									<option value={new Date().getFullYear() + 3}>{new Date().getFullYear() + 3}</option>
+									<option value={new Date().getFullYear() + 4}>{new Date().getFullYear() + 4}</option>
+								</Input>
 							</Col>
 						</FormGroup>
-					</Row>	
-					{"_id" in result.grants[0] && 
-						<>
-							<hr />
-							<UserGrants data={result}/>
-						</>
-					}	
+						<FormGroup>
+							<Col>
+								<Label for="hoursTotal">Hodiny za rok {year}:</Label>
+								<h3 id="hoursTotal">{hours}</h3>
+							</Col>
+						</FormGroup>
+					</Row>
+					<hr />
+					<UserGrants user={result._id} year={year} setHours={setHours} />
 				</Jumbotron>
 				<Button onClick={() => history.goBack()} outline color="primary">Back</Button>
 			</Fade>

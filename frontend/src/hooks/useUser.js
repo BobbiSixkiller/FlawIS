@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../api';
 
-// async function getCurrentUser(accessToken) {
-//   try {
-//     const res = await api.get("user/me", {
-//       headers: {
-//         authToken: accessToken
-//       }
-//     });
-//     return res.data;
-//   } catch(err) {
-//     return err.response.data;
-//   } 
-// }
+async function getCurrentUser(accessToken) {
+  try {
+    const res = await api.get("user/me", {
+      headers: {
+        authToken: accessToken
+      }
+    });
+    return res.data;
+  } catch(err) {
+    return err.response.data;
+  } 
+}
 
 const initialState = {
   user: {},
@@ -27,21 +27,6 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [year, setYear] = useState(new Date().getFullYear());
-
-  async function getCurrentUser(accessToken) {
-    try {
-      const res = await api.get(`user/me/${year}`, 
-      {
-        headers: {
-          authToken: accessToken
-        }
-      });
-      return res.data;
-    } catch(err) {
-      return err.response.data;
-    } 
-  }
 
   async function handleAccessTokenChange() {
     if (accessToken) {
@@ -60,10 +45,10 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     handleAccessTokenChange();
-  }, [accessToken, year]);
+  }, [accessToken]);
 
   return (
-    <UserContext.Provider value={{ loading, user, year, setYear, accessToken, setAccessToken, search, setSearch }}>
+    <UserContext.Provider value={{ loading, setLoading, user, accessToken, setAccessToken, search, setSearch }}>
       {children}
     </UserContext.Provider>
   );
