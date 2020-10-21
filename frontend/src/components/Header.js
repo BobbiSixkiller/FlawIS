@@ -42,7 +42,7 @@ function Header() {
   }
 
   async function logOutAll() {
-    const res = await api.post("user/logoutall", {}, {
+    await api.post("user/logoutall", {}, {
       headers: {
         authToken: accessToken
       }

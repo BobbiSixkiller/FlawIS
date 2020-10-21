@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory, useRouteMatch, Redirect, Route, Switch } from "react-router-dom";
-import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Card, CardDeck, CardTitle, CardText, Button } from 'reactstrap';
+import { Fade, Alert, Spinner, Container, FormGroup, Col, Label, Input, Row, Jumbotron, Button } from 'reactstrap';
 
 import UserGrants from './user/UserGrants';
 import GrantDetail from './grant/GrantDetail';
@@ -8,9 +8,12 @@ import GrantDetail from './grant/GrantDetail';
 import { useUser } from '../hooks/useUser';
 
 function MyGrants() {
-	const { user, loading } = useUser();
+	const { user, accessToken, loading } = useUser();
 	const { path } = useRouteMatch();
 	const history = useHistory();
+
+	const [ year, setYear ] = React.useState(new Date().getFullYear());
+	const [ hours, setHours ] = React.useState();
 
 	if (loading === true) {
 		return <Container className="text-center"><Spinner/></Container>
@@ -46,15 +49,29 @@ function MyGrants() {
 										<Input id="devices" plaintext readOnly value={user.tokens.length} />
 									</Col>
 								</FormGroup>
+							</Row>
+							<Row form>
+								<FormGroup>
+									<Col>
+										<Label for="year">Rok:</Label>
+										<Input type="select" name="year" id="year" value={year} onChange={(e) => setYear(e.target.value)}>
+											<option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
+											<option value={new Date().getFullYear() + 1}>{new Date().getFullYear() + 1}</option>
+											<option value={new Date().getFullYear() + 2}>{new Date().getFullYear() + 2}</option>
+											<option value={new Date().getFullYear() + 3}>{new Date().getFullYear() + 3}</option>
+											<option value={new Date().getFullYear() + 4}>{new Date().getFullYear() + 4}</option>
+										</Input>
+									</Col>
+								</FormGroup>
 								<FormGroup>
 									<Col>
 										<Label for="hoursTotal">Hodiny za rok {new Date().getFullYear()}:</Label>
-										<h3 id="hoursTotal">{user.hoursTotal}</h3>
+										<h3 id="hoursTotal">{hours}</h3>
 									</Col>
 								</FormGroup>
 							</Row>
 							<hr />
-							{"_id" in user.grants[0] && <UserGrants data={user} />}
+							<UserGrants user={user._id} year={year} setHours={setHours} />
 							<Container>
 								<Button onClick={() => history.push("/")} outline color="primary">Späť</Button>
 							</Container>

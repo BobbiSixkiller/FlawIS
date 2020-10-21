@@ -111,8 +111,13 @@ router.post('/forgotPassword', async (req, res) => {
 	const token = jwt.sign({_id: user._id}, process.env.SECRET, { expiresIn: '1h' });
 	user.resetToken = token;
 
+<<<<<<< HEAD
 	const resetURL = `http://flawis.flaw.uniba.sk/resetPassword/${token}`;
 
+=======
+	const resetURL = `http://localhost:3000/resetPassword/${token}`;
+	
+>>>>>>> dev
 	try {
 		await mail.send({
 			user,
@@ -198,8 +203,7 @@ router.get('/', verify, async (req, res) => {
 	if (user.role === "admin" || user.role === "supervisor") {
 		try {
 			const aggregate = await User.getUsersGrantsAggregation();			
-			//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
-				    
+			//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});	    
 			res.status(200).send(aggregate);
 		} catch(err) {
 			res.status(500).send(err.message);
@@ -209,10 +213,37 @@ router.get('/', verify, async (req, res) => {
 	}
 });
 
+router.get('/:id/:year', verify, async (req, res) => {
+	const user = req.user[0];
+	try {
+		const match = await User.getUserGrantsAggregation(req.params.id, req.params.year);
+		if (match.length !== 0) {
+			res.status(200).send(match[0]);
+		} else {
+			res.status(404).send({error: "Používateľove granty pre zadaný rok neboli nájdené!"});
+		}
+	} catch(err) {
+		res.status(500).send({error: err.message});
+	}
+});
+
 router.get('/me', verify, async (req, res) => {
 	const user = req.user[0];
 	try {
-		const match = await User.getMyGrantsAggregation(user._id);
+		const match = await User.find({_id: user._id});
+		if (match.length !== 0) {
+			res.status(200).send(match[0]);
+		} else {
+			res.status(404).send({error: "Používateľ nebol nájdený!"});
+		}
+	} catch (err) {
+		res.status(500).send({error: err.message});
+	}
+});
+
+router.get('/:id', verify, async (req, res) => {
+	try {
+		const match = await User.find({_id: req.params.id}).populate({path: 'grants', populate: {path: 'members.member'}});
 		if (match.length !== 0) {
 			res.status(200).send(match[0]);
 		} else {
@@ -220,24 +251,6 @@ router.get('/me', verify, async (req, res) => {
 		}
 	} catch(err) {
 		res.status(500).send({error: err.message});
-	}
-});
-
-router.get('/:id', verify, async (req, res) => {
-	const user = req.user[0];
-	if (user) {
-		try {
-			const match = await User.getMyGrantsAggregation(req.params.id);
-			if (match.length !== 0) {
-				res.status(200).send(match[0]);
-			} else {
-				res.status(404).send({error: "Používateľ nebol nájdený!"});
-			}
-		} catch(err) {
-			res.status(500).send({error: err.message});
-		}
-	} else {
-		res.status(401).send({error: "Prístup zamietnutý!"});
 	}
 });
 

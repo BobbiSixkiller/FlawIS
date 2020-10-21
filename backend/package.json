@@ -1,7 +1,7 @@
 {
-  "name": "FlawIS-API",
+  "name": "flawis-api",
   "author": "Matus Muransky",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backend service based on Express API with mongoose adapter",
   "license": "MIT",
   "private": true,
@@ -10,7 +10,6 @@
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
-  "license": "MIT",
   "dependencies": {
     "@hapi/joi": "^16.1.7",
     "bcryptjs": "^2.4.3",

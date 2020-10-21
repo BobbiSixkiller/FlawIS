@@ -29,13 +29,13 @@ export function UserProvider({ children }) {
   const [search, setSearch] = useState("");
 
   async function handleAccessTokenChange() {
-    if (!user._id && accessToken) {
+    if (accessToken) {
       setLoading(true);
       localStorage.setItem('authToken', accessToken);
       const user = await getCurrentUser(accessToken);
       setUser(user);
       setLoading(false);
-    } else if (!accessToken) {
+    } else {
       // Log Out
       localStorage.removeItem('authToken');
       setUser({});
@@ -48,7 +48,7 @@ export function UserProvider({ children }) {
   }, [accessToken]);
 
   return (
-    <UserContext.Provider value={{ user, loading, accessToken, setAccessToken, search, setSearch }}>
+    <UserContext.Provider value={{ loading, setLoading, user, accessToken, setAccessToken, search, setSearch }}>
       {children}
     </UserContext.Provider>
   );

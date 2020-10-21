@@ -1,7 +1,7 @@
 import React from 'react';
 import api from '../../api';
 import { Redirect, Switch, Route, useHistory, useRouteMatch } from 'react-router-dom';
-import { Fade, Button, ButtonGroup, Spinner, Container, Table, Row, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Fade, Col, Alert, Button, ButtonGroup, Spinner, Container, Table, Row, Modal, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 import User from './User';
 import AddUser from './AddUser';
@@ -44,7 +44,8 @@ function Users() {
 				});
 			setUsers(res.data);
 		} catch(err) {
-			err.response.data.error && setBackendError(err.response.data.error);
+			console.log(err.response.data);
+			err.response.data && setBackendError(err.response.data);
 		}
 	}
 
@@ -77,9 +78,9 @@ function Users() {
 
 	if (!user._id || role === "basic") {
 		return <Redirect to={{path: "/"}}/>
-	} else if (users.length === 0) {
+	} else if (users.length === 0 && !backendError) {
 		return <Container className="text-center"><Spinner/></Container>
-	} else {
+	} else if (!backendError) {
 		return(
 			<Switch>
 				<Route exact path={path}>
@@ -161,6 +162,20 @@ function Users() {
 					<User />
 				</Route>
 			</Switch>		
+		);
+	} else {
+		return(
+			<Fade>
+				<Container>
+					<h1 className="text-center">Manažment používateľov</h1>
+					<Row form>
+						<Col className="my-5">
+							<Alert className="text-center" color="danger">{backendError}</Alert>
+						</Col>
+					</Row>
+					<Button outline color="primary" onClick={() => {history.push("/")}}>Späť</Button>
+				</Container>
+			</Fade>
 		);
 	}	
 }
