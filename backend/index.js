@@ -15,11 +15,7 @@ app.use(cors());
 
 //DB connecttion
 mongoose.connect(
-<<<<<<< HEAD
 	process.env.DB,
-=======
-	process.env.DB_DEV_ATLAS,
->>>>>>> dev
 	{ useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true },
 	() => console.log('DB connected!')
 );

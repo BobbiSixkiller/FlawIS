@@ -111,13 +111,8 @@ router.post('/forgotPassword', async (req, res) => {
 	const token = jwt.sign({_id: user._id}, process.env.SECRET, { expiresIn: '1h' });
 	user.resetToken = token;
 
-<<<<<<< HEAD
 	const resetURL = `http://flawis.flaw.uniba.sk/resetPassword/${token}`;
 
-=======
-	const resetURL = `http://localhost:3000/resetPassword/${token}`;
-	
->>>>>>> dev
 	try {
 		await mail.send({
 			user,
