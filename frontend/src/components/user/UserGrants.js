@@ -22,6 +22,7 @@ function UserGrants(props) {
 	React.useEffect(() => {
 		setBackendError(null);
 		getData();
+		console.log(userGrants);
 		userGrants && setPagesCount(Math.ceil(userGrants.length / pageSize));
 	}, [year]);
 
@@ -67,81 +68,87 @@ function UserGrants(props) {
 		return(
 			<Fade>
 				<Container className="my-5">
-					<h2>Granty:</h2>
-					<Table responsive hover>
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Názov</th>
-								<th>Typ</th>
-								<th>Cestovné</th>
-								<th>Služby</th>
-								<th>Materiál</th>
-								<th>Hodiny</th>
-								<th>Akcia</th>
-							</tr>
-						</thead>
-						<tbody>
-							{userGrants
-								.filter(({name}) => (name).toLowerCase().indexOf(search.toLowerCase()) > - 1)
-								.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-								.map((grant, index) => {
-									return (
-										<tr key={index}>
-											<td>{index}</td>
-											<td>{grant.name}</td>
-											<td>{grant.type}</td>
-											<td>
-												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() == year) return budget.travel + " €"
-												})}
-											</td>
-											<td>
-												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() == year) return budget.services + " €"
-												})}
-											</td>
-											<td>
-												{grant.budget.map((budget) => {
-													if (new Date(budget.year).getFullYear() == year) return budget.material + " €"
-												})}
-											</td>
-											<td>
-												{grant.budget.map(budget => {
-													if (new Date(budget.year).getFullYear() == year) {
-														return budget.members.map((member) => {
-															if (member.member._id === user) return member.hours
-														})
-													}
-												})}
-											</td>
-											{location.pathname.includes("/mygrants") ? 
-												(<td><Button onClick={() => {history.push("/mygrants/" + grant._id)}} color="info">Detail</Button></td>) :
-												(<td><Button onClick={() => {history.push("/grants/" + grant._id)}} color="info">Detail</Button></td>)
-											}	
-										</tr>
-									)
-								})
-							}
-						</tbody>
-					</Table>
-					<Row className="justify-content-center">
-						<Pagination aria-label="user's grants pagination nav">
-							<PaginationItem disabled={currentPage <= 0}>
-								<PaginationLink onClick={handlePrevClick} previous href="#" />
-							</PaginationItem>
-							{[...Array(pagesCount)].map((page, i) => (
-								<PaginationItem active={i === currentPage} key={i}>
-									<PaginationLink onClick={e => handlePageClick(e, i)} href="#">
-										{i + 1}
-									</PaginationLink>
-								</PaginationItem>
-							))}
-							<PaginationItem disabled={currentPage >= pagesCount - 1}>
-								<PaginationLink onClick={handleNextClick} next href="#" />
-							</PaginationItem>
-						</Pagination>
-					</Row>
+					{"_id" in userGrants[0] ? (
+						<>
+							<h2>Granty:</h2>
+							<Table responsive hover>
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Názov</th>
+										<th>Typ</th>
+										<th>Cestovné</th>
+										<th>Služby</th>
+										<th>Materiál</th>
+										<th>Hodiny</th>
+										<th>Akcia</th>
+									</tr>
+								</thead>
+								<tbody>
+									{userGrants
+										.filter(({name}) => (name).toLowerCase().indexOf(search.toLowerCase()) > - 1)
+										.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+										.map((grant, index) => {
+											return (
+												<tr key={index}>
+													<td>{index}</td>
+													<td>{grant.name}</td>
+													<td>{grant.type}</td>
+													<td>
+														{grant.budget.map(budget => {
+															if (new Date(budget.year).getFullYear() == year) return budget.travel + " €"
+														})}
+													</td>
+													<td>
+														{grant.budget.map(budget => {
+															if (new Date(budget.year).getFullYear() == year) return budget.services + " €"
+														})}
+													</td>
+													<td>
+														{grant.budget.map(budget => {
+															if (new Date(budget.year).getFullYear() == year) return budget.material + " €"
+														})}
+													</td>
+													<td>
+														{grant.budget.map(budget => {
+															if (new Date(budget.year).getFullYear() == year) {
+																return budget.members.map((member) => {
+																	if (member.member._id === user) return member.hours
+																})
+															}
+														})}
+													</td>
+													{location.pathname.includes("/mygrants") ? 
+														(<td><Button onClick={() => {history.push("/mygrants/" + grant._id)}} color="info">Detail</Button></td>) :
+														(<td><Button onClick={() => {history.push("/grants/" + grant._id)}} color="info">Detail</Button></td>)
+													}	
+												</tr>
+											)
+										})
+									}
+								</tbody>
+							</Table>
+							<Row className="justify-content-center">
+								<Pagination aria-label="user's grants pagination nav">
+									<PaginationItem disabled={currentPage <= 0}>
+										<PaginationLink onClick={handlePrevClick} previous href="#" />
+									</PaginationItem>
+									{[...Array(pagesCount)].map((page, i) => (
+										<PaginationItem active={i === currentPage} key={i}>
+											<PaginationLink onClick={e => handlePageClick(e, i)} href="#">
+												{i + 1}
+											</PaginationLink>
+										</PaginationItem>
+									))}
+									<PaginationItem disabled={currentPage >= pagesCount - 1}>
+										<PaginationLink onClick={handleNextClick} next href="#" />
+									</PaginationItem>
+								</Pagination>
+							</Row>
+						</>
+					) : (
+						<Alert className="text-center" color="info">Používateľ nemá pridelené žiadne granty!</Alert>
+					)}
 				</Container>
 			</Fade>
 		);
