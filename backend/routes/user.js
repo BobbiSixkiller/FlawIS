@@ -212,6 +212,7 @@ router.get('/:id/:year', verify, async (req, res) => {
 	const user = req.user[0];
 	try {
 		const match = await User.getUserGrantsAggregation(req.params.id, req.params.year);
+		console.log(match);
 		if (match.length !== 0) {
 			res.status(200).send(match[0]);
 		} else {

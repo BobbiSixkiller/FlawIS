@@ -267,12 +267,12 @@ userSchema.statics.getUserGrantsAggregation = function (id, year) {
 	          $mergeObjects: ["$grants.budget.members", "$users"],
 	        },
 	      },
-	    },
+		},
 	    {
 	      $project: {
-	        users: 0,
-	      },
-	    },
+			users: 0,
+	      }
+		},
 	    {
 	      $group: {
 	        _id: {
@@ -294,7 +294,7 @@ userSchema.statics.getUserGrantsAggregation = function (id, year) {
 	          $first: "$grants.budget",
 	        },
 	        members: {
-	        	$push: "$grants.budget.members",
+				$push: "$grants.budget.members",
 	        },
 	        hoursTotal: { $first: "$hoursTotal" }   
 	      },
@@ -358,7 +358,7 @@ userSchema.statics.getUserGrantsAggregation = function (id, year) {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    }
+		},
 	]).exec();
 }
 

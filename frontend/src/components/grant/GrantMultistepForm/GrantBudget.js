@@ -90,7 +90,7 @@ function GrantBudget(props) {
 		        {values.members.length === 0 && 
 		        	<Row form className="justify-content-center">
     		        	<Col sm={6}>
-    			        	<Alert color="danger">Nebol pridaný žiadny riešiteľ</Alert>
+    			        	<Alert color="danger" className="text-center">Nebol pridaný žiadny riešiteľ</Alert>
     			        </Col>
     		        </Row> 
 		        }
