@@ -89,40 +89,26 @@ function UserGrants(props) {
 										.filter(({name}) => (name).toLowerCase().indexOf(search.toLowerCase()) > - 1)
 										.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
 										.map((grant, index) => {
-											return (
-												<tr key={index}>
-													<td>{index}</td>
-													<td>{grant.name}</td>
-													<td>{grant.type}</td>
-													<td>
-														{grant.budget.map(budget => {
-															if (new Date(budget.year).getFullYear() == year) return budget.travel + " €"
-														})}
-													</td>
-													<td>
-														{grant.budget.map(budget => {
-															if (new Date(budget.year).getFullYear() == year) return budget.services + " €"
-														})}
-													</td>
-													<td>
-														{grant.budget.map(budget => {
-															if (new Date(budget.year).getFullYear() == year) return budget.material + " €"
-														})}
-													</td>
-													<td>
-														{grant.budget.map(budget => {
-															if (new Date(budget.year).getFullYear() == year) {
-																return budget.members.map((member) => {
-																	if (member.member._id === user) return member.hours
-																})
-															}
-														})}
-													</td>
-													{location.pathname.includes("/mygrants") ? 
-														(<td><Button onClick={() => {history.push("/mygrants/" + grant._id)}} color="info">Detail</Button></td>) :
-														(<td><Button onClick={() => {history.push("/grants/" + grant._id)}} color="info">Detail</Button></td>)
-													}	
-												</tr>
+											return grant.budget.filter(budget => new Date(budget.year).getFullYear() == year).map(budget => 
+												(
+													<tr key={index}> 
+														<td>{index}</td>
+														<td>{grant.name}</td>
+														<td>{grant.type}</td>
+														<td>{budget.travel + " €"}</td>
+														<td>{budget.services + " €"}</td>
+														<td>{budget.material + " €"}</td>
+														<td>
+															{budget.members.map((member) => {
+																if (member.member._id === user) return member.hours
+															})}
+														</td>
+														{location.pathname.includes("/mygrants") ? 
+															(<td><Button onClick={() => {history.push("/mygrants/" + grant._id)}} color="info">Detail</Button></td>) :
+															(<td><Button onClick={() => {history.push("/grants/" + grant._id)}} color="info">Detail</Button></td>)
+														}	
+													</tr>
+												)
 											)
 										})
 									}
