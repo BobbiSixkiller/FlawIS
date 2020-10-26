@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const mongoose = require('mongoose');
 
 const { announcementValidation } = require('../validation');
 const Announcement = require('../models/Announcement');

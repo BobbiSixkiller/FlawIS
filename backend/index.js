@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('./handlers/mail');
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');

@@ -3,14 +3,11 @@ const fs = require('fs');
 const Grant = require('../models/Grant');
 const Announcement = require('../models/Announcement');
 
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-const {grantValidation, announcementValidation, membersValidation, budgetValidation, budgetUpdateValidation} = require('../validation');
+const { grantValidation, announcementValidation, membersValidation, budgetValidation, budgetUpdateValidation } = require('../validation');
 const verify = require('../middleware/verifyToken');
-const {upload} = require('../handlers/upload');
+const { upload } = require('../handlers/upload');
 
 router.get('/', verify, async (req, res) => {
 	const user = req.user[0];
