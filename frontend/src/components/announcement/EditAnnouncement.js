@@ -11,7 +11,6 @@ import { Alert, ModalHeader, ModalBody, ModalFooter, Button, Row, Col, Form, For
 function EditAnnouncement(props) {
 	const { accessToken, user } = useUser();
 	const { modal, setModal, getData } = props;
-	const history = useHistory();
 
 	const INITIAL_STATE = {
 		name: modal.data.name,

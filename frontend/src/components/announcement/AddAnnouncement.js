@@ -22,7 +22,8 @@ function AddAnnouncement(props) {
 	const history = useHistory();
 	const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateAnnouncement, addAnnouncement);
   	const [ backendError, setBackendError ] = React.useState(null);
-  	const [ backendMsg, setBackendMsg ] = React.useState(null);
+	const [ backendMsg, setBackendMsg ] = React.useState(null);
+	const [ files, setFiles ] = React.useState([]);
 
   	async function addAnnouncement() {
 		try {
@@ -30,6 +31,7 @@ function AddAnnouncement(props) {
 				values,
         		{ 
 		          headers: {
+					//'Content-type': 'multipart/form-data',
 		            authToken: accessToken
 		          } 
 		        }
@@ -41,6 +43,11 @@ function AddAnnouncement(props) {
 		}
 	}
 
+	async function handleFilesChange(e) {
+		await setFiles(e.target.files);
+		console.log(files);
+	}
+
 	return(
 		<Fade>
 	      <h1 className="text-center">Nový oznam</h1>
@@ -49,9 +56,10 @@ function AddAnnouncement(props) {
 	          <Col sm={6}>
 	        		<Label for="type">Typ grantu:</Label>
 	        		<Input type="select" name="type" id="type" value={values.type} onChange={handleChange}>
-						<option>APVV</option>
-						<option>VEGA</option>
-						<option>KEGA</option>
+						<option value={"APVV"}>APVV</option>
+						<option value={"VEGA"}>VEGA</option>
+						<option value={"KEGA"}>KEGA</option>
+						<option value={"ALL"}>Všetky</option>
 			        </Input>
 	          </Col>
 	        </FormGroup>

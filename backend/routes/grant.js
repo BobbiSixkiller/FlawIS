@@ -3,14 +3,11 @@ const fs = require('fs');
 const Grant = require('../models/Grant');
 const Announcement = require('../models/Announcement');
 
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-const {grantValidation, announcementValidation, membersValidation, budgetValidation, budgetUpdateValidation} = require('../validation');
+const { grantValidation, announcementValidation, membersValidation, budgetValidation, budgetUpdateValidation } = require('../validation');
 const verify = require('../middleware/verifyToken');
-const {upload} = require('../handlers/upload');
+const { upload } = require('../handlers/upload');
 
 router.get('/', verify, async (req, res) => {
 	const user = req.user[0];
@@ -72,6 +69,7 @@ router.post('/:grant_id/addBudget', verify, async (req, res) => {
 			travel: req.body.travel,
 			material: req.body.material,
 			services: req.body.services,
+			indirect: req.body.indirect,
 			members: req.body.members
 		}
 
@@ -237,7 +235,8 @@ router.put('/:grant_id/budget/:budget_id', verify, async (req, res) => {
 		            //"budget.$[inner].year": req.body.year,
 		            "budget.$[inner].travel": req.body.travel,
 		            "budget.$[inner].material": req.body.material,
-		            "budget.$[inner].services": req.body.services,
+					"budget.$[inner].services": req.body.services,
+					"budget.$[inner].indirect": req.body.indirect
 		            //"budget.$[inner].members": req.body.members
 		          }
 		        },

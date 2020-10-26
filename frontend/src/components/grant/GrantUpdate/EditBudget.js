@@ -18,7 +18,8 @@ function EditBudget(props) {
 	const INITIAL_STATE = {
 		travel: modal.data.travel,
 		material: modal.data.material,
-		services: modal.data.services
+		services: modal.data.services,
+		indirect: modal.data.indirect
 	}
 
 	const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateBudget, editBudget);
@@ -102,6 +103,26 @@ function EditBudget(props) {
 			            />
 			          	<FormFeedback invalid>{errors.material}</FormFeedback>
 			            <FormFeedback valid>{valid.material}</FormFeedback>
+			          </FormGroup>  
+			        </Col>
+		        </Row>
+				<Row form className="justify-content-center">
+			        <Col>
+			          <FormGroup>
+			            <Label for="indirect" >Nepriame:</Label>
+			            <Input 
+			            	id="indirect" 
+			            	name="indirect" 
+			            	placeholder="Položka pre nepriame náklady" 
+			            	onBlur={handleBlur} 
+			            	onChange={handleChange} 
+			            	value={values.indirect}
+			            	invalid={errors.indirect && true}
+			                valid={valid.indirect && true} 
+			                autoComplete="off"
+			            />
+			          	<FormFeedback invalid>{errors.indirect}</FormFeedback>
+			            <FormFeedback valid>{valid.indirect}</FormFeedback>
 			          </FormGroup>  
 			        </Col>
 		        </Row>
