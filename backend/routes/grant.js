@@ -69,6 +69,7 @@ router.post('/:grant_id/addBudget', verify, async (req, res) => {
 			travel: req.body.travel,
 			material: req.body.material,
 			services: req.body.services,
+			indirect: req.body.indirect,
 			members: req.body.members
 		}
 
@@ -234,7 +235,8 @@ router.put('/:grant_id/budget/:budget_id', verify, async (req, res) => {
 		            //"budget.$[inner].year": req.body.year,
 		            "budget.$[inner].travel": req.body.travel,
 		            "budget.$[inner].material": req.body.material,
-		            "budget.$[inner].services": req.body.services,
+					"budget.$[inner].services": req.body.services,
+					"budget.$[inner].indirect": req.body.indirect
 		            //"budget.$[inner].members": req.body.members
 		          }
 		        },

@@ -4,7 +4,6 @@ const mail = require('../handlers/mail');
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 const {registerValidation, userAddValidation, loginValidation, userUpdateValidation, forgotPasswordValidation, resetPasswordValidation} = require('../validation');
 const verify = require('../middleware/verifyToken');

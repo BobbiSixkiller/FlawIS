@@ -155,7 +155,9 @@ function GrantDetail() {
 													<Alert key={key} color="primary">
 														{user.role !== "basic" && <Button close onClick={() => setModal({show: true, data: announcement, action: "deleteAnnouncement"})}/>}
 														<p className="font-weight-bold">{announcement.name}</p>
+														
 														<p>{announcement.content}</p>
+														{/* <hr /> */}
 														<p>Zverejnil: {announcement.issuedBy ? (announcement.issuedBy.fullName) : ("Používateľ bol zmazaný")}, {new Date(announcement.updatedAt).toLocaleDateString('sk-SK', options)}</p>	
 													</Alert>
 													</Col>

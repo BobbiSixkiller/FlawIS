@@ -13,7 +13,21 @@ const announcementSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User',
 		required: true
-	}
+	},
+	files: [{
+		url: {
+			type: String,
+			required: true
+		},
+		path: {
+			type: String,
+			required: true
+		},
+		name: {
+			type: String,
+			required: true
+		}
+	}]
 }, {
 	timestamps: true,
 	toObject: { virtuals: true },

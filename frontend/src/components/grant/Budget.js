@@ -55,6 +55,10 @@ function Budget(props) {
 				    					<CardTitle>Materiál</CardTitle>
 				    					<CardText className="font-weight-bold">{budget.material + " €"}</CardText>
 				    				</Card>
+									<Card body inverse={budgetYear === currentYear ? true : false} outline={budgetYear !== currentYear ? true : false} color="primary" className="text-center">
+				    					<CardTitle>Nepriame</CardTitle>
+				    					<CardText className="font-weight-bold">{budget.indirect ? (budget.indirect + " €") : ("0 €")}</CardText>
+				    				</Card>
 				    			</CardDeck>
 								{user.role !== "basic" && !props.checkout &&
 									<FormGroup className="my-2" row>

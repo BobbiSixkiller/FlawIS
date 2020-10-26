@@ -12,6 +12,7 @@ function GrantBudget(props) {
 		travel: props.form.budget[props.i] ? props.form.budget[props.i].travel : "",
 		material: props.form.budget[props.i] ? props.form.budget[props.i].material : "",
 		services: props.form.budget[props.i] ? props.form.budget[props.i].services : "",
+		indirect: props.form.budget[props.i] ? props.form.budget[props.i].indirect : "",
 		members: props.form.budget[props.i] ? props.form.budget[props.i].members : []
 	}
 
@@ -31,7 +32,7 @@ function GrantBudget(props) {
 			<Form onSubmit={handleSubmit}>
 				<h2 className="text-center">Rozpočet {props.year}</h2>
 		        <Row form className="justify-content-center">
-		        	<Col sm={2}>
+		        	<Col sm={3}>
 			          <FormGroup>
 		            	<Label for="travel" >Cestovné:</Label>
 			            <Input 
@@ -49,7 +50,7 @@ function GrantBudget(props) {
 		            	<FormFeedback valid>{valid.travel}</FormFeedback>
 			          </FormGroup>
 			        </Col>
-			        <Col sm={2}>
+			        <Col sm={3}>
 			          <FormGroup>
 			            <Label for="services" >Služby:</Label>
 			            <Input 
@@ -67,7 +68,9 @@ function GrantBudget(props) {
 			            <FormFeedback valid>{valid.services}</FormFeedback>
 			          </FormGroup>
 			        </Col>
-			        <Col sm={2}>
+		        </Row>
+				<Row form className="justify-content-center">
+				<Col sm={3}>
 			          <FormGroup>
 			            <Label for="material" >Materiál:</Label>
 			            <Input 
@@ -85,7 +88,25 @@ function GrantBudget(props) {
 			            <FormFeedback valid>{valid.material}</FormFeedback>
 			          </FormGroup>  
 			        </Col>
-		        </Row>
+					<Col sm={3}>
+			          <FormGroup>
+			            <Label for="indirect" >Nepriame:</Label>
+			            <Input 
+			            	id="indirect" 
+			            	name="indirect" 
+			            	placeholder="Položka pre materiál" 
+			            	onBlur={handleBlur} 
+			            	onChange={handleChange} 
+			            	value={values.indirect}
+			            	invalid={errors.indirect && true}
+			                valid={valid.indirect && true} 
+			                autoComplete="off"
+			            />
+			          	<FormFeedback invalid>{errors.indirect}</FormFeedback>
+			            <FormFeedback valid>{valid.indirect}</FormFeedback>
+			          </FormGroup>  
+			        </Col>
+				</Row>
 		        <GrantBudgetMembers users={props.users} step={props.step} setValues={setValues} budget={values} />
 		        {values.members.length === 0 && 
 		        	<Row form className="justify-content-center">

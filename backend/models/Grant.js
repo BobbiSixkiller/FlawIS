@@ -20,6 +20,7 @@ const budgetSchema = new mongoose.Schema({
 	travel: {type: Number, required: true, trim: true},
 	material: {type: Number, required: true, trim: true},
 	services: {type: Number, required: true, trim: true},
+	indirect: {type: Number, trim: true},
 	members: [memberSchema]
 }, { timestamps: true });
 

@@ -80,6 +80,7 @@ function UserGrants(props) {
 										<th>Cestovné</th>
 										<th>Služby</th>
 										<th>Materiál</th>
+										<th>Nepriame</th>
 										<th>Hodiny</th>
 										<th>Akcia</th>
 									</tr>
@@ -98,6 +99,7 @@ function UserGrants(props) {
 														<td>{budget.travel + " €"}</td>
 														<td>{budget.services + " €"}</td>
 														<td>{budget.material + " €"}</td>
+														<td>{budget.indirect ? (budget.indirect + " €") : ("0 €")}</td>
 														<td>
 															{budget.members.map((member) => {
 																if (member.member._id === user) return member.hours
