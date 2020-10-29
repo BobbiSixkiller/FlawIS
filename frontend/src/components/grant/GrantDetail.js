@@ -155,9 +155,19 @@ function GrantDetail() {
 													<Alert key={key} color="primary">
 														{user.role !== "basic" && <Button close onClick={() => setModal({show: true, data: announcement, action: "deleteAnnouncement"})}/>}
 														<p className="font-weight-bold">{announcement.name}</p>
-														
 														<p>{announcement.content}</p>
-														{/* <hr /> */}
+														{announcement.files.length !== 0 &&
+															<Row form>
+																{announcement.files.map((file, key) => 
+																	(	
+																		<FormGroup className="mx-1" row>
+																			<Button key={key} tag={NavLink} target="_blank" href={file.url} outline color="primary"><FileEarmark /> {file.name}</Button>													
+																		</FormGroup>
+																	)
+																)}
+															</Row>
+														}
+														<hr />
 														<p>Zverejnil: {announcement.issuedBy ? (announcement.issuedBy.fullName) : ("Používateľ bol zmazaný")}, {new Date(announcement.updatedAt).toLocaleDateString('sk-SK', options)}</p>	
 													</Alert>
 													</Col>

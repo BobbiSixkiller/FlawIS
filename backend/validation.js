@@ -83,7 +83,7 @@ const announcementValidation = data => {
 		content: Joi.string().required(),
 		issuedBy: Joi.string().required(),
 		type: Joi.string().valid('APVV', 'VEGA', 'KEGA', 'ALL'),
-		files: Joi.array().items(Joi.object({url: Joi.string(), path: Joi.string(), name: Joi.string()}))
+		files: Joi.array()
 	});
 
 	return schema.validate(data);

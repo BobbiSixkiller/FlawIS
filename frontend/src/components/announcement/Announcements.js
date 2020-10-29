@@ -2,7 +2,7 @@ import React from 'react';
 import api from '../../api';
 import { Switch, Route, Redirect, useRouteMatch, useHistory } from 'react-router-dom';
 
-import { Col, Alert, Fade, Button, ButtonGroup, Spinner, Container, Table, Row, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
+import { Col, Alert, Fade, Button, ButtonGroup, Spinner, Container, Table, Row, Modal, Pagination, PaginationItem, PaginationLink } from 'reactstrap';
 
 import { useUser } from '../../hooks/useUser';
 
@@ -151,7 +151,7 @@ function Announcements() {
 							<Button outline color="primary" onClick={() => history.goBack()}>Späť</Button>
 							<Modal isOpen={modal.show} toggle={() => setModal(!modal)} >
 								{modal.action === "delete" && <DeleteAnnouncement getData={getData} modal={modal} setModal={setModal} />}
-								{modal.action === "edit" && <EditAnnouncement getData={getData} modal={modal} setModal={setModal} />}
+								{modal.action === "edit" && <EditAnnouncement announcements={announcements} getData={getData} modal={modal} setModal={setModal} />}
 							</Modal>
 						</Container>
 					</Fade>

@@ -16,6 +16,11 @@ export default function validateAnnouncement(values) {
         valid.content = 'Oznam OK';
     }
     
-	
+    if (Object.keys(values.files).length > 5) {
+        errors.files = 'Presiahli ste maximálny počet súborov pri uploade!';
+    } else {
+        valid.files = 'Súbory dokumentov OK.';
+    }
+    
     return {errors, valid};
 }
