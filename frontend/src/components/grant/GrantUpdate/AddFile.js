@@ -1,17 +1,30 @@
 import React from "react";
 import api from '../../../api';
 
-import { Alert, ModalHeader, ModalBody, ModalFooter, Button, Row, Col, Form, FormGroup, FormText, Label, CustomInput } from "reactstrap";
+import { Alert, ModalHeader, ModalBody, ModalFooter, Button, Row, Col, Form, FormGroup, FormFeedback, FormText, Label, CustomInput } from "reactstrap";
 
 import { useUser } from '../../../hooks/useUser';
+import useFormValidation from '../../../hooks/useFormValidation';
+import validateDocument from '../../../validation/validateDocument';
+
+const INITIAL_STATE = {
+	files: {}
+}
 
 function AddFile(props) {
 	const { accessToken } = useUser();
 	const { modal, setModal, getData } = props;
 
+	const {handleChange, handleSubmit, values, errors, valid} = useFormValidation(INITIAL_STATE, validateDocument, addDocument);
+
 	async function addDocument(formData) {
 		setLoading(true);
 		try {
+			const formData = new FormData();
+			for (const key of Object.keys(values.files)) {
+				formData.append("files", values.files[key]);
+			}
+
 			const res = await api.post(
 				`grant/${modal.data._id}/file`,
         		formData,
@@ -34,22 +47,6 @@ function AddFile(props) {
 	const [ backendError, setBackendError ] = React.useState(null);
 	const [ backendMsg, setBackendMsg ] = React.useState(null);
 	const [ loading, setLoading ] = React.useState(false);
-	const [ files, setFiles ] = React.useState([]);
-
-	async function handleChange(e) {
-		await setFiles(e.target.files);
-		console.log(files);
-	}
-
-	function handleSubmit(e) {
-		e.preventDefault();
-		const formData = new FormData();
-		for (const key of Object.keys(files)) {
-			console.log(files[key]);
-			formData.append("files", files[key]);
-		}
-		addDocument(formData);
-	}
 
 	return(
 		<Form onSubmit={handleSubmit}>
@@ -58,19 +55,24 @@ function AddFile(props) {
 		        <Row form className="justify-content-center">
 		        	<Col>
 			          <FormGroup>
-		            	<Label for="file">Nový dokument</Label>
+		            	<Label for="files">Nový dokument</Label>
         				<CustomInput 
         					type="file" 
-        					id="file" 
-        					name="file" 
+        					id="files" 
+        					name="files" 
         					label="Vyberte súbor nového dokumentu."
-        					onChange={handleChange}
-        					multiple
-        				/>
+							onChange={handleChange}
+							valid={valid.files}
+							invalid={errors.files}
+							multiple
+        				>
+							<FormFeedback invalid>{errors.files}</FormFeedback>
+	            			<FormFeedback valid>{valid.files}</FormFeedback>
+						</CustomInput>
+						<FormText color="muted">
+							Maximálne je možné nahrať 5 súborov naraz!
+						</FormText>
 			          </FormGroup>
-			          <FormText color="muted">
-			            Maximálne je možné nahrať 5 súborov naraz!
-			          </FormText>
 			        </Col>
 		       	</Row>
 		        {backendError && 

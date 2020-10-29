@@ -44,12 +44,12 @@ function Home() {
 					<hr />
 					<CardDeck>
 	    				<Card body inverse color="primary">
-							<h5 class="card-title">Moje Granty</h5>
+							<h5 className="card-title">Moje Granty</h5>
 							<CardText>Modul poskytuje informácie ohľadne rozpočtu a hodín alokovaných v príslušných grantoch, v ktorých ste zapojený.</CardText>
 							<Button color="info" onClick={() => history.push("/mygrants")}>Zobraziť</Button>
 						</Card>
 						<Card body inverse color="danger">
-							<h5 class="card-title">Nástenka</h5>
+							<h5 className="card-title">Nástenka</h5>
 							<CardText>Modul poskytuje informácie ohľadne vedeckej práce pedagogických pracovníkov fakulty</CardText>
 							<Button color="info" onClick={() => history.push("/mywork")}>Zobraziť</Button>
 						</Card>

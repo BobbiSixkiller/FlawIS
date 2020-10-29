@@ -19,10 +19,22 @@ function useFormValidation(initialState, validate, action) {
 	}, [errors]);
 
 	function handleChange(e) {
-		setValues({
-			...values,
-			[e.target.name]: e.target.value
-		});
+		switch (e.target.name) {
+			case 'files':
+				setValues({
+					...values,
+					[e.target.name]: e.target.files
+				});
+				break;
+		
+			default:
+				setValues({
+					...values,
+					[e.target.name]: e.target.value
+				});
+				break;
+		}
+		
 		const {errors, valid} = validate(values);
 		setErrors(errors);
 		setValid(valid);

@@ -2,11 +2,12 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import api from '../../api';
 
-import { Fade, Form, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
+import { Fade, Form, FormText, CustomInput, FormGroup, FormFeedback, Button, Label, Input, Col, Row, Alert } from 'reactstrap';
 
 import { useUser } from '../../hooks/useUser';
 import useFormValidation from "../../hooks/useFormValidation";
 import validateAnnouncement from "../../validation/validateAnnouncement";
+import { FileEarmarkSpreadsheet } from 'react-bootstrap-icons';
 
 function AddAnnouncement(props) {
 	const { getData } = props;
@@ -16,22 +17,31 @@ function AddAnnouncement(props) {
 		name: "",
 		content: "",
 		issuedBy: user._id,
-		type: "APVV"
+		type: "APVV",
+		files: {}
 	}
 
 	const history = useHistory();
 	const { handleSubmit, handleChange, handleBlur, values, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateAnnouncement, addAnnouncement);
   	const [ backendError, setBackendError ] = React.useState(null);
 	const [ backendMsg, setBackendMsg ] = React.useState(null);
-	const [ files, setFiles ] = React.useState([]);
 
   	async function addAnnouncement() {
 		try {
+			let formData = new FormData();
+			for (const key of Object.keys(values.files)) {
+				formData.append("files", values.files[key]);
+			}
+			formData.append("name", values.name);
+			formData.append("content", values.content);
+			formData.append("issuedBy", values.issuedBy);
+			formData.append("type", values.type);
+
 			const res = await api.post("announcement/mass",
-				values,
+				formData,
         		{ 
 		          headers: {
-					//'Content-type': 'multipart/form-data',
+					'Content-type': 'multipart/form-data',
 		            authToken: accessToken
 		          } 
 		        }
@@ -41,11 +51,6 @@ function AddAnnouncement(props) {
 		} catch(err) {
 			err.response.data.error && setBackendError(err.response.data.error);
 		}
-	}
-
-	async function handleFilesChange(e) {
-		await setFiles(e.target.files);
-		console.log(files);
 	}
 
 	return(
@@ -101,6 +106,27 @@ function AddAnnouncement(props) {
 	            <FormFeedback valid>{valid.content}</FormFeedback>
 	          </Col>
 	        </FormGroup>
+			<FormGroup row className="justify-content-center">
+				<Col sm={6}>
+					<Label for="files">Pripojiť dokument:</Label>
+					<CustomInput 
+						type="file" 
+						id="files" 
+						name="files" 
+						label="Vyberte súbor nového dokumentu."
+						onChange={handleChange}
+						multiple
+						invalid={errors.files}
+						valid={valid.files}
+					>
+						<FormFeedback invalid>{errors.files}</FormFeedback>
+	            		<FormFeedback valid>{valid.files}</FormFeedback>
+					</CustomInput>
+					<FormText color="muted">
+						Maximálne je možné nahrať 5 súborov naraz!
+					</FormText>
+				</Col>
+			</FormGroup>
 	        {backendMsg && 
 	          <FormGroup row className="justify-content-center">
 	            <Col sm={6}>
