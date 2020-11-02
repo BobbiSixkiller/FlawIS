@@ -88,13 +88,13 @@ function GrantDetail() {
 									<FormGroup>
 										<Col>
 											<Label for="start">Začiatok grantu:</Label>
-											<Input id="start" plaintext readOnly value={new Date(grant.start).toDateString()} />
+											<Input id="start" plaintext readOnly value={new Date(grant.start).toLocaleDateString()} />
 										</Col>
 									</FormGroup>
 									<FormGroup>
 										<Col>
 											<Label for="end">Koniec grantu:</Label>
-											<Input id="end" plaintext readOnly value={new Date(grant.start).toDateString()} />
+											<Input id="end" plaintext readOnly value={new Date(grant.end).toLocaleDateString()} />
 										</Col>
 									</FormGroup>
 								</Row>
