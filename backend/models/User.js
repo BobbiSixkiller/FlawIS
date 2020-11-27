@@ -195,7 +195,10 @@ userSchema.statics.getUsersGrantsAggregation = function () {
 	        },
 	        hoursTotal: { $first: "$hoursTotal" },
 	      },
-	    }
+		},
+		{
+			$sort: { lastName: 1}
+		}
 	]).exec();
 }
 
