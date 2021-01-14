@@ -8,7 +8,7 @@ function useFormValidation(initialState, validate, action) {
 
 	React.useEffect(() => {
 		if (isSubmitting) {
-			const noErrors = Object.keys(errors).length === 0
+			const noErrors = Object.keys(errors).length === 0;
 			if (noErrors) {
 				action();
 				setSubmitting(false);
@@ -20,41 +20,46 @@ function useFormValidation(initialState, validate, action) {
 
 	function handleChange(e) {
 		switch (e.target.name) {
-			case 'files':
+			case "files":
 				setValues({
 					...values,
-					[e.target.name]: e.target.files
+					[e.target.name]: e.target.files,
 				});
 				break;
-		
+
 			default:
 				setValues({
 					...values,
-					[e.target.name]: e.target.value
+					[e.target.name]: e.target.value,
 				});
 				break;
 		}
-		
-		const {errors, valid} = validate(values);
-		setErrors(errors);
-		setValid(valid);
 	}
 
 	function handleBlur(e) {
-		const {errors, valid} = validate(values);
+		const { errors, valid } = validate(values);
 		setErrors(errors);
 		setValid(valid);
 	}
 
 	function handleSubmit(e) {
-    	e.preventDefault();
-    	const {errors, valid} = validate(values);
+		e.preventDefault();
+		const { errors, valid } = validate(values);
 		setErrors(errors);
 		setValid(valid);
-    	setSubmitting(true);
-  	}
+		setSubmitting(true);
+	}
 
-	return { handleSubmit, handleChange, handleBlur, values, setValues, errors, valid, isSubmitting }
+	return {
+		handleSubmit,
+		handleChange,
+		handleBlur,
+		values,
+		setValues,
+		errors,
+		valid,
+		isSubmitting,
+	};
 }
 
 export default useFormValidation;
