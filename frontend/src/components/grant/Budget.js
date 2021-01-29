@@ -26,14 +26,6 @@ import { useUser } from "../../hooks/useUser";
 function Budget(props) {
 	const { user } = useUser();
 	const { setModal, grant } = props;
-
-	const budgetAct = new Date(
-		props.budget.find(
-			(budget) =>
-				new Date(budget.year).getFullYear() === new Date().getFullYear()
-		).year
-	).getFullYear();
-	const [activeTab, setActiveTab] = React.useState(budgetAct);
 	const [fadeIn, setFadeIn] = React.useState(true);
 
 	function tabNav(year) {
@@ -41,6 +33,20 @@ function Budget(props) {
 		setFadeIn(false);
 		setFadeIn(true);
 	}
+
+	const [activeTab, setActiveTab] = React.useState(
+		new Date(props.budget[0].year).getFullYear()
+	);
+
+	React.useEffect(() => {
+		const selectedBudget = props.budget.filter(
+			(budget) =>
+				new Date(budget.year).getFullYear() === new Date().getFullYear()
+		);
+		if (selectedBudget.length > 0) {
+			setActiveTab(new Date(selectedBudget[0].year).getFullYear());
+		}
+	}, []);
 
 	return (
 		<Container className="my-5">
