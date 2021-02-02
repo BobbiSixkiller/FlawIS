@@ -475,7 +475,9 @@ router.delete("/:grant_id/files", verify, async (req, res) => {
 		if (!grant) return res.status(404).send({ error: "Grant nebol nájdený!" });
 
 		try {
-			grant.files.forEach((file) => fs.unlinkSync(file.path));
+			grant.files.forEach((file) =>
+				fs.unlink(file.path, (err) => console.log(err))
+			);
 			grant.files = [];
 			await grant.save();
 			res.status(200).send({ msg: "Dokumenty grantu boli vymazané." });
@@ -495,7 +497,7 @@ router.delete("/:grant_id/file/:file_id", verify, async (req, res) => {
 
 		try {
 			const file = grant.files.id(req.params.file_id);
-			fs.unlinkSync(file.path);
+			fs.unlink(file.path, (err) => console.log(err));
 			await file.remove();
 			await grant.save();
 			res.status(200).send({ msg: "Dokument bol vymazaný." });
