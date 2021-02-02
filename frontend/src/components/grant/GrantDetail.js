@@ -18,7 +18,6 @@ import {
 	Label,
 	Modal,
 	Alert,
-	NavLink,
 } from "reactstrap";
 
 import getUsers from "../../hooks/useAPI";
@@ -227,7 +226,6 @@ function GrantDetail() {
 												<FormGroup className="mx-1" row>
 													<Button
 														key={key}
-														tag={NavLink}
 														target="_blank"
 														href={file.url}
 														outline
@@ -290,7 +288,6 @@ function GrantDetail() {
 																		<FormGroup className="mx-1" row>
 																			<Button
 																				key={key}
-																				tag={NavLink}
 																				target="_blank"
 																				href={file.url}
 																				outline

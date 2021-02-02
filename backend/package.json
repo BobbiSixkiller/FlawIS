@@ -1,7 +1,7 @@
 {
   "name": "flawis-api",
   "author": "Matus Muransky",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Backend service based on Express API with mongoose adapter",
   "license": "MIT",
   "private": true,

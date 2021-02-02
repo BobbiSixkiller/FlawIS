@@ -43,7 +43,7 @@ router.get("/:id", verify, async (req, res) => {
 });
 
 router.post("/mass", verify, upload.array("files", 5), async (req, res) => {
-	const url = req.protocol + "://" + req.get("host");
+	const url = "https://" + req.get("host");
 	const user = req.user[0];
 
 	if (user.role === "admin" || user.role === "supervisor") {
@@ -112,7 +112,7 @@ router.post("/mass", verify, upload.array("files", 5), async (req, res) => {
 });
 
 router.put("/:id", verify, upload.array("files", 5), async (req, res) => {
-	const url = req.protocol + "://" + req.get("host");
+	const url = "https://" + req.get("host");
 	const user = req.user[0];
 
 	if (user.role === "admin" || user.role === "supervisor") {
