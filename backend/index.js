@@ -14,12 +14,7 @@ app.use(cors());
 
 //DB connecttion
 mongoose.connect(
-<<<<<<< HEAD
 	process.env.DB,
-	{ useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true },
-	() => console.log('DB connected!')
-=======
-	process.env.DB_DEV_ATLAS,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
@@ -27,7 +22,6 @@ mongoose.connect(
 		useCreateIndex: true,
 	},
 	() => console.log("DB connected!")
->>>>>>> dev
 );
 
 //import routes
