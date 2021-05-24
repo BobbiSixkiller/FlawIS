@@ -5,48 +5,41 @@ const { announcementValidation } = require("../validation");
 const Announcement = require("../models/Announcement");
 const Grant = require("../models/Grant");
 
-const verify = require("../middleware/verifyToken");
+const { checkAuth, isSupervisor } = require("../middleware/auth");
 const { upload } = require("../handlers/upload");
 
-router.get("/", verify, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin" || user.role === "supervisor") {
-		try {
-			const announcements = await Announcement.find()
-				.populate("issuedBy", "firstName lastName")
-				.populate("grants", "url")
-				.sort({ updatedAt: -1 });
-			res.status(200).send(announcements);
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
+router.get("/", checkAuth, isSupervisor, async (req, res) => {
+	try {
+		const announcements = await Announcement.find()
+			.populate("issuedBy", "firstName lastName")
+			.populate("grants", "url")
+			.sort({ updatedAt: -1 });
+		res.status(200).send(announcements);
+	} catch (err) {
+		res.status(500).send({ error: err.message });
 	}
 });
 
-router.get("/:id", verify, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin" || user.role === "supervisor") {
-		try {
-			const announcement = await Announcement.findOne({ _id: req.params.id });
-			if (!announcement)
-				return res.status(400).send({ error: "Oznam nebol nájdený!" });
+router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
+	try {
+		const announcement = await Announcement.findOne({ _id: req.params.id });
+		if (!announcement)
+			return res.status(400).send({ error: "Oznam nebol nájdený!" });
 
-			res.status(200).send(announcement);
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
+		res.status(200).send(announcement);
+	} catch (err) {
+		res.status(500).send({ error: err.message });
 	}
 });
 
-router.post("/mass", verify, upload.array("files", 5), async (req, res) => {
-	const url = "https://" + req.get("host");
-	const user = req.user[0];
+router.post(
+	"/mass",
+	checkAuth,
+	isSupervisor,
+	upload.array("files", 5),
+	async (req, res) => {
+		const url = "https://" + req.get("host");
 
-	if (user.role === "admin" || user.role === "supervisor") {
 		try {
 			const { error } = announcementValidation(req.body);
 			if (error)
@@ -106,16 +99,17 @@ router.post("/mass", verify, upload.array("files", 5), async (req, res) => {
 		} catch (err) {
 			res.status(500).send({ error: err.message });
 		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
 	}
-});
+);
 
-router.put("/:id", verify, upload.array("files", 5), async (req, res) => {
-	const url = "https://" + req.get("host");
-	const user = req.user[0];
+router.put(
+	"/:id",
+	checkAuth,
+	isSupervisor,
+	upload.array("files", 5),
+	async (req, res) => {
+		const url = "https://" + req.get("host");
 
-	if (user.role === "admin" || user.role === "supervisor") {
 		try {
 			const { error } = announcementValidation(req.body);
 			if (error)
@@ -149,38 +143,31 @@ router.put("/:id", verify, upload.array("files", 5), async (req, res) => {
 		} catch (err) {
 			res.status(500).send({ error: err.message });
 		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
+	}
+);
+
+router.delete("/:id", checkAuth, isSupervisor, async (req, res) => {
+	try {
+		const announcement = await Announcement.findOne({ _id: req.params.id });
+		if (!announcement)
+			return res.status(400).send({ error: "Oznam nebol nájdený!" });
+
+		announcement.files.forEach((file) =>
+			fs.unlink(file.path, (err) => console.log(err))
+		);
+		await announcement.remove();
+
+		res.status(200).send({ msg: "Oznam bol odstránený." });
+	} catch (err) {
+		res.status(500).send({ error: err.message });
 	}
 });
 
-router.delete("/:id", verify, async (req, res) => {
-	const user = req.user[0];
-
-	if (user.role === "admin" || user.role === "supervisor") {
-		try {
-			const announcement = await Announcement.findOne({ _id: req.params.id });
-			if (!announcement)
-				return res.status(400).send({ error: "Oznam nebol nájdený!" });
-
-			announcement.files.forEach((file) =>
-				fs.unlink(file.path, (err) => console.log(err))
-			);
-			await announcement.remove();
-
-			res.status(200).send({ msg: "Oznam bol odstránený." });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
-	}
-});
-
-router.delete("/:id/file/:file_id", verify, async (req, res) => {
-	const user = req.user[0];
-
-	if (user.role === "admin" || user.role === "supervisor") {
+router.delete(
+	"/:id/file/:file_id",
+	checkAuth,
+	isSupervisor,
+	async (req, res) => {
 		const announcement = await Announcement.findOne({ _id: req.params.id });
 		if (!announcement)
 			return res.status(400).send({ error: "Oznam nebol nájdený!" });
@@ -196,9 +183,7 @@ router.delete("/:id/file/:file_id", verify, async (req, res) => {
 		} catch (err) {
 			res.status(500).send({ error: err.message });
 		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
 	}
-});
+);
 
 module.exports = router;

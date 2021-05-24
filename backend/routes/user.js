@@ -13,7 +13,7 @@ const {
 	forgotPasswordValidation,
 	resetPasswordValidation,
 } = require("../validation");
-const verify = require("../middleware/verifyToken");
+const { checkAuth, isAdmin, isSupervisor } = require("../middleware/auth");
 
 router.post("/register", async (req, res) => {
 	//validation
@@ -50,7 +50,7 @@ router.post("/register", async (req, res) => {
 	}
 });
 
-router.post("/add", verify, async (req, res) => {
+router.post("/add", verify, isSupervisor, async (req, res) => {
 	const user = req.user[0];
 	if (user.role === "admin" || user.role === "supervisor") {
 		//validation
@@ -222,32 +222,17 @@ router.post("/logoutall", verify, async (req, res) => {
 	}
 });
 
-router.get("/names", verify, async (req, res) => {
+router.get("/", verify, isSupervisor, async (req, res) => {
 	try {
-		const names = await User.find({}, "_id firstName lastName");
-		res.status(200).send(names);
+		const aggregate = await User.getUsersGrantsAggregation();
+		//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
+		res.status(200).send(aggregate);
 	} catch (err) {
 		res.status(500).send(err.message);
 	}
 });
 
-router.get("/", verify, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin" || user.role === "supervisor") {
-		try {
-			const aggregate = await User.getUsersGrantsAggregation();
-			//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
-			res.status(200).send(aggregate);
-		} catch (err) {
-			res.status(500).send(err.message);
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
-	}
-});
-
 router.get("/:id/:year", verify, async (req, res) => {
-	const user = req.user[0];
 	try {
 		const match = await User.getUserGrantsAggregation(
 			req.params.id,
@@ -267,11 +252,10 @@ router.get("/:id/:year", verify, async (req, res) => {
 });
 
 router.get("/me", verify, async (req, res) => {
-	const user = req.user[0];
 	try {
-		const match = await User.find({ _id: user._id });
+		const match = await User.findOne({ _id: req.user._id });
 		if (match.length !== 0) {
-			res.status(200).send(match[0]);
+			res.status(200).send(match);
 		} else {
 			res.status(404).send({ error: "Používateľ nebol nájdený!" });
 		}
@@ -282,11 +266,11 @@ router.get("/me", verify, async (req, res) => {
 
 router.get("/:id", verify, async (req, res) => {
 	try {
-		const match = await User.find({ _id: req.params.id }).populate({
+		const match = await User.findOne({ _id: req.params.id }).populate({
 			path: "grants",
 			populate: { path: "members.member" },
 		});
-		if (match.length !== 0) {
+		if (match) {
 			res.status(200).send(match[0]);
 		} else {
 			res.status(404).send({ error: "Používateľ nebol nájdený!" });
@@ -297,68 +281,58 @@ router.get("/:id", verify, async (req, res) => {
 });
 
 //prerobit update aby pocital s repeatpass ale neukladal to do DB
-router.put("/:id", verify, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin" || user.role === "supervisor") {
-		const { error } = await userUpdateValidation(req.body);
-		if (error) return res.status(400).send({ error: error.details[0].message });
+router.put("/:id", verify, isSupervisor, async (req, res) => {
+	const { error } = await userUpdateValidation(req.body);
+	if (error) return res.status(400).send({ error: error.details[0].message });
 
-		if (req.body.password) {
-			const salt = await bcrypt.genSalt(10);
-			req.body.password = await bcrypt.hash(req.body.password, salt);
-		}
+	if (req.body.password) {
+		const salt = await bcrypt.genSalt(10);
+		req.body.password = await bcrypt.hash(req.body.password, salt);
+	}
 
-		try {
-			const userAct = await User.find({ _id: req.params.id });
-			if (userAct[0].email !== req.body.email) {
-				const emailExist = await User.findOne({ email: req.body.email });
-				if (emailExist)
-					return res
-						.status(400)
-						.send({ error: "Zadaný email je už zaregistrovaný!" });
-
-				const update = await User.findOneAndUpdate(
-					{ _id: req.params.id },
-					{ $set: req.body },
-					{ new: true }
-				);
+	try {
+		const userAct = await User.find({ _id: req.params.id });
+		if (userAct[0].email !== req.body.email) {
+			const emailExist = await User.findOne({ email: req.body.email });
+			if (emailExist)
 				return res
-					.status(200)
-					.send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
-			} else {
-				const update = await User.findOneAndUpdate(
-					{ _id: req.params.id },
-					{ $set: req.body },
-					{ new: true }
-				);
-				return res
-					.status(200)
-					.send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
-			}
-		} catch (err) {
-			res.status(500).send({ error: err.message });
+					.status(400)
+					.send({ error: "Zadaný email je už zaregistrovaný!" });
+
+			const update = await User.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ $set: req.body },
+				{ new: true }
+			);
+			return res
+				.status(200)
+				.send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
+		} else {
+			const update = await User.findOneAndUpdate(
+				{ _id: req.params.id },
+				{ $set: req.body },
+				{ new: true }
+			);
+			return res
+				.status(200)
+				.send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
 		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
+	} catch (err) {
+		res.status(500).send({ error: err.message });
 	}
 });
 
-router.delete("/:id", verify, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin") {
-		try {
-			const user = await User.findOne({ _id: req.params.id });
-			if (!user)
-				return res.status(404).send({ error: "Používateľ nebol nájdený!" });
+router.delete("/:id", verify, isAdmin, async (req, res) => {
+	try {
+		const user = await User.findOne({ _id: req.params.id });
+		if (!user)
+			return res.status(404).send({ error: "Používateľ nebol nájdený!" });
 
-			await user.remove();
+		await user.remove();
 
-			res.status(200).send({ msg: "Používateľ vymazaný!" });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
+		res.status(200).send({ msg: "Používateľ vymazaný!" });
+	} catch (err) {
+		res.status(500).send({ error: err.message });
 	}
 });
 
