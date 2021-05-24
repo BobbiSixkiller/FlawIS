@@ -19,7 +19,7 @@ const transport = nodemailer.createTransport({
 
 exports.send = async (options) => {
 	const mailOptions = {
-		from: `FlawCS <noreply@flaw.uniba.sk>`,
+		from: `FlawIS <noreply@flaw.uniba.sk>`,
 		to: options.user.email,
 		subject: options.subject,
 		text: options.text,
