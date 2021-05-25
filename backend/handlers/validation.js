@@ -167,7 +167,6 @@ const postValidation = (data) => {
 		name: Joi.string().required(),
 		body: Joi.string().required(),
 		tags: Joi.array().items(Joi.string().required()).required(),
-		author: Joi.string().required(),
 	});
 
 	return schema.validate(data);
