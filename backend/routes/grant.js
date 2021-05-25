@@ -11,8 +11,8 @@ const {
 	membersValidation,
 	budgetValidation,
 	budgetUpdateValidation,
-} = require("../validation");
-const { checkAuth, isSupervisor } = require("../middleware/auth");
+} = require("../handlers/validation");
+const { checkAuth, isSupervisor } = require("../middlewares/auth");
 const { upload } = require("../handlers/upload");
 
 router.get("/", checkAuth, async (req, res) => {

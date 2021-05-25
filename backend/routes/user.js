@@ -12,8 +12,8 @@ const {
 	userUpdateValidation,
 	forgotPasswordValidation,
 	resetPasswordValidation,
-} = require("../validation");
-const { checkAuth, isAdmin, isSupervisor } = require("../middleware/auth");
+} = require("../handlers/validation");
+const { checkAuth, isAdmin, isSupervisor } = require("../middlewares/auth");
 
 router.post("/register", async (req, res) => {
 	//validation
@@ -50,7 +50,7 @@ router.post("/register", async (req, res) => {
 	}
 });
 
-router.post("/add", verify, isSupervisor, async (req, res) => {
+router.post("/add", checkAuth, isSupervisor, async (req, res) => {
 	const user = req.user[0];
 	if (user.role === "admin" || user.role === "supervisor") {
 		//validation
@@ -198,7 +198,7 @@ router.post("/reset/:token", async (req, res) => {
 	}
 });
 
-router.post("/logout", verify, async (req, res) => {
+router.post("/logout", checkAuth, async (req, res) => {
 	const user = req.user[0];
 	try {
 		user.tokens = user.tokens.filter((token) => {
@@ -211,7 +211,7 @@ router.post("/logout", verify, async (req, res) => {
 	}
 });
 
-router.post("/logoutall", verify, async (req, res) => {
+router.post("/logoutall", checkAuth, async (req, res) => {
 	const user = req.user[0];
 	try {
 		user.tokens.splice(0, user.tokens.length);
@@ -222,7 +222,7 @@ router.post("/logoutall", verify, async (req, res) => {
 	}
 });
 
-router.get("/", verify, isSupervisor, async (req, res) => {
+router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	try {
 		const aggregate = await User.getUsersGrantsAggregation();
 		//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
@@ -232,7 +232,7 @@ router.get("/", verify, isSupervisor, async (req, res) => {
 	}
 });
 
-router.get("/:id/:year", verify, async (req, res) => {
+router.get("/:id/:year", checkAuth, async (req, res) => {
 	try {
 		const match = await User.getUserGrantsAggregation(
 			req.params.id,
@@ -251,7 +251,7 @@ router.get("/:id/:year", verify, async (req, res) => {
 	}
 });
 
-router.get("/me", verify, async (req, res) => {
+router.get("/me", checkAuth, async (req, res) => {
 	try {
 		const match = await User.findOne({ _id: req.user._id });
 		if (match.length !== 0) {
@@ -264,7 +264,7 @@ router.get("/me", verify, async (req, res) => {
 	}
 });
 
-router.get("/:id", verify, async (req, res) => {
+router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
 	try {
 		const match = await User.findOne({ _id: req.params.id }).populate({
 			path: "grants",
@@ -281,7 +281,7 @@ router.get("/:id", verify, async (req, res) => {
 });
 
 //prerobit update aby pocital s repeatpass ale neukladal to do DB
-router.put("/:id", verify, isSupervisor, async (req, res) => {
+router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
 	const { error } = await userUpdateValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
@@ -322,7 +322,7 @@ router.put("/:id", verify, isSupervisor, async (req, res) => {
 	}
 });
 
-router.delete("/:id", verify, isAdmin, async (req, res) => {
+router.delete("/:id", checkAuth, isAdmin, async (req, res) => {
 	try {
 		const user = await User.findOne({ _id: req.params.id });
 		if (!user)

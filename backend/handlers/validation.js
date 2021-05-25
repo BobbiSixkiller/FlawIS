@@ -142,7 +142,7 @@ const budgetValidation = (data) => {
 			Joi.object({
 				member: Joi.string().required(),
 				hours: Joi.number().required(),
-				role: Joi.string(),
+				role: Joi.string().required(),
 			})
 		),
 	});
@@ -162,6 +162,17 @@ const budgetUpdateValidation = (data) => {
 	return schema.validate(data);
 };
 
+const postValidation = (data) => {
+	const schema = Joi.object({
+		name: Joi.string().required(),
+		body: Joi.string().required(),
+		tags: Joi.array().items(Joi.string().required()).required(),
+		author: Joi.string().required(),
+	});
+
+	return schema.validate(data);
+};
+
 module.exports.registerValidation = registerValidation;
 module.exports.userAddValidation = userAddValidation;
 module.exports.loginValidation = loginValidation;
@@ -173,3 +184,4 @@ module.exports.announcementValidation = announcementValidation;
 module.exports.membersValidation = membersValidation;
 module.exports.budgetValidation = budgetValidation;
 module.exports.budgetUpdateValidation = budgetUpdateValidation;
+module.exports.postValidation = postValidation;

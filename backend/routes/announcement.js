@@ -1,11 +1,11 @@
 const router = require("express").Router();
 const fs = require("fs");
 
-const { announcementValidation } = require("../validation");
+const { announcementValidation } = require("../handlers/validation");
 const Announcement = require("../models/Announcement");
 const Grant = require("../models/Grant");
 
-const { checkAuth, isSupervisor } = require("../middleware/auth");
+const { checkAuth, isSupervisor } = require("../middlewares/auth");
 const { upload } = require("../handlers/upload");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
