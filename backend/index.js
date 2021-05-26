@@ -28,11 +28,13 @@ mongoose.connect(
 const userRoute = require("./routes/user");
 const grantRoute = require("./routes/grant");
 const announcementRoute = require("./routes/announcement");
+const postRoute = require("./routes/post");
 
 //routes middleware
 app.use("/api/user", userRoute);
 app.use("/api/grant", grantRoute);
 app.use("/api/announcement", announcementRoute);
+app.use("/api/post", postRoute);
 
 app.use(function (err, req, res, next) {
 	console.error(err.message);
