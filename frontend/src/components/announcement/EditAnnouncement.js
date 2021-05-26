@@ -67,7 +67,7 @@ function EditAnnouncement(props) {
 			const res = await api.put(`announcement/${modal.data._id}`, formData, {
 				headers: {
 					"Content-type": "multipart/form-data",
-					authToken: accessToken,
+					authorization: accessToken,
 				},
 			});
 			setBackendMsg(res.data.msg);

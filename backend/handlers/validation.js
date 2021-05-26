@@ -112,8 +112,10 @@ const announcementValidation = (data) => {
 		name: Joi.string().required(),
 		content: Joi.string().required(),
 		issuedBy: Joi.string().required(),
-		type: Joi.string().valid("APVV", "VEGA", "KEGA", "ALL"),
-		files: Joi.array(),
+		type: Joi.string().valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE"),
+		files: Joi.array().items(
+			Joi.object({ url: Joi.string(), path: Joi.string(), name: Joi.string() })
+		),
 	});
 
 	return schema.validate(data);

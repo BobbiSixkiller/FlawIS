@@ -1,16 +1,15 @@
 const router = require("express").Router();
-const fs = require("fs");
+const mongoose = require("mongoose");
+
 const Grant = require("../models/Grant");
 const Announcement = require("../models/Announcement");
 
-const mongoose = require("mongoose");
-
 const {
 	grantValidation,
-	announcementValidation,
 	membersValidation,
 	budgetValidation,
 	budgetUpdateValidation,
+	announcementValidation,
 } = require("../handlers/validation");
 const { checkAuth, isSupervisor } = require("../middlewares/auth");
 const { upload } = require("../handlers/upload");
@@ -48,6 +47,53 @@ router.post("/add", checkAuth, isSupervisor, async (req, res) => {
 		res.status(500).send({ error: err.message });
 	}
 });
+
+router.post(
+	"/:id/announcement",
+	checkAuth,
+	isSupervisor,
+	upload.array("files", 5),
+	async (req, res) => {
+		console.log("FIRE");
+		const url = "https://" + req.get("host");
+
+		try {
+			const { error } = announcementValidation(req.body);
+			if (error)
+				return res.status(400).send({ error: error.details[0].message });
+
+			const reqFiles = [];
+			for (var i = 0; i < req.files.length; i++) {
+				const reqFile = {};
+				reqFile.url = url + "/public/documents/" + req.files[i].filename;
+				reqFile.path = "public/documents/" + req.files[i].filename;
+				reqFile.name = req.files[i].filename.slice(
+					37,
+					req.files[i].filename.length
+				);
+				reqFiles.push(reqFile);
+			}
+
+			const announcement = new Announcement({
+				name: req.body.name,
+				content: req.body.content,
+				issuedBy: req.user._id,
+				files: reqFiles,
+			});
+
+			await announcement.save();
+
+			await Grant.updateOne(
+				{ _id: req.params.id },
+				{ $push: { announcements: announcement } }
+			);
+
+			res.status(200).send({ msg: "Oznam bol pridaný." });
+		} catch (err) {
+			res.status(500).send({ error: err.message });
+		}
+	}
+);
 
 router.post(
 	"/:grant_id/addBudget",
@@ -123,77 +169,6 @@ router.post(
 		try {
 			const updatedGrant = await grant.save();
 			res.status(200).send({ msg: "Bol pridaný nový riešiteľ." });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	}
-);
-
-router.post(
-	"/:grant_id/announcement",
-	checkAuth,
-	isSupervisor,
-	async (req, res) => {
-		const { error } = await announcementValidation(req.body);
-		if (error) return res.status(400).send({ error: error.details[0].message });
-
-		const grant = await Grant.findOne({ _id: req.params.grant_id });
-		if (!grant) return res.status(400).send({ error: "Grant nebol nájdený!" });
-
-		try {
-			const announcement = new Announcement({
-				name: req.body.name,
-				content: req.body.content,
-				issuedBy: user._id,
-			});
-
-			await announcement.save();
-
-			grant.announcements = grant.announcements.concat(announcement);
-
-			await grant.save();
-			res.status(200).send({ msg: "Oznam bol pridaný." });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	}
-);
-
-router.post(
-	"/:grant_id/file",
-	checkAuth,
-	isSupervisor,
-	upload.array("files", 5),
-	async (req, res) => {
-		const url = "https://" + req.get("host");
-
-		if (req.files.length === 0)
-			return res.status(400).send({ error: "Neboli zaslané žiadne súbory!" });
-
-		const reqFiles = [];
-		for (var i = 0; i < req.files.length; i++) {
-			const reqFile = {};
-			reqFile.url = url + "/public/documents/" + req.files[i].filename;
-			reqFile.path = "public/documents/" + req.files[i].filename;
-			reqFile.name = req.files[i].filename.slice(
-				37,
-				req.files[i].filename.length
-			);
-			reqFiles.push(reqFile);
-		}
-
-		const grant = await Grant.findOne({ _id: req.params.grant_id });
-		if (!grant) return res.status(404).send({ error: "Grant nebol nájdený!" });
-
-		grant.files = grant.files.concat(reqFiles);
-
-		try {
-			await grant.save();
-			if (req.files.length === 1) {
-				res.status(200).send({ msg: "Dokument bol úspešne nahraný." });
-			} else {
-				res.status(200).send({ msg: "Dokumenty boli úspešne nahrané." });
-			}
 		} catch (err) {
 			res.status(500).send({ error: err.message });
 		}
@@ -417,43 +392,6 @@ router.delete(
 				.remove();
 			const updatedGrant = await grant.save();
 			res.status(200).send({ msg: "Riešiteľ bol odobratý." });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	}
-);
-
-//endpoint zmaze vsetky files pre daný grant a rovnako aj z documents static folderu
-router.delete("/:grant_id/files", checkAuth, isSupervisor, async (req, res) => {
-	const grant = await Grant.findOne({ _id: req.params.grant_id });
-	if (!grant) return res.status(404).send({ error: "Grant nebol nájdený!" });
-
-	try {
-		grant.files.forEach((file) =>
-			fs.unlink(file.path, (err) => console.log(err))
-		);
-		grant.files = [];
-		await grant.save();
-		res.status(200).send({ msg: "Dokumenty grantu boli vymazané." });
-	} catch (err) {
-		res.status(500).send({ error: err.message });
-	}
-});
-
-router.delete(
-	"/:grant_id/file/:file_id",
-	checkAuth,
-	isSupervisor,
-	async (req, res) => {
-		const grant = await Grant.findOne({ _id: req.params.grant_id });
-		if (!grant) return res.status(404).send({ error: "Grant nebol nájdený!" });
-
-		try {
-			const file = grant.files.id(req.params.file_id);
-			fs.unlink(file.path, (err) => console.log(err));
-			await file.remove();
-			await grant.save();
-			res.status(200).send({ msg: "Dokument bol vymazaný." });
 		} catch (err) {
 			res.status(500).send({ error: err.message });
 		}

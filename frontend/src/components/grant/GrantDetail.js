@@ -61,7 +61,7 @@ function GrantDetail() {
 		try {
 			const res = await api.get(`grant/${url.id}`, {
 				headers: {
-					authToken: token,
+					authorization: token,
 				},
 			});
 			setGrant(res.data);
@@ -186,7 +186,7 @@ function GrantDetail() {
 												</Button>
 											</Col>
 										</FormGroup>
-										<FormGroup>
+										{/* <FormGroup>
 											<Col>
 												<ButtonGroup>
 													<Button
@@ -215,10 +215,10 @@ function GrantDetail() {
 													</Button>
 												</ButtonGroup>
 											</Col>
-										</FormGroup>
+										</FormGroup> */}
 									</Row>
 								)}
-								{grant.files && grant.files.length > 0 && (
+								{/* {grant.files && grant.files.length > 0 && (
 									<>
 										<hr />
 										<Row form>
@@ -251,7 +251,7 @@ function GrantDetail() {
 											))}
 										</Row>
 									</>
-								)}
+								)} */}
 								{grant.announcements && grant.announcements.length !== 0 && (
 									<>
 										<hr />
