@@ -41,7 +41,7 @@ function UserGrants(props) {
 		try {
 			const res = await api.get(`user/${user}/${year}`, {
 				headers: {
-					authToken: accessToken,
+					authorization: accessToken,
 				},
 			});
 			setUserGrants(res.data.grants);

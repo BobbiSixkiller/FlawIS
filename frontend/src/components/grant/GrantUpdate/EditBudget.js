@@ -53,7 +53,7 @@ function EditBudget(props) {
 				values,
 				{
 					headers: {
-						authToken: accessToken,
+						authorization: accessToken,
 					},
 				}
 			);

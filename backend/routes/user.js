@@ -199,27 +199,21 @@ router.post("/reset/:token", async (req, res) => {
 });
 
 router.post("/logout", checkAuth, async (req, res) => {
-	const user = req.user[0];
-	try {
-		user.tokens = user.tokens.filter((token) => {
-			return token.token !== req.token;
-		});
-		await user.save();
-		res.send({ msg: `Deleted token: ${req.token}` });
-	} catch (err) {
-		res.status(500).send({ error: err.message });
-	}
+	const user = await User.findOne({ _id: req.user._id });
+
+	user.tokens = user.tokens.filter((token) => {
+		return token.token !== req.token;
+	});
+	await user.save();
+	res.send({ msg: `Deleted token: ${req.token}` });
 });
 
 router.post("/logoutall", checkAuth, async (req, res) => {
-	const user = req.user[0];
-	try {
-		user.tokens.splice(0, user.tokens.length);
-		await user.save();
-		res.send({ msg: "All devices have been logged out" });
-	} catch (err) {
-		res.status(500).send({ error: err.message });
-	}
+	const user = await User.findOne({ _id: req.user._id });
+
+	user.tokens.splice(0, user.tokens.length);
+	await user.save();
+	res.send({ msg: "All devices have been logged out" });
 });
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
@@ -230,6 +224,12 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	} catch (err) {
 		res.status(500).send(err.message);
 	}
+});
+
+router.get("/names", checkAuth, async (req, res) => {
+	const users = await User.find().select("firstName lastName");
+
+	res.status(200).send(users);
 });
 
 router.get("/:id/:year", checkAuth, async (req, res) => {
@@ -254,7 +254,7 @@ router.get("/:id/:year", checkAuth, async (req, res) => {
 router.get("/me", checkAuth, async (req, res) => {
 	try {
 		const match = await User.findOne({ _id: req.user._id });
-		if (match.length !== 0) {
+		if (match) {
 			res.status(200).send(match);
 		} else {
 			res.status(404).send({ error: "Používateľ nebol nájdený!" });
@@ -271,7 +271,7 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
 			populate: { path: "members.member" },
 		});
 		if (match) {
-			res.status(200).send(match[0]);
+			res.status(200).send(match);
 		} else {
 			res.status(404).send({ error: "Používateľ nebol nájdený!" });
 		}

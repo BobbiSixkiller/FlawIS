@@ -1,6 +1,17 @@
 import React from "react";
 import { Redirect, useHistory, useParams } from "react-router-dom";
-import { Jumbotron, Fade, Col, Row, Label, Input, FormGroup, Button, Container, Spinner } from "reactstrap";
+import {
+	Jumbotron,
+	Fade,
+	Col,
+	Row,
+	Label,
+	Input,
+	FormGroup,
+	Button,
+	Container,
+	Spinner,
+} from "reactstrap";
 
 import UserGrants from "./UserGrants";
 
@@ -12,25 +23,34 @@ function User() {
 	const url = useParams();
 	const { user, accessToken } = useUser();
 
-	const [ year, setYear ] = React.useState(new Date().getFullYear());
-	const [ hours, setHours ] = React.useState();
+	const [year, setYear] = React.useState(new Date().getFullYear());
+	const [hours, setHours] = React.useState();
 
 	const result = useAPI(`user/${url.id}`, "GET", accessToken);
+	console.log(result);
 
 	if (!user._id || user.role === "basic") {
-		return <Redirect to={{path: "/"}}/>
+		return <Redirect to={{ path: "/" }} />;
 	} else if (Object.keys(result).length === 0) {
-		return <Container className="text-center"><Spinner/></Container>
+		return (
+			<Container className="text-center">
+				<Spinner />
+			</Container>
+		);
 	} else {
-		return(
+		return (
 			<Fade>
 				<Jumbotron>
-					<h1 className="mb-5">Profil používateľa</h1>	
+					<h1 className="mb-5">Profil používateľa</h1>
 					<Row form>
 						<FormGroup>
 							<Col>
 								<Label for="full name">Meno:</Label>
-								<Input plaintext readOnly value={result.firstName + ' ' + result.lastName} />
+								<Input
+									plaintext
+									readOnly
+									value={result.firstName + " " + result.lastName}
+								/>
 							</Col>
 						</FormGroup>
 						<FormGroup>
@@ -51,17 +71,33 @@ function User() {
 								<Input plaintext readOnly value={result.tokens.length} />
 							</Col>
 						</FormGroup>
-					</Row>	
+					</Row>
 					<Row form>
 						<FormGroup>
 							<Col>
 								<Label for="year">Rok:</Label>
-								<Input type="select" name="year" id="year" value={year} onChange={(e) => setYear(e.target.value)}>
-									<option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
-									<option value={new Date().getFullYear() + 1}>{new Date().getFullYear() + 1}</option>
-									<option value={new Date().getFullYear() + 2}>{new Date().getFullYear() + 2}</option>
-									<option value={new Date().getFullYear() + 3}>{new Date().getFullYear() + 3}</option>
-									<option value={new Date().getFullYear() + 4}>{new Date().getFullYear() + 4}</option>
+								<Input
+									type="select"
+									name="year"
+									id="year"
+									value={year}
+									onChange={(e) => setYear(e.target.value)}
+								>
+									<option value={new Date().getFullYear()}>
+										{new Date().getFullYear()}
+									</option>
+									<option value={new Date().getFullYear() + 1}>
+										{new Date().getFullYear() + 1}
+									</option>
+									<option value={new Date().getFullYear() + 2}>
+										{new Date().getFullYear() + 2}
+									</option>
+									<option value={new Date().getFullYear() + 3}>
+										{new Date().getFullYear() + 3}
+									</option>
+									<option value={new Date().getFullYear() + 4}>
+										{new Date().getFullYear() + 4}
+									</option>
 								</Input>
 							</Col>
 						</FormGroup>
@@ -75,7 +111,9 @@ function User() {
 					<hr />
 					<UserGrants user={url.id} year={year} setHours={setHours} />
 				</Jumbotron>
-				<Button onClick={() => history.goBack()} outline color="primary">Back</Button>
+				<Button onClick={() => history.goBack()} outline color="primary">
+					Back
+				</Button>
 			</Fade>
 		);
 	}

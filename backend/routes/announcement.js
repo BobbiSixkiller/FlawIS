@@ -60,7 +60,7 @@ router.post(
 			const announcement = new Announcement({
 				name: req.body.name,
 				content: req.body.content,
-				issuedBy: user._id,
+				issuedBy: req.user._id,
 				files: reqFiles,
 			});
 
@@ -133,7 +133,7 @@ router.put(
 
 			announcement.name = req.body.name;
 			announcement.content = req.body.content;
-			announcement.issuedBy = user._id;
+			announcement.issuedBy = req.user._id;
 			announcement.files = announcement.files.concat(reqFiles);
 
 			const update = await announcement.save();
