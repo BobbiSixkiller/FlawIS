@@ -1,5 +1,6 @@
 import React from "react";
 import api from "../../api";
+import axios from "axios";
 import { useHistory, Link } from "react-router-dom";
 
 import {
@@ -34,7 +35,6 @@ function Login() {
 			setAccessToken(loginRes.data.token);
 			history.push("/");
 		} catch (err) {
-			console.log(err);
 			err.response.data.error && setBackendError(err.response.data.error);
 		}
 	};
