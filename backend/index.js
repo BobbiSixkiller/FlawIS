@@ -36,12 +36,6 @@ app.use("/api/grant", grantRoute);
 app.use("/api/announcement", announcementRoute);
 app.use("/api/post", postRoute);
 
-app.use(function (err, req, res, next) {
-	console.error(err.message);
-	if (!err.statusCode) err.statusCode = 500;
-	res.status(err.statusCode).send({ error: err.message });
-});
-
 app.listen(process.env.PORT, () =>
 	console.log("Server is up and running on port: " + process.env.PORT)
 );

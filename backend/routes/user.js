@@ -91,21 +91,14 @@ router.post("/add", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-	//validation
-	const { error } = await loginValidation(req.body);
+	const { error } = loginValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
-	//check if email exists
 	const user = await User.findOne({ email: req.body.email });
-	if (!user)
-		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
-
-	//check if password is correct
 	const passwordExists = await bcrypt.compare(req.body.password, user.password);
-	if (!passwordExists)
+	if (!user || !passwordExists)
 		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
 
-	//create webtoken
 	const token = jwt.sign({ _id: user._id }, process.env.SECRET);
 	user.tokens = user.tokens.concat({ token });
 
@@ -118,7 +111,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/forgotPassword", async (req, res) => {
-	const { error } = await forgotPasswordValidation(req.body);
+	const { error } = forgotPasswordValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
 	const user = await User.findOne({ email: req.body.email });
