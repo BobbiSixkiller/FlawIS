@@ -16,24 +16,20 @@ const {
 const { checkAuth, isAdmin, isSupervisor } = require("../middlewares/auth");
 
 router.post("/register", async (req, res) => {
-	//validation
 	const { error } = await registerValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
-	//check for duplicates
 	const emailExist = await User.findOne({ email: req.body.email });
 	if (emailExist)
 		return res
 			.status(400)
 			.send({ error: "Zadaný email je už zaregistrovaný!" });
 
-	//password hashing
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
 	const init = await User.find({});
 
-	//create a new user
 	const user = new User({
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
@@ -43,7 +39,7 @@ router.post("/register", async (req, res) => {
 	});
 
 	try {
-		const savedUser = await user.save();
+		await user.save();
 		res.status(200).send({ msg: "Registrácia prebehla úspešne." });
 	} catch (err) {
 		res.status(500).send({ error: err.message });
