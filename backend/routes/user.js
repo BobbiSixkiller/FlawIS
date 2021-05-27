@@ -282,7 +282,7 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
 
 //prerobit update aby pocital s repeatpass ale neukladal to do DB
 router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
-	const { error } = await userUpdateValidation(req.body);
+	const { error } = userUpdateValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
 	if (req.body.password) {
@@ -291,8 +291,8 @@ router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
 	}
 
 	try {
-		const userAct = await User.find({ _id: req.params.id });
-		if (userAct[0].email !== req.body.email) {
+		const userAct = await User.findOne({ _id: req.params.id });
+		if (userAct.email !== req.body.email) {
 			const emailExist = await User.findOne({ email: req.body.email });
 			if (emailExist)
 				return res

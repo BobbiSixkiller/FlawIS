@@ -66,4 +66,15 @@ router.put("/:id", checkAuth, isOwnPost, async (req, res) => {
 	res.status(200).send({ msg: "Post bol aktualizovaný.", post });
 });
 
+router.delete("/:id", checkAuth, isOwnPost, async (req, res) => {
+	const post = await Post.findOne({ _id: req.params.id });
+	if (!post) {
+		return res.status(400).send({ error: "Post nebol nájdený." });
+	}
+
+	await post.remove();
+
+	res.status(200).send({ msg: "Post bol zmazaný." });
+});
+
 module.exports = router;
