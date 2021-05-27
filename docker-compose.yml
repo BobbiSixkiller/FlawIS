@@ -11,7 +11,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - public_folder:/backend/public
+      - ./backend/public:/backend/public
     networks:
       - internal
     depends_on:
@@ -51,4 +51,4 @@ networks:
 volumes:
   mongo_data: {}
   mongo_config: {}
-  public_folder: {}
+  #public_folder: {}
