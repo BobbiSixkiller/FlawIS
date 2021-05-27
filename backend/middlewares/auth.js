@@ -35,6 +35,7 @@ module.exports.isSupervisor = async function (req, res, next) {
 };
 
 module.exports.isOwnPost = async function (req, res, next) {
+	console.log(req.user);
 	if (
 		req.user.posts.some((post) => post._id == req.params.id) ||
 		req.user.role === "admin" ||
@@ -42,5 +43,5 @@ module.exports.isOwnPost = async function (req, res, next) {
 	) {
 		return next();
 	}
-	res.status(401).sned({ error: "Prístup zamietnutý!" });
+	res.status(401).send({ error: "Prístup zamietnutý!" });
 };
