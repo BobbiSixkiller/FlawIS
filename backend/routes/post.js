@@ -4,10 +4,59 @@ const Post = require("../models/Post");
 const { checkAuth, isOwnPost } = require("../middlewares/auth");
 const { postValidation } = require("../handlers/validation");
 
-router.get("/", checkAuth, async (req, res) => {
-	const posts = await Post.find();
+router.get("/api/search", checkAuth, async (req, res) => {
+	const pageSize = parseInt(req.query.size || 9);
+	const page = parseInt(req.query.page || 1);
 
-	res.status(200).send(posts);
+	const [posts, total] = await Promise.all([
+		Post.find(
+			{ $text: { $search: req.query.q } },
+			{ score: { $meta: "textScore" } }
+		)
+			.sort({ score: { $meta: "textScore" } })
+			.skip(page * pageSize - pageSize)
+			.limit(pageSize),
+		Post.countDocuments(),
+	]);
+
+	res
+		.status(200)
+		.send({ posts, pages: Math.ceil(total / pageSize), query: req.query.q });
+});
+
+router.get("/", checkAuth, async (req, res) => {
+	const pageSize = parseInt(req.query.size || 9);
+	const page = parseInt(req.query.page || 1);
+
+	const [posts, total] = await Promise.all([
+		Post.find()
+			.skip(page * pageSize - pageSize)
+			.limit(pageSize)
+			.sort({ updatedAt: -1 }),
+		Post.countDocuments(),
+	]);
+
+	res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });
+});
+
+router.get("/user/:id", checkAuth, async (req, res) => {
+	const pageSize = parseInt(req.query.size || 9);
+	const page = parseInt(req.query.page || 1);
+
+	const [posts, total] = await Promise.all([
+		Post.find({ userId: req.params.id })
+			.skip(page * pageSize - pageSize)
+			.limit(pageSize)
+			.sort({ updatedAt: -1 }),
+		Post.countDocuments(),
+	]);
+	if (posts.length === 0) {
+		return res
+			.status(200)
+			.send({ msg: "Zadaný používateľ nemá žiadne posty." });
+	}
+
+	res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });
 });
 
 router.get("/:id", checkAuth, async (req, res) => {
@@ -17,17 +66,6 @@ router.get("/:id", checkAuth, async (req, res) => {
 	}
 
 	res.status(200).send(post);
-});
-
-router.get("/user/:id", checkAuth, async (req, res) => {
-	const posts = await Post.find({ userId: req.params.id });
-	if (posts.length === 0) {
-		return res
-			.status(200)
-			.send({ msg: "Zadaný používateľ nemá žiadne posty." });
-	}
-
-	res.status(200).send(posts);
 });
 
 router.post("/add", checkAuth, async (req, res) => {

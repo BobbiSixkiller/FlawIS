@@ -31,10 +31,10 @@ const announcementRoute = require("./routes/announcement");
 const postRoute = require("./routes/post");
 
 //routes middleware
-app.use("/api/user", userRoute);
-app.use("/api/grant", grantRoute);
-app.use("/api/announcement", announcementRoute);
-app.use("/api/post", postRoute);
+app.use("/user", userRoute);
+app.use("/grant", grantRoute);
+app.use("/announcement", announcementRoute);
+app.use("/post", postRoute);
 
 app.listen(process.env.PORT, () =>
 	console.log("Server is up and running on port: " + process.env.PORT)
