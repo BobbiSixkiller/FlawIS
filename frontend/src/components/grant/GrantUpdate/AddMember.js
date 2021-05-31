@@ -21,7 +21,7 @@ import validateMember from "../../../validation/validateMember";
 import useFormValidation from "../../../hooks/useFormValidation";
 import { useUser } from "../../../hooks/useUser";
 
-import AutoInput from "../../AutoInput";
+import AutoInput from "../../MembersAutoInput";
 
 const INITIAL_STATE = {
 	member: "",

@@ -1,20 +1,34 @@
 import React from "react";
 
-import { Pagination, PaginationItem, PaginationLink, Spinner, Fade, Row, FormGroup, Col, Label, Input, CustomInput, FormFeedback, Button, Table, DropdownMenu, DropdownItem } from 'reactstrap';
+import {
+	Pagination,
+	PaginationItem,
+	PaginationLink,
+	Fade,
+	Row,
+	FormGroup,
+	Col,
+	Label,
+	Input,
+	CustomInput,
+	FormFeedback,
+	Button,
+	Table,
+} from "reactstrap";
 
 import validateMember from "../../../validation/validateMember";
 import useFormValidation from "../../../hooks/useFormValidation";
 
 import { IDtoName } from "../../../util/helperFunctions";
 
-import AutoInput from "../../AutoInput";
+import MembersAutoInput from "../../MembersAutoInput";
 
 const INITIAL_STATE = {
 	member: "",
 	hours: "",
 	role: "basic",
-	active: true
-}
+	active: true,
+};
 
 function GrantBudgetMembers(props) {
 	const [members, setMembers] = React.useState(props.budget.members);
@@ -23,10 +37,19 @@ function GrantBudgetMembers(props) {
 	const [pagesCount, setPagesCount] = React.useState();
 	const [currentPage, setCurrentPage] = React.useState(0);
 
-	const { handleSubmit, handleChange, handleBlur, values, setValues, errors, valid, isSubmitting } = useFormValidation(INITIAL_STATE, validateMember, addMember);
+	const {
+		handleSubmit,
+		handleChange,
+		handleBlur,
+		values,
+		setValues,
+		errors,
+		valid,
+		isSubmitting,
+	} = useFormValidation(INITIAL_STATE, validateMember, addMember);
 
 	React.useEffect(() => {
-		const budget = {...props.budget};
+		const budget = { ...props.budget };
 		budget.members = members;
 		props.setValues(budget);
 		//pagination of member records table
@@ -38,7 +61,7 @@ function GrantBudgetMembers(props) {
 	}
 
 	function removeMember(member) {
-		setMembers(members.filter(i => i.member !== member));
+		setMembers(members.filter((i) => i.member !== member));
 	}
 
 	function handlePageClick(e, index) {
@@ -56,119 +79,166 @@ function GrantBudgetMembers(props) {
 		setCurrentPage(currentPage + 1);
 	}
 
-	return(
+	return (
 		<FormGroup>
 			<Row form className="justify-content-center">
-		        <Col sm={4}>
-		          	<AutoInput 
-		          		users={props.users} 
-		          		handleChange={handleChange} 
-		          		handleBlur={handleBlur} 
-		          		values={values} 
-		          		setValues={setValues} 
-		          		errors={errors} 
-		          		valid={valid} 
-		          	/>
-		        </Col>
-		        <Col sm={2}>
-		          <FormGroup>
-		            <Label for="hours">Hodiny:</Label>
-		            <Input 
-						id="hours" 
-						name="hours" 
-						placeholder="Hodiny" 
-						value={values.hours} 
-						onChange={handleChange} 
-						onBlur={handleBlur}
-						valid={valid.hours && true}
-						invalid={errors.hours && true}
-						autoComplete="off"
-					/>
-					<FormFeedback invalid>{errors.hours}</FormFeedback>
-				    <FormFeedback valid>{valid.hours}</FormFeedback>
-		          </FormGroup>
-		        </Col>
-	      	</Row>
-			<Row form className="justify-content-center">
 				<Col sm={4}>
-					<CustomInput type="radio" id="basic" name="role" value="basic" label="Riešiteľ" inline defaultChecked onChange={handleChange}></CustomInput>
-	            	<CustomInput type="radio" id="deputy" name="role" value="deputy" label="Zástupca" inline onChange={handleChange}></CustomInput>
-	            	<CustomInput type="radio" id="leader" name="role" value="leader" label="Hlavný" inline onChange={handleChange}></CustomInput>
+					<MembersAutoInput
+						users={props.users}
+						handleChange={handleChange}
+						handleBlur={handleBlur}
+						values={values}
+						setValues={setValues}
+						errors={errors}
+						valid={valid}
+					/>
 				</Col>
 				<Col sm={2}>
 					<FormGroup>
-						<Button className="float-sm-right" id="addMember" color="primary" onClick={handleSubmit}>Pridať</Button>
-					</FormGroup>  
+						<Label for="hours">Hodiny:</Label>
+						<Input
+							id="hours"
+							name="hours"
+							placeholder="Hodiny"
+							value={values.hours}
+							onChange={handleChange}
+							onBlur={handleBlur}
+							valid={valid.hours && true}
+							invalid={errors.hours && true}
+							autoComplete="off"
+						/>
+						<FormFeedback invalid>{errors.hours}</FormFeedback>
+						<FormFeedback valid>{valid.hours}</FormFeedback>
+					</FormGroup>
 				</Col>
 			</Row>
-			{members.length !== 0 && 
+			<Row form className="justify-content-center">
+				<Col sm={4}>
+					<CustomInput
+						type="radio"
+						id="basic"
+						name="role"
+						value="basic"
+						label="Riešiteľ"
+						inline
+						defaultChecked
+						onChange={handleChange}
+					></CustomInput>
+					<CustomInput
+						type="radio"
+						id="deputy"
+						name="role"
+						value="deputy"
+						label="Zástupca"
+						inline
+						onChange={handleChange}
+					></CustomInput>
+					<CustomInput
+						type="radio"
+						id="leader"
+						name="role"
+						value="leader"
+						label="Hlavný"
+						inline
+						onChange={handleChange}
+					></CustomInput>
+				</Col>
+				<Col sm={2}>
+					<FormGroup>
+						<Button
+							className="float-sm-right"
+							id="addMember"
+							color="primary"
+							onClick={handleSubmit}
+						>
+							Pridať
+						</Button>
+					</FormGroup>
+				</Col>
+			</Row>
+			{members.length !== 0 && (
 				<Fade>
 					<Row form className="justify-content-center my-5">
 						<Col sm={6}>
 							<Label>Members:</Label>
 							<Table responsive hover>
-					        	<thead>
-					        		<tr>
-					        			<th>#</th>
-					        			<th>Meno</th>
-					        			<th>Rola</th>
-					        			<th>Hodiny</th>
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Meno</th>
+										<th>Rola</th>
+										<th>Hodiny</th>
 										<th>Akcia</th>
-					        		</tr>
-					        	</thead>
-					        	<tbody>
-					        		{props.users.length !== 0 && members
-					        			.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-					        			.map((member, i) => {
-					        				let role = "";
-		    								switch (member.role) {
-		    									case "basic":
-											      role = "Riešiteľ";
-											      break;
-											    case "deputy":
-											      role = "Zástupca";
-											      break;
-											    case "leader":
-											      role = "Hlavný";
-											      break;
-		    								}
+									</tr>
+								</thead>
+								<tbody>
+									{props.users.length !== 0 &&
+										members
+											.slice(
+												currentPage * pageSize,
+												(currentPage + 1) * pageSize
+											)
+											.map((member, i) => {
+												let role = "";
+												switch (member.role) {
+													case "basic":
+														role = "Riešiteľ";
+														break;
+													case "deputy":
+														role = "Zástupca";
+														break;
+													case "leader":
+														role = "Hlavný";
+														break;
+												}
 
-		    								return(
-		    									<tr key={i}>
-							        				<td>{i}</td>
-							        				<td>{IDtoName(member.member, props.users)}</td>
-							        				<td>{role}</td>
-							        				<td>{member.hours}</td>
-							        				<td><Button onClick={() => removeMember(member.member)} type="button" className="close float-left" aria-label="Close"><span aria-hidden="true">&times;</span></Button></td>
-							        			</tr>
-		    								)
-					        			}
-					        		)}
-					        	</tbody>
-					        </Table>
+												return (
+													<tr key={i}>
+														<td>{i}</td>
+														<td>{IDtoName(member.member, props.users)}</td>
+														<td>{role}</td>
+														<td>{member.hours}</td>
+														<td>
+															<Button
+																onClick={() => removeMember(member.member)}
+																type="button"
+																className="close float-left"
+																aria-label="Close"
+															>
+																<span aria-hidden="true">&times;</span>
+															</Button>
+														</td>
+													</tr>
+												);
+											})}
+								</tbody>
+							</Table>
 						</Col>
 					</Row>
 					<Row form className="justify-content-center">
 						<Pagination aria-label="members pagination nav">
 							<PaginationItem disabled={currentPage <= 0}>
-  								<PaginationLink onClick={handlePrevClick} previous href="#" />
-  							</PaginationItem>
-  							{[...Array(pagesCount)].map((page, i) => (
-							 	<PaginationItem active={i === currentPage} key={i}>
-							   		<PaginationLink onClick={e => handlePageClick(e, i)} href="#">
-							     		{i + 1}
-							   		</PaginationLink>
-							 	</PaginationItem>
+								<PaginationLink onClick={handlePrevClick} previous href="#" />
+							</PaginationItem>
+							{[...Array(pagesCount)].map((page, i) => (
+								<PaginationItem active={i === currentPage} key={i}>
+									<PaginationLink
+										onClick={(e) => handlePageClick(e, i)}
+										href="#"
+									>
+										{i + 1}
+									</PaginationLink>
+								</PaginationItem>
 							))}
 							<PaginationItem disabled={currentPage >= pagesCount - 1}>
-  								<PaginationLink onClick={handleNextClick} next href="#" />
-  							</PaginationItem>
-  						</Pagination>
+								<PaginationLink onClick={handleNextClick} next href="#" />
+							</PaginationItem>
+						</Pagination>
 					</Row>
 				</Fade>
-			}
-        </FormGroup>
-	);	
+			)}
+		</FormGroup>
+	);
 }
 
 export default GrantBudgetMembers;
