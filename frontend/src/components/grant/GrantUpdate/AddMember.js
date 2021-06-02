@@ -21,7 +21,7 @@ import validateMember from "../../../validation/validateMember";
 import useFormValidation from "../../../hooks/useFormValidation";
 import { useUser } from "../../../hooks/useUser";
 
-import AutoInput from "../../MembersAutoInput";
+import AutoInput from "../../AutoInput";
 
 const INITIAL_STATE = {
 	member: "",
@@ -74,7 +74,7 @@ function AddMember(props) {
 				<Row form className="justify-content-center">
 					<Col sm={8}>
 						<AutoInput
-							users={props.users}
+							data={props.users}
 							handleChange={handleChange}
 							handleBlur={handleBlur}
 							values={values}

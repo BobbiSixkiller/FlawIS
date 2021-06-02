@@ -54,9 +54,9 @@ function EditPost(props) {
 			});
 			setBackendMsg(res.data.msg);
 			getData();
-		} catch (error) {
-			console.log(error);
-			setBackendError(error.error);
+		} catch (err) {
+			console.log(err);
+			setBackendError(err.response.data.error);
 		}
 	}
 

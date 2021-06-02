@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, Redirect } from "react-router-dom";
 
 import {
 	Fade,
@@ -15,6 +15,7 @@ import {
 	CardColumns,
 	CardSubtitle,
 	CardBody,
+	Alert,
 } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
@@ -26,11 +27,12 @@ import EditPost from "../components/post/EditPost";
 import AddPost from "../components/post/AddPost";
 import DeletePost from "../components/post/DeletePost";
 import ViewPost from "../components/post/ViewPost";
+import ApiSearch from "../components/ApiSearch";
 
 function Posts() {
 	const history = useHistory();
 	const params = useParams();
-	const { accessToken, user } = useUser();
+	const { accessToken, user, search } = useUser();
 
 	const [loading, setLoading] = React.useState(false);
 	const [posts, setPosts] = React.useState([]);
@@ -42,6 +44,10 @@ function Posts() {
 	React.useEffect(() => {
 		getData();
 	}, [page]);
+
+	// React.useEffect(() => {
+	// 	apiSearch();
+	// }, [search]);
 
 	async function getData() {
 		try {
@@ -60,13 +66,34 @@ function Posts() {
 		}
 	}
 
-	return (
-		<Container>
-			{loading ? (
-				<Row className="justify-content-center">
-					<Spinner />
-				</Row>
-			) : (
+	async function apiSearch() {
+		try {
+			setLoading(true);
+			const res = await API.get(`post/api/search?q=${search}&page=${page}`, {
+				headers: {
+					authorization: accessToken,
+				},
+			});
+			setPosts(res.data.posts);
+			setPages(res.data.pages);
+			setLoading(false);
+		} catch (err) {
+			setLoading(false);
+			console.log(err);
+		}
+	}
+
+	if (!user._id) {
+		return <Redirect to={{ path: "/" }} />;
+	} else if (loading) {
+		return (
+			<Row className="justify-content-center">
+				<Spinner />
+			</Row>
+		);
+	} else {
+		return (
+			<Container>
 				<Fade>
 					<Row className="justify-content-between mb-3">
 						<h1>Prehľad postov</h1>
@@ -79,63 +106,76 @@ function Posts() {
 							Nový post
 						</Button>
 					</Row>
-					<CardColumns>
-						{posts
-							// .filter(
-							// 	({ author, name, tags }) =>
-							// 		name.toLowerCase().indexOf(search.toLowerCase()) > -1 ||
-							// 		author.toLowerCase().indexOf(search.toLowerCase()) > -1
-							// )
-							.map((post, i) => (
-								<Card key={i}>
-									<CardBody>
-										<CardTitle tag="h5">{post.name}</CardTitle>
-										<CardSubtitle tag="h6" className="mb-2 text-muted">
-											{post.author +
-												", " +
-												new Date(post.updatedAt).toLocaleDateString()}
-										</CardSubtitle>
-										<CardText>
-											Oblasť: {post.tags.map((tag) => `${tag}, `)}
-										</CardText>
-										<Button
-											onClick={() =>
-												setModal({ show: true, action: "view", post })
-											}
-											size="sm"
-											color="info"
-										>
-											Zobraziť
-										</Button>{" "}
-										{user.id === post.userId && (
-											<ButtonGroup>
-												<Button
-													outline
-													size="sm"
-													color="warning"
-													onClick={() =>
-														setModal({ show: true, action: "edit", post })
-													}
-												>
-													<PencilFill />
-												</Button>
-												<Button
-													outline
-													size="sm"
-													color="danger"
-													onClick={() =>
-														setModal({ show: true, action: "delete", post })
-													}
-												>
-													<Trash2Fill />
-												</Button>
-											</ButtonGroup>
-										)}
-									</CardBody>
-								</Card>
-							))}
-					</CardColumns>
-					<PaginationComponent pages={pages} page={page} changePage={setPage} />
+					{posts.length === 0 ? (
+						<Alert color="primary" className="text-center">
+							Pridajte nový post na nástenku.
+						</Alert>
+					) : (
+						<>
+							<CardColumns>
+								{posts.map((post, i) => (
+									<Card key={i}>
+										<CardBody>
+											<CardTitle tag="h5">{post.name}</CardTitle>
+											<CardSubtitle tag="h6" className="mb-2 text-muted">
+												{post.author +
+													", " +
+													new Date(post.updatedAt).toLocaleDateString()}
+											</CardSubtitle>
+											<CardText>
+												Oblasť: {post.tags.map((tag) => `${tag}, `)}
+											</CardText>
+											<Button
+												onClick={() =>
+													setModal({ show: true, action: "view", post })
+												}
+												size="sm"
+												color="info"
+											>
+												Zobraziť
+											</Button>{" "}
+											{(user.id === post.userId ||
+												user.role === "admin" ||
+												user.role === "supervisor") && (
+												<ButtonGroup>
+													<Button
+														outline
+														size="sm"
+														color="warning"
+														onClick={() =>
+															setModal({ show: true, action: "edit", post })
+														}
+													>
+														<PencilFill />
+													</Button>
+													<Button
+														outline
+														size="sm"
+														color="danger"
+														onClick={() =>
+															setModal({ show: true, action: "delete", post })
+														}
+													>
+														<Trash2Fill />
+													</Button>
+												</ButtonGroup>
+											)}
+										</CardBody>
+									</Card>
+								))}
+							</CardColumns>
+							<PaginationComponent
+								pages={pages}
+								page={page}
+								changePage={setPage}
+							/>
+						</>
+					)}
+					<Row className="my-5">
+						<Button onClick={() => history.push("/")} outline color="primary">
+							Späť
+						</Button>
+					</Row>
 					<Modal isOpen={modal.show} toggle={() => setModal(!modal)}>
 						{modal.action === "add" && (
 							<AddPost getData={getData} modal={modal} setModal={setModal} />
@@ -150,15 +190,11 @@ function Posts() {
 							<ViewPost modal={modal} setModal={setModal} />
 						)}
 					</Modal>
-					<Row className="my-5">
-						<Button onClick={() => history.push("/")} outline color="primary">
-							Späť
-						</Button>
-					</Row>
 				</Fade>
-			)}
-		</Container>
-	);
+				)
+			</Container>
+		);
+	}
 }
 
 export default Posts;

@@ -2,9 +2,15 @@ import React from "react";
 
 import { Input, Label, FormGroup, FormFeedback, Col } from "reactstrap";
 
-function MembersAutoInput(props) {
-	const { handleChange, handleBlur, valid, errors, values, setValues, users } =
-		props;
+function AutoInput({
+	handleChange,
+	handleBlur,
+	valid,
+	errors,
+	values,
+	setValues,
+	data,
+}) {
 	const [display, setDisplay] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const autoWrapRef = React.useRef(null);
@@ -57,7 +63,7 @@ function MembersAutoInput(props) {
 				<FormFeedback valid>{valid.member}</FormFeedback>
 				{display && (
 					<Col className="dropDown">
-						{users
+						{data
 							.filter(
 								({ firstName, lastName }) =>
 									(firstName + " " + lastName)
@@ -82,4 +88,4 @@ function MembersAutoInput(props) {
 	);
 }
 
-export default MembersAutoInput;
+export default AutoInput;

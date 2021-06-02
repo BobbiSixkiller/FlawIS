@@ -21,7 +21,7 @@ import useFormValidation from "../../../hooks/useFormValidation";
 
 import { IDtoName } from "../../../util/helperFunctions";
 
-import MembersAutoInput from "../../MembersAutoInput";
+import AutoInput from "../../AutoInput";
 
 const INITIAL_STATE = {
 	member: "",
@@ -83,8 +83,8 @@ function GrantBudgetMembers(props) {
 		<FormGroup>
 			<Row form className="justify-content-center">
 				<Col sm={4}>
-					<MembersAutoInput
-						users={props.users}
+					<AutoInput
+						data={props.users}
 						handleChange={handleChange}
 						handleBlur={handleBlur}
 						values={values}
@@ -218,20 +218,17 @@ function GrantBudgetMembers(props) {
 					<Row form className="justify-content-center">
 						<Pagination aria-label="members pagination nav">
 							<PaginationItem disabled={currentPage <= 0}>
-								<PaginationLink onClick={handlePrevClick} previous href="#" />
+								<PaginationLink onClick={handlePrevClick} previous />
 							</PaginationItem>
 							{[...Array(pagesCount)].map((page, i) => (
 								<PaginationItem active={i === currentPage} key={i}>
-									<PaginationLink
-										onClick={(e) => handlePageClick(e, i)}
-										href="#"
-									>
+									<PaginationLink onClick={(e) => handlePageClick(e, i)}>
 										{i + 1}
 									</PaginationLink>
 								</PaginationItem>
 							))}
 							<PaginationItem disabled={currentPage >= pagesCount - 1}>
-								<PaginationLink onClick={handleNextClick} next href="#" />
+								<PaginationLink onClick={handleNextClick} next />
 							</PaginationItem>
 						</Pagination>
 					</Row>

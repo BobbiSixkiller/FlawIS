@@ -23,8 +23,9 @@ function Header() {
 	const history = useHistory();
 	const location = useLocation();
 
-	const { user, setAccessToken, accessToken, search, setSearch } = useUser();
+	const { user, setAccessToken, accessToken, setSearch, search } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
+	const [searchInput, setSearchInput] = useState("");
 
 	const toggle = () => setIsOpen(!isOpen);
 	//authentication handlers
@@ -96,6 +97,7 @@ function Header() {
 				</UncontrolledDropdown>
 				<NavItem>
 					<Input
+						type="text"
 						placeholder="Vyhľadávanie"
 						name="search"
 						value={search}
@@ -104,6 +106,18 @@ function Header() {
 						className="mx-md-1"
 					/>
 				</NavItem>
+				{/* <NavItem>
+					<Button
+						block
+						color="success"
+						onClick={() => {
+							setSearch(searchInput);
+							setSearchInput("");
+						}}
+					>
+						Search
+					</Button>
+				</NavItem> */}
 			</Nav>
 		);
 	}
