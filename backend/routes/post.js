@@ -5,25 +5,12 @@ const { checkAuth, isOwnPost } = require("../middlewares/auth");
 const { postValidation } = require("../handlers/validation");
 
 router.get("/api/search", checkAuth, async (req, res) => {
-	const pageSize = parseInt(req.query.size || 9);
-	const page = parseInt(req.query.page || 1);
+	const posts = await Post.find(
+		{ $text: { $search: req.query.q } },
+		{ score: { $meta: "textScore" } }
+	).sort({ score: { $meta: "textScore" } });
 
-	console.log(req.query);
-
-	const [posts, total] = await Promise.all([
-		Post.find(
-			{ $text: { $search: req.query.q } },
-			{ score: { $meta: "textScore" } }
-		)
-			.skip(page * pageSize - pageSize)
-			.limit(pageSize)
-			.sort({ score: { $meta: "textScore" } }),
-		Post.countDocuments(),
-	]);
-
-	res
-		.status(200)
-		.send({ posts, pages: Math.ceil(total / pageSize), query: req.query.q });
+	res.status(200).send({ posts, query: req.query.q });
 });
 
 router.get("/", checkAuth, async (req, res) => {

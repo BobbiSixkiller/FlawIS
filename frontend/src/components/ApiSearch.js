@@ -12,6 +12,7 @@ export default function ApiSearch(props) {
 
 	const [display, setDisplay] = React.useState(false);
 	const [search, setSearch] = React.useState("");
+	const [loading, setLoading] = React.useState(false);
 	const [suggestions, setSuggestions] = React.useState([]);
 	const autoWrapRef = React.useRef(null);
 
@@ -23,6 +24,10 @@ export default function ApiSearch(props) {
 		};
 	}, [autoWrapRef]);
 
+	React.useEffect(() => {
+		apiSearch();
+	}, [search]);
+
 	function handleClickOutside(e) {
 		if (autoWrapRef.current && !autoWrapRef.current.contains(e.target)) {
 			setDisplay(false);
@@ -33,61 +38,53 @@ export default function ApiSearch(props) {
 		setDisplay(false);
 	}
 
-	async function APIcall(e) {
-		e.preventDefault();
-
+	async function apiSearch() {
 		try {
+			setLoading(true);
 			const res = await API.get(`post/api/search?q=${search}`, {
 				headers: {
 					authorization: accessToken,
 				},
 			});
-			setSuggestions(res.data.data);
+			setSuggestions(res.data.posts);
+			setLoading(false);
 		} catch (err) {
+			setLoading(false);
 			console.log(err);
 		}
 	}
 
 	return (
 		<div ref={autoWrapRef}>
-			<Form inline onSubmit={APIcall}>
-				<FormGroup>
-					<Input
-						className="autoInput"
-						id="search"
-						name="search"
-						placeholder="Search..."
-						value={search}
-						onClick={() => setDisplay(!display)}
-						onChange={(e) => setSearch(e.target.value)}
-						autoComplete="off"
-					/>
-					{display && (
-						<Col className="dropDown">
-							{suggestions.length === 0 ? (
-								<div className="text-muted">No results</div>
-							) : (
-								suggestions.map((suggestion, i) => {
-									return (
-										<div
-											tabIndex="0"
-											onClick={() => handleDropdownClick(suggestion)}
-											key={i}
-										>
-											res{i}
-										</div>
-									);
-								})
-							)}
-						</Col>
+			<Input
+				className="autoInput"
+				id="search"
+				name="search"
+				placeholder="Search..."
+				value={search}
+				onClick={() => setDisplay(!display)}
+				onChange={(e) => setSearch(e.target.value)}
+				autoComplete="off"
+			/>
+			{display && (
+				<Col className="dropDown">
+					{suggestions.length === 0 ? (
+						<div className="text-muted">No results</div>
+					) : (
+						suggestions.map((suggestion, i) => {
+							return (
+								<div
+									tabIndex="0"
+									onClick={() => handleDropdownClick(suggestion)}
+									key={i}
+								>
+									{suggestion.name}
+								</div>
+							);
+						})
 					)}
-				</FormGroup>
-				<FormGroup>
-					<Button disabled={search.length === 0} type="submit" color="success">
-						Search
-					</Button>
-				</FormGroup>
-			</Form>
+				</Col>
+			)}
 		</div>
 	);
 }

@@ -31,10 +31,7 @@ function App() {
 							<Route path="/mygrants">
 								<MyGrants />
 							</Route>
-							<Route exact path="/posts">
-								<Posts />
-							</Route>
-							<Route exact path="/posts/:page">
+							<Route path="/posts">
 								<Posts />
 							</Route>
 							<Route path="/register">
