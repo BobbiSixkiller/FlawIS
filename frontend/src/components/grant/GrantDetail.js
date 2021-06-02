@@ -30,9 +30,6 @@ import DeleteMember from "./GrantUpdate/DeleteMember";
 import AddMember from "./GrantUpdate/AddMember";
 import AddAnnouncement from "./GrantUpdate/AddAnnouncement";
 import DeleteAnnouncement from "../announcement/DeleteAnnouncement";
-import AddFile from "./GrantUpdate/AddFile";
-import DeleteFile from "./GrantUpdate/DeleteFile";
-import DeleteFiles from "./GrantUpdate/DeleteFiles";
 
 function GrantDetail() {
 	const history = useHistory();
@@ -367,19 +364,6 @@ function GrantDetail() {
 								modal={modal}
 								setModal={setModal}
 							/>
-						)}
-						{modal.action === "addDocument" && (
-							<AddFile getData={getData} modal={modal} setModal={setModal} />
-						)}
-						{modal.action === "deleteDocuments" && (
-							<DeleteFiles
-								getData={getData}
-								modal={modal}
-								setModal={setModal}
-							/>
-						)}
-						{modal.action === "deleteDocument" && (
-							<DeleteFile getData={getData} modal={modal} setModal={setModal} />
 						)}
 					</Modal>
 				</Container>

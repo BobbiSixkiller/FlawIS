@@ -11,7 +11,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import MyGrants from "./components/MyGrants";
-import MyWork from "./pages/MyWork";
+import Posts from "./pages/Posts";
 import Users from "./components/user/Users";
 import Grants from "./components/grant/Grants";
 
@@ -31,8 +31,11 @@ function App() {
 							<Route path="/mygrants">
 								<MyGrants />
 							</Route>
-							<Route path="/mywork">
-								<MyWork />
+							<Route exact path="/posts">
+								<Posts />
+							</Route>
+							<Route exact path="/posts/:page">
+								<Posts />
 							</Route>
 							<Route path="/register">
 								<Register />
