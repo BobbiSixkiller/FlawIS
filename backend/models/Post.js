@@ -1,3 +1,4 @@
+const { text } = require("express");
 const { Schema, model } = require("mongoose");
 
 const postSchema = new Schema(
@@ -10,5 +11,12 @@ const postSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+postSchema.index({
+	name: "text",
+	body: "text",
+	author: "text",
+	tags: "text",
+});
 
 module.exports = model("Post", postSchema);

@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api";
 
 async function getCurrentUser(accessToken) {
-	console.log("useUSER HOOK");
 	try {
 		const res = await api.get("user/me", {
 			headers: {

@@ -91,8 +91,11 @@ router.post("/login", async (req, res) => {
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
 	const user = await User.findOne({ email: req.body.email });
+	if (!user)
+		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
+
 	const passwordExists = await bcrypt.compare(req.body.password, user.password);
-	if (!user || !passwordExists)
+	if (!passwordExists)
 		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
 
 	const token = jwt.sign({ _id: user._id }, process.env.SECRET);

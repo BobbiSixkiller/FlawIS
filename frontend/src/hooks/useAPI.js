@@ -14,7 +14,6 @@ export default function useAPI(endpoint, method, token) {
 			},
 		});
 		setValue(response.data);
-		console.log(response);
 	}
 
 	React.useEffect(() => {

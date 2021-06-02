@@ -2,12 +2,19 @@ import React from "react";
 
 import { Input, Label, FormGroup, FormFeedback, Col } from "reactstrap";
 
-function AutoInput(props) {
-	const { handleChange, handleBlur, valid, errors, values, setValues, users  } = props;
+function AutoInput({
+	handleChange,
+	handleBlur,
+	valid,
+	errors,
+	values,
+	setValues,
+	data,
+}) {
 	const [display, setDisplay] = React.useState(false);
 	const [search, setSearch] = React.useState("");
-	const autoWrapRef = React.useRef(null); 
-	
+	const autoWrapRef = React.useRef(null);
+
 	React.useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
 
@@ -29,24 +36,24 @@ function AutoInput(props) {
 	}
 
 	function handleDropdownClick(memberObj) {
-		const member = {...memberObj};
-		setValues({...values, member: member._id});
+		const member = { ...memberObj };
+		setValues({ ...values, member: member._id });
 		setSearch(member.firstName + " " + member.lastName);
 		setDisplay(false);
 	}
 
-	return(
+	return (
 		<div ref={autoWrapRef}>
 			<FormGroup>
 				<Label for="member">Riešiteľ:</Label>
 				<Input
-					className="autoInput" 
-					id="member" 
-					name="member" 
-					placeholder="Meno riešiteľa" 
+					className="autoInput"
+					id="member"
+					name="member"
+					placeholder="Meno riešiteľa"
 					value={search}
-					onClick={() => setDisplay(!display)} 
-					onChange={(e) => handleDropdownChange(e)} 
+					onClick={() => setDisplay(!display)}
+					onChange={(e) => handleDropdownChange(e)}
 					onBlur={handleBlur}
 					valid={valid.member && true}
 					invalid={errors.member && true}
@@ -56,11 +63,24 @@ function AutoInput(props) {
 				<FormFeedback valid>{valid.member}</FormFeedback>
 				{display && (
 					<Col className="dropDown">
-						{users
-							.filter(({firstName, lastName}) => (firstName + " " + lastName).toLowerCase().indexOf(search.toLowerCase()) > - 1)
+						{data
+							.filter(
+								({ firstName, lastName }) =>
+									(firstName + " " + lastName)
+										.toLowerCase()
+										.indexOf(search.toLowerCase()) > -1
+							)
 							.map((member, i) => {
-								return <div tabIndex="0" onClick={() => handleDropdownClick(member)} key={i}>{member.firstName + " " + member.lastName}</div>
-						})}
+								return (
+									<div
+										tabIndex="0"
+										onClick={() => handleDropdownClick(member)}
+										key={i}
+									>
+										{member.firstName + " " + member.lastName}
+									</div>
+								);
+							})}
 					</Col>
 				)}
 			</FormGroup>

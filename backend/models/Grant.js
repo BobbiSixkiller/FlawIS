@@ -76,6 +76,8 @@ const grantSchema = new mongoose.Schema(
 	}
 );
 
+grantSchema.index({ name: "text", idNumber: "text" });
+
 grantSchema.virtual("url").get(function () {
 	return "/grants/" + this._id;
 });

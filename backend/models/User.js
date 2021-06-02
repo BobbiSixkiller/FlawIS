@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
+userSchema.index({
+	email: "text",
+	firstName: "text",
+	lastName: "text",
+});
+
 userSchema.statics.getUsersGrantsAggregation = function () {
 	return this.aggregate([
 		{
