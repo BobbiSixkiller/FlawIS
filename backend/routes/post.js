@@ -8,14 +8,16 @@ router.get("/api/search", checkAuth, async (req, res) => {
 	const pageSize = parseInt(req.query.size || 9);
 	const page = parseInt(req.query.page || 1);
 
+	console.log(req.query);
+
 	const [posts, total] = await Promise.all([
 		Post.find(
 			{ $text: { $search: req.query.q } },
 			{ score: { $meta: "textScore" } }
 		)
-			.sort({ score: { $meta: "textScore" } })
 			.skip(page * pageSize - pageSize)
-			.limit(pageSize),
+			.limit(pageSize)
+			.sort({ score: { $meta: "textScore" } }),
 		Post.countDocuments(),
 	]);
 

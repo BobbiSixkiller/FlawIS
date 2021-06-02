@@ -175,7 +175,7 @@ router.post(
 	}
 );
 
-router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
+router.get("/:id", checkAuth, async (req, res) => {
 	try {
 		const match = await Grant.findById(mongoose.Types.ObjectId(req.params.id))
 			.populate("budget.members.member")
