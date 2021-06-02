@@ -191,7 +191,6 @@ function Posts() {
 						)}
 					</Modal>
 				</Fade>
-				)
 			</Container>
 		);
 	}
