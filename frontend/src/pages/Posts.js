@@ -170,7 +170,13 @@ export default function Posts() {
 								Späť
 							</Button>
 						</Row>
-						<Modal isOpen={modal.show} toggle={() => setModal(!modal)}>
+						<Modal
+							isOpen={modal.show}
+							toggle={() => {
+								setModal(!modal);
+								getData(accessToken);
+							}}
+						>
 							{modal.action === "add" && (
 								<AddPost getData={getData} modal={modal} setModal={setModal} />
 							)}
