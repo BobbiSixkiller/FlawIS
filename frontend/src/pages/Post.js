@@ -62,7 +62,7 @@ export default function Post() {
 					</p>
 					<hr className="my-2" />
 					<p className="text-muted">
-						{post.tags && post.tags.map((tag) => `${tag}, `)}
+						{post.tags && post.tags.map((tag) => `#${tag} `)}
 					</p>
 					<p>{post.body}</p>
 					<p className="lead">
