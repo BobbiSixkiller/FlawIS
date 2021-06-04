@@ -20,6 +20,8 @@ router.get("/", checkAuth, async (req, res) => {
 	const authorFilter = req.query.author ? { author: req.query.author } : {};
 	const tagsFilter = req.query.tag ? { tags: req.query.tag } : {};
 
+	console.log(req.query);
+
 	const [posts, total] = await Promise.all([
 		Post.find({ ...authorFilter, ...tagsFilter })
 			.skip(page * pageSize - pageSize)
@@ -27,26 +29,6 @@ router.get("/", checkAuth, async (req, res) => {
 			.sort({ updatedAt: -1 }),
 		Post.countDocuments({ ...authorFilter, ...tagsFilter }),
 	]);
-
-	res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });
-});
-
-router.get("/user/:id", checkAuth, async (req, res) => {
-	const pageSize = parseInt(req.query.size || 9);
-	const page = parseInt(req.query.page || 1);
-
-	const [posts, total] = await Promise.all([
-		Post.find({ userId: req.params.id })
-			.skip(page * pageSize - pageSize)
-			.limit(pageSize)
-			.sort({ updatedAt: -1 }),
-		Post.countDocuments(),
-	]);
-	if (posts.length === 0) {
-		return res
-			.status(200)
-			.send({ msg: "Zadaný používateľ nemá žiadne posty." });
-	}
 
 	res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });
 });

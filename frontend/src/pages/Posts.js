@@ -12,7 +12,10 @@ import {
 	Fade,
 	Modal,
 	Spinner,
+	ListGroup,
+	ListGroupItem,
 	Row,
+	Col,
 	ButtonGroup,
 	Button,
 	Card,
@@ -53,7 +56,7 @@ export default function Posts() {
 		if (user._id) {
 			getData(accessToken);
 		}
-	}, [page]);
+	}, [page, author, tag]);
 
 	async function getData(token) {
 		try {
@@ -89,15 +92,34 @@ export default function Posts() {
 				<Route exact path={path}>
 					<Fade>
 						<Row className="justify-content-between mb-3">
-							<h1>Prehľad postov</h1>
-							<Button
-								outline
-								size="lg"
-								color="success"
-								onClick={() => setModal({ show: true, action: "add" })}
-							>
-								Nový post
-							</Button>
+							<Col>
+								<h1>Prehľad postov</h1>
+								<ListGroup horizontal>
+									{author && (
+										<ListGroupItem>
+											{author}
+											<Button onClick={() => setAuthor("")} size="sm" close />
+										</ListGroupItem>
+									)}
+									{tag && (
+										<ListGroupItem>
+											#{tag}
+											<Button onClick={() => setTag("")} size="sm" close />
+										</ListGroupItem>
+									)}
+								</ListGroup>
+							</Col>
+							<Col>
+								<Button
+									className="float-right"
+									outline
+									size="lg"
+									color="success"
+									onClick={() => setModal({ show: true, action: "add" })}
+								>
+									Nový post
+								</Button>
+							</Col>
 						</Row>
 						{posts.length === 0 ? (
 							<Alert color="primary" className="text-center">
@@ -111,13 +133,17 @@ export default function Posts() {
 											<CardBody>
 												<CardTitle tag="h5">{post.name}</CardTitle>
 												<CardSubtitle tag="h6" className="mb-2 text-muted">
-													<CardLink>{post.author}</CardLink>,{" "}
-													{new Date(post.updatedAt).toLocaleDateString()}
+													<CardLink onClick={() => setAuthor(post.author)}>
+														{post.author}
+													</CardLink>
+													, {new Date(post.updatedAt).toLocaleDateString()}
 												</CardSubtitle>
 												<CardText>
 													Oblasť:{" "}
-													{post.tags.map((tag) => (
-														<CardLink>#{tag}</CardLink>
+													{post.tags.map((tag, i) => (
+														<CardLink key={i} onClick={() => setTag(tag)}>
+															#{tag}
+														</CardLink>
 													))}
 												</CardText>
 												<Button

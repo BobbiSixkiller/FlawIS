@@ -2,7 +2,7 @@
   "name": "flawis-client",
   "author": "Matus Muransky",
   "version": "1.4.1",
-  "description": "Frontend/cliet React application",
+  "description": "Client React application",
   "license": "MIT",
   "private": true,
   "dependencies": {

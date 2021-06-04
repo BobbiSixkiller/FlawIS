@@ -1,19 +1,20 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import { useUser } from "../hooks/useUser";
 
 import API from "../api";
-import { Form, FormGroup, Col, Button, Input } from "reactstrap";
+import { Row, Col, Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch(props) {
 	const history = useHistory();
+	const { pathname } = useLocation();
 	const { accessToken } = useUser();
 
 	const [display, setDisplay] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const [loading, setLoading] = React.useState(false);
-	const [suggestions, setSuggestions] = React.useState([]);
+	const [suggestions, setSuggestions] = React.useState(null);
 	const autoWrapRef = React.useRef(null);
 
 	React.useEffect(() => {
@@ -36,6 +37,7 @@ export default function ApiSearch(props) {
 
 	function handleDropdownClick(id) {
 		setDisplay(false);
+		history.push(`${pathname}/${id}`);
 	}
 
 	async function apiSearch() {
@@ -68,6 +70,7 @@ export default function ApiSearch(props) {
 			/>
 			{display && (
 				<Col className="dropDown">
+					{loading && <Spinner />}
 					{suggestions.length === 0 ? (
 						<div className="text-muted">No results</div>
 					) : (
@@ -75,10 +78,11 @@ export default function ApiSearch(props) {
 							return (
 								<div
 									tabIndex="0"
-									onClick={() => handleDropdownClick(suggestion)}
+									onClick={() => handleDropdownClick(suggestion._id)}
 									key={i}
 								>
-									{suggestion.name}
+									{suggestion.name}, {suggestion.author}, Oblasť:{" "}
+									{suggestion.tags.map((tag) => `#${tag} `)}
 								</div>
 							);
 						})
