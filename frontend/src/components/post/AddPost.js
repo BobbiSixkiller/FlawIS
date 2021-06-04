@@ -18,8 +18,6 @@ import {
 	FormFeedback,
 	Label,
 	Input,
-	List,
-	ListInlineItem,
 } from "reactstrap";
 import TagInput from "../TagInput";
 
@@ -55,9 +53,7 @@ function AddPost(props) {
 				},
 			});
 			setBackendMsg(res.data.msg);
-			getData();
 		} catch (err) {
-			console.log(err);
 			setBackendError(err.response.data.error);
 		}
 	}
@@ -69,7 +65,14 @@ function AddPost(props) {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<ModalHeader toggle={() => setModal(!modal)}>Nový post</ModalHeader>
+			<ModalHeader
+				toggle={() => {
+					setModal(!modal);
+					getData(accessToken);
+				}}
+			>
+				Nový post
+			</ModalHeader>
 			<ModalBody>
 				<Row form className="justify-content-center">
 					<Col>
@@ -145,7 +148,14 @@ function AddPost(props) {
 				<Button type="submit" disabled={isSubmitting} color="success">
 					Pridať
 				</Button>{" "}
-				<Button outline color="secondary" onClick={() => setModal(!modal)}>
+				<Button
+					outline
+					color="secondary"
+					onClick={() => {
+						setModal(!modal);
+						getData(accessToken);
+					}}
+				>
 					Zrušiť
 				</Button>
 			</ModalFooter>

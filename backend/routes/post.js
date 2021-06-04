@@ -17,12 +17,15 @@ router.get("/", checkAuth, async (req, res) => {
 	const pageSize = parseInt(req.query.size || 9);
 	const page = parseInt(req.query.page || 1);
 
+	const authorFilter = req.query.author ? { author: req.query.author } : {};
+	const tagsFilter = req.query.tag ? { tags: req.query.tag } : {};
+
 	const [posts, total] = await Promise.all([
-		Post.find()
+		Post.find({ ...authorFilter, ...tagsFilter })
 			.skip(page * pageSize - pageSize)
 			.limit(pageSize)
 			.sort({ updatedAt: -1 }),
-		Post.countDocuments(),
+		Post.countDocuments({ ...authorFilter, ...tagsFilter }),
 	]);
 
 	res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });

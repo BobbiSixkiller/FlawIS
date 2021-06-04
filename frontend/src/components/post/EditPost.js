@@ -45,7 +45,7 @@ function EditPost(props) {
 		isSubmitting,
 	} = useFormValidation(INITIAL_STATE, validatePost, update);
 
-	async function update(params) {
+	async function update() {
 		try {
 			const res = await API.put(`post/${modal.post._id}`, values, {
 				headers: {
@@ -53,16 +53,21 @@ function EditPost(props) {
 				},
 			});
 			setBackendMsg(res.data.msg);
-			getData();
 		} catch (err) {
-			console.log(err);
 			setBackendError(err.response.data.error);
 		}
 	}
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<ModalHeader toggle={() => setModal(!modal)}>Upraviť post</ModalHeader>
+			<ModalHeader
+				toggle={() => {
+					setModal(!modal);
+					getData(accessToken);
+				}}
+			>
+				Upraviť post
+			</ModalHeader>
 			<ModalBody>
 				<Row form className="justify-content-center">
 					<Col>
@@ -138,7 +143,14 @@ function EditPost(props) {
 				<Button type="submit" disabled={isSubmitting} color="warning">
 					Aktualizovať
 				</Button>{" "}
-				<Button outline color="secondary" onClick={() => setModal(!modal)}>
+				<Button
+					outline
+					color="secondary"
+					onClick={() => {
+						setModal(!modal);
+						getData(accessToken);
+					}}
+				>
 					Zrušiť
 				</Button>
 			</ModalFooter>

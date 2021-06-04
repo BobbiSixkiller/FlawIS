@@ -183,72 +183,8 @@ function GrantDetail() {
 												</Button>
 											</Col>
 										</FormGroup>
-										{/* <FormGroup>
-											<Col>
-												<ButtonGroup>
-													<Button
-														color="success"
-														onClick={() =>
-															setModal({
-																show: true,
-																data: grant,
-																action: "addDocument",
-															})
-														}
-													>
-														Pridať dokumenty
-													</Button>
-													<Button
-														color="danger"
-														onClick={() =>
-															setModal({
-																show: true,
-																data: grant,
-																action: "deleteDocuments",
-															})
-														}
-													>
-														Zmazať všetky
-													</Button>
-												</ButtonGroup>
-											</Col>
-										</FormGroup> */}
 									</Row>
 								)}
-								{/* {grant.files && grant.files.length > 0 && (
-									<>
-										<hr />
-										<Row form>
-											{grant.files.map((file, key) => (
-												<FormGroup className="mx-1" row>
-													<Button
-														key={key}
-														target="_blank"
-														href={file.url}
-														outline
-														color="primary"
-													>
-														<FileEarmark /> {file.name}
-													</Button>
-													{user.role !== "basic" && (
-														<Button
-															close
-															onClick={() =>
-																setModal({
-																	show: true,
-																	grant: grant,
-																	file: file,
-																	action: "deleteDocument",
-																})
-															}
-															className="pl-1"
-														/>
-													)}
-												</FormGroup>
-											))}
-										</Row>
-									</>
-								)} */}
 								{grant.announcements && grant.announcements.length !== 0 && (
 									<>
 										<hr />

@@ -1,7 +1,6 @@
 import React from "react";
 import {
 	useRouteMatch,
-	useHistory,
 	useParams,
 	Redirect,
 	Switch,
@@ -13,16 +12,16 @@ import {
 	Fade,
 	Modal,
 	Spinner,
-	Container,
 	Row,
-	Card,
 	ButtonGroup,
 	Button,
+	Card,
 	CardTitle,
 	CardText,
 	CardColumns,
 	CardSubtitle,
 	CardBody,
+	CardLink,
 	Alert,
 } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
@@ -37,30 +36,36 @@ import DeletePost from "../components/post/DeletePost";
 import Post from "../pages/Post";
 
 export default function Posts() {
-	const history = useHistory();
-	const { path } = useRouteMatch();
+	const { path, url } = useRouteMatch();
 	const params = useParams();
 	const { accessToken, user, search } = useUser();
 
 	const [loading, setLoading] = React.useState(false);
 	const [posts, setPosts] = React.useState([]);
+	const [author, setAuthor] = React.useState("");
+	const [tag, setTag] = React.useState("");
 	const [modal, setModal] = React.useState(false);
 
 	const [page, setPage] = React.useState(params.page || 1);
 	const [pages, setPages] = React.useState(1);
 
 	React.useEffect(() => {
-		getData();
+		if (user._id) {
+			getData(accessToken);
+		}
 	}, [page]);
 
-	async function getData() {
+	async function getData(token) {
 		try {
 			setLoading(true);
-			const res = await API.get(`post?page=${page}`, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
+			const res = await API.get(
+				`post?page=${page}&author=${author}&tag=${tag}`,
+				{
+					headers: {
+						authorization: token,
+					},
+				}
+			);
 			setPosts(res.data.posts);
 			setPages(res.data.pages);
 			setLoading(false);
@@ -106,15 +111,18 @@ export default function Posts() {
 											<CardBody>
 												<CardTitle tag="h5">{post.name}</CardTitle>
 												<CardSubtitle tag="h6" className="mb-2 text-muted">
-													{post.author +
-														", " +
-														new Date(post.updatedAt).toLocaleDateString()}
+													<CardLink>{post.author}</CardLink>,{" "}
+													{new Date(post.updatedAt).toLocaleDateString()}
 												</CardSubtitle>
 												<CardText>
-													Oblasť: {post.tags.map((tag) => `${tag}, `)}
+													Oblasť:{" "}
+													{post.tags.map((tag) => (
+														<CardLink>#{tag}</CardLink>
+													))}
 												</CardText>
 												<Button
-													onClick={() => history.push(`${path}/${post._id}`)}
+													tag={Link}
+													to={`${url}/${post._id}`}
 													size="sm"
 													color="info"
 												>
@@ -158,7 +166,7 @@ export default function Posts() {
 							</>
 						)}
 						<Row className="my-5">
-							<Button onClick={() => history.push("/")} outline color="primary">
+							<Button tag={Link} to="/" outline color="primary">
 								Späť
 							</Button>
 						</Row>
@@ -179,7 +187,7 @@ export default function Posts() {
 						</Modal>
 					</Fade>
 				</Route>
-				<Route path={`${path}/:id`}>
+				<Route path={`${path}/:postId`}>
 					<Post />
 				</Route>
 			</Switch>

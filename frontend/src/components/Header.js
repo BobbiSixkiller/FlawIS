@@ -18,6 +18,7 @@ import {
 	Input,
 	NavItem,
 } from "reactstrap";
+import ApiSearch from "./ApiSearch";
 
 function Header() {
 	const history = useHistory();
@@ -86,7 +87,7 @@ function Header() {
 					<DropdownToggle nav caret>
 						Zdroje
 					</DropdownToggle>
-					<DropdownMenu down>
+					<DropdownMenu>
 						<DropdownItem onClick={() => history.push("/users")}>
 							Používatelia
 						</DropdownItem>
@@ -106,18 +107,9 @@ function Header() {
 						className="mx-md-1"
 					/>
 				</NavItem>
-				{/* <NavItem>
-					<Button
-						block
-						color="success"
-						onClick={() => {
-							setSearch(searchInput);
-							setSearchInput("");
-						}}
-					>
-						Search
-					</Button>
-				</NavItem> */}
+				<NavItem className="ml-3">
+					<ApiSearch />
+				</NavItem>
 			</Nav>
 		);
 	}

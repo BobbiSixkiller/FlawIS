@@ -14,7 +14,7 @@ app.use(cors());
 
 //DB connecttion
 mongoose.connect(
-	process.env.DB,
+	process.env.DB_DEV_ATLAS,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,

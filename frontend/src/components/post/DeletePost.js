@@ -30,16 +30,21 @@ function DeletePost(props) {
 				},
 			});
 			setBackendMsg(res.data.msg);
-			getData();
 		} catch (err) {
-			console.log(err);
 			setBackendError(err.response.data.error);
 		}
 	}
 
 	return (
 		<Form onSubmit={(e) => deletePost(e)}>
-			<ModalHeader toggle={() => setModal(!modal)}>Zmazať post</ModalHeader>
+			<ModalHeader
+				toggle={() => {
+					setModal(!modal);
+					getData(accessToken);
+				}}
+			>
+				Zmazať post
+			</ModalHeader>
 			<ModalBody>
 				<p>Potvrďte zmazanie postu:</p>
 				<p className="font-weight-bold">{modal.post.name}</p>
@@ -72,7 +77,14 @@ function DeletePost(props) {
 				<Button type="submit" color="danger">
 					Zmazať
 				</Button>{" "}
-				<Button outline color="secondary" onClick={() => setModal(!modal)}>
+				<Button
+					outline
+					color="secondary"
+					onClick={() => {
+						setModal(!modal);
+						getData(accessToken);
+					}}
+				>
 					Zrušiť
 				</Button>
 			</ModalFooter>

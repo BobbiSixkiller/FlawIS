@@ -1,11 +1,5 @@
 import React from "react";
-import {
-	useHistory,
-	useRouteMatch,
-	Redirect,
-	Route,
-	Switch,
-} from "react-router-dom";
+import { useHistory, useRouteMatch, Route, Switch } from "react-router-dom";
 import {
 	Fade,
 	Alert,

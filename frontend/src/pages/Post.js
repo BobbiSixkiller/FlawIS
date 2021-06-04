@@ -1,44 +1,77 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams, Redirect } from "react-router-dom";
 
 import API from "../api";
-import { Jumbotron, Button } from "reactstrap";
+import { useUser } from "../hooks/useUser";
+import { Row, Fade, Jumbotron, Button, Spinner, Alert } from "reactstrap";
 
 export default function Post() {
 	const history = useHistory();
+	const { postId } = useParams();
+	const { accessToken, user } = useUser();
 
-	async function apiSearch() {
+	const [loading, setLoading] = React.useState(false);
+	const [post, setPost] = React.useState({});
+	const [backendError, setBackendError] = React.useState(null);
+
+	React.useEffect(() => {
+		if (user._id) {
+			getData(accessToken);
+		}
+	}, []);
+
+	async function getData(token) {
 		try {
 			setLoading(true);
-			const res = await API.get(`post/api/search?q=${search}`, {
+			const res = await API.get(`post/${postId}`, {
 				headers: {
-					authorization: accessToken,
+					authorization: token,
 				},
 			});
-			setSuggestions(res.data.posts);
+			setPost(res.data);
+			console.log(res.data.tags);
 			setLoading(false);
 		} catch (err) {
 			setLoading(false);
-			console.log(err);
+			setBackendError(err.response.data.error);
 		}
 	}
-	return (
-		<Jumbotron>
-			<h1 className="display-3">Hello, world!</h1>
-			<p className="lead">
-				This is a simple hero unit, a simple Jumbotron-style component for
-				calling extra attention to featured content or information.
-			</p>
-			<hr className="my-2" />
-			<p>
-				It uses utility classes for typography and spacing to space content out
-				within the larger container.
-			</p>
-			<p className="lead">
-				<Button color="primary" onClick={() => history.goBack()}>
-					Späť
-				</Button>
-			</p>
-		</Jumbotron>
-	);
+
+	if (!user._id) {
+		return <Redirect to={{ path: "/" }} />;
+	} else if (loading) {
+		return (
+			<Row className="justify-content-center">
+				<Spinner />
+			</Row>
+		);
+	} else if (backendError) {
+		return (
+			<Alert color="danger">
+				{backendError} <Button close onClick={() => history.goBack()} />
+			</Alert>
+		);
+	} else {
+		return (
+			<Fade>
+				<Jumbotron>
+					<h1 className="display-3">{post.name}</h1>
+					<p className="lead">
+						Autor: {post.author}, dňa{" "}
+						{new Date(post.updatedAt).toLocaleDateString()}
+					</p>
+					<hr className="my-2" />
+					<p className="text-muted">
+						{post.tags && post.tags.map((tag) => `${tag}, `)}
+					</p>
+					<p>{post.body}</p>
+					<p className="lead">
+						<Button color="primary" onClick={() => history.goBack()}>
+							Späť
+						</Button>
+					</p>
+				</Jumbotron>
+			</Fade>
+		);
+	}
 }
