@@ -4,7 +4,17 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useUser } from "../hooks/useUser";
 
 import API from "../api";
-import { Row, Col, Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
+import {
+	Col,
+	Input,
+	Spinner,
+	ListGroup,
+	ListGroupItem,
+	Dropdown,
+	DropdownToggle,
+	DropdownMenu,
+	DropdownItem,
+} from "reactstrap";
 
 export default function ApiSearch(props) {
 	const history = useHistory();
@@ -57,38 +67,51 @@ export default function ApiSearch(props) {
 	}
 
 	return (
-		<div ref={autoWrapRef}>
-			<Input
-				className="autoInput"
-				id="search"
-				name="search"
-				placeholder="Search..."
-				value={search}
-				onClick={() => setDisplay(!display)}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-			/>
-			{display && (
-				<Col className="dropDown">
-					{loading && <Spinner />}
-					{suggestions.length === 0 ? (
-						<div className="text-muted">No results</div>
-					) : (
-						suggestions.map((suggestion, i) => {
-							return (
-								<div
-									tabIndex="0"
-									onClick={() => handleDropdownClick(suggestion._id)}
-									key={i}
-								>
-									{suggestion.name}, {suggestion.author}, Oblasť:{" "}
-									{suggestion.tags.map((tag) => `#${tag} `)}
-								</div>
-							);
-						})
-					)}
-				</Col>
-			)}
-		</div>
+		<Dropdown nav isOpen={display} toggle={() => setDisplay(!display)}>
+			<DropdownToggle tag={Input} nav caret></DropdownToggle>
+			<DropdownMenu>
+				<DropdownItem header>Header</DropdownItem>
+				<DropdownItem>Some Action</DropdownItem>
+				<DropdownItem text>Dropdown Item Text</DropdownItem>
+				<DropdownItem disabled>Action (disabled)</DropdownItem>
+				<DropdownItem divider />
+				<DropdownItem>Foo Action</DropdownItem>
+				<DropdownItem>Bar Action</DropdownItem>
+				<DropdownItem>Quo Action</DropdownItem>
+			</DropdownMenu>
+		</Dropdown>
+		// <div ref={autoWrapRef}>
+		// 	<Input
+		// 		className="autoInput"
+		// 		id="search"
+		// 		name="search"
+		// 		placeholder="Search..."
+		// 		value={search}
+		// 		onClick={() => setDisplay(!display)}
+		// 		onChange={(e) => setSearch(e.target.value)}
+		// 		autoComplete="off"
+		// 	/>
+		// 	{display && (
+		// 		<Col>
+		// 			{loading && <Spinner size="sm" />}
+		// 			{suggestions.length === 0 ? (
+		// 				<div className="text-muted">No results</div>
+		// 			) : (
+		// 				suggestions.map((suggestion, i) => {
+		// 					return (
+		// 						<div
+		// 							tabIndex="0"
+		// 							onClick={() => handleDropdownClick(suggestion._id)}
+		// 							key={i}
+		// 						>
+		// 							{suggestion.name}, {suggestion.author}, Oblasť:{" "}
+		// 							{suggestion.tags.map((tag) => `#${tag} `)}
+		// 						</div>
+		// 					);
+		// 				})
+		// 			)}
+		// 		</Col>
+		// 	)}
+		// </div>
 	);
 }

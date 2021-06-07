@@ -12,7 +12,7 @@ body {
 }
 
 .autoInput input {
-	position: relative !important;
+	position: relative;
 }
 
 .dropDown {
@@ -21,7 +21,7 @@ body {
 	border-radius: 0.25rem;
 	color: #000000;
 	background-color: white;
-	height: 200px;
+	max-height: 200px;
 	overflow: auto;
 	top: 90%;
 	right: 0;
