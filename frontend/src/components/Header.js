@@ -3,6 +3,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import api from "../api";
 
 import { useUser } from "../hooks/useUser";
+import ApiSearch from "./post/PostApiSearch";
 
 import {
 	Collapse,
@@ -18,12 +19,10 @@ import {
 	Input,
 	NavItem,
 } from "reactstrap";
-import ApiSearch from "./ApiSearch";
 
 function Header() {
 	const history = useHistory();
 	const { pathname } = useLocation();
-	console.log(pathname);
 
 	const { user, setAccessToken, accessToken, setSearch, search } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
@@ -72,6 +71,8 @@ function Header() {
 		Brand = <NavbarBrand href="/mywork">eNástenka</NavbarBrand>;
 	} else if (pathname.includes("/mygrants")) {
 		Brand = <NavbarBrand href="/mygrants">Moje Granty</NavbarBrand>;
+	} else if (pathname.includes("/posts")) {
+		Brand = <NavbarBrand href="/mygrants">Nástenka</NavbarBrand>;
 	} else {
 		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
 	}

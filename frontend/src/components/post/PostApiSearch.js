@@ -1,9 +1,9 @@
 import React from "react";
 import { useHistory, useLocation, Link } from "react-router-dom";
 
-import { useUser } from "../hooks/useUser";
+import { useUser } from "../../hooks/useUser";
 
-import API from "../api";
+import API from "../../api";
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch(props) {
