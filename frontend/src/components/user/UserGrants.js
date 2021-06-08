@@ -31,26 +31,24 @@ function UserGrants(props) {
 	const [currentPage, setCurrentPage] = React.useState(0);
 
 	React.useEffect(() => {
+		async function getData() {
+			try {
+				const res = await api.get(`user/${user}/${year}`, {
+					headers: {
+						authorization: accessToken,
+					},
+				});
+				setUserGrants(res.data.grants);
+				setHours(res.data.hoursTotal);
+			} catch (err) {
+				setHours(0);
+				err.response.data.error && setBackendError(err.response.data.error);
+			}
+		}
 		setBackendError(null);
 		getData();
-		console.log(userGrants);
 		userGrants && setPagesCount(Math.ceil(userGrants.length / pageSize));
 	}, [year]);
-
-	async function getData() {
-		try {
-			const res = await api.get(`user/${user}/${year}`, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
-			setUserGrants(res.data.grants);
-			setHours(res.data.hoursTotal);
-		} catch (err) {
-			setHours(0);
-			err.response.data.error && setBackendError(err.response.data.error);
-		}
-	}
 
 	function handlePageClick(e, index) {
 		e.preventDefault();

@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory, useLocation, Link } from "react-router-dom";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 
 import { useUser } from "../../hooks/useUser";
 
@@ -8,7 +8,12 @@ import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch(props) {
 	const history = useHistory();
-	const { pathname } = useLocation();
+	const location = useLocation();
+	const match = useRouteMatch();
+	console.log(match);
+
+	console.log(location);
+
 	const { accessToken } = useUser();
 
 	const [display, setDisplay] = React.useState(false);
@@ -39,7 +44,7 @@ export default function ApiSearch(props) {
 	function handleSuggestionClick(id, i) {
 		activeSuggestionRef.current = i;
 		setDisplay(false);
-		history.push(`${pathname}/${id}`);
+		history.push(`${location.pathname}/${id}`);
 	}
 
 	async function apiSearch() {

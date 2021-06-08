@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
 import api from "../api";
 
 import { useUser } from "../hooks/useUser";
@@ -72,7 +72,7 @@ function Header() {
 	} else if (pathname.includes("/mygrants")) {
 		Brand = <NavbarBrand href="/mygrants">Moje Granty</NavbarBrand>;
 	} else if (pathname.includes("/posts")) {
-		Brand = <NavbarBrand href="/mygrants">Nástenka</NavbarBrand>;
+		Brand = <NavbarBrand href="/posts">Nástenka</NavbarBrand>;
 	} else {
 		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
 	}
@@ -80,7 +80,31 @@ function Header() {
 	let Search;
 	if (pathname.includes("/posts")) {
 		Search = <ApiSearch />;
-	} else {
+	} else if (pathname.includes("/grants")) {
+		Search = (
+			<Input
+				type="text"
+				placeholder="Vyhľadávanie"
+				name="search"
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+				autoComplete="off"
+				className="mx-md-1"
+			/>
+		);
+	} else if (pathname.includes("/users")) {
+		Search = (
+			<Input
+				type="text"
+				placeholder="Vyhľadávanie"
+				name="search"
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+				autoComplete="off"
+				className="mx-md-1"
+			/>
+		);
+	} else if (pathname.includes("/mygrants")) {
 		Search = (
 			<Input
 				type="text"

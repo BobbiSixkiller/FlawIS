@@ -1,5 +1,10 @@
 import React from "react";
-import { useHistory, useParams, Redirect } from "react-router-dom";
+import {
+	useHistory,
+	useParams,
+	Redirect,
+	useRouteMatch,
+} from "react-router-dom";
 
 import API from "../api";
 import { useUser } from "../hooks/useUser";
@@ -8,6 +13,9 @@ import { Row, Fade, Jumbotron, Button, Spinner, Alert } from "reactstrap";
 export default function Post() {
 	const history = useHistory();
 	const { postId } = useParams();
+	const match = useRouteMatch();
+	console.log(match);
+
 	const { accessToken, user } = useUser();
 
 	const [loading, setLoading] = React.useState(false);

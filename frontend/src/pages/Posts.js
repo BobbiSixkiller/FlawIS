@@ -2,7 +2,6 @@ import React from "react";
 import {
 	useRouteMatch,
 	useParams,
-	Redirect,
 	Switch,
 	Route,
 	Link,
@@ -16,6 +15,7 @@ import {
 	ListGroupItem,
 	Row,
 	Col,
+	Container,
 	ButtonGroup,
 	Button,
 	Card,
@@ -41,7 +41,7 @@ import Post from "../pages/Post";
 export default function Posts() {
 	const { path, url } = useRouteMatch();
 	const params = useParams();
-	const { accessToken, user, search } = useUser();
+	const { accessToken, user } = useUser();
 
 	const [loading, setLoading] = React.useState(false);
 	const [posts, setPosts] = React.useState([]);
@@ -53,9 +53,7 @@ export default function Posts() {
 	const [pages, setPages] = React.useState(1);
 
 	React.useEffect(() => {
-		if (user._id) {
-			getData(accessToken);
-		}
+		getData(accessToken);
 	}, [page, author, tag]);
 
 	async function getData(token) {
@@ -78,15 +76,13 @@ export default function Posts() {
 		}
 	}
 
-	if (!user._id) {
-		return <Redirect to={{ path: "/" }} />;
-	} else if (loading) {
+	if (loading) {
 		return (
 			<Row className="justify-content-center">
 				<Spinner />
 			</Row>
 		);
-	} else {
+	} else if (user._id) {
 		return (
 			<Switch>
 				<Route exact path={path}>
@@ -223,6 +219,13 @@ export default function Posts() {
 					<Post />
 				</Route>
 			</Switch>
+		);
+	} else {
+		return (
+			<Container>
+				<h1 className="text-center">Prosím prihláste sa</h1>
+				{user.error && <Alert color="danger">{user.error}</Alert>}
+			</Container>
 		);
 	}
 }
