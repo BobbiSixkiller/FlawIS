@@ -15,38 +15,12 @@ body {
 	position: relative;
 }
 
-.dropDown {
-	position: absolute !important;
-	border: 1px solid #ced4da;
-	border-radius: 0.25rem;
-	color: #000000;
-	background-color: white;
-	max-height: 200px;
-	overflow: auto;
+.suggestions {
+	position: absolute;
 	top: 90%;
 	right: 0;
 	left: 0;
 	z-index: 999;
-	padding: 0 !important;
-}
-
-.dropDown div {
-	cursor: pointer;
-	background-color: white;
-	height: calc(1.5em + 0.75rem + 2px);
-	padding: 0.375rem 0.75rem;
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.5;
-	color: #000000;
-}
-
-.dropDown div:hover {
-	background-color: #007bff;
-	color: white;
-}
-
-.dropDownActive {
-	background-color: #007bff;
-	color: white;
+	max-height: 200px;
+	overflow: auto;
 }

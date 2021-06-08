@@ -15,27 +15,25 @@ export default function Post() {
 	const [backendError, setBackendError] = React.useState(null);
 
 	React.useEffect(() => {
+		async function getData(token) {
+			try {
+				setLoading(true);
+				const res = await API.get(`post/${postId}`, {
+					headers: {
+						authorization: token,
+					},
+				});
+				setPost(res.data);
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				setBackendError(err.response.data.error);
+			}
+		}
 		if (user._id) {
 			getData(accessToken);
 		}
-	}, []);
-
-	async function getData(token) {
-		try {
-			setLoading(true);
-			const res = await API.get(`post/${postId}`, {
-				headers: {
-					authorization: token,
-				},
-			});
-			setPost(res.data);
-			console.log(res.data.tags);
-			setLoading(false);
-		} catch (err) {
-			setLoading(false);
-			setBackendError(err.response.data.error);
-		}
-	}
+	}, [user, accessToken]);
 
 	if (!user._id) {
 		return <Redirect to={{ path: "/" }} />;

@@ -22,16 +22,13 @@ import ApiSearch from "./ApiSearch";
 
 function Header() {
 	const history = useHistory();
-	const location = useLocation();
+	const { pathname } = useLocation();
+	console.log(pathname);
 
 	const { user, setAccessToken, accessToken, setSearch, search } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
-	const [searchInput, setSearchInput] = useState("");
 
 	const toggle = () => setIsOpen(!isOpen);
-	//authentication handlers
-	const register = () => history.push("/register");
-	const login = () => history.push("/login");
 
 	async function logOut() {
 		await api
@@ -71,17 +68,34 @@ function Header() {
 	}
 
 	let Brand;
-	if (location.pathname.includes("/mywork")) {
+	if (pathname.includes("/mywork")) {
 		Brand = <NavbarBrand href="/mywork">eNástenka</NavbarBrand>;
-	} else if (location.pathname.includes("/mygrants")) {
-		Brand = <NavbarBrand href="/mygrants">eGranty</NavbarBrand>;
+	} else if (pathname.includes("/mygrants")) {
+		Brand = <NavbarBrand href="/mygrants">Moje Granty</NavbarBrand>;
 	} else {
 		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
 	}
 
-	let adminNav;
+	let Search;
+	if (pathname.includes("/posts")) {
+		Search = <ApiSearch />;
+	} else {
+		Search = (
+			<Input
+				type="text"
+				placeholder="Vyhľadávanie"
+				name="search"
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+				autoComplete="off"
+				className="mx-md-1"
+			/>
+		);
+	}
+
+	let leftNav;
 	if (user.role === "supervisor" || user.role === "admin") {
-		adminNav = (
+		leftNav = (
 			<Nav className="mr-auto" navbar>
 				<UncontrolledDropdown nav inNavbar>
 					<DropdownToggle nav caret>
@@ -96,20 +110,13 @@ function Header() {
 						</DropdownItem>
 					</DropdownMenu>
 				</UncontrolledDropdown>
-				<NavItem>
-					<Input
-						type="text"
-						placeholder="Vyhľadávanie"
-						name="search"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						autoComplete="off"
-						className="mx-md-1"
-					/>
-				</NavItem>
-				<NavItem className="ml-3">
-					<ApiSearch />
-				</NavItem>
+				<NavItem>{Search}</NavItem>
+			</Nav>
+		);
+	} else {
+		leftNav = (
+			<Nav className="mr-auto" navbar>
+				<NavItem>{Search}</NavItem>
 			</Nav>
 		);
 	}
@@ -121,7 +128,7 @@ function Header() {
 			<Collapse isOpen={isOpen} navbar>
 				{user._id ? (
 					<>
-						{adminNav}
+						{leftNav}
 						<Nav className="ml-auto" navbar>
 							<UncontrolledDropdown nav inNavbar>
 								<DropdownToggle nav caret>
@@ -147,12 +154,16 @@ function Header() {
 				) : (
 					<Nav className="ml-auto" navbar>
 						<NavItem className="mx-md-2 my-2 my-md-0">
-							<Button block color="success" onClick={login}>
+							<Button
+								block
+								color="success"
+								onClick={() => history.push("/login")}
+							>
 								Prihlásiť sa
 							</Button>
 						</NavItem>
 						<NavItem>
-							<Button block onClick={register}>
+							<Button block onClick={() => history.push("/register")}>
 								Registrácia
 							</Button>
 						</NavItem>

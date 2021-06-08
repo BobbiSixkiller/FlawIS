@@ -1,20 +1,10 @@
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation, Link } from "react-router-dom";
 
 import { useUser } from "../hooks/useUser";
 
 import API from "../api";
-import {
-	Col,
-	Input,
-	Spinner,
-	ListGroup,
-	ListGroupItem,
-	Dropdown,
-	DropdownToggle,
-	DropdownMenu,
-	DropdownItem,
-} from "reactstrap";
+import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch(props) {
 	const history = useHistory();
@@ -26,6 +16,7 @@ export default function ApiSearch(props) {
 	const [loading, setLoading] = React.useState(false);
 	const [suggestions, setSuggestions] = React.useState(null);
 	const autoWrapRef = React.useRef(null);
+	const activeSuggestionRef = React.useRef(null);
 
 	React.useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
@@ -45,7 +36,8 @@ export default function ApiSearch(props) {
 		}
 	}
 
-	function handleDropdownClick(id) {
+	function handleSuggestionClick(id, i) {
+		activeSuggestionRef.current = i;
 		setDisplay(false);
 		history.push(`${pathname}/${id}`);
 	}
@@ -67,51 +59,42 @@ export default function ApiSearch(props) {
 	}
 
 	return (
-		<Dropdown nav isOpen={display} toggle={() => setDisplay(!display)}>
-			<DropdownToggle tag={Input} nav caret></DropdownToggle>
-			<DropdownMenu>
-				<DropdownItem header>Header</DropdownItem>
-				<DropdownItem>Some Action</DropdownItem>
-				<DropdownItem text>Dropdown Item Text</DropdownItem>
-				<DropdownItem disabled>Action (disabled)</DropdownItem>
-				<DropdownItem divider />
-				<DropdownItem>Foo Action</DropdownItem>
-				<DropdownItem>Bar Action</DropdownItem>
-				<DropdownItem>Quo Action</DropdownItem>
-			</DropdownMenu>
-		</Dropdown>
-		// <div ref={autoWrapRef}>
-		// 	<Input
-		// 		className="autoInput"
-		// 		id="search"
-		// 		name="search"
-		// 		placeholder="Search..."
-		// 		value={search}
-		// 		onClick={() => setDisplay(!display)}
-		// 		onChange={(e) => setSearch(e.target.value)}
-		// 		autoComplete="off"
-		// 	/>
-		// 	{display && (
-		// 		<Col>
-		// 			{loading && <Spinner size="sm" />}
-		// 			{suggestions.length === 0 ? (
-		// 				<div className="text-muted">No results</div>
-		// 			) : (
-		// 				suggestions.map((suggestion, i) => {
-		// 					return (
-		// 						<div
-		// 							tabIndex="0"
-		// 							onClick={() => handleDropdownClick(suggestion._id)}
-		// 							key={i}
-		// 						>
-		// 							{suggestion.name}, {suggestion.author}, Oblasť:{" "}
-		// 							{suggestion.tags.map((tag) => `#${tag} `)}
-		// 						</div>
-		// 					);
-		// 				})
-		// 			)}
-		// 		</Col>
-		// 	)}
-		// </div>
+		<div ref={autoWrapRef}>
+			<Input
+				className="autoInput"
+				id="search"
+				name="search"
+				placeholder="Search..."
+				value={search}
+				onClick={() => setDisplay(!display)}
+				onChange={(e) => setSearch(e.target.value)}
+				autoComplete="off"
+			/>
+			{display && (
+				<ListGroup className="suggestions">
+					{loading && (
+						<ListGroupItem>
+							<Spinner size="sm" />
+						</ListGroupItem>
+					)}
+					{suggestions.length === 0 ? (
+						<ListGroupItem className="text-muted">No results</ListGroupItem>
+					) : (
+						suggestions.map((suggestion, i) => (
+							<ListGroupItem
+								key={i}
+								onClick={() => handleSuggestionClick(suggestion._id, i)}
+								tag="button"
+								action
+								active={activeSuggestionRef.current === i}
+							>
+								{suggestion.name}, {suggestion.author}, Oblasť:{" "}
+								{suggestion.tags.map((tag) => `#${tag} `)}
+							</ListGroupItem>
+						))
+					)}
+				</ListGroup>
+			)}
+		</div>
 	);
 }
