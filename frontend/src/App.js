@@ -21,10 +21,10 @@ function App() {
 	return (
 		<UserProvider>
 			<BrowserRouter>
-				<div id="App" className="d-flex flex-column justify-content-between">
-					<Header />
-					<Container className="my-5">
-						<Switch>
+				<Switch>
+					<div id="App" className="d-flex flex-column justify-content-between">
+						<Header />
+						<Container className="my-5">
 							<Route exact path="/">
 								<Home />
 							</Route>
@@ -52,10 +52,10 @@ function App() {
 							<Route path="/users">
 								<Users />
 							</Route>
-						</Switch>
-					</Container>
-					<Footer />
-				</div>
+						</Container>
+						<Footer />
+					</div>
+				</Switch>
 			</BrowserRouter>
 		</UserProvider>
 	);

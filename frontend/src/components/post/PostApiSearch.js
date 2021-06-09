@@ -1,18 +1,14 @@
 import React from "react";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useLocation, useRouteMatch, Link } from "react-router-dom";
 
 import { useUser } from "../../hooks/useUser";
 
 import API from "../../api";
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
-export default function ApiSearch(props) {
-	const history = useHistory();
+export default function ApiSearch() {
 	const location = useLocation();
 	const match = useRouteMatch();
-	console.log(match);
-
-	console.log(location);
 
 	const { accessToken } = useUser();
 
@@ -32,6 +28,21 @@ export default function ApiSearch(props) {
 	}, [autoWrapRef]);
 
 	React.useEffect(() => {
+		async function apiSearch() {
+			try {
+				setLoading(true);
+				const res = await API.get(`post/api/search?q=${search}`, {
+					headers: {
+						authorization: accessToken,
+					},
+				});
+				setSuggestions(res.data.posts);
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+				console.log(err);
+			}
+		}
 		apiSearch();
 	}, [search]);
 
@@ -44,23 +55,6 @@ export default function ApiSearch(props) {
 	function handleSuggestionClick(id, i) {
 		activeSuggestionRef.current = i;
 		setDisplay(false);
-		history.push(`${location.pathname}/${id}`);
-	}
-
-	async function apiSearch() {
-		try {
-			setLoading(true);
-			const res = await API.get(`post/api/search?q=${search}`, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
-			setSuggestions(res.data.posts);
-			setLoading(false);
-		} catch (err) {
-			setLoading(false);
-			console.log(err);
-		}
 	}
 
 	return (
@@ -89,7 +83,8 @@ export default function ApiSearch(props) {
 							<ListGroupItem
 								key={i}
 								onClick={() => handleSuggestionClick(suggestion._id, i)}
-								tag="button"
+								tag={Link}
+								to={`${match.url}/${suggestion._id}`}
 								action
 								active={activeSuggestionRef.current === i}
 							>

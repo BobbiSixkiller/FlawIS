@@ -1,10 +1,5 @@
 import React from "react";
-import {
-	useHistory,
-	useParams,
-	Redirect,
-	useRouteMatch,
-} from "react-router-dom";
+import { useParams, Redirect, useHistory, Link } from "react-router-dom";
 
 import API from "../api";
 import { useUser } from "../hooks/useUser";
@@ -12,9 +7,7 @@ import { Row, Fade, Jumbotron, Button, Spinner, Alert } from "reactstrap";
 
 export default function Post() {
 	const history = useHistory();
-	const { postId } = useParams();
-	const match = useRouteMatch();
-	console.log(match);
+	const { id } = useParams();
 
 	const { accessToken, user } = useUser();
 
@@ -26,7 +19,7 @@ export default function Post() {
 		async function getData(token) {
 			try {
 				setLoading(true);
-				const res = await API.get(`post/${postId}`, {
+				const res = await API.get(`post/${id}`, {
 					headers: {
 						authorization: token,
 					},
@@ -41,7 +34,7 @@ export default function Post() {
 		if (user._id) {
 			getData(accessToken);
 		}
-	}, [user, accessToken]);
+	}, [user, accessToken, id]);
 
 	if (!user._id) {
 		return <Redirect to={{ path: "/" }} />;
@@ -72,7 +65,7 @@ export default function Post() {
 					</p>
 					<p>{post.body}</p>
 					<p className="lead">
-						<Button color="primary" onClick={() => history.goBack()}>
+						<Button color="primary" tag={Link} to="/posts">
 							Späť
 						</Button>
 					</p>

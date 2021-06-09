@@ -58,11 +58,6 @@ function AddPost(props) {
 		}
 	}
 
-	function addTag(params) {
-		const tags = values.tags;
-		setValues({ ...values, tags });
-	}
-
 	return (
 		<Form onSubmit={handleSubmit}>
 			<ModalHeader

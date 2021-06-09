@@ -17,10 +17,10 @@ router.get("/", checkAuth, async (req, res) => {
 	const pageSize = parseInt(req.query.size || 9);
 	const page = parseInt(req.query.page || 1);
 
-	const authorFilter = req.query.author ? { author: req.query.author } : {};
-	const tagsFilter = req.query.tag ? { tags: req.query.tag } : {};
-
-	console.log(req.query);
+	const authorFilter = req.query.author
+		? { author: { $in: req.query.author } }
+		: {};
+	const tagsFilter = req.query.tag ? { tags: { $in: req.query.tag } } : {};
 
 	const [posts, total] = await Promise.all([
 		Post.find({ ...authorFilter, ...tagsFilter })

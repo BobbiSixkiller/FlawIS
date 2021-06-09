@@ -45,8 +45,8 @@ export default function Posts() {
 
 	const [loading, setLoading] = React.useState(false);
 	const [posts, setPosts] = React.useState([]);
-	const [author, setAuthor] = React.useState("");
-	const [tag, setTag] = React.useState("");
+	const [authors, setAuthors] = React.useState([]);
+	const [tags, setTags] = React.useState([]);
 	const [modal, setModal] = React.useState(false);
 
 	const [page, setPage] = React.useState(params.page || 1);
@@ -54,13 +54,16 @@ export default function Posts() {
 
 	React.useEffect(() => {
 		getData(accessToken);
-	}, [page, author, tag]);
+	}, [page, authors, tags]);
 
 	async function getData(token) {
 		try {
 			setLoading(true);
 			const res = await API.get(
-				`post?page=${page}&author=${author}&tag=${tag}`,
+				//`post?page=${page}&author=${author}&tag=${tag}`,
+				`post?page=${page}${authors.map((a) => `&author=${a}`)}${tags.map(
+					(t) => `&tag=${t}`
+				)}`,
 				{
 					headers: {
 						authorization: token,
@@ -87,27 +90,41 @@ export default function Posts() {
 			<Switch>
 				<Route exact path={path}>
 					<Fade>
-						<Row className="justify-content-between mb-3">
+						<Row className="mb-3">
 							<Col>
 								<h1>Prehľad postov</h1>
 								<ListGroup horizontal>
-									{author && (
-										<ListGroupItem>
-											{author}
-											<Button onClick={() => setAuthor("")} size="sm" close />
-										</ListGroupItem>
-									)}
-									{tag && (
-										<ListGroupItem>
-											#{tag}
-											<Button onClick={() => setTag("")} size="sm" close />
-										</ListGroupItem>
-									)}
+									{authors.length !== 0 &&
+										authors.map((a, i) => (
+											<ListGroupItem key={i}>
+												{a}
+												<Button
+													onClick={() =>
+														setAuthors(authors.filter((author) => author !== a))
+													}
+													size="sm"
+													close
+												/>
+											</ListGroupItem>
+										))}
+									{tags.length !== 0 &&
+										tags.map((t, i) => (
+											<ListGroupItem key={i}>
+												#{t}
+												<Button
+													onClick={() =>
+														setTags(tags.filter((tag) => tag !== t))
+													}
+													size="sm"
+													close
+												/>
+											</ListGroupItem>
+										))}
 								</ListGroup>
 							</Col>
 							<Col>
 								<Button
-									className="float-right"
+									className="float-md-right "
 									outline
 									size="lg"
 									color="success"
@@ -129,7 +146,11 @@ export default function Posts() {
 											<CardBody>
 												<CardTitle tag="h5">{post.name}</CardTitle>
 												<CardSubtitle tag="h6" className="mb-2 text-muted">
-													<CardLink onClick={() => setAuthor(post.author)}>
+													<CardLink
+														onClick={() =>
+															setAuthors([...authors, post.author])
+														}
+													>
 														{post.author}
 													</CardLink>
 													, {new Date(post.updatedAt).toLocaleDateString()}
@@ -137,7 +158,10 @@ export default function Posts() {
 												<CardText>
 													Oblasť:{" "}
 													{post.tags.map((tag, i) => (
-														<CardLink key={i} onClick={() => setTag(tag)}>
+														<CardLink
+															key={i}
+															onClick={() => setTags([...tags, tag])}
+														>
 															#{tag}
 														</CardLink>
 													))}
@@ -215,7 +239,7 @@ export default function Posts() {
 						</Modal>
 					</Fade>
 				</Route>
-				<Route path={`${path}/:postId`}>
+				<Route path={`${path}/:id`}>
 					<Post />
 				</Route>
 			</Switch>

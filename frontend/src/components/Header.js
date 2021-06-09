@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import { useHistory, useLocation, Switch, Route } from "react-router-dom";
 import api from "../api";
 
 import { useUser } from "../hooks/useUser";
@@ -77,47 +77,6 @@ function Header() {
 		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
 	}
 
-	let Search;
-	if (pathname.includes("/posts")) {
-		Search = <ApiSearch />;
-	} else if (pathname.includes("/grants")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	} else if (pathname.includes("/users")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	} else if (pathname.includes("/mygrants")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	}
-
 	let leftNav;
 	if (user.role === "supervisor" || user.role === "admin") {
 		leftNav = (
@@ -135,13 +94,46 @@ function Header() {
 						</DropdownItem>
 					</DropdownMenu>
 				</UncontrolledDropdown>
-				<NavItem>{Search}</NavItem>
-			</Nav>
-		);
-	} else {
-		leftNav = (
-			<Nav className="mr-auto" navbar>
-				<NavItem>{Search}</NavItem>
+				<NavItem>
+					<Switch>
+						<Route path="/posts">
+							<ApiSearch />
+						</Route>
+						<Route exact path="/grants">
+							<Input
+								type="text"
+								placeholder="Vyhľadávanie"
+								name="search"
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								autoComplete="off"
+								className="mx-md-1"
+							/>
+						</Route>
+						<Route path="/mygrants">
+							<Input
+								type="text"
+								placeholder="Vyhľadávanie"
+								name="search"
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								autoComplete="off"
+								className="mx-md-1"
+							/>
+						</Route>
+						<Route exact path="/users">
+							<Input
+								type="text"
+								placeholder="Vyhľadávanie"
+								name="search"
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								autoComplete="off"
+								className="mx-md-1"
+							/>
+						</Route>
+					</Switch>
+				</NavItem>
 			</Nav>
 		);
 	}
