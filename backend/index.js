@@ -14,7 +14,7 @@ app.use(morgan("dev"));
 
 //DB connecttion
 mongoose.connect(
-	process.env.DB_DEV_ATLAS,
+	process.env.DB,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
