@@ -24,3 +24,7 @@ body {
 	max-height: 200px;
 	overflow: auto;
 }
+
+.pink {
+	color: #b46b7a;
+}

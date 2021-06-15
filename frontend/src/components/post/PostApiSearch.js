@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useRouteMatch, Link } from "react-router-dom";
+import { useRouteMatch, Link } from "react-router-dom";
 
 import { useUser } from "../../hooks/useUser";
 
@@ -7,7 +7,6 @@ import API from "../../api";
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch() {
-	const location = useLocation();
 	const match = useRouteMatch();
 
 	const { accessToken } = useUser();

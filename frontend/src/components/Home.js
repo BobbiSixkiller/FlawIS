@@ -106,13 +106,11 @@ function Home() {
 			<div>
 				<Row className="justify-content-center mb-3">
 					<img
-						src={process.env.PUBLIC_URL + "/Praf-UK-logo.png"}
+						className="img-fluid"
+						src={process.env.PUBLIC_URL + "/flawis-logo-small.png"}
 						alt="Logo main"
-						width="200"
-						height="200"
 					></img>
 				</Row>
-				<h1 className="text-center">Prosím prihláste sa</h1>
 				{user.error && (
 					<Col className="my-5">
 						<Alert className="text-center" color="danger">

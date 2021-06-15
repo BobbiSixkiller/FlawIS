@@ -39,7 +39,18 @@ router.post("/register", async (req, res) => {
 	});
 	await user.save();
 
-	const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+	const token = jwt.sign(
+		{
+			_id: user._id,
+			name: `${user.firstName} ${user.lastName}`,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.SECRET,
+		{
+			expiresIn: "1h",
+		}
+	);
 
 	res
 		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
@@ -103,11 +114,22 @@ router.post("/login", async (req, res) => {
 		if (!passwordExists)
 			return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
 
-		const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-		// user.tokens = user.tokens.concat({ token });
+		const token = jwt.sign(
+			{
+				_id: user._id,
+				name: user.fullName,
+				email: user.email,
+				role: user.role,
+			},
+			process.env.SECRET,
+			{
+				expiresIn: "1h",
+			}
+		);
+		user.tokens = user.tokens.concat({ token });
 
-		// await user.save();
-		// res.send({ token: token, user: user });
+		await user.save();
+		res.send({ token: token, user: user });
 
 		res
 			.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
@@ -199,30 +221,30 @@ router.post("/reset/:token", async (req, res) => {
 	}
 });
 
-router.get("/logout", (req, res) => {
-	res
-		.cookie("token", "", { httpOnly: true, expires: new Date(0) })
-		.status(200)
-		.send({ msg: "Boli ste odhlásený." });
+// router.get("/logout", (req, res) => {
+// 	res
+// 		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+// 		.status(200)
+// 		.send({ msg: "Boli ste odhlásený." });
+// });
+
+router.post("/logout", checkAuth, async (req, res) => {
+	const user = await User.findOne({ _id: req.user._id });
+
+	user.tokens = user.tokens.filter((token) => {
+		return token.token !== req.token;
+	});
+	await user.save();
+	res.send({ msg: `Deleted token: ${req.token}` });
 });
 
-// router.post("/logout", checkAuth, async (req, res) => {
-//   const user = await User.findOne({ _id: req.user._id });
+router.post("/logoutall", checkAuth, async (req, res) => {
+	const user = await User.findOne({ _id: req.user._id });
 
-//   user.tokens = user.tokens.filter((token) => {
-//     return token.token !== req.token;
-//   });
-//   await user.save();
-//   res.send({ msg: `Deleted token: ${req.token}` });
-// });
-
-// router.post("/logoutall", checkAuth, async (req, res) => {
-//   const user = await User.findOne({ _id: req.user._id });
-
-//   user.tokens.splice(0, user.tokens.length);
-//   await user.save();
-//   res.send({ msg: "All devices have been logged out" });
-// });
+	user.tokens.splice(0, user.tokens.length);
+	await user.save();
+	res.send({ msg: "All devices have been logged out" });
+});
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	try {
@@ -231,6 +253,22 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 		res.status(200).send(aggregate);
 	} catch (err) {
 		res.status(500).send(err.message);
+	}
+});
+
+//experimental endpoint
+router.get("/tokenIsValid", async (req, res) => {
+	const { authorization } = req.cookies;
+	if (!authorization) {
+		return res.send(false);
+	}
+	const token = authorization.split("Bearer ")[1];
+
+	try {
+		jwt.verify(token, process.env.secret);
+		res.send(true);
+	} catch (error) {
+		return res.send(false);
 	}
 });
 
@@ -341,24 +379,6 @@ router.delete("/:id", checkAuth, isAdmin, async (req, res) => {
 		res.status(200).send({ msg: "Používateľ vymazaný!" });
 	} catch (err) {
 		res.status(500).send({ error: err.message });
-	}
-});
-
-//experimental endpoint
-router.post("/tokenIsValid", async (req, res) => {
-	try {
-		const token = req.header("authToken");
-		if (!token) return res.json(false);
-
-		const verified = jwt.verify(token, process.env.SECRET);
-		if (!verified) return res.json(false);
-
-		const user = await User.findById(verified);
-		if (!user) return res.json(false);
-
-		return res.json({ valid: true, user });
-	} catch (err) {
-		res.status(500).json({ error: err.message });
 	}
 });
 
