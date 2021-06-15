@@ -210,30 +210,30 @@ router.post("/reset/:token", async (req, res) => {
 	}
 });
 
-router.get("/logout", (req, res) => {
-	res
-		.cookie("token", "", { httpOnly: true, expires: new Date(0) })
-		.status(200)
-		.send({ msg: "Boli ste odhlásený." });
+// router.get("/logout", (req, res) => {
+// 	res
+// 		.cookie("token", "", { httpOnly: true, expires: new Date(0) })
+// 		.status(200)
+// 		.send({ msg: "Boli ste odhlásený." });
+// });
+
+router.post("/logout", checkAuth, async (req, res) => {
+	const user = await User.findOne({ _id: req.user._id });
+
+	user.tokens = user.tokens.filter((token) => {
+		return token.token !== req.token;
+	});
+	await user.save();
+	res.send({ msg: `Deleted token: ${req.token}` });
 });
 
-// router.post("/logout", checkAuth, async (req, res) => {
-//   const user = await User.findOne({ _id: req.user._id });
+router.post("/logoutall", checkAuth, async (req, res) => {
+	const user = await User.findOne({ _id: req.user._id });
 
-//   user.tokens = user.tokens.filter((token) => {
-//     return token.token !== req.token;
-//   });
-//   await user.save();
-//   res.send({ msg: `Deleted token: ${req.token}` });
-// });
-
-// router.post("/logoutall", checkAuth, async (req, res) => {
-//   const user = await User.findOne({ _id: req.user._id });
-
-//   user.tokens.splice(0, user.tokens.length);
-//   await user.save();
-//   res.send({ msg: "All devices have been logged out" });
-// });
+	user.tokens.splice(0, user.tokens.length);
+	await user.save();
+	res.send({ msg: "All devices have been logged out" });
+});
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	try {
