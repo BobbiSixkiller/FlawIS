@@ -37,13 +37,25 @@ router.post("/register", async (req, res) => {
 		password: hashedPassword,
 		role: `${init.length === 0 ? "admin" : "basic"}`,
 	});
+	await user.save();
 
-	try {
-		await user.save();
-		res.status(200).send({ msg: "Registrácia prebehla úspešne." });
-	} catch (err) {
-		res.status(500).send({ error: err.message });
-	}
+	const token = jwt.sign(
+		{
+			_id: user._id,
+			name: `${user.firstName} ${user.lastName}`,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.SECRET,
+		{
+			expiresIn: "1h",
+		}
+	);
+
+	res
+		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
+		.status(200)
+		.send({ msg: "Registrácia prebehla úspešne!" });
 });
 
 router.post("/add", checkAuth, isSupervisor, async (req, res) => {
@@ -87,25 +99,44 @@ router.post("/add", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-	const { error } = loginValidation(req.body);
-	if (error) return res.status(400).send({ error: error.details[0].message });
-
-	const user = await User.findOne({ email: req.body.email });
-	if (!user)
-		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
-
-	const passwordExists = await bcrypt.compare(req.body.password, user.password);
-	if (!passwordExists)
-		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
-
-	const token = jwt.sign({ _id: user._id }, process.env.SECRET);
-	user.tokens = user.tokens.concat({ token });
-
 	try {
+		const { error } = loginValidation(req.body);
+		if (error) return res.status(400).send({ error: error.details[0].message });
+
+		const user = await User.findOne({ email: req.body.email });
+		if (!user)
+			return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
+
+		const passwordExists = await bcrypt.compare(
+			req.body.password,
+			user.password
+		);
+		if (!passwordExists)
+			return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
+
+		const token = jwt.sign(
+			{
+				_id: user._id,
+				name: user.fullName,
+				email: user.email,
+				role: user.role,
+			},
+			process.env.SECRET,
+			{
+				expiresIn: "1h",
+			}
+		);
+		user.tokens = user.tokens.concat({ token });
+
 		await user.save();
 		res.send({ token: token, user: user });
-	} catch (err) {
-		res.status(500).send({ error: err.message });
+
+		res
+			.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
+			.status(200)
+			.send({ msg: `Vitajte ${user.fullName}!` });
+	} catch (error) {
+		console.log(error);
 	}
 });
 
@@ -190,6 +221,13 @@ router.post("/reset/:token", async (req, res) => {
 	}
 });
 
+// router.get("/logout", (req, res) => {
+// 	res
+// 		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+// 		.status(200)
+// 		.send({ msg: "Boli ste odhlásený." });
+// });
+
 router.post("/logout", checkAuth, async (req, res) => {
 	const user = await User.findOne({ _id: req.user._id });
 
@@ -215,6 +253,22 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 		res.status(200).send(aggregate);
 	} catch (err) {
 		res.status(500).send(err.message);
+	}
+});
+
+//experimental endpoint
+router.get("/tokenIsValid", async (req, res) => {
+	const { authorization } = req.cookies;
+	if (!authorization) {
+		return res.send(false);
+	}
+	const token = authorization.split("Bearer ")[1];
+
+	try {
+		jwt.verify(token, process.env.secret);
+		res.send(true);
+	} catch (error) {
+		return res.send(false);
 	}
 });
 
@@ -325,24 +379,6 @@ router.delete("/:id", checkAuth, isAdmin, async (req, res) => {
 		res.status(200).send({ msg: "Používateľ vymazaný!" });
 	} catch (err) {
 		res.status(500).send({ error: err.message });
-	}
-});
-
-//experimental endpoint
-router.post("/tokenIsValid", async (req, res) => {
-	try {
-		const token = req.header("authToken");
-		if (!token) return res.json(false);
-
-		const verified = jwt.verify(token, process.env.SECRET);
-		if (!verified) return res.json(false);
-
-		const user = await User.findById(verified);
-		if (!user) return res.json(false);
-
-		return res.json({ valid: true, user });
-	} catch (err) {
-		res.status(500).json({ error: err.message });
 	}
 });
 

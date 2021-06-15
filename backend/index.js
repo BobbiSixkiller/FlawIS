@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -7,8 +8,9 @@ const cors = require("cors");
 const app = express();
 
 //middleware
-app.use(cors());
+app.use(cors({ origin: ["http://localhost:3000"], credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use("/public", express.static("public"));
 app.use(morgan("dev"));
 
@@ -21,7 +23,13 @@ mongoose.connect(
 		useFindAndModify: false,
 		useCreateIndex: true,
 	},
-	() => console.log("DB connected!")
+	(err) => {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log("DB connected!");
+		}
+	}
 );
 
 //import routes

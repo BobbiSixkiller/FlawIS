@@ -59,14 +59,10 @@ router.post("/add", checkAuth, async (req, res) => {
 });
 
 router.put("/:id", checkAuth, isOwnPost, async (req, res) => {
+	const { post } = req;
 	const { error } = postValidation(req.body);
 	if (error) {
 		return res.status(400).send({ error });
-	}
-
-	const post = await Post.findOne({ _id: req.params.id });
-	if (!post) {
-		return res.status(400).send({ error: "Post nebol nájdený." });
 	}
 
 	post.name = req.body.name;
@@ -79,10 +75,7 @@ router.put("/:id", checkAuth, isOwnPost, async (req, res) => {
 });
 
 router.delete("/:id", checkAuth, isOwnPost, async (req, res) => {
-	const post = await Post.findOne({ _id: req.params.id });
-	if (!post) {
-		return res.status(400).send({ error: "Post nebol nájdený." });
-	}
+	const { post } = req;
 
 	await post.remove();
 
