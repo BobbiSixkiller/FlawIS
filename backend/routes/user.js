@@ -121,10 +121,10 @@ router.post("/login", async (req, res) => {
 				email: user.email,
 				role: user.role,
 			},
-			process.env.SECRET,
-			{
-				expiresIn: "1h",
-			}
+			process.env.SECRET
+			// {
+			// 	expiresIn: "1h",
+			// }
 		);
 		user.tokens = user.tokens.concat({ token });
 
