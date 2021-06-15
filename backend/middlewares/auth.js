@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const Post = require("../models/Post");
 
 module.exports.checkAuth = function (req, res, next) {
-	const { authorization } = req.cookies;
+	//const { authorization } = req.cookies;
+	const { authorization } = req.headers;
 	if (!authorization) {
 		return res
 			.status(401)
