@@ -74,11 +74,7 @@ function Header() {
 	} else if (pathname.includes("/posts")) {
 		Brand = <NavbarBrand href="/posts">Nástenka</NavbarBrand>;
 	} else {
-		Brand = (
-			<NavbarBrand href="/">
-				FLAW<span className="pink">IS</span>
-			</NavbarBrand>
-		);
+		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
 	}
 
 	let leftNav;

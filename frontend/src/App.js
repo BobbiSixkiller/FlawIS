@@ -2,10 +2,9 @@ import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import { UserProvider } from "./hooks/useUser";
-import { AuthContextProvider } from "./context/AuthContext";
 
-import Register from "./pages/Register";
-import Login from "./pages/Login";
+import Register from "./components/user/Register";
+import Login from "./components/user/Login";
 import ForgotPassword from "./components/user/ForgotPassword";
 import PasswordReset from "./components/user/PasswordReset";
 import Header from "./components/Header";
@@ -22,10 +21,10 @@ function App() {
 	return (
 		<UserProvider>
 			<BrowserRouter>
-				<div id="App" className="d-flex flex-column justify-content-between">
-					<Header />
-					<Container className="my-5">
-						<Switch>
+				<Switch>
+					<div id="App" className="d-flex flex-column justify-content-between">
+						<Header />
+						<Container className="my-5">
 							<Route exact path="/">
 								<Home />
 							</Route>
@@ -53,10 +52,10 @@ function App() {
 							<Route path="/users">
 								<Users />
 							</Route>
-						</Switch>
-					</Container>
-					<Footer />
-				</div>
+						</Container>
+						<Footer />
+					</div>
+				</Switch>
 			</BrowserRouter>
 		</UserProvider>
 	);

@@ -2,20 +2,17 @@ const jwt = require("jsonwebtoken");
 const Post = require("../models/Post");
 
 module.exports.checkAuth = function (req, res, next) {
-	//const { authorization } = req.cookies;
-	const { authorization } = req.headers;
-	if (!authorization) {
+	const token = req.header("authorization");
+	if (!token)
 		return res
 			.status(401)
 			.send({ error: "Prístup zamietnutý, prosím prihláste sa!" });
-	}
-	const token = authorization.split("Bearer ")[1];
 
 	try {
-		req.user = jwt.verify(token, process.env.secret);
+		req.user = jwt.verify(token, process.env.SECRET);
 		next();
-	} catch (error) {
-		return res.status(401).send({ error });
+	} catch (err) {
+		res.status(401).send({ error: err.message });
 	}
 };
 
@@ -36,10 +33,10 @@ module.exports.isSupervisor = function (req, res, next) {
 module.exports.isOwnPost = async function (req, res, next) {
 	const post = await Post.findOne({ _id: req.params.id });
 	if (!post) {
-		res.status(400).send({ error: "Post nebol nájdený." });
+		return res.status(400).send({ error: "Post nebol nájdený." });
 	}
 	if (
-		post.userId === req.user.id ||
+		post.userId === req.params.id ||
 		req.user.role === "admin" ||
 		req.user.role === "supervisor"
 	) {

@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../api";
+import api from "../../api";
 import { useHistory, Link } from "react-router-dom";
 
 import {
@@ -15,9 +15,9 @@ import {
 	Fade,
 } from "reactstrap";
 
-import { useUser } from "../hooks/useUser";
-import useFormValidation from "../hooks/useFormValidation";
-import validateLogin from "../validation/validateLogin";
+import { useUser } from "../../hooks/useUser";
+import useFormValidation from "../../hooks/useFormValidation";
+import validateLogin from "../../validation/validateLogin";
 
 const INITIAL_STATE = {
 	email: "",
