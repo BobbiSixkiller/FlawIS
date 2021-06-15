@@ -107,7 +107,7 @@ function Home() {
 				<Row className="justify-content-center mb-3">
 					<img
 						className="img-fluid"
-						src={process.env.PUBLIC_URL + "/flawis-logo-small.png"}
+						src={process.env.PUBLIC_URL + "/flawis-logo.png"}
 						alt="Logo main"
 					></img>
 				</Row>
