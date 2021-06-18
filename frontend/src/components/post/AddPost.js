@@ -1,7 +1,6 @@
 import React from "react";
 import API from "../../api";
 
-import { useUser } from "../../hooks/useUser";
 import useFormValidation from "../../hooks/useFormValidation";
 import validatePost from "../../validation/validatePost";
 
@@ -23,7 +22,6 @@ import TagInput from "../TagInput";
 
 function AddPost(props) {
 	const { modal, setModal, getData } = props;
-	const { accessToken } = useUser();
 
 	const [backendError, setBackendError] = React.useState(null);
 	const [backendMsg, setBackendMsg] = React.useState(null);
@@ -47,11 +45,7 @@ function AddPost(props) {
 
 	async function newPost() {
 		try {
-			const res = await API.post("post/add", values, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
+			const res = await API.post("post/", values);
 			setBackendMsg(res.data.msg);
 		} catch (err) {
 			setBackendError(err.response.data.error);
@@ -63,7 +57,7 @@ function AddPost(props) {
 			<ModalHeader
 				toggle={() => {
 					setModal(!modal);
-					getData(accessToken);
+					getData();
 				}}
 			>
 				Nový post
@@ -148,7 +142,7 @@ function AddPost(props) {
 					color="secondary"
 					onClick={() => {
 						setModal(!modal);
-						getData(accessToken);
+						getData();
 					}}
 				>
 					Zrušiť

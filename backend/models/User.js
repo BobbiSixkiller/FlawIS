@@ -33,13 +33,6 @@ const userSchema = new mongoose.Schema(
 			enum: ["basic", "supervisor", "admin"],
 			trim: true,
 		},
-		tokens: [
-			{
-				token: {
-					type: String,
-				},
-			},
-		],
 	},
 	{
 		timestamps: true,

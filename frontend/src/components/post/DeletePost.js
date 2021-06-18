@@ -1,8 +1,6 @@
 import React from "react";
 import API from "../../api";
 
-import { useUser } from "../../hooks/useUser";
-
 import {
 	Alert,
 	ModalHeader,
@@ -16,7 +14,6 @@ import {
 
 function DeletePost(props) {
 	const { modal, setModal, getData } = props;
-	const { accessToken } = useUser();
 
 	const [backendError, setBackendError] = React.useState(null);
 	const [backendMsg, setBackendMsg] = React.useState(null);
@@ -24,11 +21,7 @@ function DeletePost(props) {
 	async function deletePost(e) {
 		e.preventDefault();
 		try {
-			const res = await API.delete(`post/${modal.post._id}`, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
+			const res = await API.delete(`post/${modal.post._id}`);
 			setBackendMsg(res.data.msg);
 		} catch (err) {
 			setBackendError(err.response.data.error);
@@ -40,7 +33,7 @@ function DeletePost(props) {
 			<ModalHeader
 				toggle={() => {
 					setModal(!modal);
-					getData(accessToken);
+					getData();
 				}}
 			>
 				Zmazať post
@@ -82,7 +75,7 @@ function DeletePost(props) {
 					color="secondary"
 					onClick={() => {
 						setModal(!modal);
-						getData(accessToken);
+						getData();
 					}}
 				>
 					Zrušiť

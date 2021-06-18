@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import api from "../api";
-import { useHistory, Link } from "react-router-dom";
+import { useLocation, useHistory, Link } from "react-router-dom";
 
 import {
 	NavLink,
@@ -15,7 +15,7 @@ import {
 	Fade,
 } from "reactstrap";
 
-import { useUser } from "../hooks/useUser";
+import { AuthContext } from "../context/auth";
 import useFormValidation from "../hooks/useFormValidation";
 import validateLogin from "../validation/validateLogin";
 
@@ -25,18 +25,21 @@ const INITIAL_STATE = {
 };
 
 function Login() {
-	const { setAccessToken } = useUser();
+	const context = useContext(AuthContext);
+	const location = useLocation();
 	const history = useHistory();
 
-	const login = async () => {
+	let { from } = location.state || { from: { pathname: "/" } };
+
+	async function login() {
 		try {
-			const loginRes = await api.post("user/login", values);
-			setAccessToken(loginRes.data.token);
-			history.push("/");
+			const res = await api.post("user/login", values);
+			//context.login(res.data);
+			history.replace(from);
 		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
+			context.login(err.response.data);
 		}
-	};
+	}
 
 	const {
 		handleSubmit,
@@ -47,7 +50,6 @@ function Login() {
 		valid,
 		isSubmitting,
 	} = useFormValidation(INITIAL_STATE, validateLogin, login);
-	const [backendError, setBackendError] = React.useState(null);
 
 	return (
 		<Fade>
@@ -91,12 +93,12 @@ function Login() {
 						<FormFeedback valid>{valid.password}</FormFeedback>
 					</Col>
 				</FormGroup>
-				{backendError && (
+				{context.error && (
 					<FormGroup row className="justify-content-center">
 						<Col sm={6}>
 							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
+								{context.error}
+								<Button close onClick={() => context.hideError()} />
 							</Alert>
 						</Col>
 					</FormGroup>

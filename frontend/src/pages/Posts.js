@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
 	useRouteMatch,
 	useParams,
@@ -15,7 +15,6 @@ import {
 	ListGroupItem,
 	Row,
 	Col,
-	Container,
 	ButtonGroup,
 	Button,
 	Card,
@@ -29,7 +28,7 @@ import {
 } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
-import { useUser } from "../hooks/useUser";
+import { AuthContext } from "../context/auth";
 import API from "../api";
 
 import PaginationComponent from "../components/PaginationComponent";
@@ -41,34 +40,28 @@ import Post from "../pages/Post";
 export default function Posts() {
 	const { path, url } = useRouteMatch();
 	const params = useParams();
-	const { accessToken, user } = useUser();
+	const { user } = useContext(AuthContext);
 
-	const [loading, setLoading] = React.useState(false);
-	const [posts, setPosts] = React.useState([]);
-	const [authors, setAuthors] = React.useState([]);
-	const [tags, setTags] = React.useState([]);
-	const [modal, setModal] = React.useState(false);
+	const [loading, setLoading] = useState(false);
+	const [posts, setPosts] = useState([]);
+	const [authors, setAuthors] = useState([]);
+	const [tags, setTags] = useState([]);
+	const [modal, setModal] = useState(false);
 
-	const [page, setPage] = React.useState(params.page || 1);
-	const [pages, setPages] = React.useState(1);
+	const [page, setPage] = useState(params.page || 1);
+	const [pages, setPages] = useState(1);
 
-	React.useEffect(() => {
-		getData(accessToken);
+	useEffect(() => {
+		getData();
 	}, [page, authors, tags]);
 
-	async function getData(token) {
+	async function getData() {
 		try {
 			setLoading(true);
 			const res = await API.get(
-				//`post?page=${page}&author=${author}&tag=${tag}`,
 				`post?page=${page}${authors.map((a) => `&author=${a}`)}${tags.map(
 					(t) => `&tag=${t}`
-				)}`,
-				{
-					headers: {
-						authorization: token,
-					},
-				}
+				)}`
 			);
 			setPosts(res.data.posts);
 			setPages(res.data.pages);
@@ -85,13 +78,13 @@ export default function Posts() {
 				<Spinner />
 			</Row>
 		);
-	} else if (user._id) {
+	} else {
 		return (
 			<Switch>
 				<Route exact path={path}>
 					<Fade>
 						<Row className="mb-3">
-							<Col>
+							<Col sm={8}>
 								<h1>Prehľad postov</h1>
 								<ListGroup horizontal>
 									{authors.length !== 0 &&
@@ -122,7 +115,7 @@ export default function Posts() {
 										))}
 								</ListGroup>
 							</Col>
-							<Col>
+							<Col sm={4}>
 								<Button
 									className="float-md-right "
 									outline
@@ -220,7 +213,7 @@ export default function Posts() {
 							isOpen={modal.show}
 							toggle={() => {
 								setModal(!modal);
-								getData(accessToken);
+								getData();
 							}}
 						>
 							{modal.action === "add" && (
@@ -243,13 +236,6 @@ export default function Posts() {
 					<Post />
 				</Route>
 			</Switch>
-		);
-	} else {
-		return (
-			<Container>
-				<h1 className="text-center">Prosím prihláste sa</h1>
-				{user.error && <Alert color="danger">{user.error}</Alert>}
-			</Container>
 		);
 	}
 }

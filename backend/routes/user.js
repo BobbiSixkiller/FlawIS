@@ -7,7 +7,6 @@ const jwt = require("jsonwebtoken");
 
 const {
 	registerValidation,
-	userAddValidation,
 	loginValidation,
 	userUpdateValidation,
 	forgotPasswordValidation,
@@ -55,89 +54,87 @@ router.post("/register", async (req, res) => {
 	res
 		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
 		.status(200)
-		.send({ msg: "Registrácia prebehla úspešne!" });
+		.send({
+			msg: `Vitajte ${user.fullName}!`,
+			user: {
+				_id: user._id,
+				fullName: user.fullName,
+				email: user.email,
+				role: user.role,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
+			},
+		});
 });
 
-router.post("/add", checkAuth, isSupervisor, async (req, res) => {
-	const user = req.user[0];
-	if (user.role === "admin" || user.role === "supervisor") {
-		//validation
-		const { error } = await userAddValidation(req.body);
-		if (error) return res.status(400).send({ error: error.details[0].message });
+router.post("/", checkAuth, isSupervisor, async (req, res) => {
+	//validation
+	const { error } = await registerValidation(req.body);
+	if (error) return res.status(400).send({ error: error.details[0].message });
 
-		//check for duplicates
-		const emailExist = await User.findOne({ email: req.body.email });
-		if (emailExist)
-			return res
-				.status(400)
-				.send({ error: "Zadaný email je už zaregistrovaný!" });
+	//check for duplicates
+	const emailExist = await User.findOne({ email: req.body.email });
+	if (emailExist)
+		return res
+			.status(400)
+			.send({ error: "Zadaný email je už zaregistrovaný!" });
 
-		//password hashing
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(req.body.password, salt);
+	//password hashing
+	const salt = await bcrypt.genSalt(10);
+	const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-		//create a new user
-		const user = new User({
-			firstName: req.body.firstName,
-			lastName: req.body.lastName,
-			email: req.body.email,
-			password: hashedPassword,
-			role: req.body.role,
-		});
+	//create a new user
+	const user = new User({
+		firstName: req.body.firstName,
+		lastName: req.body.lastName,
+		email: req.body.email,
+		password: hashedPassword,
+		role: req.body.role,
+	});
 
-		try {
-			const savedUser = await user.save();
-			res
-				.status(200)
-				.send({ msg: `Používateľ ${savedUser.fullName} bol pridaný.` });
-		} catch (err) {
-			res.status(500).send({ error: err.message });
-		}
-	} else {
-		res.status(401).send({ error: "Prístup zamietnutý!" });
-	}
+	await user.save();
+	res.status(200).send({ msg: `Používateľ ${user.fullName} bol pridaný.` });
 });
 
 router.post("/login", async (req, res) => {
-	try {
-		const { error } = loginValidation(req.body);
-		if (error) return res.status(400).send({ error: error.details[0].message });
+	const { error } = loginValidation(req.body);
+	if (error) return res.status(400).send({ error: error.details[0].message });
 
-		const user = await User.findOne({ email: req.body.email });
-		if (!user)
-			return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
+	const user = await User.findOne({ email: req.body.email });
+	if (!user)
+		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
 
-		const passwordExists = await bcrypt.compare(
-			req.body.password,
-			user.password
-		);
-		if (!passwordExists)
-			return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
+	const passwordExists = await bcrypt.compare(req.body.password, user.password);
+	if (!passwordExists)
+		return res.status(400).send({ error: "Email alebo heslo sú nesprávne!" });
 
-		const token = jwt.sign(
-			{
+	const token = jwt.sign(
+		{
+			_id: user._id,
+			name: user.fullName,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.SECRET,
+		{
+			expiresIn: "1h",
+		}
+	);
+
+	res
+		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
+		.status(200)
+		.send({
+			msg: `Vitajte ${user.fullName}!`,
+			user: {
 				_id: user._id,
-				name: user.fullName,
+				fullName: user.fullName,
 				email: user.email,
 				role: user.role,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt,
 			},
-			process.env.SECRET,
-			{
-				expiresIn: "1h",
-			}
-		);
-		user.tokens = user.tokens.concat({ token });
-
-		await user.save();
-		res.send({ token: token, user: user });
-
-		res
-			.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
-			.status(200)
-			.send({ msg: `Vitajte ${user.fullName}!` });
-	} catch (error) {
-		console.log(error);
-	}
+		});
 });
 
 router.post("/forgotPassword", async (req, res) => {
@@ -153,9 +150,8 @@ router.post("/forgotPassword", async (req, res) => {
 	const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
 		expiresIn: "1h",
 	});
-	user.resetToken = token;
 
-	const resetURL = `http://flawis.flaw.uniba.sk/resetPassword/${token}`;
+	const resetURL = `https://flawis.flaw.uniba.sk/resetPassword/${token}`;
 
 	try {
 		await mail.send({
@@ -194,56 +190,42 @@ router.post("/reset/:token", async (req, res) => {
 		function (err, decoded) {
 			if (err) {
 				if (err.message === "jwt expired") {
-					return res
-						.status(400)
-						.send({ error: { message: "Token pre reset hesla expiroval!" } });
+					return res.status(401).send({
+						error: {
+							...err,
+							message: "Autorizačný token expiroval, prihláste sa prosím!",
+						},
+					});
 				}
-				res.status(400).send({ error: err });
+				res.status(401).send({ error: err });
 			} else {
 				return decoded;
 			}
 		}
 	);
 
+	const user = await User.findOne({ _id: id });
+	if (!user) {
+		return res.status(404).send({ error: "Používateľ nebol nájdený!" });
+	}
+
 	const { error } = await resetPasswordValidation(req.body);
 	if (error) return res.status(400).send({ error: error.details[0].message });
 
 	const salt = await bcrypt.genSalt(10);
-	req.body.password = await bcrypt.hash(req.body.password, salt);
+	const password = await bcrypt.hash(req.body.password, salt);
 
-	try {
-		const user = await User.findOne({ _id: id });
-		user.password = req.body.password;
-		await user.save();
-		res.status(200).send({ msg: "Vaše heslo bolo zmenené!" });
-	} catch (err) {
-		res.status(500).send({ error: err });
-	}
+	user.password = password;
+	await user.save();
+
+	res.status(200).send({ msg: "Vaše heslo bolo zmenené!" });
 });
 
-// router.get("/logout", (req, res) => {
-// 	res
-// 		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
-// 		.status(200)
-// 		.send({ msg: "Boli ste odhlásený." });
-// });
-
-router.post("/logout", checkAuth, async (req, res) => {
-	const user = await User.findOne({ _id: req.user._id });
-
-	user.tokens = user.tokens.filter((token) => {
-		return token.token !== req.token;
-	});
-	await user.save();
-	res.send({ msg: `Deleted token: ${req.token}` });
-});
-
-router.post("/logoutall", checkAuth, async (req, res) => {
-	const user = await User.findOne({ _id: req.user._id });
-
-	user.tokens.splice(0, user.tokens.length);
-	await user.save();
-	res.send({ msg: "All devices have been logged out" });
+router.get("/logout", (req, res) => {
+	res
+		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+		.status(200)
+		.send({ msg: "Boli ste odhlásený." });
 });
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
@@ -256,22 +238,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	}
 });
 
-//experimental endpoint
-router.get("/tokenIsValid", async (req, res) => {
-	const { authorization } = req.cookies;
-	if (!authorization) {
-		return res.send(false);
-	}
-	const token = authorization.split("Bearer ")[1];
-
-	try {
-		jwt.verify(token, process.env.secret);
-		res.send(true);
-	} catch (error) {
-		return res.send(false);
-	}
-});
-
+//util endpoint for grant members
 router.get("/names", checkAuth, async (req, res) => {
 	const users = await User.find().select("firstName lastName");
 
@@ -298,16 +265,12 @@ router.get("/:id/:year", checkAuth, async (req, res) => {
 });
 
 router.get("/me", checkAuth, async (req, res) => {
-	try {
-		const match = await User.findOne({ _id: req.user._id });
-		if (match) {
-			res.status(200).send(match);
-		} else {
-			res.status(404).send({ error: "Používateľ nebol nájdený!" });
-		}
-	} catch (err) {
-		res.status(500).send({ error: err.message });
+	const user = await User.findOne({ _id: req.user._id }).select("-password");
+	if (!user) {
+		return res.status(404).send({ error: "Používateľ nebol nájdený!" });
 	}
+
+	res.status(200).send({ msg: `Vitajte ${user.fullName}!`, user });
 });
 
 router.get("/:id", checkAuth, isSupervisor, async (req, res) => {

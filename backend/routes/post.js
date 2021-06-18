@@ -42,7 +42,7 @@ router.get("/:id", checkAuth, async (req, res) => {
 	res.status(200).send(post);
 });
 
-router.post("/add", checkAuth, async (req, res) => {
+router.post("/", checkAuth, async (req, res) => {
 	const { error } = postValidation(req.body);
 	if (error) {
 		return res.status(400).send({ error });
@@ -50,7 +50,7 @@ router.post("/add", checkAuth, async (req, res) => {
 
 	const post = new Post({
 		...req.body,
-		author: req.user.fullName,
+		author: req.user.name,
 		userId: req.user._id,
 	});
 	await post.save();

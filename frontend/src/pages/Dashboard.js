@@ -1,5 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useHistory, useRouteMatch, Switch, Route } from "react-router-dom";
+import { Route, Switch, useRouteMatch, useHistory } from "react-router-dom";
+
+import API from "../api";
+import { AuthContext } from "../context/auth";
+
 import {
 	Fade,
 	Alert,
@@ -17,10 +21,7 @@ import {
 	Button,
 } from "reactstrap";
 
-import API from "../api";
-import { AuthContext } from "../context/auth";
-
-function Home() {
+export default function Profile() {
 	const context = useContext(AuthContext);
 	const { path, url } = useRouteMatch();
 	const history = useHistory();
@@ -49,7 +50,7 @@ function Home() {
 				<Spinner />
 			</Container>
 		);
-	} else if (context.user) {
+	} else {
 		return (
 			<Switch>
 				<Route exact path={path}>
@@ -141,33 +142,9 @@ function Home() {
 						</Jumbotron>
 					</Fade>
 				</Route>
-				<Route path=""></Route>
-				<Route></Route>
+				<Route path={`${path}/mygrants`}></Route>
+				<Route path={`${path}/posts`}></Route>
 			</Switch>
-		);
-	} else {
-		return (
-			<>
-				{context.error && (
-					<Row>
-						<Col className="my-5">
-							<Alert className="text-center" color="danger">
-								{context.error}
-								<Button close onClick={() => context.hideError()} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-				<Row className="justify-content-center mb-3">
-					<img
-						className="img-fluid"
-						src={process.env.PUBLIC_URL + "/flawis-logo.png"}
-						alt="Logo main"
-					></img>
-				</Row>
-			</>
 		);
 	}
 }
-
-export default Home;

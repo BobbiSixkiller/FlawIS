@@ -1,29 +1,22 @@
-import React from "react";
-import { useParams, Redirect, useHistory, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useHistory } from "react-router-dom";
 
 import API from "../api";
-import { useUser } from "../hooks/useUser";
 import { Row, Fade, Jumbotron, Button, Spinner, Alert } from "reactstrap";
 
 export default function Post() {
 	const history = useHistory();
 	const { id } = useParams();
 
-	const { accessToken, user } = useUser();
+	const [loading, setLoading] = useState(false);
+	const [post, setPost] = useState({});
+	const [backendError, setBackendError] = useState(null);
 
-	const [loading, setLoading] = React.useState(false);
-	const [post, setPost] = React.useState({});
-	const [backendError, setBackendError] = React.useState(null);
-
-	React.useEffect(() => {
-		async function getData(token) {
+	useEffect(() => {
+		async function getData() {
 			try {
 				setLoading(true);
-				const res = await API.get(`post/${id}`, {
-					headers: {
-						authorization: token,
-					},
-				});
+				const res = await API.get(`post/${id}`);
 				setPost(res.data);
 				setLoading(false);
 			} catch (err) {
@@ -31,14 +24,10 @@ export default function Post() {
 				setBackendError(err.response.data.error);
 			}
 		}
-		if (user._id) {
-			getData(accessToken);
-		}
-	}, [user, accessToken, id]);
+		getData();
+	}, [id]);
 
-	if (!user._id) {
-		return <Redirect to={{ path: "/" }} />;
-	} else if (loading) {
+	if (loading) {
 		return (
 			<Row className="justify-content-center">
 				<Spinner />
@@ -65,7 +54,7 @@ export default function Post() {
 					</p>
 					<p>{post.body}</p>
 					<p className="lead">
-						<Button color="primary" tag={Link} to="/posts">
+						<Button color="primary" onClick={() => history.goBack()}>
 							Späť
 						</Button>
 					</p>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import api from "../api";
 
@@ -14,6 +14,7 @@ import {
 	Fade,
 } from "reactstrap";
 
+import { AuthContext } from "../context/auth";
 import useFormValidation from "../hooks/useFormValidation";
 import validateRegister from "../validation/validateRegister";
 
@@ -26,14 +27,18 @@ const INITIAL_STATE = {
 };
 
 function Register() {
-	const Register = async () => {
+	const context = useContext(AuthContext);
+	const history = useHistory();
+
+	async function Register() {
 		try {
 			const res = await api.post("user/register", values);
-			setBackendMsg(res.data.msg);
+			//context.login(res.data);
+			history.push("/");
 		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
+			context.login(err.response.data);
 		}
-	};
+	}
 	const {
 		handleSubmit,
 		handleChange,
@@ -43,9 +48,6 @@ function Register() {
 		valid,
 		isSubmitting,
 	} = useFormValidation(INITIAL_STATE, validateRegister, Register);
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
-	const history = useHistory();
 
 	return (
 		<Fade>
@@ -146,28 +148,12 @@ function Register() {
 						<FormFeedback valid>{valid.repeatPass}</FormFeedback>
 					</Col>
 				</FormGroup>
-				{backendMsg && (
-					<FormGroup row className="justify-content-center">
-						<Col sm={6}>
-							<Alert color="success">
-								{backendMsg}
-								<Button
-									close
-									onClick={() => {
-										setBackendMsg(null);
-										history.push("/login");
-									}}
-								/>
-							</Alert>
-						</Col>
-					</FormGroup>
-				)}
-				{backendError && (
+				{context.error && (
 					<FormGroup row className="justify-content-center">
 						<Col sm={6}>
 							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
+								{context.error}
+								<Button close onClick={() => context.hideError()} />
 							</Alert>
 						</Col>
 					</FormGroup>
