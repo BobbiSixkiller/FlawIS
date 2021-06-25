@@ -1,32 +1,22 @@
 import React, { useContext } from "react";
 import { Route, Redirect } from "react-router-dom";
 
-import { Spinner, Container } from "reactstrap";
-
 import { AuthContext } from "../context/auth";
 
 export function AuthRoute({ children, ...rest }) {
-	const { user, loading } = useContext(AuthContext);
-
-	if (loading) {
-		return (
-			<Container className="text-center">
-				<Spinner />
-			</Container>
-		);
-	}
+	const { user } = useContext(AuthContext);
 
 	return (
 		<Route
 			{...rest}
-			render={(props) =>
+			render={({ location }) =>
 				user ? (
 					children
 				) : (
 					<Redirect
 						to={{
 							pathname: "/login",
-							state: { from: props.location },
+							state: { from: location },
 						}}
 					/>
 				)
@@ -36,27 +26,19 @@ export function AuthRoute({ children, ...rest }) {
 }
 
 export function AdminRoute({ children, ...rest }) {
-	const { user, loading } = useContext(AuthContext);
-
-	if (loading) {
-		return (
-			<Container className="text-center">
-				<Spinner />
-			</Container>
-		);
-	}
+	const { user } = useContext(AuthContext);
 
 	return (
 		<Route
 			{...rest}
-			render={(props) =>
+			render={({ location }) =>
 				user && (user.role === "admin" || user.role === "supervisor") ? (
 					children
 				) : (
 					<Redirect
 						to={{
 							pathname: "/login",
-							state: { from: props.location },
+							state: { from: location },
 						}}
 					/>
 				)

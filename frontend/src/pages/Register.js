@@ -33,7 +33,7 @@ function Register() {
 	async function Register() {
 		try {
 			const res = await api.post("user/register", values);
-			//context.login(res.data);
+			context.login(res.data);
 			history.push("/");
 		} catch (err) {
 			context.login(err.response.data);

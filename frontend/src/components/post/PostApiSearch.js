@@ -1,20 +1,25 @@
-import React from "react";
-import { useRouteMatch, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouteMatch, useLocation, Link } from "react-router-dom";
 
-import API from "../../api";
+import useDataFetch from "../../hooks/useDataFetch";
+
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
 export default function ApiSearch() {
-	const match = useRouteMatch();
+	const { url } = useRouteMatch();
+	const { pathname } = useLocation();
 
-	const [display, setDisplay] = React.useState(false);
-	const [search, setSearch] = React.useState("");
-	const [loading, setLoading] = React.useState(false);
-	const [suggestions, setSuggestions] = React.useState(null);
-	const autoWrapRef = React.useRef(null);
-	const activeSuggestionRef = React.useRef(null);
+	const [display, setDisplay] = useState(false);
+	const [search, setSearch] = useState("");
+	const autoWrapRef = useRef(null);
+	const activeSuggestionRef = useRef(null);
 
-	React.useEffect(() => {
+	const {
+		state: { loading, error, data },
+		setUrl,
+	} = useDataFetch(`post/api/search?q=${search}`, []);
+
+	useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
 
 		return () => {
@@ -22,21 +27,13 @@ export default function ApiSearch() {
 		};
 	}, [autoWrapRef]);
 
-	React.useEffect(() => {
-		async function apiSearch() {
-			try {
-				setLoading(true);
-				const res = await API.get(`post/api/search?q=${search}`);
-				setSuggestions(res.data.posts);
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
-				setSuggestions([]);
-				console.log(err);
-			}
-		}
-		apiSearch();
-	}, [search]);
+	useEffect(() => {
+		setUrl(`post/api/search?q=${search}`);
+	}, [search, setUrl]);
+
+	useEffect(() => {
+		activeSuggestionRef.current = pathname.split("/")[3];
+	}, [pathname]);
 
 	function handleClickOutside(e) {
 		if (autoWrapRef.current && !autoWrapRef.current.contains(e.target)) {
@@ -44,8 +41,7 @@ export default function ApiSearch() {
 		}
 	}
 
-	function handleSuggestionClick(i) {
-		activeSuggestionRef.current = i;
+	function handleSuggestionClick() {
 		setDisplay(false);
 	}
 
@@ -55,7 +51,7 @@ export default function ApiSearch() {
 				className="autoInput"
 				id="search"
 				name="search"
-				placeholder="Search..."
+				placeholder="Hľadať..."
 				value={search}
 				onClick={() => setDisplay(!display)}
 				onChange={(e) => setSearch(e.target.value)}
@@ -68,20 +64,22 @@ export default function ApiSearch() {
 							<Spinner size="sm" />
 						</ListGroupItem>
 					)}
-					{suggestions.length === 0 ? (
-						<ListGroupItem className="text-muted">No results</ListGroupItem>
+					{data.posts.length === 0 || error ? (
+						<ListGroupItem className="text-muted">
+							Žiadne výsledky
+						</ListGroupItem>
 					) : (
-						suggestions.map((suggestion, i) => (
+						data.posts.map((post, i) => (
 							<ListGroupItem
 								key={i}
-								onClick={() => handleSuggestionClick(i)}
+								onClick={() => handleSuggestionClick(post._id)}
 								tag={Link}
-								to={`${match.url}/${suggestion._id}`}
+								to={`${url}/${post._id}`}
 								action
-								active={activeSuggestionRef.current === i}
+								active={activeSuggestionRef.current === post._id}
 							>
-								{suggestion.name}, {suggestion.author}, Oblasť:{" "}
-								{suggestion.tags.map((tag) => `#${tag} `)}
+								{post.name}, {post.author}, Oblasť:{" "}
+								{post.tags.map((tag) => `#${tag} `)}
 							</ListGroupItem>
 						))
 					)}

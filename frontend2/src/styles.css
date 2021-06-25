@@ -1,0 +1,30 @@
+html,
+body {
+	height: 100vh;
+}
+
+#root {
+	height: 100%;
+}
+
+#App {
+	height: 100%;
+}
+
+.autoInput input {
+	position: relative;
+}
+
+.suggestions {
+	position: absolute;
+	top: 90%;
+	right: 0;
+	left: 0;
+	z-index: 999;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.pink {
+	color: #b46b7a;
+}

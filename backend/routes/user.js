@@ -52,7 +52,11 @@ router.post("/register", async (req, res) => {
 	);
 
 	res
-		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
+		.cookie("authorization", `Bearer ${token}`, {
+			httpOnly: true,
+			maxAge: 3600000,
+			sameSite: "strict",
+		})
 		.status(200)
 		.send({
 			msg: `Vitajte ${user.fullName}!`,
@@ -122,7 +126,11 @@ router.post("/login", async (req, res) => {
 	);
 
 	res
-		.cookie("authorization", `Bearer ${token}`, { httpOnly: true })
+		.cookie("authorization", `Bearer ${token}`, {
+			httpOnly: true,
+			maxAge: 3600000,
+			sameSite: "strict",
+		})
 		.status(200)
 		.send({
 			msg: `Vitajte ${user.fullName}!`,

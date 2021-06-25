@@ -1,12 +1,12 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
-function useFormValidation(initialState, validate, action) {
-	const [values, setValues] = React.useState(initialState);
-	const [errors, setErrors] = React.useState({});
-	const [valid, setValid] = React.useState({});
-	const [isSubmitting, setSubmitting] = React.useState(false);
+export default function useFormValidation(initialState, validate, action) {
+	const [values, setValues] = useState(initialState);
+	const [errors, setErrors] = useState({});
+	const [valid, setValid] = useState({});
+	const [isSubmitting, setSubmitting] = useState(false);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (isSubmitting) {
 			const noErrors = Object.keys(errors).length === 0;
 			if (noErrors) {
@@ -16,27 +16,25 @@ function useFormValidation(initialState, validate, action) {
 				setSubmitting(false);
 			}
 		}
-	}, [errors]);
+	}, [errors, isSubmitting, action]);
 
 	function handleChange(e) {
 		switch (e.target.name) {
 			case "files":
-				setValues({
+				return setValues({
 					...values,
 					[e.target.name]: e.target.files,
 				});
-				break;
 
 			default:
-				setValues({
+				return setValues({
 					...values,
 					[e.target.name]: e.target.value,
 				});
-				break;
 		}
 	}
 
-	function handleBlur(e) {
+	function handleBlur() {
 		const { errors, valid } = validate(values);
 		setErrors(errors);
 		setValid(valid);
@@ -61,5 +59,3 @@ function useFormValidation(initialState, validate, action) {
 		isSubmitting,
 	};
 }
-
-export default useFormValidation;

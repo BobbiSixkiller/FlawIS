@@ -35,7 +35,7 @@ module.exports.isOwnPost = async function (req, res, next) {
 		res.status(400).send({ error: "Post nebol nájdený." });
 	}
 	if (
-		post.userId === req.user.id ||
+		post.userId == req.user._id ||
 		req.user.role === "admin" ||
 		req.user.role === "supervisor"
 	) {

@@ -1,11 +1,17 @@
-import React, { useState, useEffect, useReducer, createContext } from "react";
+import React, {
+	useCallback,
+	useReducer,
+	createContext,
+	useEffect,
+	useState,
+} from "react";
 
-import API from "../api";
+import API from "../util/ClientConfig";
 
 const INITIAL_STATE = {
 	user: null,
-	msg: "",
-	error: "",
+	msg: null,
+	error: null,
 };
 
 const AuthContext = createContext({
@@ -28,7 +34,7 @@ function authReducer(state, action) {
 				...state,
 				user: null,
 				msg: action.payload.msg,
-				error: null,
+				error: action.payload.error,
 			};
 		case "HIDE_MSG":
 			return {
@@ -42,37 +48,35 @@ function authReducer(state, action) {
 			};
 
 		default:
-			return { ...state };
+			return state;
 	}
 }
 
 function AuthProvider({ children }) {
 	const [state, dispatch] = useReducer(authReducer, INITIAL_STATE);
-	const [loading, setLoading] = useState(true);
-	//temporary solution of fulltext search for users and grants
-	const [search, setSearch] = useState("");
+	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		async function currentUser() {
-			try {
-				const user = await API.get("user/me");
-				login(user.data);
-				setLoading(false);
-			} catch (error) {
-				console.log(error.response);
-				setLoading(false);
-			}
-		}
-
-		currentUser();
-	}, []);
-
-	function login(data) {
+	const login = useCallback((data) => {
 		dispatch({
 			type: "LOGIN",
 			payload: data,
 		});
-	}
+	}, []);
+
+	useEffect(() => {
+		async function isLoggedIn() {
+			try {
+				setLoading(true);
+				const user = await API.get("user/me");
+				login(user.data);
+				setLoading(false);
+			} catch (error) {
+				setLoading(false);
+				console.log(error);
+			}
+		}
+		isLoggedIn();
+	}, [login]);
 
 	function logout(data) {
 		dispatch({
@@ -100,8 +104,6 @@ function AuthProvider({ children }) {
 				hideError,
 				hideMsg,
 				loading,
-				search,
-				setSearch,
 			}}
 		>
 			{children}

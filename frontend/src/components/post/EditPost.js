@@ -21,7 +21,7 @@ import {
 import TagInput from "../TagInput";
 
 function EditPost(props) {
-	const { modal, setModal, getData } = props;
+	const { modal, setModal, refresh } = props;
 
 	const [backendError, setBackendError] = React.useState(null);
 	const [backendMsg, setBackendMsg] = React.useState(null);
@@ -57,7 +57,7 @@ function EditPost(props) {
 			<ModalHeader
 				toggle={() => {
 					setModal(!modal);
-					getData();
+					refresh();
 				}}
 			>
 				Upraviť post
@@ -142,7 +142,7 @@ function EditPost(props) {
 					color="secondary"
 					onClick={() => {
 						setModal(!modal);
-						getData();
+						refresh();
 					}}
 				>
 					Zrušiť

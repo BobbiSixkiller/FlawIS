@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import api from "../api";
 import { useLocation, useHistory, Link } from "react-router-dom";
 
@@ -33,8 +33,8 @@ function Login() {
 
 	async function login() {
 		try {
-			const res = await api.post("user/login", values);
-			//context.login(res.data);
+			const user = await api.post("user/login", values);
+			context.login(user.data);
 			history.replace(from);
 		} catch (err) {
 			context.login(err.response.data);

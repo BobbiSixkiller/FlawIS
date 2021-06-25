@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 
 function DeletePost(props) {
-	const { modal, setModal, getData } = props;
+	const { modal, setModal, refresh } = props;
 
 	const [backendError, setBackendError] = React.useState(null);
 	const [backendMsg, setBackendMsg] = React.useState(null);
@@ -33,7 +33,7 @@ function DeletePost(props) {
 			<ModalHeader
 				toggle={() => {
 					setModal(!modal);
-					getData();
+					refresh();
 				}}
 			>
 				Zmazať post
@@ -75,7 +75,7 @@ function DeletePost(props) {
 					color="secondary"
 					onClick={() => {
 						setModal(!modal);
-						getData();
+						refresh();
 					}}
 				>
 					Zrušiť

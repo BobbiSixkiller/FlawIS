@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import API from "../../api";
 
 import useFormValidation from "../../hooks/useFormValidation";
@@ -20,17 +20,18 @@ import {
 } from "reactstrap";
 import TagInput from "../TagInput";
 
+const INITIAL_STATE = {
+	name: "",
+	body: "",
+	tags: [],
+};
+
 function AddPost(props) {
-	const { modal, setModal, getData } = props;
+	const { modal, setModal, refresh } = props;
 
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
-
-	const INITIAL_STATE = {
-		name: "",
-		body: "",
-		tags: [],
-	};
+	const [backendError, setBackendError] = useState(null);
+	const [backendMsg, setBackendMsg] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	const {
 		handleSubmit,
@@ -44,11 +45,14 @@ function AddPost(props) {
 	} = useFormValidation(INITIAL_STATE, validatePost, newPost);
 
 	async function newPost() {
+		setLoading(true);
 		try {
 			const res = await API.post("post/", values);
 			setBackendMsg(res.data.msg);
+			setLoading(false);
 		} catch (err) {
 			setBackendError(err.response.data.error);
+			setLoading(false);
 		}
 	}
 
@@ -57,7 +61,7 @@ function AddPost(props) {
 			<ModalHeader
 				toggle={() => {
 					setModal(!modal);
-					getData();
+					refresh();
 				}}
 			>
 				Nový post
@@ -134,7 +138,7 @@ function AddPost(props) {
 				)}
 			</ModalBody>
 			<ModalFooter>
-				<Button type="submit" disabled={isSubmitting} color="success">
+				<Button type="submit" disabled={loading} color="success">
 					Pridať
 				</Button>{" "}
 				<Button
@@ -142,7 +146,7 @@ function AddPost(props) {
 					color="secondary"
 					onClick={() => {
 						setModal(!modal);
-						getData();
+						refresh();
 					}}
 				>
 					Zrušiť

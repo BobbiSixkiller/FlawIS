@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
-import { useHistory, useLocation, Switch, Route } from "react-router-dom";
+import { useHistory, Switch, Route } from "react-router-dom";
 import api from "../api";
 
-import ApiSearch from "./post/PostApiSearch";
+import PostApiSearch from "./post/PostApiSearch";
 import { AuthContext } from "../context/auth";
 
 import {
@@ -23,7 +23,6 @@ import {
 function Header() {
 	const context = useContext(AuthContext);
 	const history = useHistory();
-	const { pathname } = useLocation();
 
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -32,6 +31,7 @@ function Header() {
 	async function logOut() {
 		const res = await api.get("user/logout");
 		context.logout(res.data);
+		history.push("/");
 	}
 
 	function changePassword() {
@@ -39,24 +39,11 @@ function Header() {
 		history.push("/forgotPassword");
 	}
 
-	let Brand;
-	if (pathname.includes("/mywork")) {
-		Brand = <NavbarBrand href="/mywork">eNástenka</NavbarBrand>;
-	} else if (pathname.includes("/mygrants")) {
-		Brand = <NavbarBrand href="/mygrants">Moje Granty</NavbarBrand>;
-	} else if (pathname.includes("/posts")) {
-		Brand = <NavbarBrand href="/posts">Nástenka</NavbarBrand>;
-	} else {
-		Brand = (
+	return (
+		<Navbar color="dark" dark expand="md" className="sticky-top">
 			<NavbarBrand href="/">
 				FLAW<span className="pink">IS</span>
 			</NavbarBrand>
-		);
-	}
-
-	return (
-		<Navbar color="dark" dark expand="md" className="sticky-top">
-			{Brand}
 			<NavbarToggler onClick={toggle} />
 			<Collapse isOpen={isOpen} navbar>
 				{context.user ? (
@@ -69,20 +56,24 @@ function Header() {
 										Zdroje
 									</DropdownToggle>
 									<DropdownMenu>
-										<DropdownItem onClick={() => history.push("/users")}>
+										<DropdownItem
+											onClick={() => history.push("/dashboard/users")}
+										>
 											Používatelia
 										</DropdownItem>
-										<DropdownItem onClick={() => history.push("/grants")}>
+										<DropdownItem
+											onClick={() => history.push("/dashboard/grants")}
+										>
 											Granty
 										</DropdownItem>
 									</DropdownMenu>
 								</UncontrolledDropdown>
 								<NavItem>
 									<Switch>
-										<Route path="/posts">
-											<ApiSearch />
+										<Route path="/dashboard/posts">
+											<PostApiSearch />
 										</Route>
-										<Route exact path="/grants">
+										<Route exact path="/dashboard/grants">
 											<Input
 												type="text"
 												placeholder="Vyhľadávanie"
@@ -93,7 +84,7 @@ function Header() {
 												className="mx-md-1"
 											/>
 										</Route>
-										<Route path="/mygrants">
+										<Route path="/dashboard/mygrants">
 											<Input
 												type="text"
 												placeholder="Vyhľadávanie"
@@ -104,7 +95,7 @@ function Header() {
 												className="mx-md-1"
 											/>
 										</Route>
-										<Route exact path="/users">
+										<Route exact path="/dashboard/users">
 											<Input
 												type="text"
 												placeholder="Vyhľadávanie"
