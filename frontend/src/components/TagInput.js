@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
 	Row,
@@ -14,12 +14,16 @@ import {
 } from "reactstrap";
 
 export default function TagInput(props) {
-	const { handleBlur, values, setValues, errors, valid } = props;
-	const [tags, setTags] = React.useState(values.tags);
+	const { handleArrayChange, handleBlur, values, errors, valid } = props;
+	const [tags, setTags] = React.useState(values);
 	const [value, setValue] = React.useState("Finančné právo");
 	const [other, setOther] = React.useState(false);
 
-	function addTag() {
+	useEffect(() => {
+		handleArrayChange(tags);
+	}, [tags]);
+
+	function addTag(e) {
 		if (tags.find((tag) => tag === value || tag === other.value)) {
 			return;
 		}
@@ -33,10 +37,6 @@ export default function TagInput(props) {
 	function removeTag(i) {
 		setTags(tags.filter((tag) => tags.indexOf(tag) !== i));
 	}
-
-	React.useEffect(() => {
-		setValues({ ...values, tags });
-	}, [tags]);
 
 	return (
 		<>
@@ -54,8 +54,8 @@ export default function TagInput(props) {
 								setValue(e.target.value);
 								setOther(false);
 							}}
-							invalid={errors.tags}
-							valid={valid.tags}
+							invalid={errors.tags && errors.tags.length > 0}
+							valid={valid.tags && valid.tags.length > 0}
 						>
 							<option>Finančné právo</option>
 							<option>Medzinárodné právo</option>
@@ -74,8 +74,8 @@ export default function TagInput(props) {
 								Iné...
 							</option>
 						</Input>
-						<FormFeedback invalid>{errors.tags}</FormFeedback>
-						<FormFeedback valid>{valid.tags}</FormFeedback>
+						<FormFeedback invalid="true">{errors.tags}</FormFeedback>
+						<FormFeedback valid={true}>{valid.tags}</FormFeedback>
 						{other.show && (
 							<Input
 								className="mt-1"
@@ -88,8 +88,8 @@ export default function TagInput(props) {
 									setOther({ show: true, value: e.target.value })
 								}
 								value={other.value}
-								invalid={errors.tags}
-								valid={valid.tags}
+								invalid={errors.tags && errors.tags.length > 0}
+								valid={valid.tags && valid.tags.length > 0}
 								autoComplete="off"
 							/>
 						)}

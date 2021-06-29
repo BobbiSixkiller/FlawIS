@@ -2,7 +2,7 @@ import React from "react";
 import API from "../../api";
 
 import useFormValidation from "../../hooks/useFormValidation";
-import validatePost from "../../validation/validatePost";
+import { validatePost } from "../../util/validation";
 
 import {
 	Alert,

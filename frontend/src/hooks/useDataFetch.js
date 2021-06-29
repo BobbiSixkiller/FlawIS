@@ -14,6 +14,7 @@ function dataFetchReducer(state, action) {
 	}
 }
 
+//dorobit aj state pre METHOD a nasledne vyuzivat aj na posielanie dat POST/PUT/DELETE
 export default function useDataFetch(initUrl, initData) {
 	const [url, setUrl] = useState(initUrl);
 	const [refresh, setRefresh] = useState(false);

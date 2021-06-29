@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import api from "../api";
+import api from "../../api";
 import { useLocation, useHistory, Link } from "react-router-dom";
 
 import {
@@ -15,9 +15,9 @@ import {
 	Fade,
 } from "reactstrap";
 
-import { AuthContext } from "../context/auth";
-import useFormValidation from "../hooks/useFormValidation";
-import validateLogin from "../validation/validateLogin";
+import { AuthContext } from "../../context/auth";
+import useFormValidation from "../../hooks/useFormValidation";
+import { validateLogin } from "../../util/validation";
 
 const INITIAL_STATE = {
 	email: "",
@@ -65,12 +65,12 @@ function Login() {
 							type="email"
 							id="email"
 							value={values.email}
-							invalid={errors.email && true}
-							valid={valid.email && true}
+							invalid={errors.email && errors.email.length > 0}
+							valid={valid.email && valid.email.length > 0}
 							autoComplete="off"
 							placeholder="Vaša emailová adresa"
 						/>
-						<FormFeedback invalid>{errors.email}</FormFeedback>
+						<FormFeedback invalid="true">{errors.email}</FormFeedback>
 						<FormFeedback valid>{valid.email}</FormFeedback>
 					</Col>
 				</FormGroup>
@@ -84,12 +84,12 @@ function Login() {
 							type="password"
 							id="password"
 							value={values.password}
-							invalid={errors.password && true}
-							valid={valid.email && true}
+							invalid={errors.password && errors.password.length > 0}
+							valid={valid.email && valid.email.length > 0}
 							autoComplete="off"
 							placeholder="Vaše heslo"
 						/>
-						<FormFeedback invalid>{errors.password}</FormFeedback>
+						<FormFeedback invalid="true">{errors.password}</FormFeedback>
 						<FormFeedback valid>{valid.password}</FormFeedback>
 					</Col>
 				</FormGroup>
@@ -108,9 +108,9 @@ function Login() {
 						<Button block color="primary" disabled={isSubmitting} type="submit">
 							Prihlásiť
 						</Button>
-						<Link className="text-center" to="/forgotPassword">
-							<NavLink>Zabudli ste heslo ?</NavLink>
-						</Link>
+						<NavLink className="text-center" to="/forgotPassword" tag={Link}>
+							Zabudli ste heslo ?
+						</NavLink>
 					</Col>
 				</FormGroup>
 			</Form>

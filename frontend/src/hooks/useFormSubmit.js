@@ -1,23 +1,25 @@
-import { useReducer, useEffect, useState } from "react";
+import { useReducer, useEffect, useState, useCallback } from "react";
 
 import API from "../api";
 
-function formSUbmitReducer(action, state) {
+function formSubmitReducer(state, action) {
 	switch (action.type) {
 		//backend
 		case "INIT":
 			return { ...state, loading: true, error: false };
 		case "SUCCESS":
-			return { ...state, loading: false, error: false, data: action.payload };
+			return { ...state, loading: false, error: false, res: action.payload };
 		case "FAILURE":
-			return { ...state, loading: false, error: true, data: action.payload };
+			return { ...state, loading: false, error: true, res: action.payload };
+		case "HIDE_RES":
+			return { ...state, res: null };
 		//frontend
-		case "VALUES":
-			return { ...state, loading: false, error: false, values: action.payload };
+		case "INPUT":
+			return { ...state, loading: false, values: action.payload };
 		case "VALID":
-			return { ...state, loading: false, error: false, valid: action.payload };
+			return { ...state, loading: false, valid: action.payload };
 		case "ERROR":
-			return { ...state, loading: false, error: true, errors: action.payload };
+			return { ...state, loading: false, errors: action.payload };
 		default:
 			return { ...state };
 	}
@@ -25,7 +27,14 @@ function formSUbmitReducer(action, state) {
 
 export default function useFormSubmit(initialState, validate, url, method) {
 	const [submitting, setSubmitting] = useState(false);
-	const [state, dispatch] = useReducer(formSUbmitReducer, initialState);
+	const [state, dispatch] = useReducer(formSubmitReducer, {
+		loading: false,
+		error: false,
+		res: "",
+		values: initialState,
+		valid: {},
+		errors: {},
+	});
 
 	useEffect(() => {
 		let cancel = false;
@@ -44,54 +53,68 @@ export default function useFormSubmit(initialState, validate, url, method) {
 			}
 		}
 
-		if (isSubmitting) {
-			const noErrors = Object.keys(errors).length === 0;
+		if (submitting) {
+			const noErrors = Object.keys(state.errors).length === 0;
 			if (noErrors) {
+				console.log("FIRE");
 				sendData();
-				setSubmitting(false);
+				if (!cancel) setSubmitting(false);
 			} else {
-				setSubmitting(false);
+				if (!cancel) setSubmitting(false);
 			}
 		}
 
 		return () => (cancel = true);
-	}, [state, submitting]);
+	}, [state, submitting, method, url]);
 
-	function handleChange(e) {
-		console.log("CHANGE");
-
+	function handleInputChange(e) {
 		switch (e.target.name) {
 			case "files":
 				return dispatch({
-					type: "VALUES",
-					payload: { ...state, [e.target.name]: e.target.files },
+					type: "INPUT",
+					payload: { ...state.values, [e.target.name]: e.target.files },
 				});
 
 			default:
+				const inputs = { ...state.values };
+				console.log(inputs);
+
 				return dispatch({
-					type: "VALUES",
-					payload: { ...state, [e.target.name]: e.target.value },
+					type: "INPUT",
+					payload: { ...state.values, [e.target.name]: e.target.value },
 				});
 		}
 	}
 
-	function handleBlur() {
-		console.log("BLUR");
+	function handleArrayChange(array) {
+		dispatch({ type: "INPUT", payload: { ...state.values, array } });
+	}
 
-		const { errors, valid } = validate(state.data);
-		dispatch({ type: "VALID", payload: { ...state, valid } });
-		dispatch({ type: "ERROR", payload: { ...state, errors } });
+	function handleBlur() {
+		const { errors, valid } = validate(state.values);
+		dispatch({ type: "VALID", payload: valid });
+		dispatch({ type: "ERROR", payload: errors });
 	}
 
 	function handleSubmit(e) {
-		console.log("SUBMIT");
-
 		e.preventDefault();
-		const { errors, valid } = validate(values);
-		dispatch({ type: "VALID", payload: { ...state, valid } });
-		dispatch({ type: "ERROR", payload: { ...state, errors } });
+		const { errors, valid } = validate(state.values);
+		dispatch({ type: "VALID", payload: valid });
+		dispatch({ type: "ERROR", payload: errors });
 		setSubmitting(true);
 	}
 
-	return { handleChange, handleBlur, handleSubmit, state, dispatch };
+	function hideRes() {
+		dispatch({ type: "HIDE_RES" });
+	}
+
+	return {
+		handleInputChange,
+		handleArrayChange,
+		handleBlur,
+		handleSubmit,
+		hideRes,
+		state,
+		dispatch,
+	};
 }

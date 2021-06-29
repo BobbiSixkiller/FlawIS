@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
-import api from "../api";
+import api from "../../api";
 
 import {
 	Form,
@@ -14,9 +14,9 @@ import {
 	Fade,
 } from "reactstrap";
 
-import { AuthContext } from "../context/auth";
-import useFormValidation from "../hooks/useFormValidation";
-import validateRegister from "../validation/validateRegister";
+import { AuthContext } from "../../context/auth";
+import useFormValidation from "../../hooks/useFormValidation";
+import { validateRegister } from "../../util/validation";
 
 const INITIAL_STATE = {
 	email: "",

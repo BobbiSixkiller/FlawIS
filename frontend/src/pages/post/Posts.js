@@ -41,11 +41,10 @@ export default function Posts() {
 	const [tags, setTags] = useState([]);
 
 	const {
-		state: { loading, error, data },
+		state: { loading, data },
 		setUrl,
 		refreshData,
 	} = useDataFetch("post/", [], "GET");
-	console.log(loading, error, data);
 
 	useEffect(() => {
 		setUrl(

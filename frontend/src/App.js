@@ -7,10 +7,10 @@ import { AuthProvider } from "./context/auth";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import ForgotPassword from "./components/user/ForgotPassword";
-import PasswordReset from "./components/user/PasswordReset";
+import Register from "./pages/auth/Register";
+import Login from "./pages/auth/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import PasswordReset from "./pages/auth/PasswordReset";
 import Footer from "./components/Footer";
 
 import { Container } from "reactstrap";

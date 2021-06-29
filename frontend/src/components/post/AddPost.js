@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import API from "../../api";
 
+import useFormSubmit from "../../hooks/useFormSubmit";
 import useFormValidation from "../../hooks/useFormValidation";
-import validatePost from "../../validation/validatePost";
+import { validatePost } from "../../util/validation";
 
 import {
 	Alert,
@@ -29,32 +30,42 @@ const INITIAL_STATE = {
 function AddPost(props) {
 	const { modal, setModal, refresh } = props;
 
-	const [backendError, setBackendError] = useState(null);
-	const [backendMsg, setBackendMsg] = useState(null);
-	const [loading, setLoading] = useState(false);
-
 	const {
-		handleSubmit,
-		handleChange,
+		handleInputChange,
+		handleArrayChange,
 		handleBlur,
-		values,
-		setValues,
-		errors,
-		valid,
-		isSubmitting,
-	} = useFormValidation(INITIAL_STATE, validatePost, newPost);
+		handleSubmit,
+		hideRes,
+		state: { loading, values, valid, errors, res },
+	} = useFormSubmit(INITIAL_STATE, validatePost, "post/", "POST");
 
-	async function newPost() {
-		setLoading(true);
-		try {
-			const res = await API.post("post/", values);
-			setBackendMsg(res.data.msg);
-			setLoading(false);
-		} catch (err) {
-			setBackendError(err.response.data.error);
-			setLoading(false);
-		}
-	}
+	console.log(values);
+	// const [backendError, setBackendError] = useState(null);
+	// const [backendMsg, setBackendMsg] = useState(null);
+	// const [loading, setLoading] = useState(false);
+
+	// const {
+	// 	handleSubmit,
+	// 	handleChange,
+	// 	handleBlur,
+	// 	values,
+	// 	setValues,
+	// 	errors,
+	// 	valid,
+	// 	isSubmitting,
+	// } = useFormValidation(INITIAL_STATE, validatePost, newPost);
+
+	// async function newPost() {
+	// 	setLoading(true);
+	// 	try {
+	// 		const res = await API.post("post/", values);
+	// 		setBackendMsg(res.data.msg);
+	// 		setLoading(false);
+	// 	} catch (err) {
+	// 		setBackendError(err.response.data.error);
+	// 		setLoading(false);
+	// 	}
+	// }
 
 	return (
 		<Form onSubmit={handleSubmit}>
@@ -77,13 +88,13 @@ function AddPost(props) {
 								name="name"
 								placeholder="Názov postu"
 								onBlur={handleBlur}
-								onChange={handleChange}
+								onChange={handleInputChange}
 								value={values.name}
-								invalid={errors.name}
-								valid={valid.name}
+								invalid={errors.name && errors.name.length > 0}
+								valid={valid.name && valid.name.length > 0}
 								autoComplete="off"
 							/>
-							<FormFeedback invalid>{errors.name}</FormFeedback>
+							<FormFeedback invalid="true">{errors.name}</FormFeedback>
 							<FormFeedback valid>{valid.name}</FormFeedback>
 						</FormGroup>
 					</Col>
@@ -98,13 +109,13 @@ function AddPost(props) {
 								name="body"
 								placeholder="Text postu..."
 								onBlur={handleBlur}
-								onChange={handleChange}
+								onChange={handleInputChange}
 								value={values.body}
-								invalid={errors.body}
-								valid={valid.body}
+								invalid={errors.body && errors.body.length > 0}
+								valid={valid.body && valid.body.length > 0}
 								autoComplete="off"
 							/>
-							<FormFeedback invalid>{errors.body}</FormFeedback>
+							<FormFeedback invalid="true">{errors.body}</FormFeedback>
 							<FormFeedback valid>{valid.body}</FormFeedback>
 						</FormGroup>
 					</Col>
@@ -112,11 +123,12 @@ function AddPost(props) {
 				<TagInput
 					errors={errors}
 					valid={valid}
-					values={values}
-					setValues={setValues}
+					values={values.tags}
+					handleArrayChange={handleArrayChange}
+					//dispatch={dispatch}
 					handleBlur={handleBlur}
 				/>
-				{backendMsg && (
+				{/* {backendMsg && (
 					<Row row className="justify-content-center my-3">
 						<Col>
 							<Alert color="success">
@@ -132,6 +144,16 @@ function AddPost(props) {
 							<Alert color="danger">
 								{backendError}
 								<Button close onClick={() => setBackendError(null)} />
+							</Alert>
+						</Col>
+					</Row>
+				)} */}
+				{res && (
+					<Row row className="justify-content-center my-3">
+						<Col>
+							<Alert color="danger">
+								{res}
+								<Button close onClick={hideRes} />
 							</Alert>
 						</Col>
 					</Row>
