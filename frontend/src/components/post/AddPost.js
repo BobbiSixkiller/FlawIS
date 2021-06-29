@@ -32,7 +32,7 @@ function AddPost(props) {
 
 	const {
 		handleInputChange,
-		handleArrayChange,
+		valueChangeCb,
 		handleBlur,
 		handleSubmit,
 		hideRes,
@@ -124,8 +124,7 @@ function AddPost(props) {
 					errors={errors}
 					valid={valid}
 					values={values.tags}
-					handleArrayChange={handleArrayChange}
-					//dispatch={dispatch}
+					valueChangeCb={valueChangeCb}
 					handleBlur={handleBlur}
 				/>
 				{/* {backendMsg && (

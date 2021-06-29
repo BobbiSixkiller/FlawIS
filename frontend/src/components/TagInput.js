@@ -14,16 +14,16 @@ import {
 } from "reactstrap";
 
 export default function TagInput(props) {
-	const { handleArrayChange, handleBlur, values, errors, valid } = props;
+	const { valueChangeCb, handleBlur, values, errors, valid } = props;
 	const [tags, setTags] = React.useState(values);
 	const [value, setValue] = React.useState("Finančné právo");
 	const [other, setOther] = React.useState(false);
 
 	useEffect(() => {
-		handleArrayChange(tags);
-	}, [tags]);
+		valueChangeCb(tags, "tags");
+	}, [tags, valueChangeCb]);
 
-	function addTag(e) {
+	function addTag() {
 		if (tags.find((tag) => tag === value || tag === other.value)) {
 			return;
 		}

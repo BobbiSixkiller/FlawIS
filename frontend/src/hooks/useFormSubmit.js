@@ -58,14 +58,15 @@ export default function useFormSubmit(initialState, validate, url, method) {
 			if (noErrors) {
 				console.log("FIRE");
 				sendData();
-				if (!cancel) setSubmitting(false);
+				console.log(state.res);
+				setSubmitting(false);
 			} else {
-				if (!cancel) setSubmitting(false);
+				setSubmitting(false);
 			}
 		}
 
 		return () => (cancel = true);
-	}, [state, submitting, method, url]);
+	}, [state.errors, state.values, state.res, submitting, method, url]);
 
 	function handleInputChange(e) {
 		switch (e.target.name) {
@@ -86,9 +87,16 @@ export default function useFormSubmit(initialState, validate, url, method) {
 		}
 	}
 
-	function handleArrayChange(array) {
-		dispatch({ type: "INPUT", payload: { ...state.values, array } });
+	function handleValueChange(value, key) {
+		dispatch({ type: "INPUT", payload: { ...state.values, [key]: value } });
 	}
+
+	const valueChangeCb = useCallback(
+		(key, value) => {
+			dispatch({ type: "INPUT", payload: { ...state.values, [key]: value } });
+		},
+		[state.values]
+	);
 
 	function handleBlur() {
 		const { errors, valid } = validate(state.values);
@@ -110,7 +118,8 @@ export default function useFormSubmit(initialState, validate, url, method) {
 
 	return {
 		handleInputChange,
-		handleArrayChange,
+		handleValueChange,
+		valueChangeCb,
 		handleBlur,
 		handleSubmit,
 		hideRes,
