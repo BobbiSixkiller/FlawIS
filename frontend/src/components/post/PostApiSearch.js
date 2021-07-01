@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouteMatch, useLocation, Link } from "react-router-dom";
 
-import useDataFetch from "../../hooks/useDataFetch";
+import { useDataFetch } from "../../hooks/useApi";
 
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 

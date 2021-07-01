@@ -14,30 +14,23 @@ import {
 } from "reactstrap";
 
 export default function TagInput(props) {
-  const {
-    handleArrayPush,
-    handleArrayFilter,
-    handleBlur,
-    tags,
-    errors,
-    valid,
-  } = props;
+  const { values, setValues, handleBlur, errors, valid } = props;
   const [value, setValue] = useState("Finančné právo");
   const [other, setOther] = useState(false);
 
   function addTag() {
-    if (tags.find((tag) => tag === value || tag === other.value)) {
+    if (values.tags.find((tag) => tag === value || tag === other.value)) {
       return;
     }
     if (other.show) {
-      handleArrayPush(other.value, "tags");
+      setValues({ ...values, tags: [...values.tags, other.value] });
     } else {
-      handleArrayPush(value, "tags");
+      setValues({ ...values, tags: [...values.tags, value] });
     }
   }
 
   function removeTag(tag) {
-    handleArrayFilter(tag, "tags");
+    setValues({ ...values, tags: values.tags.filter((t) => t !== tag) });
   }
 
   return (
@@ -110,7 +103,7 @@ export default function TagInput(props) {
         <Col>
           <FormGroup>
             <List type="inline">
-              {tags.map((tag, i) => (
+              {values.tags.map((tag, i) => (
                 <ListInlineItem key={i}>
                   {tag}
                   <Button onClick={() => removeTag(tag)} size="sm" close />

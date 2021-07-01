@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 
-import useDataFetch from "../../hooks/useDataFetch";
+import { useDataFetch } from "../../hooks/useApi";
 
 import { Row, Fade, Jumbotron, Button, Spinner, Alert } from "reactstrap";
 
