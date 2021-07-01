@@ -1,5 +1,9 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 
 export default function User() {
-	return <></>;
+	const params = useParams();
+	console.log(params);
+
+	return <div>USER</div>;
 }
