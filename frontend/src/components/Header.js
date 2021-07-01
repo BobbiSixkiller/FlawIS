@@ -73,39 +73,8 @@ function Header() {
 										<Route path="/dashboard/posts">
 											<PostApiSearch />
 										</Route>
-										<Route exact path="/dashboard/grants">
-											<Input
-												type="text"
-												placeholder="Vyhľadávanie"
-												name="search"
-												value={context.search}
-												onChange={(e) => context.setSearch(e.target.value)}
-												autoComplete="off"
-												className="mx-md-1"
-											/>
-										</Route>
-										<Route path="/dashboard/mygrants">
-											<Input
-												type="text"
-												placeholder="Vyhľadávanie"
-												name="search"
-												value={context.search}
-												onChange={(e) => context.setSearch(e.target.value)}
-												autoComplete="off"
-												className="mx-md-1"
-											/>
-										</Route>
-										<Route exact path="/dashboard/users">
-											<Input
-												type="text"
-												placeholder="Vyhľadávanie"
-												name="search"
-												value={context.search}
-												onChange={(e) => context.setSearch(e.target.value)}
-												autoComplete="off"
-												className="mx-md-1"
-											/>
-										</Route>
+										<Route exact path="/dashboard/grants"></Route>
+										<Route exact path="/dashboard/users"></Route>
 									</Switch>
 								</NavItem>
 							</Nav>
