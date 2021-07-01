@@ -22,7 +22,7 @@ import {
 } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
-import useDataFetch from "../../hooks/useDataFetch";
+import { useDataFetch } from "../../hooks/useApi";
 import { AuthContext } from "../../context/auth";
 
 import PaginationComponent from "../../components/PaginationComponent";

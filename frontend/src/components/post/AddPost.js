@@ -1,6 +1,7 @@
 import React from "react";
 
-import useFormSubmit from "../../hooks/useFormSubmit";
+import { useDataSend } from "../../hooks/useApi";
+import useFormValidation from "../../hooks/useFormValidation";
 import { validatePost } from "../../util/validation";
 
 import {
@@ -29,14 +30,24 @@ function AddPost(props) {
   const { modal, setModal, refresh } = props;
 
   const {
-    handleInputChange,
-    handleArrayPush,
-    handleArrayFilter,
+    state: { loading, error, data },
+    sendData,
+    hideMessage,
+  } = useDataSend();
+
+  const {
+    handleChange,
     handleBlur,
     handleSubmit,
-    hideRes,
-    state: { loading, values, valid, errors, error, res },
-  } = useFormSubmit(INITIAL_STATE, validatePost, "post/", "POST");
+    setValues,
+    values,
+    errors,
+    valid,
+  } = useFormValidation(INITIAL_STATE, validatePost, addPost);
+
+  function addPost() {
+    sendData("post/", "POST", values);
+  }
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -59,7 +70,7 @@ function AddPost(props) {
                 name="name"
                 placeholder="Názov postu"
                 onBlur={handleBlur}
-                onChange={handleInputChange}
+                onChange={handleChange}
                 value={values.name}
                 invalid={errors.name && errors.name.length > 0}
                 valid={valid.name && valid.name.length > 0}
@@ -80,7 +91,7 @@ function AddPost(props) {
                 name="body"
                 placeholder="Text postu..."
                 onBlur={handleBlur}
-                onChange={handleInputChange}
+                onChange={handleChange}
                 value={values.body}
                 invalid={errors.body && errors.body.length > 0}
                 valid={valid.body && valid.body.length > 0}
@@ -94,17 +105,16 @@ function AddPost(props) {
         <TagInput
           errors={errors}
           valid={valid}
-          tags={values.tags}
-          handleArrayFilter={handleArrayFilter}
-          handleArrayPush={handleArrayPush}
+          values={values}
+          setValues={setValues}
           handleBlur={handleBlur}
         />
-        {res && (
+        {data && (
           <Row className="justify-content-center my-3">
             <Col>
               <Alert color={error ? "danger" : "success"}>
-                {res.msg}
-                <Button close onClick={hideRes} />
+                {data.msg}
+                <Button close onClick={hideMessage} />
               </Alert>
             </Col>
           </Row>

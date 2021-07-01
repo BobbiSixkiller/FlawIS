@@ -1,5 +1,6 @@
 import React from "react";
-import API from "../../api";
+
+import { useDataSend } from "../../hooks/useApi";
 
 import {
   Alert,
@@ -13,27 +14,28 @@ import {
 } from "reactstrap";
 
 function DeletePost(props) {
-  const { modal, setModal, refresh } = props;
+  const {
+    modal: { post },
+    setModal,
+    refresh,
+  } = props;
 
-  const [backendMsg, setBackendMsg] = React.useState(null);
-  const [error, setError] = React.useState(false);
-
-  async function deletePost(e) {
-    e.preventDefault();
-    try {
-      const res = await API.delete(`post/${modal.post._id}`);
-      setBackendMsg(res.data.msg);
-    } catch (err) {
-      setError(true);
-      setBackendMsg(err.response.data.error);
-    }
-  }
+  const {
+    state: { loading, error, data },
+    sendData,
+    hideMessage,
+  } = useDataSend();
 
   return (
-    <Form onSubmit={(e) => deletePost(e)}>
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+        sendData(`post/${post._id}`, "DELETE");
+      }}
+    >
       <ModalHeader
         toggle={() => {
-          setModal(!modal);
+          setModal(!post);
           refresh();
         }}
       >
@@ -41,31 +43,31 @@ function DeletePost(props) {
       </ModalHeader>
       <ModalBody>
         <p>Potvrďte zmazanie postu:</p>
-        <p className="font-weight-bold">{modal.post.name}</p>
+        <p className="font-weight-bold">{post.name}</p>
         <p>
-          Zverejnil: {modal.post.author},{" "}
-          {new Date(modal.post.updatedAt).toLocaleDateString()}
+          Zverejnil: {post.author},{" "}
+          {new Date(post.updatedAt).toLocaleDateString()}
         </p>
-        {backendMsg && (
+        {data && (
           <Row className="justify-content-center my-3">
             <Col>
               <Alert color={error ? "danger" : "success"}>
-                {backendMsg}
-                <Button close onClick={() => setBackendMsg(null)} />
+                {data.msg}
+                <Button close onClick={() => hideMessage()} />
               </Alert>
             </Col>
           </Row>
         )}
       </ModalBody>
       <ModalFooter>
-        <Button type="submit" color="danger">
+        <Button type="submit" color="danger" disabled={loading}>
           Zmazať
         </Button>{" "}
         <Button
           outline
           color="secondary"
           onClick={() => {
-            setModal(!modal);
+            setModal(!post);
             refresh();
           }}
         >

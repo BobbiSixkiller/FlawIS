@@ -1,112 +1,119 @@
-import React, { useState, useEffect, useReducer, createContext } from "react";
+import React, { useEffect, useReducer, createContext } from "react";
 
 import API from "../api";
 
 const INITIAL_STATE = {
-	user: null,
-	msg: "",
-	error: "",
+  loading: true,
+  user: null,
+  error: false,
+  msg: "",
 };
 
 const AuthContext = createContext({
-	user: null,
-	login: function (data) {},
-	logout: function () {},
+  user: null,
+  login: function (data) {},
+  logout: function () {},
 });
 
 function authReducer(state, action) {
-	switch (action.type) {
-		case "LOGIN":
-			return {
-				...state,
-				user: action.payload.user,
-				msg: action.payload.msg,
-				error: action.payload.error,
-			};
-		case "LOGOUT":
-			return {
-				...state,
-				user: null,
-				msg: action.payload.msg,
-				error: null,
-			};
-		case "HIDE_MSG":
-			return {
-				...state,
-				msg: null,
-			};
-		case "HIDE_ERROR":
-			return {
-				...state,
-				error: null,
-			};
+  switch (action.type) {
+    case "INIT":
+      return {
+        ...state,
+        loading: true,
+        error: false,
+        msg: "",
+      };
+    case "SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        user: action.payload.user,
+        error: false,
+        msg: action.payload.msg,
+      };
+    case "FAILURE":
+      return {
+        ...state,
+        loading: false,
+        user: null,
+        error: true,
+        msg: action.payload.msg,
+      };
+    case "HIDE_MSG":
+      return {
+        ...state,
+        msg: null,
+      };
 
-		default:
-			return { ...state };
-	}
+    default:
+      return { ...state };
+  }
 }
 
 function AuthProvider({ children }) {
-	const [state, dispatch] = useReducer(authReducer, INITIAL_STATE);
-	const [loading, setLoading] = useState(true);
-	//temporary solution of fulltext search for users and grants
-	const [search, setSearch] = useState("");
+  const [state, dispatch] = useReducer(authReducer, INITIAL_STATE);
 
-	useEffect(() => {
-		async function currentUser() {
-			try {
-				const user = await API.get("user/me");
-				login(user.data);
-				setLoading(false);
-			} catch (error) {
-				console.log(error.response);
-				setLoading(false);
-			}
-		}
+  useEffect(() => {
+    async function currentUser() {
+      dispatch({ type: "INIT" });
+      try {
+        const res = await API.get("user/me");
+        dispatch({ type: "SUCCESS", payload: res.data });
+      } catch (error) {
+        console.log(error.response);
+        dispatch({ type: "FAILURE", payload: {} });
+      }
+    }
 
-		currentUser();
-	}, []);
+    currentUser();
+  }, []);
 
-	function login(data) {
-		dispatch({
-			type: "LOGIN",
-			payload: data,
-		});
-	}
+  async function register(data) {
+    dispatch({ type: "INIT" });
+    try {
+      const res = await API.post("user/register", data);
+      dispatch({ type: "SUCCESS", payload: res.data });
+    } catch (err) {
+      dispatch({ type: "FAILURE", payload: err.response.data });
+    }
+  }
 
-	function logout(data) {
-		dispatch({
-			type: "LOGOUT",
-			payload: data,
-		});
-	}
+  async function login(data) {
+    dispatch({ type: "INIT" });
+    try {
+      const res = await API.post("user/login", data);
+      dispatch({ type: "SUCCESS", payload: res.data });
+    } catch (err) {
+      dispatch({ type: "FAILURE", payload: err.response.data });
+    }
+  }
 
-	function hideMsg() {
-		dispatch({ type: "HIDE_MSG" });
-	}
+  async function logout() {
+    const res = await API.get("user/logout");
+    dispatch({ type: "SUCCESS", payload: res.data });
+  }
 
-	function hideError() {
-		dispatch({ type: "HIDE_ERROR" });
-	}
+  function hideMsg() {
+    dispatch({ type: "HIDE_MSG" });
+  }
 
-	return (
-		<AuthContext.Provider
-			value={{
-				user: state.user,
-				error: state.error,
-				msg: state.msg,
-				login,
-				logout,
-				hideError,
-				hideMsg,
-				loading,
-				search,
-				setSearch,
-			}}
-		>
-			{children}
-		</AuthContext.Provider>
-	);
+  return (
+    <AuthContext.Provider
+      value={{
+        loading: state.loading,
+        user: state.user,
+        error: state.error,
+        msg: state.msg,
+        register,
+        login,
+        logout,
+        hideMsg,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export { AuthContext, AuthProvider };
