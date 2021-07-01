@@ -4,28 +4,13 @@ const registerValidation = (data) => {
 	const schema = Joi.object({
 		firstName: Joi.string().max(50).required(),
 		lastName: Joi.string().max(50).required(),
-		email: Joi.string().required().email(),
+		email: Joi.string().required().email().required(),
 		password: Joi.string()
 			.min(8)
 			.required()
 			.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
 		repeatPass: Joi.ref("password"),
-	});
-
-	return schema.validate(data);
-};
-
-const userAddValidation = (data) => {
-	const schema = Joi.object({
-		firstName: Joi.string().max(50).required(),
-		lastName: Joi.string().max(50).required(),
-		email: Joi.string().required().email(),
-		password: Joi.string()
-			.min(8)
-			.required()
-			.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
-		repeatPass: Joi.ref("password"),
-		role: Joi.string().valid("basic", "supervisor", "admin").required(),
+		role: Joi.string().valid("basic", "supervisor", "admin"),
 	});
 
 	return schema.validate(data);
@@ -34,7 +19,7 @@ const userAddValidation = (data) => {
 const loginValidation = (data) => {
 	const schema = Joi.object({
 		email: Joi.string().required().email(),
-		password: Joi.string().min(8).required(),
+		password: Joi.string().required(),
 	});
 
 	return schema.validate(data);
@@ -175,7 +160,6 @@ const postValidation = (data) => {
 };
 
 module.exports.registerValidation = registerValidation;
-module.exports.userAddValidation = userAddValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.forgotPasswordValidation = forgotPasswordValidation;
 module.exports.resetPasswordValidation = resetPasswordValidation;

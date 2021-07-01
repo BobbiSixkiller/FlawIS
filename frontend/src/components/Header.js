@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useHistory, Switch, Route } from "react-router-dom";
 import api from "../api";
 
-import { useUser } from "../hooks/useUser";
-import ApiSearch from "./post/PostApiSearch";
+import PostApiSearch from "./post/PostApiSearch";
+import { AuthContext } from "../context/auth";
 
 import {
 	Collapse,
@@ -21,44 +21,17 @@ import {
 } from "reactstrap";
 
 function Header() {
+	const context = useContext(AuthContext);
 	const history = useHistory();
-	const { pathname } = useLocation();
 
-	const { user, setAccessToken, accessToken, setSearch, search } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
 
 	const toggle = () => setIsOpen(!isOpen);
 
 	async function logOut() {
-		await api
-			.post(
-				"user/logout",
-				{},
-				{
-					headers: {
-						authorization: accessToken,
-					},
-				}
-			)
-			.then(() => {
-				setAccessToken(null);
-			});
-	}
-
-	async function logOutAll() {
-		await api
-			.post(
-				"user/logoutall",
-				{},
-				{
-					headers: {
-						authorization: accessToken,
-					},
-				}
-			)
-			.then(() => {
-				setAccessToken(null);
-			});
+		const res = await api.get("user/logout");
+		context.logout(res.data);
+		history.push("/");
 	}
 
 	function changePassword() {
@@ -66,98 +39,81 @@ function Header() {
 		history.push("/forgotPassword");
 	}
 
-	let Brand;
-	if (pathname.includes("/mywork")) {
-		Brand = <NavbarBrand href="/mywork">eNástenka</NavbarBrand>;
-	} else if (pathname.includes("/mygrants")) {
-		Brand = <NavbarBrand href="/mygrants">Moje Granty</NavbarBrand>;
-	} else if (pathname.includes("/posts")) {
-		Brand = <NavbarBrand href="/posts">Nástenka</NavbarBrand>;
-	} else {
-		Brand = <NavbarBrand href="/">FlawIS</NavbarBrand>;
-	}
-
-	let Search;
-	if (pathname.includes("/posts")) {
-		Search = <ApiSearch />;
-	} else if (pathname.includes("/grants")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	} else if (pathname.includes("/users")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	} else if (pathname.includes("/mygrants")) {
-		Search = (
-			<Input
-				type="text"
-				placeholder="Vyhľadávanie"
-				name="search"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				autoComplete="off"
-				className="mx-md-1"
-			/>
-		);
-	}
-
-	let leftNav;
-	if (user.role === "supervisor" || user.role === "admin") {
-		leftNav = (
-			<Nav className="mr-auto" navbar>
-				<UncontrolledDropdown nav inNavbar>
-					<DropdownToggle nav caret>
-						Zdroje
-					</DropdownToggle>
-					<DropdownMenu>
-						<DropdownItem onClick={() => history.push("/users")}>
-							Používatelia
-						</DropdownItem>
-						<DropdownItem onClick={() => history.push("/grants")}>
-							Granty
-						</DropdownItem>
-					</DropdownMenu>
-				</UncontrolledDropdown>
-				<NavItem>{Search}</NavItem>
-			</Nav>
-		);
-	} else {
-		leftNav = (
-			<Nav className="mr-auto" navbar>
-				<NavItem>{Search}</NavItem>
-			</Nav>
-		);
-	}
-
 	return (
 		<Navbar color="dark" dark expand="md" className="sticky-top">
-			{Brand}
+			<NavbarBrand href="/">
+				FLAW<span className="pink">IS</span>
+			</NavbarBrand>
 			<NavbarToggler onClick={toggle} />
 			<Collapse isOpen={isOpen} navbar>
-				{user._id ? (
+				{context.user ? (
 					<>
-						{leftNav}
+						{(context.user.role === "supervisor" ||
+							context.user.role === "admin") && (
+							<Nav className="mr-auto" navbar>
+								<UncontrolledDropdown nav inNavbar>
+									<DropdownToggle nav caret>
+										Zdroje
+									</DropdownToggle>
+									<DropdownMenu>
+										<DropdownItem
+											onClick={() => history.push("/dashboard/users")}
+										>
+											Používatelia
+										</DropdownItem>
+										<DropdownItem
+											onClick={() => history.push("/dashboard/grants")}
+										>
+											Granty
+										</DropdownItem>
+									</DropdownMenu>
+								</UncontrolledDropdown>
+								<NavItem>
+									<Switch>
+										<Route path="/dashboard/posts">
+											<PostApiSearch />
+										</Route>
+										<Route exact path="/dashboard/grants">
+											<Input
+												type="text"
+												placeholder="Vyhľadávanie"
+												name="search"
+												value={context.search}
+												onChange={(e) => context.setSearch(e.target.value)}
+												autoComplete="off"
+												className="mx-md-1"
+											/>
+										</Route>
+										<Route path="/dashboard/mygrants">
+											<Input
+												type="text"
+												placeholder="Vyhľadávanie"
+												name="search"
+												value={context.search}
+												onChange={(e) => context.setSearch(e.target.value)}
+												autoComplete="off"
+												className="mx-md-1"
+											/>
+										</Route>
+										<Route exact path="/dashboard/users">
+											<Input
+												type="text"
+												placeholder="Vyhľadávanie"
+												name="search"
+												value={context.search}
+												onChange={(e) => context.setSearch(e.target.value)}
+												autoComplete="off"
+												className="mx-md-1"
+											/>
+										</Route>
+									</Switch>
+								</NavItem>
+							</Nav>
+						)}
 						<Nav className="ml-auto" navbar>
 							<UncontrolledDropdown nav inNavbar>
 								<DropdownToggle nav caret>
-									Prihlásený {user.firstName + " " + user.lastName}
+									Prihlásený {context.user.fullName}
 								</DropdownToggle>
 								<DropdownMenu right>
 									{/* dorobit upravit profil 
@@ -169,9 +125,6 @@ function Header() {
 									</DropdownItem>
 									<DropdownItem divider />
 									<DropdownItem onClick={logOut}>Odhlásiť</DropdownItem>
-									<DropdownItem onClick={logOutAll}>
-										Odhlásiť všetky
-									</DropdownItem>
 								</DropdownMenu>
 							</UncontrolledDropdown>
 						</Nav>

@@ -1,47 +1,46 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const Post = require("../models/Post");
 
-module.exports.checkAuth = async function (req, res, next) {
-	const token = req.header("authorization");
-	if (!token)
-		return res
-			.status(401)
-			.send({ error: "Prístup zamietnutý, prosím prihláste sa!" });
+module.exports.checkAuth = function (req, res, next) {
+  try {
+    const { authorization } = req.cookies;
+    const token = authorization.split("Bearer ")[1];
 
-	try {
-		const id = jwt.verify(token, process.env.SECRET);
-		req.user = await User.findOne({ _id: id, "tokens.token": token })
-			.select("-tokens -password")
-			.populate("posts");
-		req.token = token;
-		next();
-	} catch (err) {
-		res.status(401).send({ error: err.message });
-	}
+    req.user = jwt.verify(token, process.env.secret);
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .send({ error: true, msg: "Prístup zamietnutý, prosím prihláste sa!" });
+  }
 };
 
-module.exports.isAdmin = async function (req, res, next) {
-	if (req.user.role === "admin") {
-		return next();
-	}
-	res.status(401).send({ error: "Prístup zamietnutý!" });
+module.exports.isAdmin = function (req, res, next) {
+  if (req.user.role === "admin") {
+    return next();
+  }
+  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
 };
 
-module.exports.isSupervisor = async function (req, res, next) {
-	if (req.user.role === "admin" || req.user.role === "supervisor") {
-		return next();
-	}
-	res.status(401).send({ error: "Prístup zamietnutý!" });
+module.exports.isSupervisor = function (req, res, next) {
+  if (req.user.role === "admin" || req.user.role === "supervisor") {
+    return next();
+  }
+  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
 };
 
 module.exports.isOwnPost = async function (req, res, next) {
-	if (
-		req.user.posts.some((post) => post._id == req.params.id) ||
-		req.user.role === "admin" ||
-		req.user.role === "supervisor"
-	) {
-		return next();
-	}
-	res.status(401).send({ error: "Prístup zamietnutý!" });
+  const post = await Post.findOne({ _id: req.params.id });
+  if (!post) {
+    res.status(400).send({ error: true, msg: "Post nebol nájdený." });
+  }
+  if (
+    post.userId == req.user._id ||
+    req.user.role === "admin" ||
+    req.user.role === "supervisor"
+  ) {
+    req.post = post;
+    return next();
+  }
+  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
 };
