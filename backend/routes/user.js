@@ -197,7 +197,7 @@ router.post("/forgotPassword", async (req, res) => {
 });
 
 router.post("/reset/:token", async (req, res) => {
-  const id = await jwt.verify(
+  const id = jwt.verify(
     req.params.token,
     process.env.SECRET,
     function (err, decoded) {
@@ -219,10 +219,12 @@ router.post("/reset/:token", async (req, res) => {
 
   const user = await User.findOne({ _id: id });
   if (!user) {
-    return res.status(404).send({ error: "Používateľ nebol nájdený!" });
+    return res
+      .status(404)
+      .send({ error: true, msg: "Používateľ nebol nájdený!" });
   }
 
-  const { error } = await resetPasswordValidation(req.body);
+  const { error } = resetPasswordValidation(req.body);
   if (error) return res.status(400).send({ error: error.details[0].message });
 
   const salt = await bcrypt.genSalt(10);
@@ -243,7 +245,8 @@ router.get("/logout", (req, res) => {
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
   try {
-    const aggregate = await User.getUsersGrantsAggregation();
+    const aggregate = await User.getUsers();
+    //const aggregate = await User.getUsersGrantsAggregation();
     //const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
     res.status(200).send(aggregate);
   } catch (err) {
@@ -268,9 +271,10 @@ router.get("/:id/:year", checkAuth, async (req, res) => {
     if (match.length !== 0) {
       res.status(200).send(match[0]);
     } else {
-      res
-        .status(404)
-        .send({ error: "Používateľove granty pre zadaný rok neboli nájdené!" });
+      res.status(404).send({
+        error: true,
+        msg: "Používateľove granty pre zadaný rok neboli nájdené!",
+      });
     }
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -297,7 +301,7 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
     if (match) {
       res.status(200).send(match);
     } else {
-      res.status(404).send({ error: "Používateľ nebol nájdený!" });
+      res.status(404).send({ error: true, msg: "Používateľ nebol nájdený!" });
     }
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -307,7 +311,8 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
 //prerobit update aby pocital s repeatpass ale neukladal to do DB
 router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
   const { error } = userUpdateValidation(req.body);
-  if (error) return res.status(400).send({ error: error.details[0].message });
+  if (error)
+    return res.status(400).send({ error: true, msg: error.details[0].message });
 
   if (req.body.password) {
     const salt = await bcrypt.genSalt(10);
@@ -321,7 +326,7 @@ router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
       if (emailExist)
         return res
           .status(400)
-          .send({ error: "Zadaný email je už zaregistrovaný!" });
+          .send({ error: true, msg: "Zadaný email je už zaregistrovaný!" });
 
       const update = await User.findOneAndUpdate(
         { _id: req.params.id },
@@ -350,7 +355,9 @@ router.delete("/:id", checkAuth, isAdmin, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
     if (!user)
-      return res.status(404).send({ error: "Používateľ nebol nájdený!" });
+      return res
+        .status(404)
+        .send({ error: true, msg: "Používateľ nebol nájdený!" });
 
     await user.remove();
 

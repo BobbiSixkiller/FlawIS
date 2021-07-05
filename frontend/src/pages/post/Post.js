@@ -27,7 +27,8 @@ export default function Post() {
   } else if (error) {
     return (
       <Alert color="danger">
-        {error} <Button close onClick={() => history.goBack()} />
+        Nebolo mozne nacitat post!{" "}
+        <Button close onClick={() => history.goBack()} />
       </Alert>
     );
   } else {
