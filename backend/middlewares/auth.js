@@ -44,3 +44,14 @@ module.exports.isOwnPost = async function (req, res, next) {
   }
   res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
 };
+
+module.exports.isOwnUser = function (req, res, next) {
+  if (
+    req.user._id === req.params.id ||
+    req.user.role === "admin" ||
+    req.user.role === "supervisor"
+  ) {
+    return next();
+  }
+  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
+};

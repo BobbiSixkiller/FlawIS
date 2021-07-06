@@ -47,7 +47,7 @@ userSchema.index({
   lastName: "text",
 });
 
-userSchema.statics.getUsers = function () {
+userSchema.statics.getUsersAggregation = function () {
   return this.aggregate([
     {
       $lookup: {
@@ -106,6 +106,75 @@ userSchema.statics.getUsers = function () {
         email: 1,
         role: 1,
         hoursTotal: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    },
+    {
+      $sort: {
+        updatedAt: -1,
+      },
+    },
+  ]);
+};
+
+userSchema.statics.getUserAggregation = function (userId, year) {
+  return this.aggregate([
+    { $match: { _id: mongoose.Types.ObjectId(userId) } },
+    {
+      $lookup: {
+        from: "grants",
+        localField: "_id",
+        foreignField: "budget.members.member",
+        as: "grants",
+      },
+    },
+    { $addFields: { grants: "$grants" } },
+    { $unwind: { path: "$grants", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: "$grants.budget", preserveNullAndEmptyArrays: true } },
+    {
+      $unwind: {
+        path: "$grants.budget.members",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $match: {
+        $and: [
+          { $expr: { $eq: ["$_id", "$grants.budget.members.member"] } },
+          {
+            $expr: {
+              $eq: [
+                new Date(year).getFullYear(),
+                { $year: "$grants.budget.year" },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        firstName: { $first: "$firstName" },
+        lastName: { $first: "$lastName" },
+        email: { $first: "$email" },
+        role: { $first: "$role" },
+        tokens: { $first: "$tokens" },
+        hoursTotal: { $sum: "$grants.budget.members.hours" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        grants: { $push: "$grants" },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        fullName: { $concat: ["$firstName", " ", "$lastName"] },
+        email: 1,
+        role: 1,
+        hoursTotal: 1,
+        grants: 1,
         createdAt: 1,
         updatedAt: 1,
       },

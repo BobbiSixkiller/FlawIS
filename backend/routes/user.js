@@ -12,7 +12,12 @@ const {
   forgotPasswordValidation,
   resetPasswordValidation,
 } = require("../handlers/validation");
-const { checkAuth, isAdmin, isSupervisor } = require("../middlewares/auth");
+const {
+  checkAuth,
+  isAdmin,
+  isSupervisor,
+  isOwnUser,
+} = require("../middlewares/auth");
 
 router.post("/register", async (req, res) => {
   const { error } = await registerValidation(req.body);
@@ -236,16 +241,9 @@ router.post("/reset/:token", async (req, res) => {
   res.status(200).send({ msg: "Vaše heslo bolo zmenené!" });
 });
 
-router.get("/logout", (req, res) => {
-  res
-    .cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
-    .status(200)
-    .send({ msg: "Boli ste odhlásený." });
-});
-
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
   try {
-    const aggregate = await User.getUsers();
+    const aggregate = await User.getUsersAggregation();
     //const aggregate = await User.getUsersGrantsAggregation();
     //const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
     res.status(200).send(aggregate);
@@ -254,31 +252,11 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
   }
 });
 
-//util endpoint for grant members
-router.get("/names", checkAuth, async (req, res) => {
-  const users = await User.find().select("firstName lastName");
-
-  res.status(200).send(users);
-});
-
-router.get("/:id/:year", checkAuth, async (req, res) => {
-  try {
-    const match = await User.getUserGrantsAggregation(
-      req.params.id,
-      req.params.year
-    );
-    console.log(match);
-    if (match.length !== 0) {
-      res.status(200).send(match[0]);
-    } else {
-      res.status(404).send({
-        error: true,
-        msg: "Používateľove granty pre zadaný rok neboli nájdené!",
-      });
-    }
-  } catch (err) {
-    res.status(500).send({ error: err.message });
-  }
+router.get("/logout", (req, res) => {
+  res
+    .cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+    .status(200)
+    .send({ msg: "Boli ste odhlásený." });
 });
 
 router.get("/me", checkAuth, async (req, res) => {
@@ -292,20 +270,33 @@ router.get("/me", checkAuth, async (req, res) => {
   res.status(200).send({ msg: `Vitajte ${user.fullName}!`, user });
 });
 
-router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
-  try {
-    const match = await User.findOne({ _id: req.params.id }).populate({
-      path: "grants",
-      populate: { path: "members.member" },
+//util endpoint for grant members
+router.get("/names", checkAuth, async (req, res) => {
+  const users = await User.find().select("firstName lastName");
+
+  res.status(200).send(users);
+});
+
+router.get("/:id", checkAuth, isOwnUser, async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+  if (!user)
+    return res
+      .status(404)
+      .send({ error: true, msg: "Používateľ nebol nájdený!" });
+
+  res.status(200).send(user);
+});
+
+router.get("/:id/:year", checkAuth, isOwnUser, async (req, res) => {
+  const grants = await User.getUserAggregation(req.params.id, req.params.year);
+  if (grants.length === 0) {
+    return res.status(404).send({
+      error: true,
+      msg: "Používateľove granty pre zadaný rok neboli nájdené!",
     });
-    if (match) {
-      res.status(200).send(match);
-    } else {
-      res.status(404).send({ error: true, msg: "Používateľ nebol nájdený!" });
-    }
-  } catch (err) {
-    res.status(500).send({ error: err.message });
   }
+
+  res.status(200).send(grants[0]);
 });
 
 //prerobit update aby pocital s repeatpass ale neukladal to do DB
