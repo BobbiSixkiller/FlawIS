@@ -1,30 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
 
-import {
-  Row,
-  ButtonGroup,
-  Button,
-  Table,
-  Spinner,
-  Fade,
-  Modal,
-} from "reactstrap";
+import { Row, Button, Table, Spinner, Fade, Modal } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
+import useModal from "../../hooks/useModal";
 import { useDataFetch } from "../../hooks/useApi";
+import { AuthContext } from "../../context/auth";
 
 import User from "./User";
+import AddUser from "../../components/user/AddUser";
+import EditUser from "../../components/user/EditUser";
+import DeleteUser from "../../components/user/DeleteUser";
+import PaginationComponent from "../../components/PaginationComponent";
 
 export default function Users() {
+  const auth = useContext(AuthContext);
   const { path, url } = useRouteMatch();
-  console.log(path, url);
-  const [modal, setModal] = useState(false);
+  const [page, setPage] = useState(1);
+  //const [modal, setModal] = useState(false);
+
+  const { dispatch, show, action, modalData } = useModal();
 
   const {
     state: { loading, data },
+    setUrl,
     refreshData,
   } = useDataFetch("user/", []);
+
+  useEffect(() => {
+    setUrl(`user?page=${page}`);
+  }, [page, setUrl]);
 
   if (loading) {
     return (
@@ -39,14 +45,19 @@ export default function Users() {
         <Fade>
           <Row className="justify-content-between my-3">
             <h1>Manažment používateľov</h1>
-            <Button outline color="success" size="lg">
+            <Button
+              outline
+              color="success"
+              size="lg"
+              // onClick={() => setModal({ show: true, action: "add" })}
+              onClick={() => dispatch({ type: "ADD" })}
+            >
               Pridať
             </Button>
           </Row>
-          <Table hover responsive>
+          <Table className="my-2" hover responsive>
             <thead>
               <tr>
-                <th>#</th>
                 <th>Meno</th>
                 <th>Email</th>
                 <th>Hodiny</th>
@@ -57,84 +68,90 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {data.map((user, i) => (
-                <tr key={i}>
-                  <th scope="row">{i}</th>
-                  <td>{user.fullName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.hoursTotal}</td>
-                  <td>{user.role}</td>
-                  <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                  <td>{new Date(user.updatedAt).toLocaleDateString()}</td>
-                  <td>
-                    <Button
-                      tag={Link}
-                      to={`${url}/${user._id}`}
-                      size="sm"
-                      color="info"
-                    >
-                      Zobraziť
-                    </Button>{" "}
-                    <ButtonGroup>
+              {data.users &&
+                data.users.map((user) => (
+                  <tr key={user._id}>
+                    <td>{user.fullName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.hoursTotal}</td>
+                    <td>{user.role}</td>
+                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>{new Date(user.updatedAt).toLocaleDateString()}</td>
+                    <td>
                       <Button
+                        tag={Link}
+                        to={`${url}/${user._id}`}
+                        size="sm"
+                        color="info"
+                      >
+                        Zobraziť
+                      </Button>{" "}
+                      <Button
+                        outline
                         size="sm"
                         color="warning"
                         onClick={() =>
-                          setModal({ show: true, action: "edit", user })
+                          //setModal({ show: true, action: "edit", user })
+                          dispatch({ type: "UPDATE", payload: user })
                         }
                       >
                         <PencilFill />
-                      </Button>
-                      <Button
-                        size="sm"
-                        color="danger"
-                        onClick={() =>
-                          setModal({
-                            show: true,
-                            action: "delete",
-                            user,
-                          })
-                        }
-                      >
-                        <Trash2Fill />
-                      </Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              ))}
+                      </Button>{" "}
+                      {auth.user.role === "admin" && (
+                        <Button
+                          outline
+                          size="sm"
+                          color="danger"
+                          onClick={() =>
+                            // setModal({
+                            //   show: true,
+                            //   action: "delete",
+                            //   user,
+                            // })
+                            dispatch({ type: "DELETE", payload: user })
+                          }
+                        >
+                          <Trash2Fill />
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
+          <PaginationComponent
+            page={page}
+            pages={data.pages}
+            changePage={setPage}
+          />
           <Button className="mb-5" tag={Link} to="/" outline color="primary">
             Späť
           </Button>
           <Modal
-            isOpen={modal.show}
+            isOpen={show}
             toggle={() => {
-              setModal(!modal);
+              //setModal(!modal);
+              dispatch({ type: "TOGGLE" });
               refreshData();
             }}
           >
-            {/* {modal.action === "add" && (
-              <AddPost
+            {action === "ADD" && (
+              <AddUser refresh={refreshData} dispatch={dispatch} />
+            )}
+            {action === "DELETE" && (
+              <DeleteUser
                 refresh={refreshData}
-                modal={modal}
-                setModal={setModal}
+                user={modalData}
+                dispatch={dispatch}
               />
             )}
-            {modal.action === "delete" && (
-              <DeletePost
+            {action === "UPDATE" && (
+              <EditUser
                 refresh={refreshData}
-                modal={modal}
-                setModal={setModal}
+                user={modalData}
+                dispatch={dispatch}
               />
             )}
-            {modal.action === "edit" && (
-              <EditPost
-                refresh={refreshData}
-                modal={modal}
-                setModal={setModal}
-              />
-            )} */}
           </Modal>
         </Fade>
       </Route>

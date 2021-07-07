@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 import TagInput from "../TagInput";
 
-function EditPost(props) {
+export default function EditPost(props) {
   const {
     modal: { post },
     setModal,
@@ -142,5 +142,3 @@ function EditPost(props) {
     </Form>
   );
 }
-
-export default EditPost;

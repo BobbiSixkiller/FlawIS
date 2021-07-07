@@ -26,7 +26,7 @@ const INITIAL_STATE = {
   tags: [],
 };
 
-function AddPost(props) {
+export default function AddPost(props) {
   const { modal, setModal, refresh } = props;
 
   const {
@@ -138,5 +138,3 @@ function AddPost(props) {
     </Form>
   );
 }
-
-export default AddPost;

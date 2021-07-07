@@ -17,7 +17,7 @@ export default function ApiSearch() {
   const {
     state: { loading, error, data },
     setUrl,
-  } = useDataFetch(`post/api/search?q=${search}`, []);
+  } = useDataFetch(`user/api/search?q=${search}`, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -28,7 +28,7 @@ export default function ApiSearch() {
   }, [autoWrapRef]);
 
   useEffect(() => {
-    setUrl(`post/api/search?q=${search}`);
+    setUrl(`user/api/search?q=${search}`);
   }, [search, setUrl]);
 
   useEffect(() => {
@@ -60,22 +60,21 @@ export default function ApiSearch() {
               <Spinner size="sm" />
             </ListGroupItem>
           )}
-          {data.posts.length === 0 || error ? (
+          {data.users.length === 0 || error ? (
             <ListGroupItem className="text-muted">
               Žiadne výsledky
             </ListGroupItem>
           ) : (
-            data.posts.map((post, i) => (
+            data.users.map((user, i) => (
               <ListGroupItem
                 key={i}
                 onClick={() => setDisplay(false)}
                 tag={Link}
-                to={`${url}/${post._id}`}
+                to={`${url}/${user._id}`}
                 action
-                active={activeSuggestionRef.current === post._id}
+                active={activeSuggestionRef.current === user._id}
               >
-                {post.name}, {post.author}, Oblasť:{" "}
-                {post.tags.map((tag) => `#${tag} `)}
+                {user.fullName}, {user.email}
               </ListGroupItem>
             ))
           )}

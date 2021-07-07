@@ -33,25 +33,15 @@ export default function User() {
 
   useEffect(() => {
     setUrl(`user/${id}/${year}`);
-  }, [id, year]);
-
-  if (loading) {
-    return (
-      <Row className="justify-content-center">
-        <Spinner />
-      </Row>
-    );
-  }
+  }, [id, year, setUrl]);
 
   return (
     <Fade>
-      <h2>Granty</h2>
-      <Form form>
-        <FormGroup row>
-          <Label for="year" md={1}>
-            Rok:
-          </Label>
-          <Col md={2}>
+      <h2 className="text-center">Granty</h2>
+      <Form inline className="my-3">
+        <FormGroup>
+          <Label for="year">Rok:</Label>
+          <Col>
             <Input
               type="select"
               name="year"
@@ -66,21 +56,25 @@ export default function User() {
               <option>{parseInt(currentYear) + 4}</option>
             </Input>
           </Col>
-          <Label for="hours" md={1}>
-            Hodiny:
-          </Label>
-          <Col md={8}>
+        </FormGroup>
+        <FormGroup>
+          <Label for="hours">Hodiny:</Label>
+          <Col>
             <Input id="hours" plaintext readOnly value={data.hoursTotal || 0} />
           </Col>
         </FormGroup>
-        <FormGroup></FormGroup>
       </Form>
+      {loading && (
+        <Row className="justify-content-center">
+          <Spinner />
+        </Row>
+      )}
       {error && (
         <Alert color="primary" className="text-center">
           {data.msg}
         </Alert>
       )}
-      {!error && (
+      {!error && !loading && (
         <Table responsive hover>
           <thead>
             <tr>

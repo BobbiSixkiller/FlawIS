@@ -1,231 +1,196 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
-import api from "../../api";
+
+import { useDataSend } from "../../hooks/useApi";
+import useFormValidation from "../../hooks/useFormValidation";
+import { validateRegister } from "../../util/validation";
 
 import {
-	Fade,
-	Form,
-	FormGroup,
-	FormFeedback,
-	Button,
-	Label,
-	Input,
-	Col,
-	Row,
-	Alert,
+  Alert,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Row,
+  Col,
+  Form,
+  FormGroup,
+  FormFeedback,
+  Label,
+  Input,
 } from "reactstrap";
 
-import { useUser } from "../../hooks/useUser";
-import useFormValidation from "../../hooks/useFormValidation";
-import validateUser from "../../validation/validateRegister";
-
 const INITIAL_STATE = {
-	email: "",
-	password: "",
-	repeatPass: "",
-	firstName: "",
-	lastName: "",
-	role: "basic",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  repeatPass: "",
+  role: "basic",
 };
 
-function AddUser(props) {
-	const { getData } = props;
-	const { accessToken } = useUser();
+export default function AddUser(props) {
+  const { dispatch, refresh } = props;
 
-	async function Register() {
-		delete values.repeatPass;
-		try {
-			const res = await api.post("user/add", values, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
-			setBackendMsg(res.data.msg);
-			getData(accessToken);
-		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
-		}
-	}
+  const {
+    state: { loading, error, data },
+    sendData,
+    hideMessage,
+  } = useDataSend();
 
-	const {
-		handleSubmit,
-		handleChange,
-		handleBlur,
-		values,
-		errors,
-		valid,
-		isSubmitting,
-	} = useFormValidation(INITIAL_STATE, validateUser, Register);
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
-	const history = useHistory();
+  const { handleChange, handleBlur, handleSubmit, values, errors, valid } =
+    useFormValidation(INITIAL_STATE, validateRegister, addPost);
 
-	return (
-		<Fade>
-			<h1 className="text-center">Nový používateľ</h1>
-			<Form onSubmit={handleSubmit}>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="email">Email:</Label>
-						<Input
-							onChange={handleChange}
-							onBlur={handleBlur}
-							name="email"
-							type="email"
-							id="email"
-							value={values.email}
-							invalid={errors.email && true}
-							valid={valid.email && true}
-							autoComplete="off"
-							placeholder="Emailová adresa"
-						/>
-						<FormFeedback invalid>{errors.email}</FormFeedback>
-						<FormFeedback valid>{valid.email}</FormFeedback>
-					</Col>
-				</FormGroup>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="role">Rola:</Label>
-						<Input
-							type="select"
-							name="role"
-							id="role"
-							value={values.role}
-							onChange={handleChange}
-						>
-							<option>basic</option>
-							<option>supervisor</option>
-							<option>admin</option>
-						</Input>
-					</Col>
-				</FormGroup>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="firstName">Krstné meno:</Label>
-						<Input
-							onChange={handleChange}
-							onBlur={handleBlur}
-							name="firstName"
-							type="text"
-							id="firstName"
-							value={values.firstName}
-							invalid={errors.firstName && true}
-							valid={valid.firstName && true}
-							autoComplete="off"
-							placeholder="Krstné meno"
-						/>
-						<FormFeedback invalid>{errors.firstName}</FormFeedback>
-						<FormFeedback valid>{valid.firstName}</FormFeedback>
-					</Col>
-				</FormGroup>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="lastName">Priezvisko:</Label>
-						<Input
-							onChange={handleChange}
-							onBlur={handleBlur}
-							name="lastName"
-							type="text"
-							id="lastName"
-							value={values.lastName}
-							invalid={errors.lastName && true}
-							valid={valid.lastName && true}
-							autoComplete="off"
-							placeholder="Priezvisko"
-						/>
-						<FormFeedback invalid>{errors.lastName}</FormFeedback>
-						<FormFeedback valid>{valid.lastName}</FormFeedback>
-					</Col>
-				</FormGroup>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="password">Heslo:</Label>
-						<Input
-							onChange={handleChange}
-							onBlur={handleBlur}
-							name="password"
-							type="password"
-							id="password"
-							value={values.password}
-							invalid={errors.password && true}
-							valid={valid.password && true}
-							placeholder="Heslo"
-							autoComplete="off"
-						/>
-						<FormFeedback invalid>{errors.password}</FormFeedback>
-						<FormFeedback valid>{valid.password}</FormFeedback>
-					</Col>
-				</FormGroup>
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Label for="repeatPass">Zopakovať heslo:</Label>
-						<Input
-							onChange={handleChange}
-							onBlur={handleBlur}
-							name="repeatPass"
-							type="password"
-							id="repeatPass"
-							value={values.repeatPass}
-							invalid={errors.repeatPass && true}
-							valid={valid.repeatPass && true}
-							placeholder="Zopakujte heslo"
-							autoComplete="off"
-						/>
-						<FormFeedback invalid>{errors.repeatPass}</FormFeedback>
-						<FormFeedback valid>{valid.repeatPass}</FormFeedback>
-					</Col>
-				</FormGroup>
-				{backendMsg && (
-					<FormGroup row className="justify-content-center">
-						<Col sm={6}>
-							<Alert color="success">
-								{backendMsg}
-								<Button
-									close
-									onClick={() => {
-										setBackendMsg(null);
-										history.goBack();
-									}}
-								/>
-							</Alert>
-						</Col>
-					</FormGroup>
-				)}
-				{backendError && (
-					<FormGroup row className="justify-content-center">
-						<Col sm={6}>
-							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
-							</Alert>
-						</Col>
-					</FormGroup>
-				)}
-				<FormGroup row className="justify-content-center">
-					<Col sm={6}>
-						<Row className="justify-content-between">
-							<Button
-								className="ml-3"
-								outline
-								color="primary"
-								onClick={() => history.goBack()}
-							>
-								Späť
-							</Button>
-							<Button
-								className="mr-3"
-								color="success"
-								disabled={isSubmitting}
-								type="submit"
-							>
-								Pridať
-							</Button>
-						</Row>
-					</Col>
-				</FormGroup>
-			</Form>
-		</Fade>
-	);
+  function addPost() {
+    sendData("user/", "POST", values);
+  }
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <ModalHeader
+        toggle={() => {
+          dispatch({ type: "TOGGLE" });
+          refresh();
+        }}
+      >
+        Nový používateľ
+      </ModalHeader>
+      <ModalBody>
+        <Row form className="justify-content-center">
+          <Col>
+            <FormGroup>
+              <Label for="firstName">Krstné meno:</Label>
+              <Input
+                type="text"
+                id="firstName"
+                name="firstName"
+                placeholder="Krstné meno"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.firstName}
+                invalid={errors.firstName && errors.firstName.length > 0}
+                valid={valid.firstName && valid.firstName.length > 0}
+                autoComplete="off"
+              />
+              <FormFeedback invalid="true">{errors.firstName}</FormFeedback>
+              <FormFeedback valid>{valid.firstName}</FormFeedback>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row form className="justify-content-center">
+          <Col>
+            <FormGroup>
+              <Label for="lastName">Priezvisko:</Label>
+              <Input
+                type="text"
+                id="lastName"
+                name="lastName"
+                placeholder="Priezvisko"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.lastName}
+                invalid={errors.lastName && errors.lastName.length > 0}
+                valid={valid.lastName && valid.lastName.length > 0}
+                autoComplete="off"
+              />
+              <FormFeedback invalid="true">{errors.lastName}</FormFeedback>
+              <FormFeedback valid>{valid.lastName}</FormFeedback>
+            </FormGroup>
+          </Col>
+        </Row>
+        <FormGroup>
+          <Label for="email">Email:</Label>
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Email"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.email}
+            invalid={errors.email && errors.email.length > 0}
+            valid={valid.email && valid.email.length > 0}
+            autoComplete="off"
+          />
+          <FormFeedback invalid="true">{errors.email}</FormFeedback>
+          <FormFeedback valid>{valid.email}</FormFeedback>
+        </FormGroup>
+        <FormGroup>
+          <Label for="password">Heslo:</Label>
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Heslo"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.password}
+            invalid={errors.password && errors.password.length > 0}
+            valid={valid.password && valid.password.length > 0}
+            autoComplete="off"
+          />
+          <FormFeedback invalid="true">{errors.password}</FormFeedback>
+          <FormFeedback valid>{valid.password}</FormFeedback>
+        </FormGroup>
+        <FormGroup>
+          <Label for="repeatPass">Zopakujte heslo:</Label>
+          <Input
+            type="password"
+            id="repeatPass"
+            name="repeatPass"
+            placeholder="Heslo znova"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={values.repeatPass}
+            invalid={errors.repeatPass && errors.repeatPass.length > 0}
+            valid={valid.repeatPass && valid.repeatPass.length > 0}
+            autoComplete="off"
+          />
+          <FormFeedback invalid="true">{errors.repeatPass}</FormFeedback>
+          <FormFeedback valid>{valid.repeatPass}</FormFeedback>
+        </FormGroup>
+        <FormGroup>
+          <Label for="role">Rola:</Label>
+          <Input
+            type="select"
+            id="role"
+            name="role"
+            onChange={handleChange}
+            value={values.role}
+            invalid={errors.role && errors.role.length > 0}
+            valid={valid.role && valid.role.length > 0}
+            autoComplete="off"
+          >
+            <option value="basic">Používateľ</option>
+            <option value="admin">Administrátor</option>
+            <option value="supervisor">Grantové oddelenie</option>
+          </Input>
+        </FormGroup>
+        {data && (
+          <Row className="justify-content-center my-3">
+            <Col>
+              <Alert color={error ? "danger" : "success"}>
+                {data.msg}
+                <Button close onClick={hideMessage} />
+              </Alert>
+            </Col>
+          </Row>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button type="submit" disabled={loading} color="success">
+          Pridať
+        </Button>{" "}
+        <Button
+          outline
+          color="secondary"
+          onClick={() => {
+            dispatch({ type: "TOGGLE" });
+            refresh();
+          }}
+        >
+          Zrušiť
+        </Button>
+      </ModalFooter>
+    </Form>
+  );
 }
-
-export default AddUser;

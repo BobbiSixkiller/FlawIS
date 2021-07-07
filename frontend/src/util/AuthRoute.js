@@ -36,7 +36,7 @@ export function AuthRoute({ children, ...rest }) {
 }
 
 export function AdminRoute({ children, ...rest }) {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, logout } = useContext(AuthContext);
 
   if (loading) {
     return (
@@ -44,6 +44,10 @@ export function AdminRoute({ children, ...rest }) {
         <Spinner />
       </Container>
     );
+  }
+
+  if (user.role === "basic") {
+    logout();
   }
 
   return (

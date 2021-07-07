@@ -1,81 +1,71 @@
 import React from "react";
-import api from "../../api";
+
+import { useDataSend } from "../../hooks/useApi";
 
 import {
-	Alert,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
-	Button,
-	Row,
-	Col,
-	Form,
+  Alert,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Row,
+  Col,
+  Form,
 } from "reactstrap";
 
-import { useUser } from "../../hooks/useUser";
+export default function DeleteUser(props) {
+  const { user, dispatch, refresh } = props;
 
-function DeleteUser(props) {
-	const { getData, modal, setModal } = props;
-	const { accessToken } = useUser();
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
+  const {
+    state: { loading, error, data },
+    sendData,
+    hideMessage,
+  } = useDataSend();
 
-	async function deleteUser(e) {
-		e.preventDefault();
-		try {
-			const res = await api.delete(`user/${modal.data._id}`, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
-			setBackendMsg(res.data.msg);
-			getData(accessToken);
-		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
-		}
-	}
-
-	return (
-		<Form onSubmit={deleteUser}>
-			<ModalHeader toggle={() => setModal(!modal.show)}>
-				Zmazať grant
-			</ModalHeader>
-			<ModalBody>
-				<p>Potvrďte zmazanie používateľa:</p>
-				<p className="font-weight-bold">
-					{modal.data.firstName + " " + modal.data.lastName}
-				</p>
-				{backendError && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-				{backendMsg && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="success">
-								{backendMsg}
-								<Button close onClick={() => setBackendMsg(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-			</ModalBody>
-			<ModalFooter>
-				<Button color="danger" type="submit">
-					Zmazať
-				</Button>{" "}
-				<Button outline color="secondary" onClick={() => setModal(!modal.show)}>
-					Zrušiť
-				</Button>
-			</ModalFooter>
-		</Form>
-	);
+  return (
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+        sendData(`user/${user._id}`, "DELETE");
+      }}
+    >
+      <ModalHeader
+        toggle={() => {
+          dispatch({ type: "TOGGLE" });
+          refresh();
+        }}
+      >
+        Zmazať používateľa
+      </ModalHeader>
+      <ModalBody>
+        <p>Potvrďte zmazanie používateľa:</p>
+        <p className="font-weight-bold">{user.fullName}</p>
+        {data && (
+          <Row className="justify-content-center my-3">
+            <Col>
+              <Alert color={error ? "danger" : "success"}>
+                {data.msg}
+                <Button close onClick={() => hideMessage()} />
+              </Alert>
+            </Col>
+          </Row>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button type="submit" color="danger" disabled={loading}>
+          Zmazať
+        </Button>{" "}
+        <Button
+          outline
+          color="secondary"
+          onClick={() => {
+            dispatch({ type: "TOGGLE" });
+            refresh();
+          }}
+        >
+          Zrušiť
+        </Button>
+      </ModalFooter>
+    </Form>
+  );
 }
-
-export default DeleteUser;

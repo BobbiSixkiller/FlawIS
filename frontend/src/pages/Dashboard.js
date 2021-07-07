@@ -66,15 +66,15 @@ export default function Dashboard() {
         </Fade>
       </Route>
       <AuthRoute path={`${path}/users/:id`}>
-        <User user={context.user} />
+        <User />
       </AuthRoute>
       <AuthRoute path={`${path}/posts`}>
         <Posts />
       </AuthRoute>
-      <AdminRoute exact path={`${path}/users`}>
+      <AdminRoute path={`${path}/users`}>
         <Users />
       </AdminRoute>
-      <AdminRoute exact path={`${path}/grants`}></AdminRoute>
+      <AdminRoute path={`${path}/grants`}></AdminRoute>
     </Switch>
   );
 }

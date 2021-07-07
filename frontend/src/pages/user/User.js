@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 
 import {
+  Alert,
   Fade,
   Row,
   Spinner,
@@ -18,28 +19,29 @@ import { useDataFetch } from "../../hooks/useApi";
 
 export default function User() {
   const history = useHistory();
-  const {
-    params: { id },
-    url,
-  } = useRouteMatch();
-
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(currentYear);
+  const { id } = useParams();
 
   const {
     state: { data, loading, error },
     setUrl,
-  } = useDataFetch(url, {});
+  } = useDataFetch(`user/${id}`, {});
 
   useEffect(() => {
     setUrl(`user/${id}`);
-  }, [id]);
+  }, [id, setUrl]);
 
   if (loading) {
     return (
       <Row className="justify-content-center">
         <Spinner />
       </Row>
+    );
+  } else if (error) {
+    return (
+      <Alert color="danger" className="text-center">
+        Používateľ nebol nájdený!{" "}
+        <Button close onClick={() => history.goBack()} />
+      </Alert>
     );
   }
 

@@ -13,7 +13,7 @@ import {
   Form,
 } from "reactstrap";
 
-function DeletePost(props) {
+export default function DeletePost(props) {
   const {
     modal: { post },
     setModal,
@@ -77,5 +77,3 @@ function DeletePost(props) {
     </Form>
   );
 }
-
-export default DeletePost;
