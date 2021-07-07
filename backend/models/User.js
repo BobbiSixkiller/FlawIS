@@ -47,7 +47,7 @@ userSchema.index({
   lastName: "text",
 });
 
-userSchema.statics.getUsersAggregation = function () {
+userSchema.statics.getUsersAggregation = function (limit, skip) {
   return this.aggregate([
     {
       $lookup: {
@@ -102,6 +102,8 @@ userSchema.statics.getUsersAggregation = function () {
     {
       $project: {
         _id: 1,
+        firstName: 1,
+        lastName: 1,
         fullName: { $concat: ["$firstName", " ", "$lastName"] },
         email: 1,
         role: 1,
@@ -115,6 +117,8 @@ userSchema.statics.getUsersAggregation = function () {
         updatedAt: -1,
       },
     },
+    { $skip: skip },
+    { $limit: limit },
   ]);
 };
 
@@ -170,6 +174,8 @@ userSchema.statics.getUserAggregation = function (userId, year) {
     {
       $project: {
         _id: 1,
+        firstName: 1,
+        lastName: 1,
         fullName: { $concat: ["$firstName", " ", "$lastName"] },
         email: 1,
         role: 1,

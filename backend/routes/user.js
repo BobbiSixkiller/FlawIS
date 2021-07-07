@@ -8,7 +8,6 @@ const jwt = require("jsonwebtoken");
 const {
   registerValidation,
   loginValidation,
-  userUpdateValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
 } = require("../handlers/validation");
@@ -21,7 +20,8 @@ const {
 
 router.post("/register", async (req, res) => {
   const { error } = await registerValidation(req.body);
-  if (error) return res.status(400).send({ error: error.details[0].message });
+  if (error)
+    return res.status(400).send({ error: true, msg: error.details[0].message });
 
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist)
@@ -77,22 +77,19 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/", checkAuth, isSupervisor, async (req, res) => {
-  //validation
   const { error } = await registerValidation(req.body);
-  if (error) return res.status(400).send({ error: error.details[0].message });
+  if (error)
+    return res.status(400).send({ error: true, msg: error.details[0].message });
 
-  //check for duplicates
   const emailExist = await User.findOne({ email: req.body.email });
   if (emailExist)
     return res
       .status(400)
       .send({ error: "Zadaný email je už zaregistrovaný!" });
 
-  //password hashing
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  //create a new user
   const user = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -157,7 +154,8 @@ router.post("/login", async (req, res) => {
 
 router.post("/forgotPassword", async (req, res) => {
   const { error } = forgotPasswordValidation(req.body);
-  if (error) return res.status(400).send({ error: error.details[0].message });
+  if (error)
+    return res.status(400).send({ error: true, msg: error.details[0].message });
 
   const user = await User.findOne({ email: req.body.email });
   if (!user)
@@ -215,7 +213,7 @@ router.post("/reset/:token", async (req, res) => {
             },
           });
         }
-        res.status(401).send({ error: err });
+        res.status(401).send({ error: true, msg: err });
       } else {
         return decoded;
       }
@@ -230,7 +228,8 @@ router.post("/reset/:token", async (req, res) => {
   }
 
   const { error } = resetPasswordValidation(req.body);
-  if (error) return res.status(400).send({ error: error.details[0].message });
+  if (error)
+    return res.status(400).send({ error: true, msg: error.details[0].message });
 
   const salt = await bcrypt.genSalt(10);
   const password = await bcrypt.hash(req.body.password, salt);
@@ -241,12 +240,27 @@ router.post("/reset/:token", async (req, res) => {
   res.status(200).send({ msg: "Vaše heslo bolo zmenené!" });
 });
 
+router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
+  const users = await User.find(
+    { $text: { $search: req.query.q } },
+    { score: { $meta: "textScore" } }
+  ).sort({ score: { $meta: "textScore" } });
+
+  res.status(200).send({ users, query: req.query.q });
+});
+
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
+  const pageSize = parseInt(req.query.size || 5);
+  const page = parseInt(req.query.page || 1);
+
   try {
-    const aggregate = await User.getUsersAggregation();
+    const [users, total] = await Promise.all([
+      User.getUsersAggregation(pageSize, page * pageSize - pageSize),
+      User.countDocuments(),
+    ]);
     //const aggregate = await User.getUsersGrantsAggregation();
     //const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
-    res.status(200).send(aggregate);
+    res.status(200).send({ users, pages: Math.ceil(total / pageSize) });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -299,63 +313,54 @@ router.get("/:id/:year", checkAuth, isOwnUser, async (req, res) => {
   res.status(200).send(grants[0]);
 });
 
-//prerobit update aby pocital s repeatpass ale neukladal to do DB
 router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
-  const { error } = userUpdateValidation(req.body);
+  const { error } = registerValidation(req.body);
   if (error)
     return res.status(400).send({ error: true, msg: error.details[0].message });
 
-  if (req.body.password) {
-    const salt = await bcrypt.genSalt(10);
-    req.body.password = await bcrypt.hash(req.body.password, salt);
+  const user = await User.findOne({ _id: req.params.id });
+  if (!user)
+    return res
+      .status(404)
+      .send({ error: true, msg: "Používateľ nebol nájdený!" });
+
+  //skusit refactor s mongoose custom validator
+  if (user.email !== req.body.email) {
+    const emailExists = User.findOne({ email: req.body.email });
+    if (emailExists)
+      return res
+        .status(400)
+        .send({ error: true, msg: "Zadaný email je používaný!" });
   }
 
-  try {
-    const userAct = await User.findOne({ _id: req.params.id });
-    if (userAct.email !== req.body.email) {
-      const emailExist = await User.findOne({ email: req.body.email });
-      if (emailExist)
-        return res
-          .status(400)
-          .send({ error: true, msg: "Zadaný email je už zaregistrovaný!" });
+  const salt = await bcrypt.genSalt(10);
+  const password = await bcrypt.hash(req.body.password, salt);
 
-      const update = await User.findOneAndUpdate(
-        { _id: req.params.id },
-        { $set: req.body },
-        { new: true }
-      );
-      return res
-        .status(200)
-        .send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
-    } else {
-      const update = await User.findOneAndUpdate(
-        { _id: req.params.id },
-        { $set: req.body },
-        { new: true }
-      );
-      return res
-        .status(200)
-        .send({ msg: `Používateľ ${update.fullName} aktualizovaný.` });
-    }
-  } catch (err) {
-    res.status(500).send({ error: err.message });
+  user.firstName = req.body.firstName;
+  user.lastName = req.body.lastName;
+  user.email = req.body.email;
+  user.password = password;
+  if (req.user.role === "admin") {
+    user.role = req.body.role;
   }
+
+  await user.save();
+
+  res
+    .status(200)
+    .send({ msg: `Používateľ ${user.fullName} bol aktualizovaný!`, user });
 });
 
 router.delete("/:id", checkAuth, isAdmin, async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.params.id });
-    if (!user)
-      return res
-        .status(404)
-        .send({ error: true, msg: "Používateľ nebol nájdený!" });
+  const user = await User.findOne({ _id: req.params.id });
+  if (!user)
+    return res
+      .status(404)
+      .send({ error: true, msg: "Používateľ nebol nájdený!" });
 
-    await user.remove();
+  await user.remove();
 
-    res.status(200).send({ msg: "Používateľ vymazaný!" });
-  } catch (err) {
-    res.status(500).send({ error: err.message });
-  }
+  res.status(200).send({ msg: `Používateľ ${user.fullName} vymazaný!` });
 });
 
 module.exports = router;
