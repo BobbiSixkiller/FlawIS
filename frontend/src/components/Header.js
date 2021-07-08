@@ -52,7 +52,7 @@ function Header() {
           <Route path="/dashboard/posts">
             <PostApiSearch />
           </Route>
-          <Route exact path="/dashboard/grants">
+          <Route path="/dashboard/grants">
             <GrantApiSearch />
           </Route>
           <Route path="/dashboard/users">

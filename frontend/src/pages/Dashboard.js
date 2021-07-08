@@ -16,6 +16,7 @@ import { AuthContext } from "../context/auth";
 import { AuthRoute, AdminRoute } from "../util/AuthRoute";
 
 import Grants from "./grant/Grants";
+import Grant from "./grant/Grant";
 import Posts from "./post/Posts";
 import Users from "./user/Users";
 import User from "./user/User";
@@ -68,6 +69,9 @@ export default function Dashboard() {
       </Route>
       <AuthRoute path={`${path}/users/:id`}>
         <User />
+      </AuthRoute>
+      <AuthRoute path={`${path}/grants/:id`}>
+        <Grant />
       </AuthRoute>
       <AuthRoute path={`${path}/posts`}>
         <Posts />

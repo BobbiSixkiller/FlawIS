@@ -75,7 +75,6 @@ export default function MyGrants() {
         <Table responsive hover>
           <thead>
             <tr>
-              <th>#</th>
               <th>Názov</th>
               <th>Hodiny</th>
               <th>Cestovné</th>
@@ -88,9 +87,8 @@ export default function MyGrants() {
           </thead>
           <tbody>
             {data.grants &&
-              data.grants.map((grant, i) => (
+              data.grants.map((grant) => (
                 <tr key={grant._id}>
-                  <td>{i}</td>
                   <td>{grant.name}</td>
                   <td>{grant.budget.members.hours}</td>
                   <td>{grant.budget.travel}</td>
@@ -101,7 +99,7 @@ export default function MyGrants() {
                   <td>
                     <Button
                       tag={Link}
-                      to={`${url}/${grant._id}`}
+                      to={`/dashboard/grants/${grant._id}`}
                       size="sm"
                       color="info"
                     >
