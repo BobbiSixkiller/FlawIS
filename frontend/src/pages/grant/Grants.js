@@ -126,7 +126,7 @@ export default function Grants() {
             {action === "DELETE" && (
               <DeleteGrant
                 refresh={refreshData}
-                user={modalData}
+                grant={modalData}
                 dispatch={dispatch}
               />
             )}
