@@ -13,34 +13,22 @@ import {
   Form,
 } from "reactstrap";
 
-export default function DeletePost(props) {
-  const {
-    modal: { post },
-    setModal,
-    refresh,
-  } = props;
+export default function DeletePost({ post, dispatch, refresh }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+  function deletePost(e) {
+    e.preventDefault();
+    sendData(`post/${post._id}`, "DELETE");
+  }
+
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
 
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-        sendData(`post/${post._id}`, "DELETE");
-      }}
-    >
-      <ModalHeader
-        toggle={() => {
-          setModal(!post);
-          refresh();
-        }}
-      >
-        Zmazať post
-      </ModalHeader>
+    <Form onSubmit={deletePost}>
+      <ModalHeader toggle={toggle}>Zmazať post</ModalHeader>
       <ModalBody>
         <p>Potvrďte zmazanie postu:</p>
         <p className="font-weight-bold">{post.name}</p>
@@ -63,14 +51,7 @@ export default function DeletePost(props) {
         <Button type="submit" color="danger" disabled={loading}>
           Zmazať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            setModal(!post);
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

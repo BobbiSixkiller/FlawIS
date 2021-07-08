@@ -15,9 +15,10 @@ import {
 import { AuthContext } from "../context/auth";
 import { AuthRoute, AdminRoute } from "../util/AuthRoute";
 
+import Grants from "./grant/Grants";
 import Posts from "./post/Posts";
-import User from "./user/User";
 import Users from "./user/Users";
+import User from "./user/User";
 
 export default function Dashboard() {
   const context = useContext(AuthContext);
@@ -74,7 +75,9 @@ export default function Dashboard() {
       <AdminRoute path={`${path}/users`}>
         <Users />
       </AdminRoute>
-      <AdminRoute path={`${path}/grants`}></AdminRoute>
+      <AdminRoute path={`${path}/grants`}>
+        <Grants />
+      </AdminRoute>
     </Switch>
   );
 }

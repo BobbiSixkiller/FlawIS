@@ -17,7 +17,7 @@ import {
 
 import { useDataFetch } from "../../hooks/useApi";
 
-export default function User() {
+export default function MyGrants() {
   const {
     params: { id },
     url,
@@ -26,10 +26,7 @@ export default function User() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
 
-  const {
-    state: { data, loading, error },
-    setUrl,
-  } = useDataFetch(`${url}/${year}`, []);
+  const { data, loading, error, setUrl } = useDataFetch(`${url}/${year}`, []);
 
   useEffect(() => {
     setUrl(`user/${id}/${year}`);

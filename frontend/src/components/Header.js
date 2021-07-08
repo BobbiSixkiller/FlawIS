@@ -3,6 +3,7 @@ import { useHistory, Switch, Route } from "react-router-dom";
 
 import PostApiSearch from "./post/PostApiSearch";
 import UserApiSearch from "./user/UserApiSearch";
+import GrantApiSearch from "./grant/GrantApiSearch";
 import { AuthContext } from "../context/auth";
 
 import {
@@ -51,7 +52,9 @@ function Header() {
           <Route path="/dashboard/posts">
             <PostApiSearch />
           </Route>
-          <Route exact path="/dashboard/grants"></Route>
+          <Route exact path="/dashboard/grants">
+            <GrantApiSearch />
+          </Route>
           <Route path="/dashboard/users">
             <UserApiSearch />
           </Route>

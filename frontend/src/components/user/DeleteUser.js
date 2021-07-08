@@ -13,30 +13,22 @@ import {
   Form,
 } from "reactstrap";
 
-export default function DeleteUser(props) {
-  const { user, dispatch, refresh } = props;
+export default function DeleteUser({ user, dispatch, refresh }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+  function deleteUser(e) {
+    e.preventDefault();
+    sendData(`user/${user._id}`, "DELETE");
+  }
+
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
 
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-        sendData(`user/${user._id}`, "DELETE");
-      }}
-    >
-      <ModalHeader
-        toggle={() => {
-          dispatch({ type: "TOGGLE" });
-          refresh();
-        }}
-      >
-        Zmazať používateľa
-      </ModalHeader>
+    <Form onSubmit={deleteUser}>
+      <ModalHeader toggle={toggle}>Zmazať používateľa</ModalHeader>
       <ModalBody>
         <p>Potvrďte zmazanie používateľa:</p>
         <p className="font-weight-bold">{user.fullName}</p>
@@ -55,14 +47,7 @@ export default function DeleteUser(props) {
         <Button type="submit" color="danger" disabled={loading}>
           Zmazať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            dispatch({ type: "TOGGLE" });
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

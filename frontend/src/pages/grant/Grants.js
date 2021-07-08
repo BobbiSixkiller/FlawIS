@@ -1,30 +1,37 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
 
-import { Row, Button, Table, Spinner, Fade, Modal } from "reactstrap";
-import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
+import {
+  Row,
+  ButtonGroup,
+  Button,
+  Table,
+  Spinner,
+  Fade,
+  Modal,
+} from "reactstrap";
+import { Trash2Fill } from "react-bootstrap-icons";
 
 import useModal from "../../hooks/useModal";
 import { useDataFetch } from "../../hooks/useApi";
 import { AuthContext } from "../../context/auth";
 
-import User from "./User";
-import AddUser from "../../components/user/AddUser";
-import EditUser from "../../components/user/EditUser";
-import DeleteUser from "../../components/user/DeleteUser";
+import Grant from "./Grant";
+import AddGrant from "./AddGrant";
+import DeleteGrant from "../../components/grant/DeleteGrant";
 import PaginationComponent from "../../components/PaginationComponent";
 
-export default function Users() {
+export default function Grants() {
   const auth = useContext(AuthContext);
   const { path, url } = useRouteMatch();
   const [page, setPage] = useState(1);
 
   const { dispatch, show, action, modalData } = useModal();
 
-  const { loading, data, setUrl, refreshData } = useDataFetch("user/", []);
+  const { loading, data, setUrl, refreshData } = useDataFetch("grant/", []);
 
   useEffect(() => {
-    setUrl(`user?page=${page}`);
+    setUrl(`grant?page=${page}`);
   }, [page, setUrl]);
 
   if (loading) {
@@ -39,56 +46,50 @@ export default function Users() {
       <Route exact path={path}>
         <Fade>
           <Row className="justify-content-between my-3">
-            <h1>Manažment používateľov</h1>
-            <Button
-              outline
-              color="success"
-              size="lg"
-              onClick={() => dispatch({ type: "ADD" })}
-            >
-              Pridať
-            </Button>
+            <h1>Manažment grantov</h1>
+            <ButtonGroup>
+              <Button outline color="primary" size="lg">
+                Oznamy
+              </Button>
+              <Button
+                color="success"
+                size="lg"
+                onClick={() => dispatch({ type: "ADD" })}
+              >
+                Nový grant
+              </Button>
+            </ButtonGroup>
           </Row>
           <Table className="my-2" hover responsive>
             <thead>
               <tr>
-                <th>Meno</th>
-                <th>Email</th>
-                <th>Hodiny</th>
-                <th>Rola</th>
-                <th>Vytvorený</th>
+                <th>Názov</th>
+                <th>ID</th>
+                <th>Typ</th>
+                <th>Začiatok</th>
+                <th>Koniec</th>
                 <th>Aktualizovaný</th>
                 <th>Akcia</th>
               </tr>
             </thead>
             <tbody>
-              {data.users &&
-                data.users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.hoursTotal}</td>
-                    <td>{user.role}</td>
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                    <td>{new Date(user.updatedAt).toLocaleDateString()}</td>
+              {data.grants &&
+                data.grants.map((grant) => (
+                  <tr key={grant._id}>
+                    <td>{grant.name}</td>
+                    <td>{grant.idNumber}</td>
+                    <td>{grant.type}</td>
+                    <td>{new Date(grant.start).toLocaleDateString()}</td>
+                    <td>{new Date(grant.end).toLocaleDateString()}</td>
+                    <td>{new Date(grant.updatedAt).toLocaleString()}</td>
                     <td>
                       <Button
                         tag={Link}
-                        to={`${url}/${user._id}`}
+                        to={`${url}/${grant._id}`}
                         size="sm"
                         color="info"
                       >
                         Zobraziť
-                      </Button>{" "}
-                      <Button
-                        outline
-                        size="sm"
-                        color="warning"
-                        onClick={() =>
-                          dispatch({ type: "UPDATE", payload: user })
-                        }
-                      >
-                        <PencilFill />
                       </Button>{" "}
                       {auth.user.role === "admin" && (
                         <Button
@@ -96,7 +97,7 @@ export default function Users() {
                           size="sm"
                           color="danger"
                           onClick={() =>
-                            dispatch({ type: "DELETE", payload: user })
+                            dispatch({ type: "DELETE", payload: grant })
                           }
                         >
                           <Trash2Fill />
@@ -122,18 +123,8 @@ export default function Users() {
               refreshData();
             }}
           >
-            {action === "ADD" && (
-              <AddUser refresh={refreshData} dispatch={dispatch} />
-            )}
             {action === "DELETE" && (
-              <DeleteUser
-                refresh={refreshData}
-                user={modalData}
-                dispatch={dispatch}
-              />
-            )}
-            {action === "UPDATE" && (
-              <EditUser
+              <DeleteGrant
                 refresh={refreshData}
                 user={modalData}
                 dispatch={dispatch}
@@ -143,7 +134,10 @@ export default function Users() {
         </Fade>
       </Route>
       <Route path={`${path}/:id`}>
-        <User />
+        <Grant />
+      </Route>
+      <Route path={`${path}/new`}>
+        <AddGrant />
       </Route>
     </Switch>
   );

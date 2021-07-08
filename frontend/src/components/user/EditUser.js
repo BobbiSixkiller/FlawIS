@@ -20,9 +20,7 @@ import {
   Input,
 } from "reactstrap";
 
-export default function EditUser(props) {
-  const { user, dispatch, refresh } = props;
-
+export default function EditUser({ user, dispatch, refresh }) {
   const INITIAL_STATE = {
     firstName: user.firstName,
     lastName: user.lastName,
@@ -34,11 +32,7 @@ export default function EditUser(props) {
 
   const auth = useContext(AuthContext);
 
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const { handleChange, handleBlur, handleSubmit, values, errors, valid } =
     useFormValidation(INITIAL_STATE, validateRegister, editPost);
@@ -47,16 +41,14 @@ export default function EditUser(props) {
     sendData(`user/${user._id}`, "PUT", values);
   }
 
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
+
   return (
     <Form onSubmit={handleSubmit}>
-      <ModalHeader
-        toggle={() => {
-          dispatch({ type: "TOGGLE" });
-          refresh();
-        }}
-      >
-        Upraviť {user.fullName}
-      </ModalHeader>
+      <ModalHeader toggle={toggle}>Upraviť {user.fullName}</ModalHeader>
       <ModalBody>
         <Row form className="justify-content-center">
           <Col>
@@ -184,14 +176,7 @@ export default function EditUser(props) {
         <Button type="submit" disabled={loading} color="warning">
           Aktualizovať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            dispatch({ type: "TOGGLE" });
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

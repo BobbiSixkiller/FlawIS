@@ -5,17 +5,18 @@ import { useDataFetch } from "../../hooks/useApi";
 
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
-export default function ApiSearch() {
+export default function GrantApiSearch() {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
 
   const [display, setDisplay] = useState(false);
   const [search, setSearch] = useState("");
+
   const autoWrapRef = useRef(null);
   const activeSuggestionRef = useRef(null);
 
   const { loading, error, data, setUrl } = useDataFetch(
-    `user/api/search?q=${search}`,
+    `grant/api/search?q=${search}`,
     []
   );
 
@@ -28,7 +29,7 @@ export default function ApiSearch() {
   }, [autoWrapRef]);
 
   useEffect(() => {
-    setUrl(`user/api/search?q=${search}`);
+    setUrl(`grant/api/search?q=${search}`);
   }, [search, setUrl]);
 
   useEffect(() => {
@@ -60,21 +61,21 @@ export default function ApiSearch() {
               <Spinner size="sm" />
             </ListGroupItem>
           )}
-          {data.users.length === 0 || error ? (
+          {data.grants.length === 0 || error ? (
             <ListGroupItem className="text-muted">
               Žiadne výsledky
             </ListGroupItem>
           ) : (
-            data.users.map((user, i) => (
+            data.grants.map((grant) => (
               <ListGroupItem
-                key={i}
+                key={grant._id}
                 onClick={() => setDisplay(false)}
                 tag={Link}
-                to={`${url}/${user._id}`}
+                to={`${url}/${grant._id}`}
                 action
-                active={activeSuggestionRef.current === user._id}
+                active={activeSuggestionRef.current === grant._id}
               >
-                {user.fullName}, {user.email}
+                {grant.name}, {grant.idNumber}
               </ListGroupItem>
             ))
           )}

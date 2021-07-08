@@ -52,7 +52,11 @@ export function useDataFetch(initUrl, initData) {
     setRefresh(!refresh);
   }
 
-  return { state, setUrl, refreshData };
+  return {
+    ...state,
+    setUrl,
+    refreshData,
+  };
 }
 
 export function useDataSend() {
@@ -76,5 +80,5 @@ export function useDataSend() {
     dispatch({ type: "HIDE_MSG" });
   }
 
-  return { state, sendData, hideMessage };
+  return { ...state, sendData, hideMessage };
 }

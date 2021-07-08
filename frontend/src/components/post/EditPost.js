@@ -20,24 +20,14 @@ import {
 } from "reactstrap";
 import TagInput from "../TagInput";
 
-export default function EditPost(props) {
-  const {
-    modal: { post },
-    setModal,
-    refresh,
-  } = props;
-
+export default function EditPost({ post, dispatch, refresh }) {
   const INITIAL_STATE = {
     name: post.name,
     body: post.body,
     tags: post.tags,
   };
 
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const {
     handleChange,
@@ -53,16 +43,14 @@ export default function EditPost(props) {
     sendData(`post/${post._id}`, "PUT", values);
   }
 
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
+
   return (
     <Form onSubmit={handleSubmit}>
-      <ModalHeader
-        toggle={() => {
-          setModal(!post);
-          refresh();
-        }}
-      >
-        Upraviť post
-      </ModalHeader>
+      <ModalHeader toggle={toggle}>Upraviť post</ModalHeader>
       <ModalBody>
         <Row form className="justify-content-center">
           <Col>
@@ -128,14 +116,7 @@ export default function EditPost(props) {
         <Button type="submit" disabled={loading} color="warning">
           Aktualizovať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            setModal(!post);
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

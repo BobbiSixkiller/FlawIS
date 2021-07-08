@@ -23,6 +23,7 @@ import {
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
 import { useDataFetch } from "../../hooks/useApi";
+import useModal from "../../hooks/useModal";
 import { AuthContext } from "../../context/auth";
 
 import PaginationComponent from "../../components/PaginationComponent";
@@ -36,15 +37,16 @@ export default function Posts() {
   const { user } = useContext(AuthContext);
 
   const [page, setPage] = useState(1);
-  const [modal, setModal] = useState(false);
   const [authors, setAuthors] = useState([]);
   const [tags, setTags] = useState([]);
 
-  const {
-    state: { loading, data },
-    setUrl,
-    refreshData,
-  } = useDataFetch("post/", [], "GET");
+  const { show, action, modalData, dispatch } = useModal();
+
+  const { loading, data, setUrl, refreshData } = useDataFetch(
+    "post/",
+    [],
+    "GET"
+  );
 
   useEffect(() => {
     setUrl(
@@ -115,7 +117,7 @@ export default function Posts() {
                   outline
                   size="lg"
                   color="success"
-                  onClick={() => setModal({ show: true, action: "add" })}
+                  onClick={() => dispatch({ type: "ADD" })}
                 >
                   Nový post
                 </Button>
@@ -169,7 +171,7 @@ export default function Posts() {
                                 size="sm"
                                 color="warning"
                                 onClick={() =>
-                                  setModal({ show: true, action: "edit", post })
+                                  dispatch({ type: "UPDATE", payload: post })
                                 }
                               >
                                 <PencilFill />
@@ -179,11 +181,7 @@ export default function Posts() {
                                 size="sm"
                                 color="danger"
                                 onClick={() =>
-                                  setModal({
-                                    show: true,
-                                    action: "delete",
-                                    post,
-                                  })
+                                  dispatch({ type: "DELETE", payload: post })
                                 }
                               >
                                 <Trash2Fill />
@@ -205,31 +203,27 @@ export default function Posts() {
               Späť
             </Button>
             <Modal
-              isOpen={modal.show}
+              isOpen={show}
               toggle={() => {
-                setModal(!modal);
+                dispatch({ type: "TOGGLE" });
                 refreshData();
               }}
             >
-              {modal.action === "add" && (
-                <AddPost
-                  refresh={refreshData}
-                  modal={modal}
-                  setModal={setModal}
-                />
+              {action === "ADD" && (
+                <AddPost refresh={refreshData} dispatch={dispatch} />
               )}
-              {modal.action === "delete" && (
+              {action === "DELETE" && (
                 <DeletePost
                   refresh={refreshData}
-                  modal={modal}
-                  setModal={setModal}
+                  post={modalData}
+                  dispatch={dispatch}
                 />
               )}
-              {modal.action === "edit" && (
+              {action === "UPDATE" && (
                 <EditPost
                   refresh={refreshData}
-                  modal={modal}
-                  setModal={setModal}
+                  post={modalData}
+                  dispatch={dispatch}
                 />
               )}
             </Modal>

@@ -5,19 +5,20 @@ import { useDataFetch } from "../../hooks/useApi";
 
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
-export default function ApiSearch() {
+export default function PostApiSearch() {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
 
   const [display, setDisplay] = useState(false);
   const [search, setSearch] = useState("");
+
   const autoWrapRef = useRef(null);
   const activeSuggestionRef = useRef(null);
 
-  const {
-    state: { loading, error, data },
-    setUrl,
-  } = useDataFetch(`post/api/search?q=${search}`, []);
+  const { loading, error, data, setUrl } = useDataFetch(
+    `post/api/search?q=${search}`,
+    []
+  );
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

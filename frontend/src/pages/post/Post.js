@@ -9,10 +9,11 @@ export default function Post() {
   const history = useHistory();
   const { id } = useParams();
 
-  const {
-    state: { loading, error, data },
-    setUrl,
-  } = useDataFetch(`post/${id}`, {}, "GET");
+  const { loading, error, data, setUrl } = useDataFetch(
+    `post/${id}`,
+    {},
+    "GET"
+  );
 
   useEffect(() => {
     setUrl(`post/${id}`);

@@ -26,14 +26,8 @@ const INITIAL_STATE = {
   tags: [],
 };
 
-export default function AddPost(props) {
-  const { modal, setModal, refresh } = props;
-
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+export default function AddPost({ dispatch, refresh }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const {
     handleChange,
@@ -49,16 +43,14 @@ export default function AddPost(props) {
     sendData("post/", "POST", values);
   }
 
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
+
   return (
     <Form onSubmit={handleSubmit}>
-      <ModalHeader
-        toggle={() => {
-          setModal(!modal);
-          refresh();
-        }}
-      >
-        Nový post
-      </ModalHeader>
+      <ModalHeader toggle={toggle}>Nový post</ModalHeader>
       <ModalBody>
         <Row form className="justify-content-center">
           <Col>
@@ -124,14 +116,7 @@ export default function AddPost(props) {
         <Button type="submit" disabled={loading} color="success">
           Pridať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            setModal(!modal);
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

@@ -21,10 +21,7 @@ export default function User() {
   const history = useHistory();
   const { id } = useParams();
 
-  const {
-    state: { data, loading, error },
-    setUrl,
-  } = useDataFetch(`user/${id}`, {});
+  const { data, loading, error, setUrl } = useDataFetch(`user/${id}`, {});
 
   useEffect(() => {
     setUrl(`user/${id}`);

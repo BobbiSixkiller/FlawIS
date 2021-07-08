@@ -28,14 +28,8 @@ const INITIAL_STATE = {
   role: "basic",
 };
 
-export default function AddUser(props) {
-  const { dispatch, refresh } = props;
-
-  const {
-    state: { loading, error, data },
-    sendData,
-    hideMessage,
-  } = useDataSend();
+export default function AddUser({ dispatch, refresh }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const { handleChange, handleBlur, handleSubmit, values, errors, valid } =
     useFormValidation(INITIAL_STATE, validateRegister, addPost);
@@ -44,16 +38,14 @@ export default function AddUser(props) {
     sendData("user/", "POST", values);
   }
 
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refresh();
+  }
+
   return (
     <Form onSubmit={handleSubmit}>
-      <ModalHeader
-        toggle={() => {
-          dispatch({ type: "TOGGLE" });
-          refresh();
-        }}
-      >
-        Nový používateľ
-      </ModalHeader>
+      <ModalHeader toggle={toggle}>Nový používateľ</ModalHeader>
       <ModalBody>
         <Row form className="justify-content-center">
           <Col>
@@ -180,14 +172,7 @@ export default function AddUser(props) {
         <Button type="submit" disabled={loading} color="success">
           Pridať
         </Button>{" "}
-        <Button
-          outline
-          color="secondary"
-          onClick={() => {
-            dispatch({ type: "TOGGLE" });
-            refresh();
-          }}
-        >
+        <Button outline color="secondary" onClick={toggle}>
           Zrušiť
         </Button>
       </ModalFooter>

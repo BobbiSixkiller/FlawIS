@@ -49,24 +49,24 @@ module.exports.grantValidation = (data) => {
   const schema = Joi.object({
     name: Joi.string().max(500).required(),
     idNumber: Joi.string().max(100).required(),
-    type: Joi.string().valid("APVV", "VEGA", "KEGA"),
+    type: Joi.string().valid("APVV", "VEGA", "KEGA").required(),
     start: Joi.date().required(),
     end: Joi.date().required(),
     budget: Joi.array()
       .items(
         Joi.object({
-          year: Joi.number(),
-          travel: Joi.number(),
-          material: Joi.number(),
-          services: Joi.number(),
-          indirect: Joi.number(),
-          salaries: Joi.number(),
+          year: Joi.number().required(),
+          travel: Joi.number().required(),
+          material: Joi.number().required(),
+          services: Joi.number().required(),
+          indirect: Joi.number().required(),
+          salaries: Joi.number().required(),
           members: Joi.array().items(
             Joi.object({
               member: Joi.string().required(),
               hours: Joi.number().required(),
-              role: Joi.string(),
-              active: Joi.boolean(),
+              role: Joi.string().required(),
+              active: Joi.boolean().required(),
             })
           ),
         })
@@ -82,39 +82,14 @@ module.exports.announcementValidation = (data) => {
     name: Joi.string().required(),
     content: Joi.string().required(),
     issuedBy: Joi.string().required(),
-    type: Joi.string().valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE"),
+    type: Joi.string()
+      .valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE")
+      .required(),
     files: Joi.array().items(
-      Joi.object({ url: Joi.string(), path: Joi.string(), name: Joi.string() })
-    ),
-  });
-
-  return schema.validate(data);
-};
-
-module.exports.membersValidation = (data) => {
-  const schema = Joi.object({
-    hours: Joi.number(),
-    member: Joi.string(),
-    role: Joi.string().valid("basic", "deputy", "leader"),
-    active: Joi.boolean(),
-  });
-
-  return schema.validate(data);
-};
-
-module.exports.budgetValidation = (data) => {
-  const schema = Joi.object({
-    year: Joi.number().required(),
-    travel: Joi.number().required(),
-    material: Joi.number().required(),
-    services: Joi.number().required(),
-    indirect: Joi.number(),
-    salaries: Joi.number(),
-    members: Joi.array().items(
       Joi.object({
-        member: Joi.string().required(),
-        hours: Joi.number().required(),
-        role: Joi.string().required(),
+        url: Joi.string().required(),
+        path: Joi.string().required(),
+        name: Joi.string().required(),
       })
     ),
   });
@@ -122,13 +97,44 @@ module.exports.budgetValidation = (data) => {
   return schema.validate(data);
 };
 
-module.exports.budgetUpdateValidation = (data) => {
+module.exports.memberValidation = (data) => {
+  const schema = Joi.object({
+    hours: Joi.number().required(),
+    member: Joi.string().required(),
+    role: Joi.string().valid("basic", "deputy", "leader").required(),
+    active: Joi.boolean().required(),
+  });
+
+  return schema.validate(data);
+};
+
+// module.exports.budgetValidation = (data) => {
+//   const schema = Joi.object({
+//     year: Joi.number().required(),
+//     travel: Joi.number().required(),
+//     material: Joi.number().required(),
+//     services: Joi.number().required(),
+//     indirect: Joi.number().required(),
+//     salaries: Joi.number().required(),
+//     members: Joi.array().items(
+//       Joi.object({
+//         member: Joi.string().required(),
+//         hours: Joi.number().required(),
+//         role: Joi.string().required(),
+//       })
+//     ),
+//   });
+
+//   return schema.validate(data);
+// };
+
+module.exports.budgetValidation = (data) => {
   const schema = Joi.object({
     travel: Joi.number().required(),
     material: Joi.number().required(),
     services: Joi.number().required(),
-    indirect: Joi.number(),
-    salaries: Joi.number(),
+    indirect: Joi.number().required(),
+    salaries: Joi.number().required(),
   });
 
   return schema.validate(data);
