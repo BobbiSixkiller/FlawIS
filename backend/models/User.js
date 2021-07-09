@@ -158,14 +158,11 @@ userSchema.statics.getUserAggregation = function (userId, year) {
       },
     },
     {
-<<<<<<< HEAD
       $sort: {
         "grants.updatedAt": -1,
       },
     },
     {
-=======
->>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
       $group: {
         _id: "$_id",
         firstName: { $first: "$firstName" },
@@ -193,14 +190,6 @@ userSchema.statics.getUserAggregation = function (userId, year) {
         updatedAt: 1,
       },
     },
-<<<<<<< HEAD
-=======
-    {
-      $sort: {
-        updatedAt: -1,
-      },
-    },
->>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   ]);
 };
 

@@ -45,11 +45,7 @@ export default function Grants() {
     <Switch>
       <Route exact path={path}>
         <Fade>
-<<<<<<< HEAD
           <Row className="justify-content-between mb-3">
-=======
-          <Row className="justify-content-between my-3">
->>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
             <h1>Manažment grantov</h1>
             <ButtonGroup>
               <Button outline color="primary" size="lg">
