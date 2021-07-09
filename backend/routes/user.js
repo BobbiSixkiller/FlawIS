@@ -85,7 +85,11 @@ router.post("/", checkAuth, isSupervisor, async (req, res) => {
   if (emailExist)
     return res
       .status(400)
+<<<<<<< HEAD
       .send({ error: true, msg: "Zadaný email je už zaregistrovaný!" });
+=======
+      .send({ error: "Zadaný email je už zaregistrovaný!" });
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -159,7 +163,11 @@ router.post("/forgotPassword", async (req, res) => {
 
   const user = await User.findOne({ email: req.body.email });
   if (!user)
+<<<<<<< HEAD
     return res.status(404).send({
+=======
+    return res.status(400).send({
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
       error: true,
       msg: "So zadaným emailom nie je spojený žiadny používateľ.",
     });
@@ -211,11 +219,19 @@ router.post("/reset/:token", async (req, res) => {
           return res.status(401).send({
             error: {
               ...err,
+<<<<<<< HEAD
               message: "Autorizačný reset token expiroval!",
             },
           });
         }
         res.status(500).send({ error: true, msg: err });
+=======
+              message: "Autorizačný token expiroval, prihláste sa prosím!",
+            },
+          });
+        }
+        res.status(401).send({ error: true, msg: err });
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
       } else {
         return decoded;
       }

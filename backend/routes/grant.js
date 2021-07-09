@@ -36,7 +36,11 @@ router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
   res.status(200).send({ grants, query: req.query.q });
 });
 
+<<<<<<< HEAD
 router.post("/", checkAuth, isSupervisor, async (req, res) => {
+=======
+router.post("/add", checkAuth, isSupervisor, async (req, res) => {
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   const { error } = await grantValidation(req.body);
   if (error) return res.status(400).send({ error: error.details[0].message });
 
@@ -51,6 +55,10 @@ router.post("/", checkAuth, isSupervisor, async (req, res) => {
 
   try {
     const newGrant = await grant.save();
+<<<<<<< HEAD
+=======
+    //Grant.collection.dropIndexes();
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
     res.status(200).send(newGrant);
   } catch (err) {
     res.status(500).send({ error: err.message });
@@ -66,6 +74,7 @@ router.post(
     console.log("FIRE");
     const url = "https://" + req.get("host");
 
+<<<<<<< HEAD
     const { error } = announcementValidation(req.body);
     if (error)
       return res
@@ -99,6 +108,43 @@ router.post(
     );
 
     res.status(200).send({ msg: "Oznam bol pridaný." });
+=======
+    try {
+      const { error } = announcementValidation(req.body);
+      if (error)
+        return res.status(400).send({ error: error.details[0].message });
+
+      const reqFiles = [];
+      for (var i = 0; i < req.files.length; i++) {
+        const reqFile = {};
+        reqFile.url = url + "/public/documents/" + req.files[i].filename;
+        reqFile.path = "public/documents/" + req.files[i].filename;
+        reqFile.name = req.files[i].filename.slice(
+          37,
+          req.files[i].filename.length
+        );
+        reqFiles.push(reqFile);
+      }
+
+      const announcement = new Announcement({
+        name: req.body.name,
+        content: req.body.content,
+        issuedBy: req.user._id,
+        files: reqFiles,
+      });
+
+      await announcement.save();
+
+      await Grant.updateOne(
+        { _id: req.params.id },
+        { $push: { announcements: announcement } }
+      );
+
+      res.status(200).send({ msg: "Oznam bol pridaný." });
+    } catch (err) {
+      res.status(500).send({ error: err.message });
+    }
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   }
 );
 
@@ -183,6 +229,7 @@ router.post(
 );
 
 router.get("/:id", checkAuth, async (req, res) => {
+<<<<<<< HEAD
   const grant = await Grant.findOne({ _id: req.params.id })
     .populate("budget.members.member")
     .populate({ path: "announcements", populate: { path: "issuedBy" } });
@@ -192,6 +239,20 @@ router.get("/:id", checkAuth, async (req, res) => {
   res.status(200).send(grant);
 });
 //nepouzivane, nakolko vykonavam mensie updaty v ramci properties grant objektu
+=======
+  try {
+    const match = await Grant.findById(mongoose.Types.ObjectId(req.params.id))
+      .populate("budget.members.member")
+      .populate({ path: "announcements", populate: { path: "issuedBy" } });
+    if (match === null)
+      return res.status(404).send({ error: "Grant nebol nájdený!" });
+    res.status(200).send(match);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+});
+//nepouzivane, nakolko vykonavam mensie updaty v ramci properties of grant object
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
 router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
   const { error } = await grantValidation(req.body);
   if (error) return res.status(400).send({ error: error.details[0].message });

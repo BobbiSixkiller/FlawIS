@@ -27,11 +27,14 @@ export default function Users() {
     setUrl(`user?page=${page}`);
   }, [page, setUrl]);
 
+<<<<<<< HEAD
   function toggle() {
     dispatch({ type: "TOGGLE" });
     refreshData();
   }
 
+=======
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   if (loading) {
     return (
       <Row className="justify-content-center">
@@ -43,13 +46,21 @@ export default function Users() {
     <Switch>
       <Route exact path={path}>
         <Fade>
+<<<<<<< HEAD
           <Row className="justify-content-between mb-3">
+=======
+          <Row className="justify-content-between my-3">
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
             <h1>Manažment používateľov</h1>
             <Button
               outline
               color="success"
               size="lg"
+<<<<<<< HEAD
               onClick={() => dispatch({ type: "ACTION", name: "ADD" })}
+=======
+              onClick={() => dispatch({ type: "ADD" })}
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
             >
               Pridať
             </Button>
@@ -90,11 +101,15 @@ export default function Users() {
                         size="sm"
                         color="warning"
                         onClick={() =>
+<<<<<<< HEAD
                           dispatch({
                             type: "ACTION",
                             name: "UPDATE",
                             payload: user,
                           })
+=======
+                          dispatch({ type: "UPDATE", payload: user })
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
                         }
                       >
                         <PencilFill />
@@ -125,6 +140,7 @@ export default function Users() {
             pages={data.pages}
             changePage={setPage}
           />
+<<<<<<< HEAD
           <Button tag={Link} to="/" outline color="primary">
             Späť
           </Button>
@@ -135,6 +151,34 @@ export default function Users() {
             )}
             {action === "UPDATE" && (
               <EditUser user={modalData} toggle={toggle} />
+=======
+          <Button className="mb-5" tag={Link} to="/" outline color="primary">
+            Späť
+          </Button>
+          <Modal
+            isOpen={show}
+            toggle={() => {
+              dispatch({ type: "TOGGLE" });
+              refreshData();
+            }}
+          >
+            {action === "ADD" && (
+              <AddUser refresh={refreshData} dispatch={dispatch} />
+            )}
+            {action === "DELETE" && (
+              <DeleteUser
+                refresh={refreshData}
+                user={modalData}
+                dispatch={dispatch}
+              />
+            )}
+            {action === "UPDATE" && (
+              <EditUser
+                refresh={refreshData}
+                user={modalData}
+                dispatch={dispatch}
+              />
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
             )}
           </Modal>
         </Fade>

@@ -81,6 +81,10 @@ module.exports.announcementValidation = (data) => {
   const schema = Joi.object({
     name: Joi.string().required(),
     content: Joi.string().required(),
+<<<<<<< HEAD
+=======
+    issuedBy: Joi.string().required(),
+>>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
     type: Joi.string()
       .valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE")
       .required(),
