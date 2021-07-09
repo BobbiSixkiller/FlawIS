@@ -1,0 +1,53 @@
+version: "3.0"
+
+services:
+  backend:
+    container_name: backend
+    restart: unless-stopped
+    build: ./backend
+    ports:
+      - "5000:5000"
+    env_file: ./backend/.env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./backend/public:/backend/public
+    networks:
+      - internal
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    restart: unless-stopped
+    build: ./frontend
+    environment:
+      - NODE_PATH=/frontend/src
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+  db:
+    container_name: mongodb
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: node-app
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mongo_data: {}
+  mongo_config: {}
