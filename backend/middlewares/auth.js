@@ -32,11 +32,7 @@ module.exports.isSupervisor = function (req, res, next) {
 module.exports.isOwnPost = async function (req, res, next) {
   const post = await Post.findOne({ _id: req.params.id });
   if (!post) {
-<<<<<<< HEAD
     res.status(404).send({ error: true, msg: "Post nebol nájdený." });
-=======
-    res.status(400).send({ error: true, msg: "Post nebol nájdený." });
->>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   }
   if (
     post.userId == req.user._id ||

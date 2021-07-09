@@ -36,11 +36,7 @@ router.get("/", checkAuth, async (req, res) => {
 router.get("/:id", checkAuth, async (req, res) => {
   const post = await Post.findOne({ _id: req.params.id });
   if (!post) {
-<<<<<<< HEAD
     return res.status(404).send({ error: true, msg: "Post nebol nájdený." });
-=======
-    return res.status(400).send({ error: true, msg: "Post nebol nájdený." });
->>>>>>> 1373e2ac8cc4a860090e5acb909ee3de5f810344
   }
 
   res.status(200).send(post);
