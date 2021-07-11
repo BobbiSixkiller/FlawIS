@@ -3,25 +3,20 @@ import { useRouteMatch, useLocation, Link } from "react-router-dom";
 
 import { useDataFetch } from "../../hooks/useApi";
 
-import {
-  Input,
-  FormFeedback,
-  Spinner,
-  ListGroup,
-  ListGroupItem,
-} from "reactstrap";
+import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
-export default function ApiSearch({ memberInput, errors, valid }) {
+export default function AnnouncementApiSearch() {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
 
   const [display, setDisplay] = useState(false);
   const [search, setSearch] = useState("");
+
   const autoWrapRef = useRef(null);
   const activeSuggestionRef = useRef(null);
 
   const { loading, error, data, setUrl } = useDataFetch(
-    `user/api/search?q=${search}`,
+    `announcement/api/search?q=${search}`,
     []
   );
 
@@ -34,7 +29,7 @@ export default function ApiSearch({ memberInput, errors, valid }) {
   }, [autoWrapRef]);
 
   useEffect(() => {
-    setUrl(`user/api/search?q=${search}`);
+    setUrl(`announcement/api/search?q=${search}`);
   }, [search, setUrl]);
 
   useEffect(() => {
@@ -59,12 +54,6 @@ export default function ApiSearch({ memberInput, errors, valid }) {
         onChange={(e) => setSearch(e.target.value)}
         autoComplete="off"
       />
-      {memberInput && (
-        <>
-          <FormFeedback invalid="true">{errors.member}</FormFeedback>
-          <FormFeedback valid>{valid.member}</FormFeedback>
-        </>
-      )}
       {display && (
         <ListGroup className="suggestions">
           {loading && (
@@ -72,37 +61,24 @@ export default function ApiSearch({ memberInput, errors, valid }) {
               <Spinner size="sm" />
             </ListGroupItem>
           )}
-          {data.users.length === 0 || error ? (
+          {data.announcements.length === 0 || error ? (
             <ListGroupItem className="text-muted">
               Žiadne výsledky
             </ListGroupItem>
           ) : (
-            data.users.map((user, i) =>
-              memberInput ? (
-                <ListGroupItem
-                  key={i}
-                  onClick={() => {
-                    memberInput(user._id);
-                    setDisplay(false);
-                  }}
-                  action
-                  active={activeSuggestionRef.current === user._id}
-                >
-                  {user.fullName}, {user.email}
-                </ListGroupItem>
-              ) : (
-                <ListGroupItem
-                  key={i}
-                  onClick={() => setDisplay(false)}
-                  tag={Link}
-                  to={`${url}/${user._id}`}
-                  action
-                  active={activeSuggestionRef.current === user._id}
-                >
-                  {user.fullName}, {user.email}
-                </ListGroupItem>
-              )
-            )
+            data.announcements.map((announcement) => (
+              <ListGroupItem
+                key={announcement._id}
+                onClick={() => setDisplay(false)}
+                tag={Link}
+                to={`${url}/${announcement._id}`}
+                action
+                active={activeSuggestionRef.current === announcement._id}
+              >
+                {announcement.name}, Aktualizované:{" "}
+                {new Date(announcement.updatedAt).toLocaleString()}
+              </ListGroupItem>
+            ))
           )}
         </ListGroup>
       )}

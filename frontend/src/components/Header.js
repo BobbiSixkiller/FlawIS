@@ -1,11 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useHistory, Switch, Route } from "react-router-dom";
 
-import PostApiSearch from "./post/PostApiSearch";
-import UserApiSearch from "./user/UserApiSearch";
-import GrantApiSearch from "./grant/GrantApiSearch";
-import { AuthContext } from "../context/auth";
-
 import {
   Collapse,
   Navbar,
@@ -19,6 +14,13 @@ import {
   Button,
   NavItem,
 } from "reactstrap";
+
+import { AuthContext } from "../context/auth";
+
+import PostApiSearch from "./post/PostApiSearch";
+import UserApiSearch from "./user/UserApiSearch";
+import GrantApiSearch from "./grant/GrantApiSearch";
+import AnnouncementApiSearch from "./announcement/AnnouncementApiSearch";
 
 function Header() {
   const auth = useContext(AuthContext);
@@ -49,6 +51,9 @@ function Header() {
     search = (
       <NavItem>
         <Switch>
+          <Route path="/dashboard/announcements">
+            <AnnouncementApiSearch />
+          </Route>
           <Route path="/dashboard/posts">
             <PostApiSearch />
           </Route>
@@ -89,6 +94,11 @@ function Header() {
                       onClick={() => history.push("/dashboard/grants")}
                     >
                       Granty
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => history.push("/dashboard/announcements")}
+                    >
+                      Oznamy
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>

@@ -101,31 +101,11 @@ module.exports.memberValidation = (data) => {
     hours: Joi.number().required(),
     member: Joi.string().required(),
     role: Joi.string().valid("basic", "deputy", "leader").required(),
-    active: Joi.boolean().required(),
+    active: Joi.boolean(),
   });
 
   return schema.validate(data);
 };
-
-// module.exports.budgetValidation = (data) => {
-//   const schema = Joi.object({
-//     year: Joi.number().required(),
-//     travel: Joi.number().required(),
-//     material: Joi.number().required(),
-//     services: Joi.number().required(),
-//     indirect: Joi.number().required(),
-//     salaries: Joi.number().required(),
-//     members: Joi.array().items(
-//       Joi.object({
-//         member: Joi.string().required(),
-//         hours: Joi.number().required(),
-//         role: Joi.string().required(),
-//       })
-//     ),
-//   });
-
-//   return schema.validate(data);
-// };
 
 module.exports.budgetValidation = (data) => {
   const schema = Joi.object({

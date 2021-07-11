@@ -15,6 +15,7 @@ import {
 import { AuthContext } from "../context/auth";
 import { AuthRoute, AdminRoute } from "../util/AuthRoute";
 
+import Announcements from "./announcement/Announcements";
 import Grants from "./grant/Grants";
 import Grant from "./grant/Grant";
 import Posts from "./post/Posts";
@@ -81,6 +82,9 @@ export default function Dashboard() {
       </AdminRoute>
       <AdminRoute path={`${path}/grants`}>
         <Grants />
+      </AdminRoute>
+      <AdminRoute path={`${path}/announcements`}>
+        <Announcements />
       </AdminRoute>
     </Switch>
   );

@@ -63,7 +63,6 @@ router.post(
   isSupervisor,
   upload.array("files", 5),
   async (req, res) => {
-    console.log("FIRE");
     const url = "https://" + req.get("host");
 
     const { error } = announcementValidation(req.body);
@@ -103,14 +102,14 @@ router.post(
 );
 
 router.post(
-  "/:grant_id/addBudget",
+  "/:grantId/addBudget",
   checkAuth,
   isSupervisor,
   async (req, res) => {
     const { error } = await budgetValidation(req.body);
     if (error) return res.status(400).send({ error: error.details[0].message });
 
-    const grant = await Grant.findById(req.params.grant_id);
+    const grant = await Grant.findById(req.params.grantId);
     if (!grant) return res.status(404).send({ error: "Grant nebol nájdený!" });
 
     //some porovna items v poli proti nejakej funkcii a vrati boolean
@@ -148,41 +147,43 @@ router.post(
 );
 
 router.post(
-  "/:grant_id/budget/:budget_id/addMember",
+  "/:grantId/budget/:budgetId",
   checkAuth,
   isSupervisor,
   async (req, res) => {
-    const { error } = await membersValidation(req.body);
-    if (error) return res.status(400).send({ error: error.details[0].message });
+    const { error } = await memberValidation(req.body);
+    if (error)
+      return res
+        .status(400)
+        .send({ error: true, msg: error.details[0].message });
 
     const grant = await Grant.findOne({
-      _id: req.params.grant_id,
-      "budget._id": req.params.budget_id,
+      _id: req.params.grantId,
     });
     if (!grant)
+      return res.status(404).send({ error: true, msg: "Grant nebol nájdený!" });
+
+    const budget = grant.budget.id(req.params.budgetId);
+    if (!budget)
       return res
         .status(404)
-        .send({ error: "Grant alebo rozpočet nebol nájdený" });
+        .send({ error: true, msg: "Rozpočet nebol nájdený!" });
 
     const member = {
       member: req.body.member,
       role: req.body.role,
       hours: req.body.hours,
     };
+    budget.members.push(member);
 
-    const budget = grant.budget.id(req.params.budget_id);
-    budget.members = budget.members.concat(member);
+    await grant.save();
 
-    try {
-      const updatedGrant = await grant.save();
-      res.status(200).send({ msg: "Bol pridaný nový riešiteľ." });
-    } catch (err) {
-      res.status(500).send({ error: err.message });
-    }
+    res.status(200).send({ msg: "Bol pridaný nový riešiteľ." });
   }
 );
 
 router.get("/:id", checkAuth, async (req, res) => {
+  console.log("FIRED GET GRANT");
   const grant = await Grant.findOne({ _id: req.params.id })
     .populate("budget.members.member")
     .populate({ path: "announcements", populate: { path: "issuedBy" } });
@@ -211,125 +212,82 @@ router.put("/:id", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.put(
-  "/:grant_id/budget/:budget_id",
+  "/:grantId/budget/:budgetId",
   checkAuth,
   isSupervisor,
   async (req, res) => {
-    const { error } = await budgetUpdateValidation(req.body);
-    if (error) return res.status(400).send({ error: error.details[0].message });
+    const { error } = await budgetValidation(req.body);
+    if (error)
+      return res
+        .status(400)
+        .send({ error: true, msg: error.details[0].message });
 
-    try {
-      let grant = await Grant.findOne({
-        _id: req.params.grant_id,
-        "budget._id": req.params.budget_id,
-      });
-      if (!grant)
-        return res
-          .status(404)
-          .send({ error: "Grant alebo rozpočet nebol nájdený" });
-
-      if (
-        grant.budget.some(
-          (budget) =>
-            new Date(budget.year).getFullYear() ===
-            new Date(req.body.year).getFullYear()
-        )
-      ) {
-        return res.status(400).send({
-          error: "Pre daný rok môže byť vytvorený iba jeden rozpočet!",
-        });
-      }
-      //pri budget update menim len konkretne polozky budgetu
-      let result = await Grant.findByIdAndUpdate(
-        req.params.grant_id,
-        {
-          $set: {
-            //"budget.$[inner].year": req.body.year,
-            "budget.$[inner].travel": req.body.travel,
-            "budget.$[inner].material": req.body.material,
-            "budget.$[inner].services": req.body.services,
-            "budget.$[inner].indirect": req.body.indirect,
-            "budget.$[inner].salaries": req.body.salaries,
-            //"budget.$[inner].members": req.body.members
-          },
+    let update = await Grant.findOneAndUpdate(
+      { _id: req.params.grantId },
+      {
+        $set: {
+          //"budget.$[inner].year": req.body.year,
+          "budget.$[inner].travel": req.body.travel,
+          "budget.$[inner].material": req.body.material,
+          "budget.$[inner].services": req.body.services,
+          "budget.$[inner].indirect": req.body.indirect,
+          "budget.$[inner].salaries": req.body.salaries,
+          //"budget.$[inner].members": req.body.members
         },
-        {
-          arrayFilters: [{ "inner._id": req.params.budget_id }],
-          new: true,
-        }
-      );
-      if (result === null)
-        return res.status(404).send({ error: "Grant nebol nájdený!" });
-      res.status(200).send({ msg: "Rozpočet bol aktualizovaný." });
-    } catch (err) {
-      res.status(500).send({ error: err.message });
-    }
+      },
+      {
+        arrayFilters: [{ "inner._id": req.params.budgetId }],
+        new: true,
+      }
+    );
+    if (!update)
+      return res.status(404).send({ error: true, msg: "Grant nebol nájdený!" });
+
+    res.status(200).send({ msg: "Rozpočet bol aktualizovaný." });
   }
 );
 
 router.put(
-  "/:grant_id/budget/:budget_id/member/:member_id",
+  "/:grantId/budget/:budgetId/member/:memberId",
   checkAuth,
   isSupervisor,
   async (req, res) => {
-    const { error } = await membersValidation(req.body);
-    if (error) return res.status(400).send({ error: error.details[0].message });
+    const { error } = memberValidation(req.body);
+    if (error)
+      return res
+        .status(400)
+        .send({ error: true, msg: error.details[0].message });
 
-    try {
-      const result = await Grant.findOneAndUpdate(
-        {
-          _id: req.params.grant_id,
-          "budget._id": req.params.budget_id,
-          "budget.members._id": req.params.member_id,
+    const result = await Grant.findOneAndUpdate(
+      {
+        _id: req.params.grantId,
+        "budget._id": req.params.budgetId,
+        "budget.members._id": req.params.memberId,
+      },
+      {
+        $set: {
+          "budget.$[budget].members.$[member].hours": req.body.hours,
+          "budget.$[budget].members.$[member].active": req.body.active,
+          "budget.$[budget].members.$[member].role": req.body.role,
+          "budget.$[budget].members.$[member].member": req.body.member,
         },
-        {
-          $set: {
-            "budget.$[budget].members.$[member].hours": req.body.hours,
-            "budget.$[budget].members.$[member].active": req.body.active,
-            "budget.$[budget].members.$[member].role": req.body.role,
-            "budget.$[budget].members.$[member].member": req.body.member,
-          },
-        },
-        {
-          arrayFilters: [
-            { "budget._id": req.params.budget_id },
-            { "member._id": req.params.member_id },
-          ],
-          new: true,
-        }
-      );
-      //zdeaktivuje konkretneho clena grantu vo vsetkych budgetoch v ramci daneho grantu
-      if (!req.body.active) {
-        const result2 = await Grant.findOneAndUpdate(
-          {
-            _id: req.params.grant_id,
-            "budget._id": req.params.budget_id,
-            "budget.members._id": req.params.member_id,
-          },
-          {
-            $set: {
-              "budget.$[].members.$[member].active": req.body.active,
-            },
-          },
-          {
-            arrayFilters: [{ "member.member": req.body.member }],
-            multi: true,
-          }
-        );
-        if (!result2)
-          return res
-            .status(404)
-            .send({ error: "Grant, rozpočet alebo riešiteľ nebol nájdený!" });
-        return res.status(200).send({ msg: "Riešiteľ bol aktualizovaný." });
+      },
+      {
+        arrayFilters: [
+          { "budget._id": req.params.budgetId },
+          { "member._id": req.params.memberId },
+        ],
+        new: true,
       }
-      if (!result)
-        return res
-          .status(404)
-          .send({ error: "Grant, rozpočet alebo riešiteľ nebol nájdený!" });
-      return res.status(200).send({ msg: "Riešiteľ bol aktualizovaný." });
-    } catch (err) {
-      res.status(500).send({ error: err.message });
-    }
+    );
+
+    if (!result)
+      return res.status(404).send({
+        error: true,
+        msg: "Grant, rozpočet alebo riešiteľ nebol nájdený!",
+      });
+
+    res.status(200).send({ msg: "Riešiteľ bol aktualizovaný." });
   }
 );
 
@@ -345,13 +303,13 @@ router.delete("/:id", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.delete(
-  "/:grant_id/budget/:budget_id",
+  "/:grantId/budget/:budgetId",
   checkAuth,
   isSupervisor,
   async (req, res) => {
     const grant = await Grant.findOne({
-      _id: req.params.grant_id,
-      "budget._id": req.params.budget_id,
+      _id: req.params.grantId,
+      "budget._id": req.params.budgetId,
     });
     if (!grant)
       return res
@@ -360,9 +318,9 @@ router.delete(
 
     try {
       const match = await Grant.findByIdAndUpdate(
-        req.params.grant_id,
+        req.params.grantId,
         {
-          $pull: { budget: { _id: req.params.budget_id } },
+          $pull: { budget: { _id: req.params.budgetId } },
         },
         { new: true }
       );
@@ -376,29 +334,35 @@ router.delete(
 );
 
 router.delete(
-  "/:grant_id/budget/:budget_id/member/:member_id",
+  "/:grantId/budget/:budgetId/member/:memberId",
   checkAuth,
   isSupervisor,
   async (req, res) => {
     const grant = await Grant.findOne({
-      _id: req.params.grant_id,
-      "budget._id": req.params.budget_id,
-      "budget.members._id": req.params.member_id,
+      _id: req.params.grantId,
     });
     if (!grant)
+      return res.status(404).send({
+        error: true,
+        msg: "Grant nebol nájdený!",
+      });
+
+    const budget = grant.budget.id(req.params.budgetId);
+    if (!budget)
       return res
         .status(404)
-        .send({ error: "Grant, rozpočet alebo riešiteľ nebol nájdený!" });
-    try {
-      await grant.budget
-        .id(req.params.budget_id)
-        .members.id(req.params.member_id)
-        .remove();
-      const updatedGrant = await grant.save();
-      res.status(200).send({ msg: "Riešiteľ bol odobratý." });
-    } catch (err) {
-      res.status(500).send({ error: err.message });
-    }
+        .send({ error: true, msg: "Rozpočet nebol nájdený!" });
+
+    const member = budget.members.id(req.params.memberId);
+    if (!member)
+      return res
+        .status(404)
+        .send({ error: true, msg: "Riešiteľ nebol nájdený!" });
+
+    await member.remove();
+    await grant.save();
+
+    res.status(200).send({ msg: "Riešiteľ bol odobratý." });
   }
 );
 

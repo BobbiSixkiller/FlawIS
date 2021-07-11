@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
 
-import {
-  Row,
-  ButtonGroup,
-  Button,
-  Table,
-  Spinner,
-  Fade,
-  Modal,
-} from "reactstrap";
+import { Row, Button, Table, Spinner, Fade, Modal } from "reactstrap";
 import { Trash2Fill } from "react-bootstrap-icons";
 
 import useModal from "../../hooks/useModal";
@@ -47,18 +39,14 @@ export default function Grants() {
         <Fade>
           <Row className="justify-content-between mb-3">
             <h1>Manažment grantov</h1>
-            <ButtonGroup>
-              <Button outline color="primary" size="lg">
-                Oznamy
-              </Button>
-              <Button
-                color="success"
-                size="lg"
-                onClick={() => dispatch({ type: "ADD" })}
-              >
-                Nový grant
-              </Button>
-            </ButtonGroup>
+            <Button
+              outline
+              color="success"
+              size="lg"
+              onClick={() => dispatch({ type: "ADD" })}
+            >
+              Nový grant
+            </Button>
           </Row>
           <Table className="my-2" hover responsive>
             <thead>
