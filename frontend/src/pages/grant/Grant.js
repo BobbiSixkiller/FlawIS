@@ -21,7 +21,7 @@ import { useDataFetch } from "../../hooks/useApi";
 import { AuthContext } from "../../context/auth";
 
 import Announcements from "../../components/grant/Announcements";
-import AddAnnouncement from "../../components/grant/AddAnnouncement";
+import AddAnnouncement from "../../components/announcement/AddAnnouncement";
 import DeleteAnnouncement from "../../components/announcement/DeleteAnnouncement";
 import Budget from "../../components/grant/Budget";
 import EditBudget from "../../components/grant/EditBudget";
@@ -150,7 +150,7 @@ function GrantDetail() {
               </FormGroup>
             </Row>
           )}
-          {data.announcements && (
+          {data.announcements && data.announcements.length !== 0 && (
             <Announcements
               announcements={data.announcements}
               dispatch={dispatch}
@@ -182,7 +182,7 @@ function GrantDetail() {
             <AddMember toggle={toggle} modalData={modalData} />
           )}
           {action === "ADD_ANNOUNCEMENT" && (
-            <AddAnnouncement toggle={toggle} grant={modalData} />
+            <AddAnnouncement toggle={toggle} grantId={modalData._id} />
           )}
           {action === "DELETE_ANNOUNCEMENT" && (
             <DeleteAnnouncement toggle={toggle} announcement={modalData} />

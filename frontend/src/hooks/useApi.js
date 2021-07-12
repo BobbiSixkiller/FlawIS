@@ -1,5 +1,7 @@
-import { useReducer, useState, useEffect } from "react";
+import { useReducer, useState, useEffect, useContext } from "react";
 import API from "../api";
+
+import { AuthContext } from "../context/auth";
 
 function apiReducer(state, action) {
   switch (action.type) {
@@ -17,6 +19,8 @@ function apiReducer(state, action) {
 }
 
 export function useDataFetch(initUrl, initData) {
+  const { logout } = useContext(AuthContext);
+
   const [url, setUrl] = useState(initUrl);
   const [refresh, setRefresh] = useState(false);
 
@@ -39,14 +43,18 @@ export function useDataFetch(initUrl, initData) {
         }
       } catch (err) {
         if (!cancel) {
-          dispatch({ type: "FAILURE", payload: err.response.data });
+          if (err.response.status === 401) {
+            logout();
+          } else {
+            dispatch({ type: "FAILURE", payload: err.response.data });
+          }
         }
       }
     }
 
     fetchData();
     return () => (cancel = true);
-  }, [url, refresh]);
+  }, [url, refresh, logout]);
 
   function refreshData() {
     setRefresh(!refresh);
@@ -60,6 +68,8 @@ export function useDataFetch(initUrl, initData) {
 }
 
 export function useDataSend() {
+  const { logout } = useContext(AuthContext);
+
   const [state, dispatch] = useReducer(apiReducer, {
     loadig: false,
     error: false,
@@ -72,7 +82,11 @@ export function useDataSend() {
       const res = await API.request({ url, method, data, headers });
       dispatch({ type: "SUCCESS", payload: res.data });
     } catch (err) {
-      dispatch({ type: "FAILURE", payload: err.response.data });
+      if (err.response.status === 401) {
+        logout();
+      } else {
+        dispatch({ type: "FAILURE", payload: err.response.data });
+      }
     }
   }
 

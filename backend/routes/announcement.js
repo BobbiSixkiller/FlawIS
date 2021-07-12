@@ -15,7 +15,6 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
   const [announcements, total] = await Promise.all([
     Announcement.find()
       .populate("issuedBy", "firstName lastName")
-      .populate("grants", "url")
       .skip(page * pageSize - pageSize)
       .limit(pageSize)
       .sort({ updatedAt: -1 }),
@@ -26,7 +25,12 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
-  const announcement = await Announcement.findOne({ _id: req.params.id });
+  const announcement = await Announcement.findOne({
+    _id: req.params.id,
+  })
+    .populate("issuedBy", "firstName lastName")
+    .populate("grants", "url");
+
   if (!announcement)
     return res.status(404).send({ error: true, msg: "Oznam nebol nájdený!" });
 
@@ -42,7 +46,6 @@ router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
   res.status(200).send({ announcements, query: req.query.q });
 });
 
-//refactor grant update nech z frontendu posiela priamo filter object pre update query
 router.post(
   "/",
   checkAuth,
@@ -76,19 +79,19 @@ router.post(
       files: reqFiles,
     });
 
-    const newAnnouncement = await announcement.save();
+    await announcement.save();
 
-    if (!newAnnouncement)
-      return res.status(500).send({
-        error: "Nový oznam sa nevytvoril, kontaktujte IT oddelenie!",
-      });
-
-    if (req.body.type === "ALL") {
-      await Grant.updateMany({}, { $push: { announcements: newAnnouncement } });
+    if (req.body.grantId) {
+      await Grant.updateOne(
+        { _id: req.body.grantId },
+        { $push: { announcements: announcement } }
+      );
+    } else if (req.body.scope === "ALL") {
+      await Grant.updateMany({}, { $push: { announcements: announcement } });
     } else {
       await Grant.updateMany(
         { type: req.body.type },
-        { $push: { announcements: newAnnouncement } }
+        { $push: { announcements: announcement } }
       );
     }
 
@@ -105,7 +108,10 @@ router.put(
     const url = "https://" + req.get("host");
 
     const { error } = announcementValidation(req.body);
-    if (error) return res.status(400).send({ error: error.details[0].message });
+    if (error)
+      return res
+        .status(400)
+        .send({ error: true, msg: error.details[0].message });
 
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
@@ -121,17 +127,17 @@ router.put(
 
     const announcement = await Announcement.findOne({ _id: req.params.id });
     if (!announcement)
-      return res.status(404).send({ error: "Oznam nebol nájdený!" });
+      return res.status(404).send({ error: true, msg: "Oznam nebol nájdený!" });
 
     announcement.name = req.body.name;
     announcement.content = req.body.content;
     announcement.issuedBy = req.user._id;
     announcement.files = announcement.files.concat(reqFiles);
+    //announcement.files.push(reqFiles);
 
-    const update = await announcement.save();
-    res
-      .status(200)
-      .send({ msg: "Oznam bol aktualizovaný", announcement: update });
+    await announcement.save();
+
+    res.status(200).send({ msg: "Oznam bol aktualizovaný" });
   }
 );
 
@@ -155,17 +161,20 @@ router.delete(
   async (req, res) => {
     const announcement = await Announcement.findOne({ _id: req.params.id });
     if (!announcement)
-      return res.status(400).send({ error: "Oznam nebol nájdený!" });
+      return res.status(400).send({ error: true, msg: "Oznam nebol nájdený!" });
 
     const file = announcement.files.id(req.params.file_id);
+    if (!file)
+      return res
+        .status(404)
+        .send({ error: true, msg: "Dokument nebol nájdený!" });
+
     fs.unlink(file.path, (err) => console.log(err));
     await file.remove();
 
     await announcement.save();
 
-    res
-      .status(200)
-      .send({ msg: "Dokument bol vymazaný.", announcement: update });
+    res.status(200).send({ msg: "Dokument bol vymazaný." });
   }
 );
 

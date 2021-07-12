@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import {
   ModalHeader,
@@ -17,18 +17,15 @@ import {
   Alert,
 } from "reactstrap";
 
-import { AuthContext } from "../../context/auth";
 import { useDataSend } from "../../hooks/useApi";
 import useFormValidation from "../../hooks/useFormValidation";
 import { validateAnnouncement } from "../../util/validation";
 
-export default function AddAnnouncement({ toggle }) {
-  const { user } = useContext(AuthContext);
-
+export default function AddAnnouncement({ toggle, grantId }) {
   const INITIAL_STATE = {
     name: "",
     content: "",
-    type: "APVV",
+    scope: grantId ? "SINGLE" : "APVV",
     files: {},
   };
 
@@ -44,7 +41,8 @@ export default function AddAnnouncement({ toggle }) {
     }
     formData.append("name", values.name);
     formData.append("content", values.content);
-    formData.append("type", values.type);
+    formData.append("scope", values.scope);
+    if (grantId) formData.append("grantId", grantId);
 
     sendData("announcement/", "POST", formData, {
       "Content-type": "multipart/form-data",
@@ -55,26 +53,28 @@ export default function AddAnnouncement({ toggle }) {
     <Form onSubmit={handleSubmit}>
       <ModalHeader toggle={toggle}>Nový oznam</ModalHeader>
       <ModalBody>
-        <Row form className="justify-content-center">
-          <Col>
-            {" "}
-            <FormGroup>
-              <Label for="type">Typ grantu:</Label>
-              <Input
-                type="select"
-                name="type"
-                id="type"
-                value={values.type}
-                onChange={handleChange}
-              >
-                <option value={"APVV"}>APVV</option>
-                <option value={"VEGA"}>VEGA</option>
-                <option value={"KEGA"}>KEGA</option>
-                <option value={"ALL"}>Všetky</option>
-              </Input>
-            </FormGroup>
-          </Col>
-        </Row>
+        {!grantId && (
+          <Row form className="justify-content-center">
+            <Col>
+              {" "}
+              <FormGroup>
+                <Label for="scope">Typ grantu:</Label>
+                <Input
+                  type="select"
+                  name="scope"
+                  id="scope"
+                  value={values.scope}
+                  onChange={handleChange}
+                >
+                  <option value={"APVV"}>APVV</option>
+                  <option value={"VEGA"}>VEGA</option>
+                  <option value={"KEGA"}>KEGA</option>
+                  <option value={"ALL"}>Všetky</option>
+                </Input>
+              </FormGroup>
+            </Col>
+          </Row>
+        )}
         <Row form className="justify-content-center">
           <Col>
             <FormGroup>
@@ -91,7 +91,7 @@ export default function AddAnnouncement({ toggle }) {
                 autoComplete="off"
                 placeholder="Názov oznamu"
               />
-              <FormFeedback invalid>{errors.name}</FormFeedback>
+              <FormFeedback invalid="true">{errors.name}</FormFeedback>
               <FormFeedback valid>{valid.name}</FormFeedback>
             </FormGroup>
           </Col>
@@ -112,7 +112,7 @@ export default function AddAnnouncement({ toggle }) {
                 autoComplete="off"
                 placeholder="Obsah oznamu..."
               />
-              <FormFeedback invalid>{errors.content}</FormFeedback>
+              <FormFeedback invalid="true">{errors.content}</FormFeedback>
               <FormFeedback valid>{valid.content}</FormFeedback>
             </FormGroup>
           </Col>
@@ -128,10 +128,10 @@ export default function AddAnnouncement({ toggle }) {
                 label="Vyberte súbor nového dokumentu."
                 onChange={handleChange}
                 multiple
-                invalid={errors.files}
-                valid={valid.files}
+                invalid={errors.files && true}
+                valid={valid.files && true}
               >
-                <FormFeedback invalid>{errors.files}</FormFeedback>
+                <FormFeedback invalid="true">{errors.files}</FormFeedback>
                 <FormFeedback valid>{valid.files}</FormFeedback>
               </CustomInput>
               <FormText color="muted">

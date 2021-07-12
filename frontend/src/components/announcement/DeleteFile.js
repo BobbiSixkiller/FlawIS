@@ -1,81 +1,63 @@
 import React from "react";
 import {
-	Row,
-	Col,
-	Alert,
-	Button,
-	Modal,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
+  Form,
+  Row,
+  Col,
+  Alert,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "reactstrap";
 
-import api from "../../api";
-import { useUser } from "../../hooks/useUser";
+import { useDataSend } from "../../hooks/useApi";
 
-function DeleteFile(props) {
-	const { getData, setModal, nestedModal, setNestedModal } = props;
-	const { accessToken } = useUser();
+function DeleteFile({ show, dispatch, modalData, removeFile }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
+  function deleteFile() {
+    sendData(
+      `announcement/${modalData.announcement._id}/file/${modalData.file._id}`,
+      "DELETE"
+    );
+    removeFile(modalData.file._id);
+  }
 
-	async function deleteFile() {
-		try {
-			const res = await api.delete(
-				`announcement/${nestedModal.announcement._id}/file/${nestedModal.file._id}`,
-				{
-					headers: {
-						authorization: accessToken,
-					},
-				}
-			);
-			setBackendMsg(res.data.msg);
-			setModal({ show: true, data: res.data.announcement, action: "edit" });
-			getData(accessToken);
-		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
-		}
-	}
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+  }
 
-	return (
-		<Modal
-			isOpen={nestedModal.show}
-			toggle={() => setNestedModal(!nestedModal)}
-		>
-			<ModalHeader>Zmazať súbor</ModalHeader>
-			<ModalBody>
-				<p>Potvrďte zmazanie súboru:</p>
-				<p className="font-weight-bold">{nestedModal.file.name}</p>
-				{backendError && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-				{backendMsg && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="success">
-								{backendMsg}
-								<Button close onClick={() => setBackendMsg(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-			</ModalBody>
-			<ModalFooter>
-				<Button color="danger" onClick={() => deleteFile()}>
-					Submit
-				</Button>
-				<Button onClick={() => setNestedModal(!nestedModal)}>Zrušiť</Button>
-			</ModalFooter>
-		</Modal>
-	);
+  return (
+    <Modal isOpen={show} toggle={toggle}>
+      <ModalHeader>Zmazať súbor</ModalHeader>
+      <ModalBody>
+        <p>Potvrďte zmazanie súboru:</p>
+        <p className="font-weight-bold">{show && modalData.file.name}</p>
+        {data && (
+          <Row className="justify-content-center">
+            <Col>
+              <Alert color={error ? "danger" : "success"}>
+                {data.msg}
+                <Button close onClick={hideMessage} />
+              </Alert>
+            </Col>
+          </Row>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          color="danger"
+          type="submit"
+          disabled={loading}
+          onClick={deleteFile}
+        >
+          Zmazať
+        </Button>
+        <Button onClick={toggle}>Zrušiť</Button>
+      </ModalFooter>
+    </Modal>
+  );
 }
 
 export default DeleteFile;

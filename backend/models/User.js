@@ -4,34 +4,24 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
       trim: true,
-      max: 50,
     },
     lastName: {
       type: String,
-      required: true,
       trim: true,
-      max: 50,
     },
     email: {
       type: String,
-      required: true,
-      max: 255,
       trim: true,
     },
     password: {
       type: String,
-      required: true,
       trim: true,
-      min: 8,
-      max: 1024,
     },
     role: {
       type: String,
       default: "basic",
       enum: ["basic", "supervisor", "admin"],
-      trim: true,
     },
   },
   {
@@ -592,17 +582,6 @@ userSchema.pre("remove", function (next) {
       { $pull: { "budget.$[].members": { member: user._id } } }
     );
   next();
-});
-
-userSchema.post("remove", function (user) {
-  console.log(user);
-  user
-    .model("Grant")
-    .updateMany(
-      { "budget.members.member": user._id },
-      { $pull: { "budget.$[].members": { member: user._id } } }
-    )
-    .exec();
 });
 
 module.exports = mongoose.model("User", userSchema);

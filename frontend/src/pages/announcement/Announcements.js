@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Switch, Route, useRouteMatch, Link } from "react-router-dom";
 
-import {
-  Fade,
-  Button,
-  ButtonGroup,
-  Spinner,
-  Row,
-  Table,
-  Modal,
-} from "reactstrap";
+import { Fade, Button, Spinner, Row, Table, Modal } from "reactstrap";
 import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
 
 import { useDataFetch } from "../../hooks/useApi";
@@ -18,17 +10,17 @@ import useModal from "../../hooks/useModal";
 import PaginationComponent from "../../components/PaginationComponent";
 import Announcement from "./Announcement";
 import AddAnnouncement from "../../components/announcement/AddAnnouncement";
-// import EditAnnouncement from "../../components/announcement/EditAnnouncement";
+import EditAnnouncement from "../../components/announcement/EditAnnouncement";
 import DeleteAnnouncement from "../../components/announcement/DeleteAnnouncement";
 
 export default function Announcements() {
-  const { path } = useRouteMatch();
+  const { path, url } = useRouteMatch();
 
   const [page, setPage] = useState(1);
 
   const { show, action, modalData, dispatch } = useModal();
 
-  const { loading, error, data, setUrl, refreshData } = useDataFetch(
+  const { loading, data, setUrl, refreshData } = useDataFetch(
     "announcement",
     []
   );
@@ -40,6 +32,22 @@ export default function Announcements() {
   function toggle() {
     dispatch({ type: "TOGGLE" });
     refreshData();
+  }
+
+  function updateAnnouncement(data) {
+    dispatch({
+      type: "ACTION",
+      name: "UPDATE",
+      payload: data,
+    });
+  }
+
+  function deleteAnnouncement(data) {
+    dispatch({
+      type: "ACTION",
+      name: "DELETE",
+      payload: data,
+    });
   }
 
   if (loading) {
@@ -75,7 +83,6 @@ export default function Announcements() {
                     <th>#</th>
                     <th>Názov</th>
                     <th>Autor</th>
-                    <th>Prepojenia</th>
                     <th>Vytvorený</th>
                     <th>Aktualizovaný</th>
                     <th>Akcia</th>
@@ -92,7 +99,6 @@ export default function Announcements() {
                             ? announcement.issuedBy.fullName
                             : "Používateľ bol zmazaný"}
                         </td>
-                        <td>{announcement.grants.length}</td>
                         <td>
                           {new Date(announcement.createdAt).toLocaleString()}
                         </td>
@@ -100,25 +106,30 @@ export default function Announcements() {
                           {new Date(announcement.updatedAt).toLocaleString()}
                         </td>
                         <td>
-                          <ButtonGroup>
-                            <Button outline size="sm" color="warning">
-                              <PencilFill />
-                            </Button>
-                            <Button
-                              outline
-                              size="sm"
-                              color="danger"
-                              onClick={() => {
-                                dispatch({
-                                  type: "ACTION",
-                                  name: "DELETE",
-                                  payload: announcement,
-                                });
-                              }}
-                            >
-                              <Trash2Fill />
-                            </Button>
-                          </ButtonGroup>
+                          <Button
+                            tag={Link}
+                            to={`${url}/${announcement._id}`}
+                            size="sm"
+                            color="info"
+                          >
+                            Zobraziť
+                          </Button>{" "}
+                          <Button
+                            outline
+                            size="sm"
+                            color="warning"
+                            onClick={() => updateAnnouncement(announcement)}
+                          >
+                            <PencilFill />
+                          </Button>{" "}
+                          <Button
+                            outline
+                            size="sm"
+                            color="danger"
+                            onClick={() => deleteAnnouncement(announcement)}
+                          >
+                            <Trash2Fill />
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -137,20 +148,26 @@ export default function Announcements() {
           <Modal isOpen={show} toggle={toggle}>
             {action === "ADD" && <AddAnnouncement toggle={toggle} />}
             {action === "DELETE" && (
-              <DeleteAnnouncement toggle={toggle} announcement={modalData} />
-            )}
-            {/* {action === "edit" && (
-              <EditAnnouncement
-                announcements={announcements}
-                getData={getData}
-                modal={modal}
-                setModal={setModal}
+              <DeleteAnnouncement
+                toggle={toggle}
+                deleteAnnouncement={deleteAnnouncement}
+                announcement={modalData}
               />
-            )} */}
+            )}
+            {action === "UPDATE" && (
+              <EditAnnouncement
+                toggle={toggle}
+                updateAnnouncement={updateAnnouncement}
+                announcement={modalData}
+                dispatch={dispatch}
+              />
+            )}
           </Modal>
         </Fade>
       </Route>
-      <Route path={`${path}/:id`}>{/* <Announcement /> */}</Route>
+      <Route path={`${path}/:id`}>
+        <Announcement />
+      </Route>
     </Switch>
   );
 }

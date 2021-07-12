@@ -58,50 +58,6 @@ router.post("/", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.post(
-  "/:id/announcement",
-  checkAuth,
-  isSupervisor,
-  upload.array("files", 5),
-  async (req, res) => {
-    const url = "https://" + req.get("host");
-
-    const { error } = announcementValidation(req.body);
-    if (error)
-      return res
-        .status(400)
-        .send({ error: true, msg: error.details[0].message });
-
-    const reqFiles = [];
-    for (var i = 0; i < req.files.length; i++) {
-      const reqFile = {};
-      reqFile.url = url + "/public/documents/" + req.files[i].filename;
-      reqFile.path = "public/documents/" + req.files[i].filename;
-      reqFile.name = req.files[i].filename.slice(
-        37,
-        req.files[i].filename.length
-      );
-      reqFiles.push(reqFile);
-    }
-
-    const announcement = new Announcement({
-      name: req.body.name,
-      content: req.body.content,
-      issuedBy: req.user._id,
-      files: reqFiles,
-    });
-
-    await announcement.save();
-
-    await Grant.updateOne(
-      { _id: req.params.id },
-      { $push: { announcements: announcement } }
-    );
-
-    res.status(200).send({ msg: "Oznam bol pridaný." });
-  }
-);
-
-router.post(
   "/:grantId/addBudget",
   checkAuth,
   isSupervisor,

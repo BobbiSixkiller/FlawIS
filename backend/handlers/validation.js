@@ -81,16 +81,16 @@ module.exports.announcementValidation = (data) => {
   const schema = Joi.object({
     name: Joi.string().required(),
     content: Joi.string().required(),
-    type: Joi.string()
-      .valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE")
-      .required(),
-    files: Joi.array().items(
-      Joi.object({
-        url: Joi.string().required(),
-        path: Joi.string().required(),
-        name: Joi.string().required(),
-      })
-    ),
+    grantId: Joi.string(),
+    scope: Joi.string().valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE"),
+    // files: Joi.array().items(
+    //   Joi.object({
+    //     url: Joi.string(),
+    //     path: Joi.string(),
+    //     name: Joi.string(),
+    //   })
+    // ),
+    files: Joi.array(),
   });
 
   return schema.validate(data);

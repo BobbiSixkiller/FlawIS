@@ -60,8 +60,6 @@ const grantSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toObject: { virtuals: true },
-    toJSON: { virtuals: true },
   }
 );
 
