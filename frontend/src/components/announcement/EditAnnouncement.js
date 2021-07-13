@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Alert,
@@ -26,15 +26,14 @@ import { validateAnnouncement } from "../../util/validation";
 
 import DeleteFile from "./DeleteFile";
 
-function EditAnnouncement({ toggle, announcement }) {
+export default function EditAnnouncement({ toggle, announcement, dispatch }) {
   const INITIAL_STATE = {
     name: announcement.name,
     content: announcement.content,
     files: announcement.files,
   };
 
-  const { show, modalData, dispatch } = useModal();
-
+  const { show, modalData, dispatch: nestedDispatch } = useModal(announcement);
   const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const {
@@ -47,7 +46,7 @@ function EditAnnouncement({ toggle, announcement }) {
     valid,
   } = useFormValidation(INITIAL_STATE, validateAnnouncement, update);
 
-  async function update() {
+  function update() {
     const formData = new FormData();
     for (const key of Object.keys(values.files)) {
       formData.append("files", values.files[key]);
@@ -58,14 +57,13 @@ function EditAnnouncement({ toggle, announcement }) {
     sendData(`announcement/${announcement._id}`, "PUT", formData, {
       "Content-type": "multipart/form-data",
     });
+    setValues({ ...values, files: {} });
   }
 
-  function removeFile(id) {
-    setValues({
-      ...values,
-      files: values.files.filter((file) => file._id !== id),
-    });
-  }
+  useEffect(() => {
+    console.log(data);
+    if (data) dispatch({ type: "UPDATE_DATA", payload: data.announcement });
+  }, [data, dispatch]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -150,7 +148,7 @@ function EditAnnouncement({ toggle, announcement }) {
             <Button
               close
               onClick={() =>
-                dispatch({
+                nestedDispatch({
                   type: "ACTION",
                   payload: { announcement, file },
                 })
@@ -172,8 +170,8 @@ function EditAnnouncement({ toggle, announcement }) {
         <DeleteFile
           show={show}
           dispatch={dispatch}
+          nestedDispatch={nestedDispatch}
           modalData={modalData}
-          removeFile={removeFile}
         />
       </ModalBody>
       <ModalFooter>
@@ -187,5 +185,3 @@ function EditAnnouncement({ toggle, announcement }) {
     </Form>
   );
 }
-
-export default EditAnnouncement;

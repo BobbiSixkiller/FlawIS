@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
-  Form,
   Row,
   Col,
   Alert,
@@ -13,7 +12,7 @@ import {
 
 import { useDataSend } from "../../hooks/useApi";
 
-function DeleteFile({ show, dispatch, modalData, removeFile }) {
+function DeleteFile({ show, dispatch, nestedDispatch, modalData }) {
   const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   function deleteFile() {
@@ -21,11 +20,19 @@ function DeleteFile({ show, dispatch, modalData, removeFile }) {
       `announcement/${modalData.announcement._id}/file/${modalData.file._id}`,
       "DELETE"
     );
-    removeFile(modalData.file._id);
   }
+  useEffect(() => {
+    if (data) {
+      dispatch({
+        type: "UPDATE_DATA",
+        payload: data.announcement,
+      });
+    }
+  }, [data, dispatch]);
 
   function toggle() {
-    dispatch({ type: "TOGGLE" });
+    nestedDispatch({ type: "TOGGLE" });
+    hideMessage();
   }
 
   return (

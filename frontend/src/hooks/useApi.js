@@ -81,11 +81,14 @@ export function useDataSend() {
     try {
       const res = await API.request({ url, method, data, headers });
       dispatch({ type: "SUCCESS", payload: res.data });
+
+      return res.data;
     } catch (err) {
       if (err.response.status === 401) {
         logout();
       } else {
         dispatch({ type: "FAILURE", payload: err.response.data });
+        return err.response.data;
       }
     }
   }

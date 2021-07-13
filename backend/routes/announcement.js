@@ -133,11 +133,10 @@ router.put(
     announcement.content = req.body.content;
     announcement.issuedBy = req.user._id;
     announcement.files = announcement.files.concat(reqFiles);
-    //announcement.files.push(reqFiles);
 
     await announcement.save();
 
-    res.status(200).send({ msg: "Oznam bol aktualizovaný" });
+    res.status(200).send({ msg: "Oznam bol aktualizovaný.", announcement });
   }
 );
 
@@ -174,7 +173,7 @@ router.delete(
 
     await announcement.save();
 
-    res.status(200).send({ msg: "Dokument bol vymazaný." });
+    res.status(200).send({ msg: "Dokument bol vymazaný.", announcement });
   }
 );
 

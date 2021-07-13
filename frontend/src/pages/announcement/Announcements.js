@@ -34,22 +34,6 @@ export default function Announcements() {
     refreshData();
   }
 
-  function updateAnnouncement(data) {
-    dispatch({
-      type: "ACTION",
-      name: "UPDATE",
-      payload: data,
-    });
-  }
-
-  function deleteAnnouncement(data) {
-    dispatch({
-      type: "ACTION",
-      name: "DELETE",
-      payload: data,
-    });
-  }
-
   if (loading) {
     return (
       <Row className="justify-content-center">
@@ -118,7 +102,13 @@ export default function Announcements() {
                             outline
                             size="sm"
                             color="warning"
-                            onClick={() => updateAnnouncement(announcement)}
+                            onClick={() =>
+                              dispatch({
+                                type: "ACTION",
+                                name: "UPDATE",
+                                payload: announcement,
+                              })
+                            }
                           >
                             <PencilFill />
                           </Button>{" "}
@@ -126,7 +116,13 @@ export default function Announcements() {
                             outline
                             size="sm"
                             color="danger"
-                            onClick={() => deleteAnnouncement(announcement)}
+                            onClick={() =>
+                              dispatch({
+                                type: "ACTION",
+                                name: "DELETE",
+                                payload: announcement,
+                              })
+                            }
                           >
                             <Trash2Fill />
                           </Button>
@@ -148,16 +144,11 @@ export default function Announcements() {
           <Modal isOpen={show} toggle={toggle}>
             {action === "ADD" && <AddAnnouncement toggle={toggle} />}
             {action === "DELETE" && (
-              <DeleteAnnouncement
-                toggle={toggle}
-                deleteAnnouncement={deleteAnnouncement}
-                announcement={modalData}
-              />
+              <DeleteAnnouncement toggle={toggle} announcement={modalData} />
             )}
             {action === "UPDATE" && (
               <EditAnnouncement
                 toggle={toggle}
-                updateAnnouncement={updateAnnouncement}
                 announcement={modalData}
                 dispatch={dispatch}
               />

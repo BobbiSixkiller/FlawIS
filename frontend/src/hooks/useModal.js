@@ -1,15 +1,9 @@
 import { useReducer } from "react";
 
-const INITIAL_STATE = {
-  show: false,
-  action: "",
-  data: null,
-};
-
 function modalReducer(state, action) {
   switch (action.type) {
     case "TOGGLE":
-      return { ...state, show: !state.show };
+      return { ...state, show: !state.show, data: null };
     case "ACTION":
       return {
         ...state,
@@ -17,14 +11,20 @@ function modalReducer(state, action) {
         action: action.name,
         data: action.payload,
       };
+    case "UPDATE_DATA":
+      return { ...state, data: action.payload };
 
     default:
       return { ...state };
   }
 }
 
-export default function useModal() {
-  const [state, dispatch] = useReducer(modalReducer, INITIAL_STATE);
+export default function useModal(initData) {
+  const [state, dispatch] = useReducer(modalReducer, {
+    show: false,
+    action: "",
+    data: initData,
+  });
 
   return {
     show: state.show,
