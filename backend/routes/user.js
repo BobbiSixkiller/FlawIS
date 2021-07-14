@@ -164,6 +164,8 @@ router.post("/forgotPassword", async (req, res) => {
       msg: "So zadaným emailom nie je spojený žiadny používateľ.",
     });
 
+  console.log(user);
+
   const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
     expiresIn: "1h",
   });
@@ -192,13 +194,13 @@ router.post("/forgotPassword", async (req, res) => {
         "\n\n" +
         "Ak si nezelate zmenit Vase heslo, ignorujte tento email.\n",
     });
-
-    res.status(200).send({
-      msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
-    });
   } catch (err) {
-    res.status(500).send({ error: true, msg: err.message });
+    return res.status(500).send({ error: true, msg: err.message });
   }
+
+  res.status(200).send({
+    msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
+  });
 });
 
 router.post("/reset/:token", async (req, res) => {
@@ -215,14 +217,14 @@ router.post("/reset/:token", async (req, res) => {
             },
           });
         }
-        res.status(500).send({ error: true, msg: err });
+        return res.status(500).send({ error: true, msg: err });
       } else {
         return decoded;
       }
     }
   );
-
-  const user = await User.findOne({ _id: id });
+  console.log(id);
+  const user = await User.findOne({ _id: id._id });
   if (!user) {
     return res
       .status(404)

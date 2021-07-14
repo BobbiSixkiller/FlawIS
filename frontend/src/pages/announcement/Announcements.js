@@ -138,7 +138,7 @@ export default function Announcements() {
               />
             </>
           )}
-          <Button outline color="primary" tag={Link} to="/dashboard/grants">
+          <Button outline color="primary" tag={Link} to="/dashboard/">
             Späť
           </Button>
           <Modal isOpen={show} toggle={toggle}>

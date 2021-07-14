@@ -1,5 +1,4 @@
 import React from "react";
-import api from "../../api";
 
 import {
   Fade,
@@ -11,8 +10,10 @@ import {
   Input,
   Button,
   Alert,
+  Spinner,
 } from "reactstrap";
 
+import { useDataSend } from "../../hooks/useApi";
 import useFormValidation from "../../hooks/useFormValidation";
 import { validateForgotPassword } from "../../util/validation";
 
@@ -20,24 +21,15 @@ const INITIAL_STATE = {
   email: "",
 };
 
-function ForgotPassword() {
-  const forgotPassword = async () => {
-    setLoading(true);
-    try {
-      const forgotPassword = await api.post("user/forgotPassword", values);
-      setBackendMsg(forgotPassword.data.msg);
-      setLoading(false);
-    } catch (err) {
-      err.response.data.error && setBackendError(err.response.data.error);
-      setLoading(false);
-    }
-  };
+export default function ForgotPassword() {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
     useFormValidation(INITIAL_STATE, validateForgotPassword, forgotPassword);
-  const [backendError, setBackendError] = React.useState(null);
-  const [backendMsg, setBackendMsg] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
+
+  function forgotPassword() {
+    sendData("user/forgotPassword", "POST", values);
+  }
 
   return (
     <Fade>
@@ -58,26 +50,16 @@ function ForgotPassword() {
               autoComplete="off"
               placeholder="Vaša emailová adresa"
             />
-            <FormFeedback invalid>{errors.email}</FormFeedback>
+            <FormFeedback invalid="true">{errors.email}</FormFeedback>
             <FormFeedback valid>{valid.email}</FormFeedback>
           </Col>
         </FormGroup>
-        {backendError && (
+        {data && (
           <FormGroup row className="justify-content-center">
             <Col sm={6}>
-              <Alert color="danger">
-                {backendError}
-                <Button close onClick={() => setBackendError(null)} />
-              </Alert>
-            </Col>
-          </FormGroup>
-        )}
-        {backendMsg && (
-          <FormGroup row className="justify-content-center">
-            <Col sm={6}>
-              <Alert color="success">
-                {backendMsg}
-                <Button close onClick={() => setBackendMsg(null)} />
+              <Alert color={error ? "danger" : "success"}>
+                {data.msg}
+                <Button close onClick={hideMessage} />
               </Alert>
             </Col>
           </FormGroup>
@@ -85,7 +67,11 @@ function ForgotPassword() {
         <FormGroup row className="justify-content-center">
           <Col sm={6}>
             <Button block color="primary" disabled={loading} type="submit">
-              Resetovať heslo
+              {loading ? (
+                <Spinner size="sm" color="secondary" />
+              ) : (
+                "Resetovať heslo"
+              )}
             </Button>
           </Col>
         </FormGroup>
@@ -93,5 +79,3 @@ function ForgotPassword() {
     </Fade>
   );
 }
-
-export default ForgotPassword;

@@ -19,8 +19,6 @@ function apiReducer(state, action) {
 }
 
 export function useDataFetch(initUrl, initData) {
-  const { logout } = useContext(AuthContext);
-
   const [url, setUrl] = useState(initUrl);
   const [refresh, setRefresh] = useState(false);
 
@@ -43,18 +41,14 @@ export function useDataFetch(initUrl, initData) {
         }
       } catch (err) {
         if (!cancel) {
-          if (err.response.status === 401) {
-            logout();
-          } else {
-            dispatch({ type: "FAILURE", payload: err.response.data });
-          }
+          dispatch({ type: "FAILURE", payload: err.response.data });
         }
       }
     }
 
     fetchData();
     return () => (cancel = true);
-  }, [url, refresh, logout]);
+  }, [url, refresh]);
 
   function refreshData() {
     setRefresh(!refresh);
@@ -81,14 +75,11 @@ export function useDataSend() {
     try {
       const res = await API.request({ url, method, data, headers });
       dispatch({ type: "SUCCESS", payload: res.data });
-
-      return res.data;
     } catch (err) {
       if (err.response.status === 401) {
         logout();
       } else {
         dispatch({ type: "FAILURE", payload: err.response.data });
-        return err.response.data;
       }
     }
   }

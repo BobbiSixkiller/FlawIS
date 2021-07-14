@@ -1,6 +1,5 @@
 import React from "react";
-import api from "../../api";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import {
   Fade,
@@ -14,6 +13,7 @@ import {
   Label,
 } from "reactstrap";
 
+import { useDataSend } from "../../hooks/useApi";
 import useFormValidation from "../../hooks/useFormValidation";
 import { validatePasswordReset } from "../../util/validation";
 
@@ -23,29 +23,16 @@ const INITIAL_STATE = {
 };
 
 function PasswordRedet() {
-  const history = useHistory();
   const url = useParams();
 
-  const resetPassword = async () => {
-    setLoading(true);
-    try {
-      const reset = await api.post(`user/reset/${url.token}`, values);
-      setLoading(false);
-      setBackendMsg(reset.data.msg);
-      setTimeout(() => history.push("/"), 2000);
-    } catch (err) {
-      err.response.data.error.message &&
-        setBackendError(err.response.data.error.message);
-      setLoading(false);
-    }
-  };
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
     useFormValidation(INITIAL_STATE, validatePasswordReset, resetPassword);
-  const [backendError, setBackendError] = React.useState(null);
-  const [backendMsg, setBackendMsg] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
 
+  function resetPassword() {
+    sendData(`user/reset/${url.token}`, "POST", values);
+  }
   return (
     <Fade>
       <h1 className="text-center">Reset hesla</h1>
@@ -65,7 +52,7 @@ function PasswordRedet() {
               placeholder="Zvoľte heslo"
               autoComplete="off"
             />
-            <FormFeedback invalid>{errors.password}</FormFeedback>
+            <FormFeedback invalid="true">{errors.password}</FormFeedback>
             <FormFeedback valid>{valid.password}</FormFeedback>
           </Col>
         </FormGroup>
@@ -84,26 +71,16 @@ function PasswordRedet() {
               placeholder="Pre potvrdenie zopakujte heslo"
               autoComplete="off"
             />
-            <FormFeedback invalid>{errors.repeatPass}</FormFeedback>
+            <FormFeedback invalid="true">{errors.repeatPass}</FormFeedback>
             <FormFeedback valid>{valid.repeatPass}</FormFeedback>
           </Col>
         </FormGroup>
-        {backendMsg && (
+        {data && (
           <FormGroup row className="justify-content-center">
             <Col sm={6}>
-              <Alert color="success">
-                {backendMsg}
-                <Button close onClick={() => setBackendError(null)} />
-              </Alert>
-            </Col>
-          </FormGroup>
-        )}
-        {backendError && (
-          <FormGroup row className="justify-content-center">
-            <Col sm={6}>
-              <Alert color="danger">
-                {backendError}
-                <Button close onClick={() => setBackendError(null)} />
+              <Alert color={error ? "danger" : "success"}>
+                {data.msg}
+                <Button close onClick={hideMessage} />
               </Alert>
             </Col>
           </FormGroup>

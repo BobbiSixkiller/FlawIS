@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useLocation, useHistory, Link } from "react-router-dom";
 
 import {
@@ -32,11 +32,17 @@ function Login() {
 
   function login() {
     auth.login(values);
-    history.replace(from);
   }
 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
     useFormValidation(INITIAL_STATE, validateLogin, login);
+
+  useEffect(() => {
+    console.log(auth.user);
+    if (auth.user) {
+      history.replace(from);
+    }
+  }, [auth.user]);
 
   return (
     <Fade>

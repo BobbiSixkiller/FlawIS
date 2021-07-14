@@ -21,8 +21,9 @@ function DeleteFile({ show, dispatch, nestedDispatch, modalData }) {
       "DELETE"
     );
   }
+
   useEffect(() => {
-    if (data) {
+    if (data && !error) {
       dispatch({
         type: "UPDATE_DATA",
         payload: data.announcement,

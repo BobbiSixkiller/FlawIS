@@ -30,7 +30,7 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
   const INITIAL_STATE = {
     name: announcement.name,
     content: announcement.content,
-    files: announcement.files,
+    files: {},
   };
 
   const { show, modalData, dispatch: nestedDispatch } = useModal(announcement);
@@ -62,7 +62,8 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
 
   useEffect(() => {
     console.log(data);
-    if (data) dispatch({ type: "UPDATE_DATA", payload: data.announcement });
+    if (data && !error)
+      dispatch({ type: "UPDATE_DATA", payload: data.announcement });
   }, [data, dispatch]);
 
   return (
@@ -81,8 +82,8 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.name}
-                invalid={errors.name && errors.name.length > 0}
-                valid={valid.name && valid.name.length > 0}
+                invalid={errors.name && true}
+                valid={valid.name && true}
                 autoComplete="off"
               />
               <FormFeedback invalid="true">{errors.name}</FormFeedback>
@@ -102,8 +103,8 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.content}
-                invalid={errors.content && errors.content.length > 0}
-                valid={valid.content && valid.content.length > 0}
+                invalid={errors.content && true}
+                valid={valid.content && true}
                 autoComplete="off"
               />
               <FormFeedback invalid="true">{errors.content}</FormFeedback>
@@ -122,8 +123,8 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
                 label="Vyberte súbor nového dokumentu."
                 onChange={handleChange}
                 multiple
-                invalid={errors.files && errors.files.length > 0}
-                valid={valid.files && valid.files.length > 0}
+                invalid={errors.files && true}
+                valid={valid.files && true}
               >
                 <FormFeedback invalid="true">{errors.files}</FormFeedback>
                 <FormFeedback valid>{valid.files}</FormFeedback>

@@ -3,7 +3,7 @@ import { useReducer } from "react";
 function modalReducer(state, action) {
   switch (action.type) {
     case "TOGGLE":
-      return { ...state, show: !state.show, data: null };
+      return { ...state, show: !state.show };
     case "ACTION":
       return {
         ...state,
