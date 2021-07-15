@@ -11,6 +11,7 @@ import {
   Button,
   Input,
   Label,
+  Spinner,
 } from "reactstrap";
 
 import { useDataSend } from "../../hooks/useApi";
@@ -88,7 +89,11 @@ function PasswordRedet() {
         <FormGroup row className="justify-content-center">
           <Col sm={6}>
             <Button block color="primary" disabled={loading} type="submit">
-              Resetovať heslo
+              {loading ? (
+                <Spinner size="sm" color="light" />
+              ) : (
+                "Resetovať heslo"
+              )}
             </Button>
           </Col>
         </FormGroup>

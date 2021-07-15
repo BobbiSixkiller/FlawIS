@@ -12,6 +12,7 @@ import {
   Col,
   Alert,
   Fade,
+  Spinner,
 } from "reactstrap";
 
 import { AuthContext } from "../../context/auth";
@@ -28,10 +29,11 @@ function Login() {
   const location = useLocation();
   const history = useHistory();
 
-  let { from } = location.state || { from: { pathname: "/" } };
+  let { from } = location.state || { from: { pathname: "/dashboard" } };
 
   function login() {
     auth.login(values);
+    //history.replace(from);
   }
 
   const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
@@ -99,7 +101,7 @@ function Login() {
         <FormGroup row className="justify-content-center">
           <Col sm={6}>
             <Button block color="primary" disabled={auth.loading} type="submit">
-              Prihlásiť
+              {auth.loading ? <Spinner size="sm" color="light" /> : "Prihlásiť"}
             </Button>
             <NavLink className="text-center" to="/forgotPassword" tag={Link}>
               Zabudli ste heslo ?

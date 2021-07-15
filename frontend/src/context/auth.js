@@ -2,13 +2,6 @@ import React, { useEffect, useReducer, createContext } from "react";
 
 import API from "../api";
 
-const INITIAL_STATE = {
-  loading: true,
-  user: null,
-  error: false,
-  msg: "",
-};
-
 const AuthContext = createContext({
   user: null,
   login: function (data) {},
@@ -52,7 +45,12 @@ function authReducer(state, action) {
 }
 
 function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(authReducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(authReducer, {
+    loading: true,
+    user: null,
+    error: false,
+    msg: "",
+  });
 
   useEffect(() => {
     async function currentUser() {

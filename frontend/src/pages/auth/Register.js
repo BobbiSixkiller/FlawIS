@@ -10,6 +10,7 @@ import {
   Input,
   Col,
   Alert,
+  Spinner,
   Fade,
 } from "reactstrap";
 
@@ -31,17 +32,10 @@ function Register() {
 
   async function register() {
     auth.register(values);
-    history.push("/");
+    history.push("/dashboard");
   }
-  const {
-    handleSubmit,
-    handleChange,
-    handleBlur,
-    values,
-    errors,
-    valid,
-    isSubmitting,
-  } = useFormValidation(INITIAL_STATE, validateRegister, register);
+  const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
+    useFormValidation(INITIAL_STATE, validateRegister, register);
 
   return (
     <Fade>
@@ -154,8 +148,12 @@ function Register() {
         )}
         <FormGroup row className="justify-content-center">
           <Col sm={6}>
-            <Button block color="primary" disabled={isSubmitting} type="submit">
-              Registrovať
+            <Button block color="primary" disabled={auth.loading} type="submit">
+              {auth.loading ? (
+                <Spinner size="sm" color="light" />
+              ) : (
+                "Registrovať"
+              )}
             </Button>
           </Col>
         </FormGroup>

@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const fs = require("fs");
+const { ErrorResponse } = require("../middlewares/error");
 
 const { announcementValidation } = require("../handlers/validation");
 const Announcement = require("../models/Announcement");
@@ -24,7 +25,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
   res.status(200).send({ announcements, total: Math.ceil(total / pageSize) });
 });
 
-router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
+router.get("/:id", checkAuth, isSupervisor, async (req, res, next) => {
   const announcement = await Announcement.findOne({
     _id: req.params.id,
   })
@@ -32,7 +33,7 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res) => {
     .populate("grants", "url");
 
   if (!announcement)
-    return res.status(404).send({ error: true, msg: "Oznam nebol nájdený!" });
+    return next(new ErrorResponse("Oznam nebol nájdený!", 404));
 
   res.status(200).send(announcement);
 });
@@ -51,14 +52,11 @@ router.post(
   checkAuth,
   isSupervisor,
   upload.array("files", 5),
-  async (req, res) => {
+  async (req, res, next) => {
     const url = "https://" + req.get("host");
 
     const { error } = announcementValidation(req.body);
-    if (error)
-      return res
-        .status(404)
-        .send({ error: true, msg: error.details[0].message });
+    if (error) return next(new ErrorResponse(error.details[0].message, 400));
 
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
@@ -104,14 +102,11 @@ router.put(
   checkAuth,
   isSupervisor,
   upload.array("files", 5),
-  async (req, res) => {
+  async (req, res, next) => {
     const url = "https://" + req.get("host");
 
     const { error } = announcementValidation(req.body);
-    if (error)
-      return res
-        .status(400)
-        .send({ error: true, msg: error.details[0].message });
+    if (error) return next(new ErrorResponse(error.details[0].message, 400));
 
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
@@ -127,7 +122,7 @@ router.put(
 
     const announcement = await Announcement.findOne({ _id: req.params.id });
     if (!announcement)
-      return res.status(404).send({ error: true, msg: "Oznam nebol nájdený!" });
+      return next(new ErrorResponse("Oznam nebol nájdený!", 404));
 
     announcement.name = req.body.name;
     announcement.content = req.body.content;
@@ -140,10 +135,10 @@ router.put(
   }
 );
 
-router.delete("/:id", checkAuth, isSupervisor, async (req, res) => {
+router.delete("/:id", checkAuth, isSupervisor, async (req, res, next) => {
   const announcement = await Announcement.findOne({ _id: req.params.id });
   if (!announcement)
-    return res.status(404).send({ error: true, msg: "Oznam nebol nájdený!" });
+    return next(new ErrorResponse("Oznam nebol nájdený!", 404));
 
   announcement.files.forEach((file) =>
     fs.unlink(file.path, (err) => console.log(err))
@@ -157,20 +152,17 @@ router.delete(
   "/:id/file/:file_id",
   checkAuth,
   isSupervisor,
-  async (req, res) => {
+  async (req, res, next) => {
     const announcement = await Announcement.findOne({ _id: req.params.id });
     if (!announcement)
-      return res.status(400).send({ error: true, msg: "Oznam nebol nájdený!" });
+      return next(new ErrorResponse("Oznam nebol nájdený!", 404));
 
     const file = announcement.files.id(req.params.file_id);
-    if (!file)
-      return res
-        .status(404)
-        .send({ error: true, msg: "Dokument nebol nájdený!" });
+    if (!file) return next(new ErrorResponse("Dokument nebol nájdený!", 404));
 
     fs.unlink(file.path, (err) => console.log(err));
-    await file.remove();
 
+    await file.remove();
     await announcement.save();
 
     res.status(200).send({ msg: "Dokument bol vymazaný.", announcement });

@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const User = require("../models/User");
-const mail = require("../handlers/mail");
-
+const { ErrorResponse } = require("../middlewares/error");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+const User = require("../models/User");
+const mail = require("../handlers/mail");
 
 const {
   registerValidation,
@@ -18,7 +19,7 @@ const {
   isOwnUser,
 } = require("../middlewares/auth");
 
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   const { error } = await registerValidation(req.body);
   if (error)
     return res.status(400).send({ error: true, msg: error.details[0].message });

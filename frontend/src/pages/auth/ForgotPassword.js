@@ -68,7 +68,7 @@ export default function ForgotPassword() {
           <Col sm={6}>
             <Button block color="primary" disabled={loading} type="submit">
               {loading ? (
-                <Spinner size="sm" color="secondary" />
+                <Spinner size="sm" color="light" />
               ) : (
                 "Resetovať heslo"
               )}

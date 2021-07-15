@@ -47,8 +47,13 @@ module.exports.resetPasswordValidation = (data) => {
 
 module.exports.grantValidation = (data) => {
   const schema = Joi.object({
-    name: Joi.string().max(500).required(),
-    idNumber: Joi.string().max(100).required(),
+    name: Joi.string()
+      .required()
+      .messages({
+        "any.required": "Zadajte nazov grantu",
+        "string.empty": "Nazov nemoze byt prazdny",
+      }),
+    idNumber: Joi.string().required(),
     type: Joi.string().valid("APVV", "VEGA", "KEGA").required(),
     start: Joi.date().required(),
     end: Joi.date().required(),
@@ -74,7 +79,7 @@ module.exports.grantValidation = (data) => {
       .required(),
   });
 
-  return schema.validate(data);
+  return schema.validate(data, { abortEarly: false });
 };
 
 module.exports.announcementValidation = (data) => {

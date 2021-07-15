@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { ErrorResponse } = require("./error");
 const Post = require("../models/Post");
 
 module.exports.checkAuth = function (req, res, next) {
@@ -9,9 +10,7 @@ module.exports.checkAuth = function (req, res, next) {
     req.user = jwt.verify(token, process.env.secret);
     next();
   } catch (error) {
-    return res
-      .status(401)
-      .send({ error: true, msg: "Prístup zamietnutý, prosím prihláste sa!" });
+    next(new ErrorResponse("Prístup zamietnutý, prosím prihláste sa!", 401));
   }
 };
 
@@ -19,20 +18,20 @@ module.exports.isAdmin = function (req, res, next) {
   if (req.user.role === "admin") {
     return next();
   }
-  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
+  next(new ErrorResponse("Prístup zamietnutý!", 401));
 };
 
 module.exports.isSupervisor = function (req, res, next) {
   if (req.user.role === "admin" || req.user.role === "supervisor") {
     return next();
   }
-  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
+  next(new ErrorResponse("Prístup zamietnutý!", 401));
 };
 
 module.exports.isOwnPost = async function (req, res, next) {
   const post = await Post.findOne({ _id: req.params.id });
   if (!post) {
-    res.status(404).send({ error: true, msg: "Post nebol nájdený." });
+    return next(new ErrorResponse("Post nebol nájdený!", 404));
   }
   if (
     post.userId == req.user._id ||
@@ -42,7 +41,7 @@ module.exports.isOwnPost = async function (req, res, next) {
     req.post = post;
     return next();
   }
-  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
+  next(new ErrorResponse("Prístup zamietnutý!", 401));
 };
 
 module.exports.isOwnUser = function (req, res, next) {
@@ -53,5 +52,5 @@ module.exports.isOwnUser = function (req, res, next) {
   ) {
     return next();
   }
-  res.status(401).send({ error: true, msg: "Prístup zamietnutý!" });
+  next(new ErrorResponse("Prístup zamietnutý!", 401));
 };

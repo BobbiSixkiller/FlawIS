@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { ErrorResponse } = require("../middlewares/error");
 
 const Post = require("../models/Post");
 const { checkAuth, isOwnPost } = require("../middlewares/auth");
@@ -33,20 +34,16 @@ router.get("/", checkAuth, async (req, res) => {
   res.status(200).send({ posts, pages: Math.ceil(total / pageSize) });
 });
 
-router.get("/:id", checkAuth, async (req, res) => {
+router.get("/:id", checkAuth, async (req, res, next) => {
   const post = await Post.findOne({ _id: req.params.id });
-  if (!post) {
-    return res.status(404).send({ error: true, msg: "Post nebol nájdený." });
-  }
+  if (!post) return next(new ErrorResponse("Post nebol nájdený!", 404));
 
   res.status(200).send(post);
 });
 
 router.post("/", checkAuth, async (req, res) => {
   const { error } = postValidation(req.body);
-  if (error) {
-    return res.status(400).send({ error });
-  }
+  if (error) return;
 
   const post = new Post({
     ...req.body,
@@ -58,12 +55,10 @@ router.post("/", checkAuth, async (req, res) => {
   res.status(200).send({ msg: "Nový post pridaný.", post });
 });
 
-router.put("/:id", checkAuth, isOwnPost, async (req, res) => {
+router.put("/:id", checkAuth, isOwnPost, async (req, res, next) => {
   const { post } = req;
   const { error } = postValidation(req.body);
-  if (error) {
-    return res.status(400).send({ error });
-  }
+  if (error) return next(new ErrorResponse(error.details[0].message, 400));
 
   post.name = req.body.name;
   post.body = req.body.body;

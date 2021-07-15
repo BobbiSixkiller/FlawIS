@@ -1,5 +1,6 @@
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const { ErrorResponse } = require("../middlewares/error");
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -22,7 +23,7 @@ module.exports.upload = multer({
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error("Povolene typy suborov: PDF, Word!"));
+      return cb(new ErrorResponse("Povolene typy suborov: PDF, Word!", 400));
     }
   },
 });
