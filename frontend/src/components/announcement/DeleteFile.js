@@ -29,7 +29,7 @@ function DeleteFile({ show, dispatch, nestedDispatch, modalData }) {
         payload: data.announcement,
       });
     }
-  }, [data, dispatch]);
+  }, [data, error, dispatch]);
 
   function toggle() {
     nestedDispatch({ type: "TOGGLE" });
@@ -46,7 +46,7 @@ function DeleteFile({ show, dispatch, nestedDispatch, modalData }) {
           <Row className="justify-content-center">
             <Col>
               <Alert color={error ? "danger" : "success"}>
-                {data.msg}
+                {error ? data.errors.map((e) => e) : data.message}
                 <Button close onClick={hideMessage} />
               </Alert>
             </Col>

@@ -144,7 +144,7 @@ export default function AddAnnouncement({ toggle, grantId }) {
           <Row className="justify-content-center my-3">
             <Col>
               <Alert color={error ? "danger" : "success"}>
-                {data.msg}
+                {error ? data.errors.map((e) => e) : data.message}
                 <Button close onClick={hideMessage} />
               </Alert>
             </Col>

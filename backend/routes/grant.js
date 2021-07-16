@@ -4,11 +4,13 @@ const { ErrorResponse } = require("../middlewares/error");
 const Grant = require("../models/Grant");
 
 const {
+  grantSchema,
   grantValidation,
   memberValidation,
   budgetValidation,
-} = require("../handlers/validation");
+} = require("../util/validation");
 const { checkAuth, isSupervisor, isAdmin } = require("../middlewares/auth");
+const validate = require("../middlewares/validation");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
   const page = req.query.page || 1;
@@ -34,26 +36,35 @@ router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
   res.status(200).send({ grants, query: req.query.q });
 });
 
-router.post("/", checkAuth, isSupervisor, async (req, res, next) => {
-  // const { error } = await grantValidation(req.body);
-  // if (error) return res.status(400).send({ error });
+router.post(
+  "/",
+  checkAuth,
+  isSupervisor,
+  validate(grantSchema),
+  async (req, res, next) => {
+    // const { error } = await grantValidation(req.body);
+    // if (error) return res.status(400).send({ error });
 
-  try {
-    const grant = new Grant({
-      name: req.body.name,
-      idNumber: req.body.idNumber,
-      type: req.body.type,
-      start: req.body.start,
-      end: req.body.end,
-      budget: req.body.budget,
-    });
+    try {
+      //await grantValidationSchema.validate(req.body);
 
-    const newGrant = await grant.save();
-    res.status(200).send(newGrant);
-  } catch (err) {
-    next(err);
+      const grant = new Grant({
+        name: req.body.name,
+        idNumber: req.body.idNumber,
+        type: req.body.type,
+        start: req.body.start,
+        end: req.body.end,
+        budget: req.body.budget,
+      });
+
+      const newGrant = await grant.save();
+      res.status(200).send(newGrant);
+    } catch (err) {
+      //next(err);
+      res.send(err);
+    }
   }
-});
+);
 
 router.post(
   "/:grantId/addBudget",

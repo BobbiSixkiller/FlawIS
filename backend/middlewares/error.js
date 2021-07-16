@@ -1,24 +1,35 @@
-module.exports.ErrorResponse = class ErrorResponse extends Error {
-  constructor(message, status) {
+module.exports.UserInputError = class ErrorResponse extends Error {
+  constructor(message, errorsArray) {
     super(message);
-    this.status = status;
+    this.name = "ValidationError";
+    this.status = 400;
+    this.errors = errorsArray;
+  }
+};
+
+module.exports.AuthError = class ErrorResponse extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthError";
+    this.status = 401;
+  }
+};
+
+module.exports.NotFoundError = class ErrorResponse extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NotFoundError";
+    this.status = 404;
   }
 };
 
 module.exports.errorHandler = function (err, req, res, next) {
-  let error = { ...err };
-  error.message = err.message;
+  console.log(err);
 
-  if (err.name === "ValidationError") {
-    error.status = 400;
-    error.message = Object.values(error.errors)
-      .map((val) => val.properties.message)
-      .join(" ");
-  }
-
-  console.log(error);
-
-  res
-    .status(error.status || 500)
-    .send({ error: true, msg: error.message || "Internal server error" });
+  res.status(err.status || 500).send({
+    success: false,
+    name: err.name,
+    message: err.message || "Internal server error",
+    errors: err.errors || [],
+  });
 };

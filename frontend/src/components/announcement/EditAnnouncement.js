@@ -64,7 +64,7 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
     console.log(data);
     if (data && !error)
       dispatch({ type: "UPDATE_DATA", payload: data.announcement });
-  }, [data, dispatch]);
+  }, [data, error, dispatch]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -162,7 +162,7 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
           <Row className="justify-content-center my-3">
             <Col>
               <Alert color={error ? "danger" : "success"}>
-                {data.msg}
+                {error ? data.errors.map((e) => e) : data.message}
                 <Button close onClick={hideMessage} />
               </Alert>
             </Col>

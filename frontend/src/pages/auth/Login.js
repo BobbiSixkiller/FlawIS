@@ -44,7 +44,7 @@ function Login() {
     if (auth.user) {
       history.replace(from);
     }
-  }, [auth.user]);
+  }, [auth.user, history, from]);
 
   return (
     <Fade>

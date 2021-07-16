@@ -1,13 +1,14 @@
 const router = require("express").Router();
 const fs = require("fs");
-const { ErrorResponse } = require("../middlewares/error");
+const { NotFoundError } = require("../middlewares/error");
 
-const { announcementValidation } = require("../handlers/validation");
+const { announcementSchema } = require("../util/validation");
 const Announcement = require("../models/Announcement");
 const Grant = require("../models/Grant");
 
 const { checkAuth, isSupervisor } = require("../middlewares/auth");
-const { upload } = require("../handlers/upload");
+const validate = require("../middlewares/validation");
+const { upload } = require("../util/upload");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
   const page = req.query.page || 1;
@@ -32,8 +33,7 @@ router.get("/:id", checkAuth, isSupervisor, async (req, res, next) => {
     .populate("issuedBy", "firstName lastName")
     .populate("grants", "url");
 
-  if (!announcement)
-    return next(new ErrorResponse("Oznam nebol nájdený!", 404));
+  if (!announcement) return next(new NotFoundError("Oznam nebol nájdený!"));
 
   res.status(200).send(announcement);
 });
@@ -52,11 +52,9 @@ router.post(
   checkAuth,
   isSupervisor,
   upload.array("files", 5),
-  async (req, res, next) => {
+  validate(announcementSchema),
+  async (req, res) => {
     const url = "https://" + req.get("host");
-
-    const { error } = announcementValidation(req.body);
-    if (error) return next(new ErrorResponse(error.details[0].message, 400));
 
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
@@ -93,7 +91,7 @@ router.post(
       );
     }
 
-    res.status(200).send({ msg: "Oznam bol pridaný." });
+    res.status(200).send({ message: "Oznam bol pridaný." });
   }
 );
 
@@ -102,11 +100,9 @@ router.put(
   checkAuth,
   isSupervisor,
   upload.array("files", 5),
+  validate(announcementSchema),
   async (req, res, next) => {
     const url = "https://" + req.get("host");
-
-    const { error } = announcementValidation(req.body);
-    if (error) return next(new ErrorResponse(error.details[0].message, 400));
 
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
@@ -121,8 +117,7 @@ router.put(
     }
 
     const announcement = await Announcement.findOne({ _id: req.params.id });
-    if (!announcement)
-      return next(new ErrorResponse("Oznam nebol nájdený!", 404));
+    if (!announcement) return next(new NotFoundError("Oznam nebol nájdený!"));
 
     announcement.name = req.body.name;
     announcement.content = req.body.content;
@@ -131,21 +126,21 @@ router.put(
 
     await announcement.save();
 
-    res.status(200).send({ msg: "Oznam bol aktualizovaný.", announcement });
+    res.status(200).send({ message: "Oznam bol aktualizovaný.", announcement });
   }
 );
 
 router.delete("/:id", checkAuth, isSupervisor, async (req, res, next) => {
   const announcement = await Announcement.findOne({ _id: req.params.id });
   if (!announcement)
-    return next(new ErrorResponse("Oznam nebol nájdený!", 404));
+    return next(new NotFoundError("Oznam nebol nájdený!", 404));
 
   announcement.files.forEach((file) =>
     fs.unlink(file.path, (err) => console.log(err))
   );
   await announcement.remove();
 
-  res.status(200).send({ msg: "Oznam bol odstránený." });
+  res.status(200).send({ message: "Oznam bol odstránený." });
 });
 
 router.delete(
@@ -155,17 +150,17 @@ router.delete(
   async (req, res, next) => {
     const announcement = await Announcement.findOne({ _id: req.params.id });
     if (!announcement)
-      return next(new ErrorResponse("Oznam nebol nájdený!", 404));
+      return next(new NotFoundError("Oznam nebol nájdený!", 404));
 
     const file = announcement.files.id(req.params.file_id);
-    if (!file) return next(new ErrorResponse("Dokument nebol nájdený!", 404));
+    if (!file) return next(new NotFoundError("Dokument nebol nájdený!", 404));
 
     fs.unlink(file.path, (err) => console.log(err));
 
     await file.remove();
     await announcement.save();
 
-    res.status(200).send({ msg: "Dokument bol vymazaný.", announcement });
+    res.status(200).send({ message: "Dokument bol vymazaný.", announcement });
   }
 );
 

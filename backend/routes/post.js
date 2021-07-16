@@ -3,7 +3,7 @@ const { ErrorResponse } = require("../middlewares/error");
 
 const Post = require("../models/Post");
 const { checkAuth, isOwnPost } = require("../middlewares/auth");
-const { postValidation } = require("../handlers/validation");
+const { postValidation } = require("../util/validation");
 
 router.get("/api/search", checkAuth, async (req, res) => {
   const posts = await Post.find(

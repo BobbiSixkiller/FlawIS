@@ -1,4 +1,5 @@
 const Joi = require("@hapi/joi");
+const Yup = require("yup");
 
 module.exports.registerValidation = (data) => {
   const schema = Joi.object({
@@ -45,54 +46,40 @@ module.exports.resetPasswordValidation = (data) => {
   return schema.validate(data);
 };
 
-module.exports.grantValidation = (data) => {
-  const schema = Joi.object({
-    name: Joi.string()
-      .required()
-      .messages({
-        "any.required": "Zadajte nazov grantu",
-        "string.empty": "Nazov nemoze byt prazdny",
-      }),
-    idNumber: Joi.string().required(),
-    type: Joi.string().valid("APVV", "VEGA", "KEGA").required(),
-    start: Joi.date().required(),
-    end: Joi.date().required(),
-    budget: Joi.array()
-      .items(
-        Joi.object({
-          year: Joi.number().required(),
-          travel: Joi.number().required(),
-          material: Joi.number().required(),
-          services: Joi.number().required(),
-          indirect: Joi.number().required(),
-          salaries: Joi.number().required(),
-          members: Joi.array().items(
-            Joi.object({
-              member: Joi.string().required(),
-              hours: Joi.number().required(),
-              role: Joi.string().required(),
-              active: Joi.boolean().required(),
-            })
-          ),
-        })
-      )
-      .required(),
-  });
+module.exports.grantSchema = Yup.object({
+  name: Yup.string().required(),
+  idNumber: Yup.string().required(),
+  type: Yup.mixed().required().oneOf(["APVV", "VEGA", "KEGA"]),
+  start: Yup.date().required(),
+  end: Yup.date().required(),
+  budget: Yup.array(
+    Yup.object({
+      year: Yup.date().required(),
+      travel: Yup.number().required(),
+      material: Yup.number().required(),
+      services: Yup.number().required(),
+      indirect: Yup.number().required(),
+      salaries: Yup.number().required(),
+      members: Yup.array(
+        Yup.object({
+          member: Yup.string().required(),
+          hours: Yup.number().required(),
+          role: Yup.string().required(),
+          active: Yup.boolean().required(),
+        }).required()
+      ),
+    })
+  ).required(),
+});
 
-  return schema.validate(data, { abortEarly: false });
-};
-
-module.exports.announcementValidation = (data) => {
-  const schema = Joi.object({
-    name: Joi.string().required(),
-    content: Joi.string().required(),
-    grantId: Joi.string(),
-    scope: Joi.string().valid("APVV", "VEGA", "KEGA", "ALL", "SINGLE"),
-    files: Joi.object(),
-  });
-
-  return schema.validate(data);
-};
+module.exports.announcementSchema = Yup.object({
+  name: Yup.string().required(),
+  content: Yup.string().required(),
+  grantId: Yup.string(),
+  scope: Yup.mixed()
+    .oneOf(["APVV", "VEGA", "KEGA", "ALL", "SINGLE"])
+    .required(),
+});
 
 module.exports.memberValidation = (data) => {
   const schema = Joi.object({

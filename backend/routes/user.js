@@ -4,14 +4,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
-const mail = require("../handlers/mail");
+const mail = require("../util/mail");
 
 const {
   registerValidation,
   loginValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
-} = require("../handlers/validation");
+} = require("../util/validation");
 const {
   checkAuth,
   isAdmin,
