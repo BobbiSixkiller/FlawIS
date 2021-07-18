@@ -2,11 +2,20 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/User");
+const mail = require("../util/mail");
+
 const {
   AuthError,
   NotFoundError,
   UserInputError,
 } = require("../middlewares/error");
+const {
+  checkAuth,
+  isAdmin,
+  isSupervisor,
+  isOwnUser,
+} = require("../middlewares/auth");
 const validate = require("../middlewares/validation");
 const {
   userSchema,
@@ -14,16 +23,6 @@ const {
   forgotPasswordSchema,
   resetPasswordSchema,
 } = require("../util/validation");
-
-const User = require("../models/User");
-const mail = require("../util/mail");
-
-const {
-  checkAuth,
-  isAdmin,
-  isSupervisor,
-  isOwnUser,
-} = require("../middlewares/auth");
 
 router.post("/register", validate(userSchema), async (req, res, next) => {
   const emailExist = await User.findOne({ email: req.body.email });
@@ -65,7 +64,7 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
     })
     .status(200)
     .send({
-      msg: `Vitajte ${user.fullName}!`,
+      message: `Vitajte ${user.fullName}!`,
       user: {
         _id: user._id,
         fullName: user.fullName,
@@ -85,7 +84,11 @@ router.post(
   async (req, res, next) => {
     const emailExist = await User.findOne({ email: req.body.email });
     if (emailExist)
-      return next(new UserInputError("Zadaný email je už zaregistrovaný!", []));
+      return next(
+        new UserInputError("Bad user input!", [
+          "Zadaný email je už zaregistrovaný!",
+        ])
+      );
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -99,7 +102,9 @@ router.post(
     });
 
     await user.save();
-    res.status(200).send({ msg: `Používateľ ${user.fullName} bol pridaný.` });
+    res
+      .status(200)
+      .send({ message: `Používateľ ${user.fullName} bol pridaný.` });
   }
 );
 
@@ -132,7 +137,7 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
     })
     .status(200)
     .send({
-      msg: `Vitajte ${user.fullName}!`,
+      message: `Vitajte ${user.fullName}!`,
       user: {
         _id: user._id,
         fullName: user.fullName,
@@ -144,24 +149,29 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
     });
 });
 
-router.post("/forgotPassword", async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user)
-    return next(
-      new NotFoundError("So zadaným emailom nie je spojený žiadny používateľ!")
-    );
+router.post(
+  "/forgotPassword",
+  validate(forgotPasswordSchema),
+  async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user)
+      return next(
+        new NotFoundError(
+          "So zadaným emailom nie je spojený žiadny používateľ!"
+        )
+      );
 
-  const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-    expiresIn: "1h",
-  });
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+      expiresIn: "1h",
+    });
 
-  const resetURL = `https://flawis.flaw.uniba.sk/resetPassword/${token}`;
+    const resetURL = `https://flawis.flaw.uniba.sk/resetPassword/${token}`;
 
-  try {
-    await mail.send({
-      user,
-      subject: "Password Reset",
-      html: `<!DOCTYPE html>
+    try {
+      await mail.send({
+        user,
+        subject: "Password Reset",
+        html: `<!DOCTYPE html>
 				<html>
 					<head>
 						<title>Reset hesla</title>
@@ -173,47 +183,52 @@ router.post("/forgotPassword", async (req, res, next) => {
 						<p>Pokial si nezelate obnovit Vase heslo, prosim ignorujte tento email</p>
 					</body>
 				</html>`,
-      text:
-        "Pre obnovenie hesla prosim skopirujte do Vasho weboveho prehliadaca nasledujuci link:\n\n" +
-        resetURL +
-        "\n\n" +
-        "Ak si nezelate zmenit Vase heslo, ignorujte tento email.\n",
-    });
-  } catch (err) {
-    return next(err);
-  }
-
-  res.status(200).send({
-    msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
-  });
-});
-
-router.post("/reset/:token", async (req, res, next) => {
-  const id = jwt.verify(
-    req.params.token,
-    process.env.SECRET,
-    function (err, decoded) {
-      if (err) {
-        if (err.message === "jwt expired") {
-          return next(new AuthError("Autorizačný reset token expiroval!"));
-        }
-        return next(err);
-      } else {
-        return decoded;
-      }
+        text:
+          "Pre obnovenie hesla prosim skopirujte do Vasho weboveho prehliadaca nasledujuci link:\n\n" +
+          resetURL +
+          "\n\n" +
+          "Ak si nezelate zmenit Vase heslo, ignorujte tento email.\n",
+      });
+    } catch (err) {
+      return next(err);
     }
-  );
-  const user = await User.findOne({ _id: id._id });
-  if (!user) return next(new NotFoundError("Používateľ nebol nájdený!"));
 
-  const salt = await bcrypt.genSalt(10);
-  const password = await bcrypt.hash(req.body.password, salt);
+    res.status(200).send({
+      msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
+    });
+  }
+);
 
-  user.password = password;
-  await user.save();
+router.post(
+  "/reset/:token",
+  validate(resetPasswordSchema),
+  async (req, res, next) => {
+    const id = jwt.verify(
+      req.params.token,
+      process.env.SECRET,
+      function (err, decoded) {
+        if (err) {
+          if (err.message === "jwt expired") {
+            return next(new AuthError("Autorizačný reset token expiroval!"));
+          }
+          return next(err);
+        } else {
+          return decoded;
+        }
+      }
+    );
+    const user = await User.findOne({ _id: id._id });
+    if (!user) return next(new NotFoundError("Používateľ nebol nájdený!"));
 
-  res.status(200).send({ message: "Vaše heslo bolo zmenené!" });
-});
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(req.body.password, salt);
+
+    user.password = password;
+    await user.save();
+
+    res.status(200).send({ message: "Vaše heslo bolo zmenené!" });
+  }
+);
 
 router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
   const users = await User.find(
@@ -287,7 +302,11 @@ router.put(
     if (user.email !== req.body.email) {
       const emailExists = User.findOne({ email: req.body.email });
       if (emailExists)
-        return next(new UserInputError("Zadaný email je používaný!", []));
+        return next(
+          new UserInputError("Bad user input!", [
+            "Zadaný email je už zaregistrovaný!",
+          ])
+        );
     }
 
     const salt = await bcrypt.genSalt(10);

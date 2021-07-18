@@ -166,14 +166,16 @@ export default function EditAnnouncement({ toggle, announcement, dispatch }) {
                 isOpen={data}
                 toggle={hideMessage}
               >
-                {error ? (
-                  <ul>
-                    {data.errors.map((e) => (
-                      <li>{e}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  data.message
+                {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
                 )}
               </Alert>
             </Col>

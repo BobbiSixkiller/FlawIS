@@ -72,7 +72,7 @@ module.exports.memberSchema = Yup.object({
 });
 
 module.exports.budgetSchema = Yup.object({
-  travel: Yup.number().required,
+  travel: Yup.number().required(),
   material: Yup.number().required(),
   services: Yup.number().required(),
   indirect: Yup.number().required(),

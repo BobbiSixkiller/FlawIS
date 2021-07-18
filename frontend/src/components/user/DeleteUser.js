@@ -30,9 +30,12 @@ export default function DeleteUser({ user, toggle }) {
         {data && (
           <Row className="justify-content-center my-3">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={() => hideMessage()} />
+              <Alert
+                color={error ? "danger" : "success"}
+                show={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </Row>

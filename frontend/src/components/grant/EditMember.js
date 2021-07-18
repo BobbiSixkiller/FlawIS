@@ -82,7 +82,7 @@ export default function EditMember({ toggle, modalData }) {
                 invalid={errors.hours && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.hours}</FormFeedback>
+              <FormFeedback invalid="true">{errors.hours}</FormFeedback>
               <FormFeedback valid>{valid.hours}</FormFeedback>
             </FormGroup>
           </Col>
@@ -136,9 +136,22 @@ export default function EditMember({ toggle, modalData }) {
         {data && (
           <Row row className="justify-content-center my-3">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </Alert>
             </Col>
           </Row>

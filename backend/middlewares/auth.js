@@ -10,11 +10,7 @@ module.exports.checkAuth = function (req, res, next) {
     req.user = jwt.verify(token, process.env.secret);
     next();
   } catch (error) {
-    next(
-      new AuthError("Invalid user credentials", [
-        "Prístup zamietnutý, prosím prihláste sa!",
-      ])
-    );
+    next(new AuthError("Invalid user session, please log in!"));
   }
 };
 
@@ -56,5 +52,5 @@ module.exports.isOwnUser = function (req, res, next) {
   ) {
     return next();
   }
-  next(new AuthError("Prístup zamietnutý!"));
+  next(new AuthError("Access denied!"));
 };

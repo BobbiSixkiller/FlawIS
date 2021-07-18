@@ -105,6 +105,16 @@ export default function AddPost({ toggle }) {
                 toggle={hideMessage}
               >
                 {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </Alert>
             </Col>
           </Row>

@@ -19,9 +19,9 @@ export default function Announcements({ announcements, dispatch }) {
           day: "numeric",
         };
         return (
-          <Row form>
+          <Row key={announcement._id} form>
             <Col>
-              <Alert key={announcement._id} color="primary">
+              <Alert color="primary">
                 {user.role !== "basic" && (
                   <Button
                     close

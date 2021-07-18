@@ -155,9 +155,22 @@ export default function AddUser({ toggle }) {
         {data && (
           <Row className="justify-content-center my-3">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                show={data}
+                toggle={hideMessage}
+              >
+                {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </Alert>
             </Col>
           </Row>

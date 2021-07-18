@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Redirect } from "react-router-dom";
-import { Fade, Alert, Col, Row, Button } from "reactstrap";
+import { Fade, Row } from "reactstrap";
 
 import { AuthContext } from "../context/auth";
 

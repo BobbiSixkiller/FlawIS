@@ -148,14 +148,16 @@ export default function AddAnnouncement({ toggle, grantId }) {
                 isOpen={data}
                 toggle={hideMessage}
               >
-                {error ? (
-                  <ul>
-                    {data.errors.map((e) => (
-                      <li>{e}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  data.message
+                {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
                 )}
               </Alert>
             </Col>

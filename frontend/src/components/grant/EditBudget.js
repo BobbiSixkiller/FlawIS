@@ -62,7 +62,7 @@ export default function EditBudget({ toggle, modalData }) {
                 valid={valid.travel && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.travel}</FormFeedback>
+              <FormFeedback invalid="true">{errors.travel}</FormFeedback>
               <FormFeedback valid>{valid.travel}</FormFeedback>
             </FormGroup>
           </Col>
@@ -82,7 +82,7 @@ export default function EditBudget({ toggle, modalData }) {
                 valid={valid.services && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.services}</FormFeedback>
+              <FormFeedback invalid="true">{errors.services}</FormFeedback>
               <FormFeedback valid>{valid.services}</FormFeedback>
             </FormGroup>
           </Col>
@@ -102,7 +102,7 @@ export default function EditBudget({ toggle, modalData }) {
                 valid={valid.material && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.material}</FormFeedback>
+              <FormFeedback invalid="true">{errors.material}</FormFeedback>
               <FormFeedback valid>{valid.material}</FormFeedback>
             </FormGroup>
           </Col>
@@ -122,7 +122,7 @@ export default function EditBudget({ toggle, modalData }) {
                 valid={valid.indirect && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.indirect}</FormFeedback>
+              <FormFeedback invalid="true">{errors.indirect}</FormFeedback>
               <FormFeedback valid>{valid.indirect}</FormFeedback>
             </FormGroup>
           </Col>
@@ -142,17 +142,30 @@ export default function EditBudget({ toggle, modalData }) {
                 valid={valid.salaries && true}
                 autoComplete="off"
               />
-              <FormFeedback invalid>{errors.salaries}</FormFeedback>
+              <FormFeedback invalid="true">{errors.salaries}</FormFeedback>
               <FormFeedback valid>{valid.salaries}</FormFeedback>
             </FormGroup>
           </Col>
         </Row>
         {data && (
-          <Row row className="justify-content-center my-3">
+          <Row className="justify-content-center my-3">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </Alert>
             </Col>
           </Row>

@@ -85,6 +85,16 @@ function PasswordRedet() {
                 toggle={hideMessage}
               >
                 {data.message}
+                {data.errors && (
+                  <>
+                    <hr />
+                    <ul>
+                      {data.errors.map((e) => (
+                        <li>{e}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </Alert>
             </Col>
           </FormGroup>
