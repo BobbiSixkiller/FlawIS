@@ -99,9 +99,12 @@ export default function AddPost({ toggle }) {
         {data && (
           <Row className="justify-content-center my-3">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </Row>

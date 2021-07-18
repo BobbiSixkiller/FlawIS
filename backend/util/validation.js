@@ -1,50 +1,35 @@
-const Joi = require("@hapi/joi");
 const Yup = require("yup");
 
-module.exports.registerValidation = (data) => {
-  const schema = Joi.object({
-    firstName: Joi.string().max(50).required(),
-    lastName: Joi.string().max(50).required(),
-    email: Joi.string().required().email().required(),
-    password: Joi.string()
-      .min(8)
-      .required()
-      .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
-    repeatPass: Joi.ref("password"),
-    role: Joi.string().valid("basic", "supervisor", "admin"),
-  });
+module.exports.userSchema = Yup.object({
+  firstName: Yup.string().max(50).required(),
+  lastName: Yup.string().max(50).required(),
+  email: Yup.string().email().required(),
+  password: Yup.string()
+    .required()
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
+  repeatPass: Yup.mixed()
+    .required()
+    .oneOf([Yup.ref("password")]),
+  role: Yup.mixed().required().oneOf(["basic", "supervisor", "admin"]),
+});
 
-  return schema.validate(data);
-};
+module.exports.loginSchema = Yup.object({
+  email: Yup.string().email().required(),
+  password: Yup.string().required(),
+});
 
-module.exports.loginValidation = (data) => {
-  const schema = Joi.object({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  });
+module.exports.forgotPasswordSchema = Yup.object({
+  email: Yup.string().email().required(),
+});
 
-  return schema.validate(data);
-};
-
-module.exports.forgotPasswordValidation = (data) => {
-  const schema = Joi.object({
-    email: Joi.string().required().email(),
-  });
-
-  return schema.validate(data);
-};
-
-module.exports.resetPasswordValidation = (data) => {
-  const schema = Joi.object({
-    password: Joi.string()
-      .min(8)
-      .required()
-      .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
-    repeatPass: Joi.ref("password"),
-  });
-
-  return schema.validate(data);
-};
+module.exports.resetPasswordSchema = Yup.object({
+  password: Yup.string()
+    .required()
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
+  repeatPass: Yup.mixed()
+    .required()
+    .oneOf([Yup.ref("password")]),
+});
 
 module.exports.grantSchema = Yup.object({
   name: Yup.string().required(),
@@ -76,40 +61,26 @@ module.exports.announcementSchema = Yup.object({
   name: Yup.string().required(),
   content: Yup.string().required(),
   grantId: Yup.string(),
-  scope: Yup.mixed()
-    .oneOf(["APVV", "VEGA", "KEGA", "ALL", "SINGLE"])
-    .required(),
+  scope: Yup.mixed().oneOf(["APVV", "VEGA", "KEGA", "ALL", "SINGLE"]),
 });
 
-module.exports.memberValidation = (data) => {
-  const schema = Joi.object({
-    hours: Joi.number().required(),
-    member: Joi.string().required(),
-    role: Joi.string().valid("basic", "deputy", "leader").required(),
-    active: Joi.boolean(),
-  });
+module.exports.memberSchema = Yup.object({
+  hours: Yup.number().required(),
+  member: Yup.string().required(),
+  role: Yup.mixed().oneOf(["basic", "deputy", "leader"]).required(),
+  active: Yup.boolean(),
+});
 
-  return schema.validate(data);
-};
+module.exports.budgetSchema = Yup.object({
+  travel: Yup.number().required,
+  material: Yup.number().required(),
+  services: Yup.number().required(),
+  indirect: Yup.number().required(),
+  salaries: Yup.number().required(),
+});
 
-module.exports.budgetValidation = (data) => {
-  const schema = Joi.object({
-    travel: Joi.number().required(),
-    material: Joi.number().required(),
-    services: Joi.number().required(),
-    indirect: Joi.number().required(),
-    salaries: Joi.number().required(),
-  });
-
-  return schema.validate(data);
-};
-
-module.exports.postValidation = (data) => {
-  const schema = Joi.object({
-    name: Joi.string().required(),
-    body: Joi.string().required(),
-    tags: Joi.array().items(Joi.string().required()).required(),
-  });
-
-  return schema.validate(data);
-};
+module.exports.postSchema = Yup.object({
+  name: Yup.string().required(),
+  body: Yup.string().required(),
+  tags: Yup.array().min(1).of(Yup.string().required()),
+});

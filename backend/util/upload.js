@@ -24,7 +24,7 @@ module.exports.upload = multer({
     } else {
       cb(null, false);
       return cb(
-        new UserInputError("Wrong input data provided!", [
+        new UserInputError("Bad user input", [
           "Povolene typy suborov: PDF, Word!",
         ])
       );

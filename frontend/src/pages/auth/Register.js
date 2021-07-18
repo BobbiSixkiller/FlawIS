@@ -136,12 +136,15 @@ function Register() {
             <FormFeedback valid>{valid.repeatPass}</FormFeedback>
           </Col>
         </FormGroup>
-        {auth.msg && (
+        {auth.message && (
           <FormGroup row className="justify-content-center">
             <Col sm={6}>
-              <Alert color={auth.error ? "danger" : "success"}>
-                {auth.msg}
-                <Button close onClick={() => auth.hideError()} />
+              <Alert
+                color={auth.error ? "danger" : "success"}
+                show={auth.message}
+                toggle={auth.hideMessage}
+              >
+                {auth.message}
               </Alert>
             </Col>
           </FormGroup>

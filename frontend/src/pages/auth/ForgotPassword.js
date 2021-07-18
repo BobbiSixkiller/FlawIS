@@ -57,9 +57,12 @@ export default function ForgotPassword() {
         {data && (
           <FormGroup row className="justify-content-center">
             <Col sm={6}>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                show={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </FormGroup>

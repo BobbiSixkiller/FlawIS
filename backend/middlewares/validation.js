@@ -7,6 +7,6 @@ module.exports = (schema) => async (req, res, next) => {
     await schema.validate(body, { abortEarly: false });
     return next();
   } catch ({ errors }) {
-    next(new UserInputError("Submitted data invalid!", errors));
+    next(new UserInputError("Bad user input!", errors));
   }
 };

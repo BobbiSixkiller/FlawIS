@@ -1,9 +1,10 @@
 const router = require("express").Router();
-const { ErrorResponse } = require("../middlewares/error");
+const { NotFoundError } = require("../middlewares/error");
 
 const Post = require("../models/Post");
 const { checkAuth, isOwnPost } = require("../middlewares/auth");
-const { postValidation } = require("../util/validation");
+const validate = require("../middlewares/validation");
+const { postSchema } = require("../util/validation");
 
 router.get("/api/search", checkAuth, async (req, res) => {
   const posts = await Post.find(
@@ -36,15 +37,12 @@ router.get("/", checkAuth, async (req, res) => {
 
 router.get("/:id", checkAuth, async (req, res, next) => {
   const post = await Post.findOne({ _id: req.params.id });
-  if (!post) return next(new ErrorResponse("Post nebol nájdený!", 404));
+  if (!post) return next(new NotFoundError("Post nebol nájdený!"));
 
   res.status(200).send(post);
 });
 
-router.post("/", checkAuth, async (req, res) => {
-  const { error } = postValidation(req.body);
-  if (error) return;
-
+router.post("/", checkAuth, validate(postSchema), async (req, res) => {
   const post = new Post({
     ...req.body,
     author: req.user.name,
@@ -52,29 +50,33 @@ router.post("/", checkAuth, async (req, res) => {
   });
   await post.save();
 
-  res.status(200).send({ msg: "Nový post pridaný.", post });
+  res.status(200).send({ message: "Nový post pridaný!", post });
 });
 
-router.put("/:id", checkAuth, isOwnPost, async (req, res, next) => {
-  const { post } = req;
-  const { error } = postValidation(req.body);
-  if (error) return next(new ErrorResponse(error.details[0].message, 400));
+router.put(
+  "/:id",
+  checkAuth,
+  isOwnPost,
+  validate(postSchema),
+  async (req, res, next) => {
+    const { post } = req;
 
-  post.name = req.body.name;
-  post.body = req.body.body;
-  post.tags = req.body.tags;
+    post.name = req.body.name;
+    post.body = req.body.body;
+    post.tags = req.body.tags;
 
-  await post.save();
+    await post.save();
 
-  res.status(200).send({ msg: "Post bol aktualizovaný.", post });
-});
+    res.status(200).send({ message: "Post bol aktualizovaný!", post });
+  }
+);
 
 router.delete("/:id", checkAuth, isOwnPost, async (req, res) => {
   const { post } = req;
 
   await post.remove();
 
-  res.status(200).send({ msg: "Post bol zmazaný." });
+  res.status(200).send({ message: "Post bol zmazaný!" });
 });
 
 module.exports = router;

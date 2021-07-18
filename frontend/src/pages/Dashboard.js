@@ -23,19 +23,23 @@ import Users from "./user/Users";
 import User from "./user/User";
 
 export default function Dashboard() {
-  const context = useContext(AuthContext);
+  const auth = useContext(AuthContext);
   const { path, url } = useRouteMatch();
 
   return (
     <Switch>
       <Route exact path={path}>
         <Fade>
-          {context.msg && (
+          {auth.message && (
             <Row className="mt-5">
               <Col>
-                <Alert className="text-center" color="primary">
-                  {context.msg}
-                  <Button close onClick={() => context.hideMsg()} />
+                <Alert
+                  className="text-center"
+                  color="primary"
+                  show={auth.message}
+                  toggle={auth.hideMessage}
+                >
+                  {auth.message}
                 </Alert>
               </Col>
             </Row>
@@ -50,7 +54,7 @@ export default function Dashboard() {
               <Button
                 color="info"
                 tag={Link}
-                to={`${url}/users/${context.user._id}`}
+                to={`${url}/users/${auth.user._id}`}
               >
                 Zobraziť
               </Button>

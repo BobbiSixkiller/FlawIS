@@ -48,9 +48,12 @@ function DeleteAnnouncement({ toggle, announcement }) {
         {data && (
           <Row row className="justify-content-center">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {error ? data.errors.map((e) => e) : data.message}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </Row>

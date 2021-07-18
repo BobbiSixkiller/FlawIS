@@ -15,7 +15,7 @@ function authReducer(state, action) {
         ...state,
         loading: true,
         error: false,
-        msg: "",
+        message: "",
       };
     case "SUCCESS":
       return {
@@ -23,7 +23,7 @@ function authReducer(state, action) {
         loading: false,
         user: action.payload.user,
         error: false,
-        msg: action.payload.msg,
+        message: action.payload.message,
       };
     case "FAILURE":
       return {
@@ -31,12 +31,12 @@ function authReducer(state, action) {
         loading: false,
         user: null,
         error: true,
-        msg: action.payload.msg,
+        message: action.payload.message,
       };
     case "HIDE_MSG":
       return {
         ...state,
-        msg: null,
+        message: null,
       };
 
     default:
@@ -49,7 +49,7 @@ function AuthProvider({ children }) {
     loading: true,
     user: null,
     error: false,
-    msg: "",
+    message: "",
   });
 
   useEffect(() => {
@@ -88,11 +88,18 @@ function AuthProvider({ children }) {
   }
 
   async function logout() {
+    dispatch({ type: "INIT" });
+    try {
+      const res = await API.get("user/logout");
+      dispatch({ type: "SUCCESS", payload: res.data });
+    } catch (err) {
+      dispatch({ type: "FAILURE", payload: err.response.data });
+    }
     const res = await API.get("user/logout");
     dispatch({ type: "SUCCESS", payload: res.data });
   }
 
-  function hideMsg() {
+  function hideMessage() {
     dispatch({ type: "HIDE_MSG" });
   }
 
@@ -102,11 +109,11 @@ function AuthProvider({ children }) {
         loading: state.loading,
         user: state.user,
         error: state.error,
-        msg: state.msg,
+        message: state.message,
         register,
         login,
         logout,
-        hideMsg,
+        hideMessage,
       }}
     >
       {children}
