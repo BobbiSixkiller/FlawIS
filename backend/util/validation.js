@@ -51,10 +51,14 @@ module.exports.grantSchema = Yup.object({
           hours: Yup.number().required(),
           role: Yup.string().required(),
           active: Yup.boolean().required(),
-        }).required()
-      ),
+        })
+      )
+        .required()
+        .min(1),
     })
-  ).required(),
+  )
+    .required()
+    .min(1),
 });
 
 module.exports.announcementSchema = Yup.object({

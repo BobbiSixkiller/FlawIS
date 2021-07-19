@@ -41,6 +41,14 @@ router.post(
   isSupervisor,
   validate(grantSchema),
   async (req, res, next) => {
+    const grantExists = await Grant.findOne({ idNumber: req.body.idNumber });
+    if (grantExists)
+      return next(
+        new UserInputError("Bad user input!", [
+          "Grant so zadaným ID uz existuje!",
+        ])
+      );
+
     const grant = new Grant({
       name: req.body.name,
       idNumber: req.body.idNumber,
@@ -50,8 +58,9 @@ router.post(
       budget: req.body.budget,
     });
 
-    const newGrant = await grant.save();
-    res.status(200).send(newGrant);
+    await grant.save();
+
+    res.status(200).send(grant);
   }
 );
 

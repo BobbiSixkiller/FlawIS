@@ -26,6 +26,11 @@ export default function Grants() {
     setUrl(`grant?page=${page}`);
   }, [page, setUrl]);
 
+  function toggle() {
+    dispatch({ type: "TOGGLE" });
+    refreshData();
+  }
+
   if (loading) {
     return (
       <Row className="justify-content-center">
@@ -43,7 +48,7 @@ export default function Grants() {
               outline
               color="success"
               size="lg"
-              onClick={() => dispatch({ type: "ADD" })}
+              onClick={() => dispatch({ type: "ACTION", name: "ADD" })}
             >
               Nový grant
             </Button>
@@ -85,7 +90,11 @@ export default function Grants() {
                           size="sm"
                           color="danger"
                           onClick={() =>
-                            dispatch({ type: "DELETE", payload: grant })
+                            dispatch({
+                              type: "ACTION",
+                              name: "DELETE",
+                              payload: grant,
+                            })
                           }
                         >
                           <Trash2Fill />
@@ -104,28 +113,16 @@ export default function Grants() {
           <Button tag={Link} to="/" outline color="primary">
             Späť
           </Button>
-          <Modal
-            isOpen={show}
-            toggle={() => {
-              dispatch({ type: "TOGGLE" });
-              refreshData();
-            }}
-          >
+          <Modal isOpen={show} toggle={toggle}>
             {action === "DELETE" && (
-              <DeleteGrant
-                refresh={refreshData}
-                grant={modalData}
-                dispatch={dispatch}
-              />
+              <DeleteGrant toggle={toggle} grant={modalData} />
             )}
+            {action === "ADD" && <AddGrant toggle={toggle} />}
           </Modal>
         </Fade>
       </Route>
       <Route path={`${path}/:id`}>
         <Grant />
-      </Route>
-      <Route path={`${path}/new`}>
-        <AddGrant />
       </Route>
     </Switch>
   );

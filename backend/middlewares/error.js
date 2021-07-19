@@ -1,4 +1,4 @@
-module.exports.UserInputError = class ErrorResponse extends Error {
+module.exports.UserInputError = class UserInputError extends Error {
   constructor(message, errorsArray) {
     super(message);
     this.name = "ValidationError";
@@ -7,7 +7,7 @@ module.exports.UserInputError = class ErrorResponse extends Error {
   }
 };
 
-module.exports.AuthError = class ErrorResponse extends Error {
+module.exports.AuthError = class AuthError extends Error {
   constructor(message) {
     super(message);
     this.name = "AuthError";
@@ -15,7 +15,7 @@ module.exports.AuthError = class ErrorResponse extends Error {
   }
 };
 
-module.exports.NotFoundError = class ErrorResponse extends Error {
+module.exports.NotFoundError = class NotFoundError extends Error {
   constructor(message) {
     super(message);
     this.name = "NotFoundError";

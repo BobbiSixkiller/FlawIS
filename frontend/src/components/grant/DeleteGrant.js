@@ -13,17 +13,12 @@ import {
 
 import { useDataSend } from "../../hooks/useApi";
 
-function DeleteGrant({ refresh, grant, dispatch }) {
+export default function DeleteGrant({ toggle, grant }) {
   const { loading, error, data, sendData, hideMessage } = useDataSend();
 
   function deleteGrant(e) {
     e.preventDefault();
     sendData(`grant/${grant._id}`, "DELETE");
-  }
-
-  function toggle() {
-    dispatch({ type: "TOGGLE" });
-    refresh();
   }
 
   return (
@@ -35,9 +30,12 @@ function DeleteGrant({ refresh, grant, dispatch }) {
         {data && (
           <Row row className="justify-content-center">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={() => hideMessage()} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </Row>
@@ -54,5 +52,3 @@ function DeleteGrant({ refresh, grant, dispatch }) {
     </Form>
   );
 }
-
-export default DeleteGrant;

@@ -33,9 +33,12 @@ export default function DeleteMember({ toggle, modalData }) {
         {data && (
           <Row row className="justify-content-center">
             <Col>
-              <Alert color={error ? "danger" : "success"}>
-                {data.msg}
-                <Button close onClick={hideMessage} />
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
               </Alert>
             </Col>
           </Row>
