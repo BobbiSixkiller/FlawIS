@@ -313,7 +313,7 @@ export const memberSchema = Yup.object({
 	active: Yup.boolean(),
 });
 
-export const budgetSchema = Yup.array({
+export const budgetSchema = Yup.object({
 	year: Yup.date().required(),
 	travel: Yup.number().required(),
 	material: Yup.number().required(),
