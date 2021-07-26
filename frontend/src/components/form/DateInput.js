@@ -1,12 +1,12 @@
 import React from "react";
-import { getIn } from "formik";
+import { useField } from "formik";
 
 import { Label, Input, FormGroup, FormFeedback } from "reactstrap";
 
-export default function DateInput({ field, form, ...props }) {
-  const error =
-    getIn(form.touched, field.name) && getIn(form.errors, field.name);
-  const valid = getIn(form.touched, field.name) && !error;
+export default function DateInput({ ...props }) {
+  const [field, meta] = useField(props);
+  const error = meta.touched && meta.error;
+  const valid = meta.touched && !error;
 
   return (
     <FormGroup>

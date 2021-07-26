@@ -1,7 +1,7 @@
 import React from "react";
-import { Formik, Form } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 
-import { ModalHeader, ModalBody, Button } from "reactstrap";
+import { ModalHeader, ModalBody, Button, Col, Row } from "reactstrap";
 
 import { Field, FieldArray } from "formik";
 //import { WizzardForm, FormStep } from "../../components/form/WizzardForm";
@@ -9,9 +9,8 @@ import { grantSchema, budgetSchema } from "../../util/validation";
 
 import GrantID from "./GrandID";
 
+import UserApiSearch from "../../components/user/UserApiSearch";
 import TextInput from "../../components/form/TextInput";
-import DateInput from "../../components/form/DateInput";
-import SelectInput from "../../components/form/SelectInput";
 import RadioInput from "../../components/form/RadioInput";
 
 export default function AddGrant({ toggle }) {
@@ -35,78 +34,85 @@ export default function AddGrant({ toggle }) {
           {(props) => (
             <Form>
               <GrantID />
+              {/* namiesto fieldarray iba checkovat values a forEach vyrenderovat komponenty s budgetom */}
               <FieldArray name="budget">
                 {() =>
-                  props.values.budget.map((b, i) => (
+                  props.values.budget.map((_, i) => (
                     <div key={i}>
-                      <Field
+                      <TextInput
                         name={`budget[${i}].material`}
                         label="Položka materiál"
                         placeholder="Materiál..."
-                        component={TextInput}
                       />
-                      <Field
+                      <TextInput
                         name={`budget[${i}].services`}
                         label="Položka služby"
                         placeholder="Služby..."
-                        component={TextInput}
                       />
-                      <Field
+                      <TextInput
                         name={`budget[${i}].travel`}
                         label="Položka cestovné"
                         placeholder="Cestovné..."
-                        component={TextInput}
                       />
-                      <Field
+                      <TextInput
                         name={`budget[${i}].indirect`}
                         label="Položka nepriame"
                         placeholder="Neprimae náklady..."
-                        component={TextInput}
                       />
-                      <Field
+                      <TextInput
                         name={`budget[${i}].salaries`}
                         label="Položka platy"
                         placeholder="Nazov grantu..."
-                        component={TextInput}
                       />
                       {/* AddMember component ktory pushuje do FieldArray, nasledne map render s moznostou vymazania riesitela zo zoznamu */}
                       <FieldArray name={`budget[${i}].members`}>
-                        {(arrayHelpers) => (
-                          <div>
-                            <Field
-                              name={`budget[${i}].members`}
-                              label="Meno"
-                              placeholder="Meno riesitela..."
-                              component={TextInput}
-                            />
-                            <Field
-                              name={`budget[${i}].members`}
-                              label="Typ"
-                              placeholder="Typ riesitela..."
-                              component={TextInput}
-                            />
-                            <Field
-                              name={`budget[${i}].members`}
-                              label="hodiny"
-                              placeholder="Hodiny..."
-                              component={TextInput}
-                            />
-                            <Button
-                              onClick={() =>
-                                arrayHelpers.push({
-                                  member: "id123",
-                                  hours: "1",
-                                  role: "leader",
-                                })
-                              }
-                            >
-                              +MEMBER
-                            </Button>
-                            {props.values.budget[i].members.map((m, i) => (
-                              <div key={i}>MEMBER {i}</div>
-                            ))}
-                          </div>
-                        )}
+                        {(arrayHelpers) =>
+                          props.values.budget[i].members.map((m, index) => (
+                            <div key={index}>
+                              <Row>
+                                <Col sm={8}>
+                                  <UserApiSearch
+                                    name={`budget[${i}].members[${index}].member`}
+                                    label="Meno"
+                                    placeholder="Meno riesitela..."
+                                  />
+                                </Col>
+                                <Col sm={4}>
+                                  <TextInput
+                                    name={`budget[${i}].members[${index}].hours`}
+                                    label="hodiny"
+                                    placeholder="Hodiny..."
+                                  />
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col sm={8}>
+                                  <RadioInput
+                                    name={`budget[${i}].members[${index}].role`}
+                                    options={[
+                                      { label: "Riesitel", value: "basic" },
+                                      { label: "Zastupca", value: "deputy" },
+                                      { label: "Hlavny", value: "leader" },
+                                    ]}
+                                  />
+                                </Col>
+                                <Col sm={4}>
+                                  <Button
+                                    onClick={() =>
+                                      arrayHelpers.push({
+                                        member: "",
+                                        hours: "",
+                                        role: "",
+                                      })
+                                    }
+                                  >
+                                    Pridat
+                                  </Button>
+                                </Col>
+                              </Row>
+                            </div>
+                          ))
+                        }
                       </FieldArray>
                     </div>
                   ))

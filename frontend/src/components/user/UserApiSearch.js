@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouteMatch, useLocation, Link } from "react-router-dom";
+import { useFormikContext, useField } from "formik";
 
 import { useDataFetch } from "../../hooks/useApi";
 
 import {
+  Label,
   Input,
   FormFeedback,
   Spinner,
@@ -11,9 +13,10 @@ import {
   ListGroupItem,
 } from "reactstrap";
 
-export default function ApiSearch({ memberInput, errors, valid }) {
+export default function ApiSearch({ label, ...props }) {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
+  const [field, meta, helpers] = useField(props);
 
   const [display, setDisplay] = useState(false);
   const [search, setSearch] = useState("");
@@ -49,6 +52,7 @@ export default function ApiSearch({ memberInput, errors, valid }) {
 
   return (
     <div ref={autoWrapRef}>
+      {label && <Label>{label}</Label>}
       <Input
         className="autoInput"
         id="search"
@@ -58,11 +62,13 @@ export default function ApiSearch({ memberInput, errors, valid }) {
         onClick={() => setDisplay(!display)}
         onChange={(e) => setSearch(e.target.value)}
         autoComplete="off"
+        invalid={meta.touched && meta.error && true}
+        valid={meta.touched && !meta.error && true}
       />
-      {memberInput && (
+      {meta && (
         <>
-          <FormFeedback invalid="true">{errors.member}</FormFeedback>
-          <FormFeedback valid>{valid.member}</FormFeedback>
+          <FormFeedback invalid="true">{meta.error}</FormFeedback>
+          <FormFeedback valid>{label} OK!</FormFeedback>
         </>
       )}
       {display && (
@@ -78,11 +84,11 @@ export default function ApiSearch({ memberInput, errors, valid }) {
             </ListGroupItem>
           ) : (
             data.users.map((user, i) =>
-              memberInput ? (
+              field ? (
                 <ListGroupItem
                   key={i}
                   onClick={() => {
-                    memberInput(user._id);
+                    helpers.setValue(user._id);
                     setDisplay(false);
                   }}
                   action

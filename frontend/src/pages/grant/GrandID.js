@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Field, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 
 import TextInput from "../../components/form/TextInput";
 import SelectInput from "../../components/form/SelectInput";
@@ -31,14 +31,18 @@ export default function GrantID() {
         services: "",
         salaries: "",
         indirect: "",
-        members: [],
+        members: [{ member: "", role: "basic", hours: "" }],
       }))
     );
   }, [values.start, values.end]);
 
+  useEffect(() => {
+    console.log(values);
+  }, [values]);
+
   return (
     <div>
-      <Field
+      <SelectInput
         name="type"
         label="Typ"
         options={[
@@ -46,32 +50,15 @@ export default function GrantID() {
           { name: "VEGA", value: "VEGA" },
           { name: "KEGA", value: "KEGA" },
         ]}
-        component={SelectInput}
       />
-      <Field
-        name="name"
-        label="Nazov"
-        placeholder="Nazov grantu..."
-        component={TextInput}
-      />
-      <Field
-        name="idNumber"
-        label="ID"
-        placeholder="ID grantu..."
-        component={TextInput}
-      />
-      <Field
+      <TextInput name="name" label="Nazov" placeholder="Nazov grantu..." />
+      <TextInput name="idNumber" label="ID" placeholder="ID grantu..." />
+      <DateInput
         name="start"
         label="Zaciatok"
         placeholder="Zaciatok grantu..."
-        component={DateInput}
       />
-      <Field
-        name="end"
-        label="Koniec"
-        placeholder="Koniec grantu..."
-        component={DateInput}
-      />
+      <DateInput name="end" label="Koniec" placeholder="Koniec grantu..." />
     </div>
   );
 }
