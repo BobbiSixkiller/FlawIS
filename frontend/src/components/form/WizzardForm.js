@@ -3,61 +3,80 @@ import { Formik, Form } from "formik";
 
 import { Button, Progress } from "reactstrap";
 
-export function FormStep({ children, ...props }) {
-	console.log(props);
-	return <>{children}</>;
+export function FormStep({ children }) {
+  return <>{children}</>;
 }
 
-export function WizzardForm({ children, ...props }) {
-	const childrenArray = Children.toArray(children);
-	const [step, setStep] = useState(0);
-	const currentStep = childrenArray[step];
+export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
+  const [stepNumber, setStepNumber] = useState(0);
+  const steps = Children.toArray(children);
 
-	console.log(currentStep);
+  //refactor tak, ze rozseka validation schema a values na kazdy step samostatne
+  const [snapshot, setSnapshot] = useState(initialValues);
 
-	function isLastStep() {
-		return step === children.length - 1;
-	}
+  const step = steps[stepNumber];
+  const isLastStep = stepNumber === steps.length - 1;
 
-	function toggle() {
-		if (step === 0) {
-			return props.toggle();
-		} else {
-			return setStep((s) => s - 1);
-		}
-	}
+  const next = (values) => {
+    setSnapshot(values);
+    setStepNumber(Math.min(stepNumber + 1, steps.length - 1));
+  };
 
-	return (
-		<Formik
-			{...props}
-			validationSchema={children[step].props.validationSchema}
-			onSubmit={async (values, helpers) => {
-				console.log("SUBMIT");
-				if (isLastStep()) {
-					await props.onSubmit(values, helpers);
-				} else {
-					setStep((s) => s + 1);
-				}
-			}}
-		>
-			<Form autoComplete="off">
-				{currentStep}
+  const previous = (values) => {
+    setSnapshot(values);
+    if (stepNumber === 0) {
+      props.toggle();
+    } else {
+      setStepNumber(Math.max(stepNumber - 1, 0));
+    }
+  };
 
-				<div className="my-5">
-					<div className="text-center">{`${step + 1} / ${
-						children.length
-					}`}</div>
-					<Progress value={(step + 1 / children.length) * 100} />
-				</div>
+  return (
+    <Formik
+      initialValues={snapshot}
+      validationSchema={step.props.validationSchema}
+      onSubmit={async (values, bag) => {
+        if (step.props.onSubmit) {
+          await step.props.onSubmit(values, bag);
+        }
+        if (isLastStep) {
+          return onSubmit(values, bag);
+        } else {
+          bag.setTouched({});
+          next(values);
+        }
+      }}
+    >
+      {(formik) => (
+        <Form autoComplete="off">
+          {step}
 
-				<Button type="button" outline color="secondary" onClick={toggle}>
-					{step === 0 ? "Zrušiť" : "Späť"}
-				</Button>
+          <div className="my-5">
+            <div className="text-center">{`${stepNumber + 1} / ${
+              steps.length
+            }`}</div>
+            <Progress animated value={(stepNumber + 1 / steps.length) * 100} />
+          </div>
 
-				<Button type="submit" color="success" className="float-right">
-					{isLastStep() ? "Pridať" : "Ďalej"}
-				</Button>
-			</Form>
-		</Formik>
-	);
+          <Button
+            type="button"
+            outline
+            color="secondary"
+            onClick={() => previous(formik.values)}
+          >
+            {stepNumber === 0 ? "Zrušiť" : "Späť"}
+          </Button>
+
+          <Button
+            type="submit"
+            color="success"
+            className="float-right"
+            disabled={formik.isSubmitting}
+          >
+            {isLastStep ? "Pridať" : "Ďalej"}
+          </Button>
+        </Form>
+      )}
+    </Formik>
+  );
 }

@@ -4,7 +4,7 @@ import { useField } from "formik";
 import { CustomInput, FormGroup } from "reactstrap";
 
 export default function RadioInput({ ...props }) {
-  const [field, _, helpers] = useField(props);
+  const [field, meta, helpers] = useField(props);
 
   return (
     <FormGroup>

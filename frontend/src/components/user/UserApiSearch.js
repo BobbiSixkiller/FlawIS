@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouteMatch, useLocation, Link } from "react-router-dom";
-import { useFormikContext, useField } from "formik";
+import { useField } from "formik";
 
 import { useDataFetch } from "../../hooks/useApi";
 
@@ -89,6 +89,7 @@ export default function ApiSearch({ label, ...props }) {
                   key={i}
                   onClick={() => {
                     helpers.setValue(user._id);
+                    setSearch(user.fullName);
                     setDisplay(false);
                   }}
                   action

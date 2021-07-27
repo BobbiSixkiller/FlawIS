@@ -1,25 +1,25 @@
-import React from "react";
-import { Formik, Form, ErrorMessage } from "formik";
+import React, { useState } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 
-import { ModalHeader, ModalBody, Button, Col, Row } from "reactstrap";
+import { ModalHeader, ModalBody, Button } from "reactstrap";
 
-import { Field, FieldArray } from "formik";
-//import { WizzardForm, FormStep } from "../../components/form/WizzardForm";
-import { grantSchema, budgetSchema } from "../../util/validation";
+import { WizzardForm, FormStep } from "../../components/form/WizzardForm";
+import { grantSchema, grantBudgetSchema } from "../../util/validation";
 
 import GrantID from "./GrandID";
-
-import UserApiSearch from "../../components/user/UserApiSearch";
-import TextInput from "../../components/form/TextInput";
-import RadioInput from "../../components/form/RadioInput";
+import GrantBudget from "./GrantBudget";
 
 export default function AddGrant({ toggle }) {
+  const [budgets, setBudgets] = useState([]);
+  const [step, setStep] = useState(0);
+
   return (
     <>
       <ModalHeader toggle={toggle}>Nový grant</ModalHeader>
       <ModalBody>
-        <Formik
-          //toggle={toggle}
+        <WizzardForm
+          toggle={toggle}
           initialValues={{
             name: "",
             type: "APVV",
@@ -28,106 +28,36 @@ export default function AddGrant({ toggle }) {
             end: "",
             budget: [],
           }}
-          validationSchema={grantSchema}
           onSubmit={(values) => console.log(values)}
         >
-          {(props) => (
-            <Form>
-              <GrantID />
-              {/* namiesto fieldarray iba checkovat values a forEach vyrenderovat komponenty s budgetom */}
-              <FieldArray name="budget">
-                {() =>
-                  props.values.budget.map((_, i) => (
-                    <div key={i}>
-                      <TextInput
-                        name={`budget[${i}].material`}
-                        label="Položka materiál"
-                        placeholder="Materiál..."
-                      />
-                      <TextInput
-                        name={`budget[${i}].services`}
-                        label="Položka služby"
-                        placeholder="Služby..."
-                      />
-                      <TextInput
-                        name={`budget[${i}].travel`}
-                        label="Položka cestovné"
-                        placeholder="Cestovné..."
-                      />
-                      <TextInput
-                        name={`budget[${i}].indirect`}
-                        label="Položka nepriame"
-                        placeholder="Neprimae náklady..."
-                      />
-                      <TextInput
-                        name={`budget[${i}].salaries`}
-                        label="Položka platy"
-                        placeholder="Nazov grantu..."
-                      />
-                      {/* AddMember component ktory pushuje do FieldArray, nasledne map render s moznostou vymazania riesitela zo zoznamu */}
-                      <FieldArray name={`budget[${i}].members`}>
-                        {(arrayHelpers) =>
-                          props.values.budget[i].members.map((m, index) => (
-                            <div key={index}>
-                              <Row>
-                                <Col sm={8}>
-                                  <UserApiSearch
-                                    name={`budget[${i}].members[${index}].member`}
-                                    label="Meno"
-                                    placeholder="Meno riesitela..."
-                                  />
-                                </Col>
-                                <Col sm={4}>
-                                  <TextInput
-                                    name={`budget[${i}].members[${index}].hours`}
-                                    label="hodiny"
-                                    placeholder="Hodiny..."
-                                  />
-                                </Col>
-                              </Row>
-                              <Row>
-                                <Col sm={8}>
-                                  <RadioInput
-                                    name={`budget[${i}].members[${index}].role`}
-                                    options={[
-                                      { label: "Riesitel", value: "basic" },
-                                      { label: "Zastupca", value: "deputy" },
-                                      { label: "Hlavny", value: "leader" },
-                                    ]}
-                                  />
-                                </Col>
-                                <Col sm={4}>
-                                  <Button
-                                    onClick={() =>
-                                      arrayHelpers.push({
-                                        member: "",
-                                        hours: "",
-                                        role: "",
-                                      })
-                                    }
-                                  >
-                                    Pridat
-                                  </Button>
-                                </Col>
-                              </Row>
-                            </div>
-                          ))
-                        }
-                      </FieldArray>
-                    </div>
-                  ))
-                }
-              </FieldArray>
-              <Button type="button" outline color="secondary" onClick={toggle}>
-                Zrušiť
-              </Button>
+          {/* {({ values }) => ( */}
+          {/* <Form> */}
+          <FormStep
+            onSubmit={() => console.log("GRANT ID SUBMIT")}
+            validationSchema={grantSchema}
+          >
+            <GrantID setBudgets={setBudgets} />
+          </FormStep>
+          {budgets.map((_, i) => (
+            <FormStep
+              onSubmit={() => console.log("GRANT BUDGET SUBMIT")}
+              validationSchema={grantBudgetSchema}
+              key={i}
+            >
+              <GrantBudget index={i} />
+            </FormStep>
+          ))}
 
-              <Button type="submit" color="success" className="float-right">
-                Pridať
-              </Button>
-            </Form>
-          )}
-        </Formik>
+          {/* <Button type="button" outline color="secondary" onClick={toggle}>
+              Zrušiť
+            </Button>
+
+            <Button type="submit" color="success" className="float-right">
+              Pridať
+            </Button> */}
+          {/* </Form> */}
+          {/* )} */}
+        </WizzardForm>
       </ModalBody>
     </>
   );
