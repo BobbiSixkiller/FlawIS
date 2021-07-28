@@ -6,25 +6,26 @@ const memberSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    hours: Number,
+    name: { type: String, trim: true },
     active: { type: Boolean, default: true },
     role: {
       type: String,
       default: "basic",
       enum: ["basic", "deputy", "leader"],
     },
+    hours: Number,
   },
   { timestamps: true }
 );
 
 const budgetSchema = new mongoose.Schema(
   {
-    year: Date,
-    travel: Number,
-    material: Number,
-    services: Number,
-    indirect: Number,
-    salaries: Number,
+    year: { type: Date, default: new Date().getFullYear() },
+    travel: { type: Number, default: 0 },
+    material: { type: Number, default: 0 },
+    services: { type: Number, default: 0 },
+    indirect: { type: Number, default: 0 },
+    salaries: { type: Number, default: 0 },
     members: [memberSchema],
   },
   { timestamps: true }
