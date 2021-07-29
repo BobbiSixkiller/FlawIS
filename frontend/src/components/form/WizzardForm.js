@@ -8,10 +8,8 @@ export function FormStep({ children }) {
 }
 
 export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
-  const [stepNumber, setStepNumber] = useState(0);
   const steps = Children.toArray(children);
-
-  //refactor tak, ze rozseka validation schema a values na kazdy step samostatne
+  const [stepNumber, setStepNumber] = useState(0);
   const [snapshot, setSnapshot] = useState(initialValues);
 
   const step = steps[stepNumber];
@@ -34,15 +32,16 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
   return (
     <Formik
       initialValues={snapshot}
+      innerRef={props.formRef}
       validationSchema={step.props.validationSchema}
-      onSubmit={async (values, bag) => {
+      onSubmit={async (values, helpers) => {
         if (step.props.onSubmit) {
-          await step.props.onSubmit(values, bag);
+          await step.props.onSubmit(values, helpers);
         }
         if (isLastStep) {
-          return onSubmit(values, bag);
+          return onSubmit(values, helpers);
         } else {
-          bag.setTouched({});
+          helpers.setTouched({});
           next(values);
         }
       }}
@@ -55,7 +54,7 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
             <div className="text-center">{`${stepNumber + 1} / ${
               steps.length
             }`}</div>
-            <Progress animated value={(stepNumber + 1 / steps.length) * 100} />
+            <Progress value={((stepNumber + 1) / steps.length) * 100} />
           </div>
 
           <Button

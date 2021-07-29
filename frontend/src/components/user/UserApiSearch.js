@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouteMatch, useLocation, Link } from "react-router-dom";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 
 import { useDataFetch } from "../../hooks/useApi";
 
@@ -17,9 +17,10 @@ export default function ApiSearch({ label, ...props }) {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
   const [field, meta, helpers] = useField(props);
+  const { setFieldValue } = useFormikContext();
 
   const [display, setDisplay] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(field.value || "");
   const autoWrapRef = useRef(null);
   const activeSuggestionRef = useRef(null);
 
@@ -88,7 +89,8 @@ export default function ApiSearch({ label, ...props }) {
                 <ListGroupItem
                   key={i}
                   onClick={() => {
-                    helpers.setValue(user._id);
+                    helpers.setValue(user.fullName);
+                    setFieldValue(props.member, user._id);
                     setSearch(user.fullName);
                     setDisplay(false);
                   }}

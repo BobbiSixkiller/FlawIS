@@ -307,38 +307,33 @@ export const resetPasswordSchema = Yup.object({
 });
 
 export const memberSchema = Yup.object({
-  hours: Yup.number().required(),
+  hours: Yup.number().min(1),
   member: Yup.string().required(),
+  name: Yup.string().required(),
   role: Yup.mixed().oneOf(["basic", "deputy", "leader"]).required(),
   active: Yup.boolean(),
 });
 
 export const budgetSchema = Yup.object({
   year: Yup.date().required(),
-  travel: Yup.number().required(),
-  material: Yup.number().required(),
-  services: Yup.number().required(),
-  indirect: Yup.number().required(),
-  salaries: Yup.number().required(),
-  members: Yup.array().of(memberSchema).required().min(1),
+  travel: Yup.number(),
+  material: Yup.number(),
+  services: Yup.number(),
+  indirect: Yup.number(),
+  salaries: Yup.number(),
+  members: Yup.array(memberSchema).min(1),
 });
 
-export const grantSchema = Yup.object({
+export const grantIdSchema = Yup.object({
   name: Yup.string().required(),
   idNumber: Yup.string().required(),
   type: Yup.mixed().required().oneOf(["APVV", "VEGA", "KEGA"]),
   start: Yup.date().max(Yup.ref("end")).required(),
   end: Yup.date().min(Yup.ref("start")).required(),
-  //budget: Yup.array(budgetSchema),
 });
 
 export const grantBudgetSchema = Yup.object({
-  name: Yup.string().required(),
-  idNumber: Yup.string().required(),
-  type: Yup.mixed().required().oneOf(["APVV", "VEGA", "KEGA"]),
-  start: Yup.date().max(Yup.ref("end")).required(),
-  end: Yup.date().min(Yup.ref("start")).required(),
-  budget: Yup.array(budgetSchema),
+  budget: Yup.array().of(budgetSchema).required().min(1),
 });
 
 export const announcementSchema = Yup.object({

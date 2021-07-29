@@ -5,7 +5,7 @@ import TextInput from "../../components/form/TextInput";
 import SelectInput from "../../components/form/SelectInput";
 import DateInput from "../../components/form/DateInput";
 
-export default function GrantID({ setBudgets }) {
+export default function GrantID({ setYears }) {
   const { values, setFieldValue } = useFormikContext();
 
   useEffect(() => {
@@ -22,37 +22,23 @@ export default function GrantID({ setBudgets }) {
     }
 
     const years = getYears(start, end);
+    setYears(years);
     setFieldValue(
       "budget",
       years.map((year) => ({
         year,
-        travel: "",
-        material: "",
-        services: "",
-        salaries: "",
-        indirect: "",
-        members: [{ member: "", role: "basic", hours: "" }],
+        travel: 0,
+        material: 0,
+        services: 0,
+        salaries: 0,
+        indirect: 0,
+        members: [{ member: "", name: "", role: "basic", hours: 0 }],
       }))
     );
-    setBudgets(
-      years.map((year) => ({
-        year,
-        travel: "",
-        material: "",
-        services: "",
-        salaries: "",
-        indirect: "",
-        members: [{ member: "", role: "basic", hours: "" }],
-      }))
-    );
-  }, [values.start, values.end, setFieldValue]);
-
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
+  }, [values.start, values.end, setYears, setFieldValue]);
 
   return (
-    <div>
+    <>
       <SelectInput
         name="type"
         label="Typ"
@@ -70,6 +56,6 @@ export default function GrantID({ setBudgets }) {
         placeholder="Zaciatok grantu..."
       />
       <DateInput name="end" label="Koniec" placeholder="Koniec grantu..." />
-    </div>
+    </>
   );
 }

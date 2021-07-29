@@ -1,41 +1,50 @@
-import React from "react";
-import { FieldArray, useFormikContext } from "formik";
+import React, { useEffect } from "react";
+import { FieldArray, useFormikContext, Field } from "formik";
 
-import { Row, Col, Button } from "reactstrap";
+import { Row, Col, Button, FormGroup, CustomInput, Form } from "reactstrap";
 import { Trash2Fill, PlusLg } from "react-bootstrap-icons";
 
-import TextInput from "../../components/form/TextInput";
+import NumberInput from "../../components/form/NumberInput";
 import RadioInput from "../../components/form/RadioInput";
 import UserApiSearch from "../../components/user/UserApiSearch";
 
 export default function GrantBudget({ index }) {
-  const { values, errors } = useFormikContext();
-  console.log(errors);
+  const { values, setFieldValue, errors } = useFormikContext();
+
+  useEffect(() => {
+    values.budget.forEach((b, i) =>
+      setFieldValue(`budget[${i}].members`, values.budget[index].members)
+    );
+  }, [values.budget[index].members, index, setFieldValue]);
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   return (
     <div>
       <h5>Rozpocet {values.budget[index].year}</h5>
-      <TextInput
+      <NumberInput
         name={`budget[${index}].material`}
         label="Položka materiál"
         placeholder="Materiál..."
       />
-      <TextInput
+      <NumberInput
         name={`budget[${index}].services`}
         label="Položka služby"
         placeholder="Služby..."
       />
-      <TextInput
+      <NumberInput
         name={`budget[${index}].travel`}
         label="Položka cestovné"
         placeholder="Cestovné..."
       />
-      <TextInput
+      <NumberInput
         name={`budget[${index}].indirect`}
         label="Položka nepriame"
         placeholder="Neprimae náklady..."
       />
-      <TextInput
+      <NumberInput
         name={`budget[${index}].salaries`}
         label="Položka platy"
         placeholder="Nazov grantu..."
@@ -54,9 +63,10 @@ export default function GrantBudget({ index }) {
                   outline
                   onClick={() =>
                     arrayHelpers.push({
+                      name: "",
                       member: "",
-                      hours: "",
-                      role: "",
+                      hours: 0,
+                      role: "basic",
                     })
                   }
                 >
@@ -69,13 +79,14 @@ export default function GrantBudget({ index }) {
                 <Row>
                   <Col sm={8}>
                     <UserApiSearch
-                      name={`budget[${index}].members[${i}].member`}
+                      name={`budget[${index}].members[${i}].name`}
+                      member={`budget[${index}].members[${i}].member`}
                       label="Meno"
                       placeholder="Meno riesitela..."
                     />
                   </Col>
                   <Col sm={4}>
-                    <TextInput
+                    <NumberInput
                       name={`budget[${index}].members[${i}].hours`}
                       label="hodiny"
                       placeholder="Hodiny..."
@@ -84,14 +95,56 @@ export default function GrantBudget({ index }) {
                 </Row>
                 <Row>
                   <Col sm={8}>
-                    <RadioInput
-                      name={`budget[${index}].members[${i}].role`}
-                      options={[
-                        { label: "Riesitel", value: "basic" },
-                        { label: "Zastupca", value: "deputy" },
-                        { label: "Hlavny", value: "leader" },
-                      ]}
-                    />
+                    <FormGroup>
+                      {/* <RadioInput
+                        type="radio"
+                        name={`budget[${index}].members[${i}].role`}
+                        id="basic"
+                        value="basic"
+                        label="Riešiteľ"
+                        inline
+                      />
+                      <RadioInput
+                        type="radio"
+                        name={`budget[${index}].members[${i}].role`}
+                        id="deputy"
+                        value="deputy"
+                        label="Zástupca"
+                        inline
+                      />
+                      <RadioInput
+                        type="radio"
+                        name={`budget[${index}].members[${i}].role`}
+                        id="leader"
+                        value="leader"
+                        label="Hlavný"
+                        inline
+                      /> */}
+                      <label>
+                        <Field
+                          type="radio"
+                          name={`budget[${index}].members[${i}].role`}
+                          value="basic"
+                        />
+                        Basic
+                      </label>
+                      <label>
+                        <Field
+                          type="radio"
+                          name={`budget[${index}].members[${i}].role`}
+                          value="deputy"
+                        />
+                        Deputy
+                      </label>
+                      <label>
+                        <Field
+                          type="radio"
+                          name={`budget[${index}].members[${i}].role`}
+                          value="lader"
+                        />
+                        Leader
+                      </label>
+                    </FormGroup>
                   </Col>
                   <Col sm={4}>
                     <Button

@@ -1,18 +1,15 @@
 import React, { useState } from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
 
-import { ModalHeader, ModalBody, Button } from "reactstrap";
+import { ModalHeader, ModalBody } from "reactstrap";
 
 import { WizzardForm, FormStep } from "../../components/form/WizzardForm";
-import { grantSchema, grantBudgetSchema } from "../../util/validation";
+import { grantIdSchema, grantBudgetSchema } from "../../util/validation";
 
 import GrantID from "./GrandID";
 import GrantBudget from "./GrantBudget";
 
 export default function AddGrant({ toggle }) {
-  const [budgets, setBudgets] = useState([]);
-  const [step, setStep] = useState(0);
+  const [years, setYears] = useState([new Date().getFullYear()]);
 
   return (
     <>
@@ -30,33 +27,27 @@ export default function AddGrant({ toggle }) {
           }}
           onSubmit={(values) => console.log(values)}
         >
-          {/* {({ values }) => ( */}
-          {/* <Form> */}
           <FormStep
-            onSubmit={() => console.log("GRANT ID SUBMIT")}
-            validationSchema={grantSchema}
+            onSubmit={(values) => {
+              console.log("GRANT ID SUBMIT");
+              console.log(values);
+            }}
+            validationSchema={grantIdSchema}
           >
-            <GrantID setBudgets={setBudgets} />
+            <GrantID setYears={setYears} />
           </FormStep>
-          {budgets.map((_, i) => (
+          {years.map((y, i) => (
             <FormStep
-              onSubmit={() => console.log("GRANT BUDGET SUBMIT")}
+              onSubmit={(values) => {
+                console.log("GRANT BUDGET SUBMIT");
+                console.log(values);
+              }}
               validationSchema={grantBudgetSchema}
               key={i}
             >
               <GrantBudget index={i} />
             </FormStep>
           ))}
-
-          {/* <Button type="button" outline color="secondary" onClick={toggle}>
-              Zrušiť
-            </Button>
-
-            <Button type="submit" color="success" className="float-right">
-              Pridať
-            </Button> */}
-          {/* </Form> */}
-          {/* )} */}
         </WizzardForm>
       </ModalBody>
     </>
