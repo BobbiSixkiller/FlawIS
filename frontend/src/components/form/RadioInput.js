@@ -1,22 +1,17 @@
 import React from "react";
-import { useField, useFormikContext } from "formik";
+import { useField } from "formik";
 
-import { CustomInput } from "reactstrap";
+import { FormGroup, Label, Input } from "reactstrap";
 
-export default function RadioInput({ name, type, value, ...props }) {
-  const [field, meta, helpers] = useField({ name, type, value });
-  const { setFieldValue } = useFormikContext();
+export default function RadioInput({ inline, label, ...props }) {
+  const [field] = useField(props);
 
   return (
-    <CustomInput
-      type="radio"
-      {...field}
-      {...props}
-      onChange={() => {
-        console.log(field.name + " " + field.value);
-        //helpers.setValue(props.value);
-        setFieldValue(field.name, field.value);
-      }}
-    />
+    <FormGroup check inline={inline}>
+      <Label check>
+        <Input type="radio" {...field} />
+        {label}
+      </Label>
+    </FormGroup>
   );
 }

@@ -20,12 +20,12 @@ const memberSchema = new mongoose.Schema(
 
 const budgetSchema = new mongoose.Schema(
   {
-    year: { type: Date, default: new Date().getFullYear() },
-    travel: { type: Number, default: 0 },
-    material: { type: Number, default: 0 },
-    services: { type: Number, default: 0 },
-    indirect: { type: Number, default: 0 },
-    salaries: { type: Number, default: 0 },
+    year: Date,
+    travel: Number,
+    material: Number,
+    services: Number,
+    indirect: Number,
+    salaries: Number,
     members: [memberSchema],
   },
   { timestamps: true }
@@ -45,10 +45,7 @@ const grantSchema = new mongoose.Schema(
       type: String,
       enum: ["APVV", "VEGA", "KEGA"],
     },
-    start: {
-      type: Date,
-      default: Date.now,
-    },
+    start: Date,
     end: Date,
     budget: [budgetSchema],
     announcements: [

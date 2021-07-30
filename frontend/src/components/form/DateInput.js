@@ -3,14 +3,14 @@ import { useField } from "formik";
 
 import { Label, Input, FormGroup, FormFeedback } from "reactstrap";
 
-export default function DateInput({ ...props }) {
+export default function DateInput({ label, ...props }) {
   const [field, meta] = useField(props);
   const error = meta.touched && meta.error;
   const valid = meta.touched && !error;
 
   return (
     <FormGroup>
-      <Label for={field.name}>{props.label}:</Label>
+      <Label for={field.name}>{label}:</Label>
       <Input
         type="date"
         id={field.name}
@@ -20,7 +20,7 @@ export default function DateInput({ ...props }) {
         {...props}
       />
       <FormFeedback invalid="true">{error}</FormFeedback>
-      <FormFeedback valid>{props.label} OK!</FormFeedback>
+      <FormFeedback valid>{label} OK!</FormFeedback>
     </FormGroup>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, createContext } from "react";
 
-import API from "../api";
+import API from "../util/axiosConfig";
 
 const AuthContext = createContext({
   user: null,

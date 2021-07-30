@@ -1,7 +1,9 @@
 import React, { useState, Children } from "react";
 import { Formik, Form } from "formik";
 
-import { Button, Progress } from "reactstrap";
+import { Button, Progress, Alert } from "reactstrap";
+
+import { normalizeErrors } from "../../util/helperFunctions";
 
 export function FormStep({ children }) {
   return <>{children}</>;
@@ -32,14 +34,13 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
   return (
     <Formik
       initialValues={snapshot}
-      innerRef={props.formRef}
       validationSchema={step.props.validationSchema}
       onSubmit={async (values, helpers) => {
         if (step.props.onSubmit) {
           await step.props.onSubmit(values, helpers);
         }
         if (isLastStep) {
-          return onSubmit(values, helpers);
+          return await onSubmit(values, helpers);
         } else {
           helpers.setTouched({});
           next(values);
@@ -56,6 +57,26 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
             }`}</div>
             <Progress value={((stepNumber + 1) / steps.length) * 100} />
           </div>
+
+          {props.backendData && (
+            <Alert
+              color={props.backendError ? "danger" : "success"}
+              isOpen={props.backendData.message && true}
+              toggle={props.hideMessage}
+            >
+              {props.backendData.message}
+              {props.backendData.errors && (
+                <>
+                  <hr />
+                  <ul>
+                    {props.backendData.errors.map((e) => (
+                      <li key={e.path}>{e.message}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </Alert>
+          )}
 
           <Button
             type="button"

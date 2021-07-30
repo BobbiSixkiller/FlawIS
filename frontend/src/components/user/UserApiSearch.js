@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouteMatch, useLocation, Link } from "react-router-dom";
-import { useField, useFormikContext } from "formik";
+import { getIn } from "formik";
 
 import { useDataFetch } from "../../hooks/useApi";
 
@@ -13,16 +13,19 @@ import {
   ListGroupItem,
 } from "reactstrap";
 
-export default function ApiSearch({ label, ...props }) {
+export default function ApiSearch({ field, form, label, ...props }) {
   const { url } = useRouteMatch();
   const { pathname } = useLocation();
-  const [field, meta, helpers] = useField(props);
-  const { setFieldValue } = useFormikContext();
 
   const [display, setDisplay] = useState(false);
-  const [search, setSearch] = useState(field.value || "");
+  const [search, setSearch] = useState((field && field.value) || "");
   const autoWrapRef = useRef(null);
   const activeSuggestionRef = useRef(null);
+
+  const formikError = field
+    ? getIn(form.touched, field.name) && getIn(form.errors, field.name)
+    : false;
+  const valid = field ? getIn(form.touched, field.name) && !formikError : false;
 
   const { loading, error, data, setUrl } = useDataFetch(
     `user/api/search?q=${search}`,
@@ -63,12 +66,12 @@ export default function ApiSearch({ label, ...props }) {
         onClick={() => setDisplay(!display)}
         onChange={(e) => setSearch(e.target.value)}
         autoComplete="off"
-        invalid={meta.touched && meta.error && true}
-        valid={meta.touched && !meta.error && true}
+        invalid={formikError && true}
+        valid={valid && true}
       />
-      {meta && (
+      {field && form && (
         <>
-          <FormFeedback invalid="true">{meta.error}</FormFeedback>
+          <FormFeedback invalid="true">{formikError}</FormFeedback>
           <FormFeedback valid>{label} OK!</FormFeedback>
         </>
       )}
@@ -89,8 +92,8 @@ export default function ApiSearch({ label, ...props }) {
                 <ListGroupItem
                   key={i}
                   onClick={() => {
-                    helpers.setValue(user.fullName);
-                    setFieldValue(props.member, user._id);
+                    form.setFieldValue(field.name, user.fullName);
+                    form.setFieldValue(props.member, user._id);
                     setSearch(user.fullName);
                     setDisplay(false);
                   }}

@@ -1,5 +1,5 @@
 import { useReducer, useState, useEffect, useContext } from "react";
-import API from "../api";
+import API from "../util/axiosConfig";
 
 import { AuthContext } from "../context/auth";
 

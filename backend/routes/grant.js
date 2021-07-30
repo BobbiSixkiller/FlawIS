@@ -45,7 +45,7 @@ router.post(
     if (grantExists)
       return next(
         new UserInputError("Bad user input!", [
-          "Grant so zadaným ID uz existuje!",
+          { path: "idNumber", message: "Grant so zadaným ID uz existuje!" },
         ])
       );
 
@@ -60,7 +60,7 @@ router.post(
 
     await grant.save();
 
-    res.status(200).send(grant);
+    res.status(200).send({ message: `Grant: ${grant.name} bol vytvorený!` });
   }
 );
 
@@ -217,7 +217,7 @@ router.put(
   }
 );
 
-router.delete("/:grantId", checkAuth, isSupervisor, async (req, res) => {
+router.delete("/:grantId", checkAuth, isSupervisor, async (req, res, next) => {
   const grant = await Grant.findOne({ _id: req.params.grantId });
   if (!grant) return next(new NotFoundError("Grant nebol nájdený!"));
 

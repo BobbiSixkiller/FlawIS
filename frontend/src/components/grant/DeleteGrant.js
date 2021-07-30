@@ -28,7 +28,7 @@ export default function DeleteGrant({ toggle, grant }) {
         <p>Potvrďte zmazanie grantu:</p>
         <p className="font-weight-bold">{grant.name}</p>
         {data && (
-          <Row row className="justify-content-center">
+          <Row className="justify-content-center">
             <Col>
               <Alert
                 color={error ? "danger" : "success"}

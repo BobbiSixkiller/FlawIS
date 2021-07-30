@@ -26,7 +26,7 @@ export default function GrantID({ setYears }) {
     setFieldValue(
       "budget",
       years.map((year) => ({
-        year,
+        year: year.toString(),
         travel: 0,
         material: 0,
         services: 0,
@@ -36,6 +36,8 @@ export default function GrantID({ setYears }) {
       }))
     );
   }, [values.start, values.end, setYears, setFieldValue]);
+
+  useEffect(() => console.log(values), [values]);
 
   return (
     <>
@@ -48,8 +50,18 @@ export default function GrantID({ setYears }) {
           { name: "KEGA", value: "KEGA" },
         ]}
       />
-      <TextInput name="name" label="Nazov" placeholder="Nazov grantu..." />
-      <TextInput name="idNumber" label="ID" placeholder="ID grantu..." />
+      <TextInput
+        type="textarea"
+        name="name"
+        label="Nazov"
+        placeholder="Nazov grantu..."
+      />
+      <TextInput
+        type="text"
+        name="idNumber"
+        label="ID"
+        placeholder="ID grantu..."
+      />
       <DateInput
         name="start"
         label="Zaciatok"
