@@ -10,7 +10,7 @@ const userSchema = Yup.object({
 	repeatPass: Yup.mixed()
 		.required()
 		.oneOf([Yup.ref("password")]),
-	role: Yup.mixed().required().oneOf(["basic", "supervisor", "admin"]),
+	role: Yup.mixed().oneOf(["basic", "supervisor", "admin"]),
 });
 
 const loginSchema = Yup.object({

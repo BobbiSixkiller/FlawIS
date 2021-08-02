@@ -6,68 +6,66 @@ import SelectInput from "../../components/form/SelectInput";
 import DateInput from "../../components/form/DateInput";
 
 export default function GrantID({ setYears }) {
-  const { values, setFieldValue } = useFormikContext();
+	const { values, setFieldValue } = useFormikContext();
 
-  useEffect(() => {
-    const start = new Date(values.start).getFullYear();
-    const end = new Date(values.end).getFullYear();
+	useEffect(() => {
+		const start = new Date(values.start).getFullYear();
+		const end = new Date(values.end).getFullYear();
 
-    function getYears(start, end) {
-      const years = [];
-      for (let year = start; year <= end; year++) {
-        years.push(year);
-      }
+		function getYears(start, end) {
+			const years = [];
+			for (let year = start; year <= end; year++) {
+				years.push(year);
+			}
 
-      return years;
-    }
+			return years;
+		}
 
-    const years = getYears(start, end);
-    setYears(years);
-    setFieldValue(
-      "budget",
-      years.map((year) => ({
-        year: year.toString(),
-        travel: 0,
-        material: 0,
-        services: 0,
-        salaries: 0,
-        indirect: 0,
-        members: [{ member: "", name: "", role: "basic", hours: 0 }],
-      }))
-    );
-  }, [values.start, values.end, setYears, setFieldValue]);
+		const years = getYears(start, end);
+		setYears(years);
+		setFieldValue(
+			"budget",
+			years.map((year) => ({
+				year: year.toString(),
+				travel: 0,
+				material: 0,
+				services: 0,
+				salaries: 0,
+				indirect: 0,
+				members: [{ member: "", name: "", role: "basic", hours: 0 }],
+			}))
+		);
+	}, [values.start, values.end, setYears, setFieldValue]);
 
-  useEffect(() => console.log(values), [values]);
-
-  return (
-    <>
-      <SelectInput
-        name="type"
-        label="Typ"
-        options={[
-          { name: "APVV", value: "APVV" },
-          { name: "VEGA", value: "VEGA" },
-          { name: "KEGA", value: "KEGA" },
-        ]}
-      />
-      <TextInput
-        type="textarea"
-        name="name"
-        label="Nazov"
-        placeholder="Nazov grantu..."
-      />
-      <TextInput
-        type="text"
-        name="idNumber"
-        label="ID"
-        placeholder="ID grantu..."
-      />
-      <DateInput
-        name="start"
-        label="Zaciatok"
-        placeholder="Zaciatok grantu..."
-      />
-      <DateInput name="end" label="Koniec" placeholder="Koniec grantu..." />
-    </>
-  );
+	return (
+		<>
+			<SelectInput
+				name="type"
+				label="Typ"
+				options={[
+					{ name: "APVV", value: "APVV" },
+					{ name: "VEGA", value: "VEGA" },
+					{ name: "KEGA", value: "KEGA" },
+				]}
+			/>
+			<TextInput
+				type="textarea"
+				name="name"
+				label="Nazov"
+				placeholder="Nazov grantu..."
+			/>
+			<TextInput
+				type="text"
+				name="idNumber"
+				label="ID"
+				placeholder="ID grantu..."
+			/>
+			<DateInput
+				name="start"
+				label="Zaciatok"
+				placeholder="Zaciatok grantu..."
+			/>
+			<DateInput name="end" label="Koniec" placeholder="Koniec grantu..." />
+		</>
+	);
 }

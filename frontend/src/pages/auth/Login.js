@@ -1,118 +1,109 @@
 import React, { useContext, useEffect } from "react";
 import { useLocation, useHistory, Link } from "react-router-dom";
+import { Formik, Form } from "formik";
 
 import {
-  NavLink,
-  Form,
-  FormGroup,
-  FormFeedback,
-  Button,
-  Label,
-  Input,
-  Col,
-  Alert,
-  Fade,
-  Spinner,
+	NavLink,
+	FormGroup,
+	Button,
+	Col,
+	Alert,
+	Fade,
+	Spinner,
 } from "reactstrap";
 
-import { AuthContext } from "../../context/auth";
-import useFormValidation from "../../hooks/useFormValidation";
-import { validateLogin } from "../../util/validation";
+import TextInput from "../../components/form/TextInput";
+import { loginSchema } from "../../util/validation";
 
-const INITIAL_STATE = {
-  email: "",
-  password: "",
-};
+import { AuthContext } from "../../context/auth";
 
 function Login() {
-  const auth = useContext(AuthContext);
-  const location = useLocation();
-  const history = useHistory();
+	const auth = useContext(AuthContext);
+	const location = useLocation();
+	const history = useHistory();
 
-  let { from } = location.state || { from: { pathname: "/dashboard" } };
+	let { from } = location.state || { from: { pathname: "/dashboard" } };
 
-  function login() {
-    auth.login(values);
-  }
+	useEffect(() => {
+		console.log(auth.user);
+		if (auth.user) {
+			history.replace(from);
+		}
+	}, [auth.user, history, from]);
 
-  const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
-    useFormValidation(INITIAL_STATE, validateLogin, login);
-
-  useEffect(() => {
-    console.log(auth.user);
-    if (auth.user) {
-      history.replace(from);
-    }
-  }, [auth.user, history, from]);
-
-  return (
-    <Fade>
-      <Form className="my-3" onSubmit={handleSubmit}>
-        <h1 className="text-center">Prihlásenie</h1>
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Label for="email">Email:</Label>
-            <Input
-              onChange={handleChange}
-              onBlur={handleBlur}
-              name="email"
-              type="email"
-              id="email"
-              value={values.email}
-              invalid={errors.email && errors.email.length > 0}
-              valid={valid.email && valid.email.length > 0}
-              autoComplete="off"
-              placeholder="Vaša emailová adresa"
-            />
-            <FormFeedback invalid="true">{errors.email}</FormFeedback>
-            <FormFeedback valid>{valid.email}</FormFeedback>
-          </Col>
-        </FormGroup>
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Label for="password">Heslo:</Label>
-            <Input
-              onChange={handleChange}
-              onBlur={handleBlur}
-              name="password"
-              type="password"
-              id="password"
-              value={values.password}
-              invalid={errors.password && errors.password.length > 0}
-              valid={valid.email && valid.email.length > 0}
-              autoComplete="off"
-              placeholder="Vaše heslo"
-            />
-            <FormFeedback invalid="true">{errors.password}</FormFeedback>
-            <FormFeedback valid>{valid.password}</FormFeedback>
-          </Col>
-        </FormGroup>
-        {auth.message && (
-          <FormGroup row className="justify-content-center">
-            <Col sm={6}>
-              <Alert
-                color={auth.error ? "danger" : "success"}
-                show={auth.message}
-                toggle={auth.hideMessage}
-              >
-                {auth.message}
-              </Alert>
-            </Col>
-          </FormGroup>
-        )}
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Button block color="primary" disabled={auth.loading} type="submit">
-              {auth.loading ? <Spinner size="sm" color="light" /> : "Prihlásiť"}
-            </Button>
-            <NavLink className="text-center" to="/forgotPassword" tag={Link}>
-              Zabudli ste heslo ?
-            </NavLink>
-          </Col>
-        </FormGroup>
-      </Form>
-    </Fade>
-  );
+	return (
+		<Fade>
+			<h1 className="text-center">Prihlásenie</h1>
+			<Formik
+				initialValues={{ email: "", password: "" }}
+				validationSchema={loginSchema}
+				onSubmit={(values, helpers) => {
+					auth.login(values);
+				}}
+			>
+				{(formik) => (
+					<Form>
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<TextInput
+									type="email"
+									name="email"
+									placeholder="Email adresa..."
+									label="Email"
+								/>
+							</Col>
+						</FormGroup>
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<TextInput
+									type="password"
+									name="password"
+									placeholder="Heslo..."
+									label="Heslo"
+								/>
+							</Col>
+						</FormGroup>
+						{/* {auth.message && (
+							<FormGroup row className="justify-content-center">
+								<Col sm={6}>
+									<Alert
+										color={auth.error ? "danger" : "success"}
+										show={auth.message}
+										toggle={auth.hideMessage}
+									>
+										{auth.message}
+									</Alert>
+								</Col>
+							</FormGroup>
+						)} */}
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<Button
+									block
+									color="primary"
+									disabled={auth.loading}
+									type="submit"
+								>
+									{auth.loading ? (
+										<Spinner size="sm" color="light" />
+									) : (
+										"Prihlásiť"
+									)}
+								</Button>
+								<NavLink
+									className="text-center"
+									to="/forgotPassword"
+									tag={Link}
+								>
+									Zabudli ste heslo ?
+								</NavLink>
+							</Col>
+						</FormGroup>
+					</Form>
+				)}
+			</Formik>
+		</Fade>
+	);
 }
 
 export default Login;

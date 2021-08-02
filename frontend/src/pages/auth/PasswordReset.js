@@ -1,118 +1,89 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { Formik, Form } from "formik";
 
-import {
-  Fade,
-  Form,
-  FormGroup,
-  FormFeedback,
-  Col,
-  Alert,
-  Button,
-  Input,
-  Label,
-  Spinner,
-} from "reactstrap";
+import { Fade, FormGroup, Col, Alert, Button, Spinner } from "reactstrap";
 
 import { useDataSend } from "../../hooks/useApi";
-import useFormValidation from "../../hooks/useFormValidation";
-import { validatePasswordReset } from "../../util/validation";
-
-const INITIAL_STATE = {
-  password: "",
-  repeatPass: "",
-};
+import TextInput from "../../components/form/TextInput";
+import { resetPasswordSchema } from "../../util/validation";
 
 function PasswordRedet() {
-  const url = useParams();
+	const url = useParams();
 
-  const { loading, error, data, sendData, hideMessage } = useDataSend();
+	const { loading, error, data, sendData, hideMessage } = useDataSend();
 
-  const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
-    useFormValidation(INITIAL_STATE, validatePasswordReset, resetPassword);
-
-  function resetPassword() {
-    sendData(`user/reset/${url.token}`, "POST", values);
-  }
-  return (
-    <Fade>
-      <h1 className="text-center">Reset hesla</h1>
-      <Form className="my-3" onSubmit={handleSubmit}>
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Label for="password">Heslo:</Label>
-            <Input
-              onChange={handleChange}
-              onBlur={handleBlur}
-              name="password"
-              type="password"
-              id="password"
-              value={values.password}
-              invalid={errors.password && true}
-              valid={valid.password && true}
-              placeholder="Zvoľte heslo"
-              autoComplete="off"
-            />
-            <FormFeedback invalid="true">{errors.password}</FormFeedback>
-            <FormFeedback valid>{valid.password}</FormFeedback>
-          </Col>
-        </FormGroup>
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Label for="repeatPass">Zopakujte heslo:</Label>
-            <Input
-              onChange={handleChange}
-              onBlur={handleBlur}
-              name="repeatPass"
-              type="password"
-              id="repeatPass"
-              value={values.repeatPass}
-              invalid={errors.repeatPass && true}
-              valid={valid.repeatPass && true}
-              placeholder="Pre potvrdenie zopakujte heslo"
-              autoComplete="off"
-            />
-            <FormFeedback invalid="true">{errors.repeatPass}</FormFeedback>
-            <FormFeedback valid>{valid.repeatPass}</FormFeedback>
-          </Col>
-        </FormGroup>
-        {data && (
-          <FormGroup row className="justify-content-center">
-            <Col sm={6}>
-              <Alert
-                color={error ? "danger" : "success"}
-                show={data}
-                toggle={hideMessage}
-              >
-                {data.message}
-                {data.errors && (
-                  <>
-                    <hr />
-                    <ul>
-                      {data.errors.map((e) => (
-                        <li>{e}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </Alert>
-            </Col>
-          </FormGroup>
-        )}
-        <FormGroup row className="justify-content-center">
-          <Col sm={6}>
-            <Button block color="primary" disabled={loading} type="submit">
-              {loading ? (
-                <Spinner size="sm" color="light" />
-              ) : (
-                "Resetovať heslo"
-              )}
-            </Button>
-          </Col>
-        </FormGroup>
-      </Form>
-    </Fade>
-  );
+	return (
+		<Fade>
+			<h1 className="text-center">Reset hesla</h1>
+			<Formik
+				initialValues={{ password: "", repeatPass: "" }}
+				validateSchema={resetPasswordSchema}
+				onSubmit={(values, helpers) =>
+					sendData(`user/reset/${url.token}`, "POST", values)
+				}
+			>
+				{() => (
+					<Form autoComplete="off">
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<TextInput
+									type="password"
+									name="password"
+									placeholder="Nové heslo..."
+									label="Heslo"
+								/>
+							</Col>
+						</FormGroup>
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<TextInput
+									type="password"
+									name="repeatPass"
+									placeholder="Nové heslo znova..."
+									label="Zopakujte heslo"
+								/>
+							</Col>
+						</FormGroup>
+						{data && (
+							<FormGroup row className="justify-content-center">
+								<Col sm={6}>
+									<Alert
+										color={error ? "danger" : "success"}
+										show={data}
+										toggle={hideMessage}
+									>
+										{data.message}
+										{data.errors && (
+											<>
+												<hr />
+												<ul>
+													{data.errors.map((e) => (
+														<li>{e}</li>
+													))}
+												</ul>
+											</>
+										)}
+									</Alert>
+								</Col>
+							</FormGroup>
+						)}
+						<FormGroup row className="justify-content-center">
+							<Col sm={6}>
+								<Button block color="primary" disabled={loading} type="submit">
+									{loading ? (
+										<Spinner size="sm" color="light" />
+									) : (
+										"Resetovať heslo"
+									)}
+								</Button>
+							</Col>
+						</FormGroup>
+					</Form>
+				)}
+			</Formik>
+		</Fade>
+	);
 }
 
 export default PasswordRedet;
