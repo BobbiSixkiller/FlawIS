@@ -51,8 +51,9 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+			secure: true,
 			httpOnly: true,
-			maxAge: 360000 + Date.now(),
+			maxAge: 3 * 60 * 60 * 1000,
 			sameSite: "strict",
 		})
 		.status(200)
@@ -126,7 +127,7 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		.cookie("authorization", `Bearer ${token}`, {
 			secure: true,
 			httpOnly: true,
-			maxAge: 2 * 60 * 60 * 1000,
+			maxAge: 3 * 60 * 60 * 1000,
 			sameSite: "strict",
 		})
 		.status(200)
