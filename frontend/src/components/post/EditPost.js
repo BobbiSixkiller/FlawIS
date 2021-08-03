@@ -1,9 +1,5 @@
 import React from "react";
-import API from "../../api";
-
-import { useUser } from "../../hooks/useUser";
-import useFormValidation from "../../hooks/useFormValidation";
-import validatePost from "../../validation/validatePost";
+import { Formik, Form, Field } from "formik";
 
 import {
 	Alert,
@@ -13,149 +9,75 @@ import {
 	Button,
 	Row,
 	Col,
-	Form,
-	FormGroup,
-	FormFeedback,
-	Label,
-	Input,
+	Spinner,
 } from "reactstrap";
-import TagInput from "../TagInput";
 
-function EditPost(props) {
-	const { modal, setModal, getData } = props;
-	const { accessToken } = useUser();
+import TagInput from "./TagInput";
+import TextInput from "../form/TextInput";
 
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
+import { useDataSend } from "../../hooks/useApi";
+import { postSchema } from "../../util/validation";
 
-	const INITIAL_STATE = {
-		name: modal.post.name,
-		body: modal.post.body,
-		tags: modal.post.tags,
-	};
-
-	const {
-		handleSubmit,
-		handleChange,
-		handleBlur,
-		setValues,
-		values,
-		errors,
-		valid,
-		isSubmitting,
-	} = useFormValidation(INITIAL_STATE, validatePost, update);
-
-	async function update() {
-		try {
-			const res = await API.put(`post/${modal.post._id}`, values, {
-				headers: {
-					authorization: accessToken,
-				},
-			});
-			setBackendMsg(res.data.msg);
-		} catch (err) {
-			setBackendError(err.response.data.error);
-		}
-	}
+export default function EditPost({ post, toggle }) {
+	const { error, data, sendData, hideMessage } = useDataSend();
 
 	return (
-		<Form onSubmit={handleSubmit}>
-			<ModalHeader
-				toggle={() => {
-					setModal(!modal);
-					getData(accessToken);
-				}}
-			>
-				Upraviť post
-			</ModalHeader>
-			<ModalBody>
-				<Row form className="justify-content-center">
-					<Col>
-						<FormGroup>
-							<Label for="name">Názov postu:</Label>
-							<Input
-								type="text"
-								id="name"
-								name="name"
-								placeholder="Názov postu"
-								onBlur={handleBlur}
-								onChange={handleChange}
-								value={values.name}
-								invalid={errors.name}
-								valid={valid.name}
-								autoComplete="off"
-							/>
-							<FormFeedback invalid>{errors.name}</FormFeedback>
-							<FormFeedback valid>{valid.name}</FormFeedback>
-						</FormGroup>
-					</Col>
-				</Row>
-				<Row form className="justify-content-center">
-					<Col>
-						<FormGroup>
-							<Label for="body">Obsah:</Label>
-							<Input
-								type="textarea"
-								id="body"
-								name="body"
-								placeholder="Text postu..."
-								onBlur={handleBlur}
-								onChange={handleChange}
-								value={values.body}
-								invalid={errors.body}
-								valid={valid.body}
-								autoComplete="off"
-							/>
-							<FormFeedback invalid>{errors.body}</FormFeedback>
-							<FormFeedback valid>{valid.body}</FormFeedback>
-						</FormGroup>
-					</Col>
-				</Row>
-				<TagInput
-					errors={errors}
-					valid={valid}
-					values={values}
-					setValues={setValues}
-					handleBlur={handleBlur}
-				/>
-				{backendMsg && (
-					<Row row className="justify-content-center my-3">
-						<Col>
-							<Alert color="success">
-								{backendMsg}
-								<Button close onClick={() => setBackendMsg(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-				{backendError && (
-					<Row row className="justify-content-center my-3">
-						<Col>
-							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-			</ModalBody>
-			<ModalFooter>
-				<Button type="submit" disabled={isSubmitting} color="warning">
-					Aktualizovať
-				</Button>{" "}
-				<Button
-					outline
-					color="secondary"
-					onClick={() => {
-						setModal(!modal);
-						getData(accessToken);
-					}}
-				>
-					Zrušiť
-				</Button>
-			</ModalFooter>
-		</Form>
+		<Formik
+			initialValues={{ name: post.name, body: post.body, tags: post.tags }}
+			validationSchema={postSchema}
+			onSubmit={async (values, helpers) =>
+				await sendData(`post/${post._id}`, "PUT", values)
+			}
+		>
+			{({ isSubmitting }) => (
+				<Form>
+					<ModalHeader toggle={toggle}>Upraviť post</ModalHeader>
+					<ModalBody>
+						<Row form className="justify-content-center">
+							<Col>
+								<TextInput
+									type="text"
+									name="name"
+									placeholder="Názov postu..."
+									label="Názov"
+								/>
+							</Col>
+						</Row>
+						<Row form className="justify-content-center">
+							<Col>
+								<TextInput
+									type="textarea"
+									name="body"
+									placeholder="Text postu..."
+									label="Obsah"
+								/>
+							</Col>
+						</Row>
+						<Field name="tags" component={TagInput} />
+						{data && (
+							<Row className="justify-content-center my-3">
+								<Col>
+									<Alert
+										color={error ? "danger" : "success"}
+										isOpen={data}
+										toggle={hideMessage}
+									>
+										{data.message}
+									</Alert>
+								</Col>
+							</Row>
+						)}
+					</ModalBody>
+					<ModalFooter>
+						<Button type="submit" disabled={isSubmitting} color="warning">
+							{isSubmitting ? <Spinner size="sm" color="light" /> : "Upraviť"}
+						</Button>{" "}
+						<Button outline color="secondary" onClick={toggle}>
+							Zrušiť
+						</Button>
+					</ModalFooter>
+				</Form>
+			)}
+		</Formik>
 	);
 }
-
-export default EditPost;

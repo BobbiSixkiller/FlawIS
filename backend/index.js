@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
+const { errorHandler } = require("./middlewares/error");
 
 const app = express();
 
@@ -43,6 +44,8 @@ app.use("/user", userRoute);
 app.use("/grant", grantRoute);
 app.use("/announcement", announcementRoute);
 app.use("/post", postRoute);
+
+app.use(errorHandler);
 
 app.listen(process.env.PORT, () =>
 	console.log("Server is up and running on port: " + process.env.PORT)

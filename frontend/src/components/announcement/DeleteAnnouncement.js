@@ -1,96 +1,74 @@
 import React from "react";
-import api from "../../api";
 
 import {
-	Alert,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
-	Button,
-	Row,
-	Col,
-	Form,
+  Alert,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Row,
+  Col,
+  Form,
 } from "reactstrap";
 
-import { useUser } from "../../hooks/useUser";
+import { useDataSend } from "../../hooks/useApi";
 
-function DeleteAnnouncement(props) {
-	const { accessToken } = useUser();
-	const { modal, setModal, getData } = props;
+function DeleteAnnouncement({ toggle, announcement }) {
+  const { loading, error, data, sendData, hideMessage } = useDataSend();
 
-	const [backendError, setBackendError] = React.useState(null);
-	const [backendMsg, setBackendMsg] = React.useState(null);
+  function deleteAnnouncement(e) {
+    e.preventDefault();
+    sendData(`announcement/${announcement._id}`, "DELETE");
+  }
 
-	async function deleteAnnouncement(token, e) {
-		e.preventDefault();
-		try {
-			const res = await api.delete(`announcement/${modal.data._id}`, {
-				headers: {
-					authorization: token,
-				},
-			});
-			setBackendMsg(res.data.msg);
-			getData(accessToken);
-		} catch (err) {
-			err.response.data.error && setBackendError(err.response.data.error);
-		}
-	}
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  const issuedDate = new Date(announcement.updatedAt).toLocaleDateString(
+    "sk-SK",
+    options
+  );
 
-	const options = {
-		weekday: "long",
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	};
-	const issuedDate = new Date(modal.data.updatedAt).toLocaleDateString(
-		"sk-SK",
-		options
-	);
-
-	return (
-		<Form onSubmit={(e) => deleteAnnouncement(accessToken, e)}>
-			<ModalHeader toggle={() => setModal(!modal)}>Zmazať oznam</ModalHeader>
-			<ModalBody>
-				<p>Potvrďte zmazanie oznamu:</p>
-				<p className="font-weight-bold">{modal.data.name}</p>
-				<p>
-					Zverejnil:{" "}
-					{modal.data.issuedBy
-						? modal.data.issuedBy.fullName
-						: "Používateľ bol zmazaný"}
-					, {issuedDate}
-				</p>
-				{backendError && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="danger">
-								{backendError}
-								<Button close onClick={() => setBackendError(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-				{backendMsg && (
-					<Row row className="justify-content-center">
-						<Col>
-							<Alert color="success">
-								{backendMsg}
-								<Button close onClick={() => setBackendMsg(null)} />
-							</Alert>
-						</Col>
-					</Row>
-				)}
-			</ModalBody>
-			<ModalFooter>
-				<Button color="danger" type="submit">
-					Zmazať
-				</Button>{" "}
-				<Button outline color="secondary" onClick={() => setModal(!modal)}>
-					Zrušiť
-				</Button>
-			</ModalFooter>
-		</Form>
-	);
+  return (
+    <Form onSubmit={deleteAnnouncement}>
+      <ModalHeader toggle={toggle}>Zmazať oznam</ModalHeader>
+      <ModalBody>
+        <p>Potvrďte zmazanie oznamu:</p>
+        <p className="font-weight-bold">{announcement.name}</p>
+        <p>
+          Zverejnil:{" "}
+          {announcement.issuedBy
+            ? announcement.issuedBy.fullName
+            : "Používateľ bol zmazaný"}
+          , {issuedDate}
+        </p>
+        {data && (
+          <Row row className="justify-content-center">
+            <Col>
+              <Alert
+                color={error ? "danger" : "success"}
+                isOpen={data}
+                toggle={hideMessage}
+              >
+                {data.message}
+              </Alert>
+            </Col>
+          </Row>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        <Button color="danger" type="submit" disabled={loading}>
+          Zmazať
+        </Button>{" "}
+        <Button outline color="secondary" onClick={toggle}>
+          Zrušiť
+        </Button>
+      </ModalFooter>
+    </Form>
+  );
 }
 
 export default DeleteAnnouncement;

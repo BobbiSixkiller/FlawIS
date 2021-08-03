@@ -1,25 +1,26 @@
-import React from "react";
-import { useLocation, useRouteMatch, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouteMatch, useLocation, Link } from "react-router-dom";
 
-import { useUser } from "../../hooks/useUser";
+import { useDataFetch } from "../../hooks/useApi";
 
-import API from "../../api";
 import { Input, Spinner, ListGroup, ListGroupItem } from "reactstrap";
 
-export default function ApiSearch() {
-	const location = useLocation();
-	const match = useRouteMatch();
+export default function PostApiSearch() {
+	const { url } = useRouteMatch();
+	const { pathname } = useLocation();
 
-	const { accessToken } = useUser();
+	const [display, setDisplay] = useState(false);
+	const [search, setSearch] = useState("");
 
-	const [display, setDisplay] = React.useState(false);
-	const [search, setSearch] = React.useState("");
-	const [loading, setLoading] = React.useState(false);
-	const [suggestions, setSuggestions] = React.useState(null);
-	const autoWrapRef = React.useRef(null);
-	const activeSuggestionRef = React.useRef(null);
+	const autoWrapRef = useRef(null);
+	const activeSuggestionRef = useRef(null);
 
-	React.useEffect(() => {
+	const { loading, error, data, setUrl } = useDataFetch(
+		`post/api/search?q=${search}`,
+		[]
+	);
+
+	useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
 
 		return () => {
@@ -27,34 +28,18 @@ export default function ApiSearch() {
 		};
 	}, [autoWrapRef]);
 
-	React.useEffect(() => {
-		async function apiSearch() {
-			try {
-				setLoading(true);
-				const res = await API.get(`post/api/search?q=${search}`, {
-					headers: {
-						authorization: accessToken,
-					},
-				});
-				setSuggestions(res.data.posts);
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
-				console.log(err);
-			}
-		}
-		apiSearch();
-	}, [search]);
+	useEffect(() => {
+		setUrl(`post/api/search?q=${search}`);
+	}, [search, setUrl]);
+
+	useEffect(() => {
+		activeSuggestionRef.current = pathname.split("/")[3];
+	}, [pathname]);
 
 	function handleClickOutside(e) {
 		if (autoWrapRef.current && !autoWrapRef.current.contains(e.target)) {
 			setDisplay(false);
 		}
-	}
-
-	function handleSuggestionClick(id, i) {
-		activeSuggestionRef.current = i;
-		setDisplay(false);
 	}
 
 	return (
@@ -63,7 +48,7 @@ export default function ApiSearch() {
 				className="autoInput"
 				id="search"
 				name="search"
-				placeholder="Search..."
+				placeholder="Hľadať..."
 				value={search}
 				onClick={() => setDisplay(!display)}
 				onChange={(e) => setSearch(e.target.value)}
@@ -76,20 +61,22 @@ export default function ApiSearch() {
 							<Spinner size="sm" />
 						</ListGroupItem>
 					)}
-					{suggestions.length === 0 ? (
-						<ListGroupItem className="text-muted">No results</ListGroupItem>
+					{data.posts.length === 0 || error ? (
+						<ListGroupItem className="text-muted">
+							Žiadne výsledky
+						</ListGroupItem>
 					) : (
-						suggestions.map((suggestion, i) => (
+						data.posts.map((post, i) => (
 							<ListGroupItem
 								key={i}
-								onClick={() => handleSuggestionClick(suggestion._id, i)}
+								onClick={() => setDisplay(false)}
 								tag={Link}
-								to={`${match.url}/${suggestion._id}`}
+								to={`${url}/${post._id}`}
 								action
-								active={activeSuggestionRef.current === i}
+								active={activeSuggestionRef.current === post._id}
 							>
-								{suggestion.name}, {suggestion.author}, Oblasť:{" "}
-								{suggestion.tags.map((tag) => `#${tag} `)}
+								{post.name}, {post.author}, Oblasť:{" "}
+								{post.tags.map((tag) => `#${tag} `)}
 							</ListGroupItem>
 						))
 					)}
