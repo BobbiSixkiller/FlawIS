@@ -122,10 +122,13 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		}
 	);
 
+	const now = new Date();
+	now.setTime(now.getTime() + 1 * 3600 * 1000);
+
 	res
 		.cookie("authorization", `Bearer ${token}`, {
-			httpOnly: true,
-			maxAge: 360000 * 2 + Date.now(),
+			httpOnly: now,
+			maxAge: 360000 + Date.now(),
 			sameSite: "strict",
 		})
 		.status(200)
