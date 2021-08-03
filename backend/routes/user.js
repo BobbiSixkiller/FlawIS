@@ -125,7 +125,7 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			secure: true,
-			httpOnly: now,
+			httpOnly: true,
 			maxAge: 60 * 60 * 1000,
 			sameSite: "strict",
 		})
