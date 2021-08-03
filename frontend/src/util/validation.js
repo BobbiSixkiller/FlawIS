@@ -118,7 +118,7 @@ export const resetPasswordSchema = Yup.object({
 });
 
 export const memberSchema = Yup.object({
-	hours: Yup.number().min(1),
+	hours: Yup.number().min(1).required(),
 	member: Yup.string().required(),
 	name: Yup.string().required(),
 	role: Yup.mixed().oneOf(["basic", "deputy", "leader"]).required(),
@@ -127,11 +127,11 @@ export const memberSchema = Yup.object({
 
 export const budgetSchema = Yup.object({
 	year: Yup.date().required(),
-	travel: Yup.number(),
-	material: Yup.number(),
-	services: Yup.number(),
-	indirect: Yup.number(),
-	salaries: Yup.number(),
+	travel: Yup.number().required(),
+	material: Yup.number().required(),
+	services: Yup.number().required(),
+	indirect: Yup.number().required(),
+	salaries: Yup.number().required(),
 	members: Yup.array(memberSchema).min(1),
 });
 

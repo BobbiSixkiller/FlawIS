@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { useLocation, useHistory, Link } from "react-router-dom";
 import { Formik, Form } from "formik";
+import API from "../../util/axiosConfig";
 
 import {
 	NavLink,
@@ -17,7 +18,7 @@ import { loginSchema } from "../../util/validation";
 
 import { AuthContext } from "../../context/auth";
 
-function Login() {
+export default function Login() {
 	const auth = useContext(AuthContext);
 	const location = useLocation();
 	const history = useHistory();
@@ -37,11 +38,17 @@ function Login() {
 			<Formik
 				initialValues={{ email: "", password: "" }}
 				validationSchema={loginSchema}
-				onSubmit={(values, helpers) => {
-					auth.login(values);
+				onSubmit={async (values, { resetForm }) => {
+					try {
+						const res = await API.post("user/login", values);
+						auth.dispatch({ type: "SUCCESS", payload: res.data });
+					} catch (err) {
+						auth.dispatch({ type: "FAILURE", payload: err.response.data });
+						resetForm({ values });
+					}
 				}}
 			>
-				{(formik) => (
+				{({ isSubmitting }) => (
 					<Form>
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
@@ -63,7 +70,7 @@ function Login() {
 								/>
 							</Col>
 						</FormGroup>
-						{/* {auth.message && (
+						{auth.message && (
 							<FormGroup row className="justify-content-center">
 								<Col sm={6}>
 									<Alert
@@ -75,16 +82,16 @@ function Login() {
 									</Alert>
 								</Col>
 							</FormGroup>
-						)} */}
+						)}
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
 								<Button
 									block
 									color="primary"
-									disabled={auth.loading}
+									disabled={isSubmitting}
 									type="submit"
 								>
-									{auth.loading ? (
+									{isSubmitting ? (
 										<Spinner size="sm" color="light" />
 									) : (
 										"Prihlásiť"
@@ -105,5 +112,3 @@ function Login() {
 		</Fade>
 	);
 }
-
-export default Login;

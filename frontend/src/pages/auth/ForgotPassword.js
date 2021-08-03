@@ -7,12 +7,8 @@ import { useDataSend } from "../../hooks/useApi";
 import TextInput from "../../components/form/TextInput";
 import { forgotPasswordSchema } from "../../util/validation";
 
-const INITIAL_STATE = {
-	email: "",
-};
-
 export default function ForgotPassword() {
-	const { loading, error, data, sendData, hideMessage } = useDataSend();
+	const { error, data, sendData, hideMessage } = useDataSend();
 
 	return (
 		<Fade>
@@ -24,7 +20,7 @@ export default function ForgotPassword() {
 					sendData("user/forgotPassword", "POST", values)
 				}
 			>
-				{() => (
+				{({ isSubmitting }) => (
 					<Form>
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
@@ -45,24 +41,19 @@ export default function ForgotPassword() {
 										toggle={hideMessage}
 									>
 										{data.message}
-										{data.errors && (
-											<>
-												<hr />
-												<ul>
-													{data.errors.map((e) => (
-														<li>{e}</li>
-													))}
-												</ul>
-											</>
-										)}
 									</Alert>
 								</Col>
 							</FormGroup>
 						)}
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
-								<Button block color="primary" disabled={loading} type="submit">
-									{loading ? (
+								<Button
+									block
+									color="primary"
+									disabled={isSubmitting}
+									type="submit"
+								>
+									{isSubmitting ? (
 										<Spinner size="sm" color="light" />
 									) : (
 										"Resetovať heslo"

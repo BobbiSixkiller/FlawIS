@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { Formik, Form } from "formik";
+import API from "../../util/axiosConfig";
 
-import { FormGroup, Button, Col, Alert, Spinner, Fade } from "reactstrap";
+import { FormGroup, Button, Col, Spinner, Fade } from "reactstrap";
 
 import TextInput from "../../components/form/TextInput";
 import { userSchema } from "../../util/validation";
@@ -10,7 +11,7 @@ import { userSchema } from "../../util/validation";
 import { AuthContext } from "../../context/auth";
 import { normalizeErrors } from "../../util/helperFunctions";
 
-function Register() {
+export default function Register() {
 	const auth = useContext(AuthContext);
 	const history = useHistory();
 
@@ -26,16 +27,18 @@ function Register() {
 					lastName: "",
 				}}
 				validationSchema={userSchema}
-				onSubmit={async (values, helpers) => {
-					await auth.register(values);
-					if (auth.error) {
-						console.log("ERROR");
-						return helpers.setErrors(normalizeErrors(auth.message));
+				onSubmit={async (values, { setErrors }) => {
+					try {
+						const res = await API.post("user/register", values);
+						auth.dispatch({ type: "SUCCESS", payload: res.data });
+						history.push("/dashboard");
+					} catch (err) {
+						setErrors(normalizeErrors(err.response.data.errors));
+						auth.dispatch({ type: "FAILURE", payload: err.response.data });
 					}
-					history.push("/dashboard");
 				}}
 			>
-				{() => (
+				{({ isSubmitting }) => (
 					<Form autoComplete="off">
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
@@ -105,10 +108,10 @@ function Register() {
 								<Button
 									block
 									color="primary"
-									disabled={auth.loading}
+									disabled={isSubmitting}
 									type="submit"
 								>
-									{auth.loading ? (
+									{isSubmitting ? (
 										<Spinner size="sm" color="light" />
 									) : (
 										"Registrovať"
@@ -122,5 +125,3 @@ function Register() {
 		</Fade>
 	);
 }
-
-export default Register;

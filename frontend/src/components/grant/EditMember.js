@@ -1,4 +1,5 @@
 import React from "react";
+import { Formik, Form } from "formik";
 
 import {
 	Alert,
@@ -8,163 +9,108 @@ import {
 	Button,
 	Row,
 	Col,
-	Form,
-	FormGroup,
-	FormFeedback,
-	Label,
-	Input,
-	CustomInput,
+	Spinner,
 } from "reactstrap";
 
+import SwitchInput from "../form/SwitchInput";
+import TextInput from "../form/TextInput";
+import NumberInput from "../form/NumberInput";
+import RadioInput from "../form/RadioInput";
+
 import { memberSchema } from "../../util/validation";
-import useFormValidation from "../../hooks/useFormValidation";
 import { useDataSend } from "../../hooks/useApi";
 
 export default function EditMember({ toggle, modalData }) {
-	const INITIAL_STATE = {
-		hours: modalData.member.hours,
-		active: modalData.member.active,
-		role: modalData.member.role,
-		member: modalData.member.member._id,
-	};
-
-	const { loading, error, data, sendData, hideMessage } = useDataSend();
-
-	const {
-		handleSubmit,
-		handleChange,
-		handleBlur,
-		values,
-		setValues,
-		errors,
-		valid,
-	} = useFormValidation(INITIAL_STATE, function name(params) {}, editMember);
-
-	function editMember() {
-		sendData(
-			`grant/${modalData.grantId}/budget/${modalData.budget._id}/member/${modalData.member._id}`,
-			"PUT",
-			values
-		);
-	}
-	function handleActiveChange(e) {
-		setValues({ ...values, active: e.target.checked });
-	}
+	const { error, data, sendData, hideMessage } = useDataSend();
 
 	return (
-		<Form onSubmit={handleSubmit}>
-			<ModalHeader toggle={toggle}>Upraviť riešiteľa</ModalHeader>
-			<ModalBody>
-				<Row form className="justify-content-center">
-					<Col sm={8}>
-						<FormGroup>
-							<Label for="member">Riešiteľ:</Label>
-							<Input
-								id="member"
-								name="member"
-								value={modalData.member.member.fullName}
-								readOnly
-								plaintext
-							/>
-						</FormGroup>
-					</Col>
-					<Col sm={4}>
-						<FormGroup>
-							<Label for="hours">Hodiny:</Label>
-							<Input
-								id="hours"
-								name="hours"
-								placeholder="Hodiny"
-								value={values.hours}
-								onChange={handleChange}
-								onBlur={handleBlur}
-								valid={valid.hours && true}
-								invalid={errors.hours && true}
-								autoComplete="off"
-							/>
-							<FormFeedback invalid="true">{errors.hours}</FormFeedback>
-							<FormFeedback valid>{valid.hours}</FormFeedback>
-						</FormGroup>
-					</Col>
-				</Row>
-				<Row form className="justify-content-center">
-					<Col sm={8}>
-						<CustomInput
-							type="radio"
-							id="basic"
-							name="role"
-							value="basic"
-							label="Riešiteľ"
-							inline
-							defaultChecked={values.role === "basic" ? true : false}
-							onChange={handleChange}
-						/>
-						<CustomInput
-							type="radio"
-							id="deputy"
-							name="role"
-							value="deputy"
-							label="Zástupca"
-							inline
-							defaultChecked={values.role === "deputy" ? true : false}
-							onChange={handleChange}
-						/>
-						<CustomInput
-							type="radio"
-							id="leader"
-							name="role"
-							value="leader"
-							label="Hlavný"
-							inline
-							defaultChecked={values.role === "leader" ? true : false}
-							onChange={handleChange}
-						/>
-					</Col>
-					<Col sm={4}>
-						<FormGroup>
-							<CustomInput
-								type="switch"
-								id="active"
-								name="active"
-								label="Active"
-								defaultChecked={values.active}
-								onChange={handleActiveChange}
-							/>
-						</FormGroup>
-					</Col>
-				</Row>
-				{data && (
-					<Row row className="justify-content-center my-3">
-						<Col>
-							<Alert
-								color={error ? "danger" : "success"}
-								isOpen={data}
-								toggle={hideMessage}
-							>
-								{data.message}
-								{data.errors && (
-									<>
-										<hr />
-										<ul>
-											{data.errors.map((e) => (
-												<li>{e}</li>
-											))}
-										</ul>
-									</>
-								)}
-							</Alert>
-						</Col>
-					</Row>
-				)}
-			</ModalBody>
-			<ModalFooter>
-				<Button type="submit" disabled={loading} color="warning">
-					Upraviť
-				</Button>{" "}
-				<Button outline color="secondary" onClick={toggle}>
-					Zrušiť
-				</Button>
-			</ModalFooter>
-		</Form>
+		<Formik
+			initialValues={{
+				hours: modalData.member.hours,
+				active: modalData.member.active,
+				role: modalData.member.role,
+				member: modalData.member.member._id,
+				name: modalData.member.member.fullName,
+			}}
+			validationSchema={memberSchema}
+			onSubmit={async (values, helpers) =>
+				await sendData(
+					`grant/${modalData.grantId}/budget/${modalData.budget._id}/member/${modalData.member._id}`,
+					"PUT",
+					values
+				)
+			}
+		>
+			{({ values, isSubmitting }) => (
+				<Form>
+					<ModalHeader toggle={toggle}>Upraviť riešiteľa</ModalHeader>
+					<ModalBody>
+						<Row form className="justify-content-center">
+							<Col sm={8}>
+								<TextInput name="name" label="Riešiteľ" readOnly plaintext />
+							</Col>
+							<Col sm={4}>
+								<NumberInput name="hours" placeholder="Hodiny" label="Hodiny" />
+							</Col>
+						</Row>
+						<Row form className="justify-content-center">
+							<Col sm={8}>
+								<RadioInput
+									inline
+									type="radio"
+									name="role"
+									value="basic"
+									label="Riesitel"
+								/>
+								<RadioInput
+									inline
+									type="radio"
+									name="role"
+									value="deputy"
+									label="Zastupca"
+								/>
+								<RadioInput
+									inline
+									type="radio"
+									name="role"
+									value="leader"
+									label="Veduci"
+								/>
+							</Col>
+							<Col sm={4}>
+								<SwitchInput
+									type="switch"
+									id="active"
+									name="active"
+									label="Active"
+									defaultChecked={values.active}
+								/>
+							</Col>
+						</Row>
+						{data && (
+							<Row className="justify-content-center my-3">
+								<Col>
+									<Alert
+										color={error ? "danger" : "success"}
+										isOpen={data}
+										toggle={hideMessage}
+									>
+										{data.message}
+									</Alert>
+								</Col>
+							</Row>
+						)}
+					</ModalBody>
+					<ModalFooter>
+						<Button type="submit" disabled={isSubmitting} color="warning">
+							{isSubmitting ? <Spinner size="sm" color="light" /> : "Upraviť"}
+						</Button>{" "}
+						<Button outline color="secondary" onClick={toggle}>
+							Zrušiť
+						</Button>
+					</ModalFooter>
+				</Form>
+			)}
+		</Formik>
 	);
 }

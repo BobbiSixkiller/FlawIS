@@ -11,7 +11,7 @@ import { resetPasswordSchema } from "../../util/validation";
 function PasswordRedet() {
 	const url = useParams();
 
-	const { loading, error, data, sendData, hideMessage } = useDataSend();
+	const { error, data, sendData, hideMessage } = useDataSend();
 
 	return (
 		<Fade>
@@ -23,7 +23,7 @@ function PasswordRedet() {
 					sendData(`user/reset/${url.token}`, "POST", values)
 				}
 			>
-				{() => (
+				{({ isSubmitting }) => (
 					<Form autoComplete="off">
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
@@ -54,24 +54,19 @@ function PasswordRedet() {
 										toggle={hideMessage}
 									>
 										{data.message}
-										{data.errors && (
-											<>
-												<hr />
-												<ul>
-													{data.errors.map((e) => (
-														<li>{e}</li>
-													))}
-												</ul>
-											</>
-										)}
 									</Alert>
 								</Col>
 							</FormGroup>
 						)}
 						<FormGroup row className="justify-content-center">
 							<Col sm={6}>
-								<Button block color="primary" disabled={loading} type="submit">
-									{loading ? (
+								<Button
+									block
+									color="primary"
+									disabled={isSubmitting}
+									type="submit"
+								>
+									{isSubmitting ? (
 										<Spinner size="sm" color="light" />
 									) : (
 										"Resetovať heslo"

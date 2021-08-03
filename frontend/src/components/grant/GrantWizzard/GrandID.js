@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 
-import TextInput from "../../components/form/TextInput";
-import SelectInput from "../../components/form/SelectInput";
-import DateInput from "../../components/form/DateInput";
+import TextInput from "../../form/TextInput";
+import SelectInput from "../../form/SelectInput";
+import DateInput from "../../form/DateInput";
 
 export default function GrantID({ setYears }) {
 	const { values, setFieldValue } = useFormikContext();

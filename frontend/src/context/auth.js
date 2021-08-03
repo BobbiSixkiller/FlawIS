@@ -2,13 +2,7 @@ import React, { useEffect, useReducer, createContext } from "react";
 
 import API from "../util/axiosConfig";
 
-const AuthContext = createContext({
-	user: null,
-	login: function (data) {},
-	register: function (data) {},
-	logout: function () {},
-	hideMessage: function () {},
-});
+const AuthContext = createContext();
 
 function authReducer(state, action) {
 	switch (action.type) {
@@ -16,8 +10,6 @@ function authReducer(state, action) {
 			return {
 				...state,
 				loading: true,
-				error: false,
-				message: "",
 			};
 		case "SUCCESS":
 			return {
@@ -32,13 +24,16 @@ function authReducer(state, action) {
 				...state,
 				loading: false,
 				user: null,
+				message: action.payload.message,
 				error: true,
-				message: action.payload.errors,
+				errors: action.payload.errors,
 			};
 		case "HIDE_MSG":
 			return {
 				...state,
 				message: null,
+				error: false,
+				errors: [],
 			};
 
 		default:
@@ -50,8 +45,9 @@ function AuthProvider({ children }) {
 	const [state, dispatch] = useReducer(authReducer, {
 		loading: true,
 		user: null,
-		error: false,
 		message: "",
+		error: false,
+		errors: [],
 	});
 
 	useEffect(() => {
@@ -69,32 +65,13 @@ function AuthProvider({ children }) {
 		currentUser();
 	}, []);
 
-	async function register(data) {
-		dispatch({ type: "INIT" });
-		try {
-			const res = await API.post("user/register", data);
-			dispatch({ type: "SUCCESS", payload: res.data });
-		} catch (err) {
-			dispatch({ type: "FAILURE", payload: err.response.data });
-		}
-	}
-
-	async function login(data) {
-		dispatch({ type: "INIT" });
-		try {
-			const res = await API.post("user/login", data);
-			dispatch({ type: "SUCCESS", payload: res.data });
-		} catch (err) {
-			dispatch({ type: "FAILURE", payload: err.response.data });
-		}
-	}
-
 	async function logout() {
 		dispatch({ type: "INIT" });
 		try {
 			const res = await API.get("user/logout");
 			dispatch({ type: "SUCCESS", payload: res.data });
 		} catch (err) {
+			console.log(err.response);
 			dispatch({ type: "FAILURE", payload: err.response.data });
 		}
 	}
@@ -108,12 +85,12 @@ function AuthProvider({ children }) {
 			value={{
 				loading: state.loading,
 				user: state.user,
-				error: state.error,
 				message: state.message,
-				register,
-				login,
+				error: state.error,
+				errors: state.errors,
 				logout,
 				hideMessage,
+				dispatch,
 			}}
 		>
 			{children}

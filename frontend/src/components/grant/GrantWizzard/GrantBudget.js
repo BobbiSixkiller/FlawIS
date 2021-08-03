@@ -4,9 +4,9 @@ import { FieldArray, useFormikContext, Field } from "formik";
 import { Row, Col, Button } from "reactstrap";
 import { Trash2Fill, PlusLg } from "react-bootstrap-icons";
 
-import NumberInput from "../../components/form/NumberInput";
-import RadioInput from "../../components/form/RadioInput";
-import UserApiSearch from "../../components/user/UserApiSearch";
+import NumberInput from "../../form/NumberInput";
+import RadioInput from "../../form/RadioInput";
+import UserApiSearch from "../../user/UserApiSearch";
 
 export default function GrantBudget({ index }) {
 	const { values, setFieldValue } = useFormikContext();
