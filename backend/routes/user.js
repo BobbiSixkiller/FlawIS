@@ -60,10 +60,15 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 		}
 	);
 
+	const now = new Date();
+	const time = new Date().getTime();
+	time += 3600 * 1000;
+	now.setTime(time);
+
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			httpOnly: true,
-			expires: new Date(Date.now() + 900000),
+			expires: now,
 			sameSite: "strict",
 		})
 		.status(200)
@@ -133,10 +138,15 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		}
 	);
 
+	const now = new Date();
+	const time = new Date().getTime();
+	time += 3600 * 1000;
+	now.setTime(time);
+
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			httpOnly: true,
-			expires: new Date(Date.now() + 900000),
+			expires: now,
 			sameSite: "strict",
 		})
 		.status(200)
