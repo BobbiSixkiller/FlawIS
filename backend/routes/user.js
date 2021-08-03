@@ -51,10 +51,10 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+			domain: "flawis.flaw.uniba.sk",
 			secure: true,
 			httpOnly: true,
 			maxAge: 3 * 60 * 60 * 1000,
-			sameSite: "strict",
 		})
 		.status(200)
 		.send({
@@ -128,7 +128,6 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 			secure: true,
 			httpOnly: true,
 			maxAge: 3 * 60 * 60 * 1000,
-			sameSite: "strict",
 		})
 		.status(200)
 		.send({
