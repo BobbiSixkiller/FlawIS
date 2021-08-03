@@ -9,7 +9,7 @@ const { errorHandler } = require("./middlewares/error");
 const app = express();
 
 //middleware
-//app.use(cors({ origin: ["https://flawis.flaw.uniba.sk"], credentials: true }));
+app.use(cors({ origin: ["https://flawis.flaw.uniba.sk"], credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/public", express.static("public"));
