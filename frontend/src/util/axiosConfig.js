@@ -1,5 +1,5 @@
 import Axios from "axios";
 
-const api = Axios.create({
+export default Axios.create({
 	baseURL: "https://flawis-backend.flaw.uniba.sk/",
 });
