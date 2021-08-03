@@ -122,13 +122,11 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		}
 	);
 
-	const expiration = new Date(Date.now() + 60 * 60 * 1000);
-
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			secure: true,
 			httpOnly: now,
-			expires: expiration,
+			expires: Date.now() + 60 * 60 * 1000,
 			sameSite: "strict",
 		})
 		.status(200)
