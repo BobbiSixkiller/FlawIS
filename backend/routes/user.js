@@ -128,6 +128,7 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 			secure: true,
 			httpOnly: true,
 			maxAge: 3 * 60 * 60 * 1000,
+			sameSite: "none",
 		})
 		.status(200)
 		.send({
