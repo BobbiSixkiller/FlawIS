@@ -219,18 +219,9 @@ router.post(
 		user.password = password;
 		await user.save();
 
-<<<<<<< HEAD
-// router.get("/logout", (req, res) => {
-// 	res
-// 		.cookie("token", "", { httpOnly: true, expires: new Date(0) })
-// 		.status(200)
-// 		.send({ msg: "Boli ste odhlásený." });
-// });
-=======
 		res.status(200).send({ message: "Vaše heslo bolo zmenené!" });
 	}
 );
->>>>>>> dev
 
 router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
 	const users = await User.find(
@@ -261,8 +252,6 @@ router.get("/logout", (req, res) => {
 		.send({ message: "Boli ste odhlásený." });
 });
 
-<<<<<<< HEAD
-=======
 router.get("/me", checkAuth, async (req, res, next) => {
 	const user = await User.findOne({ _id: req.user._id }).select("-password");
 	if (!user) return next(new NotFoundError("Používateľ nebol nájdený!"));
@@ -271,7 +260,6 @@ router.get("/me", checkAuth, async (req, res, next) => {
 });
 
 //util endpoint for grant members
->>>>>>> dev
 router.get("/names", checkAuth, async (req, res) => {
 	const users = await User.find().select("firstName lastName");
 
