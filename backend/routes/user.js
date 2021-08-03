@@ -122,11 +122,6 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		}
 	);
 
-	const now = new Date();
-	const time = new Date().getTime();
-	time += 3600 * 1000;
-	now.setTime(time);
-
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			httpOnly: true,
