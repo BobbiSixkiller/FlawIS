@@ -47,14 +47,25 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 	});
 	await user.save();
 
-	const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+	const token = jwt.sign(
+		{
+			_id: user._id,
+			name: `${user.firstName} ${user.lastName}`,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.SECRET,
+		{
+			expiresIn: "1h",
+		}
+	);
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
-			domain: "flawis.flaw.uniba.sk",
+			domain: "flawis-backend.flaw.uniba.sk",
 			secure: true,
 			httpOnly: true,
-			maxAge: 3 * 60 * 60 * 1000,
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
@@ -127,8 +138,7 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		.cookie("authorization", `Bearer ${token}`, {
 			secure: true,
 			httpOnly: true,
-			maxAge: 3 * 60 * 60 * 1000,
-			sameSite: "none",
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
@@ -249,7 +259,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 router.get("/logout", (req, res) => {
 	res
-		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+		.clearCookie("authorization")
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
