@@ -90,8 +90,8 @@ router.post(
 		const emailExist = await User.findOne({ email: req.body.email });
 		if (emailExist)
 			return next(
-				new UserInputError("Bad user input!", [
-					"Zadaný email je už zaregistrovaný!",
+				new UserInputError("Email exists!", [
+					{ path: "email", message: "Zadaný email je už zaregistrovaný!" },
 				])
 			);
 
@@ -199,7 +199,7 @@ router.post(
 		}
 
 		res.status(200).send({
-			msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
+			message: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
 		});
 	}
 );
@@ -271,13 +271,6 @@ router.get("/me", checkAuth, async (req, res, next) => {
 	res.status(200).send({ message: `Vitajte ${user.fullName}!`, user });
 });
 
-//util endpoint for grant members
-router.get("/names", checkAuth, async (req, res) => {
-	const users = await User.find().select("firstName lastName");
-
-	res.status(200).send(users);
-});
-
 router.get("/:id", checkAuth, isOwnUser, async (req, res, next) => {
 	const user = await User.findOne({ _id: req.params.id });
 	if (!user) return next(new NotFoundError("Používateľ nebol nájdený!"));
@@ -308,8 +301,8 @@ router.put(
 			const emailExists = User.findOne({ email: req.body.email });
 			if (emailExists)
 				return next(
-					new UserInputError("Bad user input!", [
-						"Zadaný email je už zaregistrovaný!",
+					new UserInputError("Email exists!", [
+						{ path: "email", message: "Zadaný email je už zaregistrovaný!" },
 					])
 				);
 		}
