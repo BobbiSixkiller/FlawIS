@@ -4,6 +4,7 @@ const Post = require("../models/Post");
 
 module.exports.checkAuth = function (req, res, next) {
 	try {
+		console.log(req.cookies);
 		const { authorization } = req.cookies;
 		const token = authorization.split("Bearer ")[1];
 
