@@ -60,16 +60,10 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 		}
 	);
 
-	const now = new Date();
-	const time = new Date().getTime();
-	time += 3600 * 1000;
-	now.setTime(time);
-
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			httpOnly: true,
-			expires: now,
-			sameSite: "strict",
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
@@ -138,16 +132,10 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 		}
 	);
 
-	const now = new Date();
-	const time = new Date().getTime();
-	time += 3600 * 1000;
-	now.setTime(time);
-
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			httpOnly: true,
-			expires: now,
-			sameSite: "strict",
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
@@ -268,7 +256,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 router.get("/logout", (req, res) => {
 	res
-		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+		.clearCookie("authorization")
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
