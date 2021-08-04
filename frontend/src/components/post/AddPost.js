@@ -25,15 +25,19 @@ export default function AddPost({ toggle }) {
 		<Formik
 			initialValues={{ name: "", body: "", tags: [] }}
 			validationSchema={postSchema}
-			onSubmit={async (values, helpers) =>
-				await sendData("post/", "POST", values)
-			}
+			onSubmit={async (values, helpers) => {
+				try {
+					await sendData("post/", "POST", values);
+				} catch (err) {
+					console.log(err.response);
+				}
+			}}
 		>
 			{({ isSubmitting }) => (
 				<Form>
 					<ModalHeader toggle={toggle}>Nový post</ModalHeader>
 					<ModalBody>
-						<Row form className="justify-content-center">
+						<Row form>
 							<Col>
 								<TextInput
 									type="text"
@@ -43,7 +47,7 @@ export default function AddPost({ toggle }) {
 								/>
 							</Col>
 						</Row>
-						<Row form className="justify-content-center">
+						<Row form>
 							<Col>
 								<TextInput
 									type="textarea"
