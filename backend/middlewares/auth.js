@@ -5,10 +5,9 @@ const Post = require("../models/Post");
 module.exports.checkAuth = function (req, res, next) {
 	try {
 		const { authorization } = req.cookies;
-		console.log(authorization);
 		const token = authorization.split("Bearer ")[1];
 
-		req.user = jwt.verify(token, process.env.secret);
+		req.user = jwt.verify(token, process.env.SECRET);
 		next();
 	} catch (error) {
 		console.log(error);
