@@ -4,6 +4,7 @@ import { useDataSend } from "../../hooks/useApi";
 
 import {
   Alert,
+  Spinner,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -43,7 +44,7 @@ export default function DeleteUser({ user, toggle }) {
       </ModalBody>
       <ModalFooter>
         <Button type="submit" color="danger" disabled={loading}>
-          Zmazať
+          {loading ? <Spinner size="sm" color="light" /> : "Zmazať"}
         </Button>{" "}
         <Button outline color="secondary" onClick={toggle}>
           Zrušiť

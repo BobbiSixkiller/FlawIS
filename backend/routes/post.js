@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { NotFoundError } = require("../middlewares/error");
+const { NotFoundError, UserInputError } = require("../middlewares/error");
 
 const Post = require("../models/Post");
 const { checkAuth, isOwnPost } = require("../middlewares/auth");
@@ -48,9 +48,12 @@ router.post("/", checkAuth, validate(postSchema), async (req, res) => {
     author: req.user.name,
     userId: req.user._id,
   });
+
   await post.save();
 
-  res.status(200).send({ message: "Nový post pridaný!", post });
+  res
+    .status(200)
+    .send({ success: "true", message: "Nový post pridaný!", post });
 });
 
 router.put(
@@ -67,7 +70,9 @@ router.put(
 
     await post.save();
 
-    res.status(200).send({ message: "Post bol aktualizovaný!", post });
+    res
+      .status(200)
+      .send({ success: true, message: "Post bol aktualizovaný!", post });
   }
 );
 
@@ -76,7 +81,7 @@ router.delete("/:id", checkAuth, isOwnPost, async (req, res) => {
 
   await post.remove();
 
-  res.status(200).send({ message: "Post bol zmazaný!" });
+  res.status(200).send({ success: true, message: "Post bol zmazaný!", post });
 });
 
 module.exports = router;

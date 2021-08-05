@@ -8,62 +8,60 @@ import GrantID from "./GrantWizzard/GrandID";
 import GrantBudget from "./GrantWizzard/GrantBudget";
 
 import { useDataSend } from "../../hooks/useApi";
-import { normalizeErrors } from "../../util/helperFunctions";
 
 export default function AddGrant({ toggle }) {
-	const [years, setYears] = useState([new Date().getFullYear()]);
+  const [years, setYears] = useState([new Date().getFullYear()]);
 
-	const { error, data, sendData, hideMessage } = useDataSend();
+  const { sendData } = useDataSend();
 
-	return (
-		<>
-			<ModalHeader toggle={toggle}>Nový grant</ModalHeader>
-			<ModalBody>
-				<WizzardForm
-					backendError={error}
-					backendData={data}
-					hideMessage={hideMessage}
-					toggle={toggle}
-					initialValues={{
-						name: "",
-						type: "APVV",
-						idNumber: "",
-						start: "",
-						end: "",
-						budget: [],
-					}}
-					onSubmit={async (values, helpers) => {
-						await sendData("grant/", "POST", values);
-						if (error && data) {
-							console.log(data.errors);
-							helpers.setStatus(normalizeErrors(data.errors));
-						} else {
-							helpers.setStatus({});
-						}
-						helpers.setSubmitting(false);
-					}}
-				>
-					<FormStep
-						// onSubmit={(values) => {
-						// 	console.log("GRANT ID SUBMIT", values);
-						// }}
-						validationSchema={grantIdSchema}
-					>
-						<GrantID setYears={setYears} />
-					</FormStep>
-					{years.map((y, i) => (
-						<FormStep
-							// onSubmit={(values) => {
-							//   console.log("GRANT BUDGET SUBMIT", values);
-							// }}
-							validationSchema={grantBudgetSchema}
-							key={i}
-						>
-							<GrantBudget index={i} />
-						</FormStep>
-					))}
-				</WizzardForm>
-			</ModalBody>
-		</>
-	);
+  return (
+    <>
+      <ModalHeader toggle={toggle}>Nový grant</ModalHeader>
+      <ModalBody>
+        <WizzardForm
+          toggle={toggle}
+          initialValues={{
+            name: "",
+            type: "APVV",
+            idNumber: "",
+            start: "",
+            end: "",
+            budget: [],
+          }}
+          initialStatus={{ success: false, message: "", errors: [] }}
+          onSubmit={async (values, { resetForm, setStatus }) => {
+            const res = await sendData("grant/", "POST", values);
+            resetForm({
+              values,
+              status: {
+                success: res.success,
+                message: res.message,
+                errors: res.errors,
+              },
+            });
+          }}
+        >
+          <FormStep
+            // onSubmit={(values) => {
+            // 	console.log("GRANT ID SUBMIT", values);
+            // }}
+            validationSchema={grantIdSchema}
+          >
+            <GrantID setYears={setYears} />
+          </FormStep>
+          {years.map((y, i) => (
+            <FormStep
+              // onSubmit={(values) => {
+              //   console.log("GRANT BUDGET SUBMIT", values);
+              // }}
+              validationSchema={grantBudgetSchema}
+              key={i}
+            >
+              <GrantBudget index={i} />
+            </FormStep>
+          ))}
+        </WizzardForm>
+      </ModalBody>
+    </>
+  );
 }
