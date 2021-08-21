@@ -5,20 +5,16 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  FormText,
-  CustomInput,
-  FormGroup,
-  FormFeedback,
   Button,
-  Label,
-  Input,
   Col,
   Row,
   Alert,
+  Spinner,
 } from "reactstrap";
 
 import SelectInput from "../form/SelectInput";
 import TextInput from "../form/TextInput";
+import FileUpload from "../form/FileUpload";
 
 import { useDataSend } from "../../hooks/useApi";
 import { announcementSchema } from "../../util/validation";
@@ -51,11 +47,12 @@ export default function AddAnnouncement({ toggle, grantId }) {
         scope: grantId ? "SINGLE" : "APVV",
         files: {},
       }}
+      validationSchema={announcementSchema}
       onSubmit={async (values, helpers) => {
         const res = await addAnnouncement(values);
       }}
     >
-      {(formik) => (
+      {({ values, errors, isSubmitting }) => (
         <Form autoComplete="off">
           <ModalHeader toggle={toggle}>Nový oznam</ModalHeader>
           <ModalBody>
@@ -97,7 +94,7 @@ export default function AddAnnouncement({ toggle, grantId }) {
             </Row>
             <Row form className="justify-content-center">
               <Col>
-                <FormGroup>
+                {/* <FormGroup>
                   <Label for="files">Pripojiť dokument:</Label>
                   <CustomInput
                     type="file"
@@ -115,7 +112,8 @@ export default function AddAnnouncement({ toggle, grantId }) {
                   <FormText color="muted">
                     Maximálne je možné nahrať 5 súborov naraz!
                   </FormText>
-                </FormGroup>
+                </FormGroup> */}
+                <FileUpload label="Dokumenty" />
               </Col>
             </Row>
             {data && (
@@ -143,8 +141,8 @@ export default function AddAnnouncement({ toggle, grantId }) {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button type="submit" disabled={loading} color="success">
-              Pridať
+            <Button type="submit" disabled={isSubmitting} color="success">
+              {isSubmitting ? <Spinner size="sm" color7="light" /> : "Pridať"}
             </Button>{" "}
             <Button outline color="secondary" onClick={toggle}>
               Zrušiť
