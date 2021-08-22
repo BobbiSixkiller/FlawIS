@@ -59,12 +59,14 @@ router.post(
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
       const reqFile = {};
+
       reqFile.url = url + "/public/documents/" + req.files[i].filename;
       reqFile.path = "public/documents/" + req.files[i].filename;
       reqFile.name = req.files[i].filename.slice(
         37,
         req.files[i].filename.length
       );
+
       reqFiles.push(reqFile);
     }
 
