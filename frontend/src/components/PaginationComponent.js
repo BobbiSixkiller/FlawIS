@@ -1,7 +1,10 @@
 import React from "react";
+import { useLocation, Link } from "react-router-dom";
 import { Row, Pagination, PaginationItem, PaginationLink } from "reactstrap";
 
 export default function PaginationComponent({ page, pages, changePage }) {
+	const {pathname, search} = useLocation();
+
 	let links;
 
 	if (pages <= 5) {
@@ -9,6 +12,8 @@ export default function PaginationComponent({ page, pages, changePage }) {
 			<PaginationItem
 				key={i + 1}
 				onClick={() => changePage(i + 1)}
+				tag={Link}
+				to=
 				active={page === i + 1}
 			>
 				<PaginationLink>{i + 1}</PaginationLink>

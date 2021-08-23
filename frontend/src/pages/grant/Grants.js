@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Switch, Route, Link, useRouteMatch } from "react-router-dom";
+import {
+	Switch,
+	Route,
+	Link,
+	useRouteMatch,
+	useLocation,
+} from "react-router-dom";
 
 import { Row, Button, Table, Spinner, Fade, Modal } from "reactstrap";
 import { Trash2Fill } from "react-bootstrap-icons";
@@ -16,7 +22,9 @@ import PaginationComponent from "../../components/PaginationComponent";
 export default function Grants() {
 	const auth = useContext(AuthContext);
 	const { path, url } = useRouteMatch();
-	const [page, setPage] = useState(1);
+	const [page, setPage] = useState(
+		parseInt(new URLSearchParams(useLocation().search).get("page"))
+	);
 
 	const { dispatch, show, action, modalData } = useModal();
 

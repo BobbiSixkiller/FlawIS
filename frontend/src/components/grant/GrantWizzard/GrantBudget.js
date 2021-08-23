@@ -63,7 +63,7 @@ export default function GrantBudget({ index }) {
 										arrayHelpers.push({
 											name: "",
 											member: "",
-											hours: 0,
+											hours: 1,
 											role: "basic",
 										})
 									}
