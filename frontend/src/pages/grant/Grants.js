@@ -22,9 +22,7 @@ import PaginationComponent from "../../components/PaginationComponent";
 export default function Grants() {
 	const auth = useContext(AuthContext);
 	const { path, url } = useRouteMatch();
-	const [page, setPage] = useState(
-		parseInt(new URLSearchParams(useLocation().search).get("page"))
-	);
+	const page = parseInt(new URLSearchParams(useLocation().search).get("page"));
 
 	const { dispatch, show, action, modalData } = useModal();
 
@@ -113,11 +111,7 @@ export default function Grants() {
 								))}
 						</tbody>
 					</Table>
-					<PaginationComponent
-						page={page}
-						pages={data.pages}
-						changePage={setPage}
-					/>
+					<PaginationComponent page={page} pages={data.pages} />
 					<Button tag={Link} to="/" outline color="primary">
 						Späť
 					</Button>

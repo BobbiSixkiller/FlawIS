@@ -86,7 +86,7 @@ function Header() {
 									</DropdownToggle>
 									<DropdownMenu>
 										<DropdownItem
-											onClick={() => history.push("/dashboard/users")}
+											onClick={() => history.push("/dashboard/users?page=1")}
 										>
 											Používatelia
 										</DropdownItem>
@@ -96,7 +96,9 @@ function Header() {
 											Granty
 										</DropdownItem>
 										<DropdownItem
-											onClick={() => history.push("/dashboard/announcements")}
+											onClick={() =>
+												history.push("/dashboard/announcements?page=1")
+											}
 										>
 											Oznamy
 										</DropdownItem>

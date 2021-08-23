@@ -65,7 +65,7 @@ export default function Dashboard() {
 								Modul poskytuje informácie ohľadne vedeckej práce pedagogických
 								pracovníkov fakulty.
 							</CardText>
-							<Button color="info" tag={Link} to={`${url}/posts`}>
+							<Button color="info" tag={Link} to={`${url}/posts?page=1`}>
 								Zobraziť
 							</Button>
 						</Card>
