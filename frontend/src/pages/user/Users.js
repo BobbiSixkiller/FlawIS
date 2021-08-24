@@ -23,7 +23,7 @@ import PaginationComponent from "../../components/PaginationComponent";
 export default function Users() {
 	const auth = useContext(AuthContext);
 	const { path, url } = useRouteMatch();
-	const page = new URLSearchParams(useLocation().search);
+	const page = parseInt(new URLSearchParams(useLocation().search).get("page"));
 
 	const { dispatch, show, action, modalData } = useModal();
 
