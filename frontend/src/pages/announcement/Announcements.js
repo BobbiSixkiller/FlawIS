@@ -21,7 +21,7 @@ import DeleteAnnouncement from "../../components/announcement/DeleteAnnouncement
 
 export default function Announcements() {
 	const { path, url } = useRouteMatch();
-	const page = new URLSearchParams(useLocation().search);
+	const page = parseInt(new URLSearchParams(useLocation().search).get("page"));
 
 	const { show, action, modalData, dispatch } = useModal();
 

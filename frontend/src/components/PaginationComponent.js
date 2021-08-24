@@ -89,7 +89,7 @@ export default function PaginationComponent({ page, pages }) {
 				);
 			} else {
 				let lastFew = pages - page + 5;
-				console.log(lastFew, pages, page);
+
 				links = (
 					<>
 						<PaginationItem
