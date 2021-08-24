@@ -50,7 +50,6 @@ export default function PaginationComponent({ page, pages }) {
 				links = (
 					<>
 						<PaginationItem
-							key={1}
 							active={page === 1}
 							onClick={() => history.push(pathname + `?page=${1}`)}
 						>
@@ -59,7 +58,13 @@ export default function PaginationComponent({ page, pages }) {
 						<PaginationItem disabled>
 							<PaginationLink>...</PaginationLink>
 						</PaginationItem>
-
+						<PaginationItem>
+							<PaginationLink
+								onClick={() => history.push(pathname + `?page=${start}`)}
+							>
+								{start}
+							</PaginationLink>
+						</PaginationItem>
 						{[...Array(5)].map((_, i) => (
 							<PaginationItem
 								key={start + i + 1}
@@ -75,7 +80,6 @@ export default function PaginationComponent({ page, pages }) {
 							<PaginationLink>...</PaginationLink>
 						</PaginationItem>
 						<PaginationItem
-							key={pages}
 							active={page === pages}
 							onClick={() => history.push(pathname + `?page=${pages}`)}
 						>
@@ -85,10 +89,10 @@ export default function PaginationComponent({ page, pages }) {
 				);
 			} else {
 				let lastFew = pages - page + 5;
+				console.log(lastFew, pages, page);
 				links = (
 					<>
 						<PaginationItem
-							key={1}
 							active={page === 1}
 							onClick={() => history.push(pathname + `?page=${1}`)}
 						>
@@ -97,9 +101,16 @@ export default function PaginationComponent({ page, pages }) {
 						<PaginationItem disabled>
 							<PaginationLink>...</PaginationLink>
 						</PaginationItem>
+						<PaginationItem>
+							<PaginationLink
+								onClick={() => history.push(pathname + `?page=${start}`)}
+							>
+								{start}
+							</PaginationLink>
+						</PaginationItem>
 						{[...Array(lastFew)].map((_, i) => (
 							<PaginationItem
-								className={start + i + 1 > pages && `d-none`}
+								className={start + i + 1 > pages ? "d-none" : null}
 								key={start + i + 1}
 								onClick={() =>
 									history.push(pathname + `?page=${start + i + 1}`)
@@ -118,7 +129,7 @@ export default function PaginationComponent({ page, pages }) {
 	return (
 		pages > 1 && (
 			<Row className="justify-content-center">
-				<Pagination aria-label="Page navigation example">
+				<Pagination aria-label="Pagination">
 					<PaginationItem
 						disabled={page === 1}
 						onClick={() =>

@@ -13,7 +13,7 @@ const validate = require("../middlewares/validation");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	const page = req.query.page || 1;
-	const pageSize = req.query.size || 5;
+	const pageSize = req.query.size || 1;
 
 	const [grants, total] = await Promise.all([
 		Grant.find()
