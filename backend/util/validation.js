@@ -68,6 +68,7 @@ const announcementSchema = Yup.object({
 	content: Yup.string().required(),
 	grantId: Yup.string(),
 	scope: Yup.mixed().oneOf(["APVV", "VEGA", "KEGA", "ALL", "SINGLE"]),
+	files: Yup.array().of(Yup.object({ filename: Yup.string().required() })),
 });
 
 const postSchema = Yup.object({
