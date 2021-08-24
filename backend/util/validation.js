@@ -50,8 +50,8 @@ const grantSchema = Yup.object({
 	name: Yup.string().required(),
 	idNumber: Yup.string().required(),
 	type: Yup.mixed().required().oneOf(["APVV", "VEGA", "KEGA"]),
-	start: Yup.date().required(),
-	end: Yup.date().required(),
+	start: Yup.date().max(Yup.ref("end")).required(),
+	end: Yup.date().min(Yup.ref("start")).required(),
 	budget: Yup.array()
 		.of(
 			budgetSchema.shape({
