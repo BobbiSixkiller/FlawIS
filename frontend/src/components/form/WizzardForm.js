@@ -7,7 +7,13 @@ export function FormStep({ children }) {
 	return <>{children}</>;
 }
 
-export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
+export function WizzardForm({
+	children,
+	initialValues,
+	initialStatus,
+	onSubmit,
+	...props
+}) {
 	const steps = Children.toArray(children);
 	const [stepNumber, setStepNumber] = useState(0);
 	const [snapshot, setSnapshot] = useState(initialValues);
@@ -32,6 +38,7 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
 	return (
 		<Formik
 			initialValues={snapshot}
+			initialStatus={initialStatus}
 			validationSchema={step.props.validationSchema}
 			onSubmit={async (values, helpers) => {
 				if (step.props.onSubmit) {
@@ -45,7 +52,7 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
 				}
 			}}
 		>
-			{(formik) => (
+			{({ isSubmitting, values, status, setStatus }) => (
 				<Form autoComplete="off">
 					{step}
 
@@ -56,18 +63,18 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
 						<Progress value={((stepNumber + 1) / steps.length) * 100} />
 					</div>
 
-					{props.backendData && (
+					{status && (
 						<Alert
-							color={props.backendError ? "danger" : "success"}
-							isOpen={props.backendData.message && true}
-							toggle={props.hideMessage}
+							color={status.success ? "success" : "danger"}
+							isOpen={status.message.length !== 0}
+							toggle={() => setStatus({ ...status, message: "" })}
 						>
-							{props.backendData.message}
-							{props.backendData.errors && (
+							{status.message}
+							{status.errors && status.errors.length !== 0 && (
 								<>
 									<hr />
 									<ul>
-										{props.backendData.errors.map((e) => (
+										{status.errors.map((e) => (
 											<li key={e.path}>{e.message}</li>
 										))}
 									</ul>
@@ -80,7 +87,7 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
 						type="button"
 						outline
 						color="secondary"
-						onClick={() => previous(formik.values)}
+						onClick={() => previous(values)}
 					>
 						{stepNumber === 0 ? "Zrušiť" : "Späť"}
 					</Button>
@@ -90,10 +97,10 @@ export function WizzardForm({ children, initialValues, onSubmit, ...props }) {
 						type="submit"
 						color="success"
 						className="float-right"
-						disabled={formik.isSubmitting}
+						disabled={isSubmitting}
 					>
 						{isLastStep ? (
-							formik.isSubmitting ? (
+							isSubmitting ? (
 								<Spinner size="sm" color="light" />
 							) : (
 								"Pridať"

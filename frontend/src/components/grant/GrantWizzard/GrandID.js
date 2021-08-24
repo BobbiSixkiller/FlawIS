@@ -32,7 +32,7 @@ export default function GrantID({ setYears }) {
 				services: 0,
 				salaries: 0,
 				indirect: 0,
-				members: [{ member: "", name: "", role: "basic", hours: 0 }],
+				members: [{ member: "", name: "", role: "basic", hours: 1 }],
 			}))
 		);
 	}, [values.start, values.end, setYears, setFieldValue]);

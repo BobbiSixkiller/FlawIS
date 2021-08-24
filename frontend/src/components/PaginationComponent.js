@@ -1,14 +1,18 @@
 import React from "react";
+import { useLocation, useHistory } from "react-router-dom";
 import { Row, Pagination, PaginationItem, PaginationLink } from "reactstrap";
 
-export default function PaginationComponent({ page, pages, changePage }) {
+export default function PaginationComponent({ page, pages }) {
+	const history = useHistory();
+	const { pathname } = useLocation();
+
 	let links;
 
 	if (pages <= 5) {
 		links = [...Array(pages)].map((_, i) => (
 			<PaginationItem
 				key={i + 1}
-				onClick={() => changePage(i + 1)}
+				onClick={() => history.push(pathname + `?page=${i + 1}`)}
 				active={page === i + 1}
 			>
 				<PaginationLink>{i + 1}</PaginationLink>
@@ -22,7 +26,7 @@ export default function PaginationComponent({ page, pages, changePage }) {
 				{[...Array(5)].map((_, i) => (
 					<PaginationItem
 						key={start + i + 1}
-						onClick={() => changePage(start + i + 1)}
+						onClick={() => history.push(pathname + `?page=${start + i + 1}`)}
 						active={page === start + i + 1}
 					>
 						<PaginationLink>{start + i + 1}</PaginationLink>
@@ -34,7 +38,7 @@ export default function PaginationComponent({ page, pages, changePage }) {
 				<PaginationItem
 					key={pages}
 					active={page === pages}
-					onClick={() => changePage(pages)}
+					onClick={() => history.push(pathname + `?page=${pages}`)}
 				>
 					<PaginationLink>{pages}</PaginationLink>
 				</PaginationItem>
@@ -48,7 +52,7 @@ export default function PaginationComponent({ page, pages, changePage }) {
 						<PaginationItem
 							key={1}
 							active={page === 1}
-							onClick={() => changePage(1)}
+							onClick={() => history.push(pathname + `?page=${1}`)}
 						>
 							<PaginationLink>1</PaginationLink>
 						</PaginationItem>
@@ -59,7 +63,9 @@ export default function PaginationComponent({ page, pages, changePage }) {
 						{[...Array(5)].map((_, i) => (
 							<PaginationItem
 								key={start + i + 1}
-								onClick={() => changePage(start + i + 1)}
+								onClick={() =>
+									history.push(pathname + `?page=${start + i + 1}`)
+								}
 								active={page === start + i + 1}
 							>
 								<PaginationLink>{start + i + 1}</PaginationLink>
@@ -71,7 +77,7 @@ export default function PaginationComponent({ page, pages, changePage }) {
 						<PaginationItem
 							key={pages}
 							active={page === pages}
-							onClick={() => changePage(pages)}
+							onClick={() => history.push(pathname + `?page=${pages}`)}
 						>
 							<PaginationLink>{pages}</PaginationLink>
 						</PaginationItem>
@@ -84,7 +90,7 @@ export default function PaginationComponent({ page, pages, changePage }) {
 						<PaginationItem
 							key={1}
 							active={page === 1}
-							onClick={() => changePage(1)}
+							onClick={() => history.push(pathname + `?page=${1}`)}
 						>
 							<PaginationLink>1</PaginationLink>
 						</PaginationItem>
@@ -95,7 +101,9 @@ export default function PaginationComponent({ page, pages, changePage }) {
 							<PaginationItem
 								className={start + i + 1 > pages && `d-none`}
 								key={start + i + 1}
-								onClick={() => changePage(start + i + 1)}
+								onClick={() =>
+									history.push(pathname + `?page=${start + i + 1}`)
+								}
 								active={page === start + i + 1}
 							>
 								<PaginationLink>{start + i + 1}</PaginationLink>
@@ -113,14 +121,18 @@ export default function PaginationComponent({ page, pages, changePage }) {
 				<Pagination aria-label="Page navigation example">
 					<PaginationItem
 						disabled={page === 1}
-						onClick={() => page !== 1 && changePage(page - 1)}
+						onClick={() =>
+							page !== 1 && history.push(pathname + `?page=${page - 1}`)
+						}
 					>
 						<PaginationLink previous />
 					</PaginationItem>
 					{links}
 					<PaginationItem
 						disabled={page === pages}
-						onClick={() => page !== pages && changePage(page + 1)}
+						onClick={() =>
+							page !== pages && history.push(pathname + `?page=${page + 1}`)
+						}
 					>
 						<PaginationLink next />
 					</PaginationItem>

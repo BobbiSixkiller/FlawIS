@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+//Discontinued usage of this custom validation hook, decided to use formik instead
 export default function useFormValidation(initialState, validate, action) {
   const [values, setValues] = useState(initialState);
   const [errors, setErrors] = useState({});

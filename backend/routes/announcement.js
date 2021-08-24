@@ -59,12 +59,14 @@ router.post(
     const reqFiles = [];
     for (var i = 0; i < req.files.length; i++) {
       const reqFile = {};
+
       reqFile.url = url + "/public/documents/" + req.files[i].filename;
       reqFile.path = "public/documents/" + req.files[i].filename;
       reqFile.name = req.files[i].filename.slice(
         37,
         req.files[i].filename.length
       );
+
       reqFiles.push(reqFile);
     }
 
@@ -91,7 +93,9 @@ router.post(
       );
     }
 
-    res.status(200).send({ message: "Oznam bol pridaný." });
+    res
+      .status(200)
+      .send({ success: true, message: "Oznam bol pridaný.", announcement });
   }
 );
 
@@ -126,7 +130,11 @@ router.put(
 
     await announcement.save();
 
-    res.status(200).send({ message: "Oznam bol aktualizovaný.", announcement });
+    res.status(200).send({
+      success: true,
+      message: "Oznam bol aktualizovaný.",
+      announcement,
+    });
   }
 );
 
@@ -140,7 +148,7 @@ router.delete("/:id", checkAuth, isSupervisor, async (req, res, next) => {
   );
   await announcement.remove();
 
-  res.status(200).send({ message: "Oznam bol odstránený." });
+  res.status(200).send({ success: true, message: "Oznam bol odstránený." });
 });
 
 router.delete(
@@ -160,7 +168,9 @@ router.delete(
     await file.remove();
     await announcement.save();
 
-    res.status(200).send({ message: "Dokument bol vymazaný.", announcement });
+    res
+      .status(200)
+      .send({ success: true, message: "Dokument bol vymazaný.", announcement });
   }
 );
 
