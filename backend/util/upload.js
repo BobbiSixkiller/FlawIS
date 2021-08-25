@@ -25,7 +25,7 @@ module.exports.upload = multer({
       cb(null, false);
       return cb(
         new UserInputError("Bad user input", [
-          "Povolene typy suborov: PDF, Word!",
+          { path: "files", message: "Povolene typy suborov: PDF, Word!" },
         ])
       );
     }
