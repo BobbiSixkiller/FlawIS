@@ -62,13 +62,20 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+<<<<<<< HEAD
 			domain: "flawis-backend.flaw.uniba.sk",
 			secure: true,
+=======
+>>>>>>> dev
 			httpOnly: true,
 			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
+<<<<<<< HEAD
+=======
+			success: true,
+>>>>>>> dev
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,
@@ -138,13 +145,20 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+<<<<<<< HEAD
 			domain: "flawis-backend.flaw.uniba.sk",
 			secure: true,
+=======
+>>>>>>> dev
 			httpOnly: true,
 			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
+<<<<<<< HEAD
+=======
+			success: true,
+>>>>>>> dev
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,
@@ -265,7 +279,11 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 router.get("/logout", (req, res) => {
 	res
+<<<<<<< HEAD
 		.clearCookie("authorization")
+=======
+		.cookie("authorization", "", { httpOnly: true, maxAge: 0 })
+>>>>>>> dev
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
@@ -345,6 +363,7 @@ router.delete("/:id", checkAuth, isAdmin, async (req, res, next) => {
 		message: `Používateľ ${user.fullName} vymazaný!`,
 		user,
 	});
+<<<<<<< HEAD
 });
 
 //experimental endpoint
@@ -363,6 +382,8 @@ router.post("/tokenIsValid", async (req, res) => {
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
+=======
+>>>>>>> dev
 });
 
 module.exports = router;

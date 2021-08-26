@@ -19,7 +19,7 @@ import {
   Input,
   FormGroup,
 } from "reactstrap";
-import { Trash2Fill, PencilFill } from "react-bootstrap-icons";
+import { Trash2Fill, PencilSquare } from "react-bootstrap-icons";
 
 import { AuthContext } from "../../context/auth";
 
@@ -268,7 +268,7 @@ function Budget({ dispatch, grantId, budget, isCheckout }) {
                                     })
                                   }
                                 >
-                                  <PencilFill />
+                                  <PencilSquare />
                                 </Button>
                                 <Button
                                   outline
