@@ -13,19 +13,16 @@ import {
 } from "reactstrap";
 
 function FileWrapper({ file, errors, remove }) {
-  const invFileType = errors.some((err) => err.code === "file-invalid-type");
-
   return (
-    <ListGroupItem color={invFileType && "danger"} key={file.name}>
+    <ListGroupItem>
       {file.name}
-      {invFileType && " - podporovane dokumenty: PDF, Word!"}
       <Button close onClick={() => remove(file)} />
     </ListGroupItem>
   );
 }
 
 export default function FileUpload({ label, name }) {
-  const [field, meta, helpers] = useField(name);
+  const [_, meta, helpers] = useField(name);
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, fileRejections) => {
@@ -46,9 +43,6 @@ export default function FileUpload({ label, name }) {
 
   useEffect(() => {
     helpers.setValue(files);
-
-    helpers.setError("Maximalne je mozne nahrat 5 dokumentov!");
-    console.log(meta.touched && meta.error);
   }, [files]);
 
   return (
@@ -62,14 +56,17 @@ export default function FileUpload({ label, name }) {
               ? "Drop files here!"
               : "Drag n drop/click to add files..."}
           </p>
+          {meta.error && (
+            <p className="text-danger text-center">{meta.error}</p>
+          )}
         </Jumbotron>
       </div>
-      <FormFeedback invalid="true">{meta.touched && meta.error}</FormFeedback>
-
+      <FormFeedback invalid="true">{meta.error}</FormFeedback>
       <aside>
         <ListGroup>
           {files.map(({ file, errors }) => (
             <FileWrapper
+              key={file.name}
               file={file}
               errors={errors}
               remove={removeFile}
