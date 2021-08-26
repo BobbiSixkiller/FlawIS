@@ -22,7 +22,7 @@ function FileWrapper({ file, errors, remove }) {
 }
 
 export default function FileUpload({ label, name }) {
-  const [_, meta, helpers] = useField(name);
+  const [field, meta, helpers] = useField(name);
   const [files, setFiles] = useState([]);
 
   const onDrop = useCallback((acceptedFiles, fileRejections) => {

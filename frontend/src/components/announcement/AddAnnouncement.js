@@ -98,25 +98,6 @@ export default function AddAnnouncement({ toggle, grantId }) {
             </Row>
             <Row form className="justify-content-center">
               <Col>
-                {/* <FormGroup>
-                  <Label for="files">Pripojiť dokument:</Label>
-                  <CustomInput
-                    type="file"
-                    id="files"
-                    name="files"
-                    label="Vyberte súbor nového dokumentu."
-                    onChange={handleChange}
-                    multiple
-                    invalid={errors.files && true}
-                    valid={valid.files && true}
-                  >
-                    <FormFeedback invalid="true">{errors.files}</FormFeedback>
-                    <FormFeedback valid>{valid.files}</FormFeedback>
-                  </CustomInput>
-                  <FormText color="muted">
-                    Maximálne je možné nahrať 5 súborov naraz!
-                  </FormText>
-                </FormGroup> */}
                 <FileUpload name="files" label="Dokumenty" />
               </Col>
             </Row>
@@ -125,7 +106,7 @@ export default function AddAnnouncement({ toggle, grantId }) {
                 <Col>
                   <Alert
                     color={error ? "danger" : "success"}
-                    isOpen={data}
+                    isOpen={data.message.length !== 0}
                     toggle={hideMessage}
                   >
                     {data.message}
