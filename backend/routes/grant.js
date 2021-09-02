@@ -18,7 +18,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 	const [grants, total] = await Promise.all([
 		Grant.find()
-			.sort({ updatedAt: -1 })
+			//.sort({ updatedAt: -1 })
 			.skip(page * pageSize - pageSize)
 			.limit(pageSize),
 		Grant.countDocuments(),
