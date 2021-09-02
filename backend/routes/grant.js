@@ -17,10 +17,14 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	const pageSize = parseInt(req.query.size) || 5;
 
 	const [grants, total] = await Promise.all([
-		Grant.find()
-			.skip(page * pageSize - pageSize)
-			.limit(pageSize)
-			.sort({ updatedAt: -1 }),
+		Grant.find(
+			{},
+			{},
+			{ skip: page * pageSize - pageSize, limit: pageSize, sort: "-updatedAt" }
+		),
+		// .skip(page * pageSize - pageSize)
+		// .limit(pageSize)
+		// .sort({ updatedAt: -1 }),
 		Grant.countDocuments(),
 	]);
 
