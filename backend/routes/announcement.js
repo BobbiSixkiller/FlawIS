@@ -11,8 +11,8 @@ const validate = require("../middlewares/validation");
 const { upload } = require("../util/upload");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
-	const page = req.query.page || 1;
-	const pageSize = req.query.size || 5;
+	const page = parseInt(req.query.page) || 1;
+	const pageSize = parseInt(req.query.size) || 5;
 
 	const [announcements, total] = await Promise.all([
 		Announcement.find()

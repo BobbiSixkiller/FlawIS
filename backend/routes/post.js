@@ -16,8 +16,8 @@ router.get("/api/search", checkAuth, async (req, res) => {
 });
 
 router.get("/", checkAuth, async (req, res) => {
-	const pageSize = parseInt(req.query.size || 9);
-	const page = parseInt(req.query.page || 1);
+	const pageSize = parseInt(req.query.size) || 9;
+	const page = parseInt(req.query.page) || 1;
 
 	const authorFilter = req.query.author
 		? { author: { $in: req.query.author } }
