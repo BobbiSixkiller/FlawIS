@@ -251,8 +251,8 @@ router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
-	const pageSize = parseInt(req.query.size || 5);
-	const page = parseInt(req.query.page || 1);
+	const pageSize = parseInt(req.query.size) || 5;
+	const page = parseInt(req.query.page) || 1;
 
 	const [users, total] = await Promise.all([
 		User.getUsersAggregation(pageSize, page * pageSize - pageSize),
