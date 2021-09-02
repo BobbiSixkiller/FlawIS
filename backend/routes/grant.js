@@ -22,9 +22,6 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 			{},
 			{ skip: page * pageSize - pageSize, limit: pageSize, sort: "-updatedAt" }
 		),
-		// .skip(page * pageSize - pageSize)
-		// .limit(pageSize)
-		// .sort({ updatedAt: -1 }),
 		Grant.countDocuments(),
 	]);
 
