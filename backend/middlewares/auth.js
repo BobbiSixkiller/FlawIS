@@ -7,7 +7,7 @@ module.exports.checkAuth = function (req, res, next) {
 		const { authorization } = req.cookies;
 		const token = authorization.split("Bearer ")[1];
 
-		req.user = jwt.verify(token, process.env.secret);
+		req.user = jwt.verify(token, process.env.SECRET);
 		next();
 	} catch (error) {
 		next(new AuthError("Invalid user session, please log in!"));

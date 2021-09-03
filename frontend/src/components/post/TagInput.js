@@ -51,14 +51,22 @@ export default function TagInput({ field, form, ...props }) {
 						<Input
 							type="select"
 							onChange={(e) => {
-								setValue(e.target.value);
-								setOther(false);
+								switch (e.target.value) {
+									case "Iné...":
+										setValue(e.target.value);
+										return setOther({ show: true, value: "" });
+
+									default:
+										setValue(e.target.value);
+										return setOther(false);
+								}
 							}}
 							invalid={error && true}
 							valid={valid && true}
 							value={value}
 							onBlur={field.onBlur}
 							name={field.name}
+							placeholder="Vyberte oblasť príspevku..."
 						>
 							<option>Finančné právo</option>
 							<option>Medzinárodné právo</option>

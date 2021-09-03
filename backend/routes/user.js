@@ -47,17 +47,29 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 	});
 	await user.save();
 
-	const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+	const token = jwt.sign(
+		{
+			_id: user._id,
+			name: `${user.firstName} ${user.lastName}`,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.SECRET,
+		{
+			expiresIn: "1h",
+		}
+	);
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
 			domain: "flawis.flaw.uniba.sk",
 			secure: true,
 			httpOnly: true,
-			maxAge: 3 * 60 * 60 * 1000,
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
+			success: true,
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,
@@ -79,8 +91,8 @@ router.post(
 		const emailExist = await User.findOne({ email: req.body.email });
 		if (emailExist)
 			return next(
-				new UserInputError("Bad user input!", [
-					"Zadaný email je už zaregistrovaný!",
+				new UserInputError("Email exists!", [
+					{ path: "email", message: "Zadaný email je už zaregistrovaný!" },
 				])
 			);
 
@@ -96,9 +108,11 @@ router.post(
 		});
 
 		await user.save();
-		res
-			.status(200)
-			.send({ message: `Používateľ ${user.fullName} bol pridaný.` });
+		res.status(200).send({
+			success: true,
+			message: `Používateľ ${user.fullName} bol pridaný.`,
+			user,
+		});
 	}
 );
 
@@ -125,13 +139,14 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+			domain: "flawis.flaw.uniba.sk",
 			secure: true,
 			httpOnly: true,
-			maxAge: 3 * 60 * 60 * 1000,
-			sameSite: "none",
+			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
+			success: true,
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,
@@ -189,7 +204,8 @@ router.post(
 		}
 
 		res.status(200).send({
-			msg: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
+			success: true,
+			message: "Link na obnovenie hesla bol zaslaný na zadanú emailovú adresu.",
 		});
 	}
 );
@@ -221,7 +237,9 @@ router.post(
 		user.password = password;
 		await user.save();
 
-		res.status(200).send({ message: "Vaše heslo bolo zmenené!" });
+		res
+			.status(200)
+			.send({ success: true, message: "Vaše heslo bolo zmenené!" });
 	}
 );
 
@@ -235,8 +253,8 @@ router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
 });
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
-	const pageSize = parseInt(req.query.size || 5);
-	const page = parseInt(req.query.page || 1);
+	const pageSize = parseInt(req.query.size) || 5;
+	const page = parseInt(req.query.page) || 1;
 
 	const [users, total] = await Promise.all([
 		User.getUsersAggregation(pageSize, page * pageSize - pageSize),
@@ -249,7 +267,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 router.get("/logout", (req, res) => {
 	res
-		.cookie("authorization", "", { httpOnly: true, expires: new Date(0) })
+		.cookie("authorization", "", { httpOnly: true, maxAge: 0 })
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
@@ -259,13 +277,6 @@ router.get("/me", checkAuth, async (req, res, next) => {
 	if (!user) return next(new NotFoundError("Používateľ nebol nájdený!"));
 
 	res.status(200).send({ message: `Vitajte ${user.fullName}!`, user });
-});
-
-//util endpoint for grant members
-router.get("/names", checkAuth, async (req, res) => {
-	const users = await User.find().select("firstName lastName");
-
-	res.status(200).send(users);
 });
 
 router.get("/:id", checkAuth, isOwnUser, async (req, res, next) => {
@@ -298,8 +309,8 @@ router.put(
 			const emailExists = User.findOne({ email: req.body.email });
 			if (emailExists)
 				return next(
-					new UserInputError("Bad user input!", [
-						"Zadaný email je už zaregistrovaný!",
+					new UserInputError("Email exists!", [
+						{ path: "email", message: "Zadaný email je už zaregistrovaný!" },
 					])
 				);
 		}
@@ -318,6 +329,7 @@ router.put(
 		await user.save();
 
 		res.status(200).send({
+			success: true,
 			message: `Používateľ ${user.fullName} bol aktualizovaný!`,
 			user,
 		});
@@ -330,25 +342,11 @@ router.delete("/:id", checkAuth, isAdmin, async (req, res, next) => {
 
 	await user.remove();
 
-	res.status(200).send({ message: `Používateľ ${user.fullName} vymazaný!` });
-});
-
-//experimental endpoint
-router.post("/tokenIsValid", async (req, res) => {
-	try {
-		const token = req.header("authToken");
-		if (!token) return res.json(false);
-
-		const verified = jwt.verify(token, process.env.SECRET);
-		if (!verified) return res.json(false);
-
-		const user = await User.findById(verified);
-		if (!user) return res.json(false);
-
-		return res.json({ valid: true, user });
-	} catch (err) {
-		res.status(500).json({ error: err.message });
-	}
+	res.status(200).send({
+		success: true,
+		message: `Používateľ ${user.fullName} vymazaný!`,
+		user,
+	});
 });
 
 module.exports = router;

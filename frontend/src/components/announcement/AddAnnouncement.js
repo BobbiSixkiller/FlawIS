@@ -1,177 +1,140 @@
 import React from "react";
+import { Formik, Form } from "formik";
 
 import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Form,
-  FormText,
-  CustomInput,
-  FormGroup,
-  FormFeedback,
   Button,
-  Label,
-  Input,
   Col,
   Row,
   Alert,
+  Spinner,
 } from "reactstrap";
 
+import SelectInput from "../form/SelectInput";
+import TextInput from "../form/TextInput";
+import FileUpload from "../form/FileUpload";
+
 import { useDataSend } from "../../hooks/useApi";
-import useFormValidation from "../../hooks/useFormValidation";
-import { validateAnnouncement } from "../../util/validation";
+import { announcementSchema } from "../../util/validation";
+import { normalizeErrors } from "../../util/helperFunctions";
 
 export default function AddAnnouncement({ toggle, grantId }) {
-  const INITIAL_STATE = {
-    name: "",
-    content: "",
-    scope: grantId ? "SINGLE" : "APVV",
-    files: {},
-  };
+  const { error, data, sendData, hideMessage } = useDataSend();
 
-  const { loading, error, data, sendData, hideMessage } = useDataSend();
-
-  const { handleSubmit, handleChange, handleBlur, values, errors, valid } =
-    useFormValidation(INITIAL_STATE, validateAnnouncement, addAnnouncement);
-
-  function addAnnouncement() {
+  async function addAnnouncement(values) {
     let formData = new FormData();
-    for (const key of Object.keys(values.files)) {
-      formData.append("files", values.files[key]);
-    }
+
+    values.files.forEach(({ file }) => formData.append("files", file));
     formData.append("name", values.name);
     formData.append("content", values.content);
     formData.append("scope", values.scope);
     if (grantId) formData.append("grantId", grantId);
 
-    sendData("announcement/", "POST", formData, {
+    const res = await sendData("announcement/", "POST", formData, {
       "Content-type": "multipart/form-data",
     });
+
+    return res;
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <ModalHeader toggle={toggle}>Nový oznam</ModalHeader>
-      <ModalBody>
-        {!grantId && (
-          <Row form className="justify-content-center">
-            <Col>
-              {" "}
-              <FormGroup>
-                <Label for="scope">Typ grantu:</Label>
-                <Input
-                  type="select"
-                  name="scope"
-                  id="scope"
-                  value={values.scope}
-                  onChange={handleChange}
-                >
-                  <option value={"APVV"}>APVV</option>
-                  <option value={"VEGA"}>VEGA</option>
-                  <option value={"KEGA"}>KEGA</option>
-                  <option value={"ALL"}>Všetky</option>
-                </Input>
-              </FormGroup>
-            </Col>
-          </Row>
-        )}
-        <Row form className="justify-content-center">
-          <Col>
-            <FormGroup>
-              <Label for="name">Názov oznamu:</Label>
-              <Input
-                onChange={handleChange}
-                onBlur={handleBlur}
-                name="name"
-                type="text"
-                id="name"
-                value={values.name}
-                invalid={errors.name && true}
-                valid={valid.name && true}
-                autoComplete="off"
-                placeholder="Názov oznamu"
-              />
-              <FormFeedback invalid="true">{errors.name}</FormFeedback>
-              <FormFeedback valid>{valid.name}</FormFeedback>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row form className="justify-content-center">
-          <Col>
-            <FormGroup>
-              <Label for="content">Obsah oznamu:</Label>
-              <Input
-                onChange={handleChange}
-                onBlur={handleBlur}
-                name="content"
-                type="textarea"
-                id="content"
-                value={values.content}
-                invalid={errors.content && true}
-                valid={valid.content && true}
-                autoComplete="off"
-                placeholder="Obsah oznamu..."
-              />
-              <FormFeedback invalid="true">{errors.content}</FormFeedback>
-              <FormFeedback valid>{valid.content}</FormFeedback>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row form className="justify-content-center">
-          <Col>
-            <FormGroup>
-              <Label for="files">Pripojiť dokument:</Label>
-              <CustomInput
-                type="file"
-                id="files"
-                name="files"
-                label="Vyberte súbor nového dokumentu."
-                onChange={handleChange}
-                multiple
-                invalid={errors.files && true}
-                valid={valid.files && true}
-              >
-                <FormFeedback invalid="true">{errors.files}</FormFeedback>
-                <FormFeedback valid>{valid.files}</FormFeedback>
-              </CustomInput>
-              <FormText color="muted">
-                Maximálne je možné nahrať 5 súborov naraz!
-              </FormText>
-            </FormGroup>
-          </Col>
-        </Row>
-        {data && (
-          <Row className="justify-content-center my-3">
-            <Col>
-              <Alert
-                color={error ? "danger" : "success"}
-                isOpen={data}
-                toggle={hideMessage}
-              >
-                {data.message}
-                {data.errors && (
-                  <>
-                    <hr />
-                    <ul>
-                      {data.errors.map((e) => (
-                        <li>{e}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </Alert>
-            </Col>
-          </Row>
-        )}
-      </ModalBody>
-      <ModalFooter>
-        <Button type="submit" disabled={loading} color="success">
-          Pridať
-        </Button>{" "}
-        <Button outline color="secondary" onClick={toggle}>
-          Zrušiť
-        </Button>
-      </ModalFooter>
-    </Form>
+    <Formik
+      initialValues={{
+        name: "",
+        content: "",
+        scope: grantId ? "SINGLE" : "APVV",
+        files: [],
+      }}
+      validationSchema={announcementSchema}
+      onSubmit={async (values, { resetForm }) => {
+        console.log(values);
+        const res = await addAnnouncement(values);
+        console.log(res);
+        if (!res.success)
+          resetForm({ values, errors: normalizeErrors(res.errors) });
+      }}
+    >
+      {({ values, errors, isSubmitting }) => (
+        <Form autoComplete="off">
+          <ModalHeader toggle={toggle}>Nový oznam</ModalHeader>
+          <ModalBody>
+            {!grantId && (
+              <Row form className="justify-content-center">
+                <Col>
+                  <SelectInput
+                    name="scope"
+                    label="Typ oznamu"
+                    options={[
+                      { value: "APVV", name: "APVV" },
+                      { value: "VEGA", name: "VEGA" },
+                      { value: "KEGA", name: "KEGA" },
+                      { value: "ALL", name: "Všetky" },
+                    ]}
+                  />
+                </Col>
+              </Row>
+            )}
+            <Row form className="justify-content-center">
+              <Col>
+                <TextInput
+                  type="text"
+                  name="name"
+                  label="Názov oznamu"
+                  placeholder="Názov oznamu..."
+                />
+              </Col>
+            </Row>
+            <Row form className="justify-content-center">
+              <Col>
+                <TextInput
+                  type="textarea"
+                  name="content"
+                  label="Obsah oznamu"
+                  placeholder="Obsah oznamu..."
+                />
+              </Col>
+            </Row>
+            <Row form className="justify-content-center">
+              <Col>
+                <FileUpload name="files" label="Dokumenty" />
+              </Col>
+            </Row>
+            {data && (
+              <Row className="justify-content-center my-3">
+                <Col>
+                  <Alert
+                    color={error ? "danger" : "success"}
+                    isOpen={data.message.length !== 0}
+                    toggle={hideMessage}
+                  >
+                    {data.message}
+                    {/* {data.errors && (
+                      <>
+                        <hr />
+                        <ul>
+                          {data.errors.map((e) => (
+                            <li>{e}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )} */}
+                  </Alert>
+                </Col>
+              </Row>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button type="submit" disabled={isSubmitting} color="success">
+              {isSubmitting ? <Spinner size="sm" color7="light" /> : "Pridať"}
+            </Button>{" "}
+            <Button outline color="secondary" onClick={toggle}>
+              Zrušiť
+            </Button>
+          </ModalFooter>
+        </Form>
+      )}
+    </Formik>
   );
 }

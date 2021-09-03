@@ -2,19 +2,20 @@ import React, { useEffect, useContext } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
 import {
+  Alert,
+  Button,
+  Container,
   Jumbotron,
   Fade,
-  Button,
   Spinner,
-  Container,
   Row,
   Col,
   FormGroup,
   Input,
   Label,
   Modal,
-  Alert,
 } from "reactstrap";
+import { PencilSquare } from "react-bootstrap-icons";
 
 import useModal from "../../hooks/useModal";
 import { useDataFetch } from "../../hooks/useApi";
@@ -28,6 +29,7 @@ import EditBudget from "../../components/grant/EditBudget";
 import AddMember from "../../components/grant/AddMember";
 import EditMember from "../../components/grant/EditMember";
 import DeleteMember from "../../components/grant/DeleteMember";
+import EditGrantEnd from "../../components/grant/EditGrantEnd";
 
 function GrantDetail() {
   const history = useHistory();
@@ -96,6 +98,19 @@ function GrantDetail() {
             </FormGroup>
             <FormGroup>
               <Col>
+                <PencilSquare
+                  className="mr-1"
+                  color="#007BFF"
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    dispatch({
+                      type: "ACTION",
+                      name: "UPDATE_END",
+                      payload: { grantId: data._id, end: data.end },
+                    })
+                  }
+                />
+
                 <Label for="end">Koniec grantu:</Label>
                 <Input
                   id="end"
@@ -169,6 +184,9 @@ function GrantDetail() {
           Späť
         </Button>
         <Modal isOpen={show} toggle={toggle}>
+          {action === "UPDATE_END" && (
+            <EditGrantEnd toggle={toggle} modalData={modalData} />
+          )}
           {action === "UPDATE_BUDGET" && (
             <EditBudget toggle={toggle} modalData={modalData} />
           )}

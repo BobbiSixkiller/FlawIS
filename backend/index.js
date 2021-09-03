@@ -17,12 +17,10 @@ app.use(morgan("dev"));
 
 //DB connecttion
 mongoose.connect(
-	process.env.DB,
+	process.env.DB_DEV_ATLAS,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
-		useFindAndModify: false,
-		useCreateIndex: true,
 	},
 	(err) => {
 		if (err) {
@@ -34,16 +32,18 @@ mongoose.connect(
 );
 
 //import routes
-const userRoute = require("./routes/user");
-const grantRoute = require("./routes/grant");
-const announcementRoute = require("./routes/announcement");
-const postRoute = require("./routes/post");
+const utilRoutes = require("./routes/util");
+const userRoutes = require("./routes/user");
+const grantRoutes = require("./routes/grant");
+const announcementRoutes = require("./routes/announcement");
+const postRoutes = require("./routes/post");
 
 //routes middleware
-app.use("/user", userRoute);
-app.use("/grant", grantRoute);
-app.use("/announcement", announcementRoute);
-app.use("/post", postRoute);
+app.use("/util", utilRoutes);
+app.use("/user", userRoutes);
+app.use("/grant", grantRoutes);
+app.use("/announcement", announcementRoutes);
+app.use("/post", postRoutes);
 
 app.use(errorHandler);
 

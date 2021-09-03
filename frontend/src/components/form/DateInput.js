@@ -8,6 +8,8 @@ export default function DateInput({ label, ...props }) {
   const error = meta.touched && meta.error;
   const valid = meta.touched && !error;
 
+  console.log(field.value);
+
   return (
     <FormGroup>
       <Label for={field.name}>{label}:</Label>

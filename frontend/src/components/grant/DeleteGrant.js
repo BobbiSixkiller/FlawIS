@@ -2,6 +2,7 @@ import React from "react";
 
 import {
   Alert,
+  Spinner,
   ModalHeader,
   ModalBody,
   ModalFooter,
@@ -43,7 +44,7 @@ export default function DeleteGrant({ toggle, grant }) {
       </ModalBody>
       <ModalFooter>
         <Button color="danger" type="submit" disabled={loading}>
-          Zmazať
+          {loading ? <Spinner size="sm" color="light" /> : "Zmazať"}
         </Button>{" "}
         <Button outline color="secondary" onClick={toggle}>
           Zrušiť

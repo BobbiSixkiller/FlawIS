@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const Yup = require("yup");
 const { NotFoundError, UserInputError } = require("../middlewares/error");
 
 const Grant = require("../models/Grant");
@@ -12,18 +13,28 @@ const { checkAuth, isSupervisor, isAdmin } = require("../middlewares/auth");
 const validate = require("../middlewares/validation");
 
 router.get("/", checkAuth, isSupervisor, async (req, res) => {
-	const page = req.query.page || 1;
-	const pageSize = req.query.size || 5;
+	const page = parseInt(req.query.page) || 1;
+	const pageSize = parseInt(req.query.size) || 5;
 
 	const [grants, total] = await Promise.all([
-		Grant.find()
-			.skip(page * pageSize - pageSize)
-			.limit(pageSize)
-			.sort({ updatedAt: -1 }),
+		Grant.find(
+			{},
+			{},
+			{ skip: page * pageSize - pageSize, limit: pageSize, sort: "-updatedAt" }
+		),
 		Grant.countDocuments(),
 	]);
 
 	res.status(200).send({ pages: Math.ceil(total / pageSize), grants });
+});
+
+router.get("/:id", checkAuth, async (req, res) => {
+	const grant = await Grant.findOne({ _id: req.params.id })
+		.populate("budget.members.member")
+		.populate({ path: "announcements", populate: { path: "issuedBy" } });
+	if (!grant) return next(new NotFoundError("Grant nebol nájdený!"));
+
+	res.status(200).send(grant);
 });
 
 router.get("/api/search", checkAuth, isSupervisor, async (req, res) => {
@@ -60,7 +71,11 @@ router.post(
 
 		await grant.save();
 
-		res.status(200).send({ message: `Grant: ${grant.name} bol vytvorený!` });
+		res.status(200).send({
+			success: true,
+			message: `Grant: ${grant.name} bol vytvorený!`,
+			grant,
+		});
 	}
 );
 
@@ -101,9 +116,11 @@ router.post(
 		grant.budget = grant.budget.concat(budget);
 		await grant.save();
 
-		res
-			.status(200)
-			.send({ message: `Rozpočet na rok ${budget.year} pridaný!` });
+		res.status(200).send({
+			success: true,
+			message: `Rozpočet na rok ${budget.year} pridaný!`,
+			grant,
+		});
 	}
 );
 
@@ -130,24 +147,18 @@ router.post(
 
 		await grant.save();
 
-		res.status(200).send({ message: "Bol pridaný nový riešiteľ!" });
+		res
+			.status(200)
+			.send({ success: true, message: "Bol pridaný nový riešiteľ!", grant });
 	}
 );
 
-router.get("/:id", checkAuth, async (req, res) => {
-	const grant = await Grant.findOne({ _id: req.params.id })
-		.populate("budget.members.member")
-		.populate({ path: "announcements", populate: { path: "issuedBy" } });
-	if (!grant) return next(new NotFoundError("Grant nebol nájdený!"));
-
-	res.status(200).send(grant);
-});
-//nepouzivane, nakolko vykonavam mensie updaty v ramci properties grant objektu
+//universal update, temporarily used for later grant END update
 router.put(
 	"/:id",
 	checkAuth,
 	isSupervisor,
-	validate(grantSchema),
+	validate(Yup.object({ end: Yup.date().required() })),
 	async (req, res, next) => {
 		const grant = await Grant.findOneAndUpdate(
 			{ _id: req.params.id },
@@ -156,9 +167,11 @@ router.put(
 		);
 		if (!grant) return next(new NotFoundError("Grant nebol nájdený!"));
 
-		res
-			.status(200)
-			.send({ message: `Grant: ${grant.name} bol aktualizovaný!`, grant });
+		res.status(200).send({
+			success: true,
+			message: `Grant: ${grant.name} bol aktualizovaný!`,
+			grant,
+		});
 	}
 );
 
@@ -183,9 +196,11 @@ router.put(
 		await grant.save();
 
 		res.status(200).send({
+			success: true,
 			message: `Rozpočet ${new Date(
 				budget.year
 			).getFullYear()} bol aktualizovaný!`,
+			grant,
 		});
 	}
 );
@@ -211,7 +226,9 @@ router.put(
 
 		await grant.save();
 
-		res.status(200).send({ message: "Riešiteľ bol aktualizovaný!" });
+		res
+			.status(200)
+			.send({ success: true, message: "Riešiteľ bol aktualizovaný!", grant });
 	}
 );
 
@@ -221,7 +238,11 @@ router.delete("/:grantId", checkAuth, isSupervisor, async (req, res, next) => {
 
 	await grant.remove();
 
-	res.status(200).send({ message: `Grant ${grant.name} bol zmazaný!` });
+	res.status(200).send({
+		success: true,
+		message: `Grant ${grant.name} bol zmazaný!`,
+		grant,
+	});
 });
 
 router.delete(
@@ -239,7 +260,9 @@ router.delete(
 		await grant.save();
 
 		res.status(200).send({
+			success: true,
 			message: `Rozpočet ${new Date(budget.year).getFullYear()} bol zmazaný!`,
+			grant,
 		});
 	}
 );
@@ -261,7 +284,9 @@ router.delete(
 		await member.remove();
 		await grant.save();
 
-		res.status(200).send({ message: "Riešiteľ  bol zmazaný!" });
+		res
+			.status(200)
+			.send({ success: true, message: "Riešiteľ  bol zmazaný!", grant });
 	}
 );
 

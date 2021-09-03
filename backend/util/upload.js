@@ -14,6 +14,20 @@ const storage = multer.diskStorage({
 
 module.exports.upload = multer({
   storage: storage,
+  onError: function (err, next) {
+    if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      next(
+        new UserInputError("Bad user input", [
+          {
+            path: "files",
+            message: "Maximalne je mozne nahrat 5 suborov sucasne!",
+          },
+        ])
+      );
+    } else {
+      next(err);
+    }
+  },
   fileFilter(req, file, cb) {
     if (
       file.mimetype == "application/pdf" ||
@@ -25,7 +39,7 @@ module.exports.upload = multer({
       cb(null, false);
       return cb(
         new UserInputError("Bad user input", [
-          "Povolene typy suborov: PDF, Word!",
+          { path: "files", message: "Povolene typy suborov: PDF, Word!" },
         ])
       );
     }
