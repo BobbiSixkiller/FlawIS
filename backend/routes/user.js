@@ -263,7 +263,8 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 
 router.get("/logout", (req, res) => {
 	res
-		.cookie("authorization", "", { httpOnly: true, maxAge: 0 })
+		// .cookie("authorization", "", { httpOnly: true, maxAge: 0 })
+		.clearCookie("authorization", { httpOnly: true, maxAge: 60 * 60 * 1000 })
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
