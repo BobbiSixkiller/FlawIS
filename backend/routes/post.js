@@ -25,11 +25,10 @@ router.get("/", checkAuth, async (req, res) => {
 	const tagsFilter = req.query.tag ? { tags: { $in: req.query.tag } } : {};
 
 	const [posts, total] = await Promise.all([
-		Post.find(
-			{ ...authorFilter, ...tagsFilter },
-			{},
-			{ skip: page * pageSize - pageSize, limit: pageSize, sort: "-updatedAt" }
-		),
+		Post.find({ ...authorFilter, ...tagsFilter })
+			.sort("-updatedAt")
+			.skip(page * pageSize - pageSize)
+			.limit(pageSize),
 		Post.countDocuments({ ...authorFilter, ...tagsFilter }),
 	]);
 

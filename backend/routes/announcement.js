@@ -15,11 +15,11 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 	const pageSize = parseInt(req.query.size) || 5;
 
 	const [announcements, total] = await Promise.all([
-		Announcement.find(
-			{},
-			{},
-			{ skip: page * pageSize - pageSize, limit: pageSize, sort: "-updatedAt" }
-		).populate("issuedBy", "firstName lastName"),
+		Announcement.find()
+			.sort("-updatedAt")
+			.skip(page * pageSize - pageSize)
+			.limit(pageSize)
+			.populate("issuedBy", "firstName lastName"),
 		Announcement.countDocuments(),
 	]);
 
