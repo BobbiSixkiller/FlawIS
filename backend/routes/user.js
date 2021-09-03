@@ -62,14 +62,13 @@ router.post("/register", validate(userSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
-			domain: "flawis.flaw.uniba.sk",
+			domain: "flawis-backend.flaw.uniba.sk",
 			secure: true,
 			httpOnly: true,
 			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
-			success: true,
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,
@@ -139,14 +138,17 @@ router.post("/login", validate(loginSchema), async (req, res, next) => {
 
 	res
 		.cookie("authorization", `Bearer ${token}`, {
+<<<<<<< HEAD
 			domain: "flawis.flaw.uniba.sk",
+=======
+			domain: "flawis-backend.flaw.uniba.sk",
+>>>>>>> e1d9415acfa16beffbe742f18a7469199ca5b5f1
 			secure: true,
 			httpOnly: true,
 			maxAge: 60 * 60 * 1000,
 		})
 		.status(200)
 		.send({
-			success: true,
 			message: `Vitajte ${user.fullName}!`,
 			user: {
 				_id: user._id,

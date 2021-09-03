@@ -10,6 +10,7 @@ module.exports.checkAuth = function (req, res, next) {
 		req.user = jwt.verify(token, process.env.SECRET);
 		next();
 	} catch (error) {
+		console.log(error);
 		next(new AuthError("Invalid user session, please log in!"));
 	}
 };
