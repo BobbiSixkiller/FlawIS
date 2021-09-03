@@ -266,7 +266,12 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 router.get("/logout", (req, res) => {
 	res
 		// .cookie("authorization", "", { httpOnly: true, maxAge: 0 })
-		.clearCookie("authorization", { httpOnly: true, maxAge: 60 * 60 * 1000 })
+		.clearCookie("authorization", {
+			domain: "flawis-backend.flaw.uniba.sk",
+			secure: true,
+			httpOnly: true,
+			maxAge: 60 * 60 * 1000,
+		})
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
 });
