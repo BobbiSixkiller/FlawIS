@@ -9,7 +9,7 @@ router.post(
 	isSupervisor,
 	upload.single("file"),
 	(req, res, next) => {
-		console.log(req.files);
+		console.log(req.file);
 		res.send("FILE UPLOAD");
 	}
 );

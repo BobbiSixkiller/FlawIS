@@ -17,9 +17,21 @@ import { useDataSend } from "../../hooks/useApi";
 function FileWrapper({ file, errors, remove }) {
 	const { sendData } = useDataSend();
 
-	useEffect(() => {
+	async function uploadFile() {
 		let formData = new FormData();
-	}, []);
+
+		formData.append("file", file);
+
+		const res = await sendData("util/upload", "POST", formData, {
+			"Content-type": "multipart/form-data",
+		});
+
+		console.log(res);
+	}
+
+	useEffect(() => {
+		uploadFile();
+	}, [uploadFile]);
 
 	return (
 		<ListGroupItem>
@@ -78,7 +90,6 @@ export default function FileUpload({ label, name }) {
 							file={file}
 							errors={errors}
 							remove={removeFile}
-							setError={helpers.setError}
 						/>
 					))}
 				</ListGroup>

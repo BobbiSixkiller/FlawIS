@@ -21,11 +21,6 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 			.sort("-createdAt")
 			.skip(page * pageSize - pageSize)
 			.limit(pageSize),
-		// Grant.aggregate([
-		// 	{ $sort: { updatedAt: -1 } },
-		// 	{ $skip: page * pageSize - pageSize },
-		// 	{ $limit: pageSize },
-		// ]),
 		Grant.countDocuments(),
 	]);
 
