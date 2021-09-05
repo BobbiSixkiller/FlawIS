@@ -50,10 +50,11 @@ export default function AddAnnouncement({ toggle, grantId }) {
       validationSchema={announcementSchema}
       onSubmit={async (values, { resetForm }) => {
         console.log(values);
-        const res = await addAnnouncement(values);
-        console.log(res);
-        if (!res.success)
-          resetForm({ values, errors: normalizeErrors(res.errors) });
+        // console.log(values);
+        // const res = await addAnnouncement(values);
+        // console.log(res);
+        // if (!res.success)
+        //   resetForm({ values, errors: normalizeErrors(res.errors) });
       }}
     >
       {({ values, errors, isSubmitting }) => (
