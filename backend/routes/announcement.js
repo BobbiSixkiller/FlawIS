@@ -51,30 +51,31 @@ router.post(
 	"/",
 	checkAuth,
 	isSupervisor,
-	upload.array("files", 5),
+	//upload.array("files", 5),
 	validate(announcementSchema),
 	async (req, res) => {
-		const url = "https://" + req.get("host");
+		console.log(req.body);
+		// const url = "https://" + req.get("host");
 
-		const reqFiles = [];
-		for (var i = 0; i < req.files.length; i++) {
-			const reqFile = {};
+		// const reqFiles = [];
+		// for (var i = 0; i < req.files.length; i++) {
+		// 	const reqFile = {};
 
-			reqFile.url = url + "/public/documents/" + req.files[i].filename;
-			reqFile.path = "public/documents/" + req.files[i].filename;
-			reqFile.name = req.files[i].filename.slice(
-				37,
-				req.files[i].filename.length
-			);
+		// 	reqFile.url = url + "/public/documents/" + req.files[i].filename;
+		// 	reqFile.path = "public/documents/" + req.files[i].filename;
+		// 	reqFile.name = req.files[i].filename.slice(
+		// 		37,
+		// 		req.files[i].filename.length
+		// 	);
 
-			reqFiles.push(reqFile);
-		}
+		// 	reqFiles.push(reqFile);
+		// }
 
 		const announcement = new Announcement({
 			name: req.body.name,
 			content: req.body.content,
 			issuedBy: req.user._id,
-			files: reqFiles,
+			files: req.body.files,
 		});
 
 		await announcement.save();
