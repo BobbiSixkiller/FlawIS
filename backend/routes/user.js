@@ -256,14 +256,12 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 		User.getUsersAggregation(pageSize, page * pageSize - pageSize),
 		User.countDocuments(),
 	]);
-	//const aggregate = await User.getUsersGrantsAggregation();
-	//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
+
 	res.status(200).send({ users, pages: Math.ceil(total / pageSize) });
 });
 
 router.get("/logout", (req, res) => {
 	res
-		// .cookie("authorization", "", { httpOnly: true, maxAge: 0 })
 		.clearCookie("authorization", { httpOnly: true, maxAge: 60 * 60 * 1000 })
 		.status(200)
 		.send({ message: "Boli ste odhlásený." });
