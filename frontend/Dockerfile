@@ -1,4 +1,4 @@
-FROM node:14.17.5 as client
+FROM node:14.17.6 as client
 WORKDIR /frontend
 ENV PATH /frontend/node_modules/.bin:$PATH
 COPY package*.json /frontend/
