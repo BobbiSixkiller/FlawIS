@@ -258,8 +258,7 @@ router.get("/", checkAuth, isSupervisor, async (req, res) => {
 		User.getUsersAggregation(pageSize, page * pageSize - pageSize),
 		User.countDocuments(),
 	]);
-	//const aggregate = await User.getUsersGrantsAggregation();
-	//const users = await User.find().populate({path: 'grants', populate:{path: 'members.member'}});
+
 	res.status(200).send({ users, pages: Math.ceil(total / pageSize) });
 });
 
