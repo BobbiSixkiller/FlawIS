@@ -53,8 +53,8 @@ export const userSchema = Yup.object({
 	password: Yup.string()
 		.required("Zadajte heslo!")
 		.matches(
-			/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-			"Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo, bez znakov!"
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/,
+			"Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo!"
 		),
 	repeatPass: Yup.mixed()
 		.required("Zopakujte heslo!")
@@ -82,8 +82,8 @@ export const resetPasswordSchema = Yup.object({
 	password: Yup.string()
 		.required("Zadajte nové heslo!")
 		.matches(
-			/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-			"Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo, bez znakov!"
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/,
+			"Minimálna dĺžka 8 znakov, aspoň 1 písmeno a 1 číslo!"
 		),
 	repeatPass: Yup.mixed()
 		.required("Zopakujte nové heslo!")

@@ -18,7 +18,7 @@ function PasswordRedet() {
 			<h1 className="text-center">Reset hesla</h1>
 			<Formik
 				initialValues={{ password: "", repeatPass: "" }}
-				validateSchema={resetPasswordSchema}
+				validationSchema={resetPasswordSchema}
 				onSubmit={(values, helpers) =>
 					sendData(`user/reset/${url.token}`, "POST", values)
 				}
