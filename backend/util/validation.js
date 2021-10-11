@@ -6,7 +6,7 @@ const userSchema = Yup.object({
 	email: Yup.string().email().required(),
 	password: Yup.string()
 		.required()
-		.matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/),
+		.matches(/^(?=.*\d)(?=.*[a-zA-Z]).{8,}$/),
 	repeatPass: Yup.mixed()
 		.required()
 		.oneOf([Yup.ref("password")]),
@@ -25,7 +25,7 @@ const forgotPasswordSchema = Yup.object({
 const resetPasswordSchema = Yup.object({
 	password: Yup.string()
 		.required()
-		.matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,}$/),
+		.matches(/^(?=.*\d)(?=.*[a-zA-Z]).{8,}$/),
 	repeatPass: Yup.mixed()
 		.required()
 		.oneOf([Yup.ref("password")]),
