@@ -44,14 +44,14 @@ services:
     networks:
       - internal
 
-networks:
-  internal:
-    external: true
-    name: link-internal
-
 # networks:
 #   internal:
-#     driver: bridge
+#     external: true
+#     name: link-internal
+
+networks:
+  internal:
+    driver: bridge
 
 volumes:
   mongo_data: {}
