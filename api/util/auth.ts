@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
 
+import env from "dotenv";
+
+env.config();
+
 export interface Context {
 	req: Request;
 	res: Response;
@@ -27,7 +31,7 @@ export function createContext(ctx: Context): Context {
 	const context = ctx;
 
 	if (context.req.cookies.accessToken) {
-		const token = context.req.cookies.accessToken.split("Bearer ")[1];
+		const token = context.req.cookies.accessToken.split("Bearer%20")[1];
 		if (token) {
 			context.user = verifyJwt(token);
 		} else

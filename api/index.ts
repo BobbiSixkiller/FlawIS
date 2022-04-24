@@ -4,10 +4,12 @@ import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import Express from "express";
 import cookieParser from "cookie-parser";
+//import cors from "cors";
 
 import env from "dotenv";
 import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 import { Context, createContext } from "./util/auth";
+import parseCookies from "./util/cookieParser";
 
 env.config();
 
@@ -22,6 +24,22 @@ const main = async () => {
 						request.http?.headers.set("user", JSON.stringify(context.user));
 					}
 				},
+				didReceiveResponse({ response, context }): typeof response {
+					const rawCookies = response.http?.headers.get("set-cookie") as
+						| string
+						| null;
+
+					if (rawCookies) {
+						const cookies = parseCookies(rawCookies);
+						cookies.forEach(({ cookieName, cookieValue, options }) => {
+							if (context && context.res) {
+								context.res.cookie(cookieName, cookieValue, { ...options });
+							}
+						});
+					}
+
+					return response;
+				},
 			});
 		},
 	});
@@ -29,6 +47,14 @@ const main = async () => {
 	const app = Express();
 
 	app.use(cookieParser());
+	// app.use(
+	// 	cors({
+	// 		origin: [
+	// 			"http://localhost:3000",
+	// 		],
+	// 		credentials: true,
+	// 	})
+	// );
 
 	const server = new ApolloServer({
 		gateway,
@@ -41,7 +67,7 @@ const main = async () => {
 
 	await server.start();
 
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app, cors: false });
 
 	app.listen({ port: process.env.PORT || 5000 }, () =>
 		console.log(
