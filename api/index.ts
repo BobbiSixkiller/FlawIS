@@ -1,23 +1,27 @@
 import "reflect-metadata";
 import { ApolloGateway, RemoteGraphQLDataSource } from "@apollo/gateway";
 import { ApolloServer } from "apollo-server-express";
+import FileUploadDataSource from "@profusion/apollo-federation-upload/build/FileUploadDataSource";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import Express from "express";
 import cookieParser from "cookie-parser";
-//import cors from "cors";
 
 import env from "dotenv";
 import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
-import { Context, createContext } from "./util/auth";
+import { Context, createContext, isAuthMiddleware } from "./util/auth";
 import parseCookies from "./util/cookieParser";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 env.config();
 
 const main = async () => {
 	const gateway = new ApolloGateway({
-		serviceList: [{ name: "users", url: "http://localhost:5001" }],
+		serviceList: [
+			{ name: "users", url: "http://localhost:5001/graphql" },
+			{ name: "files", url: "http://localhost:5002/graphql" },
+		],
 		buildService({ name, url }) {
-			return new RemoteGraphQLDataSource({
+			return new FileUploadDataSource({
 				url,
 				willSendRequest({ request, context }) {
 					if (context.user) {
@@ -47,14 +51,14 @@ const main = async () => {
 	const app = Express();
 
 	app.use(cookieParser());
-	// app.use(
-	// 	cors({
-	// 		origin: [
-	// 			"http://localhost:3000",
-	// 		],
-	// 		credentials: true,
-	// 	})
-	// );
+	app.use(
+		"/public",
+		isAuthMiddleware,
+		createProxyMiddleware({
+			target: "http://localhost:5002/",
+			changeOrigin: false,
+		})
+	);
 
 	const server = new ApolloServer({
 		gateway,
@@ -67,7 +71,7 @@ const main = async () => {
 
 	await server.start();
 
-	server.applyMiddleware({ app, cors: false });
+	server.applyMiddleware({ app });
 
 	app.listen({ port: process.env.PORT || 5000 }, () =>
 		console.log(

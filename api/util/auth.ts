@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
 
 import env from "dotenv";
+import { RemoteGraphQLDataSource } from "@apollo/gateway";
+import parseCookies from "./cookieParser";
 
 env.config();
 
@@ -27,6 +29,7 @@ export function verifyJwt<T>(token: string): T | null {
 	}
 }
 
+//Apollo context init with authorized user
 export function createContext(ctx: Context): Context {
 	const context = ctx;
 
@@ -41,4 +44,26 @@ export function createContext(ctx: Context): Context {
 	}
 
 	return context;
+}
+
+//express auth middleware for accessing public folder on file micro-service
+export function isAuthMiddleware(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
+	if (req.cookies.accessToken) {
+		const token = req.cookies.accessToken.split("Bearer%20")[1];
+		if (token) {
+			const user = verifyJwt(token);
+			if (user) return next();
+
+			return res.status(401).send({ message: "Not authorized!" });
+		} else
+			return res.status(400).send({
+				message: "Authentication header format must be: 'Bearer [token]'.",
+			});
+	}
+
+	return res.status(401).send({ message: "Not authorized!" });
 }
