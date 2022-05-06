@@ -2,15 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
 
 import env from "dotenv";
-import { RemoteGraphQLDataSource } from "@apollo/gateway";
+
+import FileUploadDataSource from "@profusion/apollo-federation-upload/build/FileUploadDataSource";
+import { GraphQLRequestContext } from "apollo-server-types";
 import parseCookies from "./cookieParser";
+import { GraphQLDataSourceProcessOptions } from "@apollo/gateway";
+import { User } from "./types";
 
 env.config();
 
 export interface Context {
 	req: Request;
 	res: Response;
-	user: Object | null;
+	user: User | null;
 }
 
 export function signJwt(object: Object, options?: SignOptions | undefined) {
@@ -29,7 +33,7 @@ export function verifyJwt<T>(token: string): T | null {
 	}
 }
 
-//Apollo context init with authorized user
+//Apollo context init with authenticated user
 export function createContext(ctx: Context): Context {
 	const context = ctx;
 
@@ -66,4 +70,40 @@ export function isAuthMiddleware(
 	}
 
 	return res.status(401).send({ message: "Not authorized!" });
+}
+
+export class AuthenticatedDataSource extends FileUploadDataSource {
+	didReceiveResponse({
+		response,
+		context,
+	}: Required<
+		Pick<
+			GraphQLRequestContext<Record<string, any>>,
+			"request" | "response" | "context"
+		>
+	>): typeof response {
+		const rawCookies = response.http?.headers.get("set-cookie") as
+			| string
+			| null;
+
+		if (rawCookies) {
+			const cookies = parseCookies(rawCookies);
+			cookies.forEach(({ cookieName, cookieValue, options }) => {
+				if (context && context.res) {
+					context.res.cookie(cookieName, cookieValue, { ...options });
+				}
+			});
+		}
+
+		return response;
+	}
+
+	willSendRequest({
+		request,
+		context,
+	}: GraphQLDataSourceProcessOptions<Record<string, any>>) {
+		if (context.user) {
+			request.http?.headers.set("user", JSON.stringify(context.user));
+		}
+	}
 }
