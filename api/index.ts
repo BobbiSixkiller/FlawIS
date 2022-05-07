@@ -49,7 +49,7 @@ const main = async () => {
 		context: (ctx: Context) => createContext(ctx),
 		plugins: [
 			ApolloServerPluginLandingPageGraphQLPlayground,
-			new ApolloComplexityPlugin(1000),
+			new ApolloComplexityPlugin(100),
 		],
 	});
 
