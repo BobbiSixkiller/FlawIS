@@ -3,7 +3,7 @@ import { verify, sign, SignOptions } from "jsonwebtoken";
 
 import env from "dotenv";
 
-import FileUploadDataSource from "@profusion/apollo-federation-upload/build/FileUploadDataSource";
+import FileUploadDataSource from "@profusion/apollo-federation-upload";
 import { GraphQLRequestContext } from "apollo-server-types";
 import parseCookies from "./cookieParser";
 import { GraphQLDataSourceProcessOptions } from "@apollo/gateway";
@@ -85,7 +85,6 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
 		const rawCookies = response.http?.headers.get("set-cookie") as
 			| string
 			| null;
-
 		if (rawCookies) {
 			const cookies = parseCookies(rawCookies);
 			cookies.forEach(({ cookieName, cookieValue, options }) => {
@@ -94,7 +93,6 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
 				}
 			});
 		}
-
 		return response;
 	}
 

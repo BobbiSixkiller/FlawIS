@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway";
 import { ApolloServer } from "apollo-server-express";
+import { graphqlUploadExpress } from "graphql-upload";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import Express from "express";
 import cookieParser from "cookie-parser";
@@ -35,6 +36,7 @@ const main = async () => {
 	const app = Express();
 
 	app.use(cookieParser());
+	app.use(graphqlUploadExpress());
 	app.use(
 		"/public",
 		isAuthMiddleware,
