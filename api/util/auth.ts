@@ -15,6 +15,7 @@ export interface Context {
 	req: Request;
 	res: Response;
 	user: User | null;
+	locale: string;
 }
 
 export function signJwt(object: Object, options?: SignOptions | undefined) {
@@ -36,6 +37,7 @@ export function verifyJwt<T>(token: string): T | null {
 //Apollo context init with authenticated user
 export function createContext(ctx: Context): Context {
 	const context = ctx;
+	context.locale = "sk";
 
 	if (context.req.cookies.accessToken) {
 		const token = context.req.cookies.accessToken.split("Bearer%20")[1];
@@ -102,6 +104,10 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
 	}: GraphQLDataSourceProcessOptions<Record<string, any>>) {
 		if (context.user) {
 			request.http?.headers.set("user", JSON.stringify(context.user));
+		}
+
+		if (context.locale) {
+			request.http?.headers.set("locale", context.locale);
 		}
 	}
 }
