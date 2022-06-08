@@ -4,6 +4,7 @@ import { ApolloServer } from "apollo-server-express";
 import { graphqlUploadExpress } from "graphql-upload";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import Express from "express";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
@@ -35,6 +36,7 @@ const main = async () => {
 
 	const app = Express();
 
+	app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 	app.use(cookieParser());
 	app.use(graphqlUploadExpress());
 	app.use(
@@ -57,7 +59,7 @@ const main = async () => {
 
 	await server.start();
 
-	server.applyMiddleware({ app });
+	server.applyMiddleware({ app, cors: false });
 
 	app.listen({ port: process.env.PORT || 5000 }, () =>
 		console.log(
