@@ -9,10 +9,10 @@ import cookieParser from "cookie-parser";
 
 import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 import {
-	AuthenticatedDataSource,
-	Context,
-	createContext,
-	isAuthMiddleware,
+  AuthenticatedDataSource,
+  Context,
+  createContext,
+  isAuthMiddleware,
 } from "./util/auth";
 import { createProxyMiddleware } from "http-proxy-middleware";
 
@@ -21,53 +21,58 @@ import env from "dotenv";
 env.config();
 
 const main = async () => {
-	const gateway = new ApolloGateway({
-		supergraphSdl: new IntrospectAndCompose({
-			subgraphs: [
-				{ name: "users", url: "http://localhost:5001/graphql" },
-				{ name: "files", url: "http://localhost:5002/graphql" },
-				{ name: "conferences", url: "http://localhost:5003/graphql" },
-			],
-		}),
-		buildService({ name, url }) {
-			return new AuthenticatedDataSource({ url });
-		},
-	});
+  const gateway = new ApolloGateway({
+    supergraphSdl: new IntrospectAndCompose({
+      subgraphs: [
+        { name: "users", url: "http://localhost:5001/graphql" },
+        { name: "files", url: "http://localhost:5002/graphql" },
+        { name: "conferences", url: "http://localhost:5003/graphql" },
+      ],
+    }),
+    buildService({ url }) {
+      return new AuthenticatedDataSource({ url });
+    },
+  });
 
-	const app = Express();
+  const app = Express();
 
-	app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
-	app.use(cookieParser());
-	app.use(graphqlUploadExpress());
-	app.use(
-		"/public",
-		isAuthMiddleware,
-		createProxyMiddleware({
-			target: "http://localhost:5002/",
-			changeOrigin: false,
-		})
-	);
+  app.use(
+    cors({
+      credentials: true,
+      origin: ["http://localhost:3000", "http://localhost:3010"],
+    })
+  );
+  app.use(cookieParser());
+  app.use(graphqlUploadExpress());
+  app.use(
+    "/public",
+    isAuthMiddleware,
+    createProxyMiddleware({
+      target: "http://localhost:5002/",
+      changeOrigin: false,
+    })
+  );
 
-	const server = new ApolloServer({
-		gateway,
-		context: (ctx: Context) => createContext(ctx),
-		plugins: [
-			ApolloServerPluginLandingPageGraphQLPlayground,
-			new ApolloComplexityPlugin(100),
-		],
-	});
+  const server = new ApolloServer({
+    gateway,
+    context: (ctx: Context) => createContext(ctx),
+    plugins: [
+      ApolloServerPluginLandingPageGraphQLPlayground,
+      new ApolloComplexityPlugin(100),
+    ],
+  });
 
-	await server.start();
+  await server.start();
 
-	server.applyMiddleware({ app, cors: false });
+  server.applyMiddleware({ app, cors: false });
 
-	app.listen({ port: process.env.PORT || 5000 }, () =>
-		console.log(
-			`🚀 Server ready and listening at ==> http://localhost:${
-				process.env.PORT || 5000
-			}${server.graphqlPath}`
-		)
-	);
+  app.listen({ port: process.env.PORT || 5000 }, () =>
+    console.log(
+      `🚀 Server ready and listening at ==> http://localhost:${
+        process.env.PORT || 5000
+      }${server.graphqlPath}`
+    )
+  );
 };
 
 main().catch(console.error);
