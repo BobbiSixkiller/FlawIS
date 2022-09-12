@@ -9,7 +9,7 @@ import {
 } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Address, Billing, Role, User } from "../../entitites/User";
+import { Role, User } from "../../entitites/User";
 import { RefDocExists } from "../../util/validation";
 
 @ArgsType()
@@ -90,48 +90,4 @@ export class UserInput implements Partial<User> {
   @Field()
   @IsPhoneNumber()
   telephone: string;
-}
-
-@InputType()
-class AddressInput implements Address {
-  @Field()
-  @Length(1, 100, { message: "Street must be 1-100 characters long!" })
-  street: string;
-
-  @Field()
-  @Length(1, 100, { message: "City must be 1-100 characters long!" })
-  city: string;
-
-  @Field()
-  @Length(1, 20, { message: "Postal code be 1-20 characters long!" })
-  postal: string;
-
-  @Field()
-  @Length(1, 50, { message: "Country name be 1-50 characters long!" })
-  country: string;
-}
-
-@InputType()
-export class BillingInput implements Partial<Billing> {
-  @Field()
-  @Length(1, 100, { message: "Name must be 1-100 characters long!" })
-  name: string;
-
-  @Field(() => AddressInput)
-  address: AddressInput;
-
-  @Field()
-  DIC: string;
-
-  @Field()
-  ICDPH: string;
-
-  @Field()
-  ICO: string;
-
-  @Field({ nullable: true })
-  IBAN?: string;
-
-  @Field({ nullable: true })
-  SWIFT?: string;
 }

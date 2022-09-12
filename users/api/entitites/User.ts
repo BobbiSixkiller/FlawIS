@@ -2,6 +2,7 @@ import {
   ArgumentValidationError,
   Directive,
   Field,
+  ID,
   ObjectType,
   registerEnumType,
 } from "type-graphql";
@@ -27,59 +28,6 @@ registerEnumType(Role, {
   description: "User role inside the FLAWIS system", // this one is optional
 });
 
-@ObjectType()
-export class Address {
-  @Field()
-  @Property()
-  street: string;
-
-  @Field()
-  @Property()
-  city: string;
-
-  @Field()
-  @Property()
-  postal: string;
-
-  @Field()
-  @Property()
-  country: string;
-}
-
-@ObjectType({ description: "User's billing information" })
-export class Billing {
-  @Field({ nullable: true })
-  id?: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
-
-  @Field(() => Address)
-  @Property()
-  address: Address;
-
-  @Field()
-  @Property()
-  ICO: string;
-
-  @Field()
-  @Property()
-  DIC: string;
-
-  @Field()
-  @Property()
-  ICDPH: string;
-
-  @Field({ nullable: true })
-  @Property()
-  IBAN?: string;
-
-  @Field({ nullable: true })
-  @Property()
-  SWIFT?: string;
-}
-
 @pre<User>("save", async function () {
   if (this.isNew || this.isModified("password")) {
     this.password = await hash(this.password, 12);
@@ -103,26 +51,26 @@ export class Billing {
       ]);
     }
   }
-  if (this.isNew && (this.isFlaw || this.isUniba)) {
-    this.billings.push({
-      name: "Univerzita Komenského v Bratislave, Právnická fakulta",
-      ICO: "00397865",
-      DIC: "2020845332",
-      ICDPH: "SK2020845332",
-      address: {
-        street: "Šafárikovo nám. 6",
-        city: "Bratislava",
-        postal: "81000",
-        country: "Slovensko",
-      },
-    });
-  }
+  // if (this.isNew && (this.isFlaw || this.isUniba)) {
+  // this.billings.push({
+  // name: "Univerzita Komenského v Bratislave, Právnická fakulta",
+  // ICO: "00397865",
+  // DIC: "2020845332",
+  // ICDPH: "SK2020845332",
+  // address: {
+  // street: "Šafárikovo nám. 6",
+  // city: "Bratislava",
+  // postal: "81000",
+  // country: "Slovensko",
+  // },
+  // });
+  // }
 })
 @Index({ name: "text" })
 @Directive('@key(fields: "id")')
 @ObjectType({ description: "The user model entity" })
 export class User extends TimeStamps {
-  @Field()
+  @Field(() => ID)
   id: ObjectId;
 
   @Field()
@@ -147,10 +95,6 @@ export class User extends TimeStamps {
   @Field()
   @Property()
   organisation: string;
-
-  @Field(() => [Billing])
-  @Property({ type: () => [Billing], default: [] })
-  billings: Billing[];
 
   @Field()
   @Property({ default: false })

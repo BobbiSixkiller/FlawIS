@@ -5,7 +5,6 @@ import { User, UserConnection } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
-  BillingInput,
   PasswordInput,
   RegisterInput,
   UserArgs,
@@ -192,29 +191,29 @@ export class UserResolver {
   }
 
   //Mutation used to save newly added billing while registering for a conference
-  @Authorized(["IS_OWN_USER"])
-  @Mutation(() => User)
-  async updateBilling(
-    @Ctx() { user }: Context,
-    @Arg("data") billingData: BillingInput
-  ): Promise<User> {
-    const loggedInUser = await this.userService.findOne({ _id: user?.id });
-    if (!loggedInUser) throw new UserInputError("User not found!");
+  // @Authorized(["IS_OWN_USER"])
+  // @Mutation(() => User)
+  // async updateBilling(
+  //   @Ctx() { user }: Context,
+  //   @Arg("data") billingData: BillingInput
+  // ): Promise<User> {
+  //   const loggedInUser = await this.userService.findOne({ _id: user?.id });
+  //   if (!loggedInUser) throw new UserInputError("User not found!");
 
-    const billing = loggedInUser.billings.find(
-      (billing) => billing.name === billingData.name
-    );
-    if (billing) {
-      billing.address = billingData.address;
-      billing.DIC = billingData.DIC;
-      billing.ICO = billingData.ICO;
-      billing.ICDPH = billingData.ICDPH;
-    } else {
-      loggedInUser.billings.push(billingData);
-    }
+  //   const billing = loggedInUser.billings.find(
+  //     (billing) => billing.name === billingData.name
+  //   );
+  //   if (billing) {
+  //     billing.address = billingData.address;
+  //     billing.DIC = billingData.DIC;
+  //     billing.ICO = billingData.ICO;
+  //     billing.ICDPH = billingData.ICDPH;
+  //   } else {
+  //     loggedInUser.billings.push(billingData);
+  //   }
 
-    return await loggedInUser.save();
-  }
+  //   return await loggedInUser.save();
+  // }
 
   @Authorized(["ADMIN"])
   @Mutation(() => Boolean)

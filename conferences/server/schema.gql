@@ -31,11 +31,13 @@ input AddressInput {
 type Attendee {
   conference: Conference!
   createdAt: DateTime!
-  id: ObjectId!
+  id: ID!
   invoice: Invoice!
+  online: Boolean!
   submissions: [Submission!]!
   updatedAt: DateTime!
   user: User!
+  withSubmission: Boolean!
 }
 
 """AttendeeConnection type enabling cursor based pagination"""
@@ -63,7 +65,6 @@ type Billing {
   ICO: String!
   SWIFT: String
   address: Address!
-  id: ObjectId
   name: String!
 }
 
@@ -86,7 +87,7 @@ type Conference {
   description: String!
   end: DateTime
   host: Host
-  id: ObjectId!
+  id: ID!
   logoUrl: String!
   name: String!
   regStart: DateTime
@@ -107,6 +108,7 @@ input ConferenceInput {
   logoUrl: String!
   name: String!
   regStart: DateTime
+  slug: String!
   start: DateTime
   tickets: [TicketInput!]
   translations: [ConferenceInputTranslation!]
@@ -224,7 +226,7 @@ type Section {
   conference: String!
   createdAt: DateTime!
   description: String!
-  id: ObjectId!
+  id: ID!
   languages: [String!]!
   name: String!
   submissions: [Submission!]!
@@ -247,24 +249,16 @@ type SectionTranslation {
   name: String!
 }
 
-"""The submissions's review process status"""
-enum Status {
-  Accepted
-  Rejected
-  Reviewing
-}
-
 """Submission entity model type"""
 type Submission {
   abstract: String!
   authors: [User!]!
   conference: Conference!
   createdAt: DateTime!
-  id: ObjectId!
+  id: ID!
   keywords: [String!]!
   name: String!
   section: Section!
-  status: Status!
   submissionUrl: String
   translations: [SubmissionTranslation!]!
   updatedAt: DateTime!
@@ -277,7 +271,6 @@ input SubmissionInput {
   keywords: [String!]!
   name: String!
   sectionId: ObjectId
-  status: Status
   submissionUrl: String
   translations: [SubmissionInputTranslation!]!
 }
@@ -299,7 +292,7 @@ type SubmissionTranslation {
 """Conference ticket type"""
 type Ticket {
   description: String!
-  id: ObjectId!
+  id: ID!
   name: String!
   online: Boolean!
   price: Int!
@@ -334,9 +327,9 @@ input TranslationInput {
 
 """User reference type from users microservice"""
 type User {
-  id: ObjectId!
-  online: Boolean
-  withSubmission: Boolean
+  billings: [Billing!]
+  email: String!
+  id: ID!
 }
 
 """Venue that conference takes place in"""

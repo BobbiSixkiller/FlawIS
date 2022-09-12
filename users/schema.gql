@@ -13,42 +13,6 @@ directive @provides(fields: String!) on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION
 
-type Address {
-  city: String!
-  country: String!
-  postal: String!
-  street: String!
-}
-
-input AddressInput {
-  city: String!
-  country: String!
-  postal: String!
-  street: String!
-}
-
-"""User's billing information"""
-type Billing {
-  DIC: String!
-  IBAN: String
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String
-  address: Address!
-  id: ObjectId
-  name: String!
-}
-
-input BillingInput {
-  DIC: String!
-  IBAN: String
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String
-  address: AddressInput!
-  name: String!
-}
-
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -60,7 +24,6 @@ type Mutation {
   logout: Boolean!
   passwordReset(data: PasswordInput!): User!
   register(data: RegisterInput!): User!
-  updateBilling(data: BillingInput!): User!
   updateUser(data: UserInput!, id: ObjectId!): User!
 }
 
@@ -103,10 +66,9 @@ enum Role {
 """The user model entity"""
 type User {
   active: Boolean!
-  billings: [Billing!]!
   createdAt: DateTime!
   email: String!
-  id: ObjectId!
+  id: ID!
   name: String!
   organisation: String!
   role: Role!

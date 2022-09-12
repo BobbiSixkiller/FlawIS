@@ -1,12 +1,12 @@
 import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { ArgumentValidationError, Field, ObjectType } from "type-graphql";
+import { ArgumentValidationError, Field, ID, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Ref } from "../util/types";
-import { User } from "./Attendee";
 import { Conference } from "./Conference";
 import { Section } from "./Section";
+import { User } from "./User";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -54,7 +54,7 @@ class SubmissionTranslation extends Translation implements Partial<Submission> {
 })
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
-  @Field()
+  @Field(() => ID)
   id: ObjectId;
 
   @Field()

@@ -156,6 +156,10 @@ export class ConferenceInput {
 
   @Field()
   @IsString()
+  slug: string;
+
+  @Field()
+  @IsString()
   description: string;
 
   @Field()

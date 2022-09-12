@@ -1,4 +1,10 @@
-import { ArgumentValidationError, Field, Int, ObjectType } from "type-graphql";
+import {
+  ArgumentValidationError,
+  Field,
+  ID,
+  Int,
+  ObjectType,
+} from "type-graphql";
 import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
@@ -63,9 +69,6 @@ export class Address {
 
 @ObjectType({ description: "Billing information" })
 export class Billing {
-  @Field({ nullable: true })
-  id?: ObjectId;
-
   @Field()
   @Property()
   name: string;
@@ -123,7 +126,7 @@ export class Venue {
 
 @ObjectType({ description: "Conference ticket type" })
 export class Ticket {
-  @Field()
+  @Field(() => ID)
   id: ObjectId;
 
   @Field()
@@ -167,10 +170,30 @@ export class Ticket {
       ]);
     }
   }
+
+  if (this.isNew || this.isModified("slug")) {
+    const conferenceExists = await getModelForClass(Conference)
+      .findOne({ slug: this.slug })
+      .exec();
+    if (conferenceExists && conferenceExists.id !== this.id) {
+      throw new ArgumentValidationError([
+        {
+          target: Conference, // Object that was validated.
+          property: "slug", // Object's property that haven't pass validation.
+          value: this.slug, // Value that haven't pass a validation.
+          constraints: {
+            // Constraints that failed validation with error messages.
+            EmailExists: "Conference with provided slug already exists!",
+          },
+          //children?: ValidationError[], // Contains all nested validation errors of the property
+        },
+      ]);
+    }
+  }
 })
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
-  @Field()
+  @Field(() => ID)
   id: ObjectId;
 
   @Field()
