@@ -1,0 +1,14 @@
+{
+    "header":"Prihláste sa",
+    "forgot":"Zabudli ste heslo?",
+    "submit":"Prihlásiť",
+    "message":"Ste tu prvý krát? <lnk>Registrujte sa!</lnk>",
+    "email":{
+        "label":"Email",
+        "placeholder":"Email adresa..."
+    },
+    "password":{
+        "label":"Heslo",
+        "placeholder":"Heslo..."
+    }
+}

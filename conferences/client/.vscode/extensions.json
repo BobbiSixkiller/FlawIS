@@ -1,0 +1,3 @@
+{
+	"recommendations": ["dbaeumer.vscode-eslint", "graphql.vscode-graphql", "esbenp.prettier-vscode", "styled-components.vscode-styled-components", "eamodio.gitlens"]
+}
