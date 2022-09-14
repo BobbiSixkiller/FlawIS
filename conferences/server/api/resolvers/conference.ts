@@ -89,58 +89,76 @@ export class ConferenceResolver {
     return await this.sectionService.findAll({ conference: id });
   }
 
-  //refactor from freshsquare products mongo aggregation query
   @Authorized()
   @FieldResolver(() => AttendeeConnection)
   async attendees(
-    @Args() { after, first, before, last }: AttendeeArgs,
-    @Root() { id }: Conference,
-    @Ctx() { user }: Context
+    @Args() { after, first }: AttendeeArgs,
+    @Root() { id }: Conference
   ): Promise<AttendeeConnection> {
     const attendees = await this.attendeeService.aggregate([
+      { $match: { conference: id } },
       {
-        $match: {
-          conference: id,
-          $expr: {
-            $cond: [
-              { $and: [{ $eq: [after, null] }, { $eq: [before, null] }] },
-              { $ne: ["$_id", null] },
-              {
-                $cond: [
-                  { $ne: [after, null] },
-                  { $lt: ["$_id", after] },
-                  { $gt: ["$_id", before] },
-                ],
+        $facet: {
+          data: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
               },
-            ],
+            },
+            { $sort: { _id: -1 } },
+            { $limit: first || 20 },
+            {
+              $addFields: {
+                id: "$_id", //transform _id to id property as defined in GraphQL object types
+              },
+            },
+          ],
+          hasNextPage: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $sort: { _id: -1 } },
+            { $skip: first || 20 }, // skip paginated data
+            { $limit: 1 }, // just to check if there's any element
+            { $count: "totalNext" },
+          ],
+        },
+      },
+      {
+        $unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          pageInfo: {
+            hasNextPage: { $gt: ["$hasNextPage.totalNext", 0] },
+            endCursor: { $last: "$data.id" },
           },
         },
       },
-      { $sort: { _id: -1 } },
-      { $limit: first || last || 20 },
     ]);
 
-    const [hasNextPage, hasPreviousPage] = await Promise.all([
-      this.attendeeService.exists({
-        _id: { $gt: attendees[0]?._id },
-      }),
-      this.attendeeService.exists({
-        _id: { $lt: attendees[attendees.length - 1]?._id },
-      }),
-    ]);
-
-    return {
-      edges: attendees.map((attendee) => ({
-        cursor: attendee?._id,
-        node: transformIds(attendee),
-      })),
-      pageInfo: {
-        startCursor: attendees[0]?._id,
-        hasPreviousPage: hasPreviousPage !== null,
-        endCursor: attendees[attendees.length - 1]?._id,
-        hasNextPage: hasNextPage !== null,
-      },
-    };
+    return attendees[0] as unknown as AttendeeConnection;
   }
 
   @Authorized()

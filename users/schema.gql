@@ -19,6 +19,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
+  activateUser(token: String!): Boolean!
   deleteUser(id: ObjectId!): Boolean!
   login(email: String!, password: String!): User!
   logout: Boolean!
@@ -33,8 +34,6 @@ scalar ObjectId
 type PageInfo {
   endCursor: ObjectId!
   hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: ObjectId!
 }
 
 input PasswordInput {
@@ -65,7 +64,6 @@ enum Role {
 
 """The user model entity"""
 type User {
-  active: Boolean!
   createdAt: DateTime!
   email: String!
   id: ID!
@@ -74,6 +72,7 @@ type User {
   role: Role!
   telephone: String
   updatedAt: DateTime!
+  verified: Boolean!
 }
 
 """UserConnection type enabling cursor based pagination"""

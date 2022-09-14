@@ -5,8 +5,9 @@ import { Field, ID, Int, ObjectType } from "type-graphql";
 import CreateConnection from "../resolvers/types/pagination";
 
 import { Ref } from "../util/types";
+import { Billing } from "./Billing";
 
-import { Billing, Conference, Host } from "./Conference";
+import { Conference, Host } from "./Conference";
 import { Submission } from "./Submission";
 import { User } from "./User";
 
@@ -74,8 +75,8 @@ export class Attendee extends TimeStamps {
   conference: Ref<Conference>;
 
   @Field(() => User)
-  @Property({ _id: false })
-  user: User;
+  @Property({ ref: () => User })
+  user: Ref<User>;
 
   @Field()
   @Property()

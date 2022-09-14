@@ -10,6 +10,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
 import { Section } from "./Section";
+import { Address, Billing } from "./Billing";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -46,56 +47,6 @@ class ConferenceTranslation extends Translation {
   @Field(() => [TicketTranslation])
   @Property({ type: () => TicketTranslation, default: [], _id: false })
   tickets: TicketTranslation[];
-}
-
-@ObjectType()
-export class Address {
-  @Field()
-  @Property()
-  street: string;
-
-  @Field()
-  @Property()
-  city: string;
-
-  @Field()
-  @Property()
-  postal: string;
-
-  @Field()
-  @Property()
-  country: string;
-}
-
-@ObjectType({ description: "Billing information" })
-export class Billing {
-  @Field()
-  @Property()
-  name: string;
-
-  @Field(() => Address)
-  @Property({ _id: false })
-  address: Address;
-
-  @Field()
-  @Property()
-  ICO: string;
-
-  @Field()
-  @Property()
-  DIC: string;
-
-  @Field()
-  @Property()
-  ICDPH: string;
-
-  @Field({ nullable: true })
-  @Property()
-  IBAN?: string;
-
-  @Field({ nullable: true })
-  @Property()
-  SWIFT?: string;
 }
 
 @ObjectType({ description: "Conference hosting organization" })

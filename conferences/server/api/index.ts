@@ -17,6 +17,7 @@ import { authChecker } from "./util/auth";
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
 import { SubmissionResolver } from "./resolvers/submission";
+import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
 
@@ -42,7 +43,9 @@ async function main() {
       //validate: false,
       authChecker,
     },
-    {}
+    {
+      User: { __resolveReference: resolveUserReference },
+    }
   );
 
   //Create Apollo server

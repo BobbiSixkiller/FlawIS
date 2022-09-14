@@ -10,7 +10,6 @@ import {
   UserArgs,
   UserInput,
 } from "./types/user";
-import { transformIds } from "../util/typegoose-middleware";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
 import { Context, signJwt, verifyJwt } from "../util/auth";
@@ -35,50 +34,70 @@ export class UserResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
-  async users(
-    @Args() { first, after, last, before }: UserArgs
-  ): Promise<UserConnection> {
+  async users(@Args() { first, after }: UserArgs): Promise<UserConnection> {
     const users = await this.userService.aggregate([
       {
-        $match: {
-          $expr: {
-            $cond: [
-              { $and: [{ $eq: [before, null] }, { $eq: [after, null] }] },
-              { $ne: ["$_id", null] }, //return all sorted documents
-              {
-                $cond: [
-                  { $eq: [before, null] },
-                  { $lt: ["$_id", new ObjectId(after)] }, //newer users
-                  { $gt: ["$_id", new ObjectId(before)] }, //older users
-                ],
+        $facet: {
+          data: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
               },
-            ],
+            },
+            { $sort: { _id: -1 } },
+            { $limit: first || 20 },
+            {
+              $addFields: {
+                id: "$_id", //transform _id to id property as defined in GraphQL object types
+              },
+            },
+          ],
+          hasNextPage: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $sort: { _id: -1 } },
+            { $skip: first || 20 }, // skip paginated data
+            { $limit: 1 }, // just to check if there's any element
+            { $count: "totalNext" },
+          ],
+        },
+      },
+      {
+        $unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          pageInfo: {
+            hasNextPage: { $gt: ["$hasNextPage.totalNext", 0] },
+            endCursor: { $last: "$data.id" },
           },
         },
       },
-      //sort based on the latest user created
-      { $sort: { _id: -1 } },
-      { $limit: last || first || 20 },
     ]);
 
-    return {
-      edges: users.map((user) => ({
-        cursor: user?._id,
-        node: transformIds(user),
-      })),
-      pageInfo: {
-        startCursor: users[0]._id,
-        hasPreviousPage:
-          (await this.userService.exists({
-            _id: { $gt: users[0]._id },
-          })) !== null,
-        endCursor: users[users.length - 1]._id,
-        hasNextPage:
-          (await this.userService.exists({
-            _id: { $lt: users[users.length - 1]._id },
-          })) !== null,
-      },
-    };
+    return users[0] as unknown as UserConnection;
   }
 
   @Authorized()
@@ -105,7 +124,39 @@ export class UserResolver {
       secure: process.env.NODE_ENV === "production",
     });
 
+    const token = signJwt({ id: user.id }, { expiresIn: "1d" });
+    console.log(token);
+
+    sendMail(
+      registerInput.email,
+      "AccountActivation",
+      `Hi there,\nin order to activate your account, please click on the link down below.\n\n<a href=${
+        process.env.CLIENT_URL || "http://localhost:3010"
+      }/activate/${token}>Activate my account</a>\n\nBest regards,\n\nMojTrh Team`,
+      `<h1>Account Activation</h1><p>In order to activate your account please click on the following link</p><a href=${
+        process.env.CLIENT_URL || "http://localhost:3010"
+      }/activate/${token}>Activate my account</a><p>Best regards,</p><p>MojTrh team</p>`,
+      []
+    );
+
     return user;
+  }
+
+  @Mutation(() => Boolean)
+  async activateUser(@Arg("token") token: string): Promise<boolean> {
+    const user: Partial<User> | null = verifyJwt(token);
+    if (user) {
+      const { modifiedCount } = await this.userService.update(
+        { _id: user.id, verified: false },
+        { verified: true }
+      );
+
+      if (modifiedCount > 0) {
+        return true;
+      } else throw new Error("User account already activated!");
+    }
+
+    return false;
   }
 
   @Mutation(() => User)

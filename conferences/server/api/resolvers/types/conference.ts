@@ -7,13 +7,8 @@ import {
   IsString,
 } from "class-validator";
 
-import {
-  Address,
-  Billing,
-  Host,
-  Ticket,
-  Venue,
-} from "../../entitites/Conference";
+import { Host, Ticket, Venue } from "../../entitites/Conference";
+import { Address, Billing } from "../../entitites/Billing";
 
 @InputType()
 class TicketInputTranslation {
@@ -102,7 +97,7 @@ export class BillingInput implements Billing {
 }
 
 @InputType()
-export class HostInput implements Partial<Host> {
+export class HostInput implements Host {
   @Field()
   @IsString()
   logoUrl: string;

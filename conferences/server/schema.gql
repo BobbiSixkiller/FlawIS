@@ -80,7 +80,7 @@ input BillingInput {
 
 """Conference model type"""
 type Conference {
-  attendees(after: String, before: String, first: Int = 20, last: Int = 20): AttendeeConnection!
+  attendees(after: String, first: Int = 20): AttendeeConnection!
   attendeesCount: Int!
   attending: Boolean!
   createdAt: DateTime!
@@ -209,8 +209,6 @@ scalar ObjectId
 type PageInfo {
   endCursor: ObjectId!
   hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: ObjectId!
 }
 
 type Query {
@@ -325,9 +323,11 @@ input TranslationInput {
   name: String!
 }
 
-"""User reference type from users microservice"""
+"""
+User reference type from users microservice with contributed billings field
+"""
 type User {
-  billings: [Billing!]
+  billings: [Billing!]!
   email: String!
   id: ID!
 }

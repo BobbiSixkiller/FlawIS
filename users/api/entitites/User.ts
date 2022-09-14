@@ -98,7 +98,7 @@ export class User extends TimeStamps {
 
   @Field()
   @Property({ default: false })
-  active: boolean;
+  verified: boolean;
 
   @Field()
   createdAt: Date;

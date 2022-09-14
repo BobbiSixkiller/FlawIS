@@ -3,36 +3,36 @@ import { v4 as uuid } from "uuid";
 import { Invoice } from "../entitites/Attendee";
 
 export async function generatePdf(html: string) {
-	const browser = await puppeteer.launch({
-		headless: true,
-		// executablePath: "google-chrome-stable",
-		// args: ["--no-sandbox", "--disable-gpu"],
-	});
-	const page = await browser.newPage();
-	const path = `./temp/${uuid()}-invoice.pdf`;
+  const browser = await puppeteer.launch({
+    headless: true,
+    // executablePath: "google-chrome-stable",
+    // args: ["--no-sandbox", "--disable-gpu"],
+  });
+  const page = await browser.newPage();
+  const path = `./tmp/${uuid()}-invoice.pdf`;
 
-	await page.setContent(html);
-	const pdf = await page.pdf({
-		path: path,
-		format: "A4",
-	});
+  await page.setContent(html);
+  const pdf = await page.pdf({
+    path: path,
+    format: "A4",
+  });
 
-	await browser.close();
+  await browser.close();
 
-	return { pdf, path };
+  return { pdf, path };
 }
 
 export function invoice(data: Invoice, locale: string): string {
-	const { issuer, payer, body } = data;
-	let payerBilling;
-	if (!payer.ICO) {
-		payerBilling = `<p></p>`;
-	} else {
-		payerBilling = `<p>IČO: ${payer.ICO}, DIČ: ${payer.DIC}</p>							
+  const { issuer, payer, body } = data;
+  let payerBilling;
+  if (!payer.ICO) {
+    payerBilling = `<p></p>`;
+  } else {
+    payerBilling = `<p>IČO: ${payer.ICO}, DIČ: ${payer.DIC}</p>							
         <p>IČ DPH: ${payer.ICDPH}</p> `;
-	}
+  }
 
-	return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
         <html>
             <head>
                 <meta charset="UTF-8">
@@ -95,10 +95,10 @@ export function invoice(data: Invoice, locale: string): string {
                     <div class="header">
                         <img src=${issuer.logoUrl}>
                         <h1>${
-													locale === "en"
-														? "Invoice " + body.variableSymbol
-														: "Faktúra " + body.variableSymbol
-												}</h1>
+                          locale === "en"
+                            ? "Invoice " + body.variableSymbol
+                            : "Faktúra " + body.variableSymbol
+                        }</h1>
                     </div>
                     <div class="content">
                         <div class="issuer">
@@ -106,27 +106,27 @@ export function invoice(data: Invoice, locale: string): string {
                             <p>${issuer.billing.name}</p>
                             <p>${issuer.billing.address.street}</p>
                             <p>${issuer.billing.address.postal}, ${
-		issuer.billing.address.city
-	}</p>
+    issuer.billing.address.city
+  }</p>
     <p>${issuer.billing.address.country}</p>
                             <p>ICO: ${issuer.billing.ICO}, DIC: ${
-		issuer.billing.DIC
-	}</p>
+    issuer.billing.DIC
+  }</p>
                             <p>IC DPH: ${issuer.billing.ICDPH}</p>
                             <p>Issue Date: ${body.issueDate.toLocaleDateString(
-															locale
-														)}</p>
+                              locale
+                            )}</p>
                             <p>Due Date: ${body.dueDate.toLocaleDateString(
-															locale
-														)}</p>
+                              locale
+                            )}</p>
                             <p>VAT Date: ${body.vatDate.toLocaleDateString(
-															locale
-														)}</p>
+                              locale
+                            )}</p>
                             <strong>${
-															locale === "en"
-																? "Bank connection"
-																: "Bankové spojenie"
-														}</strong>
+                              locale === "en"
+                                ? "Bank connection"
+                                : "Bankové spojenie"
+                            }</strong>
                             <p>IBAN: ${issuer.billing.IBAN}</p>
                             <p>SWIFT: ${issuer.billing.SWIFT}</p>
                             <p>Form of payment: ${body.type}</p>
@@ -136,18 +136,18 @@ export function invoice(data: Invoice, locale: string): string {
                             <p>${payer.name}</p>
                             <p>${payer.address.street}</p>
                             <p>${payer.address.postal}, ${
-		payer.address.city
-	}</p>
+    payer.address.city
+  }</p>
                             <p>${payer.address.country}</p>
 							${payerBilling}
                         </div>
                     </div>
                     <p>${body.body}</p>
                     <p>${
-											locale === "en"
-												? "COMMENT: " + body.comment
-												: "Komentár :" + body.comment
-										}</p>
+                      locale === "en"
+                        ? "COMMENT: " + body.comment
+                        : "Komentár :" + body.comment
+                    }</p>
                     <table>
                         <tr>
                             <th>${locale === "en" ? "Item" : "Položka"}</th>
@@ -155,10 +155,10 @@ export function invoice(data: Invoice, locale: string): string {
                         </tr>
                         <tr>
                             <td>${
-															locale === "en"
-																? "Conference fee"
-																: "Konferenčný poplatok"
-														}</td>
+                              locale === "en"
+                                ? "Conference fee"
+                                : "Konferenčný poplatok"
+                            }</td>
                             <td>${body.ticketPrice} €</td>
                         </tr>
                         <tr>
@@ -168,14 +168,14 @@ export function invoice(data: Invoice, locale: string): string {
                         <tr>
                             <td>${locale === "en" ? "SUM" : "Spolu"}</td>
                             <td>${
-															Number(body.ticketPrice) + Number(body.vat)
-														} €</td>
+                              Number(body.ticketPrice) + Number(body.vat)
+                            } €</td>
                         </tr>
                     </table>
                     <div class="footer">
                         <strong>${
-													locale === "en" ? "Issued By:" : "Vydal:"
-												}</strong>
+                          locale === "en" ? "Issued By:" : "Vydal:"
+                        }</strong>
                         <img src=${issuer.stampUrl}>
                     </div>
                 </div>

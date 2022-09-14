@@ -1,6 +1,5 @@
 import {
   Arg,
-  Args,
   Authorized,
   Ctx,
   FieldResolver,
@@ -18,6 +17,8 @@ import { CRUDservice } from "../services/CRUDservice";
 import { Attendee } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Submission } from "../entitites/Submission";
+import { User } from "../entitites/User";
+
 import { AttendeeInput, InvoiceInput } from "./types/attendee";
 
 import { Context } from "../util/auth";
@@ -36,7 +37,8 @@ export class AttendeeResolver {
   constructor(
     private readonly attendeeService = new CRUDservice(Attendee),
     private readonly conferenceService = new CRUDservice(Conference),
-    private readonly submissionService = new CRUDservice(Submission)
+    private readonly submissionService = new CRUDservice(Submission),
+    private readonly userService = new CRUDservice(User)
   ) {}
 
   @Authorized()
@@ -59,12 +61,23 @@ export class AttendeeResolver {
     const ticketPrice = ticket.price / Number(process.env.VAT || 1.2);
     const isFlaw = user!.email.split("@")[1] === "flaw.uniba.sk";
 
+    await this.userService.update(
+      { _id: user?.id },
+      {
+        _id: user?.id,
+        email: user?.email,
+        $addToSet: { billings: billing },
+      },
+      { upsert: true }
+    );
+
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
+      withSubmission: ticket.withSubmission,
+      online: ticket.online,
       user: {
-        id: user!.id,
-        withSubmission: ticket.withSubmission,
-        online: ticket.online,
+        _id: user?.id,
+        email: user?.email,
       },
       invoice: {
         payer: billing,
@@ -146,6 +159,12 @@ export class AttendeeResolver {
     @Root() { conference }: Attendee
   ): Promise<Conference | null> {
     return await this.conferenceService.findOne({ _id: conference });
+  }
+
+  @Authorized()
+  @FieldResolver(() => User, { nullable: true })
+  async user(@Root() { user }: Attendee): Promise<User | null> {
+    return await this.userService.findOne({ _id: user });
   }
 
   @Authorized()
