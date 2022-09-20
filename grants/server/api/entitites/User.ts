@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { prop as Property } from "@typegoose/typegoose";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
 import { Billing } from "./Billing";
+import { GrantConnection } from "./Grant";
 
 @Directive("@extends")
 @Directive(`@key(fields: "id")`)
@@ -20,4 +21,7 @@ export class User {
   //aggregate all my hours in a given year
   @Field()
   hours: number;
+  //aggregate and return all grants that the user has been assigned to
+  @Field(() => GrantConnection)
+  grants: GrantConnection;
 }

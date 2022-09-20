@@ -93,6 +93,6 @@ export class Grant extends TimeStamps {
 }
 
 @ObjectType({
-  description: "AttendeeConnection type enabling cursor based pagination",
+  description: "GrantConnection type enabling cursor based pagination",
 })
-export class AttendeeConnection extends CreateConnection(Grant) {}
+export class GrantConnection extends CreateConnection(Grant) {}

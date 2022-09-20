@@ -31,6 +31,7 @@ export class GrantResolver {
     private readonly grantService = new CRUDservice(Grant),
     private readonly userService = new CRUDservice(User)
   ) {}
+
   async grants() {}
 
   async grant() {}
