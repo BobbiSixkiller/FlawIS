@@ -27,6 +27,7 @@ const main = async () => {
         { name: "users", url: "http://localhost:5001/graphql" },
         { name: "files", url: "http://localhost:5002/graphql" },
         { name: "conferences", url: "http://localhost:5003/graphql" },
+        { name: "grants", url: "http://localhost:5004/graphql" },
       ],
     }),
     buildService({ url }) {

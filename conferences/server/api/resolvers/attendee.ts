@@ -80,7 +80,7 @@ export class AttendeeResolver {
         email: user?.email,
       },
       invoice: {
-        payer: billing,
+        payer: { ...billing, name: user?.name },
         issuer: conference.host,
         body: {
           variableSymbol: conference.variableSymbol,

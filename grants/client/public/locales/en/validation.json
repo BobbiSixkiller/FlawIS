@@ -1,0 +1,4 @@
+{
+    "required":"${path} is a required field!",
+    "email":"Email is invalid!"
+}

@@ -327,7 +327,8 @@ input TranslationInput {
 User reference type from users microservice with contributed billings field
 """
 type User {
-  billings: [Billing]!
+  billings: [Billing!]!
+  email: String!
   id: ID!
 }
 

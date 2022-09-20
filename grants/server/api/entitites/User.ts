@@ -17,7 +17,7 @@ export class User {
   @Property()
   email: string;
 
-  @Field(() => [Billing], { nullable: "items" })
-  @Property({ type: () => [Billing], _id: false })
-  billings: Billing[];
+  //aggregate all my hours in a given year
+  @Field()
+  hours: number;
 }
