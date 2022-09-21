@@ -10,6 +10,7 @@ import { TypegooseMiddleware } from "./util/typegoose-middleware";
 import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { GrantResolver } from "./resolvers/grant";
+import { MemberResolver } from "./resolvers/member";
 import { UserResolver } from "./resolvers/user";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
@@ -24,7 +25,7 @@ async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
     {
-      resolvers: [GrantResolver, UserResolver],
+      resolvers: [GrantResolver, MemberResolver, UserResolver],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware],
       // use ObjectId scalar mapping

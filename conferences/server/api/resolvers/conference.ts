@@ -83,6 +83,13 @@ export class ConferenceResolver {
     return await conference.save();
   }
 
+  @Authorized(["ADMIN"])
+  @Mutation(() => Boolean)
+  async deleteConference(@Arg("id") id: ObjectId): Promise<boolean> {
+    const { deletedCount } = await this.conferenceService.delete({ _id: id });
+    return deletedCount > 0;
+  }
+
   @Authorized()
   @FieldResolver(() => [Section])
   async sections(@Root() { id }: Conference): Promise<Section[]> {

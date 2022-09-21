@@ -194,6 +194,7 @@ type Mutation {
   addSubmission(data: SubmissionInput!): Submission!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!): Section!
+  deleteConference(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): Boolean!
   deleteSubmission(id: ObjectId!): Boolean!
   removeAttendee(id: ObjectId!): Boolean!

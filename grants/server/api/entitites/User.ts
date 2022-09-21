@@ -16,11 +16,4 @@ export class User {
 
   @Property()
   email: string;
-
-  //aggregate all my hours in a given year
-  @Field()
-  hours: number;
-  //aggregate and return all grants that the user has been assigned to
-  @Field(() => GrantConnection)
-  grants: GrantConnection;
 }

@@ -1,7 +1,7 @@
 import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType } from "type-graphql";
 import CreateConnection from "../resolvers/types/pagination";
 import { Ref } from "../util/types";
 import { User } from "./User";

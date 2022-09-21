@@ -35,12 +35,12 @@ export class UserResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => Int)
-  async hours(
+  @FieldResolver(() => Int, { nullable: true })
+  async grants(
     @Arg("year") year: Date,
     @Ctx() { user }: Context
-  ): Promise<GrantConnection> {
+  ): Promise<GrantConnection | null> {
     //return count of numbers spent as a grant member based on selected year
-    const countHours = await this.grantService.aggregate([]);
+    const grants = await this.grantService.aggregate([]);
   }
 }
