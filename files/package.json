@@ -1,6 +1,6 @@
 {
-  "name": "flawis-files",
-  "description": "File upload microservice implemented as a GraphQL API",
+  "name": "FlawIS-files",
+  "description": "File uoload service implemented as a Federated subgraph GraphQL API.",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BobbiSixkiller/FlawIS-files.git"
+    "url": "git+https://github.com/BobbiSixkiller/FlawIS.git"
   },
   "author": "Matúš Muránsky",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BobbiSixkiller/FlawIS-files/issues"
+    "url": "https://github.com/BobbiSixkiller/FlawIS/issues"
   },
-  "homepage": "https://github.com/BobbiSixkiller/FlawIS-files#readme",
+  "homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
   "dependencies": {
     "@apollo/federation": "^0.25.1",
     "apollo-graphql": "^0.9.7",

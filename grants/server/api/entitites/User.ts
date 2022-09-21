@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import { prop as Property } from "@typegoose/typegoose";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
-import { Billing } from "./Billing";
 import { GrantConnection } from "./Grant";
 
 @Directive("@extends")

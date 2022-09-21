@@ -7,7 +7,7 @@ import { Ref } from "../util/types";
 import { User } from "./User";
 
 @ObjectType({ description: "Member model type" })
-class Member extends TimeStamps {
+export class Member extends TimeStamps {
   @Field(() => User)
   @Property({ ref: () => User })
   user: Ref<User>;
@@ -23,10 +23,7 @@ class Member extends TimeStamps {
 }
 
 @ObjectType({ description: "Budget model type" })
-class Budget extends TimeStamps {
-  @Field(() => ID)
-  id: ObjectId;
-
+export class Budget extends TimeStamps {
   @Field()
   @Property()
   year: Date;
@@ -83,7 +80,7 @@ export class Grant extends TimeStamps {
   files: string[];
 
   @Field(() => [Budget])
-  @Property({ type: () => [Budget] })
+  @Property({ type: () => [Budget], _id: false })
   budget: Budget[];
 
   @Field()

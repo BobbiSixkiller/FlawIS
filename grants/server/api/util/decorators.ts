@@ -34,3 +34,31 @@ export function RefDocExists(
     });
   };
 }
+
+@ValidatorConstraint({ name: "NameExists", async: true })
+class NameValidator implements ValidatorConstraintInterface {
+  async validate(name: string, args: ValidationArguments) {
+    const modelClass = args.constraints[0];
+    return await getModelForClass(modelClass).exists({ name });
+  }
+
+  defaultMessage(): string {
+    return "Document with given name already exists!";
+  }
+}
+
+export function NameExists(
+  modelClass: any,
+  validationOptions?: ValidationOptions
+) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: "NameExists",
+      target: object.constructor,
+      propertyName: propertyName,
+      constraints: [modelClass],
+      options: validationOptions,
+      validator: NameValidator,
+    });
+  };
+}

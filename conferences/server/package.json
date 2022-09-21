@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "FlawIS-conferences",
   "version": "1.0.0",
-  "description": "FlawIS-conferences backend implemented as a Federated GraphQL API.",
+  "description": "Backend service implemented as a Federated subgraph GraphQL API.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BobbiSixkiller/FlawIS-conferences.git"
+    "url": "git+https://github.com/BobbiSixkiller/FlawIS.git"
   },
   "keywords": [
     "Apollo",
@@ -22,9 +22,9 @@
   "author": "Matúš Muránsky",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BobbiSixkiller/FlawIS-conferences/issues"
+    "url": "https://github.com/BobbiSixkiller/FlawIS/issues"
   },
-  "homepage": "https://github.com/BobbiSixkiller/FlawIS-conferences#readme",
+  "homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
   "dependencies": {
     "@apollo/federation": "^0.25.1",
     "@typegoose/typegoose": "^9.8.1",
