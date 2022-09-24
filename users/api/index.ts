@@ -16,6 +16,7 @@ import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import env from "dotenv";
+import createMQProducer from "./util/rabbitmqClient";
 
 env.config();
 
@@ -39,6 +40,11 @@ async function main() {
     }
   );
 
+  const messageProducer = createMQProducer(
+    process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
+    "users"
+  );
+
   //Create Apollo server
   const server = new ApolloServer({
     schema,
@@ -46,6 +52,7 @@ async function main() {
       req,
       res,
       user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+      produceMessage: messageProducer,
     }),
   });
 

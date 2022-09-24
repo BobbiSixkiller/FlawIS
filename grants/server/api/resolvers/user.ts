@@ -32,6 +32,7 @@ export class UserResolver {
   ): Promise<number> {
     //return count of numbers spent as a grant member based on selected year
     const countHours = await this.grantService.aggregate([]);
+    return 0;
   }
 
   @Authorized()
@@ -42,5 +43,6 @@ export class UserResolver {
   ): Promise<GrantConnection | null> {
     //return count of numbers spent as a grant member based on selected year
     const grants = await this.grantService.aggregate([]);
+    return null;
   }
 }

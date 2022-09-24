@@ -54,7 +54,7 @@ async function main() {
 
   // create mongoose connection
   const mongoose = await connect(
-    process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/conferences"
+    process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/grants"
   );
   console.log(mongoose.connection && "Database connected!");
 

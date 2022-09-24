@@ -20,6 +20,7 @@ import { SubmissionResolver } from "./resolvers/submission";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
+import createMQConsumer from "./util/rabbitmqClient";
 
 env.config();
 
@@ -65,13 +66,19 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  await server.listen({ port: process.env.PORT || 5003 }, () =>
+  const consumer = createMQConsumer(
+    process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
+    "users"
+  );
+
+  await server.listen({ port: process.env.PORT || 5003 }, () => {
     console.log(
       `🚀 Server ready and listening at ==> http://localhost:${
         process.env.PORT || 5003
       }${server.graphqlPath}`
-    )
-  );
+    );
+    consumer();
+  });
 }
 
 main().catch((error) => {

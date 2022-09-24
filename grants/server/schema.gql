@@ -13,123 +13,17 @@ directive @provides(fields: String!) on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION
 
-type Address {
-  city: String!
-  country: String!
-  postal: String!
-  street: String!
-}
-
-input AddressInput {
-  city: String!
-  country: String!
-  postal: String!
-  street: String!
-}
-
-"""Attendee model type"""
-type Attendee {
-  conference: Conference!
+"""Budget model type"""
+type Budget {
   createdAt: DateTime!
-  id: ID!
-  invoice: Invoice!
-  online: Boolean!
-  submissions: [Submission!]!
+  indirect: Float!
+  material: Float!
+  members: [Member!]!
+  salaries: Float!
+  services: Float!
+  travel: Float!
   updatedAt: DateTime!
-  user: User!
-  withSubmission: Boolean!
-}
-
-"""AttendeeConnection type enabling cursor based pagination"""
-type AttendeeConnection {
-  edges: [AttendeeEdge]!
-  pageInfo: PageInfo!
-}
-
-type AttendeeEdge {
-  cursor: ObjectId!
-  node: Attendee!
-}
-
-input AttendeeInput {
-  billing: BillingInput!
-  conferenceId: ObjectId!
-  ticketId: ObjectId!
-}
-
-"""Billing information"""
-type Billing {
-  DIC: String!
-  IBAN: String
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String
-  address: Address!
-  name: String!
-}
-
-input BillingInput {
-  DIC: String!
-  IBAN: String
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String
-  address: AddressInput!
-  name: String!
-}
-
-"""Conference model type"""
-type Conference {
-  attendees(after: String, first: Int = 20): AttendeeConnection!
-  attendeesCount: Int!
-  attending: Boolean!
-  createdAt: DateTime!
-  description: String!
-  end: DateTime
-  host: Host
-  id: ID!
-  logoUrl: String!
-  name: String!
-  regStart: DateTime
-  sections: [Section!]!
-  slug: String!
-  start: DateTime
-  tickets: [Ticket!]!
-  translations: [ConferenceTranslation!]!
-  updatedAt: DateTime!
-  variableSymbol: String!
-  venue: Venue
-}
-
-input ConferenceInput {
-  description: String!
-  end: DateTime
-  host: HostInput
-  logoUrl: String!
-  name: String!
-  regStart: DateTime
-  slug: String!
-  start: DateTime
-  tickets: [TicketInput!]
-  translations: [ConferenceInputTranslation!]
-  variableSymbol: String!
-  venue: VenueInput
-}
-
-input ConferenceInputTranslation {
-  description: String!
-  language: String!
-  logoUrl: String!
-  name: String!
-  tickets: [TicketInputTranslation!]
-}
-
-type ConferenceTranslation {
-  description: String!
-  language: String!
-  logoUrl: String!
-  name: String!
-  tickets: [TicketTranslation!]!
+  year: DateTime!
 }
 
 """
@@ -137,70 +31,49 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-"""Conference hosting organization"""
-type Host {
-  billing: Billing!
-  logoUrl: String!
-  stampUrl: String!
+"""Attendee model type"""
+type Grant {
+  budget: [Budget!]!
+  createdAt: DateTime!
+  end: DateTime!
+  files: [String!]!
+  id: ID!
+  name: String!
+  start: DateTime!
+  updatedAt: DateTime!
 }
 
-input HostInput {
-  billing: BillingInput!
-  logoUrl: String!
-  stampUrl: String!
+"""GrantConnection type enabling cursor based pagination"""
+type GrantConnection {
+  edges: [GrantEdge]!
+  pageInfo: PageInfo!
 }
 
-"""Invoice entity subdocument type"""
-type Invoice {
-  body: InvoiceData!
-  issuer: Host!
-  payer: Billing!
+type GrantEdge {
+  cursor: ObjectId!
+  node: Grant!
 }
 
-"""The body of an invoice"""
-type InvoiceData {
-  body: String!
-  comment: String!
-  dueDate: DateTime!
-  issueDate: DateTime!
-  ticketPrice: Int!
-  type: String!
-  variableSymbol: String!
-  vat: Int!
-  vatDate: DateTime!
+input GrantInput {
+  end: DateTime!
+  files: [String!]!
+  name: String!
+  start: DateTime!
 }
 
-input InvoiceDataInput {
-  body: String!
-  comment: String!
-  dueDate: DateTime!
-  issueDate: DateTime!
-  ticketPrice: Int!
-  type: String!
-  variableSymbol: String!
-  vat: Int!
-  vatDate: DateTime!
-}
-
-"""Invoice data input type facilitating attendee's invoice update"""
-input InvoiceInput {
-  body: InvoiceDataInput
-  issuer: BillingInput
-  payer: BillingInput
+"""Member model type"""
+type Member {
+  createdAt: DateTime!
+  hours: Float!
+  member: User!
+  updatedAt: DateTime!
+  user: User!
 }
 
 type Mutation {
-  addAttendee(data: AttendeeInput!): Attendee!
-  addSubmission(data: SubmissionInput!): Submission!
-  createConference(data: ConferenceInput!): Conference!
-  createSection(data: SectionInput!): Section!
-  deleteSection(id: ObjectId!): Boolean!
-  deleteSubmission(id: ObjectId!): Boolean!
-  removeAttendee(id: ObjectId!): Boolean!
-  updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
-  updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
-  updateSection(data: SectionInput!, id: ObjectId!): Section!
-  updateSubmission(data: SubmissionInput!, id: ObjectId!): Submission!
+  createGrant(data: GrantInput!): Grant!
+  deleteGrant(id: ObjectId!): Boolean!
+  updategrant(data: GrantInput!, id: ObjectId!): Grant!
 }
 
 """Mongo object id scalar type"""
@@ -212,133 +85,15 @@ type PageInfo {
 }
 
 type Query {
-  attendee(id: ObjectId!): Attendee!
-  conference(slug: String!): Conference!
-  conferences(year: DateTime!): [Conference!]!
-  section(id: ObjectId!): Section!
-  submission(id: ObjectId!): Submission!
-}
-
-"""Conference's section entity model type"""
-type Section {
-  conference: String!
-  createdAt: DateTime!
-  description: String!
-  id: ID!
-  languages: [String!]!
-  name: String!
-  submissions: [Submission!]!
-  translations: [SectionTranslation!]!
-  updatedAt: DateTime!
-}
-
-"""Conference section input type"""
-input SectionInput {
-  conference: String!
-  description: String!
-  languages: [String!]!
-  name: String!
-  translations: [TranslationInput!]!
-}
-
-type SectionTranslation {
-  description: String!
-  language: String!
-  name: String!
-}
-
-"""Submission entity model type"""
-type Submission {
-  abstract: String!
-  authors: [User!]!
-  conference: Conference!
-  createdAt: DateTime!
-  id: ID!
-  keywords: [String!]!
-  name: String!
-  section: Section!
-  submissionUrl: String
-  translations: [SubmissionTranslation!]!
-  updatedAt: DateTime!
-}
-
-input SubmissionInput {
-  abstract: String!
-  authors: [String!]
-  conferenceId: ObjectId
-  keywords: [String!]!
-  name: String!
-  sectionId: ObjectId
-  submissionUrl: String
-  translations: [SubmissionInputTranslation!]!
-}
-
-input SubmissionInputTranslation {
-  abstract: String!
-  keywords: [String!]!
-  language: String!
-  name: String!
-}
-
-type SubmissionTranslation {
-  abstract: String!
-  keywords: [String!]!
-  language: String!
-  name: String!
-}
-
-"""Conference ticket type"""
-type Ticket {
-  description: String!
-  id: ID!
-  name: String!
-  online: Boolean!
-  price: Int!
-  withSubmission: Boolean!
-}
-
-input TicketInput {
-  description: String!
-  name: String!
-  online: Boolean!
-  price: Int!
-  withSubmission: Boolean!
-}
-
-input TicketInputTranslation {
-  description: String!
-  language: String!
-  name: String!
-}
-
-type TicketTranslation {
-  description: String!
-  language: String!
-  name: String!
-}
-
-input TranslationInput {
-  description: String!
-  language: String!
-  name: String!
+  grant(id: ObjectId!): Grant!
+  grants(after: String, first: Int = 20): GrantConnection!
 }
 
 """
 User reference type from users microservice with contributed billings field
 """
 type User {
-  billings: [Billing!]!
-  email: String!
+  grants(year: DateTime!): Int
+  hours(year: DateTime!): Int!
   id: ID!
-}
-
-"""Venue that conference takes place in"""
-type Venue {
-  address: Address!
-  name: String!
-}
-
-input VenueInput {
-  address: AddressInput!
-  name: String!
 }

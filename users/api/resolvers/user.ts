@@ -113,7 +113,7 @@ export class UserResolver {
   @Mutation(() => User)
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { res }: Context
+    @Ctx() { res, produceMessage }: Context
   ) {
     const user = await this.userService.create(registerInput);
 
@@ -124,6 +124,9 @@ export class UserResolver {
       secure: process.env.NODE_ENV === "production",
     });
 
+    produceMessage(JSON.stringify({ action: "REGISTER", data: user }));
+
+    //drop when email service is implemented
     const token = signJwt({ id: user.id }, { expiresIn: "1d" });
     console.log(token);
 

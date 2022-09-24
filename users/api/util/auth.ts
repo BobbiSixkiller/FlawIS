@@ -9,62 +9,63 @@ import env from "dotenv";
 env.config();
 
 export interface Context {
-	req: Request;
-	res: Response;
-	user: User | null;
-	locale: string;
+  req: Request;
+  res: Response;
+  produceMessage: (msg: string) => void;
+  user: User | null;
+  locale: string;
 }
 
 export function signJwt(object: Object, options?: SignOptions | undefined) {
-	return sign(object, process.env.SECRET || "JWT_SECRET", {
-		...(options && options),
-	});
+  return sign(object, process.env.SECRET || "JWT_SECRET", {
+    ...(options && options),
+  });
 }
 
 export function verifyJwt<T>(token: string): T | null {
-	try {
-		const decoded = verify(token, process.env.SECRET || "JWT_SECRET") as T;
-		return decoded;
-	} catch (error) {
-		console.log(error);
-		return null;
-	}
+  try {
+    const decoded = verify(token, process.env.SECRET || "JWT_SECRET") as T;
+    return decoded;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export function createContext(ctx: Context): Context {
-	const context = ctx;
+  const context = ctx;
 
-	if (context.req.cookies.accessToken) {
-		const token = context.req.cookies.accessToken.split("Bearer ")[1];
-		if (token) {
-			context.user = verifyJwt(token);
-		} else
-			throw new Error(
-				"Authentication header format must be: 'Bearer [token]'."
-			);
-	}
+  if (context.req.cookies.accessToken) {
+    const token = context.req.cookies.accessToken.split("Bearer ")[1];
+    if (token) {
+      context.user = verifyJwt(token);
+    } else
+      throw new Error(
+        "Authentication header format must be: 'Bearer [token]'."
+      );
+  }
 
-	return context;
+  return context;
 }
 
 export const authChecker: AuthChecker<Context> = (
-	{ args, context: { user } },
-	roles
+  { args, context: { user } },
+  roles
 ) => {
-	//checks for user inside the context
-	if (roles.length === 0) {
-		return user !== null;
-	}
-	//roles exists but no user in the context
-	if (!user) return false;
+  //checks for user inside the context
+  if (roles.length === 0) {
+    return user !== null;
+  }
+  //roles exists but no user in the context
+  if (!user) return false;
 
-	//check if user role matches the defined role
-	if (roles.some((role) => user.role === role)) return true;
+  //check if user role matches the defined role
+  if (roles.some((role) => user.role === role)) return true;
 
-	//check if user permissions property contains some defined role
-	if (roles.some((role) => role === "IS_OWN_USER"))
-		return args.id.toString() === user.id;
+  //check if user permissions property contains some defined role
+  if (roles.some((role) => role === "IS_OWN_USER"))
+    return args.id.toString() === user.id;
 
-	//no roles matched
-	return false;
+  //no roles matched
+  return false;
 };
