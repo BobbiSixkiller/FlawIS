@@ -17,11 +17,52 @@ import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
 import { sendMail } from "../util/mail";
 import { ResetToken } from "../util/types";
+import messageBroker from "../util/rabbitmqClient";
 
 @Service()
 @Resolver()
 export class UserResolver {
-  constructor(private readonly userService = new CRUDservice(User)) {}
+  constructor(private readonly userService = new CRUDservice(User)) {
+    userService.dataModel
+      .watch([])
+      .on(
+        "change",
+        ({ documentKey, operationType, updateDescription, fullDocument }) => {
+          switch (operationType) {
+            case "insert":
+              return messageBroker.produceMessage(
+                JSON.stringify({
+                  id: documentKey,
+                  email: fullDocument.email,
+                }),
+                "user.new"
+              );
+            case "update":
+              if (updateDescription && updateDescription.updatedFields.email) {
+                return messageBroker.produceMessage(
+                  JSON.stringify({
+                    id: documentKey,
+                    email: updateDescription.updatedFields.email,
+                  }),
+                  "user.update"
+                );
+              }
+              return;
+            case "delete":
+              return messageBroker.produceMessage(
+                JSON.stringify({
+                  id: documentKey,
+                }),
+                "user.delete"
+              );
+
+            default:
+              console.log("Unhandled operation type: ", operationType);
+              return;
+          }
+        }
+      );
+  }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
   @Query(() => User)
@@ -123,8 +164,6 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
     });
-
-    produceMessage(JSON.stringify({ action: "REGISTER", data: user }));
 
     //drop when email service is implemented
     const token = signJwt({ id: user.id }, { expiresIn: "1d" });
@@ -232,7 +271,8 @@ export class UserResolver {
   @Mutation(() => User)
   async updateUser(
     @Arg("id") id: ObjectId,
-    @Arg("data") userInput: UserInput
+    @Arg("data") userInput: UserInput,
+    @Ctx() { produceMessage }: Context
   ): Promise<User> {
     const user = await this.userService.findOne({ _id: id });
     if (!user) throw new UserInputError("User not found!");
@@ -243,31 +283,6 @@ export class UserResolver {
 
     return await user.save();
   }
-
-  //Mutation used to save newly added billing while registering for a conference
-  // @Authorized(["IS_OWN_USER"])
-  // @Mutation(() => User)
-  // async updateBilling(
-  //   @Ctx() { user }: Context,
-  //   @Arg("data") billingData: BillingInput
-  // ): Promise<User> {
-  //   const loggedInUser = await this.userService.findOne({ _id: user?.id });
-  //   if (!loggedInUser) throw new UserInputError("User not found!");
-
-  //   const billing = loggedInUser.billings.find(
-  //     (billing) => billing.name === billingData.name
-  //   );
-  //   if (billing) {
-  //     billing.address = billingData.address;
-  //     billing.DIC = billingData.DIC;
-  //     billing.ICO = billingData.ICO;
-  //     billing.ICDPH = billingData.ICDPH;
-  //   } else {
-  //     loggedInUser.billings.push(billingData);
-  //   }
-
-  //   return await loggedInUser.save();
-  // }
 
   @Authorized(["ADMIN"])
   @Mutation(() => Boolean)

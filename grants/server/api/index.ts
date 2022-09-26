@@ -18,6 +18,7 @@ import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import env from "dotenv";
+import createMQConsumer from "./util/rabbitmqClient";
 
 env.config();
 
@@ -58,13 +59,20 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  await server.listen({ port: process.env.PORT || 5004 }, () =>
+  const consumer = createMQConsumer(
+    process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
+    "FlawIS",
+    ["user.*"]
+  );
+
+  await server.listen({ port: process.env.PORT || 5004 }, () => {
     console.log(
       `🚀 Server ready and listening at ==> http://localhost:${
         process.env.PORT || 5004
       }${server.graphqlPath}`
-    )
-  );
+    );
+    consumer();
+  });
 }
 
 main().catch((error) => {

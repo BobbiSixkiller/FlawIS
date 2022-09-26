@@ -1,6 +1,19 @@
+import { getModelForClass } from "@typegoose/typegoose";
 import amqp, { Message } from "amqplib/callback_api";
+import { User } from "../entitites/User";
 
-const createMQConsumer = (amqpURl: string, queueName: string) => {
+type RoutingKey =
+  | "email"
+  | "user.update"
+  | "user.delete"
+  | "user.new"
+  | "user.*";
+
+const createMQConsumer = (
+  amqpURl: string,
+  exchange: string,
+  keys: RoutingKey[]
+) => {
   console.log("Connecting to RabbitMQ...");
   return () => {
     amqp.connect(amqpURl, (errConn, conn) => {
@@ -14,24 +27,50 @@ const createMQConsumer = (amqpURl: string, queueName: string) => {
         }
 
         console.log("Connected to RabbitMQ");
-        chan.assertQueue(queueName, { durable: true });
-        chan.consume(
-          queueName,
-          (msg: Message | null) => {
-            if (msg) {
-              const parsed = JSON.parse(msg.content.toString());
-              //refactor to include update as well
-              switch (parsed.action) {
-                case "REGISTER":
-                  console.log("Consuming REGISTER action", parsed.data);
-                  break;
-
-                default:
-                  break;
-              }
-            }
+        chan.assertExchange(exchange, "topic", {
+          durable: false,
+        });
+        chan.assertQueue(
+          "",
+          {
+            durable: true,
           },
-          { noAck: true }
+          function (errQueue, q) {
+            if (errQueue) {
+              throw errQueue;
+            }
+            console.log("[*] Receiving messages from queue.");
+
+            keys.forEach(function (key) {
+              chan.bindQueue(q.queue, exchange, key);
+            });
+
+            chan.consume(
+              q.queue,
+              async function (msg: Message | null) {
+                if (msg) {
+                  console.log(
+                    " [x] %s: '%s'",
+                    msg.fields.routingKey,
+                    JSON.parse(msg.content.toString())
+                  );
+                  const user: User = JSON.parse(msg.content.toString());
+                  await getModelForClass(User).updateOne(
+                    { _id: user?.id },
+                    {
+                      _id: user?.id,
+                      email: user?.email,
+                    },
+                    { upsert: true }
+                  );
+                  chan.ack(msg);
+                }
+              },
+              {
+                noAck: false,
+              }
+            );
+          }
         );
       });
     });

@@ -51,20 +51,6 @@ registerEnumType(Role, {
       ]);
     }
   }
-  // if (this.isNew && (this.isFlaw || this.isUniba)) {
-  // this.billings.push({
-  // name: "Univerzita Komenského v Bratislave, Právnická fakulta",
-  // ICO: "00397865",
-  // DIC: "2020845332",
-  // ICDPH: "SK2020845332",
-  // address: {
-  // street: "Šafárikovo nám. 6",
-  // city: "Bratislava",
-  // postal: "81000",
-  // country: "Slovensko",
-  // },
-  // });
-  // }
 })
 @Index({ name: "text" })
 @Directive('@key(fields: "id")')

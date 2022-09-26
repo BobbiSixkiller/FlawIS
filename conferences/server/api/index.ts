@@ -68,7 +68,8 @@ async function main() {
 
   const consumer = createMQConsumer(
     process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
-    "users"
+    "FlawIS",
+    ["user.*"]
   );
 
   await server.listen({ port: process.env.PORT || 5003 }, () => {
