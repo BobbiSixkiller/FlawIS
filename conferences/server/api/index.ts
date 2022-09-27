@@ -13,6 +13,7 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
+import messageBroker from "./util/messageBroker";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
@@ -20,7 +21,6 @@ import { SubmissionResolver } from "./resolvers/submission";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
-import createMQConsumer from "./util/rabbitmqClient";
 
 env.config();
 
@@ -66,20 +66,18 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  const consumer = createMQConsumer(
-    process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
-    "FlawIS",
-    ["user.*"]
-  );
+  await messageBroker.init();
+  messageBroker.consumeMessages(["user.delete"]);
+  Object.freeze(messageBroker); //singleton MessageBroker instance
+  console.log("RabbitMQ client connected!");
 
-  await server.listen({ port: process.env.PORT || 5003 }, () => {
+  await server.listen({ port: process.env.PORT || 5003 }, () =>
     console.log(
       `🚀 Server ready and listening at ==> http://localhost:${
         process.env.PORT || 5003
       }${server.graphqlPath}`
-    );
-    consumer();
-  });
+    )
+  );
 }
 
 main().catch((error) => {

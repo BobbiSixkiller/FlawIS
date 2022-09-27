@@ -13,7 +13,6 @@ type Binding = "EMAIL" | "USER";
 export interface Context {
   req: Request;
   res: Response;
-  produceMessage: (msg: string, binding: Binding) => void;
   user: User | null;
   locale: string;
 }

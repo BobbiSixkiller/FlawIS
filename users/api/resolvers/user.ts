@@ -17,7 +17,7 @@ import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
 import { sendMail } from "../util/mail";
 import { ResetToken } from "../util/types";
-import messageBroker from "../util/rabbitmqClient";
+import messageBroker from "../../../conferences/server/api/util/messageBroker";
 
 @Service()
 @Resolver()
@@ -32,7 +32,7 @@ export class UserResolver {
             case "insert":
               return messageBroker.produceMessage(
                 JSON.stringify({
-                  id: documentKey,
+                  id: documentKey?._id,
                   email: fullDocument.email,
                 }),
                 "user.new"
@@ -41,17 +41,17 @@ export class UserResolver {
               if (updateDescription && updateDescription.updatedFields.email) {
                 return messageBroker.produceMessage(
                   JSON.stringify({
-                    id: documentKey,
+                    id: documentKey?._id,
                     email: updateDescription.updatedFields.email,
                   }),
-                  "user.update"
+                  "user.update.email"
                 );
               }
               return;
             case "delete":
               return messageBroker.produceMessage(
                 JSON.stringify({
-                  id: documentKey,
+                  id: documentKey?._id,
                 }),
                 "user.delete"
               );
@@ -154,7 +154,7 @@ export class UserResolver {
   @Mutation(() => User)
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { res, produceMessage }: Context
+    @Ctx() { res }: Context
   ) {
     const user = await this.userService.create(registerInput);
 
@@ -271,8 +271,7 @@ export class UserResolver {
   @Mutation(() => User)
   async updateUser(
     @Arg("id") id: ObjectId,
-    @Arg("data") userInput: UserInput,
-    @Ctx() { produceMessage }: Context
+    @Arg("data") userInput: UserInput
   ): Promise<User> {
     const user = await this.userService.findOne({ _id: id });
     if (!user) throw new UserInputError("User not found!");

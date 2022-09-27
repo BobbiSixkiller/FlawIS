@@ -2,23 +2,21 @@ import "reflect-metadata";
 import Container from "typedi";
 import { ApolloServer } from "apollo-server";
 import { connect } from "mongoose";
-
 import { ObjectId } from "mongodb";
+
 import { ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./util/typegoose-middleware";
-
 import { buildFederatedSchema } from "./util/buildFederatedSchema";
+import messageBroker from "./util/messageBroker";
+import { Context } from "./util/auth";
+import { authChecker } from "./util/auth";
 
 import { GrantResolver } from "./resolvers/grant";
 import { MemberResolver } from "./resolvers/member";
 import { UserResolver } from "./resolvers/user";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
-import { Context } from "./util/auth";
-import { authChecker } from "./util/auth";
-
 import env from "dotenv";
-import createMQConsumer from "./util/rabbitmqClient";
 
 env.config();
 
@@ -59,20 +57,18 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  const consumer = createMQConsumer(
-    process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672",
-    "FlawIS",
-    ["user.*"]
-  );
+  await messageBroker.init();
+  messageBroker.consumeMessages(["user.*", "user.update.email"]);
+  Object.freeze(messageBroker); //singleton MessageBroker instance
+  console.log("RabbitMQ client connected!");
 
-  await server.listen({ port: process.env.PORT || 5004 }, () => {
+  await server.listen({ port: process.env.PORT || 5004 }, () =>
     console.log(
       `🚀 Server ready and listening at ==> http://localhost:${
         process.env.PORT || 5004
       }${server.graphqlPath}`
-    );
-    consumer();
-  });
+    )
+  );
 }
 
 main().catch((error) => {
