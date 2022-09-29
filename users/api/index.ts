@@ -16,7 +16,7 @@ import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import env from "dotenv";
-import messageBroker from "../../conferences/server/api/util/messageBroker";
+import messageBroker from "./util/messageBroker";
 
 env.config();
 

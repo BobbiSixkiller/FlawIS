@@ -28,6 +28,7 @@ import { sendMail } from "../util/mail";
 
 import env from "dotenv";
 import { generatePdf, invoice } from "../util/invoice";
+import messageBroker from "../util/messageBroker";
 
 env.config();
 
@@ -69,6 +70,11 @@ export class AttendeeResolver {
         $addToSet: { billings: billing },
       },
       { upsert: true }
+    );
+
+    messageBroker.produceMessage(
+      JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
+      "user.update.billings"
     );
 
     const attendee = await this.attendeeService.create({

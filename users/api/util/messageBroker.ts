@@ -6,8 +6,9 @@ import { User } from "../entitites/User";
 env.config();
 
 type RoutingKey =
-  | "user.new"
   | "user.delete"
+  | "user.new"
+  | "user.forgotPassword"
   | "user.update.email"
   | "user.update.billings"
   | "user.#"
@@ -52,20 +53,11 @@ class Messagebroker {
     const user: User = JSON.parse(msg.content.toString());
 
     switch (msg.fields.routingKey as RoutingKey) {
-      case "user.new":
-        return await getModelForClass(User).create({
-          _id: user.id,
-          email: user.email,
-        });
-      case "user.update.email":
+      case "user.update.billings":
         return await getModelForClass(User).updateOne(
-          {
-            _id: user.id,
-          },
-          { $set: { email: user.email } }
+          { _id: user.id },
+          { $set: { updatedAt: user.updatedAt } }
         );
-      case "user.delete":
-        return await getModelForClass(User).deleteOne({ _id: user.id });
 
       default:
         return console.log("Message with unhandled routing key!");

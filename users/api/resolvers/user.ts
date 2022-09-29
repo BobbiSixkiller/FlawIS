@@ -15,13 +15,13 @@ import { AuthenticationError, UserInputError } from "apollo-server-core";
 import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
-import { sendMail } from "../util/mail";
 import { ResetToken } from "../util/types";
-import messageBroker from "../../../conferences/server/api/util/messageBroker";
+import messageBroker from "../util/messageBroker";
 
 @Service()
 @Resolver()
 export class UserResolver {
+  //using mongodb change steams to handle user integrity accross federated subgraphs
   constructor(private readonly userService = new CRUDservice(User)) {
     userService.dataModel
       .watch([])
@@ -30,25 +30,27 @@ export class UserResolver {
         ({ documentKey, operationType, updateDescription, fullDocument }) => {
           switch (operationType) {
             case "insert":
+              const user: User = { ...fullDocument, id: documentKey?._id };
+
               return messageBroker.produceMessage(
                 JSON.stringify({
-                  id: documentKey?._id,
-                  email: fullDocument.email,
+                  id: user.id,
+                  email: user.email,
+                  name: user.name,
+                  token: signJwt({ id: user.id }, { expiresIn: "1d" }),
                 }),
                 "user.new"
               );
             case "update":
-              if (updateDescription && updateDescription.updatedFields.email) {
-                return messageBroker.produceMessage(
-                  JSON.stringify({
-                    id: documentKey?._id,
-                    email: updateDescription.updatedFields.email,
-                  }),
-                  "user.update.email"
-                );
-              }
-              return;
+              return messageBroker.produceMessage(
+                JSON.stringify({
+                  id: documentKey?._id,
+                  email: updateDescription?.updatedFields.email,
+                }),
+                "user.update.email"
+              );
             case "delete":
+              console.log(documentKey, operationType);
               return messageBroker.produceMessage(
                 JSON.stringify({
                   id: documentKey?._id,
@@ -154,7 +156,7 @@ export class UserResolver {
   @Mutation(() => User)
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { res }: Context
+    @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
   ) {
     const user = await this.userService.create(registerInput);
 
@@ -164,22 +166,6 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
     });
-
-    //drop when email service is implemented
-    const token = signJwt({ id: user.id }, { expiresIn: "1d" });
-    console.log(token);
-
-    sendMail(
-      registerInput.email,
-      "AccountActivation",
-      `Hi there,\nin order to activate your account, please click on the link down below.\n\n<a href=${
-        process.env.CLIENT_URL || "http://localhost:3010"
-      }/activate/${token}>Activate my account</a>\n\nBest regards,\n\nMojTrh Team`,
-      `<h1>Account Activation</h1><p>In order to activate your account please click on the following link</p><a href=${
-        process.env.CLIENT_URL || "http://localhost:3010"
-      }/activate/${token}>Activate my account</a><p>Best regards,</p><p>MojTrh team</p>`,
-      []
-    );
 
     return user;
   }
@@ -239,12 +225,9 @@ export class UserResolver {
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
-    sendMail(
-      email,
-      "Password Reset",
-      `Reset password with the following token: ${token}`,
-      `<html><head></head><body><p>Dear ${user.name}</p><p>Please reset your password with the following token: ${token}</p></body></html>`,
-      []
+    messageBroker.produceMessage(
+      JSON.stringify({ email: user.email, name: user.name, token }),
+      "user.forgotPassword"
     );
 
     return "Password reset link has been sent to your email!";

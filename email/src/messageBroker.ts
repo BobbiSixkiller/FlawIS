@@ -1,7 +1,6 @@
-import { getModelForClass } from "@typegoose/typegoose";
 import client, { Connection, Channel, Message } from "amqplib";
 import env from "dotenv";
-import { User } from "../entitites/User";
+import send from "./lib";
 
 env.config();
 
@@ -12,6 +11,22 @@ type RoutingKey =
   | "user.update.billings"
   | "user.#"
   | "user.*";
+
+interface Locale {
+  locale: string;
+}
+
+interface User extends Locale {
+  name: string;
+  email: string;
+  token: string;
+}
+
+interface Attendee extends Locale {
+  name: string;
+  email: string;
+  conference: string;
+}
 
 class Messagebroker {
   private connection: Connection;
@@ -49,24 +64,19 @@ class Messagebroker {
 
   private async triggerMsgResponse(msg: Message) {
     console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
-    const user: User = JSON.parse(msg.content.toString());
 
     switch (msg.fields.routingKey as RoutingKey) {
       case "user.new":
-        return await getModelForClass(User).create({
-          _id: user.id,
-          email: user.email,
-        });
-      case "user.update.email":
-        return await getModelForClass(User).updateOne(
-          {
-            _id: user.id,
-          },
-          { $set: { email: user.email } }
-        );
-      case "user.delete":
-        return await getModelForClass(User).deleteOne({ _id: user.id });
+        const user: User = JSON.parse(msg.content.toString());
 
+        return await send(
+          user.locale,
+          "user/activation",
+          "no-reply@flaw.uniba.sk",
+          user.email,
+          user,
+          []
+        );
       default:
         return console.log("Message with unhandled routing key!");
     }

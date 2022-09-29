@@ -1,17 +1,18 @@
 import { getModelForClass } from "@typegoose/typegoose";
-import client, { Connection, Channel } from "amqplib";
+import client, { Connection, Channel, Message } from "amqplib";
 import env from "dotenv";
+import { Attendee } from "../entitites/Attendee";
 import { User } from "../entitites/User";
 
 env.config();
 
 type RoutingKey =
-  | "email"
-  | "user.delete"
   | "user.new"
+  | "user.delete"
   | "user.update.email"
   | "user.update.billings"
-  | "user.#";
+  | "user.#"
+  | "user.*";
 
 class Messagebroker {
   private connection: Connection;
@@ -35,13 +36,7 @@ class Messagebroker {
       q.queue,
       async (msg) => {
         if (msg) {
-          console.log(
-            " [x] %s:'%s'",
-            msg.fields.routingKey,
-            msg.content.toString()
-          );
-          const user: User = JSON.parse(msg.content.toString());
-          await getModelForClass(User).deleteOne({ _id: user.id });
+          await this.triggerMsgResponse(msg);
           this.channel.ack(msg);
         }
       },
@@ -51,6 +46,20 @@ class Messagebroker {
 
   produceMessage(msg: string, key: RoutingKey) {
     this.channel.publish("FlawIS", key, Buffer.from(msg), { persistent: true });
+  }
+
+  private async triggerMsgResponse(msg: Message) {
+    console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
+    const user: User = JSON.parse(msg.content.toString());
+
+    switch (msg.fields.routingKey as RoutingKey) {
+      case "user.delete":
+        await getModelForClass(Attendee).deleteMany({ user: user.id });
+        await getModelForClass(User).deleteOne({ _id: user.id });
+        return;
+      default:
+        return console.log("Message with unhandled routing key!");
+    }
   }
 }
 
