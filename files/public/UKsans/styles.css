@@ -1,0 +1,42 @@
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  display: swap;
+}
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Bold.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
+  display: swap;
+}
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Heavy.otf") format("opentype");
+  font-weight: bolder;
+  font-style: normal;
+  display: swap;
+}
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+  display: swap;
+}
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  display: swap;
+}
+@font-face {
+  font-family: "UKsans";
+  src: url("UKSans-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  display: swap;
+}

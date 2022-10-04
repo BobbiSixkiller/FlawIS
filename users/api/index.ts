@@ -47,6 +47,9 @@ async function main() {
       req,
       res,
       user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+      locale: req.headers.locale
+        ? JSON.parse(req.headers.locale as string)
+        : "sk",
     }),
   });
 

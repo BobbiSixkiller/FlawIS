@@ -1,16 +1,11 @@
 import client, { Connection, Channel, Message } from "amqplib";
-import env from "dotenv";
 import send from "./lib";
+
+import env from "dotenv";
 
 env.config();
 
-type RoutingKey =
-  | "user.new"
-  | "user.delete"
-  | "user.update.email"
-  | "user.update.billings"
-  | "user.#"
-  | "user.*";
+type RoutingKey = "mail.#" | "mail.registration" | "mail.forgotPassword";
 
 interface Locale {
   locale: string;
@@ -21,11 +16,11 @@ interface User extends Locale {
   email: string;
   token: string;
 }
-
-interface Attendee extends Locale {
-  name: string;
-  email: string;
-  conference: string;
+//implement invocie interface
+interface Invoice extends Locale {
+  payer: Object;
+  issuer: Object;
+  body: Object;
 }
 
 class Messagebroker {
@@ -64,19 +59,30 @@ class Messagebroker {
 
   private async triggerMsgResponse(msg: Message) {
     console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
+    let data: User;
 
     switch (msg.fields.routingKey as RoutingKey) {
-      case "user.new":
-        const user: User = JSON.parse(msg.content.toString());
-
+      case "mail.registration":
+        data = JSON.parse(msg.content.toString());
         return await send(
-          user.locale,
+          data.locale,
           "user/activation",
           "no-reply@flaw.uniba.sk",
-          user.email,
-          user,
+          data.email,
+          data,
           []
         );
+      case "mail.forgotPassword":
+        data = JSON.parse(msg.content.toString());
+        return await send(
+          data.locale,
+          "user/forgotPassword",
+          "no-reply@flaw.uniba.sk",
+          data.email,
+          data,
+          []
+        );
+
       default:
         return console.log("Message with unhandled routing key!");
     }

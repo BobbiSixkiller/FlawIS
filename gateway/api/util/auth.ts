@@ -37,8 +37,6 @@ export function verifyJwt<T>(token: string): T | null {
 //Apollo context init with authenticated user
 export function createContext(ctx: Context): Context {
   const context = ctx;
-  //refactor later to use locale cookie from i18n
-  context.locale = "en";
 
   if (context.req.cookies.accessToken) {
     const token = context.req.cookies.accessToken.split("Bearer%20")[1];
@@ -108,7 +106,7 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
     }
 
     if (context.locale) {
-      request.http?.headers.set("locale", context.locale);
+      request.http?.headers.set("locale", JSON.stringify(context.locale));
     }
 
     //rest of the headers i.e. reset token

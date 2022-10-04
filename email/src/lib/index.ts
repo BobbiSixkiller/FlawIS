@@ -1,5 +1,8 @@
 import Email from "email-templates";
 import path from "path";
+import env from "dotenv";
+
+env.config();
 
 export default async function send(
   locale: string,
@@ -27,7 +30,11 @@ export default async function send(
         pass: "b7e520dba14a13",
       },
     },
-    i18n: {},
+    i18n: {
+      locales: ["en", "sk"],
+      directory: path.join(__dirname, `../locales`),
+      defaultLocale: "sk",
+    },
   });
 
   try {
@@ -38,6 +45,8 @@ export default async function send(
       },
       locals: {
         locale,
+        filesUrl: process.env.FILES_URL || "http://localhost:5002",
+        clientUrl: process.env.CLIENT_URL || "http://localhost:3010",
         ...data,
       },
     });

@@ -8,8 +8,6 @@ import env from "dotenv";
 
 env.config();
 
-type Binding = "EMAIL" | "USER";
-
 export interface Context {
   req: Request;
   res: Response;

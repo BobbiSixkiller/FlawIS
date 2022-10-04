@@ -56,7 +56,8 @@ const main = async () => {
 
   const server = new ApolloServer({
     gateway,
-    context: (ctx: Context) => createContext(ctx),
+    context: (ctx: Context) =>
+      createContext({ ...ctx, locale: ctx.req.cookies.NEXT_LOCALE }),
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground,
       new ApolloComplexityPlugin(100),

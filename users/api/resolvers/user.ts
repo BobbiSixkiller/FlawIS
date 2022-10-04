@@ -30,14 +30,11 @@ export class UserResolver {
         ({ documentKey, operationType, updateDescription, fullDocument }) => {
           switch (operationType) {
             case "insert":
-              const user: User = { ...fullDocument, id: documentKey?._id };
-
               return messageBroker.produceMessage(
                 JSON.stringify({
-                  id: user.id,
-                  email: user.email,
-                  name: user.name,
-                  token: signJwt({ id: user.id }, { expiresIn: "1d" }),
+                  id: fullDocument._id,
+                  email: fullDocument.email,
+                  name: fullDocument.name,
                 }),
                 "user.new"
               );
@@ -145,10 +142,20 @@ export class UserResolver {
 
   @Authorized()
   @Query(() => User)
-  async me(@Ctx() { user }: Context): Promise<User> {
+  async me(@Ctx() { user, locale }: Context): Promise<User> {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
     if (!loggedInUser)
       throw new AuthenticationError("User account has been deleted!");
+
+    messageBroker.produceMessage(
+      JSON.stringify({
+        locale,
+        name: loggedInUser.name,
+        email: loggedInUser.email,
+        token: signJwt({ id: loggedInUser.id }, { expiresIn: "1d" }),
+      }),
+      "mail.registration"
+    );
 
     return loggedInUser;
   }
@@ -158,6 +165,7 @@ export class UserResolver {
     @Arg("data") registerInput: RegisterInput,
     @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
   ) {
+    console.log(locale);
     const user = await this.userService.create(registerInput);
 
     res.cookie("accessToken", user.token, {
@@ -166,6 +174,16 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
     });
+
+    messageBroker.produceMessage(
+      JSON.stringify({
+        locale,
+        name: user.name,
+        email: user.email,
+        token: signJwt({ id: user.id }, { expiresIn: "1d" }),
+      }),
+      "mail.registration"
+    );
 
     return user;
   }
@@ -218,7 +236,10 @@ export class UserResolver {
   }
 
   @Query(() => String)
-  async forgotPassword(@Arg("email") email: string): Promise<string> {
+  async forgotPassword(
+    @Arg("email") email: string,
+    @Ctx() { locale }: Context
+  ): Promise<string> {
     const user = await this.userService.findOne({ email });
     if (!user)
       throw new UserInputError("No user with provided email address found!");
@@ -226,8 +247,8 @@ export class UserResolver {
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
     messageBroker.produceMessage(
-      JSON.stringify({ email: user.email, name: user.name, token }),
-      "user.forgotPassword"
+      JSON.stringify({ locale, email: user.email, name: user.name, token }),
+      "mail.forgotPassword"
     );
 
     return "Password reset link has been sent to your email!";

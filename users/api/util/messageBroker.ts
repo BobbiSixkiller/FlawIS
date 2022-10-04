@@ -8,11 +8,10 @@ env.config();
 type RoutingKey =
   | "user.delete"
   | "user.new"
-  | "user.forgotPassword"
   | "user.update.email"
   | "user.update.billings"
-  | "user.#"
-  | "user.*";
+  | "mail.registration"
+  | "mail.forgotPassword";
 
 class Messagebroker {
   private connection: Connection;
