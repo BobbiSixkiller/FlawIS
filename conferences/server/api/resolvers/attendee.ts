@@ -28,7 +28,7 @@ import { sendMail } from "../util/mail";
 
 import env from "dotenv";
 import { generatePdf, invoice } from "../util/invoice";
-import messageBroker from "../util/messageBroker";
+import Messagebroker from "../util/messageBroker";
 
 env.config();
 
@@ -72,7 +72,7 @@ export class AttendeeResolver {
       { upsert: true }
     );
 
-    messageBroker.produceMessage(
+    Messagebroker.produceMessage(
       JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
       "user.update.billings"
     );

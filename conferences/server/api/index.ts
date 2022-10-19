@@ -13,7 +13,7 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
-import messageBroker from "./util/messageBroker";
+import MessageBroker from "./util/messageBroker";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
@@ -66,10 +66,8 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  await messageBroker.init();
-  messageBroker.consumeMessages(["user.delete"]);
-  Object.freeze(messageBroker); //singleton MessageBroker instance
-  console.log("RabbitMQ client connected!");
+  await MessageBroker.init();
+  MessageBroker.consumeMessages(["user.delete"]);
 
   await server.listen({ port: process.env.PORT || 5003 }, () =>
     console.log(

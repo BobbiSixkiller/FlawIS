@@ -16,7 +16,7 @@ import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
 import { ResetToken } from "../util/types";
-import messageBroker from "../util/messageBroker";
+import messageBroker from "../services/messageBroker";
 
 @Service()
 @Resolver()

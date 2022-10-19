@@ -14,9 +14,9 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
+import Messagebroker from "./services/messageBroker";
 
 import env from "dotenv";
-import messageBroker from "./util/messageBroker";
 
 env.config();
 
@@ -59,10 +59,8 @@ async function main() {
   );
   console.log(mongoose.connection && "Database connected!");
 
-  await messageBroker.init();
-  messageBroker.consumeMessages(["user.update.billings"]);
-  Object.freeze(messageBroker); //singleton MessageBroker instance
-  console.log("RabbitMQ client connected!");
+  await Messagebroker.init();
+  Messagebroker.consumeMessages(["user.update.billings"]);
 
   await server.listen({ port: process.env.PORT || 5001 }, () =>
     console.log(

@@ -8,6 +8,7 @@ import { GraphQLRequestContext } from "apollo-server-types";
 import parseCookies from "./cookieParser";
 import { GraphQLDataSourceProcessOptions } from "@apollo/gateway";
 import { User } from "./types";
+import { ExpressContext } from "apollo-server-express";
 
 env.config();
 
@@ -35,20 +36,25 @@ export function verifyJwt<T>(token: string): T | null {
 }
 
 //Apollo context init with authenticated user
-export function createContext(ctx: Context): Context {
-  const context = ctx;
+export function createContext({ req, res }: ExpressContext): Context {
+  const appContext: Context = {
+    req,
+    res,
+    locale: req.cookies.NEXT_LOCALE,
+    user: null,
+  };
 
-  if (context.req.cookies.accessToken) {
-    const token = context.req.cookies.accessToken.split("Bearer%20")[1];
+  if (req.cookies.accessToken) {
+    const token = req.cookies.accessToken.split("Bearer%20")[1];
     if (token) {
-      context.user = verifyJwt(token);
+      appContext.user = verifyJwt(token);
     } else
       throw new Error(
         "Authentication header format must be: 'Bearer [token]'."
       );
   }
 
-  return context;
+  return appContext;
 }
 
 //express auth middleware for accessing public folder on file micro-service

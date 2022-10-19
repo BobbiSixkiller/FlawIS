@@ -46,8 +46,15 @@ const main = async () => {
   app.use(cookieParser());
   app.use(graphqlUploadExpress());
   app.use(
-    "/public",
+    "/public/submissions",
     isAuthMiddleware,
+    createProxyMiddleware({
+      target: "http://localhost:5002/public/submissions",
+      changeOrigin: false,
+    })
+  );
+  app.use(
+    "/public",
     createProxyMiddleware({
       target: "http://localhost:5002/",
       changeOrigin: false,
@@ -56,8 +63,7 @@ const main = async () => {
 
   const server = new ApolloServer({
     gateway,
-    context: (ctx: Context) =>
-      createContext({ ...ctx, locale: ctx.req.cookies.NEXT_LOCALE }),
+    context: (ctx) => createContext(ctx),
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground,
       new ApolloComplexityPlugin(100),

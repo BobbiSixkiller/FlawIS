@@ -1,9 +1,0 @@
-{
-  "verbose": true,
-  "ignore": [".git", "node_modules/", "dist/"],
-  "watch": ["src/**/*.ts"],
-  "execMap": {
-    "ts": "node -r ts-node/register"
-  },
-  "ext": "js,json,ts"
-}

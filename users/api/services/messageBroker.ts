@@ -14,18 +14,32 @@ type RoutingKey =
   | "mail.forgotPassword";
 
 class Messagebroker {
-  private connection: Connection;
-  private channel: Channel;
+  private static connection: Connection;
+  private static channel: Channel;
 
-  async init() {
-    this.connection = await client.connect(
-      process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672"
-    );
-    this.channel = await this.connection.createChannel();
-    await this.channel.assertExchange("FlawIS", "topic", { durable: false });
+  static async createConnection() {
+    if (!this.connection) {
+      this.connection = await client.connect(
+        process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672"
+      );
+    }
+    return this.connection;
   }
 
-  async consumeMessages(keys: RoutingKey[]) {
+  static async createChannel() {
+    if (!this.channel) {
+      this.channel = await this.connection.createChannel();
+      await this.channel.assertExchange("FlawIS", "topic", { durable: false });
+    }
+    return this.channel;
+  }
+
+  static async init() {
+    await this.createConnection();
+    await this.createChannel();
+  }
+
+  static async consumeMessages(keys: RoutingKey[]) {
     const q = await this.channel.assertQueue("", { durable: true });
     console.log(" [*] Receiving messages with keys:", keys.toString());
 
@@ -43,11 +57,11 @@ class Messagebroker {
     );
   }
 
-  produceMessage(msg: string, key: RoutingKey) {
+  static produceMessage(msg: string, key: RoutingKey) {
     this.channel.publish("FlawIS", key, Buffer.from(msg), { persistent: true });
   }
 
-  private async triggerMsgResponse(msg: Message) {
+  private static async triggerMsgResponse(msg: Message) {
     console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
     const user: User = JSON.parse(msg.content.toString());
 
@@ -64,6 +78,4 @@ class Messagebroker {
   }
 }
 
-const messageBroker = new Messagebroker();
-
-export default messageBroker;
+export default Messagebroker;

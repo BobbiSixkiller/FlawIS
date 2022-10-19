@@ -31,22 +31,6 @@ export function verifyJwt<T>(token: string): T | null {
   }
 }
 
-export function createContext(ctx: Context): Context {
-  const context = ctx;
-
-  if (context.req.cookies.accessToken) {
-    const token = context.req.cookies.accessToken.split("Bearer ")[1];
-    if (token) {
-      context.user = verifyJwt(token);
-    } else
-      throw new Error(
-        "Authentication header format must be: 'Bearer [token]'."
-      );
-  }
-
-  return context;
-}
-
 export const authChecker: AuthChecker<Context> = (
   { args, context: { user } },
   roles
