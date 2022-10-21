@@ -1,8 +1,9 @@
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { Global } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { RmqService } from './rmq.service';
 
+@Global()
 @Module({
   imports: [
     RabbitMQModule.forRootAsync(RabbitMQModule, {
@@ -21,6 +22,5 @@ import { RmqService } from './rmq.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [RmqService],
 })
 export class RmqModule {}
