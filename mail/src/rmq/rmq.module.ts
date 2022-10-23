@@ -1,9 +1,7 @@
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
-import { Global } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-@Global()
 @Module({
   imports: [
     RabbitMQModule.forRootAsync(RabbitMQModule, {
