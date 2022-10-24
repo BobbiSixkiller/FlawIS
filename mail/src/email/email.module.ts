@@ -5,7 +5,7 @@ import { I18nModule, I18nService } from 'nestjs-i18n';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { EmailService } from './email.service';
-import { CustomResolver } from 'src/email/custom.resolver';
+import { CustomResolver } from './custom.resolver';
 
 @Module({
   imports: [

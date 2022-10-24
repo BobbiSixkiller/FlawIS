@@ -1,5 +1,52 @@
-version: "3.7"
 services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    env_file:
+      - ./gateway/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./gateway:/usr/app
+      - /usr/app/node_modules
+    ports:
+      - "5000:5000"
+
+  users:
+    build:
+      context: ./users
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    env_file:
+      - ./users/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./users:/usr/app
+      - /usr/app/node_modules
+    ports:
+      - "5001:5001"
+
+  files:
+    build:
+      context: ./files
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    env_file:
+      - ./users/.env
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./users:/usr/app
+      - /usr/app/node_modules
+    ports:
+      - "5002:5002"
+
   rabbitmq:
     image: rabbitmq:3.9.13-management-alpine
     container_name: "rabbitmq"
@@ -10,9 +57,19 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    networks:
-      - rabbitmq_go_net
 
-networks:
-  rabbitmq_go_net:
-    driver: bridge
+  db:
+    container_name: mongodb
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: node-app
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+
+volumes:
+  mongo_data: {}
+  mongo_config: {}
