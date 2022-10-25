@@ -132,7 +132,3 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-
-volumes:
-  mongo_data: {}
-  mongo_config: {}
