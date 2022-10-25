@@ -18,7 +18,7 @@ import {
 } from "semantic-ui-react";
 import { Formik, FormikProps } from "formik";
 import { InferType } from "yup";
-import { FC, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { NextPage } from "next";
 import { useRouter } from "next/router";

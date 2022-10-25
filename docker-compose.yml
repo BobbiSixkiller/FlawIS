@@ -8,10 +8,14 @@ services:
     env_file:
       - ./gateway/.env
     depends_on:
-      - rabbitmq
+      - users
+      - conferences
+      - files
+      - grants
     volumes:
       - ./gateway:/usr/app
       - /usr/app/node_modules
+    restart: unless-stopped
     ports:
       - "5000:5000"
 
@@ -25,9 +29,11 @@ services:
       - ./users/.env
     depends_on:
       - rabbitmq
+      - db
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
+    restart: unless-stopped
     ports:
       - "5001:5001"
 
@@ -39,18 +45,81 @@ services:
     command: npm run dev
     env_file:
       - ./users/.env
-    depends_on:
-      - rabbitmq
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
+    restart: unless-stopped
     ports:
       - "5002:5002"
+
+  conferences:
+    build:
+      context: ./conferences/server
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    env_file:
+      - ./conferences/server/.env
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - ./conferences/server:/usr/app
+      - /usr/app/node_modules
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
+
+  grants:
+    build:
+      context: ./grants/server
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    env_file:
+      - ./grants/server/.env
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - ./grants/server:/usr/app
+      - /usr/app/node_modules
+    restart: unless-stopped
+    ports:
+      - "5004:5004"
+
+  conferences-client:
+    build:
+      context: ./conferences/client
+      dockerfile: Dockerfile
+      target: development
+    command: npm run dev
+    depends_on:
+      - gateway
+    volumes:
+      - ./conferences/client:/usr/app
+      - /usr/app/node_modules
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+
+  mail:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+      target: development
+    command: npm run start:dev
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./mail:/usr/app
+      - /usr/app/node_modules
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3.9.13-management-alpine
     container_name: "rabbitmq"
-    restart: always
+    restart: unless-stopped
     environment:
       - "RABBITMQ_DEFAULT_PASS=password"
       - "RABBITMQ_DEFAULT_USER=username"

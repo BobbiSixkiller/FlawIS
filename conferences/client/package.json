@@ -5,7 +5,7 @@
   "scripts": {
     "download-schema": "apollo service:download --endpoint=http://localhost:5000/graphql graphql-schema.json",
     "generate-types": "npx apollo codegen:generate --localSchemaFile=graphql-schema.json --target=typescript --tagName=gql",
-    "dev": "next dev -p 3010",
+    "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
