@@ -20,7 +20,7 @@ class Messagebroker {
   static async createConnection() {
     if (!this.connection) {
       this.connection = await client.connect(
-        process.env.RABBITMQ_URL || "amqp://username:password@localhost:5672"
+        process.env.RABBITMQ_URL || "amqp://rabbitmq:5672"
       );
     }
     return this.connection;

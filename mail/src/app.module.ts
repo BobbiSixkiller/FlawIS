@@ -11,8 +11,6 @@ import * as Joi from 'joi';
       isGlobal: true,
       load: [config],
       validationSchema: Joi.object({
-        RMQ_USERNAME: Joi.string().required(),
-        RMQ_PASSWORD: Joi.string().required(),
         MAIL_HOST: Joi.string().required(),
         MAIL_PORT: Joi.string().required(),
         MAIL_FROM: Joi.string().required(),

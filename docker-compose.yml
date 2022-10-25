@@ -44,9 +44,9 @@ services:
       target: development
     command: npm run dev
     env_file:
-      - ./users/.env
+      - ./files/.env
     volumes:
-      - ./users:/usr/app
+      - ./files:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
@@ -117,15 +117,9 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:3.9.13-management-alpine
-    container_name: "rabbitmq"
-    restart: unless-stopped
-    environment:
-      - "RABBITMQ_DEFAULT_PASS=password"
-      - "RABBITMQ_DEFAULT_USER=username"
+    image: rabbitmq
     ports:
-      - 15672:15672
-      - 5672:5672
+      - "5672:5672"
 
   db:
     container_name: mongodb

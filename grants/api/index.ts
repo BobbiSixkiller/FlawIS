@@ -7,7 +7,6 @@ import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./util/typegoose-middleware";
 import { buildFederatedSchema } from "./util/buildFederatedSchema";
-import messageBroker from "./util/messageBroker";
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
 
@@ -19,6 +18,10 @@ import { resolveUserReference } from "./resolvers/resolveUserReference";
 import env from "dotenv";
 
 env.config();
+
+const port = process.env.PORT || 5004;
+const mongooseUri =
+  process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/grants";
 
 async function main() {
   //Build schema
@@ -52,21 +55,12 @@ async function main() {
   });
 
   // create mongoose connection
-  const mongoose = await connect(
-    process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/grants"
-  );
+  const mongoose = await connect(mongooseUri);
   console.log(mongoose.connection && "Database connected!");
 
-  await messageBroker.init();
-  messageBroker.consumeMessages(["user.*", "user.update.email"]);
-  Object.freeze(messageBroker); //singleton MessageBroker instance
-  console.log("RabbitMQ client connected!");
-
-  await server.listen({ port: process.env.PORT || 5004 }, () =>
+  await server.listen({ port }, () =>
     console.log(
-      `🚀 Server ready and listening at ==> http://localhost:${
-        process.env.PORT || 5004
-      }${server.graphqlPath}`
+      `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
     )
   );
 }

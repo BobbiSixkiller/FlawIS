@@ -24,6 +24,10 @@ import env from "dotenv";
 
 env.config();
 
+const port = process.env.PORT || 5003;
+const mongooseUri =
+  process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/conferences";
+
 async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
@@ -61,19 +65,15 @@ async function main() {
   });
 
   // create mongoose connection
-  const mongoose = await connect(
-    process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/conferences"
-  );
+  const mongoose = await connect(mongooseUri);
   console.log(mongoose.connection && "Database connected!");
 
   await MessageBroker.init();
   MessageBroker.consumeMessages(["user.delete"]);
 
-  await server.listen({ port: process.env.PORT || 5003 }, () =>
+  await server.listen({ port }, () =>
     console.log(
-      `🚀 Server ready and listening at ==> http://localhost:${
-        process.env.PORT || 5003
-      }${server.graphqlPath}`
+      `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
     )
   );
 }
