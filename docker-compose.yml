@@ -54,17 +54,17 @@ services:
 
   conferences:
     build:
-      context: ./conferences/server
+      context: ./conferences
       dockerfile: Dockerfile
       target: development
     command: npm run dev
     env_file:
-      - ./conferences/server/.env
+      - ./conferences/.env
     depends_on:
       - rabbitmq
       - db
     volumes:
-      - ./conferences/server:/usr/app
+      - ./conferences:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
@@ -72,32 +72,32 @@ services:
 
   grants:
     build:
-      context: ./grants/server
+      context: ./grants
       dockerfile: Dockerfile
       target: development
     command: npm run dev
     env_file:
-      - ./grants/server/.env
+      - ./grants/.env
     depends_on:
       - rabbitmq
       - db
     volumes:
-      - ./grants/server:/usr/app
+      - ./grants:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5004:5004"
 
-  conferences-client:
+  client:
     build:
-      context: ./conferences/client
+      context: ./client
       dockerfile: Dockerfile
       target: development
     command: npm run dev
     depends_on:
       - gateway
     volumes:
-      - ./conferences/client:/usr/app
+      - ./client:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
