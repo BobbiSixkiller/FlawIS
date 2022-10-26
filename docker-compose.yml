@@ -97,7 +97,7 @@ services:
     depends_on:
       - gateway
     volumes:
-      - ./client:/usr/app
+      - ./client/:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
@@ -132,3 +132,7 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
+
+volumes:
+  mongo_data: {}
+  mongo_config: {}

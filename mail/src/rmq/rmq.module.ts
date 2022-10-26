@@ -15,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
             },
           ],
           uri: config.get<string>('rmqUri'),
+          connectionInitOptions: { wait: false },
         };
       },
       inject: [ConfigService],

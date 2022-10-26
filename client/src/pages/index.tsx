@@ -18,7 +18,7 @@ const Home: NextPage = () => {
     <>
       <MastHead scrollToRef={scrollToRef}>
         <Label color="black" style={{ marginRight: 0 }}>
-          2.0.0
+          2.0.0.5
         </Label>
         <Header
           as="h1"
