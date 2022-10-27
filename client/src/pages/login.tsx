@@ -4,9 +4,6 @@ import logo from "public/images/Flaw-logo-notext.png";
 
 import InputField from "src/components/form/InputField";
 
-import { LOGIN } from "src/graphql/Auth.graphql";
-import { login, loginVariables } from "src/graphql/__generated__/login";
-import { useMutation } from "@apollo/client";
 import {
   Button,
   Form,
@@ -27,6 +24,7 @@ import Validation from "src/util/validation";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Trans, useTranslation } from "next-i18next";
 import LocalizedLink from "src/components/LocalizedLink";
+import { useLoginMutation } from "src/graphql/generated/schema";
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
@@ -38,7 +36,7 @@ const Login: NextPage = () => {
 
   type Values = InferType<typeof loginInputSchema>;
 
-  const [login] = useMutation<login, loginVariables>(LOGIN, {
+  const [login] = useLoginMutation({
     onCompleted: ({ login }) => {
       dispatch({ type: ActionTypes.Login, payload: { user: login } });
       router.push("/");

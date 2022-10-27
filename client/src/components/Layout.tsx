@@ -10,10 +10,8 @@ import logo from "public/images/Flaw-logo-notext.png";
 
 import useWidth from "src/hooks/useWidth";
 import { ActionTypes, AuthContext } from "src/providers/Auth";
-import { Role } from "__generated__/globalTypes";
 import { useRouter } from "next/router";
-import { useMutation } from "@apollo/client";
-import { LOG_OUT } from "src/graphql/Auth.graphql";
+import { Role, useLogoutMutation } from "src/graphql/generated/schema";
 
 interface navProps {
   inView: boolean;
@@ -71,7 +69,7 @@ export function Nav({
 
   const router = useRouter();
 
-  const [logout] = useMutation(LOG_OUT, {
+  const [logout] = useLogoutMutation({
     onCompleted: () => {
       toggle(false);
       dispatch({ type: ActionTypes.Logout });

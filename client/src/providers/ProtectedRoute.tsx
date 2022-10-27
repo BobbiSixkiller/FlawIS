@@ -1,6 +1,6 @@
 import router from "next/router";
 import { ReactNode, useContext } from "react";
-import { Role } from "__generated__/globalTypes";
+import { Role } from "src/graphql/generated/schema";
 import { AuthContext } from "./Auth";
 
 export default function ProtectedRouteProvider({

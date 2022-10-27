@@ -1,9 +1,6 @@
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
-import { useQuery } from "@apollo/client";
-import { me } from "src/graphql/__generated__/me";
-import { login_login } from "src/graphql/__generated__/login";
 import { Loader } from "semantic-ui-react";
-import { ME } from "src/graphql/Auth.graphql";
+import { useMeQuery, User } from "src/graphql/generated/schema";
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -22,7 +19,7 @@ export enum ActionTypes {
 }
 
 type ActionPayload = {
-  [ActionTypes.Login]: { user: login_login };
+  [ActionTypes.Login]: { user: User };
   [ActionTypes.Logout]: undefined;
 };
 
@@ -43,7 +40,7 @@ function authReducer(state: AuthContextType, action: AuthActions) {
 
 interface AuthContextType {
   loading: boolean;
-  user: Partial<login_login> | null;
+  user: Partial<User> | null;
   dispatch: Dispatch<AuthActions>;
 }
 
@@ -55,7 +52,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     user: null,
   });
 
-  const { loading } = useQuery<me>(ME, {
+  const { loading } = useMeQuery({
     onCompleted: ({ me }) =>
       dispatch({ type: ActionTypes.Login, payload: { user: me } }),
     onError: (error) => {

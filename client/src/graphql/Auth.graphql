@@ -1,0 +1,81 @@
+mutation login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    id
+    name
+    email
+    role
+    verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+
+query me {
+  me {
+    id
+    name
+    email
+    organisation
+    telephone
+    role
+    verified
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+
+mutation register($data: RegisterInput!) {
+  register(data: $data) {
+    id
+    name
+    email
+    organisation
+    telephone
+    role
+    verified
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+
+mutation logout {
+  logout
+}
