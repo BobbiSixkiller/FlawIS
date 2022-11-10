@@ -19,13 +19,10 @@ import {
 import CheckboxField from "src/components/form/CheckboxField";
 import InputField, { inputFieldProps } from "src/components/form/InputField";
 import parseErrors from "src/util/parseErrors";
-import { REGISTER } from "src/graphql/Auth.graphql";
-import {
-  register,
-  registerVariables,
-} from "src/graphql/__generated__/register";
+
 import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { boolean, InferType, object, ref, string } from "yup";
+import { useRegisterMutation } from "src/graphql/generated/schema";
 
 const registerInputSchema = object({
   name: string().required(),
@@ -64,7 +61,7 @@ const Register: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
   const router = useRouter();
 
-  const [register] = useMutation<register, registerVariables>(REGISTER, {
+  const [register] = useRegisterMutation({
     onCompleted: ({ register }) => {
       dispatch({ type: ActionTypes.Login, payload: { user: register } });
       router.push("/");

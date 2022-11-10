@@ -17,8 +17,14 @@ const Home: NextPage = () => {
   return (
     <>
       <MastHead scrollToRef={scrollToRef}>
-        <Label color="black" style={{ marginRight: 0 }}>
-          2.0.0 hovno
+        <Label
+          color="black"
+          style={{ marginRight: 0 }}
+          as="a"
+          href="https://github.com/BobbiSixkiller/FlawIS"
+          target="_blank"
+        >
+          2.0.0
         </Label>
         <Header
           as="h1"

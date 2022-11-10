@@ -4,7 +4,6 @@ export default function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
 
   const hostname = req.headers.get("host");
-  console.log(url, hostname);
 
   switch (hostname) {
     case "conferences.flaw.uniba.sk":
@@ -20,7 +19,6 @@ export default function middleware(req: NextRequest) {
       return NextResponse.rewrite(url);
 
     case "localhost:3000":
-      console.log("FIRE");
       url.pathname = `/conferences${url.pathname}`;
       return NextResponse.rewrite(url);
 

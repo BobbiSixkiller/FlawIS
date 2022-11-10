@@ -19,7 +19,7 @@ export enum ActionTypes {
 }
 
 type ActionPayload = {
-  [ActionTypes.Login]: { user: User };
+  [ActionTypes.Login]: { user: Partial<User> };
   [ActionTypes.Logout]: undefined;
 };
 
