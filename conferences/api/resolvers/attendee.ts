@@ -28,7 +28,7 @@ import { sendMail } from "../util/mail";
 
 import env from "dotenv";
 import { generatePdf, invoice } from "../util/invoice";
-import Messagebroker from "../util/messageBroker";
+import Messagebroker from "../services/messageBroker";
 
 env.config();
 
@@ -60,7 +60,7 @@ export class AttendeeResolver {
     @Ctx() { user }: Context
   ): Promise<Attendee> {
     const ticketPrice = ticket.price / Number(process.env.VAT || 1.2);
-    const isFlaw = user!.email.split("@")[1] === "flaw.uniba.sk";
+    const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
     await this.userService.update(
       { _id: user?.id },

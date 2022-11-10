@@ -66,21 +66,13 @@ export class User extends TimeStamps {
   @Property()
   password: string;
 
-  @Field(() => Role)
-  @Property({ default: "BASIC", enum: ["BASIC", "SUPERVISOR", "ADMIN"] })
-  role: Role;
-
   @Field()
   @Property()
   name: string;
 
-  @Field({ nullable: true })
-  @Property()
-  telephone?: string;
-
-  @Field()
-  @Property()
-  organisation: string;
+  @Field(() => Role)
+  @Property({ default: "BASIC", enum: ["BASIC", "ADMIN"] })
+  role: Role;
 
   @Field()
   @Property({ default: false })
@@ -104,14 +96,6 @@ export class User extends TimeStamps {
         { expiresIn: "7d" }
       )
     );
-  }
-
-  get isFlaw(): boolean {
-    return this.email.split("@")[1] === "flaw.uniba.sk";
-  }
-
-  get isUniba(): boolean {
-    return this.email.split("@")[1] === "uniba.sk";
   }
 }
 

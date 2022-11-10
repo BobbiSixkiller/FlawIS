@@ -51,9 +51,7 @@ type Query {
 input RegisterInput {
   email: String!
   name: String!
-  organisation: String!
   password: String!
-  telephone: String!
 }
 
 """User role inside the FLAWIS system"""
@@ -68,9 +66,7 @@ type User {
   email: String!
   id: ID!
   name: String!
-  organisation: String!
   role: Role!
-  telephone: String
   updatedAt: DateTime!
   verified: Boolean!
 }
@@ -90,7 +86,5 @@ type UserEdge {
 input UserInput {
   email: String!
   name: String!
-  organisation: String!
   role: String
-  telephone: String!
 }

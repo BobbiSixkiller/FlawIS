@@ -55,16 +55,6 @@ export class RegisterInput extends PasswordInput implements Partial<User> {
   @Field()
   @IsEmail()
   email: string;
-
-  @Field()
-  @Length(1, 100, {
-    message: "Name of the organisation must be 1-200 characters long!",
-  })
-  organisation: string;
-
-  @Field()
-  @IsPhoneNumber()
-  telephone: string;
 }
 
 @InputType({ description: "User update input data" })
@@ -77,17 +67,7 @@ export class UserInput implements Partial<User> {
   @IsEmail()
   email: string;
 
-  @Field()
-  @Length(1, 100, {
-    message: "Name of the organisation must be 1-200 characters long!",
-  })
-  organisation: string;
-
   @Authorized(["ADMIN"])
   @Field({ nullable: true })
   role?: Role;
-
-  @Field()
-  @IsPhoneNumber()
-  telephone: string;
 }

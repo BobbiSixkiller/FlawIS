@@ -14,7 +14,7 @@ type RoutingKey =
   | "mail.invoice";
 
 class Messagebroker {
-  private static connection: Connection;
+  private static connection?: Connection;
   private static channel: Channel;
 
   private static async createConnection() {
@@ -23,11 +23,26 @@ class Messagebroker {
         process.env.RABBITMQ_URI || "amqp://rabbitmq:5672"
       );
     }
+
+    this.connection.on("error", (err) => {
+      console.log(err);
+      this.connection = undefined;
+      setTimeout(this.createConnection, 1000 * 60);
+    });
+
+    this.connection.on("close", () => {
+      console.log(
+        "Connection to RMQ server closed! Trying to establish new one..."
+      );
+      this.connection = undefined;
+      setTimeout(this.createConnection, 1000 * 60);
+    });
+
     return this.connection;
   }
 
   private static async createChannel() {
-    if (!this.channel) {
+    if (!this.channel && this.connection) {
       this.channel = await this.connection.createChannel();
       await this.channel.assertExchange("FlawIS", "topic", { durable: false });
     }

@@ -132,6 +132,12 @@ type ConferenceTranslation {
   tickets: [TicketTranslation!]!
 }
 
+"""User input type"""
+input ConferenceUserInput {
+  organisation: String!
+  telephone: String!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -199,6 +205,7 @@ type Mutation {
   deleteSubmission(id: ObjectId!): Boolean!
   removeAttendee(id: ObjectId!): Boolean!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
+  updateConferenceUser(data: ConferenceUserInput!): User!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
   updateSection(data: SectionInput!, id: ObjectId!): Section!
   updateSubmission(data: SubmissionInput!, id: ObjectId!): Submission!
@@ -330,6 +337,8 @@ User reference type from users microservice with contributed billings field
 type User {
   billings: [Billing]!
   id: ID!
+  organisation: String!
+  telephone: String!
 }
 
 """Venue that conference takes place in"""

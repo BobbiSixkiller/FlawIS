@@ -20,7 +20,7 @@ export default async function waitForServices(services: Service[]) {
     const errors = results.filter((res) => res.includes("ECONNREFUSED"));
     if (errors.length) {
       console.log("waiting for services avaliability");
-      await sleep(1000);
+      await sleep(1000 * 60);
     } else {
       return true;
     }

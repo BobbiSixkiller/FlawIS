@@ -17,13 +17,14 @@ import { Service } from "typedi";
 import { Attendee, AttendeeConnection } from "../entitites/Attendee";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
+import { User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
 import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
-import { transformIds } from "../util/typegoose-middleware";
 import { AttendeeArgs } from "./types/attendee";
 import { ConferenceInput } from "./types/conference";
+import { ConferenceUserInput } from "./types/user";
 
 @Service()
 @Resolver(() => Conference)
@@ -31,7 +32,8 @@ export class ConferenceResolver {
   constructor(
     private readonly conferenceService = new CRUDservice(Conference),
     private readonly sectionService = new CRUDservice(Section),
-    private readonly attendeeService = new CRUDservice(Attendee)
+    private readonly attendeeService = new CRUDservice(Attendee),
+    private readonly userService = new CRUDservice(User)
   ) {}
 
   @Query(() => Conference)
@@ -88,6 +90,22 @@ export class ConferenceResolver {
   async deleteConference(@Arg("id") id: ObjectId): Promise<boolean> {
     const { deletedCount } = await this.conferenceService.delete({ _id: id });
     return deletedCount > 0;
+  }
+
+  @Authorized()
+  @Mutation(() => User)
+  async updateConferenceUser(
+    @Arg("data") userInput: ConferenceUserInput,
+    @Ctx() { user }: Context
+  ) {
+    const conferenceUser = await this.userService.findOne({ _id: user?.id });
+    if (!conferenceUser) throw new Error("Accout has been deleted!");
+
+    for (const [key, value] of Object.entries(userInput)) {
+      conferenceUser[key as keyof User] = value;
+    }
+
+    return await conferenceUser.save();
   }
 
   @Authorized()

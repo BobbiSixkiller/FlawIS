@@ -248,7 +248,7 @@ export class UserResolver {
 
     messageBroker.produceMessage(
       JSON.stringify({ locale, email: user.email, name: user.name, token }),
-      "mail.forgotPassword"
+      "mail.reset"
     );
 
     return "Password reset link has been sent to your email!";

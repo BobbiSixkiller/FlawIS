@@ -13,7 +13,7 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
-import MessageBroker from "./util/messageBroker";
+import MessageBroker from "./services/messageBroker";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
@@ -69,7 +69,7 @@ async function main() {
   console.log(mongoose.connection && "Database connected!");
 
   await MessageBroker.init();
-  MessageBroker.consumeMessages(["user.delete"]);
+  MessageBroker.consumeMessages(["user.delete", "user.new"]);
 
   await server.listen({ port }, () =>
     console.log(
@@ -78,6 +78,4 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.log(error, "error");
-});
+main().catch(console.error);
