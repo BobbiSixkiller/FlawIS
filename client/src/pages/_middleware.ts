@@ -5,6 +5,9 @@ export default function middleware(req: NextRequest) {
 
   const hostname = req.headers.get("host");
 
+  if (url.pathname.includes) {
+  }
+
   switch (hostname) {
     case "conferences.flaw.uniba.sk":
       url.pathname = `/conferences${url.pathname}`;

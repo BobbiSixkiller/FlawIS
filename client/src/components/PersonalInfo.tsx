@@ -2,15 +2,12 @@ import { useMutation } from "@apollo/client";
 import { Formik, FormikProps } from "formik";
 import { FC, useContext, useState } from "react";
 import { Button, Form, Grid, Input, Segment } from "semantic-ui-react";
-import { UPDATE_USER } from "src/graphql/User.graphql";
-import {
-  updateUser,
-  updateUserVariables,
-} from "src/graphql/__generated__/updateUser";
+
 import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { InferType, object, string } from "yup";
 import InputField from "./form/InputField";
 import parseErrors from "../util/parseErrors";
+import { useUpdateUserMutation } from "src/graphql/generated/schema";
 
 const perosnalInfoInputSchema = object({
   name: string().required(),
@@ -25,15 +22,12 @@ const PersonalInfo: FC = () => {
   const [update, setUpdate] = useState(false);
   const { user, dispatch } = useContext(AuthContext);
 
-  const [updateUser] = useMutation<updateUser, updateUserVariables>(
-    UPDATE_USER,
-    {
-      onCompleted: ({ updateUser }) => {
-        dispatch({ type: ActionTypes.Login, payload: { user: updateUser } });
-        setUpdate(false);
-      },
-    }
-  );
+  const [updateUser] = useUpdateUserMutation({
+    onCompleted: ({ updateUser }) => {
+      dispatch({ type: ActionTypes.Login, payload: { user: updateUser } });
+      setUpdate(false);
+    },
+  });
 
   return (
     <Grid>
