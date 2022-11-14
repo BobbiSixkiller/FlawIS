@@ -1,5 +1,5 @@
 import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
-import { ObjectId } from "mongodb";
+import { ObjectId, ChangeStreamDocument } from "mongodb";
 import { Service } from "typedi";
 import { User, UserConnection } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
@@ -25,42 +25,39 @@ export class UserResolver {
   constructor(private readonly userService = new CRUDservice(User)) {
     userService.dataModel
       .watch([])
-      .on(
-        "change",
-        ({ documentKey, operationType, updateDescription, fullDocument }) => {
-          switch (operationType) {
-            case "insert":
-              return messageBroker.produceMessage(
-                JSON.stringify({
-                  id: fullDocument._id,
-                  email: fullDocument.email,
-                  name: fullDocument.name,
-                }),
-                "user.new"
-              );
-            case "update":
-              return messageBroker.produceMessage(
-                JSON.stringify({
-                  id: documentKey?._id,
-                  email: updateDescription?.updatedFields.email,
-                }),
-                "user.update.email"
-              );
-            case "delete":
-              console.log(documentKey, operationType);
-              return messageBroker.produceMessage(
-                JSON.stringify({
-                  id: documentKey?._id,
-                }),
-                "user.delete"
-              );
+      .on("change", (data: ChangeStreamDocument<User>) => {
+        switch (data.operationType) {
+          case "insert":
+            return messageBroker.produceMessage(
+              JSON.stringify({
+                id: data.fullDocument?.id,
+                email: data.fullDocument?.email,
+                name: data.fullDocument?.name,
+              }),
+              "user.new"
+            );
+          case "update":
+            return messageBroker.produceMessage(
+              JSON.stringify({
+                id: data.documentKey?._id,
+                email: data.updateDescription?.updatedFields?.email,
+              }),
+              "user.update.email"
+            );
+          case "delete":
+            console.log(data.documentKey, data.operationType);
+            return messageBroker.produceMessage(
+              JSON.stringify({
+                id: data.documentKey?._id,
+              }),
+              "user.delete"
+            );
 
-            default:
-              console.log("Unhandled operation type: ", operationType);
-              return;
-          }
+          default:
+            console.log("Unhandled operation type: ", data.operationType);
+            return;
         }
-      );
+      });
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
