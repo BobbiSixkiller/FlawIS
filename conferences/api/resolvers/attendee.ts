@@ -11,7 +11,6 @@ import {
 import { ObjectId } from "mongodb";
 import { UserInputError } from "apollo-server";
 import { Service } from "typedi";
-import fs from "fs";
 import { CRUDservice } from "../services/CRUDservice";
 
 import { Attendee } from "../entitites/Attendee";
@@ -24,10 +23,8 @@ import { AttendeeInput, InvoiceInput } from "./types/attendee";
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
 import { CheckTicket } from "../util/decorators";
-import { sendMail } from "../util/mail";
 
 import env from "dotenv";
-import { generatePdf, invoice } from "../util/invoice";
 import Messagebroker from "../services/messageBroker";
 
 env.config();
@@ -99,37 +96,6 @@ export class AttendeeResolver {
             "In case of not due payment the host organisation is reserving the right to cancel attendee",
         },
       },
-    });
-
-    const { pdf, path } = await generatePdf(invoice(attendee.invoice, "en"));
-
-    const locale: string = "en";
-
-    sendMail(
-      user!.email,
-      conference.name,
-      `Dear ${user!.name},\n\nYou have been successfully registered to ${
-        conference.name
-      }! You can find your invoice in the attachmenets.\n\nBest regards,\n\n${
-        conference.name
-      } team`,
-      `<html><head></head><body><p>Dear ${
-        user!.name
-      },</p><p>You have been successfully registered to ${
-        conference.name
-      }! You can find your invoice in the attachmenets.</p><p>Best regards,</p><p>${
-        conference.name
-      } team</p></body></html>`,
-      [
-        {
-          filename: locale === "en" ? "Invoice.pdf" : "Faktúra.pdf",
-          content: pdf,
-        },
-      ]
-    );
-
-    fs.unlink(path, (err) => {
-      if (err) console.log(err);
     });
 
     return attendee;
