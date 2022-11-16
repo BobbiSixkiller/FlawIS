@@ -7,11 +7,7 @@ interface props extends LinkProps {
 }
 
 const LocalizedLink: FC<props> = ({ href, children }) => {
-  return (
-    <NextLink href={href || ""}>
-      <a>{children}</a>
-    </NextLink>
-  );
+  return <NextLink href={href || ""}>{children}</NextLink>;
 };
 
 export default LocalizedLink;

@@ -165,6 +165,12 @@ export type ConferenceTranslation = {
   tickets: Array<TicketTranslation>;
 };
 
+/** User input type */
+export type ConferenceUserInput = {
+  organisation: Scalars['String'];
+  telephone: Scalars['String'];
+};
+
 /** Supported file types for upload mutation */
 export enum FileType {
   Image = 'IMAGE',
@@ -288,6 +294,7 @@ export type Mutation = {
   register: User;
   removeAttendee: Scalars['Boolean'];
   updateConference: Conference;
+  updateConferenceUser: User;
   updateInvoice: Attendee;
   updateSection: Section;
   updateSubmission: Submission;
@@ -376,6 +383,11 @@ export type MutationRemoveAttendeeArgs = {
 export type MutationUpdateConferenceArgs = {
   data: ConferenceInput;
   id: Scalars['ObjectId'];
+};
+
+
+export type MutationUpdateConferenceUserArgs = {
+  data: ConferenceUserInput;
 };
 
 
@@ -497,9 +509,7 @@ export type QueryUsersArgs = {
 export type RegisterInput = {
   email: Scalars['String'];
   name: Scalars['String'];
-  organisation: Scalars['String'];
   password: Scalars['String'];
-  telephone: Scalars['String'];
 };
 
 /** User role inside the FLAWIS system */
@@ -630,7 +640,7 @@ export type User = {
   name: Scalars['String'];
   organisation: Scalars['String'];
   role: Role;
-  telephone?: Maybe<Scalars['String']>;
+  telephone: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   verified: Scalars['Boolean'];
 };
@@ -664,9 +674,7 @@ export type UserEdge = {
 export type UserInput = {
   email: Scalars['String'];
   name: Scalars['String'];
-  organisation: Scalars['String'];
   role?: InputMaybe<Scalars['String']>;
-  telephone: Scalars['String'];
 };
 
 /** Venue that conference takes place in */
@@ -687,19 +695,19 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone?: string | null, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone?: string | null, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -712,7 +720,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 
 export const LoginDocument = gql`

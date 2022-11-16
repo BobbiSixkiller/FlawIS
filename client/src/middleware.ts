@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const config = {
+  matcher: ["/((?!_next|api|locales|images).)*"],
+};
+
 export default function middleware(req: NextRequest) {
-  const url = req.nextUrl.clone();
-
+  const url = req.nextUrl;
   const hostname = req.headers.get("host");
-
-  if (url.pathname.includes) {
-  }
 
   switch (hostname) {
     case "conferences.flaw.uniba.sk":
@@ -15,10 +15,6 @@ export default function middleware(req: NextRequest) {
 
     case "grants.flaw.uniba.sk":
       url.pathname = `/grants${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    case "auth.flaw.uniba.sk":
-      url.pathname = `/auth${url.pathname}`;
       return NextResponse.rewrite(url);
 
     case "localhost:3000":

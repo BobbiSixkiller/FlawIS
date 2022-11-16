@@ -16,15 +16,15 @@ import {
 import { Formik, FormikProps } from "formik";
 import { InferType } from "yup";
 import { useContext, useState } from "react";
-import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 
-import Validation from "src/util/validation";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Trans, useTranslation } from "next-i18next";
-import LocalizedLink from "src/components/LocalizedLink";
-import { useLoginMutation } from "src/graphql/generated/schema";
+import { ActionTypes, AuthContext } from "../providers/Auth";
+import { useLoginMutation } from "../graphql/generated/schema";
+import Validation from "../util/validation";
+import LocalizedLink from "../components/LocalizedLink";
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);

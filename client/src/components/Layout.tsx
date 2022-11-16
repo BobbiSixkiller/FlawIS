@@ -8,10 +8,10 @@ import Image from "next/image";
 import logoInverted from "public/images/Flaw-logo-notext-inverted.png";
 import logo from "public/images/Flaw-logo-notext.png";
 
-import useWidth from "src/hooks/useWidth";
-import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { useRouter } from "next/router";
-import { Role, useLogoutMutation } from "src/graphql/generated/schema";
+import { ActionTypes, AuthContext } from "../providers/Auth";
+import { Role, useLogoutMutation } from "../graphql/generated/schema";
+import useWidth from "../hooks/useWidth";
 
 interface navProps {
   inView: boolean;

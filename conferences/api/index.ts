@@ -25,8 +25,7 @@ import env from "dotenv";
 env.config();
 
 const port = process.env.PORT || 5003;
-const mongooseUri =
-  process.env.DB_DEV_ATLAS || "mongodb://localhost:27017/conferences";
+const mongooseUri = process.env.DB || "mongodb://localhost:27017/conferences";
 
 async function main() {
   //Build schema

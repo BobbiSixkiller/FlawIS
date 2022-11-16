@@ -30,7 +30,7 @@ export class UserResolver {
           case "insert":
             return messageBroker.produceMessage(
               JSON.stringify({
-                id: data.fullDocument?.id,
+                id: data.documentKey?._id,
                 email: data.fullDocument?.email,
                 name: data.fullDocument?.name,
               }),

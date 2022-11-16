@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/client";
 import { Formik, FormikProps, useFormikContext } from "formik";
 import { NextPage } from "next";
 import Image from "next/image";
@@ -16,13 +15,13 @@ import {
   Message,
   Segment,
 } from "semantic-ui-react";
-import CheckboxField from "src/components/form/CheckboxField";
-import InputField, { inputFieldProps } from "src/components/form/InputField";
-import parseErrors from "src/util/parseErrors";
 
-import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { boolean, InferType, object, ref, string } from "yup";
-import { useRegisterMutation } from "src/graphql/generated/schema";
+import CheckboxField from "../components/form/CheckboxField";
+import InputField, { inputFieldProps } from "../components/form/InputField";
+import { useRegisterMutation } from "../graphql/generated/schema";
+import { ActionTypes, AuthContext } from "../providers/Auth";
+import parseErrors from "../util/parseErrors";
 
 const registerInputSchema = object({
   name: string().required(),
@@ -33,7 +32,9 @@ const registerInputSchema = object({
   repeatPass: string()
     .required()
     .oneOf([ref("password")]),
-  terms: boolean().oneOf([true], "You must agree with the Privacy policy"),
+  terms: boolean()
+    .oneOf([true], "You must agree with the Privacy policy")
+    .required(),
 });
 
 type Values = InferType<typeof registerInputSchema>;

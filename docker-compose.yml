@@ -29,7 +29,7 @@ services:
       - ./users/.env
     depends_on:
       - rabbitmq
-      # - db
+      - db
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
@@ -62,7 +62,7 @@ services:
       - ./conferences/.env
     depends_on:
       - rabbitmq
-      # - db
+      - db
     volumes:
       - ./conferences:/usr/app
       - /usr/app/node_modules
@@ -80,7 +80,7 @@ services:
       - ./grants/.env
     depends_on:
       - rabbitmq
-      # - db
+      - db
     volumes:
       - ./grants:/usr/app
       - /usr/app/node_modules
@@ -120,18 +120,17 @@ services:
     image: rabbitmq
     ports:
       - "5672:5672"
-#    db:
-#     container_name: mongodb
-#     image: mongo
-#     restart: unless-stopped
-#     environment:
-#       MONGO_INITDB_DATABASE: node-app
-#     ports:
-#       - "27017:27017"
-#     volumes:
-#       - mongo_data:/data/db
-#       - mongo_config:/data/configdb
+  db:
+    container_name: mongodb
+    image: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
 
-# volumes:
-#   mongo_data: {}
-#   mongo_config: {}
+volumes:
+  mongo_data: {}
+  mongo_config: {}
