@@ -1,20 +1,24 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FC, ReactElement, useContext } from "react";
 import { Button, Container, Icon, IconProps } from "semantic-ui-react";
 import useWith from "src/hooks/useWidth";
 import { AuthContext } from "src/providers/Auth";
 import styled, { keyframes } from "styled-components";
 
+import bg from "../../public/images/background-main.jpg";
+
 const opacityChange = keyframes`
 	from{
 		opacity: 0;
 	}
 	to{
-		opacity: 1;
+		opacity: 0.45;
 	}
 `;
 
 const CustomSegment = styled.div`
+  z-index: 3;
   position: relative;
   overflow: hidden;
   text-align: center;
@@ -28,10 +32,13 @@ const CustomSegment = styled.div`
     position: absolute;
     top: 0px;
     left: 0px;
-    z-index: -1;
     width: 100%;
     height: 100%;
     content: "";
+    background-image: url("/images/background-main.jpg");
+    background-size: cover;
+    opacity: 0.45;
+    z-index: -1;
     /* background: radial-gradient(
       circle,
       rgba(180, 104, 122, 1) 34%,
