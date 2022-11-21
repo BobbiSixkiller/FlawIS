@@ -1,0 +1,25 @@
+mutation updateConferenceUser($data: ConferenceUserInput!) {
+  updateConferenceUser(data: $data) {
+    id
+    name
+    email
+    organisation
+    telephone
+    role
+    verified
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}

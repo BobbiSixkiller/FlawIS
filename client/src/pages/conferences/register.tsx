@@ -17,11 +17,14 @@ import {
 } from "semantic-ui-react";
 
 import { boolean, InferType, object, ref, string } from "yup";
-import CheckboxField from "../components/form/CheckboxField";
-import InputField, { inputFieldProps } from "../components/form/InputField";
-import { useRegisterMutation } from "../graphql/generated/schema";
-import { ActionTypes, AuthContext } from "../providers/Auth";
-import parseErrors from "../util/parseErrors";
+import CheckboxField from "../../components/form/CheckboxField";
+import InputField, { inputFieldProps } from "../../components/form/InputField";
+import {
+  useRegisterMutation,
+  useUpdateConferenceUserMutation,
+} from "../../graphql/generated/schema";
+import { ActionTypes, AuthContext } from "../../providers/Auth";
+import parseErrors from "../../util/parseErrors";
 
 const registerInputSchema = object({
   name: string().required(),
@@ -40,7 +43,7 @@ const registerInputSchema = object({
 type Values = InferType<typeof registerInputSchema>;
 
 const EmailField: FC<inputFieldProps> = (props) => {
-  const { values, setFieldValue, errors, touched } = useFormikContext();
+  const { values, setFieldValue, errors, touched } = useFormikContext<Values>();
 
   useEffect(() => {
     if (
@@ -65,9 +68,10 @@ const Register: NextPage = () => {
   const [register] = useRegisterMutation({
     onCompleted: ({ register }) => {
       dispatch({ type: ActionTypes.Login, payload: { user: register } });
-      router.push("/");
     },
   });
+
+  const [updateConferenceUser] = useUpdateConferenceUserMutation();
 
   return (
     <Grid container centered>
@@ -115,13 +119,20 @@ const Register: NextPage = () => {
                     data: {
                       email: values.email,
                       name: values.name,
-                      organisation: values.organisation,
-                      telephone: values.telephone,
                       password: values.password,
                     },
                   },
                 });
-              } catch (err) {
+                await updateConferenceUser({
+                  variables: {
+                    data: {
+                      organisation: values.organisation,
+                      telephone: values.telephone,
+                    },
+                  },
+                });
+                router.push("/");
+              } catch (err: any) {
                 actions.setStatus(
                   parseErrors(
                     err.graphQLErrors[0].extensions.exception.validationErrors

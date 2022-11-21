@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 import { FC, useContext, useState } from "react";
 import { Grid, Menu, Segment } from "semantic-ui-react";
-import Footer from "src/components/Footer";
-import { ContentWrapper, Nav, PageWrapper } from "src/components/Layout";
-import PersonalInfo from "src/components/PersonalInfo";
-import { AuthContext } from "src/providers/Auth";
+import Footer from "../../../components/Footer";
+import { ContentWrapper, Nav, PageWrapper } from "../../../components/Layout";
+import PersonalInfo from "../../../components/PersonalInfo";
+import { AuthContext } from "../../../providers/Auth";
 
 const AttendedConferences: FC = () => {
   return <Segment>ATTENDED CONFERENCES</Segment>;
@@ -20,7 +20,7 @@ const ProfilePage: NextPage = () => {
         <Grid.Column width={4}>
           <Menu fluid vertical style={{ flexGrow: 0 }}>
             <Menu.Item>
-              <Menu.Header>{user.name}</Menu.Header>
+              <Menu.Header>{user?.name}</Menu.Header>
               <Menu.Menu>
                 <Menu.Item
                   as="a"

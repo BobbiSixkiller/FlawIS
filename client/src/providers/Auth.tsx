@@ -1,6 +1,6 @@
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
 import { Loader } from "semantic-ui-react";
-import { useMeQuery, User } from "src/graphql/generated/schema";
+import { useMeQuery, User } from "../graphql/generated/schema";
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -44,7 +44,7 @@ interface AuthContextType {
   dispatch: Dispatch<AuthActions>;
 }
 
-const AuthContext = createContext<AuthContextType>(null);
+const AuthContext = createContext<AuthContextType>();
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, {

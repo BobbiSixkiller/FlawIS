@@ -1,12 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import { FC, ReactElement, useContext } from "react";
 import { Button, Container, Icon, IconProps } from "semantic-ui-react";
 import useWith from "src/hooks/useWidth";
 import { AuthContext } from "src/providers/Auth";
 import styled, { keyframes } from "styled-components";
-
-import bg from "../../public/images/background-main.jpg";
 
 const opacityChange = keyframes`
 	from{

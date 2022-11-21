@@ -21,10 +21,10 @@ import { useRouter } from "next/router";
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Trans, useTranslation } from "next-i18next";
-import { ActionTypes, AuthContext } from "../providers/Auth";
-import { useLoginMutation } from "../graphql/generated/schema";
-import Validation from "../util/validation";
-import LocalizedLink from "../components/LocalizedLink";
+import { ActionTypes, AuthContext } from "../../providers/Auth";
+import { useLoginMutation } from "../../graphql/generated/schema";
+import Validation from "../../util/validation";
+import LocalizedLink from "../../components/LocalizedLink";
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);

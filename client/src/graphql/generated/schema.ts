@@ -707,12 +707,19 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type UpdateConferenceUserMutationVariables = Exact<{
+  data: ConferenceUserInput;
+}>;
+
+
+export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -837,24 +844,8 @@ export const RegisterDocument = gql`
     id
     name
     email
-    organisation
-    telephone
     role
     verified
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      IBAN
-      SWIFT
-    }
   }
 }
     `;
@@ -914,6 +905,59 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const UpdateConferenceUserDocument = gql`
+    mutation updateConferenceUser($data: ConferenceUserInput!) {
+  updateConferenceUser(data: $data) {
+    id
+    name
+    email
+    organisation
+    telephone
+    role
+    verified
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+    `;
+export type UpdateConferenceUserMutationFn = Apollo.MutationFunction<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>;
+
+/**
+ * __useUpdateConferenceUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateConferenceUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateConferenceUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateConferenceUserMutation, { data, loading, error }] = useUpdateConferenceUserMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateConferenceUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>(UpdateConferenceUserDocument, options);
+      }
+export type UpdateConferenceUserMutationHookResult = ReturnType<typeof useUpdateConferenceUserMutation>;
+export type UpdateConferenceUserMutationResult = Apollo.MutationResult<UpdateConferenceUserMutation>;
+export type UpdateConferenceUserMutationOptions = Apollo.BaseMutationOptions<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {

@@ -174,8 +174,8 @@ export function Nav({
                 </Menu.Item>
 
                 {width < 550 && (
-                  <Link href="/">
-                    <Menu.Item style={{ marginLeft: "auto", marginRight: 0 }}>
+                  <Link href="/" style={{ marginLeft: "auto", marginRight: 0 }}>
+                    <Menu.Item>
                       <Image
                         alt="flaw-logo-notext"
                         src={inView && transparent ? logoInverted : logo}
