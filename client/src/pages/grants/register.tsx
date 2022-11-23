@@ -17,7 +17,7 @@ import {
 } from "semantic-ui-react";
 
 import { InferType, object, ref, string } from "yup";
-import InputField, { inputFieldProps } from "../../components/form/InputField";
+import { InputField, inputFieldProps } from "../../components/form/InputField";
 import { useRegisterMutation } from "../../graphql/generated/schema";
 import { ActionTypes, AuthContext } from "../../providers/Auth";
 import parseErrors from "../../util/parseErrors";

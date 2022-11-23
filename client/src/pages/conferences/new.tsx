@@ -1,11 +1,10 @@
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
-import { Grid, Menu, Segment } from "semantic-ui-react";
-import Footer from "src/components/Footer";
-import { ContentWrapper, Nav, PageWrapper } from "src/components/Layout";
-import { AuthContext } from "src/providers/Auth";
+import { Grid } from "semantic-ui-react";
+
 import { array, boolean, InferType, number, object, string } from "yup";
+import Footer from "../../components/Footer";
+import { ContentWrapper, Nav, PageWrapper } from "../../components/Layout";
 
 const conferenceInputSchema = object({
   name: string().required(),
@@ -88,7 +87,7 @@ const NewConferencePage: NextPage = () => {
 
 NewConferencePage.getLayout = function getLayout(page) {
   return (
-    <Nav>
+    <Nav transparent={false}>
       <PageWrapper>
         <ContentWrapper>{page}</ContentWrapper>
         <Footer />

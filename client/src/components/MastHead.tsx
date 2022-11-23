@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { FC, ReactElement, useContext } from "react";
 import { Button, Container, Icon, IconProps } from "semantic-ui-react";
-import useWith from "src/hooks/useWidth";
-import { AuthContext } from "src/providers/Auth";
 import styled, { keyframes } from "styled-components";
+import useWith from "../hooks/useWidth";
+import { AuthContext } from "../providers/Auth";
 
 const opacityChange = keyframes`
 	from{
@@ -24,7 +24,6 @@ const CustomSegment = styled.div`
   margin-bottom: 0px;
   border-bottom: none;
   background-color: black;
-  transform: translate3d(0, 0, 0);
   &:after {
     position: absolute;
     top: 0px;
@@ -33,6 +32,8 @@ const CustomSegment = styled.div`
     height: 100%;
     content: "";
     background-image: url("/images/background-main.jpg");
+    background-attachment: fixed;
+    background-position: center;
     background-size: cover;
     opacity: 0.45;
     z-index: -1;

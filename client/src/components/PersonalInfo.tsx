@@ -1,13 +1,15 @@
-import { useMutation } from "@apollo/client";
 import { Formik, FormikProps } from "formik";
 import { FC, useContext, useState } from "react";
 import { Button, Form, Grid, Input, Segment } from "semantic-ui-react";
 
-import { ActionTypes, AuthContext } from "src/providers/Auth";
 import { InferType, object, string } from "yup";
-import InputField from "./form/InputField";
+import {
+  useUpdateConferenceUserMutation,
+  useUpdateUserMutation,
+} from "../graphql/generated/schema";
+import { ActionTypes, AuthContext } from "../providers/Auth";
 import parseErrors from "../util/parseErrors";
-import { useUpdateUserMutation } from "src/graphql/generated/schema";
+import { InputField } from "./form/InputField";
 
 const perosnalInfoInputSchema = object({
   name: string().required(),
@@ -29,31 +31,39 @@ const PersonalInfo: FC = () => {
     },
   });
 
+  const [updateConferenceUser] = useUpdateConferenceUserMutation();
+
   return (
     <Grid>
       <Grid.Column mobile={16} tablet={12} computer={8}>
         <Formik
           initialValues={{
-            name: user.name,
-            email: user.email,
-            organisation: user.organisation,
-            telephone: user.telephone,
+            name: user?.name || "",
+            email: user?.email || "",
+            organisation: user?.organisation || "",
+            telephone: user?.telephone || "",
           }}
           validationSchema={perosnalInfoInputSchema}
           onSubmit={async (values, actions) => {
             try {
               await updateUser({
                 variables: {
-                  id: user.id,
+                  id: user?.id,
                   data: {
                     email: values.email,
                     name: values.name,
+                  },
+                },
+              });
+              await updateConferenceUser({
+                variables: {
+                  data: {
                     organisation: values.organisation,
                     telephone: values.telephone,
                   },
                 },
               });
-            } catch (err) {
+            } catch (err: any) {
               actions.setStatus(
                 parseErrors(
                   err.graphQLErrors[0].extensions.exception.validationErrors

@@ -17,14 +17,20 @@ export default function ProtectedRouteProvider({
   if (!protect && !admin) return <>{children}</>;
 
   if (!user) {
+    globalThis.sessionStorage.setItem("intendedPath", router.asPath);
+
     router.push("/login");
     return null;
   }
 
   if (admin && user.role !== Role.Admin) {
+    globalThis.sessionStorage.setItem("intendedPath", router.asPath);
+
     router.push("/login");
     return null;
   }
+
+  globalThis.sessionStorage.removeItem("intendedPath");
 
   return <>{children}</>;
 }

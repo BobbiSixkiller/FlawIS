@@ -18,7 +18,7 @@ import {
 
 import { boolean, InferType, object, ref, string } from "yup";
 import CheckboxField from "../../components/form/CheckboxField";
-import InputField, { inputFieldProps } from "../../components/form/InputField";
+import { InputField, inputFieldProps } from "../../components/form/InputField";
 import {
   useRegisterMutation,
   useUpdateConferenceUserMutation,

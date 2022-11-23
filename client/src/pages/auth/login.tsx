@@ -2,8 +2,6 @@ import NextLink from "next/link";
 import Image from "next/image";
 import logo from "public/images/Flaw-logo-notext.png";
 
-import InputField from "src/components/form/InputField";
-
 import {
   Button,
   Form,
@@ -25,11 +23,13 @@ import { ActionTypes, AuthContext } from "../../providers/Auth";
 import { useLoginMutation } from "../../graphql/generated/schema";
 import Validation from "../../util/validation";
 import LocalizedLink from "../../components/LocalizedLink";
+import { InputField } from "../../components/form/InputField";
 
 const Login: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
   const [error, setError] = useState("");
   const router = useRouter();
+  const intendedPath = globalThis.sessionStorage.getItem("intendedPath");
   const { t } = useTranslation("login");
 
   const { loginInputSchema } = Validation();
@@ -39,7 +39,7 @@ const Login: NextPage = () => {
   const [login] = useLoginMutation({
     onCompleted: ({ login }) => {
       dispatch({ type: ActionTypes.Login, payload: { user: login } });
-      router.push("/");
+      router.push(intendedPath ? intendedPath : "/");
     },
     onError: (err) => setError(err.message),
   });

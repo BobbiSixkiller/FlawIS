@@ -5,8 +5,8 @@ import Link from "next/link";
 import logo from "public/images/Flaw-logo-notext.png";
 
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
-import InputField from "src/components/form/InputField";
 import { InferType, object, ref, string } from "yup";
+import { InputField } from "../../components/form/InputField";
 
 const resetPasswordInputSchema = object({
   password: string().required(),

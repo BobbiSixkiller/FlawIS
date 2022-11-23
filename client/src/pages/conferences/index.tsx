@@ -1,14 +1,15 @@
-import { Segment, Grid, Header, Image, Button, Label } from "semantic-ui-react";
+import { Segment, Grid, Header, Button, Label } from "semantic-ui-react";
 import Link from "next/link";
-import Footer from "src/components/Footer";
+import Image from "next/image";
 import { NextPage } from "next";
-import { Nav } from "src/components/Layout";
-import MastHead, { Arrow, ArrowWrapper } from "src/components/MastHead";
-import { useContext, useRef } from "react";
-import useWith from "src/hooks/useWidth";
-import { AuthContext } from "src/providers/Auth";
+import useWith from "../../hooks/useWidth";
+import { useRef } from "react";
+import MastHead from "../../components/MastHead";
+import { Nav } from "../../components/Layout";
+import Footer from "../../components/Footer";
+import { NextPageWithLayout } from "../_app";
 
-const Home: NextPage = () => {
+const Home: NextPageWithLayout = () => {
   const width = useWith();
   const ref = useRef(null);
 
@@ -47,12 +48,14 @@ const Home: NextPage = () => {
           <Grid stackable container verticalAlign="middle" divided="vertically">
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
-                <Image
-                  bordered
-                  rounded
-                  size="large"
-                  src="/images/wireframe/white-image.png"
-                />
+                <div style={{ position: "relative", height: "250px" }}>
+                  <Image
+                    src="/images/SK-CIERNO-BIELE.png"
+                    alt="Picture of the author"
+                    fill={true}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </Grid.Column>
               <Grid.Column width={8}>
                 <Header as="h3" style={{ fontSize: "2em" }}>
@@ -70,23 +73,27 @@ const Home: NextPage = () => {
                 </Link>
               </Grid.Column>
               <Grid.Column floated="right" width={6} only="tablet computer">
-                <Image
-                  bordered
-                  rounded
-                  size="large"
-                  src="/images/wireframe/white-image.png"
-                />
+                <div style={{ position: "relative", height: "250px" }}>
+                  <Image
+                    src="/images/SK-CIERNO-BIELE.png"
+                    alt="Picture of the author"
+                    fill={true}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </Grid.Column>
             </Grid.Row>
 
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
-                <Image
-                  bordered
-                  rounded
-                  size="large"
-                  src="/images/wireframe/white-image.png"
-                />
+                <div style={{ position: "relative", height: "250px" }}>
+                  <Image
+                    src="/images/SK-CIERNO-BIELE.png"
+                    alt="Picture of the author"
+                    fill={true}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </Grid.Column>
               <Grid.Column width={8}>
                 <Header as="h3" style={{ fontSize: "2em" }}>
@@ -104,12 +111,14 @@ const Home: NextPage = () => {
                 </Link>
               </Grid.Column>
               <Grid.Column floated="right" width={6} only="tablet computer">
-                <Image
-                  bordered
-                  rounded
-                  size="large"
-                  src="/images/wireframe/white-image.png"
-                />
+                <div style={{ position: "relative", height: "250px" }}>
+                  <Image
+                    src="/images/SK-CIERNO-BIELE.png"
+                    alt="Picture of the author"
+                    fill={true}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </Grid.Column>
             </Grid.Row>
 

@@ -1,14 +1,15 @@
-import { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useContext, useRef, useState } from "react";
 import { Grid, Menu, Segment } from "semantic-ui-react";
-import Footer from "src/components/Footer";
-import { Nav } from "src/components/Layout";
-import MastHead from "src/components/MastHead";
-import { AuthContext } from "src/providers/Auth";
+import Footer from "../../components/Footer";
+import { Nav } from "../../components/Layout";
+import MastHead from "../../components/MastHead";
+import { AuthContext } from "../../providers/Auth";
 
-const ConferencePage: NextPage = () => {
+import { NextPageWithLayout } from "../_app";
+
+const ConferencePage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const [tab, setTab] = useState("");
 

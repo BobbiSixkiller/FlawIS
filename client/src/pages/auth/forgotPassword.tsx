@@ -13,8 +13,8 @@ import {
   Message,
   Segment,
 } from "semantic-ui-react";
-import InputField from "src/components/form/InputField";
 import { InferType, object, string } from "yup";
+import { InputField } from "../../components/form/InputField";
 
 const forgotPasswordInputSchema = object({
   email: string().required().email(),
