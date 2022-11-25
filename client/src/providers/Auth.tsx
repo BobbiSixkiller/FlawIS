@@ -25,12 +25,17 @@ type ActionPayload = {
 
 type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
-function authReducer(state: AuthContextType, action: AuthActions) {
+interface AuthStateType {
+  loading: boolean;
+  user: Partial<User> | null;
+}
+
+function authReducer(state: AuthStateType, action: AuthActions) {
   switch (action.type) {
-    case "LOGIN":
+    case ActionTypes.Login:
       return { user: action.payload.user, loading: false };
 
-    case "LOGOUT":
+    case ActionTypes.Logout:
       return { user: null, loading: false };
 
     default:
@@ -38,13 +43,13 @@ function authReducer(state: AuthContextType, action: AuthActions) {
   }
 }
 
-interface AuthContextType {
-  loading: boolean;
-  user: Partial<User> | null;
-  dispatch: Dispatch<AuthActions>;
-}
-
-const AuthContext = createContext<AuthContextType>();
+const AuthContext = createContext<
+  AuthStateType & { dispatch: Dispatch<AuthActions> }
+>({
+  loading: true,
+  user: null,
+  dispatch: () => null,
+});
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, {

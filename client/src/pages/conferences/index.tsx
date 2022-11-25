@@ -44,11 +44,14 @@ const Home: NextPageWithLayout = () => {
         />
       </MastHead>
       <div ref={ref}>
-        <Segment style={{ padding: "8em 0em" }} vertical>
+        <Segment
+          style={{ padding: width > 992 ? "8em 0em" : "4em 0em" }}
+          vertical
+        >
           <Grid stackable container verticalAlign="middle" divided="vertically">
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
-                <div style={{ position: "relative", height: "250px" }}>
+                <div style={{ position: "relative", height: "150px" }}>
                   <Image
                     src="/images/SK-CIERNO-BIELE.png"
                     alt="Picture of the author"
