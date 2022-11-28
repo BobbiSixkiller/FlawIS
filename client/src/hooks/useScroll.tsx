@@ -1,10 +1,10 @@
 import { useRef } from "react";
 
 export default function useScroll() {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   function scrollToRef() {
-    ref.current.scrollIntoView();
+    ref.current?.scrollIntoView();
   }
 
   return { ref, scrollToRef };

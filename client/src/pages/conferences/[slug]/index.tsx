@@ -24,32 +24,68 @@ const ConferencePage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const { setMenuItems } = useContext(MenuItemsContext);
   const [active, setActive] = useState<string | number | undefined>();
+  const router = useRouter();
+  const width = useWith();
+  const { slug } = router.query;
 
   useEffect(() => {
     setMenuItems(
       <Menu.Item>
         <Menu.Header>Conference</Menu.Header>
         <Menu vertical inverted>
-          <Link href="/user/profile">
-            <Menu.Item
-              as="a"
-              name="Personal Information"
-              active={router.asPath === "/user/profile"}
-            />
-          </Link>
-          {user && user.role === Role.Admin && (
-            <Link href="/new">
-              <Menu.Item as="a" name="new conference" />
-            </Link>
-          )}
-          <Link href="/">
-            <Menu.Item as="a" name="Sign out" />
-          </Link>
-          <Link href="#intro">
-            <Menu.Item as="a" name="Introduction" />
-          </Link>
           <Link href="register">
             <Menu.Item as="a" name="register" />
+          </Link>
+          {user && user.role === Role.Admin && (
+            <Link href={`/${slug}/attendees`}>
+              <Menu.Item
+                as="a"
+                name="Attendees"
+                active={router.asPath === `/${slug}/attendees`}
+              />
+            </Link>
+          )}
+          <Link href="#intro" scroll={false}>
+            <Menu.Item
+              as="a"
+              name="Introduction"
+              active={router.asPath === `/${slug}#intro`}
+            />
+          </Link>
+          <Link href="#sections">
+            <Menu.Item
+              as="a"
+              name="Sections"
+              active={router.asPath === `/${slug}#sections`}
+            />
+          </Link>
+          <Link href="#programme">
+            <Menu.Item
+              as="a"
+              name="Programme"
+              active={router.asPath === `/${slug}#programme`}
+            />
+          </Link>
+          <Link href="#fees">
+            <Menu.Item
+              as="a"
+              name="Fees"
+              active={router.asPath === `/${slug}#fees`}
+            />
+          </Link>
+          <Link href="#dates">
+            <Menu.Item
+              as="a"
+              name="Important Dates"
+              active={router.asPath === `/${slug}#dates`}
+            />
+          </Link>
+          <Link href="#guidelines">
+            <Menu.Item
+              as="a"
+              name="Submission guidelines"
+              active={router.asPath === `/${slug}#guidelines`}
+            />
           </Link>
         </Menu>
       </Menu.Item>
@@ -57,10 +93,6 @@ const ConferencePage: NextPageWithLayout = () => {
 
     return () => setMenuItems(null);
   }, []);
-
-  const router = useRouter();
-  const width = useWith();
-  const { slug } = router.query;
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -74,24 +106,32 @@ const ConferencePage: NextPageWithLayout = () => {
             margin: "auto",
           }}
         >
-          <Image
+          <Header
+            as="h1"
+            content="Míľniky práva v stredoeurópskom priestore 2022"
+            inverted
+            style={{ fontSize: width > 992 ? "4em" : "2em" }}
+          />
+          {/* <Image
             alt="conference logo"
             src={"/images/SK-CIERNO-BIELE.png"}
             width={3219}
             height={845}
             quality={50}
             layout="responsive"
-          />
+          /> */}
         </div>
       </MastHead>
       <div ref={ref}>
         <Segment
-          style={{ padding: width > 992 ? "8em 0em" : "4em 0em" }}
+          style={{
+            padding: width > 992 ? "8em 0em" : "4em 0em",
+          }}
           vertical
         >
           <Grid divided="vertically" container>
-            <Grid.Row textAlign="center">
-              <Grid.Column id="intro">
+            <Grid.Row textAlign="center" id="intro">
+              <Grid.Column>
                 <Header as="h3" style={{ fontSize: "2em" }}>
                   Introduction
                 </Header>
@@ -115,7 +155,7 @@ const ConferencePage: NextPageWithLayout = () => {
               </Grid.Column>
             </Grid.Row>
 
-            <Grid.Row centered>
+            <Grid.Row centered id="sections">
               <Grid.Column computer={10} tablet={12} mobile={16}>
                 <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
                   Sections

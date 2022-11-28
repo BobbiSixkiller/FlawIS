@@ -4,7 +4,6 @@ import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
 import {
   createContext,
   Dispatch,
-  ReactElement,
   ReactNode,
   SetStateAction,
   useContext,
@@ -87,8 +86,12 @@ export function Nav({
 
   const [logout] = useLogoutMutation({
     onCompleted: () => {
-      toggle(false);
       dispatch({ type: ActionTypes.Logout });
+      toggle(false);
+    },
+    update(cache) {
+      cache.evict({ id: `User:${user?.id}` });
+      cache.gc();
     },
   });
 
@@ -119,9 +122,24 @@ export function Nav({
               <b>Home</b>
             </Menu.Item>
           </Link>
-          <Menu.Item>
-            <Menu.Header>{user ? user.name : "User"}</Menu.Header>
-            {user ? (
+          {!user ? (
+            <>
+              <Link href="/login">
+                <Menu.Item as="a" active={router.asPath === "/login"}>
+                  <Icon name="sign in" />
+                  <b>Login</b>
+                </Menu.Item>
+              </Link>
+              <Link href="/register">
+                <Menu.Item as="a" active={router.asPath === "/register"}>
+                  <Icon name="signup" />
+                  <b>Register</b>
+                </Menu.Item>
+              </Link>
+            </>
+          ) : (
+            <Menu.Item>
+              <Menu.Header>{user.name}</Menu.Header>
               <Menu vertical inverted>
                 <Link href="/user/profile">
                   <Menu.Item
@@ -139,17 +157,8 @@ export function Nav({
                   <Menu.Item as="a" name="Sign out" onClick={() => logout()} />
                 </Link>
               </Menu>
-            ) : (
-              <Menu vertical inverted>
-                <Link href="/login">
-                  <Menu.Item as="a" name="log in" />
-                </Link>
-                <Link href="register">
-                  <Menu.Item as="a" name="register" />
-                </Link>
-              </Menu>
-            )}
-          </Menu.Item>
+            </Menu.Item>
+          )}
           {menuItems}
         </Sidebar>
 
@@ -215,6 +224,7 @@ export function Nav({
                       <Dropdown.Menu>
                         <Dropdown.Header content="Language" />
                         <Dropdown.Item
+                          style={{ textAlign: "center" }}
                           key={1}
                           text={"English"}
                           value={"English"}
@@ -226,6 +236,7 @@ export function Nav({
                           }}
                         />
                         <Dropdown.Item
+                          style={{ textAlign: "center" }}
                           key={2}
                           text={"Slovak"}
                           value={"Slovak"}

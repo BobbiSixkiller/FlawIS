@@ -10,7 +10,7 @@ const opacityChange = keyframes`
 		opacity: 0;
 	}
 	to{
-		opacity: 0.45;
+		opacity: 0.4;
 	}
 `;
 
@@ -24,6 +24,12 @@ const CustomSegment = styled.div`
   margin-bottom: 0px;
   border-bottom: none;
   background-color: black;
+  /* background-color: #b46b7a; */
+  /* background: radial-gradient(
+      circle,
+      rgba(180, 104, 122, 1) 34%,
+      rgba(2, 0, 36, 1) 100%
+    ); */
   &:after {
     position: absolute;
     top: 0px;
@@ -35,13 +41,8 @@ const CustomSegment = styled.div`
     background-attachment: fixed;
     background-position: center;
     background-size: cover;
-    opacity: 0.45;
+    opacity: 0.4;
     z-index: -1;
-    /* background: radial-gradient(
-      circle,
-      rgba(180, 104, 122, 1) 34%,
-      rgba(2, 0, 36, 1) 100%
-    ); */
     animation: ${opacityChange} 3s ease-in;
   }
 `;
@@ -94,21 +95,14 @@ const MastHead: FC<{
         style={{
           minHeight: "350px",
           height: "auto",
+          // height: "100vh",
           padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
         }}
       >
         {children}
-        {user ? (
-          <ArrowWrapper onClick={() => scrollToRef()}>
-            <Arrow name="arrow down" />
-          </ArrowWrapper>
-        ) : (
-          <Link href="/login">
-            <Button inverted size="huge">
-              Log In
-            </Button>
-          </Link>
-        )}
+        <ArrowWrapper onClick={() => scrollToRef()}>
+          <Arrow name="arrow down" />
+        </ArrowWrapper>
       </Container>
     </CustomSegment>
   );

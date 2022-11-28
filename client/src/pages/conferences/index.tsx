@@ -11,9 +11,9 @@ import { NextPageWithLayout } from "../_app";
 
 const Home: NextPageWithLayout = () => {
   const width = useWith();
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const scrollToRef = () => ref.current.scrollIntoView({ behavior: "smooth" });
+  const scrollToRef = () => ref.current?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <>
