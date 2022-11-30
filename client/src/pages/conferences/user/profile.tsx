@@ -1,16 +1,16 @@
-import { NextPage } from "next";
 import { FC, useContext, useState } from "react";
 import { Grid, Menu, Segment } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
 import { ContentWrapper, Nav, PageWrapper } from "../../../components/Layout";
 import PersonalInfo from "../../../components/PersonalInfo";
 import { AuthContext } from "../../../providers/Auth";
+import { NextPageWithLayout } from "../../_app";
 
 const AttendedConferences: FC = () => {
   return <Segment>ATTENDED CONFERENCES</Segment>;
 };
 
-const ProfilePage: NextPage = () => {
+const ProfilePage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const [tab, setTab] = useState("personal");
 

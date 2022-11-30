@@ -1,10 +1,10 @@
-import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { Grid } from "semantic-ui-react";
 
 import { array, boolean, InferType, number, object, string } from "yup";
 import Footer from "../../components/Footer";
 import { ContentWrapper, Nav, PageWrapper } from "../../components/Layout";
+import { NextPageWithLayout } from "../_app";
 
 const conferenceInputSchema = object({
   name: string().required(),
@@ -69,7 +69,7 @@ const conferenceInputSchema = object({
 
 type Values = InferType<typeof conferenceInputSchema>;
 
-const NewConferencePage: NextPage = () => {
+const NewConferencePage: NextPageWithLayout = () => {
   const router = useRouter();
   const { slug } = router.query;
 

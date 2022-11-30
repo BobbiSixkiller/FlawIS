@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -12,11 +11,12 @@ import {
   Segment,
 } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
-import { MenuItemsContext, Nav } from "../../../components/Layout";
+import { Nav } from "../../../components/Layout";
 import MastHead from "../../../components/MastHead";
 import { Role } from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";
 import { AuthContext } from "../../../providers/Auth";
+import { MenuItemsContext } from "../../../providers/MenuItems";
 
 import { NextPageWithLayout } from "../../_app";
 
@@ -33,7 +33,7 @@ const ConferencePage: NextPageWithLayout = () => {
       <Menu.Item>
         <Menu.Header>Conference</Menu.Header>
         <Menu vertical inverted>
-          <Link href="register">
+          <Link href="#register" scroll={false}>
             <Menu.Item as="a" name="register" />
           </Link>
           {user && user.role === Role.Admin && (
@@ -149,7 +149,11 @@ const ConferencePage: NextPageWithLayout = () => {
                   vedecko-pedagogickým pracovníkom v odbore právo, ktorí
                   doposiaľ nezískali vedecko-pedagogický titul docent.
                 </p>
-                <Button size="massive" id="register">
+                <Button
+                  onClick={() => router.push(`/${slug}/dashboard`)}
+                  size="massive"
+                  id="register"
+                >
                   Register
                 </Button>
               </Grid.Column>

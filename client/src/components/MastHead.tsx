@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { FC, ReactElement, useContext } from "react";
-import { Button, Container, Icon, IconProps } from "semantic-ui-react";
+import { FC, ReactElement } from "react";
+import { Grid, Icon, IconProps } from "semantic-ui-react";
 import styled, { keyframes } from "styled-components";
 import useWith from "../hooks/useWidth";
-import { AuthContext } from "../providers/Auth";
 
 const opacityChange = keyframes`
 	from{
@@ -26,10 +25,10 @@ const CustomSegment = styled.div`
   background-color: black;
   /* background-color: #b46b7a; */
   /* background: radial-gradient(
-      circle,
-      rgba(180, 104, 122, 1) 34%,
-      rgba(2, 0, 36, 1) 100%
-    ); */
+    circle,
+    rgba(180, 104, 122, 1) 34%,
+    rgba(2, 0, 36, 1) 100%
+  ); */
   &:after {
     position: absolute;
     top: 0px;
@@ -84,12 +83,11 @@ const MastHead: FC<{
   children: ReactElement | ReactElement[];
   scrollToRef: () => void;
 }> = ({ children, scrollToRef }) => {
-  const { user } = useContext(AuthContext);
   const width = useWith();
 
   return (
     <CustomSegment>
-      <Container
+      {/* <Container
         text
         textAlign="center"
         style={{
@@ -98,12 +96,27 @@ const MastHead: FC<{
           // height: "100vh",
           padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
         }}
+      > */}
+      <Grid
+        centered
+        container
+        style={{
+          minHeight: "350px",
+          height: "auto",
+          // height: "100vh",
+          padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
+        }}
       >
-        {children}
-        <ArrowWrapper onClick={() => scrollToRef()}>
-          <Arrow name="arrow down" />
-        </ArrowWrapper>
-      </Container>
+        <Grid.Row>
+          <Grid.Column textAlign="center" verticalAlign="middle">
+            {children}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+      <ArrowWrapper onClick={() => scrollToRef()}>
+        <Arrow name="arrow down" />
+      </ArrowWrapper>
+      {/* </Container> */}
     </CustomSegment>
   );
 };

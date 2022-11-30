@@ -1,15 +1,7 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
 import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -20,6 +12,7 @@ import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
 import { Role, useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
+import { MenuItemsContext } from "../providers/MenuItems";
 
 interface navProps {
   inView: boolean;
@@ -61,10 +54,6 @@ export const ContentWrapper = styled.div`
   margin: 75px 0 2em 0;
 `;
 
-export const MenuItemsContext = createContext<{
-  setMenuItems: Dispatch<SetStateAction<ReactNode>>;
-}>({ setMenuItems: () => null });
-
 export function Nav({
   children,
   transparent,
@@ -74,9 +63,9 @@ export function Nav({
 }) {
   const { ref, inView } = useInView({ threshold: 1, initialInView: true });
   const [opened, toggle] = useState(false);
-  const [menuItems, setMenuItems] = useState<ReactNode>([]);
 
   const { user, dispatch } = useContext(AuthContext);
+  const { menuItems } = useContext(MenuItemsContext);
 
   const width = useWidth();
 
@@ -100,164 +89,155 @@ export function Nav({
   }, [router.asPath]);
 
   return (
-    <MenuItemsContext.Provider value={{ setMenuItems }}>
-      <Sidebar.Pushable>
-        <Sidebar
-          as={Menu}
-          animation="overlay"
-          inverted
-          onHide={() => toggle(false)}
-          vertical
-          visible={opened}
-          style={{
-            position: "fixed",
-            top: "0px",
-            bottom: "0px",
-            overflowY: "auto",
-          }}
-        >
-          <Link href="/">
-            <Menu.Item as="a" active={router.asPath === "/"}>
-              <Icon name="home" />
-              <b>Home</b>
-            </Menu.Item>
-          </Link>
-          {!user ? (
-            <>
-              <Link href="/login">
-                <Menu.Item as="a" active={router.asPath === "/login"}>
-                  <Icon name="sign in" />
-                  <b>Login</b>
-                </Menu.Item>
+    <Sidebar.Pushable>
+      <Sidebar
+        as={Menu}
+        animation="overlay"
+        inverted
+        onHide={() => toggle(false)}
+        vertical
+        visible={opened}
+        style={{
+          position: "fixed",
+          top: "0px",
+          bottom: "0px",
+          overflowY: "auto",
+        }}
+      >
+        <Link href="/">
+          <Menu.Item as="a" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>Home</b>
+          </Menu.Item>
+        </Link>
+        {!user ? (
+          <>
+            <Link href="/login">
+              <Menu.Item as="a" active={router.asPath === "/login"}>
+                <Icon name="sign in" />
+                <b>Login</b>
+              </Menu.Item>
+            </Link>
+            <Link href="/register">
+              <Menu.Item as="a" active={router.asPath === "/register"}>
+                <Icon name="signup" />
+                <b>Register</b>
+              </Menu.Item>
+            </Link>
+          </>
+        ) : (
+          <Menu.Item>
+            <Menu.Header>{user.name}</Menu.Header>
+            <Menu vertical inverted>
+              <Link href="/user/profile">
+                <Menu.Item
+                  as="a"
+                  name="Personal Information"
+                  active={router.asPath === "/user/profile"}
+                />
               </Link>
-              <Link href="/register">
-                <Menu.Item as="a" active={router.asPath === "/register"}>
-                  <Icon name="signup" />
-                  <b>Register</b>
-                </Menu.Item>
-              </Link>
-            </>
-          ) : (
-            <Menu.Item>
-              <Menu.Header>{user.name}</Menu.Header>
-              <Menu vertical inverted>
-                <Link href="/user/profile">
-                  <Menu.Item
-                    as="a"
-                    name="Personal Information"
-                    active={router.asPath === "/user/profile"}
-                  />
+              {user.role === Role.Admin && (
+                <Link href="/new">
+                  <Menu.Item as="a" name="new conference" />
                 </Link>
-                {user.role === Role.Admin && (
-                  <Link href="/new">
-                    <Menu.Item as="a" name="new conference" />
+              )}
+              <Link href="/">
+                <Menu.Item as="a" name="Sign out" onClick={() => logout()} />
+              </Link>
+            </Menu>
+          </Menu.Item>
+        )}
+        {menuItems}
+      </Sidebar>
+
+      <Sidebar.Pusher dimmed={opened}>
+        <div ref={ref}>
+          <FollowingBar inView={inView} width={width} transparent={transparent}>
+            <Container>
+              <Menu
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+                inverted={inView && transparent ? true : false}
+                secondary
+                size="large"
+              >
+                {width > 550 && (
+                  <Link href="/">
+                    <Menu.Item>
+                      <Image
+                        alt="flaw-logo-notext"
+                        src={inView && transparent ? logoInverted : logo}
+                        height={35}
+                        width={35}
+                        priority={true}
+                      />
+                    </Menu.Item>
                   </Link>
                 )}
-                <Link href="/">
-                  <Menu.Item as="a" name="Sign out" onClick={() => logout()} />
-                </Link>
-              </Menu>
-            </Menu.Item>
-          )}
-          {menuItems}
-        </Sidebar>
-
-        <Sidebar.Pusher dimmed={opened}>
-          <div ref={ref}>
-            <FollowingBar
-              inView={inView}
-              width={width}
-              transparent={transparent}
-            >
-              <Container>
-                <Menu
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                  inverted={inView && transparent ? true : false}
-                  secondary
-                  size="large"
+                <Menu.Item
+                  style={{ marginLeft: 0, marginRight: 0 }}
+                  onClick={() => toggle(true)}
                 >
-                  {width > 550 && (
-                    <Link href="/">
-                      <Menu.Item>
-                        <Image
-                          alt="flaw-logo-notext"
-                          src={inView && transparent ? logoInverted : logo}
-                          height={35}
-                          width={35}
-                          priority={true}
-                        />
-                      </Menu.Item>
-                    </Link>
-                  )}
-                  <Menu.Item
-                    style={{ marginLeft: 0, marginRight: 0 }}
-                    onClick={() => toggle(true)}
+                  <Icon name="sidebar" /> {width > 550 && "Menu"}
+                </Menu.Item>
+
+                {width < 550 && (
+                  <Link href="/" style={{ marginLeft: "auto", marginRight: 0 }}>
+                    <Menu.Item>
+                      <Image
+                        alt="flaw-logo-notext"
+                        src={inView && transparent ? logoInverted : logo}
+                        height={35}
+                        width={35}
+                        priority={true}
+                      />
+                    </Menu.Item>
+                  </Link>
+                )}
+                <Menu.Menu position="right">
+                  <Dropdown
+                    item
+                    icon="world"
+                    style={{ marginLeft: "auto", marginRight: 0 }}
                   >
-                    <Icon name="sidebar" /> {width > 550 && "Menu"}
-                  </Menu.Item>
+                    <Dropdown.Menu>
+                      <Dropdown.Header content="Language" />
+                      <Dropdown.Item
+                        style={{ textAlign: "center" }}
+                        key={1}
+                        text={"English"}
+                        value={"English"}
+                        onClick={() => {
+                          document.cookie = `NEXT_LOCALE=en; max-age=31536000; path=/`;
+                          router.push(router.asPath, router.asPath, {
+                            locale: "en",
+                          });
+                        }}
+                      />
+                      <Dropdown.Item
+                        style={{ textAlign: "center" }}
+                        key={2}
+                        text={"Slovak"}
+                        value={"Slovak"}
+                        onClick={() => {
+                          document.cookie = `NEXT_LOCALE=sk; max-age=31536000; path=/`;
+                          router.push(router.asPath, router.asPath, {
+                            locale: "sk",
+                          });
+                        }}
+                      />
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </Menu.Menu>
+              </Menu>
+            </Container>
+          </FollowingBar>
+        </div>
 
-                  {width < 550 && (
-                    <Link
-                      href="/"
-                      style={{ marginLeft: "auto", marginRight: 0 }}
-                    >
-                      <Menu.Item>
-                        <Image
-                          alt="flaw-logo-notext"
-                          src={inView && transparent ? logoInverted : logo}
-                          height={35}
-                          width={35}
-                          priority={true}
-                        />
-                      </Menu.Item>
-                    </Link>
-                  )}
-                  <Menu.Menu position="right">
-                    <Dropdown
-                      item
-                      icon="world"
-                      style={{ marginLeft: "auto", marginRight: 0 }}
-                    >
-                      <Dropdown.Menu>
-                        <Dropdown.Header content="Language" />
-                        <Dropdown.Item
-                          style={{ textAlign: "center" }}
-                          key={1}
-                          text={"English"}
-                          value={"English"}
-                          onClick={() => {
-                            document.cookie = `NEXT_LOCALE=en; max-age=31536000; path=/`;
-                            router.push(router.asPath, router.asPath, {
-                              locale: "en",
-                            });
-                          }}
-                        />
-                        <Dropdown.Item
-                          style={{ textAlign: "center" }}
-                          key={2}
-                          text={"Slovak"}
-                          value={"Slovak"}
-                          onClick={() => {
-                            document.cookie = `NEXT_LOCALE=sk; max-age=31536000; path=/`;
-                            router.push(router.asPath, router.asPath, {
-                              locale: "sk",
-                            });
-                          }}
-                        />
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </Menu.Menu>
-                </Menu>
-              </Container>
-            </FollowingBar>
-          </div>
-
-          {children}
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
-    </MenuItemsContext.Provider>
+        {children}
+      </Sidebar.Pusher>
+    </Sidebar.Pushable>
   );
 }

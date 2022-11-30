@@ -11,6 +11,9 @@ import { AuthProvider } from "../providers/Auth";
 import ProtectedRouteProvider from "../providers/ProtectedRoute";
 import { ReactElement, ReactNode } from "react";
 import { AppProps } from "next/app";
+import { MenuItemsProvider } from "../providers/MenuItems";
+import { DialogProvider } from "../providers/Dialog";
+import UserVerifiedDialog from "../components/UserVerifiedDialog";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -31,7 +34,12 @@ const App: NextPage<AppPropsWithLayout> = ({ Component, pageProps }) => {
     <ApolloProvider client={apolloClient}>
       <AuthProvider>
         <ProtectedRouteProvider protect={protect}>
-          {getLayout(<Component {...pageProps} />)}
+          <MenuItemsProvider>
+            <DialogProvider>
+              {getLayout(<Component {...pageProps} />)}
+              <UserVerifiedDialog />
+            </DialogProvider>
+          </MenuItemsProvider>
         </ProtectedRouteProvider>
       </AuthProvider>
     </ApolloProvider>

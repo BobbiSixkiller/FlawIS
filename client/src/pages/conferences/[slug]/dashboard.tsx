@@ -5,7 +5,7 @@ import { ContentWrapper, Nav, PageWrapper } from "../../../components/Layout";
 
 import { NextPageWithLayout } from "../../_app";
 
-const AttendeesPage: NextPageWithLayout = () => {
+const Dashboard: NextPageWithLayout = () => {
   const router = useRouter();
 
   return (
@@ -23,7 +23,7 @@ const AttendeesPage: NextPageWithLayout = () => {
   );
 };
 
-AttendeesPage.getLayout = function getLayout(page) {
+Dashboard.getLayout = function getLayout(page) {
   return (
     <Nav transparent={false}>
       <PageWrapper>
@@ -34,8 +34,8 @@ AttendeesPage.getLayout = function getLayout(page) {
   );
 };
 
-AttendeesPage.getInitialProps = () => {
-  return { admin: true };
+Dashboard.getInitialProps = () => {
+  return { protect: true };
 };
 
-export default AttendeesPage;
+export default Dashboard;
