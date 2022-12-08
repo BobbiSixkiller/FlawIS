@@ -1,8 +1,6 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { I18nResolver, I18nResolverOptions } from 'nestjs-i18n';
 
-import { isRabbitContext } from '@golevelup/nestjs-rabbitmq';
-
 @Injectable()
 export class CustomResolver implements I18nResolver {
   constructor(@I18nResolverOptions() private keys: string[]) {}

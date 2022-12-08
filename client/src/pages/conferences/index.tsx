@@ -1,7 +1,6 @@
 import { Segment, Grid, Header, Button, Label } from "semantic-ui-react";
 import Link from "next/link";
 import Image from "next/image";
-import { NextPage } from "next";
 import useWith from "../../hooks/useWidth";
 import { useRef } from "react";
 import MastHead from "../../components/MastHead";

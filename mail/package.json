@@ -30,7 +30,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "handlebars": "^4.7.7",
     "joi": "^17.6.3",
-    "nestjs-i18n": "^9.2.1",
+    "nestjs-i18n": "^9.2.3",
     "nodemailer": "^6.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

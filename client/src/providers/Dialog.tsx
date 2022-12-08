@@ -1,5 +1,6 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { Button, Modal } from "semantic-ui-react";
+import { AuthContext } from "./Auth";
 
 interface DialogState {
   content: ReactNode;
@@ -26,6 +27,7 @@ export const DialogContext = createContext<DialogContextProps>({
 export function DialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<DialogState>({ content: null });
+  const { loading } = useContext(AuthContext);
 
   const handleOpen = (values: DialogState) => {
     setValues(values);
@@ -48,7 +50,11 @@ export function DialogProvider({ children }: { children: ReactNode }) {
 
   return (
     <DialogContext.Provider value={{ state: values, handleOpen }}>
-      <Modal open={open} trigger={values.trigger} size={values.size}>
+      <Modal
+        open={!loading && open}
+        trigger={values.trigger}
+        size={values.size}
+      >
         {values.header && <Modal.Header>{values.header}</Modal.Header>}
         <Modal.Content>{values.content}</Modal.Content>
         {values.confirmCb && (

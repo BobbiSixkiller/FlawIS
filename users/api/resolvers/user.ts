@@ -144,6 +144,16 @@ export class UserResolver {
     if (!loggedInUser)
       throw new AuthenticationError("User account has been deleted!");
 
+    messageBroker.produceMessage(
+      JSON.stringify({
+        locale,
+        name: loggedInUser.name,
+        email: loggedInUser.email,
+        token: signJwt({ id: loggedInUser.id }, { expiresIn: "1d" }),
+      }),
+      "mail.registration"
+    );
+
     return loggedInUser;
   }
 

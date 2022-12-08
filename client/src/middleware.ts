@@ -8,7 +8,11 @@ export default function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const hostname = req.headers.get("host");
 
-  if (["/login", "/forgotPassword", "/resetPassword"].includes(url.pathname)) {
+  if (
+    ["/login", "/forgotPassword", "/resetPassword", "/activate"].includes(
+      url.pathname
+    )
+  ) {
     url.pathname = `/auth${url.pathname}`;
     return NextResponse.rewrite(url);
   }

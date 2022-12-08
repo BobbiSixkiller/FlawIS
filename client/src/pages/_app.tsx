@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import { ApolloProvider } from "@apollo/client";
 
 import "semantic-ui-css/semantic.min.css";
-import "./app.css";
 
 import { useApollo } from "../lib/apollo";
 import { appWithTranslation } from "next-i18next";

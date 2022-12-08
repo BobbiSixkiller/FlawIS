@@ -1,13 +1,11 @@
 <html>
   <head></head>
   <body>
-    {{t 'common.greetings'}}
-    {{name}}
-    <br />
-    <br />
-    Thank you for registering in our app.<br />
-    Click on the link to confirm your account.<br />
-    <br />
-    {{url}}
+    <h1>{{t 'activation.subject'}}</h1>
+    <p>{{t 'common.greetings'}}
+      {{name}}
+    </p>
+    <p>{{t 'activation.body'}}</p>
+    <a href={{url}}>{{t 'activation.link'}}</a>
   </body>
 </html>

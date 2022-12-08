@@ -23,7 +23,7 @@ export class EmailService {
   })
   async sendActivationLink(msg: AuthMsg) {
     console.log(msg);
-    const url = `http://localhost:3010/${msg.locale}/reset/${msg.token}`;
+    const url = `http://localhost:3000/${msg.locale}/activate?token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -34,7 +34,7 @@ export class EmailService {
         // ✏️ filling curly brackets with content
         name: msg.name,
         url,
-        // i18nLang: msg.locale,
+        i18nLang: msg.locale,
       },
     });
   }
@@ -43,7 +43,23 @@ export class EmailService {
     exchange: 'FlawIS',
     routingKey: 'mail.reset',
   })
-  async sendResetLink(msg: AuthMsg) {}
+  async sendResetLink(msg: AuthMsg) {
+    console.log(msg);
+    const url = `http://localhost:3000/${msg.locale}/resetPassword?token=${msg.token}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: this.i18n.t('passwordReset.subject'),
+      template: 'passwordReset',
+      context: {
+        // ✏️ filling curly brackets with content
+        name: msg.name,
+        url,
+        i18nLang: msg.locale,
+      },
+    });
+  }
 
   @RabbitSubscribe({
     exchange: 'FlawIS',

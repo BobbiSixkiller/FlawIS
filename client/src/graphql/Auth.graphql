@@ -60,6 +60,10 @@ mutation register($data: RegisterInput!) {
   }
 }
 
+mutation activateUser($token: String!) {
+  activateUser(token: $token)
+}
+
 mutation logout {
   logout
 }
