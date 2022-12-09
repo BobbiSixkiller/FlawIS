@@ -16,7 +16,7 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <>
-      <MastHead scrollToRef={scrollToRef}>
+      <MastHead isHomePage={true} scrollToRef={scrollToRef}>
         <Label
           color="black"
           style={{ marginRight: 0 }}

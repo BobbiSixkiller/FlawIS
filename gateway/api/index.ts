@@ -6,6 +6,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-co
 import Express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 import {
@@ -13,10 +14,9 @@ import {
   createContext,
   isAuthMiddleware,
 } from "./util/auth";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import waitForServices from "./util/waitForServices";
 
 import env from "dotenv";
-import waitForServices from "./util/waitForServices";
 
 env.config();
 

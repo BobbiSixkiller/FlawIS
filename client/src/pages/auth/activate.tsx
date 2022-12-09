@@ -2,18 +2,25 @@ import { NextPage } from "next";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import NextLink from "next/link";
-import { Button, Grid, Header, Message } from "semantic-ui-react";
+import { Grid, Header, Loader } from "semantic-ui-react";
 import logo from "public/images/Flaw-logo-notext.png";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useActivateUserMutation } from "../../graphql/generated/schema";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const ActivateUserAccount: NextPage = () => {
-  const { query } = useRouter();
+  const { query, push, reload } = useRouter();
   const { t } = useTranslation("activation");
+  const mount = useRef(false);
 
-  const [activateAccount, { error }] = useActivateUserMutation();
+  const [activateAccount, { loading }] = useActivateUserMutation({
+    onCompleted: (data) => {
+      if (!data.activateUser) push("/");
+      window.location.reload();
+    },
+    onError: () => push("/"),
+  });
 
   useEffect(() => {
     async function activateUserAcc() {
@@ -21,9 +28,13 @@ const ActivateUserAccount: NextPage = () => {
         variables: { token: query.token as string },
       });
     }
+    if (mount.current) return;
+    mount.current = true;
 
-    activateAccount();
+    activateUserAcc();
   }, []);
+
+  if (loading) return <Loader active />;
 
   return (
     <Grid container centered>
@@ -50,19 +61,9 @@ const ActivateUserAccount: NextPage = () => {
             </NextLink>
           </div>
 
-          {error && (
-            <Message error icon="warning">
-              {error.message}
-            </Message>
-          )}
-
           <Header as="h2" textAlign="center">
             {t("header")}
           </Header>
-
-          <Button primary as={NextLink} href="/">
-            {t("link")}
-          </Button>
         </Grid.Column>
       </Grid.Row>
     </Grid>

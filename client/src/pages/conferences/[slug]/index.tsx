@@ -100,7 +100,7 @@ const ConferencePage: NextPageWithLayout = () => {
 
   return (
     <>
-      <MastHead scrollToRef={scrollToRef}>
+      <MastHead isHomePage={false} scrollToRef={scrollToRef}>
         <div
           style={{
             margin: "auto",

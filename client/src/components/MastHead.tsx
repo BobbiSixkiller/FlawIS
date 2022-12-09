@@ -13,7 +13,13 @@ const opacityChange = keyframes`
 	}
 `;
 
-const CustomSegment = styled.div`
+interface MastHeadProps {
+  isHomePage: boolean;
+}
+
+const CustomSegment = styled.div<MastHeadProps>`
+  min-height: 350px;
+  height: ${(props) => (props.isHomePage ? "auto" : "100vh")};
   z-index: 3;
   position: relative;
   overflow: hidden;
@@ -37,7 +43,8 @@ const CustomSegment = styled.div`
     height: 100%;
     content: "";
     background-image: url("/images/background-main.jpg");
-    background-attachment: fixed;
+    background-attachment: ${(props) =>
+      props.isHomePage ? "scroll" : "fixed"};
     background-position: center;
     background-size: cover;
     opacity: 0.4;
@@ -82,28 +89,17 @@ export const Arrow: FC<IconProps> = styled(Icon)`
 const MastHead: FC<{
   children: ReactElement | ReactElement[];
   scrollToRef: () => void;
-}> = ({ children, scrollToRef }) => {
+  isHomePage: boolean;
+}> = ({ children, scrollToRef, isHomePage }) => {
   const width = useWith();
 
   return (
-    <CustomSegment>
-      {/* <Container
-        text
-        textAlign="center"
-        style={{
-          minHeight: "350px",
-          height: "auto",
-          // height: "100vh",
-          padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
-        }}
-      > */}
+    <CustomSegment isHomePage={isHomePage}>
       <Grid
         centered
         container
         style={{
-          minHeight: "350px",
-          height: "auto",
-          // height: "100vh",
+          height: "100%",
           padding: width > 600 ? "15rem 0rem" : "6rem 0rem",
         }}
       >
@@ -113,10 +109,11 @@ const MastHead: FC<{
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <ArrowWrapper onClick={() => scrollToRef()}>
-        <Arrow name="arrow down" />
-      </ArrowWrapper>
-      {/* </Container> */}
+      {!isHomePage && (
+        <ArrowWrapper onClick={() => scrollToRef()}>
+          <Arrow name="arrow down" />
+        </ArrowWrapper>
+      )}
     </CustomSegment>
   );
 };

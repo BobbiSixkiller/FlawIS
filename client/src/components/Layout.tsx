@@ -104,46 +104,48 @@ export function Nav({
           overflowY: "auto",
         }}
       >
-        <Link href="/">
-          <Menu.Item as="a" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>Home</b>
-          </Menu.Item>
-        </Link>
+        <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+          <Icon name="home" />
+          <b>Home</b>
+        </Menu.Item>
         {!user ? (
           <>
-            <Link href="/login">
-              <Menu.Item as="a" active={router.asPath === "/login"}>
-                <Icon name="sign in" />
-                <b>Login</b>
-              </Menu.Item>
-            </Link>
-            <Link href="/register">
-              <Menu.Item as="a" active={router.asPath === "/register"}>
-                <Icon name="signup" />
-                <b>Register</b>
-              </Menu.Item>
-            </Link>
+            <Menu.Item
+              as={Link}
+              href="/login"
+              active={router.asPath === "/login"}
+            >
+              <Icon name="sign in" />
+              <b>Login</b>
+            </Menu.Item>
+            <Menu.Item
+              as={Link}
+              href="/register"
+              active={router.asPath === "/register"}
+            >
+              <Icon name="signup" />
+              <b>Register</b>
+            </Menu.Item>
           </>
         ) : (
           <Menu.Item>
             <Menu.Header>{user.name}</Menu.Header>
             <Menu vertical inverted>
-              <Link href="/user/profile">
-                <Menu.Item
-                  as="a"
-                  name="Personal Information"
-                  active={router.asPath === "/user/profile"}
-                />
-              </Link>
+              <Menu.Item
+                as={Link}
+                href="/user/profile"
+                name="Personal Information"
+                active={router.asPath === "/user/profile"}
+              />
               {user.role === Role.Admin && (
-                <Link href="/new">
-                  <Menu.Item as="a" name="new conference" />
-                </Link>
+                <Menu.Item as={Link} href="/new" name="new conference" />
               )}
-              <Link href="/">
-                <Menu.Item as="a" name="Sign out" onClick={() => logout()} />
-              </Link>
+              <Menu.Item
+                as={Link}
+                href="/"
+                name="Sign out"
+                onClick={() => logout()}
+              />
             </Menu>
           </Menu.Item>
         )}
