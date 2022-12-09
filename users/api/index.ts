@@ -17,6 +17,7 @@ import { authChecker } from "./util/auth";
 import Messagebroker from "./services/messageBroker";
 
 import env from "dotenv";
+import { initRedis } from "./util/redis";
 
 env.config();
 
@@ -61,6 +62,8 @@ async function main() {
 
   await Messagebroker.init();
   Messagebroker.consumeMessages(["user.update.billings"]);
+
+  await initRedis();
 
   await server.listen({ port: process.env.PORT || 5001 }, () =>
     console.log(

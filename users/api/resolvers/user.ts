@@ -194,9 +194,7 @@ export class UserResolver {
         { verified: true }
       );
 
-      if (modifiedCount > 0) {
-        return true;
-      } else throw new Error("User account already activated!");
+      return modifiedCount > 0;
     }
 
     return false;
