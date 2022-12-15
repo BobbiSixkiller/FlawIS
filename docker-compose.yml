@@ -125,7 +125,6 @@ services:
     ports:
       - "6379:6379"
   db:
-    container_name: mongodb
     image: mongo
     restart: unless-stopped
     ports:

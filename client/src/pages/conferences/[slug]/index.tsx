@@ -11,7 +11,7 @@ import {
   Segment,
 } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
-import { Nav } from "../../../components/Layout";
+import { Nav } from "../../../components/Nav";
 import MastHead from "../../../components/MastHead";
 import { Role } from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";

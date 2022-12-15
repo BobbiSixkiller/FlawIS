@@ -26,12 +26,8 @@ export default function middleware(req: NextRequest) {
       url.pathname = `/grants${url.pathname}`;
       return NextResponse.rewrite(url);
 
-    case "db:3000":
-      url.pathname = `/grants${url.pathname}`;
-      return NextResponse.rewrite(url);
-
     case "localhost:3000":
-      url.pathname = `/conferences${url.pathname}`;
+      url.pathname = `/grants${url.pathname}`;
       return NextResponse.rewrite(url);
 
     default:

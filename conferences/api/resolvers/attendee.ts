@@ -25,7 +25,7 @@ import { VerifiedTicket } from "../util/types";
 import { CheckTicket } from "../util/decorators";
 
 import env from "dotenv";
-import Messagebroker from "../services/messageBroker";
+import Messagebroker from "../util/rmq";
 
 env.config();
 

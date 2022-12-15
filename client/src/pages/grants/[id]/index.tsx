@@ -2,9 +2,7 @@ import { useRouter } from "next/router";
 import { Grid } from "semantic-ui-react";
 
 import { array, boolean, InferType, number, object, string } from "yup";
-import Footer from "../../components/Footer";
-import { ContentWrapper, Nav, PageWrapper } from "../../components/Nav";
-import { NextPageWithLayout } from "../_app";
+import { NextPageWithLayout } from "../../_app";
 
 const conferenceInputSchema = object({
   name: string().required(),
@@ -69,11 +67,10 @@ const conferenceInputSchema = object({
 
 type Values = InferType<typeof conferenceInputSchema>;
 
-const NewConferencePage: NextPageWithLayout = () => {
+const GrantPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const { slug } = router.query;
 
-  console.log(router.query);
+  console.log(router);
 
   return (
     <Grid columns={2} container stackable>
@@ -85,7 +82,7 @@ const NewConferencePage: NextPageWithLayout = () => {
   );
 };
 
-NewConferencePage.getLayout = function getLayout(page) {
+GrantPage.getLayout = function getLayout(page) {
   return (
     <Nav transparent={false}>
       <PageWrapper>
@@ -96,8 +93,8 @@ NewConferencePage.getLayout = function getLayout(page) {
   );
 };
 
-NewConferencePage.getInitialProps = () => {
+GrantPage.getInitialProps = () => {
   return { admin: true };
 };
 
-export default NewConferencePage;
+export default GrantPage;

@@ -4,9 +4,9 @@ import Image from "next/image";
 import useWith from "../../hooks/useWidth";
 import { useRef } from "react";
 import MastHead from "../../components/MastHead";
-import { Nav } from "../../components/Layout";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";
+import Nav from "../../components/Nav";
 
 const Home: NextPageWithLayout = () => {
   const width = useWith();

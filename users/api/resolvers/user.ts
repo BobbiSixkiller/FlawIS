@@ -1,4 +1,4 @@
-import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
+import { Arg, Args, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
 import { ObjectId, ChangeStreamDocument } from "mongodb";
 import { Service } from "typedi";
 import { User, UserConnection } from "../entitites/User";
@@ -16,7 +16,8 @@ import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
 import { ResetToken } from "../util/types";
-import messageBroker from "../services/messageBroker";
+import messageBroker from "../util/rmq";
+import { RateLimit } from "../middlewares/ratelimit-middleware";
 
 @Service()
 @Resolver()
@@ -60,9 +61,9 @@ export class UserResolver {
       });
   }
 
-  @Authorized(["ADMIN", "IS_OWN_USER"])
+  @Authorized(["ADMIN"])
   @Query(() => User)
-  async user(@Arg("id") id: ObjectId): Promise<User> {
+  async user(@Arg("id") id: ObjectId) {
     const user = await this.userService.findOne({ _id: id });
     if (!user) throw new Error("User not found!");
 
@@ -71,7 +72,7 @@ export class UserResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
-  async users(@Args() { first, after }: UserArgs): Promise<UserConnection> {
+  async users(@Args() { first, after }: UserArgs) {
     const users = await this.userService.aggregate([
       {
         $facet: {
@@ -138,8 +139,9 @@ export class UserResolver {
   }
 
   @Authorized()
+  @UseMiddleware([RateLimit(50)])
   @Query(() => User)
-  async me(@Ctx() { user, locale }: Context): Promise<User> {
+  async me(@Ctx() { user, locale }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
     if (!loggedInUser)
       throw new AuthenticationError("User account has been deleted!");
@@ -158,6 +160,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
     @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
@@ -186,7 +189,8 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async activateUser(@Arg("token") token: string): Promise<boolean> {
+  @UseMiddleware([RateLimit(50)])
+  async activateUser(@Arg("token") token: string) {
     const user: Partial<User> | null = verifyJwt(token);
     if (user) {
       const { modifiedCount } = await this.userService.update(
@@ -201,11 +205,12 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @UseMiddleware([RateLimit(50)])
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string,
     @Ctx() { res }: Context
-  ): Promise<User> {
+  ) {
     const user = await this.userService.findOne({ email });
     if (!user) throw new AuthenticationError("Invalid credentials!");
 
@@ -231,10 +236,11 @@ export class UserResolver {
   }
 
   @Query(() => String)
+  @UseMiddleware([RateLimit(50)])
   async forgotPassword(
     @Arg("email") email: string,
     @Ctx() { locale }: Context
-  ): Promise<string> {
+  ) {
     const user = await this.userService.findOne({ email });
     if (!user)
       throw new UserInputError("No user with provided email address found!");
@@ -250,10 +256,11 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @UseMiddleware([RateLimit(10)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
     @Ctx() { req }: Context
-  ): Promise<User> {
+  ) {
     const token = req.headers.resettoken;
     const userId: ResetToken = verifyJwt(token as string);
     if (!userId) throw new Error("Reset token expired!");
@@ -267,11 +274,9 @@ export class UserResolver {
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
+  @UseMiddleware([RateLimit(10)])
   @Mutation(() => User)
-  async updateUser(
-    @Arg("id") id: ObjectId,
-    @Arg("data") userInput: UserInput
-  ): Promise<User> {
+  async updateUser(@Arg("id") id: ObjectId, @Arg("data") userInput: UserInput) {
     const user = await this.userService.findOne({ _id: id });
     if (!user) throw new UserInputError("User not found!");
 

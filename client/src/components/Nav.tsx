@@ -1,6 +1,13 @@
 import styled from "styled-components";
 import { useInView } from "react-intersection-observer";
-import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
+import {
+  Container,
+  Dropdown,
+  Menu,
+  Icon,
+  Sidebar,
+  Button,
+} from "semantic-ui-react";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +17,7 @@ import logo from "public/images/Flaw-logo-notext.png";
 
 import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
-import { Role, useLogoutMutation } from "../graphql/generated/schema";
+import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import { MenuItemsContext } from "../providers/MenuItems";
 
@@ -54,7 +61,7 @@ export const ContentWrapper = styled.div`
   margin: 75px 0 2em 0;
 `;
 
-export function Nav({
+export default function Nav({
   children,
   transparent,
 }: {
@@ -134,12 +141,9 @@ export function Nav({
               <Menu.Item
                 as={Link}
                 href="/user/profile"
-                name="Personal Information"
+                name="Profile"
                 active={router.asPath === "/user/profile"}
               />
-              {user.role === Role.Admin && (
-                <Menu.Item as={Link} href="/new" name="new conference" />
-              )}
               <Menu.Item
                 as={Link}
                 href="/"
@@ -182,11 +186,15 @@ export function Nav({
                   style={{ marginLeft: 0, marginRight: 0 }}
                   onClick={() => toggle(true)}
                 >
-                  <Icon name="sidebar" /> {width > 550 && "Menu"}
+                  <Icon name="sidebar" />
+                  {width > 550 && "Menu"}
                 </Menu.Item>
 
                 {width < 550 && (
-                  <Link href="/" style={{ marginLeft: "auto", marginRight: 0 }}>
+                  <Link
+                    href="/"
+                    style={{ marginLeft: "auto", marginRight: "-60px" }}
+                  >
                     <Menu.Item>
                       <Image
                         alt="flaw-logo-notext"
@@ -199,6 +207,15 @@ export function Nav({
                   </Link>
                 )}
                 <Menu.Menu position="right">
+                  {user ? (
+                    <Menu.Item onClick={() => logout()}>
+                      <Icon name="sign out" />
+                    </Menu.Item>
+                  ) : (
+                    <Menu.Item onClick={() => router.push("/login")}>
+                      <Icon name="sign in" />
+                    </Menu.Item>
+                  )}
                   <Dropdown
                     item
                     icon="world"

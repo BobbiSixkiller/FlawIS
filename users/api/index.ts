@@ -5,7 +5,7 @@ import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "./util/scalars";
-import { TypegooseMiddleware } from "./util/typegoose-middleware";
+import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
 
 import { UserResolver } from "./resolvers/user";
 
@@ -14,7 +14,7 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
-import Messagebroker from "./services/messageBroker";
+import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
 import { initRedis } from "./util/redis";

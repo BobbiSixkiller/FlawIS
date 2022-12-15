@@ -5,7 +5,7 @@ import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "./util/scalars";
-import { TypegooseMiddleware } from "./util/typegoose-middleware";
+import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
 
 import { ConferenceResolver } from "./resolvers/conference";
 
@@ -13,7 +13,7 @@ import { buildFederatedSchema } from "./util/buildFederatedSchema";
 
 import { Context } from "./util/auth";
 import { authChecker } from "./util/auth";
-import MessageBroker from "./services/messageBroker";
+import MessageBroker from "./util/rmq";
 
 import { AttendeeResolver } from "./resolvers/attendee";
 import { SectionResolver } from "./resolvers/section";
