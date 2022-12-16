@@ -11,12 +11,12 @@ import {
   Segment,
 } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
-import { Nav } from "../../../components/Nav";
 import MastHead from "../../../components/MastHead";
+import Nav from "../../../components/Nav";
 import { Role } from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";
 import { AuthContext } from "../../../providers/Auth";
-import { MenuItemsContext } from "../../../providers/MenuItems";
+import { MenuItemsContext } from "../../../providers/ControlsProvider";
 
 import { NextPageWithLayout } from "../../_app";
 
@@ -244,7 +244,7 @@ const ConferencePage: NextPageWithLayout = () => {
 
 ConferencePage.getLayout = function getLayout(page) {
   return (
-    <Nav transparent={true}>
+    <Nav transparent={true} locales={true}>
       {page}
       <Footer />
     </Nav>

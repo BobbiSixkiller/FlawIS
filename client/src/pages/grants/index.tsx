@@ -1,12 +1,8 @@
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
-import { Grid, Header, Placeholder, Segment } from "semantic-ui-react";
+import { Grid, Placeholder, Segment } from "semantic-ui-react";
 
 import { array, boolean, InferType, number, object, string } from "yup";
 import Dashboard from "../../components/Dashboard";
-import { ContentWrapper, Nav, PageWrapper } from "../../components/Nav";
-import useWith from "../../hooks/useWidth";
-import { MenuItemsContext } from "../../providers/MenuItems";
 import { NextPageWithLayout } from "../_app";
 
 const conferenceInputSchema = object({
@@ -216,14 +212,11 @@ const HomePage: NextPageWithLayout = () => {
 };
 
 HomePage.getLayout = function getLayout(page) {
-  const width = useWith();
-  console.log(width);
-
   return <Dashboard>{page}</Dashboard>;
 };
 
 HomePage.getInitialProps = () => {
-  return { admin: true };
+  return { protect: true };
 };
 
 export default HomePage;

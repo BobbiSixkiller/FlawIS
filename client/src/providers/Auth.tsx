@@ -25,10 +25,10 @@ type ActionPayload = {
 
 type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
-interface AuthStateType {
+type AuthStateType = {
   loading: boolean;
   user: Partial<User> | null;
-}
+};
 
 function authReducer(state: AuthStateType, action: AuthActions) {
   switch (action.type) {

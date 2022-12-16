@@ -11,7 +11,7 @@ import { AuthProvider } from "../providers/Auth";
 import ProtectedRouteProvider from "../providers/ProtectedRoute";
 import { ReactElement, ReactNode } from "react";
 import { AppProps } from "next/app";
-import { MenuItemsProvider } from "../providers/MenuItems";
+import { MenuItemsProvider } from "../providers/ControlsProvider";
 import { DialogProvider } from "../providers/Dialog";
 import UserVerifiedDialog from "../components/UserVerifiedDialog";
 

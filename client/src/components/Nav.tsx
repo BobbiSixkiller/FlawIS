@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
 import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
-import { MenuItemsContext } from "../providers/MenuItems";
+import { MenuItemsContext } from "../providers/ControlsProvider";
 
 interface navProps {
   inView: boolean;
@@ -64,9 +64,11 @@ export const ContentWrapper = styled.div`
 export default function Nav({
   children,
   transparent,
+  locales,
 }: {
   children: ReactNode;
   transparent: boolean;
+  locales?: boolean;
 }) {
   const { ref, inView } = useInView({ threshold: 1, initialInView: true });
   const [opened, toggle] = useState(false);
@@ -193,7 +195,10 @@ export default function Nav({
                 {width < 550 && (
                   <Link
                     href="/"
-                    style={{ marginLeft: "auto", marginRight: "-60px" }}
+                    style={{
+                      marginLeft: "auto",
+                      marginRight: locales ? "-60px" : 0,
+                    }}
                   >
                     <Menu.Item>
                       <Image
@@ -208,47 +213,55 @@ export default function Nav({
                 )}
                 <Menu.Menu position="right">
                   {user ? (
-                    <Menu.Item onClick={() => logout()}>
+                    <Menu.Item
+                      onClick={() => logout()}
+                      style={{ marginLeft: 0, marginRight: 0 }}
+                    >
                       <Icon name="sign out" />
                     </Menu.Item>
                   ) : (
-                    <Menu.Item onClick={() => router.push("/login")}>
+                    <Menu.Item
+                      onClick={() => router.push("/login")}
+                      style={{ marginLeft: 0, marginRight: 0 }}
+                    >
                       <Icon name="sign in" />
                     </Menu.Item>
                   )}
-                  <Dropdown
-                    item
-                    icon="world"
-                    style={{ marginLeft: "auto", marginRight: 0 }}
-                  >
-                    <Dropdown.Menu>
-                      <Dropdown.Header content="Language" />
-                      <Dropdown.Item
-                        style={{ textAlign: "center" }}
-                        key={1}
-                        text={"English"}
-                        value={"English"}
-                        onClick={() => {
-                          document.cookie = `NEXT_LOCALE=en; max-age=31536000; path=/`;
-                          router.push(router.asPath, router.asPath, {
-                            locale: "en",
-                          });
-                        }}
-                      />
-                      <Dropdown.Item
-                        style={{ textAlign: "center" }}
-                        key={2}
-                        text={"Slovak"}
-                        value={"Slovak"}
-                        onClick={() => {
-                          document.cookie = `NEXT_LOCALE=sk; max-age=31536000; path=/`;
-                          router.push(router.asPath, router.asPath, {
-                            locale: "sk",
-                          });
-                        }}
-                      />
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  {locales && (
+                    <Dropdown
+                      item
+                      icon="world"
+                      style={{ marginLeft: "auto", marginRight: 0 }}
+                    >
+                      <Dropdown.Menu>
+                        <Dropdown.Header content="Language" />
+                        <Dropdown.Item
+                          style={{ textAlign: "center" }}
+                          key={1}
+                          text={"English"}
+                          value={"English"}
+                          onClick={() => {
+                            document.cookie = `NEXT_LOCALE=en; max-age=31536000; path=/`;
+                            router.push(router.asPath, router.asPath, {
+                              locale: "en",
+                            });
+                          }}
+                        />
+                        <Dropdown.Item
+                          style={{ textAlign: "center" }}
+                          key={2}
+                          text={"Slovak"}
+                          value={"Slovak"}
+                          onClick={() => {
+                            document.cookie = `NEXT_LOCALE=sk; max-age=31536000; path=/`;
+                            router.push(router.asPath, router.asPath, {
+                              locale: "sk",
+                            });
+                          }}
+                        />
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
                 </Menu.Menu>
               </Menu>
             </Container>

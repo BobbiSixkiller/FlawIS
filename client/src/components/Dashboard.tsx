@@ -28,7 +28,7 @@ export default function Dashboard({ children }: dashboardProps) {
 
   if (width < 768) {
     return (
-      <Nav transparent={false}>
+      <Nav transparent={false} locales={true}>
         <ContentWrapper>
           <Grid padded>
             <Grid.Row>

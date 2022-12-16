@@ -138,7 +138,7 @@ const Home: NextPageWithLayout = () => {
 
 Home.getLayout = function getLayout(page) {
   return (
-    <Nav transparent={true}>
+    <Nav transparent={true} locales={true}>
       {page}
       <Footer />
     </Nav>
