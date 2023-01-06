@@ -1,4 +1,4 @@
 {
-    "required":"${path} je povinné pole!",
-    "email":"Email je neplatný!"
+	"required": "Vyplňte povinné pole!",
+	"email": "Email je neplatný!"
 }

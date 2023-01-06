@@ -1,0 +1,8 @@
+{
+	"header": "Profil",
+	"form": {
+		"name": { "label": "Meno vrátane titulov", "placeholder": "Meno..." },
+		"telephone": { "label": "Telefón", "placeholder": "Telefón..." },
+		"organisation": { "label": "Organizácia", "placeholder": "Organizácia..." }
+	}
+}

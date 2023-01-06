@@ -15,11 +15,13 @@ directive @requires(fields: String!) on FIELD_DEFINITION
 
 """Supported file types for upload mutation"""
 enum FileType {
+  GRANT
   IMAGE
   SUBMISSION
 }
 
 type Mutation {
+  deleteFile(url: String!): Boolean!
   uploadFile(file: Upload!, type: FileType!): String!
 }
 

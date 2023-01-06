@@ -25,6 +25,7 @@ type Mutation {
   logout: Boolean!
   passwordReset(data: PasswordInput!): User!
   register(data: RegisterInput!): User!
+  resendActivationLink: Boolean!
   updateUser(data: UserInput!, id: ObjectId!): User!
 }
 

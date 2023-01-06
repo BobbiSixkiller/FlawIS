@@ -1,0 +1,11 @@
+mutation createGrant($data: GrantInput!) {
+	createGrant(data: $data) {
+		id
+		name
+		type
+		start
+		end
+		createdAt
+		updatedAt
+	}
+}

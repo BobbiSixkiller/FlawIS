@@ -1,7 +1,7 @@
 import { Arg, Authorized, Mutation, Resolver } from "type-graphql";
 import { GraphQLUpload } from "graphql-upload";
 import { FileType, Upload } from "./types/file";
-import { createWriteStream } from "fs";
+import { createWriteStream, unlink } from "fs";
 import * as path from "path";
 import { v4 as uuid } from "uuid";
 import { UserInputError } from "apollo-server-core";
@@ -46,5 +46,16 @@ export class FileResolver {
 				)
 				.on("error", () => reject(new Error("File upload failed!")))
 		);
+	}
+
+	@Authorized()
+	@Mutation(() => Boolean)
+	async deleteFile(@Arg("url") url: string) {
+		const path = url.split(process.env.BASE_URL || "http://localhost:5000")[1];
+
+		unlink(path, (error) => {
+			if (error) throw new Error(error.message);
+			return true;
+		});
 	}
 }

@@ -1,55 +1,68 @@
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from "react";
+import { createContext, Dispatch, ReactNode, useReducer } from "react";
 
 type ActionMap<M extends { [index: string]: any }> = {
-  [Key in keyof M]: M[Key] extends undefined
-    ? {
-        type: Key;
-      }
-    : {
-        type: Key;
-        payload: M[Key];
-      };
+	[Key in keyof M]: M[Key] extends undefined
+		? {
+				type: Key;
+		  }
+		: {
+				type: Key;
+				payload: M[Key];
+		  };
 };
 
 export enum ActionTypes {
-  CleanAll = "CLEAN_ALL",
-  SetDrawer = "SET_DRAWER",
-  SetRightPanel = "SET_RIGHT_PANEL",
-  SetFollowingMenuRight = "SET_MENU_RIGHT",
+	CleanAll = "CLEAN_ALL",
+	SetDrawer = "SET_DRAWER",
+	SetRightPanel = "SET_RIGHT_PANEL",
 }
 
 type ActionPayload = {
-  [ActionTypes.Login]: { user: Partial<User> };
-  [ActionTypes.Logout]: undefined;
+	[ActionTypes.SetDrawer]: { drawerItems: ReactNode };
+	[ActionTypes.SetRightPanel]: { rightPanelItems: ReactNode };
+	[ActionTypes.CleanAll]: undefined;
 };
 
 type ControlsActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
 type ControlsState = {
-  loading: boolean;
-  user: Partial<User> | null;
+	drawerItems: ReactNode;
+	rightPanelItems: ReactNode;
 };
 
-export const MenuItemsContext = createContext<{
-  menuItems: ReactNode;
-  setMenuItems: Dispatch<SetStateAction<ReactNode>>;
-}>({
-  menuItems: null,
-  setMenuItems: () => null,
+function controlsReducer(state: ControlsState, action: ControlsActions) {
+	switch (action.type) {
+		case ActionTypes.SetDrawer:
+			return { ...state, drawerItems: action.payload.drawerItems };
+
+		case ActionTypes.SetRightPanel:
+			return { ...state, rightPanelItems: action.payload.rightPanelItems };
+
+		case ActionTypes.CleanAll:
+			return { rightPanelItems: null, drawerItems: null };
+
+		default:
+			return state;
+	}
+}
+
+export const ControlsContext = createContext<
+	ControlsState & { dispatch: Dispatch<ControlsActions> }
+>({
+	drawerItems: null,
+	rightPanelItems: null,
+	dispatch: () => null,
 });
 
-export function MenuItemsProvider({ children }: { children: ReactNode }) {
-  const [menuItems, setMenuItems] = useState<ReactNode>([]);
+export function ControlsProvider({ children }: { children: ReactNode }) {
+	const [state, dispatch] = useReducer(controlsReducer, {
+		drawerItems: null,
+		rightPanelItems: null,
+	});
 
-  return (
-    <MenuItemsContext.Provider value={{ menuItems, setMenuItems }}>
-      {children}
-    </MenuItemsContext.Provider>
-  );
+	return (
+		<ControlsContext.Provider value={{ ...state, dispatch }}>
+			{children}
+		</ControlsContext.Provider>
+	);
 }

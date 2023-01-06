@@ -33,6 +33,16 @@ export type AddressInput = {
   street: Scalars['String'];
 };
 
+export type Announcement = {
+  __typename?: 'Announcement';
+  createdAt: Scalars['DateTime'];
+  files?: Maybe<Array<Scalars['String']>>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  text: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
 /** Attendee model type */
 export type Attendee = {
   __typename?: 'Attendee';
@@ -88,13 +98,13 @@ export type BillingInput = {
   name: Scalars['String'];
 };
 
-/** Budget model type */
+/** Budget schema type */
 export type Budget = {
   __typename?: 'Budget';
   createdAt: Scalars['DateTime'];
   indirect: Scalars['Float'];
   material: Scalars['Float'];
-  members: Array<Member>;
+  members: Array<Maybe<Member>>;
   salaries: Scalars['Float'];
   services: Scalars['Float'];
   travel: Scalars['Float'];
@@ -173,20 +183,22 @@ export type ConferenceUserInput = {
 
 /** Supported file types for upload mutation */
 export enum FileType {
+  Grant = 'GRANT',
   Image = 'IMAGE',
   Submission = 'SUBMISSION'
 }
 
-/** Attendee model type */
+/** Grant model type */
 export type Grant = {
   __typename?: 'Grant';
-  budget: Array<Budget>;
+  announcements?: Maybe<Array<Announcement>>;
+  budget: Array<Maybe<Budget>>;
   createdAt: Scalars['DateTime'];
   end: Scalars['DateTime'];
-  files: Array<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
   start: Scalars['DateTime'];
+  type: GrantType;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -205,10 +217,16 @@ export type GrantEdge = {
 
 export type GrantInput = {
   end: Scalars['DateTime'];
-  files: Array<Scalars['String']>;
   name: Scalars['String'];
   start: Scalars['DateTime'];
 };
+
+/** Type of grants inside the FLAWIS system */
+export enum GrantType {
+  Apvv = 'APVV',
+  Kega = 'KEGA',
+  Vega = 'VEGA'
+}
 
 /** Conference hosting organization */
 export type Host = {
@@ -265,12 +283,11 @@ export type InvoiceInput = {
   payer?: InputMaybe<BillingInput>;
 };
 
-/** Member model type */
+/** Member schema type */
 export type Member = {
   __typename?: 'Member';
   createdAt: Scalars['DateTime'];
   hours: Scalars['Float'];
-  member: User;
   updatedAt: Scalars['DateTime'];
   user: User;
 };
@@ -284,6 +301,7 @@ export type Mutation = {
   createGrant: Grant;
   createSection: Section;
   deleteConference: Scalars['Boolean'];
+  deleteFile: Scalars['Boolean'];
   deleteGrant: Scalars['Boolean'];
   deleteSection: Scalars['Boolean'];
   deleteSubmission: Scalars['Boolean'];
@@ -293,6 +311,7 @@ export type Mutation = {
   passwordReset: User;
   register: User;
   removeAttendee: Scalars['Boolean'];
+  resendActivationLink: Scalars['Boolean'];
   updateConference: Conference;
   updateConferenceUser: User;
   updateInvoice: Attendee;
@@ -336,6 +355,11 @@ export type MutationCreateSectionArgs = {
 
 export type MutationDeleteConferenceArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type MutationDeleteFileArgs = {
+  url: Scalars['String'];
 };
 
 
@@ -709,6 +733,11 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean } };
 
+export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResendActivationLinkMutation = { __typename?: 'Mutation', resendActivationLink: boolean };
+
 export type ActivateUserMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -727,6 +756,28 @@ export type UpdateConferenceUserMutationVariables = Exact<{
 
 
 export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+
+export type UploadFileMutationVariables = Exact<{
+  type: FileType;
+  file: Scalars['Upload'];
+}>;
+
+
+export type UploadFileMutation = { __typename?: 'Mutation', uploadFile: string };
+
+export type DeleteFileMutationVariables = Exact<{
+  url: Scalars['String'];
+}>;
+
+
+export type DeleteFileMutation = { __typename?: 'Mutation', deleteFile: boolean };
+
+export type CreateGrantMutationVariables = Exact<{
+  data: GrantInput;
+}>;
+
+
+export type CreateGrantMutation = { __typename?: 'Mutation', createGrant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -882,6 +933,36 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const ResendActivationLinkDocument = gql`
+    mutation resendActivationLink {
+  resendActivationLink
+}
+    `;
+export type ResendActivationLinkMutationFn = Apollo.MutationFunction<ResendActivationLinkMutation, ResendActivationLinkMutationVariables>;
+
+/**
+ * __useResendActivationLinkMutation__
+ *
+ * To run a mutation, you first call `useResendActivationLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResendActivationLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resendActivationLinkMutation, { data, loading, error }] = useResendActivationLinkMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useResendActivationLinkMutation(baseOptions?: Apollo.MutationHookOptions<ResendActivationLinkMutation, ResendActivationLinkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResendActivationLinkMutation, ResendActivationLinkMutationVariables>(ResendActivationLinkDocument, options);
+      }
+export type ResendActivationLinkMutationHookResult = ReturnType<typeof useResendActivationLinkMutation>;
+export type ResendActivationLinkMutationResult = Apollo.MutationResult<ResendActivationLinkMutation>;
+export type ResendActivationLinkMutationOptions = Apollo.BaseMutationOptions<ResendActivationLinkMutation, ResendActivationLinkMutationVariables>;
 export const ActivateUserDocument = gql`
     mutation activateUser($token: String!) {
   activateUser(token: $token)
@@ -996,6 +1077,108 @@ export function useUpdateConferenceUserMutation(baseOptions?: Apollo.MutationHoo
 export type UpdateConferenceUserMutationHookResult = ReturnType<typeof useUpdateConferenceUserMutation>;
 export type UpdateConferenceUserMutationResult = Apollo.MutationResult<UpdateConferenceUserMutation>;
 export type UpdateConferenceUserMutationOptions = Apollo.BaseMutationOptions<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>;
+export const UploadFileDocument = gql`
+    mutation uploadFile($type: FileType!, $file: Upload!) {
+  uploadFile(type: $type, file: $file)
+}
+    `;
+export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
+
+/**
+ * __useUploadFileMutation__
+ *
+ * To run a mutation, you first call `useUploadFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadFileMutation, { data, loading, error }] = useUploadFileMutation({
+ *   variables: {
+ *      type: // value for 'type'
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useUploadFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadFileMutation, UploadFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadFileMutation, UploadFileMutationVariables>(UploadFileDocument, options);
+      }
+export type UploadFileMutationHookResult = ReturnType<typeof useUploadFileMutation>;
+export type UploadFileMutationResult = Apollo.MutationResult<UploadFileMutation>;
+export type UploadFileMutationOptions = Apollo.BaseMutationOptions<UploadFileMutation, UploadFileMutationVariables>;
+export const DeleteFileDocument = gql`
+    mutation deleteFile($url: String!) {
+  deleteFile(url: $url)
+}
+    `;
+export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, DeleteFileMutationVariables>;
+
+/**
+ * __useDeleteFileMutation__
+ *
+ * To run a mutation, you first call `useDeleteFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFileMutation, { data, loading, error }] = useDeleteFileMutation({
+ *   variables: {
+ *      url: // value for 'url'
+ *   },
+ * });
+ */
+export function useDeleteFileMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFileMutation, DeleteFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteFileMutation, DeleteFileMutationVariables>(DeleteFileDocument, options);
+      }
+export type DeleteFileMutationHookResult = ReturnType<typeof useDeleteFileMutation>;
+export type DeleteFileMutationResult = Apollo.MutationResult<DeleteFileMutation>;
+export type DeleteFileMutationOptions = Apollo.BaseMutationOptions<DeleteFileMutation, DeleteFileMutationVariables>;
+export const CreateGrantDocument = gql`
+    mutation createGrant($data: GrantInput!) {
+  createGrant(data: $data) {
+    id
+    name
+    type
+    start
+    end
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateGrantMutationFn = Apollo.MutationFunction<CreateGrantMutation, CreateGrantMutationVariables>;
+
+/**
+ * __useCreateGrantMutation__
+ *
+ * To run a mutation, you first call `useCreateGrantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateGrantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createGrantMutation, { data, loading, error }] = useCreateGrantMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateGrantMutation(baseOptions?: Apollo.MutationHookOptions<CreateGrantMutation, CreateGrantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateGrantMutation, CreateGrantMutationVariables>(CreateGrantDocument, options);
+      }
+export type CreateGrantMutationHookResult = ReturnType<typeof useCreateGrantMutation>;
+export type CreateGrantMutationResult = Apollo.MutationResult<CreateGrantMutation>;
+export type CreateGrantMutationOptions = Apollo.BaseMutationOptions<CreateGrantMutation, CreateGrantMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {

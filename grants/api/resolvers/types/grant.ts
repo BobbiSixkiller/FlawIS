@@ -1,82 +1,97 @@
-import { Field, ArgsType, Int, InputType } from "type-graphql";
-import { Min, Max, IsInt, IsDate, IsString, IsMongoId } from "class-validator";
+import { Field, ArgsType, InputType, ObjectType } from "type-graphql";
+import { IsInt, IsDate, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { NameExists, RefDocExists } from "../../util/decorators";
-import { Budget, Grant, Member } from "../../entitites/Grant";
+import { NameExists, RefDocExists } from "../../util/validation";
+import {
+	Announcement,
+	Budget,
+	Grant,
+	GrantType,
+	Member,
+} from "../../entitites/Grant";
+import { CreateConnection, CreatePaginationArgs } from "./pagination";
+import { User } from "../../entitites/User";
 
 @InputType()
 export class GrantInput implements Partial<Grant> {
-  @Field()
-  @IsString()
-  @NameExists(Grant, { message: "Grant with provided name already exists!" })
-  name: string;
+	@Field()
+	@NameExists(Grant, { message: "Grant with provided name already exists!" })
+	name: string;
 
-  @Field()
-  @IsDate()
-  start: Date;
+	@Field(() => GrantType)
+	type: GrantType;
 
-  @Field()
-  @IsDate()
-  end: Date;
+	@Field()
+	@IsDate()
+	start: Date;
 
-  @Field(() => [String])
-  @IsString({ each: true })
-  files: string[];
+	@Field()
+	@IsDate()
+	end: Date;
 }
 
+@InputType()
 export class MemberInput implements Partial<Member> {
-  @Field()
-  @IsMongoId()
-  user: ObjectId;
+	@Field()
+	@RefDocExists(User)
+	member: ObjectId;
 
-  @Field()
-  @IsInt()
-  hours: number;
+	@Field()
+	@IsInt()
+	hours: number;
+}
+
+export class AnnouncementInput implements Partial<Announcement> {
+	@Field()
+	@IsString()
+	name: string;
+
+	@Field()
+	@IsString()
+	text: string;
+
+	@Field(() => [String], { nullable: true })
+	@IsString({ each: true })
+	files: string[];
 }
 
 @InputType()
 export class BudgetInput
-  implements Omit<Budget, "id" | "members" | "createdAt" | "updatedAt">
+	implements Omit<Budget, "id" | "members" | "createdAt" | "updatedAt">
 {
-  @Field()
-  @IsDate()
-  year: Date;
+	@Field()
+	@IsDate()
+	year: Date;
 
-  @Field(() => [MemberInput])
-  members: MemberInput[];
+	@Field(() => [MemberInput], { nullable: true })
+	members: MemberInput[];
 
-  @Field()
-  @IsInt()
-  travel: number;
+	@Field()
+	@IsInt()
+	travel: number;
 
-  @Field()
-  @IsInt()
-  material: number;
+	@Field()
+	@IsInt()
+	material: number;
 
-  @Field()
-  @IsInt()
-  services: number;
+	@Field()
+	@IsInt()
+	services: number;
 
-  @Field()
-  @IsInt()
-  indirect: number;
+	@Field()
+	@IsInt()
+	indirect: number;
 
-  @Field()
-  @IsInt()
-  salaries: number;
+	@Field()
+	@IsInt()
+	salaries: number;
 }
 
 @ArgsType()
-export class GrantArgs {
-  @Field(() => String, { nullable: true })
-  @RefDocExists(Grant, {
-    message: "Cursor's document not found!",
-  })
-  after?: ObjectId;
+export class GrantArgs extends CreatePaginationArgs(Grant) {}
 
-  @Field(() => Int, { defaultValue: 20, nullable: true })
-  @Min(1)
-  @Max(50)
-  first?: number;
-}
+@ObjectType({
+	description: "GrantConnection type enabling cursor based pagination",
+})
+export class GrantConnection extends CreateConnection(Grant) {}

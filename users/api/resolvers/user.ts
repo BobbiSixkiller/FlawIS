@@ -5,10 +5,10 @@ import { User, UserConnection } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
-  PasswordInput,
-  RegisterInput,
-  UserArgs,
-  UserInput,
+	PasswordInput,
+	RegisterInput,
+	UserArgs,
+	UserInput,
 } from "./types/user";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
@@ -22,275 +22,282 @@ import { RateLimit } from "../middlewares/ratelimit-middleware";
 @Service()
 @Resolver()
 export class UserResolver {
-  //using mongodb change steams to handle user integrity accross federated subgraphs
-  constructor(private readonly userService = new CRUDservice(User)) {
-    userService.dataModel
-      .watch([])
-      .on("change", (data: ChangeStreamDocument<User>) => {
-        switch (data.operationType) {
-          case "insert":
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-                email: data.fullDocument?.email,
-                name: data.fullDocument?.name,
-              }),
-              "user.new"
-            );
-          case "update":
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-                email: data.updateDescription?.updatedFields?.email,
-              }),
-              "user.update.email"
-            );
-          case "delete":
-            console.log(data.documentKey, data.operationType);
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-              }),
-              "user.delete"
-            );
+	//using mongodb change steams to handle user integrity accross federated subgraphs
+	constructor(private readonly userService = new CRUDservice(User)) {
+		userService.dataModel
+			.watch([])
+			.on("change", (data: ChangeStreamDocument<User>) => {
+				switch (data.operationType) {
+					case "insert":
+						return messageBroker.produceMessage(
+							JSON.stringify({
+								id: data.documentKey?._id,
+								email: data.fullDocument?.email,
+								name: data.fullDocument?.name,
+							}),
+							"user.new"
+						);
+					case "update":
+						return messageBroker.produceMessage(
+							JSON.stringify({
+								id: data.documentKey?._id,
+								email: data.updateDescription?.updatedFields?.email,
+							}),
+							"user.update.email"
+						);
+					case "delete":
+						console.log(data.documentKey, data.operationType);
+						return messageBroker.produceMessage(
+							JSON.stringify({
+								id: data.documentKey?._id,
+							}),
+							"user.delete"
+						);
 
-          default:
-            console.log("Unhandled operation type: ", data.operationType);
-            return;
-        }
-      });
-  }
+					default:
+						console.log("Unhandled operation type: ", data.operationType);
+						return;
+				}
+			});
+	}
 
-  @Authorized(["ADMIN"])
-  @Query(() => User)
-  async user(@Arg("id") id: ObjectId) {
-    const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new Error("User not found!");
+	@Authorized(["ADMIN"])
+	@Query(() => User)
+	async user(@Arg("id") id: ObjectId) {
+		const user = await this.userService.findOne({ _id: id });
+		if (!user) throw new Error("User not found!");
 
-    return user;
-  }
+		return user;
+	}
 
-  @Authorized(["ADMIN"])
-  @Query(() => UserConnection)
-  async users(@Args() { first, after }: UserArgs) {
-    const users = await this.userService.aggregate([
-      {
-        $facet: {
-          data: [
-            {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
-            },
-            { $sort: { _id: -1 } },
-            { $limit: first || 20 },
-            {
-              $addFields: {
-                id: "$_id", //transform _id to id property as defined in GraphQL object types
-              },
-            },
-          ],
-          hasNextPage: [
-            {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
-            },
-            { $sort: { _id: -1 } },
-            { $skip: first || 20 }, // skip paginated data
-            { $limit: 1 }, // just to check if there's any element
-            { $count: "totalNext" },
-          ],
-        },
-      },
-      {
-        $unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
-      },
-      {
-        $project: {
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $gt: ["$hasNextPage.totalNext", 0] },
-            endCursor: { $last: "$data.id" },
-          },
-        },
-      },
-    ]);
+	@Authorized(["ADMIN"])
+	@Query(() => UserConnection)
+	async users(@Args() { first, after }: UserArgs) {
+		const users = await this.userService.aggregate([
+			{
+				$facet: {
+					data: [
+						{
+							$match: {
+								$expr: {
+									$cond: [
+										{ $eq: [after, null] },
+										{ $ne: ["$_id", null] },
+										{ $lt: ["$_id", after] },
+									],
+								},
+							},
+						},
+						{ $sort: { _id: -1 } },
+						{ $limit: first || 20 },
+						{
+							$addFields: {
+								id: "$_id", //transform _id to id property as defined in GraphQL object types
+							},
+						},
+					],
+					hasNextPage: [
+						{
+							$match: {
+								$expr: {
+									$cond: [
+										{ $eq: [after, null] },
+										{ $ne: ["$_id", null] },
+										{ $lt: ["$_id", after] },
+									],
+								},
+							},
+						},
+						{ $sort: { _id: -1 } },
+						{ $skip: first || 20 }, // skip paginated data
+						{ $limit: 1 }, // just to check if there's any element
+						{ $count: "totalNext" },
+					],
+				},
+			},
+			{
+				$unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
+			},
+			{
+				$project: {
+					edges: {
+						$map: {
+							input: "$data",
+							as: "edge",
+							in: { cursor: "$$edge._id", node: "$$edge" },
+						},
+					},
+					pageInfo: {
+						hasNextPage: { $gt: ["$hasNextPage.totalNext", 0] },
+						endCursor: { $last: "$data.id" },
+					},
+				},
+			},
+		]);
 
-    return users[0] as unknown as UserConnection;
-  }
+		return users[0] as unknown as UserConnection;
+	}
 
-  @Authorized()
-  @UseMiddleware([RateLimit(50)])
-  @Query(() => User)
-  async me(@Ctx() { user, locale }: Context) {
-    const loggedInUser = await this.userService.findOne({ _id: user?.id });
-    if (!loggedInUser)
-      throw new AuthenticationError("User account has been deleted!");
+	@Authorized()
+	@UseMiddleware([RateLimit(50)])
+	@Query(() => User)
+	async me(@Ctx() { user, locale }: Context) {
+		const loggedInUser = await this.userService.findOne({ _id: user?.id });
+		if (!loggedInUser)
+			throw new AuthenticationError("User account has been deleted!");
 
-    messageBroker.produceMessage(
-      JSON.stringify({
-        locale,
-        name: loggedInUser.name,
-        email: loggedInUser.email,
-        token: signJwt({ id: loggedInUser.id }, { expiresIn: "1d" }),
-      }),
-      "mail.registration"
-    );
+		return loggedInUser;
+	}
 
-    return loggedInUser;
-  }
+	@Mutation(() => User)
+	@UseMiddleware([RateLimit(50)])
+	async register(
+		@Arg("data") registerInput: RegisterInput,
+		@Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
+	) {
+		console.log(locale);
+		const user = await this.userService.create(registerInput);
 
-  @Mutation(() => User)
-  @UseMiddleware([RateLimit(50)])
-  async register(
-    @Arg("data") registerInput: RegisterInput,
-    @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
-  ) {
-    console.log(locale);
-    const user = await this.userService.create(registerInput);
+		res.cookie("accessToken", user.token, {
+			httpOnly: true,
+			expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+			secure: process.env.NODE_ENV === "production",
+		});
 
-    res.cookie("accessToken", user.token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+		messageBroker.produceMessage(
+			JSON.stringify({
+				locale,
+				name: user.name,
+				email: user.email,
+				token: signJwt({ id: user.id }, { expiresIn: "1d" }),
+			}),
+			"mail.registration"
+		);
 
-    messageBroker.produceMessage(
-      JSON.stringify({
-        locale,
-        name: user.name,
-        email: user.email,
-        token: signJwt({ id: user.id }, { expiresIn: "1d" }),
-      }),
-      "mail.registration"
-    );
+		return user;
+	}
 
-    return user;
-  }
+	@Authorized()
+	@UseMiddleware([RateLimit(10)])
+	@Mutation(() => Boolean)
+	resendActivationLink(@Ctx() { locale, user }: Context) {
+		messageBroker.produceMessage(
+			JSON.stringify({
+				locale,
+				name: user?.name,
+				email: user?.email,
+				token: signJwt({ id: user?.id }, { expiresIn: "1d" }),
+			}),
+			"mail.registration"
+		);
 
-  @Mutation(() => Boolean)
-  @UseMiddleware([RateLimit(50)])
-  async activateUser(@Arg("token") token: string) {
-    const user: Partial<User> | null = verifyJwt(token);
-    if (user) {
-      const { modifiedCount } = await this.userService.update(
-        { _id: user.id, verified: false },
-        { verified: true }
-      );
+		return true;
+	}
 
-      return modifiedCount > 0;
-    }
+	@Mutation(() => Boolean)
+	@UseMiddleware([RateLimit(10)])
+	async activateUser(@Arg("token") token: string) {
+		const user: Partial<User> | null = verifyJwt(token);
+		if (user) {
+			const { modifiedCount } = await this.userService.update(
+				{ _id: user.id, verified: false },
+				{ verified: true }
+			);
 
-    return false;
-  }
+			return modifiedCount > 0;
+		}
 
-  @Mutation(() => User)
-  @UseMiddleware([RateLimit(50)])
-  async login(
-    @Arg("email") email: string,
-    @Arg("password") password: string,
-    @Ctx() { res }: Context
-  ) {
-    const user = await this.userService.findOne({ email });
-    if (!user) throw new AuthenticationError("Invalid credentials!");
+		return false;
+	}
 
-    const match = await compare(password, user.password);
-    if (!match) throw new AuthenticationError("Invalid credentials!");
+	@Mutation(() => User)
+	@UseMiddleware([RateLimit(50)])
+	async login(
+		@Arg("email") email: string,
+		@Arg("password") password: string,
+		@Ctx() { res }: Context
+	) {
+		const user = await this.userService.findOne({ email });
+		if (!user) throw new AuthenticationError("Invalid credentials!");
 
-    res.cookie("accessToken", user.token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
+		const match = await compare(password, user.password);
+		if (!match) throw new AuthenticationError("Invalid credentials!");
 
-    return user;
-  }
+		res.cookie("accessToken", user.token, {
+			httpOnly: true,
+			expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+			secure: process.env.NODE_ENV === "production",
+		});
 
-  @Authorized()
-  @Mutation(() => Boolean)
-  logout(@Ctx() { res }: Context) {
-    res.clearCookie("accessToken");
+		return user;
+	}
 
-    return true;
-  }
+	@Authorized()
+	@Mutation(() => Boolean)
+	logout(@Ctx() { res }: Context) {
+		res.clearCookie("accessToken");
 
-  @Query(() => String)
-  @UseMiddleware([RateLimit(50)])
-  async forgotPassword(
-    @Arg("email") email: string,
-    @Ctx() { locale }: Context
-  ) {
-    const user = await this.userService.findOne({ email });
-    if (!user)
-      throw new UserInputError("No user with provided email address found!");
+		return true;
+	}
 
-    const token = signJwt({ id: user.id }, { expiresIn: "1h" });
+	@Query(() => String)
+	@UseMiddleware([RateLimit(50)])
+	async forgotPassword(
+		@Arg("email") email: string,
+		@Ctx() { locale }: Context
+	) {
+		const user = await this.userService.findOne({ email });
+		if (!user)
+			throw new UserInputError("No user with provided email address found!");
 
-    messageBroker.produceMessage(
-      JSON.stringify({ locale, email: user.email, name: user.name, token }),
-      "mail.reset"
-    );
+		const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
-    return "Password reset link has been sent to your email!";
-  }
+		messageBroker.produceMessage(
+			JSON.stringify({ locale, email: user.email, name: user.name, token }),
+			"mail.reset"
+		);
 
-  @Mutation(() => User)
-  @UseMiddleware([RateLimit(10)])
-  async passwordReset(
-    @Arg("data") { password }: PasswordInput,
-    @Ctx() { req }: Context
-  ) {
-    const token = req.headers.resettoken;
-    const userId: ResetToken = verifyJwt(token as string);
-    if (!userId) throw new Error("Reset token expired!");
+		return "Password reset link has been sent to your email!";
+	}
 
-    const user = await this.userService.findOne({ _id: userId.id });
-    if (!user) throw new Error("User not found!");
+	@Mutation(() => User)
+	@UseMiddleware([RateLimit(10)])
+	async passwordReset(
+		@Arg("data") { password }: PasswordInput,
+		@Ctx() { req }: Context
+	) {
+		const token = req.headers.resettoken;
+		const userId: ResetToken = verifyJwt(token as string);
+		if (!userId) throw new Error("Reset token expired!");
 
-    user.password = password;
+		const user = await this.userService.findOne({ _id: userId.id });
+		if (!user) throw new Error("User not found!");
 
-    return await user.save();
-  }
+		user.password = password;
 
-  @Authorized(["ADMIN", "IS_OWN_USER"])
-  @UseMiddleware([RateLimit(10)])
-  @Mutation(() => User)
-  async updateUser(@Arg("id") id: ObjectId, @Arg("data") userInput: UserInput) {
-    const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new UserInputError("User not found!");
+		return await user.save();
+	}
 
-    for (const [key, value] of Object.entries(userInput)) {
-      user[key as keyof UserInput] = value;
-    }
+	@Authorized(["ADMIN", "IS_OWN_USER"])
+	@UseMiddleware([RateLimit(10)])
+	@Mutation(() => User)
+	async updateUser(@Arg("id") id: ObjectId, @Arg("data") userInput: UserInput) {
+		const user = await this.userService.findOne({ _id: id });
+		if (!user) throw new UserInputError("User not found!");
 
-    return await user.save();
-  }
+		for (const [key, value] of Object.entries(userInput)) {
+			user[key as keyof UserInput] = value;
+		}
 
-  @Authorized(["ADMIN"])
-  @Mutation(() => Boolean)
-  async deleteUser(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.userService.delete({ _id: id });
-    return deletedCount > 0;
-  }
+		return await user.save();
+	}
+
+	@Authorized(["ADMIN"])
+	@Mutation(() => Boolean)
+	async deleteUser(@Arg("id") id: ObjectId): Promise<boolean> {
+		const { deletedCount } = await this.userService.delete({ _id: id });
+		return deletedCount > 0;
+	}
 }

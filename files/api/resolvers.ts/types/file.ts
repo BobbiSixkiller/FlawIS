@@ -11,6 +11,7 @@ export interface Upload {
 export enum FileType {
 	IMAGE = "images",
 	SUBMISSION = "submissions",
+	GRANT = "grants",
 }
 
 registerEnumType(FileType, {

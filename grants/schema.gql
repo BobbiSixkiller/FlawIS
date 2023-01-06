@@ -13,12 +13,21 @@ directive @provides(fields: String!) on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION
 
-"""Budget model type"""
+type Announcement {
+  createdAt: DateTime!
+  files: [String!]
+  id: ID!
+  name: String!
+  text: String!
+  updatedAt: DateTime!
+}
+
+"""Budget schema type"""
 type Budget {
   createdAt: DateTime!
   indirect: Float!
   material: Float!
-  members: [Member!]!
+  members: [Member]!
   salaries: Float!
   services: Float!
   travel: Float!
@@ -31,15 +40,16 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-"""Attendee model type"""
+"""Grant model type"""
 type Grant {
-  budget: [Budget!]!
+  announcements: [Announcement!]
+  budget: [Budget]!
   createdAt: DateTime!
   end: DateTime!
-  files: [String!]!
   id: ID!
   name: String!
   start: DateTime!
+  type: GrantType!
   updatedAt: DateTime!
 }
 
@@ -56,16 +66,22 @@ type GrantEdge {
 
 input GrantInput {
   end: DateTime!
-  files: [String!]!
   name: String!
   start: DateTime!
+  type: GrantType!
 }
 
-"""Member model type"""
+"""Type of grants inside the FLAWIS system"""
+enum GrantType {
+  APVV
+  KEGA
+  VEGA
+}
+
+"""Member schema type"""
 type Member {
   createdAt: DateTime!
   hours: Float!
-  member: User!
   updatedAt: DateTime!
   user: User!
 }
@@ -89,9 +105,6 @@ type Query {
   grants(after: String, first: Int = 20): GrantConnection!
 }
 
-"""
-User reference type from users microservice with contributed billings field
-"""
 type User {
   grants(year: DateTime!): Int
   hours(year: DateTime!): Int!

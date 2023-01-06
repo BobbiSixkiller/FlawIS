@@ -1,23 +1,20 @@
 import { ObjectId } from "mongodb";
 import { prop as Property } from "@typegoose/typegoose";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
-import { Grant, GrantConnection } from "./Grant";
+import { Grant } from "./Grant";
 
+@ObjectType()
 @Directive("@extends")
 @Directive(`@key(fields: "id")`)
-@ObjectType({
-  description:
-    "User reference type from users microservice with contributed billings field",
-})
 export class User {
-  @Directive("@external")
-  @Field(() => ID)
-  id: ObjectId;
+	@Directive("@external")
+	@Field(() => ID)
+	id: ObjectId;
 
-  @Property()
-  email: string;
+	@Property()
+	email: string;
 
-  grants: Grant[];
+	grants: Grant[];
 
-  hours: number;
+	hours: number;
 }
