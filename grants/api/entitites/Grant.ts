@@ -1,8 +1,13 @@
-import { prop as Property } from "@typegoose/typegoose";
+import {
+	Index,
+	prop as Property,
+	Ref,
+	ReturnModelType,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
-import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
-import { Ref } from "../util/types";
+import { Field, ID, Int, ObjectType, registerEnumType } from "type-graphql";
+import { Announcement } from "./Announcement";
 import { User } from "./User";
 
 export enum GrantType {
@@ -22,6 +27,9 @@ export class Member extends TimeStamps {
 	@Property({ ref: () => User })
 	user: Ref<User>;
 
+	@Field(() => Boolean)
+	isMain: boolean;
+
 	@Field()
 	@Property()
 	hours: Number;
@@ -38,23 +46,23 @@ export class Budget extends TimeStamps {
 	@Property()
 	year: Date;
 
-	@Field()
+	@Field(() => Int)
 	@Property()
 	travel: Number;
 
-	@Field()
+	@Field(() => Int)
 	@Property()
 	material: Number;
 
-	@Field()
+	@Field(() => Int)
 	@Property()
 	services: Number;
 
-	@Field()
+	@Field(() => Int)
 	@Property()
 	indirect: Number;
 
-	@Field()
+	@Field(() => Int)
 	@Property()
 	salaries: Number;
 
@@ -68,29 +76,7 @@ export class Budget extends TimeStamps {
 	updatedAt: Date;
 }
 
-@ObjectType()
-export class Announcement extends TimeStamps {
-	@Field(() => ID)
-	id: ObjectId;
-
-	@Field()
-	@Property()
-	name: string;
-
-	@Field()
-	@Property()
-	text: string;
-
-	@Field(() => [String], { nullable: true })
-	@Property()
-	files: string[];
-
-	@Field()
-	createdAt: Date;
-	@Field()
-	updatedAt: Date;
-}
-
+@Index({ name: "text" })
 @ObjectType({ description: "Grant model type" })
 export class Grant extends TimeStamps {
 	@Field(() => ID)
@@ -112,16 +98,76 @@ export class Grant extends TimeStamps {
 	@Property()
 	end: Date;
 
-	@Field(() => [Announcement], { nullable: true })
-	@Property({ type: () => [Announcement] })
-	announcements: Announcement[];
+	@Field(() => [Announcement], { nullable: "items" })
+	@Property({ ref: () => Announcement })
+	announcements: Ref<Announcement>[];
 
 	@Field(() => [Budget], { nullable: "items" })
 	@Property({ type: () => [Budget], _id: false, default: [] })
-	budget: Budget[];
+	budgets: Budget[];
 
 	@Field()
 	createdAt: Date;
 	@Field()
 	updatedAt: Date;
+
+	public static async paginatedGrants(
+		this: ReturnModelType<typeof Grant>,
+		first: number,
+		after?: ObjectId
+	) {
+		return await this.aggregate([
+			{
+				$facet: {
+					data: [
+						{
+							$match: {
+								$expr: {
+									$cond: [
+										{ $eq: [after, null] },
+										{ $ne: ["$_id", null] },
+										{ $lt: ["$_id", after] },
+									],
+								},
+							},
+						},
+						{ $limit: first || 20 },
+						{ $sort: { _id: -1 } },
+						{ $addFields: { id: "$_id" } },
+					],
+					hasNextDoc: [
+						{
+							$match: {
+								$expr: {
+									$cond: [
+										{ $eq: [after, null] },
+										{ $ne: ["$_id", null] },
+										{ $lt: ["$_id", after] },
+									],
+								},
+							},
+						},
+						{ $skip: first || 20 },
+						{ $sort: { _id: -1 } },
+						{ $limit: 1 },
+					],
+				},
+			},
+			{
+				$project: {
+					edges: {
+						$map: {
+							input: "$data",
+							as: "doc",
+							in: { cursor: "$$doc._id", node: "$$doc" },
+						},
+					},
+					pageInfo: {
+						endCursor: { $last: "$data._id" },
+						hasNextPage: { $ne: [{ $first: "$hasNextDoc" }, null] },
+					},
+				},
+			},
+		]);
+	}
 }

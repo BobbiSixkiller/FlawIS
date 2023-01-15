@@ -1,6 +1,6 @@
 import { Max, Min } from "class-validator";
 import { ObjectId } from "mongodb";
-import { ArgsType, ClassType, Field, Int, ObjectType } from "type-graphql";
+import { ArgsType, ClassType, Field, ID, Int, ObjectType } from "type-graphql";
 import { RefDocExists } from "../../util/validation";
 
 //generic function for creating corresponding Connection Type enabling relay style pagination
@@ -38,7 +38,7 @@ export function CreateConnection<TNode>(TNodeClass: ClassType<TNode>) {
 export function CreatePaginationArgs<TNode>(TNodeClass: ClassType<TNode>) {
 	@ArgsType()
 	class PaginationArgs {
-		@Field(() => String, { nullable: true })
+		@Field({ nullable: true })
 		@RefDocExists(TNodeClass, {
 			message: "Cursor's document not found!",
 		})
@@ -47,7 +47,7 @@ export function CreatePaginationArgs<TNode>(TNodeClass: ClassType<TNode>) {
 		@Field(() => Int, { defaultValue: 20, nullable: true })
 		@Min(1)
 		@Max(50)
-		first?: number;
+		first: number = 20;
 	}
 
 	return PaginationArgs;

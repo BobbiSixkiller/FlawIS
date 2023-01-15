@@ -1,13 +1,14 @@
 import { Arg, Args, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
 import { ObjectId, ChangeStreamDocument } from "mongodb";
 import { Service } from "typedi";
-import { User, UserConnection } from "../entitites/User";
+import { User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
 	PasswordInput,
 	RegisterInput,
 	UserArgs,
+	UserConnection,
 	UserInput,
 } from "./types/user";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
@@ -62,6 +63,14 @@ export class UserResolver {
 	}
 
 	@Authorized(["ADMIN"])
+	@Query(() => UserConnection)
+	async users(@Args() { first, after }: UserArgs) {
+		const users = await this.userService.dataModel.paginatedUsers(first, after);
+
+		return users[0] as UserConnection;
+	}
+
+	@Authorized(["ADMIN"])
 	@Query(() => User)
 	async user(@Arg("id") id: ObjectId) {
 		const user = await this.userService.findOne({ _id: id });
@@ -70,72 +79,33 @@ export class UserResolver {
 		return user;
 	}
 
-	@Authorized(["ADMIN"])
-	@Query(() => UserConnection)
-	async users(@Args() { first, after }: UserArgs) {
-		const users = await this.userService.aggregate([
+	@Authorized()
+	@Query(() => [User])
+	async userTextSearch(
+		@Arg("text") text: string,
+		@Arg("domain", { nullable: true }) domain?: string
+	) {
+		return await this.userService.aggregate([
+			{ $match: { $text: { $search: text } } },
+			{ $sort: { score: { $meta: "textScore" } } },
 			{
-				$facet: {
-					data: [
-						{
-							$match: {
-								$expr: {
-									$cond: [
-										{ $eq: [after, null] },
-										{ $ne: ["$_id", null] },
-										{ $lt: ["$_id", after] },
-									],
-								},
+				$match: {
+					$expr: {
+						$cond: [
+							{ $ne: [domain, null] },
+							{
+								$eq: [
+									{ $arrayElemAt: [{ $split: ["$email", "@"] }, 1] },
+									domain,
+								],
 							},
-						},
-						{ $sort: { _id: -1 } },
-						{ $limit: first || 20 },
-						{
-							$addFields: {
-								id: "$_id", //transform _id to id property as defined in GraphQL object types
-							},
-						},
-					],
-					hasNextPage: [
-						{
-							$match: {
-								$expr: {
-									$cond: [
-										{ $eq: [after, null] },
-										{ $ne: ["$_id", null] },
-										{ $lt: ["$_id", after] },
-									],
-								},
-							},
-						},
-						{ $sort: { _id: -1 } },
-						{ $skip: first || 20 }, // skip paginated data
-						{ $limit: 1 }, // just to check if there's any element
-						{ $count: "totalNext" },
-					],
-				},
-			},
-			{
-				$unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
-			},
-			{
-				$project: {
-					edges: {
-						$map: {
-							input: "$data",
-							as: "edge",
-							in: { cursor: "$$edge._id", node: "$$edge" },
-						},
-					},
-					pageInfo: {
-						hasNextPage: { $gt: ["$hasNextPage.totalNext", 0] },
-						endCursor: { $last: "$data.id" },
+							{ $ne: ["$_id", null] },
+						],
 					},
 				},
 			},
+			{ $addFields: { id: "$_id" } },
 		]);
-
-		return users[0] as unknown as UserConnection;
 	}
 
 	@Authorized()

@@ -32,13 +32,19 @@ export default function Footer() {
 					</Grid.Row>
 				</Grid>
 				<Divider inverted section />
-				<div style={{ display: "flex", justifyContent: "center" }}>
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "center",
+					}}
+				>
 					<Image
 						alt="flaw-logo-notext"
 						src={logo}
 						height={130}
 						width={300}
-						priority={true}
+						style={{ height: 130, width: 300 }}
+						priority
 					/>
 				</div>
 

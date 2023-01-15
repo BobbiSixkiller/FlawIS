@@ -102,13 +102,22 @@ export type BillingInput = {
 export type Budget = {
   __typename?: 'Budget';
   createdAt: Scalars['DateTime'];
+  indirect: Scalars['Int'];
+  material: Scalars['Int'];
+  members: Array<Maybe<Member>>;
+  salaries: Scalars['Int'];
+  services: Scalars['Int'];
+  travel: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  year: Scalars['DateTime'];
+};
+
+export type BudgetInput = {
   indirect: Scalars['Float'];
   material: Scalars['Float'];
-  members: Array<Maybe<Member>>;
   salaries: Scalars['Float'];
   services: Scalars['Float'];
   travel: Scalars['Float'];
-  updatedAt: Scalars['DateTime'];
   year: Scalars['DateTime'];
 };
 
@@ -191,8 +200,8 @@ export enum FileType {
 /** Grant model type */
 export type Grant = {
   __typename?: 'Grant';
-  announcements?: Maybe<Array<Announcement>>;
-  budget: Array<Maybe<Budget>>;
+  announcements: Array<Maybe<Announcement>>;
+  budgets: Array<Maybe<Budget>>;
   createdAt: Scalars['DateTime'];
   end: Scalars['DateTime'];
   id: Scalars['ID'];
@@ -219,6 +228,7 @@ export type GrantInput = {
   end: Scalars['DateTime'];
   name: Scalars['String'];
   start: Scalars['DateTime'];
+  type: GrantType;
 };
 
 /** Type of grants inside the FLAWIS system */
@@ -288,14 +298,23 @@ export type Member = {
   __typename?: 'Member';
   createdAt: Scalars['DateTime'];
   hours: Scalars['Float'];
+  isMain: Scalars['Boolean'];
   updatedAt: Scalars['DateTime'];
   user: User;
+};
+
+export type MemberInput = {
+  hours: Scalars['Float'];
+  isMain: Scalars['Boolean'];
+  member: Scalars['ObjectId'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   activateUser: Scalars['Boolean'];
   addAttendee: Attendee;
+  addBudget: Grant;
+  addMember: Grant;
   addSubmission: Submission;
   createConference: Conference;
   createGrant: Grant;
@@ -330,6 +349,19 @@ export type MutationActivateUserArgs = {
 
 export type MutationAddAttendeeArgs = {
   data: AttendeeInput;
+};
+
+
+export type MutationAddBudgetArgs = {
+  data: BudgetInput;
+  id: Scalars['ObjectId'];
+};
+
+
+export type MutationAddMemberArgs = {
+  data: MemberInput;
+  id: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
 };
 
 
@@ -467,11 +499,13 @@ export type Query = {
   conferences: Array<Conference>;
   forgotPassword: Scalars['String'];
   grant: Grant;
+  grantTextSearch: Array<Grant>;
   grants: GrantConnection;
   me: User;
   section: Section;
   submission: Submission;
   user: User;
+  userTextSearch: Array<User>;
   users: UserConnection;
 };
 
@@ -501,8 +535,13 @@ export type QueryGrantArgs = {
 };
 
 
+export type QueryGrantTextSearchArgs = {
+  text: Scalars['String'];
+};
+
+
 export type QueryGrantsArgs = {
-  after?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
 };
 
@@ -519,6 +558,12 @@ export type QuerySubmissionArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type QueryUserTextSearchArgs = {
+  domain?: InputMaybe<Scalars['String']>;
+  text: Scalars['String'];
 };
 
 
@@ -779,6 +824,38 @@ export type CreateGrantMutationVariables = Exact<{
 
 export type CreateGrantMutation = { __typename?: 'Mutation', createGrant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } };
 
+export type AddBudgetMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: BudgetInput;
+}>;
+
+
+export type AddBudgetMutation = { __typename?: 'Mutation', addBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+
+export type AddMemberMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
+  data: MemberInput;
+}>;
+
+
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+
+export type GrantsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']>;
+  first?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type GrantsQuery = { __typename?: 'Query', grants: { __typename?: 'GrantConnection', edges: Array<{ __typename?: 'GrantEdge', cursor: any, node: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any } } | null>, pageInfo: { __typename?: 'PageInfo', endCursor: any, hasNextPage: boolean } } };
+
+export type GrantQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
   data: UserInput;
@@ -786,6 +863,13 @@ export type UpdateUserMutationVariables = Exact<{
 
 
 export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+
+export type UserTextSearchQueryVariables = Exact<{
+  text: Scalars['String'];
+}>;
+
+
+export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string }> };
 
 
 export const LoginDocument = gql`
@@ -1179,6 +1263,252 @@ export function useCreateGrantMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateGrantMutationHookResult = ReturnType<typeof useCreateGrantMutation>;
 export type CreateGrantMutationResult = Apollo.MutationResult<CreateGrantMutation>;
 export type CreateGrantMutationOptions = Apollo.BaseMutationOptions<CreateGrantMutation, CreateGrantMutationVariables>;
+export const AddBudgetDocument = gql`
+    mutation addBudget($id: ObjectId!, $data: BudgetInput!) {
+  addBudget(id: $id, data: $data) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      material
+      services
+      travel
+      indirect
+      salaries
+      members {
+        user {
+          id
+          name
+        }
+        hours
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type AddBudgetMutationFn = Apollo.MutationFunction<AddBudgetMutation, AddBudgetMutationVariables>;
+
+/**
+ * __useAddBudgetMutation__
+ *
+ * To run a mutation, you first call `useAddBudgetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddBudgetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addBudgetMutation, { data, loading, error }] = useAddBudgetMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddBudgetMutation(baseOptions?: Apollo.MutationHookOptions<AddBudgetMutation, AddBudgetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddBudgetMutation, AddBudgetMutationVariables>(AddBudgetDocument, options);
+      }
+export type AddBudgetMutationHookResult = ReturnType<typeof useAddBudgetMutation>;
+export type AddBudgetMutationResult = Apollo.MutationResult<AddBudgetMutation>;
+export type AddBudgetMutationOptions = Apollo.BaseMutationOptions<AddBudgetMutation, AddBudgetMutationVariables>;
+export const AddMemberDocument = gql`
+    mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
+  addMember(id: $id, year: $year, data: $data) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      material
+      services
+      travel
+      indirect
+      salaries
+      members {
+        user {
+          id
+          name
+        }
+        hours
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type AddMemberMutationFn = Apollo.MutationFunction<AddMemberMutation, AddMemberMutationVariables>;
+
+/**
+ * __useAddMemberMutation__
+ *
+ * To run a mutation, you first call `useAddMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addMemberMutation, { data, loading, error }] = useAddMemberMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      year: // value for 'year'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddMemberMutation(baseOptions?: Apollo.MutationHookOptions<AddMemberMutation, AddMemberMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddMemberMutation, AddMemberMutationVariables>(AddMemberDocument, options);
+      }
+export type AddMemberMutationHookResult = ReturnType<typeof useAddMemberMutation>;
+export type AddMemberMutationResult = Apollo.MutationResult<AddMemberMutation>;
+export type AddMemberMutationOptions = Apollo.BaseMutationOptions<AddMemberMutation, AddMemberMutationVariables>;
+export const GrantsDocument = gql`
+    query grants($after: ObjectId, $first: Int = 20) {
+  grants(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        type
+        start
+        end
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+    `;
+
+/**
+ * __useGrantsQuery__
+ *
+ * To run a query within a React component, call `useGrantsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGrantsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGrantsQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGrantsQuery(baseOptions?: Apollo.QueryHookOptions<GrantsQuery, GrantsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GrantsQuery, GrantsQueryVariables>(GrantsDocument, options);
+      }
+export function useGrantsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GrantsQuery, GrantsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GrantsQuery, GrantsQueryVariables>(GrantsDocument, options);
+        }
+export type GrantsQueryHookResult = ReturnType<typeof useGrantsQuery>;
+export type GrantsLazyQueryHookResult = ReturnType<typeof useGrantsLazyQuery>;
+export type GrantsQueryResult = Apollo.QueryResult<GrantsQuery, GrantsQueryVariables>;
+export const GrantDocument = gql`
+    query grant($id: ObjectId!) {
+  grant(id: $id) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      material
+      services
+      travel
+      indirect
+      salaries
+      members {
+        user {
+          id
+          name
+        }
+        hours
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGrantQuery__
+ *
+ * To run a query within a React component, call `useGrantQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGrantQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGrantQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGrantQuery(baseOptions: Apollo.QueryHookOptions<GrantQuery, GrantQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GrantQuery, GrantQueryVariables>(GrantDocument, options);
+      }
+export function useGrantLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GrantQuery, GrantQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GrantQuery, GrantQueryVariables>(GrantDocument, options);
+        }
+export type GrantQueryHookResult = ReturnType<typeof useGrantQuery>;
+export type GrantLazyQueryHookResult = ReturnType<typeof useGrantLazyQuery>;
+export type GrantQueryResult = Apollo.QueryResult<GrantQuery, GrantQueryVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
@@ -1233,3 +1563,39 @@ export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export const UserTextSearchDocument = gql`
+    query userTextSearch($text: String!) {
+  userTextSearch(text: $text) {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useUserTextSearchQuery__
+ *
+ * To run a query within a React component, call `useUserTextSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserTextSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserTextSearchQuery({
+ *   variables: {
+ *      text: // value for 'text'
+ *   },
+ * });
+ */
+export function useUserTextSearchQuery(baseOptions: Apollo.QueryHookOptions<UserTextSearchQuery, UserTextSearchQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserTextSearchQuery, UserTextSearchQueryVariables>(UserTextSearchDocument, options);
+      }
+export function useUserTextSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserTextSearchQuery, UserTextSearchQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserTextSearchQuery, UserTextSearchQueryVariables>(UserTextSearchDocument, options);
+        }
+export type UserTextSearchQueryHookResult = ReturnType<typeof useUserTextSearchQuery>;
+export type UserTextSearchLazyQueryHookResult = ReturnType<typeof useUserTextSearchLazyQuery>;
+export type UserTextSearchQueryResult = Apollo.QueryResult<UserTextSearchQuery, UserTextSearchQueryVariables>;

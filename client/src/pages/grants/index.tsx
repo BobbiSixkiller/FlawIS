@@ -5,162 +5,16 @@ import { Button, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
 import AddGrantDialog from "../../components/AddGrantDialog";
 
 import Dashboard from "../../components/Dashboard";
+import GrantsList from "../../components/GrantsList";
+import UserGrants from "../../components/UserGrants";
 import { Role } from "../../graphql/generated/schema";
 import { AuthContext } from "../../providers/Auth";
 import { NextPageWithLayout } from "../_app";
 
 const HomePage: NextPageWithLayout = () => {
-	const router = useRouter();
 	const { user } = useContext(AuthContext);
 
-	return (
-		<Grid padded>
-			<Grid.Row verticalAlign="middle">
-				<Grid.Column width={8}>
-					<Header>Grants</Header>
-				</Grid.Column>
-				<Grid.Column width={8}>
-					{user?.role === Role.Admin && <AddGrantDialog />}
-				</Grid.Column>
-			</Grid.Row>
-			<Grid.Row>
-				<Grid.Column>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-					<Segment>
-						<Placeholder>
-							<Placeholder.Header image>
-								<Placeholder.Line length="medium" />
-								<Placeholder.Line length="full" />
-							</Placeholder.Header>
-							<Placeholder.Paragraph>
-								<Placeholder.Line length="full" />
-								<Placeholder.Line length="medium" />
-							</Placeholder.Paragraph>
-						</Placeholder>
-					</Segment>
-				</Grid.Column>
-			</Grid.Row>
-		</Grid>
-	);
+	return user?.role === Role.Admin ? <GrantsList /> : <UserGrants />;
 };
 
 HomePage.getLayout = function getLayout(page) {

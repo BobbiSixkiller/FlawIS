@@ -25,13 +25,22 @@ type Announcement {
 """Budget schema type"""
 type Budget {
   createdAt: DateTime!
+  indirect: Int!
+  material: Int!
+  members: [Member]!
+  salaries: Int!
+  services: Int!
+  travel: Int!
+  updatedAt: DateTime!
+  year: DateTime!
+}
+
+input BudgetInput {
   indirect: Float!
   material: Float!
-  members: [Member]!
   salaries: Float!
   services: Float!
   travel: Float!
-  updatedAt: DateTime!
   year: DateTime!
 }
 
@@ -42,8 +51,8 @@ scalar DateTime
 
 """Grant model type"""
 type Grant {
-  announcements: [Announcement!]
-  budget: [Budget]!
+  announcements: [Announcement]!
+  budgets: [Budget]!
   createdAt: DateTime!
   end: DateTime!
   id: ID!
@@ -82,11 +91,20 @@ enum GrantType {
 type Member {
   createdAt: DateTime!
   hours: Float!
+  isMain: Boolean!
   updatedAt: DateTime!
   user: User!
 }
 
+input MemberInput {
+  hours: Float!
+  isMain: Boolean!
+  member: ObjectId!
+}
+
 type Mutation {
+  addBudget(data: BudgetInput!, id: ObjectId!): Grant!
+  addMember(data: MemberInput!, id: ObjectId!, year: DateTime!): Grant!
   createGrant(data: GrantInput!): Grant!
   deleteGrant(id: ObjectId!): Boolean!
   updategrant(data: GrantInput!, id: ObjectId!): Grant!
@@ -102,7 +120,8 @@ type PageInfo {
 
 type Query {
   grant(id: ObjectId!): Grant!
-  grants(after: String, first: Int = 20): GrantConnection!
+  grantTextSearch(text: String!): [Grant!]!
+  grants(after: ObjectId, first: Int = 20): GrantConnection!
 }
 
 type User {

@@ -12,10 +12,7 @@ import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
 import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
-import {
-	ControlsContext,
-	MenuItemsContext,
-} from "../providers/ControlsProvider";
+import { ControlsContext } from "../providers/ControlsProvider";
 
 interface navProps {
 	inView: boolean;
@@ -54,7 +51,7 @@ export const PageWrapper = styled.div`
 `;
 export const ContentWrapper = styled.div`
 	flex: 1;
-	margin: 75px 0 2em 0;
+	margin: 60px 0 2em 0;
 `;
 
 export default function Nav({
@@ -176,7 +173,7 @@ export default function Nav({
 												src={inView && transparent ? logoInverted : logo}
 												height={35}
 												width={35}
-												priority={true}
+												style={{ height: 35, width: 35 }}
 											/>
 										</Menu.Item>
 									</Link>
@@ -203,7 +200,7 @@ export default function Nav({
 												src={inView && transparent ? logoInverted : logo}
 												height={35}
 												width={35}
-												priority={true}
+												style={{ height: 35, width: 35 }}
 											/>
 										</Menu.Item>
 									</Link>

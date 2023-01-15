@@ -1,17 +1,12 @@
-import { Field, ArgsType, InputType, ObjectType } from "type-graphql";
+import { Field, ArgsType, InputType, ObjectType, ID } from "type-graphql";
 import { IsInt, IsDate, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
 import { NameExists, RefDocExists } from "../../util/validation";
-import {
-	Announcement,
-	Budget,
-	Grant,
-	GrantType,
-	Member,
-} from "../../entitites/Grant";
+import { Budget, Grant, GrantType, Member } from "../../entitites/Grant";
 import { CreateConnection, CreatePaginationArgs } from "./pagination";
 import { User } from "../../entitites/User";
+import { Ref } from "@typegoose/typegoose";
 
 @InputType()
 export class GrantInput implements Partial<Grant> {
@@ -33,39 +28,22 @@ export class GrantInput implements Partial<Grant> {
 
 @InputType()
 export class MemberInput implements Partial<Member> {
-	@Field()
-	@RefDocExists(User)
-	member: ObjectId;
+	@Field(() => String)
+	user: Ref<User>;
+
+	@Field(() => Boolean)
+	isMain: boolean;
 
 	@Field()
 	@IsInt()
 	hours: number;
 }
 
-export class AnnouncementInput implements Partial<Announcement> {
-	@Field()
-	@IsString()
-	name: string;
-
-	@Field()
-	@IsString()
-	text: string;
-
-	@Field(() => [String], { nullable: true })
-	@IsString({ each: true })
-	files: string[];
-}
-
 @InputType()
-export class BudgetInput
-	implements Omit<Budget, "id" | "members" | "createdAt" | "updatedAt">
-{
+export class BudgetInput implements Partial<Budget> {
 	@Field()
 	@IsDate()
 	year: Date;
-
-	@Field(() => [MemberInput], { nullable: true })
-	members: MemberInput[];
 
 	@Field()
 	@IsInt()

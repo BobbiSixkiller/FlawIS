@@ -10,8 +10,8 @@ import { AuthContext } from "./Auth";
 
 interface DialogState {
 	content: ReactNode;
-	confirmCb?: () => null;
-	cancelCb?: () => null;
+	confirmCb?: () => void;
+	cancelCb?: () => void;
 	header?: string;
 	canceltext?: string;
 	confirmText?: string;

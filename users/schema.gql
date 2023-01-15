@@ -45,6 +45,7 @@ type Query {
   forgotPassword(email: String!): String!
   me: User!
   user(id: ObjectId!): User!
+  userTextSearch(domain: String, text: String!): [User!]!
   users(after: String, before: String, first: Int = 20, last: Int = 20): UserConnection!
 }
 

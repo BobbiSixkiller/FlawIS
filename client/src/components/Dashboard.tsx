@@ -32,7 +32,7 @@ export default function Dashboard({ children }: dashboardProps) {
 		return (
 			<Nav transparent={false} locales={true}>
 				<ContentWrapper>
-					<Grid padded>
+					<Grid container>
 						<Grid.Row>
 							<Grid.Column>{children}</Grid.Column>
 						</Grid.Row>
@@ -82,7 +82,9 @@ export default function Dashboard({ children }: dashboardProps) {
 						height: "calc(100vh - 48px)",
 					}}
 				>
-					<Search placeholder="Search..." fluid input={{ fluid: true }} />
+					<div>
+						<Search placeholder="Search..." fluid input={{ fluid: true }} />
+					</div>
 					<List link size="small">
 						<List.Item as="a" href="#">
 							Contact Us

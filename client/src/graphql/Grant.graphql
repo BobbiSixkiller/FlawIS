@@ -9,3 +9,133 @@ mutation createGrant($data: GrantInput!) {
 		updatedAt
 	}
 }
+
+mutation addBudget($id: ObjectId!, $data: BudgetInput!) {
+	addBudget(id: $id, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			material
+			services
+			travel
+			indirect
+			salaries
+			members {
+				user {
+					id
+					name
+				}
+				hours
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
+}
+
+mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
+	addMember(id: $id, year: $year, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			material
+			services
+			travel
+			indirect
+			salaries
+			members {
+				user {
+					id
+					name
+				}
+				hours
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
+}
+
+query grants($after: ObjectId, $first: Int = 20) {
+	grants(after: $after, first: $first) {
+		edges {
+			cursor
+			node {
+				id
+				name
+				type
+				start
+				end
+			}
+		}
+		pageInfo {
+			endCursor
+			hasNextPage
+		}
+	}
+}
+
+query grant($id: ObjectId!) {
+	grant(id: $id) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			material
+			services
+			travel
+			indirect
+			salaries
+			members {
+				user {
+					id
+					name
+				}
+				hours
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
+}

@@ -16,6 +16,7 @@ import { UserResolver } from "./resolvers/user";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
+import MessageBroker from "./util/rmq";
 
 env.config();
 
@@ -57,6 +58,9 @@ async function main() {
 	// create mongoose connection
 	const mongoose = await connect(mongooseUri);
 	console.log(mongoose.connection && "Database connected!");
+
+	await MessageBroker.init();
+	MessageBroker.consumeMessages(["user.delete", "user.new"]);
 
 	await server.listen({ port }, () =>
 		console.log(

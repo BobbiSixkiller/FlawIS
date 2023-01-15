@@ -12,11 +12,13 @@ import parseErrors from "../../../util/parseErrors";
 import { InputField } from "../../../components/form/InputField";
 import { useTranslation } from "next-i18next";
 import Validation from "../../../util/validation";
+import useWidth from "../../../hooks/useWidth";
 
 const ProfilePage: NextPageWithLayout = () => {
 	const [update, setUpdate] = useState(false);
 	const { user, dispatch } = useContext(AuthContext);
 	const { t } = useTranslation(["common", "profile"]);
+	const width = useWidth();
 
 	const { perosnalInfoInputSchema } = Validation();
 
@@ -30,7 +32,7 @@ const ProfilePage: NextPageWithLayout = () => {
 	});
 
 	return (
-		<Grid padded>
+		<Grid padded={width < 400 ? "vertically" : true}>
 			<Grid.Row verticalAlign="middle">
 				<Grid.Column>
 					<Header>{t("header", { ns: "profile" })}</Header>

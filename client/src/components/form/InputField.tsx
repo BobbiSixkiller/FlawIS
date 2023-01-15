@@ -8,13 +8,13 @@ import {
 } from "semantic-ui-react";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
 
-export interface inputFieldProps extends FormFieldProps {
+export interface InputFieldProps extends FormFieldProps {
 	name: string;
 	fluid?: boolean;
 	placeholder?: string;
 }
 
-export const InputField: FC<inputFieldProps> = (props) => {
+export const InputField: FC<InputFieldProps> = (props) => {
 	const [field, meta, helpers] = useField(props.name);
 	const { status, setStatus } = useFormikContext();
 

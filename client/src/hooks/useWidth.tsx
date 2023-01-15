@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useWith() {
+export default function useWidth() {
 	const [width, setWidth] = useState(0); // default width, detect on server.
 
 	useEffect(() => {
