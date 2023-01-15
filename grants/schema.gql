@@ -22,15 +22,20 @@ type Announcement {
   updatedAt: DateTime!
 }
 
-"""Budget schema type"""
-type Budget {
-  createdAt: DateTime!
+type Approved {
   indirect: Int!
   material: Int!
-  members: [Member]!
   salaries: Int!
   services: Int!
   travel: Int!
+}
+
+"""Budget schema type"""
+type Budget {
+  approved: Approved!
+  createdAt: DateTime!
+  members: [Member]!
+  spent: Spent
   updatedAt: DateTime!
   year: DateTime!
 }
@@ -99,12 +104,13 @@ type Member {
 input MemberInput {
   hours: Float!
   isMain: Boolean!
-  member: ObjectId!
+  user: String!
 }
 
 type Mutation {
-  addBudget(data: BudgetInput!, id: ObjectId!): Grant!
+  addApprovedBudget(data: BudgetInput!, id: ObjectId!): Grant!
   addMember(data: MemberInput!, id: ObjectId!, year: DateTime!): Grant!
+  addSpentBudget(data: BudgetInput!, id: ObjectId!): Grant!
   createGrant(data: GrantInput!): Grant!
   deleteGrant(id: ObjectId!): Boolean!
   updategrant(data: GrantInput!, id: ObjectId!): Grant!
@@ -122,6 +128,14 @@ type Query {
   grant(id: ObjectId!): Grant!
   grantTextSearch(text: String!): [Grant!]!
   grants(after: ObjectId, first: Int = 20): GrantConnection!
+}
+
+type Spent {
+  indirect: Int!
+  material: Int!
+  salaries: Int!
+  services: Int!
+  travel: Int!
 }
 
 type User {

@@ -92,7 +92,7 @@ export class GrantResolver {
 
 	@Authorized()
 	@Mutation(() => Grant)
-	async addBudget(
+	async addApprovedBudget(
 		@Arg("id") _id: ObjectId,
 		@Arg("data") data: BudgetInput,
 		@LoadGrant() grant: DocumentType<Grant>
@@ -116,7 +116,41 @@ export class GrantResolver {
 			]);
 		}
 
-		grant.budgets.push(data as unknown as Budget);
+		grant.budgets.push({
+			year: data.year,
+			approved: {
+				services: data.services,
+				salaries: data.salaries,
+				material: data.material,
+				indirect: data.indirect,
+				travel: data.travel,
+			},
+		} as unknown as Budget);
+
+		return await grant.save();
+	}
+
+	@Authorized()
+	@Mutation(() => Grant)
+	async addSpentBudget(
+		@Arg("id") _id: ObjectId,
+		@Arg("data") data: BudgetInput,
+		@LoadGrant() grant: DocumentType<Grant>
+	) {
+		const budget = grant.budgets.find(
+			(b) => b.year.getFullYear() === data.year.getFullYear()
+		);
+		if (!budget) {
+			throw new Error("Budget not found!");
+		}
+
+		budget.spent = {
+			services: data.services,
+			salaries: data.salaries,
+			material: data.material,
+			indirect: data.indirect,
+			travel: data.travel,
+		};
 
 		return await grant.save();
 	}

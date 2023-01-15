@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Button, Form, Input } from "semantic-ui-react";
 import { date, InferType, object, number } from "yup";
-import { useAddBudgetMutation } from "../graphql/generated/schema";
+import { useAddApprovedBudgetMutation } from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
 import { InputField } from "./form/InputField";
@@ -23,7 +23,7 @@ function AddBudget() {
 	const { handleClose } = useContext(DialogContext);
 	const { query } = useRouter();
 
-	const [addBudget] = useAddBudgetMutation({
+	const [addBudget] = useAddApprovedBudgetMutation({
 		onCompleted: () => handleClose(),
 	});
 

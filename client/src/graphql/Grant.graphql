@@ -10,8 +10,8 @@ mutation createGrant($data: GrantInput!) {
 	}
 }
 
-mutation addBudget($id: ObjectId!, $data: BudgetInput!) {
-	addBudget(id: $id, data: $data) {
+mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
+	addApprovedBudget(id: $id, data: $data) {
 		id
 		name
 		type
@@ -25,11 +25,66 @@ mutation addBudget($id: ObjectId!, $data: BudgetInput!) {
 		}
 		budgets {
 			year
-			material
-			services
-			travel
-			indirect
-			salaries
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+				}
+				hours
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
+}
+
+mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
+	addSpentBudget(id: $id, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
 			members {
 				user {
 					id
@@ -62,11 +117,20 @@ mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
 		}
 		budgets {
 			year
-			material
-			services
-			travel
-			indirect
-			salaries
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
 			members {
 				user {
 					id
@@ -118,11 +182,20 @@ query grant($id: ObjectId!) {
 		}
 		budgets {
 			year
-			material
-			services
-			travel
-			indirect
-			salaries
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
 			members {
 				user {
 					id
@@ -137,5 +210,13 @@ query grant($id: ObjectId!) {
 		}
 		createdAt
 		updatedAt
+	}
+}
+
+query grantTextSearch($text: String!) {
+	grantTextSearch(text: $text) {
+		id
+		name
+		type
 	}
 }

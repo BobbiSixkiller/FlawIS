@@ -10,6 +10,7 @@ import useWith from "../hooks/useWidth";
 import Nav, { ContentWrapper } from "./Nav";
 import { useLogoutMutation } from "../graphql/generated/schema";
 import Footer from "./Footer";
+import GrantSearch from "./GrantSearch";
 
 interface dashboardProps {
 	children: ReactNode;
@@ -83,7 +84,7 @@ export default function Dashboard({ children }: dashboardProps) {
 					}}
 				>
 					<div>
-						<Search placeholder="Search..." fluid input={{ fluid: true }} />
+						<GrantSearch />
 					</div>
 					<List link size="small">
 						<List.Item as="a" href="#">

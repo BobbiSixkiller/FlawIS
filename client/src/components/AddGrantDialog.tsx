@@ -2,7 +2,11 @@ import { Formik, FormikProps } from "formik";
 import { useContext } from "react";
 import { Button, Form, Input, Select, TextArea } from "semantic-ui-react";
 import { date, InferType, object, ref, string } from "yup";
-import { useCreateGrantMutation } from "../graphql/generated/schema";
+import {
+	GrantsDocument,
+	GrantType,
+	useCreateGrantMutation,
+} from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
 import { InputField } from "./form/InputField";
@@ -23,6 +27,7 @@ function AddGrant() {
 
 	const [addGrant] = useCreateGrantMutation({
 		onCompleted: () => handleClose(),
+		refetchQueries: [{ query: GrantsDocument }, "grants"],
 	});
 
 	return (
@@ -37,7 +42,16 @@ function AddGrant() {
 			onSubmit={async (values, formik) => {
 				console.log(values);
 				try {
-					await addGrant({ variables: { data: values } });
+					await addGrant({
+						variables: {
+							data: {
+								name: values.name,
+								type: values.type as GrantType,
+								start: values.start,
+								end: values.end,
+							},
+						},
+					});
 				} catch (error: any) {
 					formik.setStatus(
 						parseErrors(

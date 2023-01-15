@@ -40,12 +40,8 @@ export class Member extends TimeStamps {
 	updatedAt: Date;
 }
 
-@ObjectType({ description: "Budget schema type" })
-export class Budget extends TimeStamps {
-	@Field()
-	@Property()
-	year: Date;
-
+@ObjectType()
+class Approved {
 	@Field(() => Int)
 	@Property()
 	travel: Number;
@@ -65,6 +61,44 @@ export class Budget extends TimeStamps {
 	@Field(() => Int)
 	@Property()
 	salaries: Number;
+}
+
+@ObjectType()
+class Spent {
+	@Field(() => Int)
+	@Property()
+	travel: Number;
+
+	@Field(() => Int)
+	@Property()
+	material: Number;
+
+	@Field(() => Int)
+	@Property()
+	services: Number;
+
+	@Field(() => Int)
+	@Property()
+	indirect: Number;
+
+	@Field(() => Int)
+	@Property()
+	salaries: Number;
+}
+
+@ObjectType({ description: "Budget schema type" })
+export class Budget extends TimeStamps {
+	@Field()
+	@Property()
+	year: Date;
+
+	@Field(() => Approved)
+	@Property({ type: () => Approved, _id: false })
+	approved: Approved;
+
+	@Field(() => Spent, { nullable: true })
+	@Property({ type: () => Spent, _id: false })
+	spent?: Spent;
 
 	@Field(() => [Member], { nullable: "items" })
 	@Property({ type: () => Member, _id: false, default: [] })

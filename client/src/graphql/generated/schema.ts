@@ -43,6 +43,15 @@ export type Announcement = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type Approved = {
+  __typename?: 'Approved';
+  indirect: Scalars['Int'];
+  material: Scalars['Int'];
+  salaries: Scalars['Int'];
+  services: Scalars['Int'];
+  travel: Scalars['Int'];
+};
+
 /** Attendee model type */
 export type Attendee = {
   __typename?: 'Attendee';
@@ -101,13 +110,10 @@ export type BillingInput = {
 /** Budget schema type */
 export type Budget = {
   __typename?: 'Budget';
+  approved: Approved;
   createdAt: Scalars['DateTime'];
-  indirect: Scalars['Int'];
-  material: Scalars['Int'];
   members: Array<Maybe<Member>>;
-  salaries: Scalars['Int'];
-  services: Scalars['Int'];
-  travel: Scalars['Int'];
+  spent?: Maybe<Spent>;
   updatedAt: Scalars['DateTime'];
   year: Scalars['DateTime'];
 };
@@ -306,15 +312,16 @@ export type Member = {
 export type MemberInput = {
   hours: Scalars['Float'];
   isMain: Scalars['Boolean'];
-  member: Scalars['ObjectId'];
+  user: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   activateUser: Scalars['Boolean'];
+  addApprovedBudget: Grant;
   addAttendee: Attendee;
-  addBudget: Grant;
   addMember: Grant;
+  addSpentBudget: Grant;
   addSubmission: Submission;
   createConference: Conference;
   createGrant: Grant;
@@ -347,14 +354,14 @@ export type MutationActivateUserArgs = {
 };
 
 
-export type MutationAddAttendeeArgs = {
-  data: AttendeeInput;
+export type MutationAddApprovedBudgetArgs = {
+  data: BudgetInput;
+  id: Scalars['ObjectId'];
 };
 
 
-export type MutationAddBudgetArgs = {
-  data: BudgetInput;
-  id: Scalars['ObjectId'];
+export type MutationAddAttendeeArgs = {
+  data: AttendeeInput;
 };
 
 
@@ -362,6 +369,12 @@ export type MutationAddMemberArgs = {
   data: MemberInput;
   id: Scalars['ObjectId'];
   year: Scalars['DateTime'];
+};
+
+
+export type MutationAddSpentBudgetArgs = {
+  data: BudgetInput;
+  id: Scalars['ObjectId'];
 };
 
 
@@ -617,6 +630,15 @@ export type SectionTranslation = {
   name: Scalars['String'];
 };
 
+export type Spent = {
+  __typename?: 'Spent';
+  indirect: Scalars['Int'];
+  material: Scalars['Int'];
+  salaries: Scalars['Int'];
+  services: Scalars['Int'];
+  travel: Scalars['Int'];
+};
+
 /** Submission entity model type */
 export type Submission = {
   __typename?: 'Submission';
@@ -824,13 +846,21 @@ export type CreateGrantMutationVariables = Exact<{
 
 export type CreateGrantMutation = { __typename?: 'Mutation', createGrant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } };
 
-export type AddBudgetMutationVariables = Exact<{
+export type AddApprovedBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
   data: BudgetInput;
 }>;
 
 
-export type AddBudgetMutation = { __typename?: 'Mutation', addBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+
+export type AddSpentBudgetMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: BudgetInput;
+}>;
+
+
+export type AddSpentBudgetMutation = { __typename?: 'Mutation', addSpentBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
 
 export type AddMemberMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -839,7 +869,7 @@ export type AddMemberMutationVariables = Exact<{
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
 
 export type GrantsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -854,7 +884,14 @@ export type GrantQueryVariables = Exact<{
 }>;
 
 
-export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, material: number, services: number, travel: number, indirect: number, salaries: number, createdAt: any, updatedAt: any, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+
+export type GrantTextSearchQueryVariables = Exact<{
+  text: Scalars['String'];
+}>;
+
+
+export type GrantTextSearchQuery = { __typename?: 'Query', grantTextSearch: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType }> };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1263,9 +1300,9 @@ export function useCreateGrantMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateGrantMutationHookResult = ReturnType<typeof useCreateGrantMutation>;
 export type CreateGrantMutationResult = Apollo.MutationResult<CreateGrantMutation>;
 export type CreateGrantMutationOptions = Apollo.BaseMutationOptions<CreateGrantMutation, CreateGrantMutationVariables>;
-export const AddBudgetDocument = gql`
-    mutation addBudget($id: ObjectId!, $data: BudgetInput!) {
-  addBudget(id: $id, data: $data) {
+export const AddApprovedBudgetDocument = gql`
+    mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
+  addApprovedBudget(id: $id, data: $data) {
     id
     name
     type
@@ -1279,11 +1316,20 @@ export const AddBudgetDocument = gql`
     }
     budgets {
       year
-      material
-      services
-      travel
-      indirect
-      salaries
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
       members {
         user {
           id
@@ -1301,33 +1347,107 @@ export const AddBudgetDocument = gql`
   }
 }
     `;
-export type AddBudgetMutationFn = Apollo.MutationFunction<AddBudgetMutation, AddBudgetMutationVariables>;
+export type AddApprovedBudgetMutationFn = Apollo.MutationFunction<AddApprovedBudgetMutation, AddApprovedBudgetMutationVariables>;
 
 /**
- * __useAddBudgetMutation__
+ * __useAddApprovedBudgetMutation__
  *
- * To run a mutation, you first call `useAddBudgetMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddBudgetMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useAddApprovedBudgetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddApprovedBudgetMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [addBudgetMutation, { data, loading, error }] = useAddBudgetMutation({
+ * const [addApprovedBudgetMutation, { data, loading, error }] = useAddApprovedBudgetMutation({
  *   variables: {
  *      id: // value for 'id'
  *      data: // value for 'data'
  *   },
  * });
  */
-export function useAddBudgetMutation(baseOptions?: Apollo.MutationHookOptions<AddBudgetMutation, AddBudgetMutationVariables>) {
+export function useAddApprovedBudgetMutation(baseOptions?: Apollo.MutationHookOptions<AddApprovedBudgetMutation, AddApprovedBudgetMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddBudgetMutation, AddBudgetMutationVariables>(AddBudgetDocument, options);
+        return Apollo.useMutation<AddApprovedBudgetMutation, AddApprovedBudgetMutationVariables>(AddApprovedBudgetDocument, options);
       }
-export type AddBudgetMutationHookResult = ReturnType<typeof useAddBudgetMutation>;
-export type AddBudgetMutationResult = Apollo.MutationResult<AddBudgetMutation>;
-export type AddBudgetMutationOptions = Apollo.BaseMutationOptions<AddBudgetMutation, AddBudgetMutationVariables>;
+export type AddApprovedBudgetMutationHookResult = ReturnType<typeof useAddApprovedBudgetMutation>;
+export type AddApprovedBudgetMutationResult = Apollo.MutationResult<AddApprovedBudgetMutation>;
+export type AddApprovedBudgetMutationOptions = Apollo.BaseMutationOptions<AddApprovedBudgetMutation, AddApprovedBudgetMutationVariables>;
+export const AddSpentBudgetDocument = gql`
+    mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
+  addSpentBudget(id: $id, data: $data) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      members {
+        user {
+          id
+          name
+        }
+        hours
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type AddSpentBudgetMutationFn = Apollo.MutationFunction<AddSpentBudgetMutation, AddSpentBudgetMutationVariables>;
+
+/**
+ * __useAddSpentBudgetMutation__
+ *
+ * To run a mutation, you first call `useAddSpentBudgetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSpentBudgetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSpentBudgetMutation, { data, loading, error }] = useAddSpentBudgetMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddSpentBudgetMutation(baseOptions?: Apollo.MutationHookOptions<AddSpentBudgetMutation, AddSpentBudgetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSpentBudgetMutation, AddSpentBudgetMutationVariables>(AddSpentBudgetDocument, options);
+      }
+export type AddSpentBudgetMutationHookResult = ReturnType<typeof useAddSpentBudgetMutation>;
+export type AddSpentBudgetMutationResult = Apollo.MutationResult<AddSpentBudgetMutation>;
+export type AddSpentBudgetMutationOptions = Apollo.BaseMutationOptions<AddSpentBudgetMutation, AddSpentBudgetMutationVariables>;
 export const AddMemberDocument = gql`
     mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
   addMember(id: $id, year: $year, data: $data) {
@@ -1344,11 +1464,20 @@ export const AddMemberDocument = gql`
     }
     budgets {
       year
-      material
-      services
-      travel
-      indirect
-      salaries
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
       members {
         user {
           id
@@ -1459,11 +1588,20 @@ export const GrantDocument = gql`
     }
     budgets {
       year
-      material
-      services
-      travel
-      indirect
-      salaries
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
       members {
         user {
           id
@@ -1509,6 +1647,43 @@ export function useGrantLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Gran
 export type GrantQueryHookResult = ReturnType<typeof useGrantQuery>;
 export type GrantLazyQueryHookResult = ReturnType<typeof useGrantLazyQuery>;
 export type GrantQueryResult = Apollo.QueryResult<GrantQuery, GrantQueryVariables>;
+export const GrantTextSearchDocument = gql`
+    query grantTextSearch($text: String!) {
+  grantTextSearch(text: $text) {
+    id
+    name
+    type
+  }
+}
+    `;
+
+/**
+ * __useGrantTextSearchQuery__
+ *
+ * To run a query within a React component, call `useGrantTextSearchQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGrantTextSearchQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGrantTextSearchQuery({
+ *   variables: {
+ *      text: // value for 'text'
+ *   },
+ * });
+ */
+export function useGrantTextSearchQuery(baseOptions: Apollo.QueryHookOptions<GrantTextSearchQuery, GrantTextSearchQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GrantTextSearchQuery, GrantTextSearchQueryVariables>(GrantTextSearchDocument, options);
+      }
+export function useGrantTextSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GrantTextSearchQuery, GrantTextSearchQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GrantTextSearchQuery, GrantTextSearchQueryVariables>(GrantTextSearchDocument, options);
+        }
+export type GrantTextSearchQueryHookResult = ReturnType<typeof useGrantTextSearchQuery>;
+export type GrantTextSearchLazyQueryHookResult = ReturnType<typeof useGrantTextSearchLazyQuery>;
+export type GrantTextSearchQueryResult = Apollo.QueryResult<GrantTextSearchQuery, GrantTextSearchQueryVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
