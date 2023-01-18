@@ -326,9 +326,11 @@ export type Mutation = {
   createConference: Conference;
   createGrant: Grant;
   createSection: Section;
+  deleteBudget: Grant;
   deleteConference: Scalars['Boolean'];
   deleteFile: Scalars['Boolean'];
   deleteGrant: Scalars['Boolean'];
+  deleteMember: Grant;
   deleteSection: Scalars['Boolean'];
   deleteSubmission: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
@@ -398,6 +400,12 @@ export type MutationCreateSectionArgs = {
 };
 
 
+export type MutationDeleteBudgetArgs = {
+  id: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
+};
+
+
 export type MutationDeleteConferenceArgs = {
   id: Scalars['ObjectId'];
 };
@@ -410,6 +418,13 @@ export type MutationDeleteFileArgs = {
 
 export type MutationDeleteGrantArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type MutationDeleteMemberArgs = {
+  id: Scalars['ObjectId'];
+  user: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
 };
 
 
@@ -846,13 +861,20 @@ export type CreateGrantMutationVariables = Exact<{
 
 export type CreateGrantMutation = { __typename?: 'Mutation', createGrant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } };
 
+export type DeleteGrantMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteGrantMutation = { __typename?: 'Mutation', deleteGrant: boolean };
+
 export type AddApprovedBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
   data: BudgetInput;
 }>;
 
 
-export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type AddSpentBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -860,7 +882,7 @@ export type AddSpentBudgetMutationVariables = Exact<{
 }>;
 
 
-export type AddSpentBudgetMutation = { __typename?: 'Mutation', addSpentBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type AddSpentBudgetMutation = { __typename?: 'Mutation', addSpentBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type AddMemberMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -869,7 +891,24 @@ export type AddMemberMutationVariables = Exact<{
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+
+export type DeleteMemberMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
+  user: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteMemberMutation = { __typename?: 'Mutation', deleteMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+
+export type DeleteBudgetMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  year: Scalars['DateTime'];
+}>;
+
+
+export type DeleteBudgetMutation = { __typename?: 'Mutation', deleteBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type GrantsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -884,7 +923,7 @@ export type GrantQueryVariables = Exact<{
 }>;
 
 
-export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string } } | null> } | null> } };
+export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type GrantTextSearchQueryVariables = Exact<{
   text: Scalars['String'];
@@ -1300,6 +1339,37 @@ export function useCreateGrantMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateGrantMutationHookResult = ReturnType<typeof useCreateGrantMutation>;
 export type CreateGrantMutationResult = Apollo.MutationResult<CreateGrantMutation>;
 export type CreateGrantMutationOptions = Apollo.BaseMutationOptions<CreateGrantMutation, CreateGrantMutationVariables>;
+export const DeleteGrantDocument = gql`
+    mutation deleteGrant($id: ObjectId!) {
+  deleteGrant(id: $id)
+}
+    `;
+export type DeleteGrantMutationFn = Apollo.MutationFunction<DeleteGrantMutation, DeleteGrantMutationVariables>;
+
+/**
+ * __useDeleteGrantMutation__
+ *
+ * To run a mutation, you first call `useDeleteGrantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteGrantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteGrantMutation, { data, loading, error }] = useDeleteGrantMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteGrantMutation(baseOptions?: Apollo.MutationHookOptions<DeleteGrantMutation, DeleteGrantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteGrantMutation, DeleteGrantMutationVariables>(DeleteGrantDocument, options);
+      }
+export type DeleteGrantMutationHookResult = ReturnType<typeof useDeleteGrantMutation>;
+export type DeleteGrantMutationResult = Apollo.MutationResult<DeleteGrantMutation>;
+export type DeleteGrantMutationOptions = Apollo.BaseMutationOptions<DeleteGrantMutation, DeleteGrantMutationVariables>;
 export const AddApprovedBudgetDocument = gql`
     mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
   addApprovedBudget(id: $id, data: $data) {
@@ -1334,8 +1404,10 @@ export const AddApprovedBudgetDocument = gql`
         user {
           id
           name
+          email
         }
         hours
+        isMain
         createdAt
         updatedAt
       }
@@ -1408,8 +1480,10 @@ export const AddSpentBudgetDocument = gql`
         user {
           id
           name
+          email
         }
         hours
+        isMain
         createdAt
         updatedAt
       }
@@ -1482,8 +1556,10 @@ export const AddMemberDocument = gql`
         user {
           id
           name
+          email
         }
         hours
+        isMain
         createdAt
         updatedAt
       }
@@ -1523,6 +1599,159 @@ export function useAddMemberMutation(baseOptions?: Apollo.MutationHookOptions<Ad
 export type AddMemberMutationHookResult = ReturnType<typeof useAddMemberMutation>;
 export type AddMemberMutationResult = Apollo.MutationResult<AddMemberMutation>;
 export type AddMemberMutationOptions = Apollo.BaseMutationOptions<AddMemberMutation, AddMemberMutationVariables>;
+export const DeleteMemberDocument = gql`
+    mutation deleteMember($id: ObjectId!, $year: DateTime!, $user: ObjectId!) {
+  deleteMember(id: $id, year: $year, user: $user) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      members {
+        user {
+          id
+          name
+          email
+        }
+        hours
+        isMain
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type DeleteMemberMutationFn = Apollo.MutationFunction<DeleteMemberMutation, DeleteMemberMutationVariables>;
+
+/**
+ * __useDeleteMemberMutation__
+ *
+ * To run a mutation, you first call `useDeleteMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteMemberMutation, { data, loading, error }] = useDeleteMemberMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      year: // value for 'year'
+ *      user: // value for 'user'
+ *   },
+ * });
+ */
+export function useDeleteMemberMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMemberMutation, DeleteMemberMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteMemberMutation, DeleteMemberMutationVariables>(DeleteMemberDocument, options);
+      }
+export type DeleteMemberMutationHookResult = ReturnType<typeof useDeleteMemberMutation>;
+export type DeleteMemberMutationResult = Apollo.MutationResult<DeleteMemberMutation>;
+export type DeleteMemberMutationOptions = Apollo.BaseMutationOptions<DeleteMemberMutation, DeleteMemberMutationVariables>;
+export const DeleteBudgetDocument = gql`
+    mutation deleteBudget($id: ObjectId!, $year: DateTime!) {
+  deleteBudget(id: $id, year: $year) {
+    id
+    name
+    type
+    start
+    end
+    announcements {
+      id
+      name
+      text
+      files
+    }
+    budgets {
+      year
+      approved {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      spent {
+        material
+        services
+        travel
+        indirect
+        salaries
+      }
+      members {
+        user {
+          id
+          name
+          email
+        }
+        hours
+        isMain
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type DeleteBudgetMutationFn = Apollo.MutationFunction<DeleteBudgetMutation, DeleteBudgetMutationVariables>;
+
+/**
+ * __useDeleteBudgetMutation__
+ *
+ * To run a mutation, you first call `useDeleteBudgetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteBudgetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteBudgetMutation, { data, loading, error }] = useDeleteBudgetMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      year: // value for 'year'
+ *   },
+ * });
+ */
+export function useDeleteBudgetMutation(baseOptions?: Apollo.MutationHookOptions<DeleteBudgetMutation, DeleteBudgetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteBudgetMutation, DeleteBudgetMutationVariables>(DeleteBudgetDocument, options);
+      }
+export type DeleteBudgetMutationHookResult = ReturnType<typeof useDeleteBudgetMutation>;
+export type DeleteBudgetMutationResult = Apollo.MutationResult<DeleteBudgetMutation>;
+export type DeleteBudgetMutationOptions = Apollo.BaseMutationOptions<DeleteBudgetMutation, DeleteBudgetMutationVariables>;
 export const GrantsDocument = gql`
     query grants($after: ObjectId, $first: Int = 20) {
   grants(after: $after, first: $first) {
@@ -1606,8 +1835,10 @@ export const GrantDocument = gql`
         user {
           id
           name
+          email
         }
         hours
+        isMain
         createdAt
         updatedAt
       }

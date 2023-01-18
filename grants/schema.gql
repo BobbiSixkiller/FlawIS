@@ -104,7 +104,7 @@ type Member {
 input MemberInput {
   hours: Float!
   isMain: Boolean!
-  user: String!
+  user: ID!
 }
 
 type Mutation {
@@ -112,7 +112,9 @@ type Mutation {
   addMember(data: MemberInput!, id: ObjectId!, year: DateTime!): Grant!
   addSpentBudget(data: BudgetInput!, id: ObjectId!): Grant!
   createGrant(data: GrantInput!): Grant!
+  deleteBudget(id: ObjectId!, year: DateTime!): Grant!
   deleteGrant(id: ObjectId!): Boolean!
+  deleteMember(id: ObjectId!, user: ObjectId!, year: DateTime!): Grant!
   updategrant(data: GrantInput!, id: ObjectId!): Grant!
 }
 
