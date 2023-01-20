@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsMongoId, IsString } from "class-validator";
 import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Announcement } from "../../entitites/Announcement";
@@ -13,21 +13,23 @@ export class AnnouncementArgs extends CreatePaginationArgs(Announcement) {}
 
 @InputType()
 export class AnnouncementInput implements Partial<Announcement> {
-	@Field()
-	@IsString()
-	name: string;
+  @Field()
+  @IsString()
+  name: string;
 
-	@Field()
-	@IsString()
-	text: string;
+  @Field()
+  @IsString()
+  text: string;
 
-	@Field(() => [String], { nullable: true })
-	@IsString({ each: true })
-	files: string[];
+  @Field(() => [String], { nullable: true })
+  @IsString({ each: true })
+  files: string[];
 
-	@Field(() => GrantType, { nullable: true })
-	grantType?: GrantType;
+  @Field(() => GrantType, { nullable: true })
+  @IsString()
+  grantType?: GrantType;
 
-	@Field(() => ObjectId, { nullable: true })
-	grantId?: ObjectId;
+  @Field(() => ObjectId, { nullable: true })
+  @IsString()
+  grantId?: ObjectId;
 }

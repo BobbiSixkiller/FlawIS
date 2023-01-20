@@ -4,9 +4,8 @@ import { verify, sign, SignOptions } from "jsonwebtoken";
 import env from "dotenv";
 
 import FileUploadDataSource from "@profusion/apollo-federation-upload";
-import { GraphQLRequestContext } from "apollo-server-types";
+import { GraphQLRequest, GraphQLRequestContext } from "apollo-server-types";
 import parseCookies from "./cookieParser";
-import { GraphQLDataSourceProcessOptions } from "@apollo/gateway";
 import { User } from "./types";
 import { ExpressContext } from "apollo-server-express";
 
@@ -106,22 +105,26 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
   willSendRequest({
     request,
     context,
-  }: GraphQLDataSourceProcessOptions<Record<string, any>>) {
+  }: {
+    request: GraphQLRequest;
+    context: any;
+  }) {
     if (context.user) {
       request.http?.headers.set("user", JSON.stringify(context.user));
     }
-
     if (context.locale) {
       request.http?.headers.set("locale", JSON.stringify(context.locale));
     }
 
-    //rest of the headers i.e. reset token
-    const headers = context.req?.headers;
-    for (const key in headers) {
-      const value = headers[key];
-      if (value) {
-        request.http?.headers.set(key, String(value));
-      }
-    }
+    // //rest of the headers i.e. reset token
+    // const headers = context.req?.headers;
+    // for (const key in headers) {
+    //   const value = headers[key];
+    //   if (value) {
+    //     request.http?.headers.set(key, String(value));
+    //   }
+    // }
+
+    console.log(request.http?.headers);
   }
 }

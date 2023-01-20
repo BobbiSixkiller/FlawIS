@@ -31,11 +31,20 @@ async function main() {
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }: Context) => ({
+    context: ({
       req,
       res,
-      user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
-    }),
+    }: {
+      req: Express.Request;
+      res: Express.Response;
+    }) => {
+      console.log(req.headers);
+      return {
+        req,
+        res,
+        user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+      };
+    },
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
   });
 

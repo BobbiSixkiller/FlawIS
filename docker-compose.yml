@@ -29,7 +29,7 @@ services:
       - ./users/.env
     depends_on:
       - rabbitmq
-      - db
+      - mongo
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
@@ -62,7 +62,7 @@ services:
       - ./conferences/.env
     depends_on:
       - rabbitmq
-      - db
+      - mongo
     volumes:
       - ./conferences:/usr/app
       - /usr/app/node_modules
@@ -80,7 +80,7 @@ services:
       - ./grants/.env
     depends_on:
       - rabbitmq
-      - db
+      - mongo
     volumes:
       - ./grants:/usr/app
       - /usr/app/node_modules
@@ -124,7 +124,7 @@ services:
     image: redis
     ports:
       - "6379:6379"
-  db:
+  mongo:
     image: mongo
     restart: unless-stopped
     ports:

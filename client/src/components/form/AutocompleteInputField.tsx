@@ -1,6 +1,5 @@
-import { useField } from "formik";
-import { useState } from "react";
-import { Dropdown, Form } from "semantic-ui-react";
+import { useField, useFormikContext } from "formik";
+import { Form } from "semantic-ui-react";
 import { useUserTextSearchLazyQuery } from "../../graphql/generated/schema";
 
 export default function AutocompleteInputField({
@@ -13,46 +12,39 @@ export default function AutocompleteInputField({
   label: string;
 }) {
   const [field, meta, helpers] = useField(name);
-  // const [searchValue, setSearchValue] = useState<
-  // 	boolean | number | string | (boolean | number | string)[]
-  // >();
-  const [options, setOptions] = useState<
-    { key: string; text: string; value: string }[]
-  >([]);
+  const { status, setStatus } = useFormikContext();
 
-  const [search, { loading, data }] = useUserTextSearchLazyQuery({
-    onCompleted: ({ userTextSearch }) =>
-      setOptions(
-        userTextSearch.map((user) => ({
-          key: user.id,
-          text: user.name,
-          value: user.id,
-        }))
-      ),
-  });
+  const [search, { loading, data }] = useUserTextSearchLazyQuery();
 
-  const error = meta.touched && meta.error;
+  const error = (meta.touched && meta.error) || (status && status[field.name]);
 
   return (
-    <Form.Field error={error}>
-      <label>{label}</label>
-      <Form.Select
-        fluid
-        selection
-        search={true}
-        options={options}
-        value={field.value}
-        name={name}
-        labeled
-        placeholder={placeholder}
-        onChange={(e, { value }) => helpers.setValue(value)}
-        onSearchChange={async (e, { searchQuery }) => {
-          console.log(searchQuery);
-          await search({ variables: { text: searchQuery } });
-        }}
-        loading={loading}
-        error={error as boolean}
-      />
-    </Form.Field>
+    <Form.Select
+      fluid
+      selection
+      search={true}
+      options={
+        data
+          ? data?.userTextSearch.map((user) => ({
+              key: user.id,
+              text: user.name,
+              value: user.id,
+            }))
+          : []
+      }
+      value={field.value}
+      name={name}
+      label={label}
+      placeholder={placeholder}
+      onChange={(e, { value }) => {
+        helpers.setValue(value);
+        setStatus({ ...status, [field.name]: undefined });
+      }}
+      onSearchChange={async (e, { searchQuery }) => {
+        await search({ variables: { text: searchQuery } });
+      }}
+      loading={loading}
+      error={error}
+    />
   );
 }

@@ -188,17 +188,41 @@ export class GrantResolver {
       (b) => b.year.getFullYear() === year.getFullYear()
     );
     if (!budget) {
-      throw new Error("Budget for submitted year not found!");
+      throw new Error("Budget not found!");
     }
 
     if (
       budget.members.some((m) => {
-        console.log(m.user?.toString(), data.user?.toString());
-
         return m.user?.toString() === data.user?.toString();
       })
     ) {
-      throw new Error("User already assigned!");
+      throw new ArgumentValidationError([
+        {
+          target: Grant, // Object that was validated.
+          property: "user", // Object's property that haven't pass validation.
+          value: data.user, // Value that haven't pass a validation.
+          constraints: {
+            // Constraints that failed validation with error messages.
+            UserExists: "User is already set for submitted year!",
+          },
+          //children?: ValidationError[], // Contains all nested validation errors of the property
+        },
+      ]);
+    }
+
+    if (data.isMain && budget.members.some((m) => m.isMain === true)) {
+      throw new ArgumentValidationError([
+        {
+          target: Grant, // Object that was validated.
+          property: "isMain", // Object's property that haven't pass validation.
+          value: data.isMain, // Value that haven't pass a validation.
+          constraints: {
+            // Constraints that failed validation with error messages.
+            MainExists: "Main is already set!",
+          },
+          //children?: ValidationError[], // Contains all nested validation errors of the property
+        },
+      ]);
     }
 
     budget.members.push(data as unknown as Member);

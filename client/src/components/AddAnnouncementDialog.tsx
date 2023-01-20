@@ -1,119 +1,139 @@
 import { Formik, FormikProps } from "formik";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Button, Form, Input } from "semantic-ui-react";
-import { InferType, object, number, boolean, string } from "yup";
+import { Button, Form, Input, TextArea } from "semantic-ui-react";
+import { InferType, object, string, array, mixed } from "yup";
+import {
+  FileType,
+  GrantType,
+  useCreateAnnouncementMutation,
+  useUploadFileMutation,
+} from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
+import {
+  checkIfFilesAreCorrectType,
+  checkIfFilesAreTooBig,
+} from "../util/validation";
+import FileUpload from "./form/FileUpload";
 import { InputField } from "./form/InputField";
 
 const budgetInputSchema = object({
-	member: string().required(),
-	isMain: boolean().required(),
-	hours: number().required(),
+  name: string().required(),
+  text: string().required(),
+  grantId: string().nullable(),
+  grantType: string().nullable(),
+  files: array().of(
+    mixed()
+      .test(
+        "is-correct-file",
+        "VALIDATION_FIELD_FILE_BIG",
+        checkIfFilesAreTooBig
+      )
+      .test(
+        "is-big-file",
+        "VALIDATION_FIELD_FILE_WRONG_TYPE",
+        checkIfFilesAreCorrectType
+      )
+  ),
 });
 
 type Values = InferType<typeof budgetInputSchema>;
 
-function AddAnnouncement() {
-	const { handleClose } = useContext(DialogContext);
-	const { query } = useRouter();
+export default function AddAnnouncementDialog({
+  grantId,
+  grantType,
+}: {
+  grantId?: string;
+  grantType?: GrantType;
+}) {
+  const { query } = useRouter();
 
-	const [addAnnouncement] = useAddMemberMutation({
-		onCompleted: () => handleClose(),
-	});
+  const { handleOpen, handleClose } = useContext(DialogContext);
 
-	return (
-		<Formik
-			initialValues={{}}
-			validationSchema={budgetInputSchema}
-			onSubmit={async (values, formik) => {
-				console.log(values);
-				try {
-					await addAnnouncement({ variables: { id: query.id, data: values } });
-				} catch (error: any) {
-					formik.setStatus(
-						parseErrors(
-							error.graphQLErrors[0].extensions.exception.validationErrors
-						)
-					);
-				}
-			}}
-		>
-			{({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
-				<Form loading={isSubmitting} onSubmit={handleSubmit}>
-					<InputField
-						fluid
-						placeholder="Rok..."
-						label="Rok"
-						name="year"
-						control={Input}
-						type="month"
-					/>
-					<InputField
-						placeholder="Cestovné..."
-						label="Cestovné"
-						name="travel"
-						control={Input}
-						type="number"
-					/>
-					<InputField
-						placeholder="Služby..."
-						label="Služby"
-						name="services"
-						control={Input}
-						type="number"
-					/>
-					<InputField
-						placeholder="Materiál..."
-						label="Materiál"
-						name="material"
-						control={Input}
-						type="number"
-					/>
-					<InputField
-						placeholder="Mzdy..."
-						label="Mzdy"
-						name="salaries"
-						control={Input}
-						type="number"
-					/>
-					<InputField
-						placeholder="Nepriame..."
-						label="Nepriame"
-						name="indirect"
-						control={Input}
-						type="number"
-					/>
+  const [addAnnouncement] = useCreateAnnouncementMutation();
+  const [upload] = useUploadFileMutation();
 
-					<Button secondary onClick={() => handleClose()} type="button">
-						Zrušiť
-					</Button>
-					<Button positive type="submit">
-						Pridať
-					</Button>
-				</Form>
-			)}
-		</Formik>
-	);
-}
+  return (
+    <Button
+      positive
+      floated="right"
+      icon="plus"
+      size="tiny"
+      onClick={() =>
+        handleOpen({
+          size: "tiny",
+          header: "Pridať oznam",
+          content: (
+            <Formik
+              initialValues={{
+                name: "",
+                text: "",
+                files: [],
+                grantId,
+                grantType,
+              }}
+              validationSchema={budgetInputSchema}
+              onSubmit={async (values, formik) => {
+                console.log(values);
+                try {
+                  const urls: string[] = [];
+                  for await (const file of values.files) {
+                    const { data } = await upload({
+                      variables: { file, type: FileType.Grant },
+                    });
+                    if (data) {
+                      urls.push(data?.uploadFile);
+                    }
+                  }
+                  console.log(urls);
+                  await addAnnouncement({
+                    variables: { data: { ...values, files: urls } },
+                  });
+                } catch (error: any) {
+                  formik.setStatus(
+                    parseErrors(
+                      error.graphQLErrors[0].extensions.exception
+                        .validationErrors
+                    )
+                  );
+                }
+              }}
+            >
+              {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
+                <Form loading={isSubmitting} onSubmit={handleSubmit}>
+                  <InputField
+                    fluid
+                    placeholder="Názov oznamu..."
+                    label="Názov"
+                    name="name"
+                    control={Input}
+                  />
+                  <InputField
+                    fluid
+                    placeholder="Text oznamu..."
+                    label="Text"
+                    name="text"
+                    control={TextArea}
+                  />
+                  <FileUpload
+                    name="files"
+                    label="Súbory"
+                    type={FileType.Grant}
+                  />
 
-export default function AddMemberDialog() {
-	const { handleOpen } = useContext(DialogContext);
-
-	return (
-		<Button
-			positive
-			floated="right"
-			icon="plus"
-			size="tiny"
-			onClick={() =>
-				handleOpen({
-					content: <AddMember />,
-					size: "tiny",
-					header: "Pridať rozpočet",
-				})
-			}
-		/>
-	);
+                  <Button secondary onClick={() => handleClose()} type="button">
+                    Zrušiť
+                  </Button>
+                  <Button positive type="submit">
+                    Pridať
+                  </Button>
+                </Form>
+              )}
+            </Formik>
+          ),
+        })
+      }
+    />
+  );
 }

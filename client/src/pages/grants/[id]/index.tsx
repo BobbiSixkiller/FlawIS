@@ -12,6 +12,7 @@ import {
   Tab,
   Table,
 } from "semantic-ui-react";
+import AddAnnouncementDialog from "../../../components/AddAnnouncementDialog";
 
 import AddBudgetDialog from "../../../components/AddBudgetDialog";
 import AddMemberDialog from "../../../components/AddMemberDIalog";
@@ -64,7 +65,7 @@ const GrantPage: NextPageWithLayout = () => {
               </Grid.Column>
               <Grid.Column>
                 {user?.role === Role.Admin && (
-                  <Button icon="plus" size="tiny" positive floated="right" />
+                  <AddAnnouncementDialog grantId={query.id} grantType={null} />
                 )}
               </Grid.Column>
             </Grid.Row>

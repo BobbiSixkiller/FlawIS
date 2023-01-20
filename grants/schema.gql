@@ -22,6 +22,29 @@ type Announcement {
   updatedAt: DateTime!
 }
 
+type AnnouncementConnection {
+  edges: [AnnouncementEdge]!
+  pageInfo: AnnouncementPageInfo!
+}
+
+type AnnouncementEdge {
+  cursor: ObjectId!
+  node: Announcement!
+}
+
+input AnnouncementInput {
+  files: [String!]
+  grantId: ObjectId
+  grantType: GrantType
+  name: String!
+  text: String!
+}
+
+type AnnouncementPageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
+}
+
 type Approved {
   indirect: Int!
   material: Int!
@@ -70,7 +93,7 @@ type Grant {
 """GrantConnection type enabling cursor based pagination"""
 type GrantConnection {
   edges: [GrantEdge]!
-  pageInfo: PageInfo!
+  pageInfo: GrantPageInfo!
 }
 
 type GrantEdge {
@@ -83,6 +106,11 @@ input GrantInput {
   name: String!
   start: DateTime!
   type: GrantType!
+}
+
+type GrantPageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
 }
 
 """Type of grants inside the FLAWIS system"""
@@ -111,22 +139,22 @@ type Mutation {
   addApprovedBudget(data: BudgetInput!, id: ObjectId!): Grant!
   addMember(data: MemberInput!, id: ObjectId!, year: DateTime!): Grant!
   addSpentBudget(data: BudgetInput!, id: ObjectId!): Grant!
+  createAnnouncement(data: AnnouncementInput!): Announcement!
   createGrant(data: GrantInput!): Grant!
+  deleteAnnouncement(id: ObjectId!): Boolean!
   deleteBudget(id: ObjectId!, year: DateTime!): Grant!
   deleteGrant(id: ObjectId!): Boolean!
   deleteMember(id: ObjectId!, user: ObjectId!, year: DateTime!): Grant!
+  updateAnnouncement(data: AnnouncementInput!, id: ObjectId!): Announcement!
   updategrant(data: GrantInput!, id: ObjectId!): Grant!
 }
 
 """Mongo object id scalar type"""
 scalar ObjectId
 
-type PageInfo {
-  endCursor: ObjectId!
-  hasNextPage: Boolean!
-}
-
 type Query {
+  announcement(id: ObjectId!): Announcement!
+  announcements(after: ObjectId, first: Int = 20): AnnouncementConnection!
   grant(id: ObjectId!): Grant!
   grantTextSearch(text: String!): [Grant!]!
   grants(after: ObjectId, first: Int = 20): GrantConnection!

@@ -36,7 +36,7 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "@apollo/gateway": "^2.0.1",
+    "@apollo/gateway": "^2.2.3",
     "@profusion/apollo-federation-upload": "^4.0.0",
     "apollo-server-core": "^3.6.7",
     "apollo-server-express": "^3.6.7",

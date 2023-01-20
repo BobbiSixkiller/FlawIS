@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import { CheckboxProps, Form } from "semantic-ui-react";
 
 interface CheckBoxfieldProps extends CheckboxProps {
@@ -8,13 +8,19 @@ interface CheckBoxfieldProps extends CheckboxProps {
 
 const CheckboxField: FC<CheckBoxfieldProps> = ({ name, ...props }) => {
   const [field, meta, helpers] = useField(name);
+  const { status, setStatus } = useFormikContext();
+
+  const error = (meta.touched && meta.error) || (status && status[field.name]);
 
   return (
     <Form.Checkbox
-      error={meta.touched && meta.error}
+      error={error ? { content: error, pointing: "left" } : undefined}
       {...props}
       checked={field.value}
-      onChange={() => helpers.setValue(!field.value)}
+      onChange={() => {
+        helpers.setValue(!field.value);
+        setStatus({ ...status, [field.name]: undefined });
+      }}
     />
   );
 };

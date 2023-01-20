@@ -17,6 +17,7 @@ import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
 import MessageBroker from "./util/rmq";
+import { AnnouncementResolver } from "./resolvers/announcement";
 
 env.config();
 
@@ -28,7 +29,12 @@ async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
     {
-      resolvers: [GrantResolver, MemberResolver, UserResolver],
+      resolvers: [
+        GrantResolver,
+        MemberResolver,
+        UserResolver,
+        AnnouncementResolver,
+      ],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware],
       // use ObjectId scalar mapping
@@ -47,12 +53,17 @@ async function main() {
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }: Context) => ({
-      req,
-      res,
-      user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
-      locale: req.headers.locale,
-    }),
+    context: ({ req, res }: Context) => {
+      console.log(req.headers);
+      return {
+        req,
+        res,
+        user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+        locale: req.headers.locale
+          ? JSON.parse(req.headers.locale as string)
+          : "sk",
+      };
+    },
   });
 
   // create mongoose connection

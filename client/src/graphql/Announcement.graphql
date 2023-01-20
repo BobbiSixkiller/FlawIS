@@ -1,0 +1,45 @@
+fragment Announcement on Announcement {
+  id
+  name
+  text
+  files
+  createdAt
+  updatedAt
+}
+
+query announcements($after: ObjectId, $first: Int = 20) {
+  announcements(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        ...Announcement
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query announcement($id: ObjectId!) {
+  announcement(id: $id) {
+    ...Announcement
+  }
+}
+
+mutation createAnnouncement($data: AnnouncementInput!) {
+  createAnnouncement(data: $data) {
+    ...Announcement
+  }
+}
+
+mutation updateAnnouncement($id: ObjectId!, $data: AnnouncementInput!) {
+  updateAnnouncement(id: $id, data: $data) {
+    ...Announcement
+  }
+}
+
+mutation deleteAnnouncement($id: ObjectId!) {
+  deleteAnnouncement(id: $id)
+}

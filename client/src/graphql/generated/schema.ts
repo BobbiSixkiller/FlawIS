@@ -43,6 +43,32 @@ export type Announcement = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type AnnouncementConnection = {
+  __typename?: 'AnnouncementConnection';
+  edges: Array<Maybe<AnnouncementEdge>>;
+  pageInfo: AnnouncementPageInfo;
+};
+
+export type AnnouncementEdge = {
+  __typename?: 'AnnouncementEdge';
+  cursor: Scalars['ObjectId'];
+  node: Announcement;
+};
+
+export type AnnouncementInput = {
+  files?: InputMaybe<Array<Scalars['String']>>;
+  grantId?: InputMaybe<Scalars['ObjectId']>;
+  grantType?: InputMaybe<GrantType>;
+  name: Scalars['String'];
+  text: Scalars['String'];
+};
+
+export type AnnouncementPageInfo = {
+  __typename?: 'AnnouncementPageInfo';
+  endCursor: Scalars['ObjectId'];
+  hasNextPage: Scalars['Boolean'];
+};
+
 export type Approved = {
   __typename?: 'Approved';
   indirect: Scalars['Int'];
@@ -221,7 +247,7 @@ export type Grant = {
 export type GrantConnection = {
   __typename?: 'GrantConnection';
   edges: Array<Maybe<GrantEdge>>;
-  pageInfo: PageInfo;
+  pageInfo: GrantPageInfo;
 };
 
 export type GrantEdge = {
@@ -235,6 +261,12 @@ export type GrantInput = {
   name: Scalars['String'];
   start: Scalars['DateTime'];
   type: GrantType;
+};
+
+export type GrantPageInfo = {
+  __typename?: 'GrantPageInfo';
+  endCursor: Scalars['ObjectId'];
+  hasNextPage: Scalars['Boolean'];
 };
 
 /** Type of grants inside the FLAWIS system */
@@ -312,7 +344,7 @@ export type Member = {
 export type MemberInput = {
   hours: Scalars['Float'];
   isMain: Scalars['Boolean'];
-  user: Scalars['String'];
+  user: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -323,9 +355,11 @@ export type Mutation = {
   addMember: Grant;
   addSpentBudget: Grant;
   addSubmission: Submission;
+  createAnnouncement: Announcement;
   createConference: Conference;
   createGrant: Grant;
   createSection: Section;
+  deleteAnnouncement: Scalars['Boolean'];
   deleteBudget: Grant;
   deleteConference: Scalars['Boolean'];
   deleteFile: Scalars['Boolean'];
@@ -340,6 +374,7 @@ export type Mutation = {
   register: User;
   removeAttendee: Scalars['Boolean'];
   resendActivationLink: Scalars['Boolean'];
+  updateAnnouncement: Announcement;
   updateConference: Conference;
   updateConferenceUser: User;
   updateInvoice: Attendee;
@@ -385,6 +420,11 @@ export type MutationAddSubmissionArgs = {
 };
 
 
+export type MutationCreateAnnouncementArgs = {
+  data: AnnouncementInput;
+};
+
+
 export type MutationCreateConferenceArgs = {
   data: ConferenceInput;
 };
@@ -397,6 +437,11 @@ export type MutationCreateGrantArgs = {
 
 export type MutationCreateSectionArgs = {
   data: SectionInput;
+};
+
+
+export type MutationDeleteAnnouncementArgs = {
+  id: Scalars['ObjectId'];
 };
 
 
@@ -464,6 +509,12 @@ export type MutationRemoveAttendeeArgs = {
 };
 
 
+export type MutationUpdateAnnouncementArgs = {
+  data: AnnouncementInput;
+  id: Scalars['ObjectId'];
+};
+
+
 export type MutationUpdateConferenceArgs = {
   data: ConferenceInput;
   id: Scalars['ObjectId'];
@@ -522,6 +573,8 @@ export type PasswordInput = {
 
 export type Query = {
   __typename?: 'Query';
+  announcement: Announcement;
+  announcements: AnnouncementConnection;
   attendee: Attendee;
   conference: Conference;
   conferences: Array<Conference>;
@@ -535,6 +588,17 @@ export type Query = {
   user: User;
   userTextSearch: Array<User>;
   users: UserConnection;
+};
+
+
+export type QueryAnnouncementArgs = {
+  id: Scalars['ObjectId'];
+};
+
+
+export type QueryAnnouncementsArgs = {
+  after?: InputMaybe<Scalars['ObjectId']>;
+  first?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -795,6 +859,45 @@ export type VenueInput = {
   name: Scalars['String'];
 };
 
+export type AnnouncementFragment = { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any };
+
+export type AnnouncementsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']>;
+  first?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type AnnouncementsQuery = { __typename?: 'Query', announcements: { __typename?: 'AnnouncementConnection', edges: Array<{ __typename?: 'AnnouncementEdge', cursor: any, node: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'AnnouncementPageInfo', endCursor: any, hasNextPage: boolean } } };
+
+export type AnnouncementQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type AnnouncementQuery = { __typename?: 'Query', announcement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
+
+export type CreateAnnouncementMutationVariables = Exact<{
+  data: AnnouncementInput;
+}>;
+
+
+export type CreateAnnouncementMutation = { __typename?: 'Mutation', createAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
+
+export type UpdateAnnouncementMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: AnnouncementInput;
+}>;
+
+
+export type UpdateAnnouncementMutation = { __typename?: 'Mutation', updateAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
+
+export type DeleteAnnouncementMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: boolean };
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -916,7 +1019,7 @@ export type GrantsQueryVariables = Exact<{
 }>;
 
 
-export type GrantsQuery = { __typename?: 'Query', grants: { __typename?: 'GrantConnection', edges: Array<{ __typename?: 'GrantEdge', cursor: any, node: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any } } | null>, pageInfo: { __typename?: 'PageInfo', endCursor: any, hasNextPage: boolean } } };
+export type GrantsQuery = { __typename?: 'Query', grants: { __typename?: 'GrantConnection', edges: Array<{ __typename?: 'GrantEdge', cursor: any, node: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any } } | null>, pageInfo: { __typename?: 'GrantPageInfo', endCursor: any, hasNextPage: boolean } } };
 
 export type GrantQueryVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -947,7 +1050,194 @@ export type UserTextSearchQueryVariables = Exact<{
 
 export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string }> };
 
+export const AnnouncementFragmentDoc = gql`
+    fragment Announcement on Announcement {
+  id
+  name
+  text
+  files
+  createdAt
+  updatedAt
+}
+    `;
+export const AnnouncementsDocument = gql`
+    query announcements($after: ObjectId, $first: Int = 20) {
+  announcements(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        ...Announcement
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+    ${AnnouncementFragmentDoc}`;
 
+/**
+ * __useAnnouncementsQuery__
+ *
+ * To run a query within a React component, call `useAnnouncementsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAnnouncementsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAnnouncementsQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useAnnouncementsQuery(baseOptions?: Apollo.QueryHookOptions<AnnouncementsQuery, AnnouncementsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AnnouncementsQuery, AnnouncementsQueryVariables>(AnnouncementsDocument, options);
+      }
+export function useAnnouncementsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AnnouncementsQuery, AnnouncementsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AnnouncementsQuery, AnnouncementsQueryVariables>(AnnouncementsDocument, options);
+        }
+export type AnnouncementsQueryHookResult = ReturnType<typeof useAnnouncementsQuery>;
+export type AnnouncementsLazyQueryHookResult = ReturnType<typeof useAnnouncementsLazyQuery>;
+export type AnnouncementsQueryResult = Apollo.QueryResult<AnnouncementsQuery, AnnouncementsQueryVariables>;
+export const AnnouncementDocument = gql`
+    query announcement($id: ObjectId!) {
+  announcement(id: $id) {
+    ...Announcement
+  }
+}
+    ${AnnouncementFragmentDoc}`;
+
+/**
+ * __useAnnouncementQuery__
+ *
+ * To run a query within a React component, call `useAnnouncementQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAnnouncementQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAnnouncementQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useAnnouncementQuery(baseOptions: Apollo.QueryHookOptions<AnnouncementQuery, AnnouncementQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AnnouncementQuery, AnnouncementQueryVariables>(AnnouncementDocument, options);
+      }
+export function useAnnouncementLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AnnouncementQuery, AnnouncementQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AnnouncementQuery, AnnouncementQueryVariables>(AnnouncementDocument, options);
+        }
+export type AnnouncementQueryHookResult = ReturnType<typeof useAnnouncementQuery>;
+export type AnnouncementLazyQueryHookResult = ReturnType<typeof useAnnouncementLazyQuery>;
+export type AnnouncementQueryResult = Apollo.QueryResult<AnnouncementQuery, AnnouncementQueryVariables>;
+export const CreateAnnouncementDocument = gql`
+    mutation createAnnouncement($data: AnnouncementInput!) {
+  createAnnouncement(data: $data) {
+    ...Announcement
+  }
+}
+    ${AnnouncementFragmentDoc}`;
+export type CreateAnnouncementMutationFn = Apollo.MutationFunction<CreateAnnouncementMutation, CreateAnnouncementMutationVariables>;
+
+/**
+ * __useCreateAnnouncementMutation__
+ *
+ * To run a mutation, you first call `useCreateAnnouncementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAnnouncementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAnnouncementMutation, { data, loading, error }] = useCreateAnnouncementMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateAnnouncementMutation(baseOptions?: Apollo.MutationHookOptions<CreateAnnouncementMutation, CreateAnnouncementMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAnnouncementMutation, CreateAnnouncementMutationVariables>(CreateAnnouncementDocument, options);
+      }
+export type CreateAnnouncementMutationHookResult = ReturnType<typeof useCreateAnnouncementMutation>;
+export type CreateAnnouncementMutationResult = Apollo.MutationResult<CreateAnnouncementMutation>;
+export type CreateAnnouncementMutationOptions = Apollo.BaseMutationOptions<CreateAnnouncementMutation, CreateAnnouncementMutationVariables>;
+export const UpdateAnnouncementDocument = gql`
+    mutation updateAnnouncement($id: ObjectId!, $data: AnnouncementInput!) {
+  updateAnnouncement(id: $id, data: $data) {
+    ...Announcement
+  }
+}
+    ${AnnouncementFragmentDoc}`;
+export type UpdateAnnouncementMutationFn = Apollo.MutationFunction<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>;
+
+/**
+ * __useUpdateAnnouncementMutation__
+ *
+ * To run a mutation, you first call `useUpdateAnnouncementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateAnnouncementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateAnnouncementMutation, { data, loading, error }] = useUpdateAnnouncementMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateAnnouncementMutation(baseOptions?: Apollo.MutationHookOptions<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>(UpdateAnnouncementDocument, options);
+      }
+export type UpdateAnnouncementMutationHookResult = ReturnType<typeof useUpdateAnnouncementMutation>;
+export type UpdateAnnouncementMutationResult = Apollo.MutationResult<UpdateAnnouncementMutation>;
+export type UpdateAnnouncementMutationOptions = Apollo.BaseMutationOptions<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>;
+export const DeleteAnnouncementDocument = gql`
+    mutation deleteAnnouncement($id: ObjectId!) {
+  deleteAnnouncement(id: $id)
+}
+    `;
+export type DeleteAnnouncementMutationFn = Apollo.MutationFunction<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>;
+
+/**
+ * __useDeleteAnnouncementMutation__
+ *
+ * To run a mutation, you first call `useDeleteAnnouncementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAnnouncementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAnnouncementMutation, { data, loading, error }] = useDeleteAnnouncementMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteAnnouncementMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>(DeleteAnnouncementDocument, options);
+      }
+export type DeleteAnnouncementMutationHookResult = ReturnType<typeof useDeleteAnnouncementMutation>;
+export type DeleteAnnouncementMutationResult = Apollo.MutationResult<DeleteAnnouncementMutation>;
+export type DeleteAnnouncementMutationOptions = Apollo.BaseMutationOptions<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>;
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {

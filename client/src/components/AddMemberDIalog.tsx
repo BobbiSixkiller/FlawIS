@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import { Button, Form, Input } from "semantic-ui-react";
 import { InferType, object, number, boolean, string } from "yup";
-import { useAddMemberMutation } from "../graphql/generated/schema";
+import {
+  useAddMemberMutation,
+  useUserTextSearchLazyQuery,
+} from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
 import AutocompleteInputField from "./form/AutocompleteInputField";
@@ -22,7 +25,11 @@ export default function AddMemberDialog({ year }: { year: any }) {
   const { handleOpen, handleClose, displayError } = useContext(DialogContext);
   const { query } = useRouter();
 
-  const [addMember] = useAddMemberMutation();
+  const [addMember, { error }] = useAddMemberMutation();
+
+  useEffect(() => {
+    displayError(error?.message || "");
+  }, [error, displayError]);
 
   return (
     <Button
@@ -39,7 +46,6 @@ export default function AddMemberDialog({ year }: { year: any }) {
               initialValues={{ user: "", isMain: false, hours: 0 }}
               validationSchema={budgetInputSchema}
               onSubmit={async (values, formik) => {
-                console.log(values);
                 try {
                   await addMember({
                     variables: {
@@ -50,7 +56,7 @@ export default function AddMemberDialog({ year }: { year: any }) {
                   });
                   handleClose();
                 } catch (error: any) {
-                  console.log("FIRED");
+                  console.log(error);
                   formik.setStatus(
                     parseErrors(
                       error.graphQLErrors[0].extensions.exception
