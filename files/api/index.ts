@@ -15,50 +15,47 @@ env.config();
 const port = process.env.PORT || 5002;
 
 async function main() {
-  //Build schema
-  const schema = await buildFederatedSchema({
-    resolvers: [FileResolver],
-    globalMiddlewares: [],
-    emitSchemaFile: true,
-    authChecker,
-  });
+	//Build schema
+	const schema = await buildFederatedSchema({
+		resolvers: [FileResolver],
+		globalMiddlewares: [],
+		emitSchemaFile: true,
+		authChecker,
+	});
 
-  const app = Express();
+	const app = Express();
 
-  app.use(graphqlUploadExpress());
-  app.use("/public", Express.static("public"));
+	app.use(graphqlUploadExpress());
+	app.use("/public", Express.static("public"));
 
-  //Create Apollo server
-  const server = new ApolloServer({
-    schema,
-    context: ({
-      req,
-      res,
-    }: {
-      req: Express.Request;
-      res: Express.Response;
-    }) => {
-      console.log(req.headers);
-      return {
-        req,
-        res,
-        user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
-      };
-    },
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
-  });
+	//Create Apollo server
+	const server = new ApolloServer({
+		schema,
+		context: ({
+			req,
+			res,
+		}: {
+			req: Express.Request;
+			res: Express.Response;
+		}) => ({
+			req,
+			res,
+			user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+		}),
+		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+	});
 
-  await server.start();
+	await server.start();
 
-  server.applyMiddleware({ app });
+	server.applyMiddleware({ app });
 
-  app.listen({ port }, () =>
-    console.log(
-      `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
-    )
-  );
+	app.listen({ port }, () =>
+		console.log(
+			`🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
+		)
+	);
 }
 
 main().catch((error) => {
-  console.log(error, "error");
+	console.log(error, "error");
 });
