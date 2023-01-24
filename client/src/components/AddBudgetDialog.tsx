@@ -22,7 +22,7 @@ const budgetInputSchema = object({
 
 type Values = InferType<typeof budgetInputSchema>;
 
-export default function AddBudgetDialog({ approved }: { approved: boolean }) {
+export default function AddBudgetDialog({ year }: { year?: Date }) {
   const { handleOpen, handleClose, displayError } = useContext(DialogContext);
   const { query } = useRouter();
 
@@ -46,11 +46,11 @@ export default function AddBudgetDialog({ approved }: { approved: boolean }) {
       onClick={() =>
         handleOpen({
           size: "tiny",
-          header: approved ? "Pridať rozpočet" : "Pridať prečerpanie",
+          header: year ? "Pridať rozpočet" : "Pridať prečerpanie",
           content: (
             <Formik
               initialValues={{
-                year: new Date("yyyy-MM-dd"),
+                year: year !== undefined ? year : new Date("yyyy-MM-dd"),
                 travel: 0,
                 material: 0,
                 services: 0,
@@ -61,7 +61,7 @@ export default function AddBudgetDialog({ approved }: { approved: boolean }) {
               onSubmit={async (values, formik) => {
                 console.log(values);
                 try {
-                  if (approved) {
+                  if (year === undefined) {
                     await addBudget({
                       variables: { id: query.id, data: values },
                     });

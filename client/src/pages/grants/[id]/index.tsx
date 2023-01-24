@@ -65,7 +65,7 @@ const GrantPage: NextPageWithLayout = () => {
               </Grid.Column>
               <Grid.Column>
                 {user?.role === Role.Admin && (
-                  <AddAnnouncementDialog grantId={query.id} grantType={null} />
+                  <AddAnnouncementDialog grantId={query.id?.toString()} />
                 )}
               </Grid.Column>
             </Grid.Row>
@@ -84,9 +84,7 @@ const GrantPage: NextPageWithLayout = () => {
                 <Header>Rozpočet</Header>
               </Grid.Column>
               <Grid.Column>
-                {user?.role === Role.Admin && (
-                  <AddBudgetDialog approved={true} />
-                )}
+                {user?.role === Role.Admin && <AddBudgetDialog />}
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
@@ -108,7 +106,7 @@ const GrantPage: NextPageWithLayout = () => {
                                       year={b?.year}
                                     />
                                     {!b?.spent && (
-                                      <AddBudgetDialog approved={false} />
+                                      <AddBudgetDialog year={b?.year} />
                                     )}
                                   </>
                                 )}

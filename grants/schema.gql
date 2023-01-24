@@ -101,6 +101,12 @@ type GrantEdge {
   node: Grant!
 }
 
+type GrantInfo {
+  availableYears: [DateTime]!
+  grants: [Grant]!
+  hours: Int!
+}
+
 input GrantInput {
   end: DateTime!
   name: String!
@@ -169,7 +175,6 @@ type Spent {
 }
 
 type User {
-  grants(year: DateTime!): Int
-  hours(year: DateTime!): Int!
+  grants(year: DateTime!): GrantInfo!
   id: ID!
 }

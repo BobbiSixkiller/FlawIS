@@ -1,10 +1,12 @@
 import { useRouter } from "next/router";
-import { useInView } from "react-intersection-observer";
+import { InView } from "react-intersection-observer";
 import {
   Button,
   Card,
   Grid,
   Header,
+  Loader,
+  Message,
   Placeholder,
   Segment,
 } from "semantic-ui-react";
@@ -15,16 +17,11 @@ import DeleteGrantDialog from "./DeleteGrantDialog";
 
 export default function GrantsList() {
   const width = useWidth();
-  const { ref, inView } = useInView({ threshold: 1, initialInView: true });
 
   const { data, error, loading, fetchMore } = useGrantsQuery({
-    // variables: { first: 20 },
+    variables: { first: 5 },
     notifyOnNetworkStatusChange: true,
   });
-
-  console.log(error);
-  console.log(data);
-  console.log(loading);
 
   const router = useRouter();
 
@@ -40,6 +37,7 @@ export default function GrantsList() {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
+          {error && <Message error content={error.message} />}
           {loading && (
             <>
               <Segment>
@@ -118,6 +116,33 @@ export default function GrantsList() {
                 </Card.Content>
               </Card>
             ))}
+          {data?.grants.pageInfo.hasNextPage && (
+            <InView
+              onChange={async (inView) => {
+                if (inView) {
+                  await fetchMore({
+                    variables: {
+                      after: data?.grants.pageInfo.endCursor,
+                      first: 5,
+                    },
+                  });
+                }
+              }}
+            >
+              <Segment>
+                <Placeholder>
+                  <Placeholder.Header image>
+                    <Placeholder.Line length="medium" />
+                    <Placeholder.Line length="full" />
+                  </Placeholder.Header>
+                  <Placeholder.Paragraph>
+                    <Placeholder.Line length="full" />
+                    <Placeholder.Line length="medium" />
+                  </Placeholder.Paragraph>
+                </Placeholder>
+              </Segment>
+            </InView>
+          )}
         </Grid.Column>
       </Grid.Row>
     </Grid>
