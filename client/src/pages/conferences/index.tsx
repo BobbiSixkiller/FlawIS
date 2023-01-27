@@ -66,7 +66,7 @@ const Home: NextPageWithLayout = () => {
                 <p style={{ fontSize: "1.33em" }}>
                   We can give your company superpowers to do things that they
                   never thought possible. Let us delight your customers and
-                  empower your needs... through pure data analytics. Yes that's
+                  empower your needs... through pure data analytics. Yes thats
                   right, you thought it was the stuff of dreams, but even
                   bananas can be bioengineered.
                 </p>
@@ -104,7 +104,7 @@ const Home: NextPageWithLayout = () => {
                 <p style={{ fontSize: "1.33em" }}>
                   We can give your company superpowers to do things that they
                   never thought possible. Let us delight your customers and
-                  empower your needs... through pure data analytics. Yes that's
+                  empower your needs... through pure data analytics. Yes thats
                   right, you thought it was the stuff of dreams, but even
                   bananas can be bioengineered.
                 </p>

@@ -2,4 +2,8 @@ dist
 node_modules
 .git
 .gitignore
+.dockerignore
 *.env
+README.md
+.prettierrc
+.eslintrc.js

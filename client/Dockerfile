@@ -1,5 +1,5 @@
 # Developemnt Stage
-FROM node:16-alpine as development
+FROM node:16-alpine AS development
 ENV NODE_ENV=development
 
 # Create app directory
@@ -12,6 +12,21 @@ RUN npm ci --silent --no-fund --no-audit
 
 COPY . .
 
-# EXPOSE 3000
+RUN npm build
 
-# CMD [ "npm", "run", "dev"]
+FROM node:16-alpine AS production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+COPY . .
+
+COPY --from=development /usr/app/dist ./dist
+
+CMD ["node", "dist/index"]

@@ -1,7 +1,7 @@
 import { FC, useContext, useState } from "react";
 import { Grid, Menu, Segment } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
-import { ContentWrapper, Nav, PageWrapper } from "../../../components/Nav";
+import Nav, { ContentWrapper, PageWrapper } from "../../../components/Nav";
 import PersonalInfo from "../../../components/PersonalInfo";
 import { AuthContext } from "../../../providers/Auth";
 import { NextPageWithLayout } from "../../_app";

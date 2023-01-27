@@ -19,23 +19,59 @@ export class UserResolver {
 
   @Authorized()
   @FieldResolver(() => GrantInfo)
-  async grants(@Arg("year") year: Date, @Ctx() { user }: Context) {
+  async grants(
+    @Ctx() { user }: Context,
+    @Arg("year", { nullable: true }) year?: Date
+  ) {
     //return count of numbers spent as a grant member based on selected year
     const data = await this.grantService.aggregate([
       {
         $match: {
-          end: { $gte: year },
           "budgets.members.user": new ObjectId(user?.id),
         },
       },
       {
         $facet: {
-          grants: [{ $sort: { _id: -1 } }, { $addFields: { id: "$_id" } }],
+          grants: [
+            { $unwind: "$budgets" },
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [year, null] }, //if no year is supplied return all budgets
+                    { $ne: ["$_id", null] },
+                    { $eq: [{ $year: "$budgets.year" }, { $year: year }] },
+                  ],
+                },
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                name: { $first: "$name" },
+                type: { $first: "$type" },
+                start: { $first: "$start" },
+                end: { $first: "$end" },
+                announcements: { $first: "$announcements" },
+                budgets: { $push: "$budgets" },
+                createdAt: { $first: "$createdAt" },
+                updatedAt: { $first: "$updatedAt" },
+              },
+            },
+            { $sort: { _id: -1 } },
+            { $addFields: { id: "$_id" } },
+          ],
           hours: [
             { $unwind: "$budgets" },
             {
               $match: {
-                $expr: { $eq: [{ $year: "$budgets.year" }, { $year: year }] },
+                $expr: {
+                  $cond: [
+                    { $eq: [year, null] }, //if no year is supplied return all budgets
+                    { $ne: ["$_id", null] },
+                    { $eq: [{ $year: "$budgets.year" }, { $year: year }] },
+                  ],
+                },
               },
             },
             { $unwind: "$budgets.members" },
@@ -56,7 +92,9 @@ export class UserResolver {
               in: { $add: ["$$value", "$$this.budgets.members.hours"] },
             },
           },
-          availableYears: { $first: "$availableYears.years" },
+          availableYears: {
+            $ifNull: [{ $first: "$availableYears.years" }, []],
+          },
         },
       },
     ]);

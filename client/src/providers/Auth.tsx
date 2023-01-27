@@ -59,7 +59,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   const { loading } = useMeQuery({
     onCompleted: ({ me }) =>
-      dispatch({ type: ActionTypes.Login, payload: { user: me } }),
+      dispatch({ type: ActionTypes.Login, payload: { user: me as User } }),
     onError: (error) => {
       console.log(error);
       dispatch({ type: ActionTypes.Logout });

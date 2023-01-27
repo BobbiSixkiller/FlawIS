@@ -5,7 +5,6 @@ import {
   Card,
   Grid,
   Header,
-  Loader,
   Message,
   Placeholder,
   Segment,
@@ -109,6 +108,7 @@ export default function GrantsList() {
                 <Card.Content extra>
                   <DeleteGrantDialog id={edge?.cursor} />
                   <Button
+                    primary
                     size="tiny"
                     icon="info"
                     onClick={() => router.push(`/${edge?.node.id}`)}

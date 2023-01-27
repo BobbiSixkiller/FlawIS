@@ -256,6 +256,13 @@ export type GrantEdge = {
   node: Grant;
 };
 
+export type GrantInfo = {
+  __typename?: 'GrantInfo';
+  availableYears: Array<Maybe<Scalars['DateTime']>>;
+  grants: Array<Maybe<Grant>>;
+  hours: Scalars['Int'];
+};
+
 export type GrantInput = {
   end: Scalars['DateTime'];
   name: Scalars['String'];
@@ -798,14 +805,13 @@ export type TranslationInput = {
   name: Scalars['String'];
 };
 
-/** User reference type from users microservice with contributed billings field */
+/** The user model entity */
 export type User = {
   __typename?: 'User';
   billings: Array<Maybe<Billing>>;
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
-  grants?: Maybe<Scalars['Int']>;
-  hours: Scalars['Int'];
+  grants: GrantInfo;
   id: Scalars['ID'];
   name: Scalars['String'];
   organisation: Scalars['String'];
@@ -816,15 +822,9 @@ export type User = {
 };
 
 
-/** User reference type from users microservice with contributed billings field */
+/** The user model entity */
 export type UserGrantsArgs = {
-  year: Scalars['DateTime'];
-};
-
-
-/** User reference type from users microservice with contributed billings field */
-export type UserHoursArgs = {
-  year: Scalars['DateTime'];
+  year?: InputMaybe<Scalars['DateTime']>;
 };
 
 /** UserConnection type enabling cursor based pagination */
@@ -906,17 +906,19 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQueryVariables = Exact<{
+  year?: InputMaybe<Scalars['DateTime']>;
+}>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -1293,7 +1295,7 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const MeDocument = gql`
-    query me {
+    query me($year: DateTime) {
   me {
     id
     name
@@ -1316,6 +1318,19 @@ export const MeDocument = gql`
       IBAN
       SWIFT
     }
+    grants(year: $year) {
+      grants {
+        id
+        name
+        type
+        start
+        end
+        createdAt
+        updatedAt
+      }
+      hours
+      availableYears
+    }
   }
 }
     `;
@@ -1332,6 +1347,7 @@ export const MeDocument = gql`
  * @example
  * const { data, loading, error } = useMeQuery({
  *   variables: {
+ *      year: // value for 'year'
  *   },
  * });
  */
@@ -1354,6 +1370,22 @@ export const RegisterDocument = gql`
     email
     role
     verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
   }
 }
     `;

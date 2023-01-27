@@ -1,73 +1,102 @@
 mutation login($email: String!, $password: String!) {
-	login(email: $email, password: $password) {
-		id
-		name
-		email
-		role
-		verified
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+  login(email: $email, password: $password) {
+    id
+    name
+    email
+    role
+    verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
 }
 
-query me {
-	me {
-		id
-		name
-		email
-		organisation
-		telephone
-		role
-		verified
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+query me($year: DateTime) {
+  me {
+    id
+    name
+    email
+    organisation
+    telephone
+    role
+    verified
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+    grants(year: $year) {
+      grants {
+        id
+        name
+        type
+        start
+        end
+        createdAt
+        updatedAt
+      }
+      hours
+      availableYears
+    }
+  }
 }
 
 mutation register($data: RegisterInput!) {
-	register(data: $data) {
-		id
-		name
-		email
-		role
-		verified
-	}
+  register(data: $data) {
+    id
+    name
+    email
+    role
+    verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
 }
 
 mutation resendActivationLink {
-	resendActivationLink
+  resendActivationLink
 }
 
 mutation activateUser($token: String!) {
-	activateUser(token: $token)
+  activateUser(token: $token)
 }
 
 mutation logout {
-	logout
+  logout
 }

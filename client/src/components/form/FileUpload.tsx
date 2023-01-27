@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useField, useFormikContext } from "formik";
+import { useField } from "formik";
 import { useDropzone } from "react-dropzone";
 import styled from "styled-components";
 import { Button, Form, List } from "semantic-ui-react";
@@ -72,6 +72,7 @@ export default function FileUpload(props: {
     setFiles(acceptedFiles);
   }, [acceptedFiles]);
 
+  /* eslint-disable */
   useEffect(() => {
     console.log(files);
     helpers.setValue(files);

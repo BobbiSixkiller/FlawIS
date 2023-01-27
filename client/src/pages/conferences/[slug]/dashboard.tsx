@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { Grid, Segment } from "semantic-ui-react";
 import Footer from "../../../components/Footer";
-import { ContentWrapper, Nav, PageWrapper } from "../../../components/Nav";
+import Nav, { ContentWrapper, PageWrapper } from "../../../components/Nav";
 
 import { NextPageWithLayout } from "../../_app";
 

@@ -175,6 +175,6 @@ type Spent {
 }
 
 type User {
-  grants(year: DateTime!): GrantInfo!
+  grants(year: DateTime): GrantInfo!
   id: ID!
 }
