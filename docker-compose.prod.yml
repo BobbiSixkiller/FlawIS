@@ -3,7 +3,6 @@ services:
     build:
       context: ./gateway
       dockerfile: Dockerfile
-      target: production
     env_file:
       - ./gateway/.env
     depends_on:
@@ -22,7 +21,6 @@ services:
     build:
       context: ./users
       dockerfile: Dockerfile
-      target: production
     env_file:
       - ./users/.env
     depends_on:
@@ -39,7 +37,6 @@ services:
     build:
       context: ./files
       dockerfile: Dockerfile
-      target: production
     env_file:
       - ./files/.env
     volumes:
@@ -53,7 +50,6 @@ services:
     build:
       context: ./conferences
       dockerfile: Dockerfile
-      target: production
     env_file:
       - ./conferences/.env
     depends_on:
@@ -70,7 +66,6 @@ services:
     build:
       context: ./grants
       dockerfile: Dockerfile
-      target: production
     env_file:
       - ./grants/.env
     depends_on:
@@ -87,7 +82,6 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-      target: production
     depends_on:
       - gateway
     volumes:
@@ -101,7 +95,6 @@ services:
     build:
       context: ./mail
       dockerfile: Dockerfile
-      target: production
     depends_on:
       - rabbitmq
     volumes:

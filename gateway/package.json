@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "tsc",
-		"serve": "node dist/server.js",
+		"serve": "node dist/api/index.js",
 		"dev": "nodemon --config nodemon.json api/index.ts"
 	},
 	"repository": {

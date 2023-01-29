@@ -12,7 +12,7 @@ RUN npm ci --silent --no-fund --no-audit
 
 COPY . .
 
-RUN npm build
+RUN npm run build
 
 FROM node:16-alpine AS production
 
@@ -27,6 +27,6 @@ RUN npm install --only=production
 
 COPY . .
 
-COPY --from=development /usr/app/dist ./dist
+COPY --from=development /usr/app/.next ./.next
 
-CMD ["node", "dist/index"]
+CMD ["npm", "run", "start"]
