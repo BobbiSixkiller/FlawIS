@@ -117,13 +117,13 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
 			request.http?.headers.set("locale", JSON.stringify(context.locale));
 		}
 
-		// //rest of the headers i.e. reset token
+		//rest of the headers i.e. reset token
 		// const headers = context.req?.headers;
 		// for (const key in headers) {
-		//   const value = headers[key];
-		//   if (value) {
-		//     request.http?.headers.set(key, String(value));
-		//   }
+		// 	const value = headers[key];
+		// 	if (value) {
+		// 		request.http?.headers.set(key, String(value));
+		// 	}
 		// }
 
 		// console.log(request.http?.headers);
