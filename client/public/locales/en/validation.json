@@ -1,0 +1,6 @@
+{
+	"required": "This is a required field!",
+	"email": "Email is invalid!",
+	"password": "Minimum eight characters, at least one letter and one number!",
+	"passNoMatch": "Passwords do not match!"
+}

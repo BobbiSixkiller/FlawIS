@@ -1,0 +1,32 @@
+mutation updateUser($id: ObjectId!, $data: UserInput!) {
+	updateUser(id: $id, data: $data) {
+		id
+		name
+		email
+		role
+		verified
+		organisation
+		telephone
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			IBAN
+			SWIFT
+		}
+	}
+}
+
+query userTextSearch($text: String!) {
+	userTextSearch(text: $text) {
+		id
+		name
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"header": "Váš účet bol aktivovaný!",
+	"link": "Domov",
+	"dialog": {
+		"header": "Neoverený účet!",
+		"body": "Pre ďalšie používanie tejto aplikácie prosím kliknite na aktivačný link, ktorý bol zaslaný na Vašu email adresu.",
+		"button": "Znovu zaslať aktivačný link",
+		"msg": "Zaslali sme Vám nový link, skontrolujte si poštu."
+	}
+}

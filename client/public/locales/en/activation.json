@@ -1,0 +1,10 @@
+{
+	"header": "Your account has been activated!",
+	"link": "Home",
+	"dialog": {
+		"header": "User not verified!",
+		"body": "In order to use this app you have to verify your user account via the link we have sent you.",
+		"button": "Resend activation link",
+		"msg": "We have sent you new link, check your inbox."
+	}
+}

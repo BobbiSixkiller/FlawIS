@@ -1,0 +1,6 @@
+{
+	"required": "Vyplňte povinné pole!",
+	"email": "Email je neplatný!",
+	"password": "Minimálne osem znakov, aspoň jedno písmeno a jedno číslo!",
+	"passNoMatch": "Heslá sa nezhodujú!"
+}

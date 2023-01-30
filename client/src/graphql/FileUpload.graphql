@@ -1,0 +1,7 @@
+mutation uploadFile($type: FileType!, $file: Upload!) {
+	uploadFile(type: $type, file: $file)
+}
+
+mutation deleteFile($url: String!) {
+	deleteFile(url: $url)
+}
