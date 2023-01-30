@@ -28,7 +28,7 @@ export class EmailService {
     await this.mailerService.sendMail({
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
-      subject: this.i18n.t('activation.subject'),
+      subject: this.i18n.t('activation.subject', { lang: msg.locale }),
       template: 'activation',
       context: {
         // ✏️ filling curly brackets with content
@@ -50,7 +50,7 @@ export class EmailService {
     await this.mailerService.sendMail({
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
-      subject: this.i18n.t('passwordReset.subject'),
+      subject: this.i18n.t('passwordReset.subject', { lang: msg.locale }),
       template: 'passwordReset',
       context: {
         // ✏️ filling curly brackets with content

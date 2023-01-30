@@ -17,11 +17,16 @@
 			"heading": "Conferences",
 			"subHeading": "Faculty of Law, Comenius university in Bratislava",
 			"button": "Log In"
-		},
-		"menu": {
-			"lang": "language",
-			"sk": "Slovak",
-			"en": "English"
 		}
+	},
+	"menu": {
+		"lang": "language",
+		"sk": "Slovak",
+		"en": "English",
+		"home": "Home",
+		"profile": "Profile",
+		"logout": "Sign Out",
+		"login": "Sign In",
+		"register": "Register"
 	}
 }

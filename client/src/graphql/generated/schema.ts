@@ -805,7 +805,7 @@ export type TranslationInput = {
   name: Scalars['String'];
 };
 
-/** The user model entity */
+/** User reference type from users microservice with contributed billings field */
 export type User = {
   __typename?: 'User';
   billings: Array<Maybe<Billing>>;
@@ -822,7 +822,7 @@ export type User = {
 };
 
 
-/** The user model entity */
+/** User reference type from users microservice with contributed billings field */
 export type UserGrantsArgs = {
   year?: InputMaybe<Scalars['DateTime']>;
 };
@@ -979,7 +979,7 @@ export type AddApprovedBudgetMutationVariables = Exact<{
 }>;
 
 
-export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type AddSpentBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1028,7 +1028,7 @@ export type GrantQueryVariables = Exact<{
 }>;
 
 
-export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
 
 export type GrantTextSearchQueryVariables = Exact<{
   text: Scalars['String'];
@@ -1705,6 +1705,7 @@ export const AddApprovedBudgetDocument = gql`
       name
       text
       files
+      updatedAt
     }
     budgets {
       year
@@ -2136,6 +2137,7 @@ export const GrantDocument = gql`
       name
       text
       files
+      updatedAt
     }
     budgets {
       year

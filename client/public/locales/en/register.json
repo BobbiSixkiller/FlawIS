@@ -1,0 +1,21 @@
+{
+	"header": "Register",
+	"submit": "Register",
+	"message": "Already have an account? <lnk>Log In!</lnk>",
+	"name": {
+		"label": "Name including titles",
+		"placeholder": "Name including titles..."
+	},
+	"email": {
+		"label": "Email",
+		"placeholder": "Email address..."
+	},
+	"password": {
+		"label": "Password",
+		"placeholder": "Password..."
+	},
+	"repeatPass": {
+		"label": "Repeat Password",
+		"placeholder": "Password..."
+	}
+}

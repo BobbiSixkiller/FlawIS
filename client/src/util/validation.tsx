@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { object, setLocale, string } from "yup";
+import { object, ref, setLocale, string } from "yup";
 
 export function checkIfFilesAreTooBig(file: File): boolean {
 	console.log(file.size, 10000000);
@@ -32,11 +32,21 @@ export default function Validation() {
 		password: string().required(),
 	});
 
+	const registerInputSchema = object({
+		name: string().required(),
+		email: string().required().email(),
+		password: string()
+			.required()
+			.matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),
+		repeatPass: string()
+			.required()
+			.oneOf([ref("password")], t("passNoMatch")),
+	});
 	const perosnalInfoInputSchema = object({
 		name: string().required(),
 		email: string().required().email(),
 		organisation: string().required(),
 	});
 
-	return { loginInputSchema, perosnalInfoInputSchema };
+	return { loginInputSchema, registerInputSchema, perosnalInfoInputSchema };
 }

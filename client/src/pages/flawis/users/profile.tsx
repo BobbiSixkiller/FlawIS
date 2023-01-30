@@ -1,7 +1,7 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NextPageWithLayout } from "../../_app";
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
-import { InferType, object, string } from "yup";
+import { InferType } from "yup";
 import { useState, useContext } from "react";
 import { Formik, FormikProps } from "formik";
 

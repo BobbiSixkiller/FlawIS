@@ -54,7 +54,7 @@ const main = async () => {
 		"/public/submissions",
 		isAuthMiddleware,
 		createProxyMiddleware({
-			target: "http://localhost:5002/public/submissions",
+			target: "http://files:5002/",
 			changeOrigin: false,
 		})
 	);
@@ -62,14 +62,14 @@ const main = async () => {
 		"/public/grants",
 		isAuthMiddleware,
 		createProxyMiddleware({
-			target: "http://localhost:5002/public/grants",
+			target: "http://files:5002/",
 			changeOrigin: false,
 		})
 	);
 	app.use(
 		"/public",
 		createProxyMiddleware({
-			target: "http://localhost:5002/",
+			target: "http://files:5002/",
 			changeOrigin: false,
 		})
 	);

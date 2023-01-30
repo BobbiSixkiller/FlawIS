@@ -26,21 +26,16 @@ async function main() {
 	const app = Express();
 
 	app.use(graphqlUploadExpress());
-	app.use("/public", Express.static("public"));
+	app.use("/public", Express.static("./public"));
 
 	//Create Apollo server
 	const server = new ApolloServer({
 		schema,
-		context: ({
+		context: ({ req, res }: Context) => ({
 			req,
 			res,
-		}: {
-			req: Express.Request;
-			res: Express.Response;
-		}) => ({
-			req,
-			res,
-			user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+			user: req.headers.user ? req.headers.user : null,
+			locale: req.headers.locale ? req.headers.locale : "sk",
 		}),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 	});

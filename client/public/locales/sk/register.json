@@ -1,0 +1,21 @@
+{
+	"header": "Registrovať",
+	"submit": "Registrovať",
+	"message": "Máte už účet? <lnk>Prihláste sa!</lnk>",
+	"name": {
+		"label": "Meno vrátane titulov",
+		"placeholder": "Meno vrátane titulov..."
+	},
+	"email": {
+		"label": "Email",
+		"placeholder": "Email adresa..."
+	},
+	"password": {
+		"label": "Heslo",
+		"placeholder": "Heslo..."
+	},
+	"repeatPass": {
+		"label": "Zopakujte heslo",
+		"placeholder": "Heslo..."
+	}
+}

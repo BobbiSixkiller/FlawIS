@@ -1,8 +1,5 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Button, Grid, Header, Placeholder, Segment } from "semantic-ui-react";
-import AddGrantDialog from "../../components/AddGrantDialog";
 
 import Dashboard from "../../components/Dashboard";
 import GrantsList from "../../components/GrantsList";

@@ -1,330 +1,332 @@
 mutation createGrant($data: GrantInput!) {
-  createGrant(data: $data) {
-    id
-    name
-    type
-    start
-    end
-    createdAt
-    updatedAt
-  }
+	createGrant(data: $data) {
+		id
+		name
+		type
+		start
+		end
+		createdAt
+		updatedAt
+	}
 }
 
 mutation deleteGrant($id: ObjectId!) {
-  deleteGrant(id: $id)
+	deleteGrant(id: $id)
 }
 
 mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
-  addApprovedBudget(id: $id, data: $data) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	addApprovedBudget(id: $id, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+			updatedAt
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
-  addSpentBudget(id: $id, data: $data) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	addSpentBudget(id: $id, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
-  addMember(id: $id, year: $year, data: $data) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	addMember(id: $id, year: $year, data: $data) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 mutation deleteMember($id: ObjectId!, $year: DateTime!, $user: ObjectId!) {
-  deleteMember(id: $id, year: $year, user: $user) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	deleteMember(id: $id, year: $year, user: $user) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 mutation deleteBudget($id: ObjectId!, $year: DateTime!) {
-  deleteBudget(id: $id, year: $year) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	deleteBudget(id: $id, year: $year) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 query grants($after: ObjectId, $first: Int = 20) {
-  grants(after: $after, first: $first) {
-    edges {
-      cursor
-      node {
-        id
-        name
-        type
-        start
-        end
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
-    }
-  }
+	grants(after: $after, first: $first) {
+		edges {
+			cursor
+			node {
+				id
+				name
+				type
+				start
+				end
+			}
+		}
+		pageInfo {
+			endCursor
+			hasNextPage
+		}
+	}
 }
 
 query grant($id: ObjectId!) {
-  grant(id: $id) {
-    id
-    name
-    type
-    start
-    end
-    announcements {
-      id
-      name
-      text
-      files
-    }
-    budgets {
-      year
-      approved {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      spent {
-        material
-        services
-        travel
-        indirect
-        salaries
-      }
-      members {
-        user {
-          id
-          name
-          email
-        }
-        hours
-        isMain
-        createdAt
-        updatedAt
-      }
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
-  }
+	grant(id: $id) {
+		id
+		name
+		type
+		start
+		end
+		announcements {
+			id
+			name
+			text
+			files
+			updatedAt
+		}
+		budgets {
+			year
+			approved {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			spent {
+				material
+				services
+				travel
+				indirect
+				salaries
+			}
+			members {
+				user {
+					id
+					name
+					email
+				}
+				hours
+				isMain
+				createdAt
+				updatedAt
+			}
+			createdAt
+			updatedAt
+		}
+		createdAt
+		updatedAt
+	}
 }
 
 query grantTextSearch($text: String!) {
-  grantTextSearch(text: $text) {
-    id
-    name
-    type
-  }
+	grantTextSearch(text: $text) {
+		id
+		name
+		type
+	}
 }

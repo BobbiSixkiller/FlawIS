@@ -13,6 +13,7 @@ import { ActionTypes, AuthContext } from "../providers/Auth";
 import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import { ControlsContext } from "../providers/ControlsProvider";
+import { useTranslation } from "next-i18next";
 
 interface navProps {
 	inView: boolean;
@@ -90,6 +91,8 @@ export default function Nav({
 		toggle(false);
 	}, [router.asPath]);
 
+	const { t } = useTranslation("common");
+
 	return (
 		<Sidebar.Pushable>
 			<Sidebar
@@ -108,7 +111,7 @@ export default function Nav({
 			>
 				<Menu.Item as={Link} href="/" active={router.asPath === "/"}>
 					<Icon name="home" />
-					<b>Home</b>
+					<b>{t("menu.home")}</b>
 				</Menu.Item>
 				{!user ? (
 					<>
@@ -118,7 +121,7 @@ export default function Nav({
 							active={router.asPath === "/login"}
 						>
 							<Icon name="sign in" />
-							<b>Login</b>
+							<b>{t("menu.login")}</b>
 						</Menu.Item>
 						<Menu.Item
 							as={Link}
@@ -126,7 +129,7 @@ export default function Nav({
 							active={router.asPath === "/register"}
 						>
 							<Icon name="signup" />
-							<b>Register</b>
+							<b>{t("menu.register")}</b>
 						</Menu.Item>
 					</>
 				) : (
@@ -136,13 +139,13 @@ export default function Nav({
 							<Menu.Item
 								as={Link}
 								href="/users/profile"
-								name="Profile"
+								name={t("menu.profile")}
 								active={router.asPath === "/user/profile"}
 							/>
 							<Menu.Item
 								as={Link}
 								href="/"
-								name="Sign out"
+								name={t("menu.logout")}
 								onClick={() => logout()}
 							/>
 						</Menu>

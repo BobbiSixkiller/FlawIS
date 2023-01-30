@@ -10,9 +10,9 @@ services:
       - conferences
       - files
       - grants
-    volumes:
-      - ./gateway:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./gateway:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -26,9 +26,9 @@ services:
     depends_on:
       - rabbitmq
       - mongo
-    volumes:
-      - ./users:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./users:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5001:5001"
@@ -39,9 +39,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./files/.env
-    volumes:
-      - ./files:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./files:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5002:5002"
@@ -55,9 +55,9 @@ services:
     depends_on:
       - rabbitmq
       - mongo
-    volumes:
-      - ./conferences:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./conferences:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5003:5003"
@@ -71,9 +71,9 @@ services:
     depends_on:
       - rabbitmq
       - mongo
-    volumes:
-      - ./grants:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./grants:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5004:5004"
@@ -84,9 +84,9 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - gateway
-    volumes:
-      - ./client/:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./client/:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -95,11 +95,13 @@ services:
     build:
       context: ./mail
       dockerfile: Dockerfile
+    env_file:
+      - ./mail/.env
     depends_on:
       - rabbitmq
-    volumes:
-      - ./mail:/usr/app
-      - /usr/app/node_modules
+    # volumes:
+    #   - ./mail:/usr/app
+    #   - /usr/app/node_modules
     restart: unless-stopped
 
   rabbitmq:

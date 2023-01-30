@@ -33,7 +33,6 @@ const Login: NextPage = () => {
 	const { t } = useTranslation("login");
 
 	const { loginInputSchema } = Validation();
-
 	type Values = InferType<typeof loginInputSchema>;
 
 	const [login] = useLoginMutation({
@@ -122,6 +121,7 @@ const Login: NextPage = () => {
 
 										<Button
 											fluid
+											positive
 											size="large"
 											loading={isSubmitting}
 											disabled={isSubmitting}

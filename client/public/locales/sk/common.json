@@ -17,11 +17,16 @@
 			"heading": "Konferencie",
 			"subHeading": "Univerzita Komenského v Bratislave, Právnická fakulta",
 			"button": "Prihláste sa"
-		},
-		"menu": {
-			"lang": "jazyk",
-			"sk": "Slovensky",
-			"en": "Anglicky"
 		}
+	},
+	"menu": {
+		"lang": "jazyk",
+		"sk": "Slovensky",
+		"en": "Anglicky",
+		"home": "Domov",
+		"profile": "Profil",
+		"logout": "Odhlásiť sa",
+		"login": "Prihlásiť sa",
+		"register": "Registrovať"
 	}
 }
