@@ -50,7 +50,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
       }),
       // this uses apollo-link-http under the hood, so all the options here come from that package
       createUploadLink({
-        uri: "http://localhost:5000/graphql",
+        uri: "https://flawis-backend.flaw.uniba.sk/graphql",
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",
