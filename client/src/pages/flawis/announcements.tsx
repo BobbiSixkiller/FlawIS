@@ -11,6 +11,7 @@ import {
 import AddAnnouncementDialog from "../../components/AddAnnouncementDialog";
 
 import Dashboard from "../../components/Dashboard";
+import DeleteAnnouncementDialog from "../../components/DeleteAnnouncementDialog";
 import { useAnnouncementsQuery } from "../../graphql/generated/schema";
 import useWidth from "../../hooks/useWidth";
 import { NextPageWithLayout } from "../_app";
@@ -29,7 +30,9 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 				<Grid.Column width={8}>
 					<Header>Oznamy</Header>
 				</Grid.Column>
-				<Grid.Column width={8}></Grid.Column>
+				<Grid.Column width={8}>
+					<AddAnnouncementDialog />
+				</Grid.Column>
 			</Grid.Row>
 			<Grid.Row>
 				<Grid.Column>
@@ -58,7 +61,9 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 									<Table.Cell>{edge?.node.name}</Table.Cell>
 									<Table.Cell>{edge?.node.text}</Table.Cell>
 									<Table.Cell>{edge?.node.files?.length || 0}</Table.Cell>
-									<Table.Cell>actions</Table.Cell>
+									<Table.Cell>
+										<DeleteAnnouncementDialog id={edge?.cursor} />
+									</Table.Cell>
 								</Table.Row>
 							))}
 							{data?.announcements.pageInfo.hasNextPage && (
