@@ -18,7 +18,7 @@ interface dashboardProps {
 }
 
 export default function Dashboard({ children }: dashboardProps) {
-	const { dispatch, user } = useContext(AuthContext);
+	const { dispatch } = useContext(AuthContext);
 	const router = useRouter();
 	const width = useWith();
 

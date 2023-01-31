@@ -7,5 +7,8 @@
 	},
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"eslint.alwaysShowStatus": true
+	"eslint.alwaysShowStatus": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features"
+	}
 }

@@ -35,32 +35,32 @@ export class Announcement extends TimeStamps {
 		after?: ObjectId
 	) {
 		return await this.aggregate([
+			{ $sort: { _id: -1 } },
 			{
 				$facet: {
-					$data: [
+					data: [
 						{
 							$match: {
 								$expr: {
 									$cond: [
 										{ $eq: [after, null] },
 										{ $ne: ["$_id", null] },
-										{ $lt: ["$_id", new ObjectId(after)] },
+										{ $lt: ["$_id", after] },
 									],
 								},
 							},
 						},
 						{ $limit: first || 20 },
-						{ $sort: { _id: -1 } },
 						{ $addFields: { id: "$_id" } },
 					],
-					$hasNextDoc: [
+					hasNextDoc: [
 						{
 							$match: {
 								$expr: {
 									$cond: [
 										{ $eq: [after, null] },
 										{ $ne: ["$_id", null] },
-										{ $lt: ["$_id", new ObjectId(after)] },
+										{ $lt: ["$_id", after] },
 									],
 								},
 							},
@@ -81,7 +81,7 @@ export class Announcement extends TimeStamps {
 					},
 					pageInfo: {
 						endCursor: { $last: "$data._id" },
-						hasNextPage: { $ne: [{ $first: "$hasNextDoc" }, null] },
+						hasNextPage: { $eq: [{ $size: "$hasNextDoc" }, 1] },
 					},
 				},
 			},

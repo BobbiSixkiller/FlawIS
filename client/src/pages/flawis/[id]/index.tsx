@@ -43,6 +43,13 @@ const GrantPage: NextPageWithLayout = () => {
 		return <Message error content={error.message} />;
 	}
 
+	const currentBudgetIndex =
+		data?.grant.budgets.findIndex(
+			(b) => new Date(b?.year).getFullYear() === new Date().getFullYear()
+		) || 0;
+
+	console.log(currentBudgetIndex);
+
 	return (
 		<Grid padded={width < 400 ? "vertically" : true}>
 			<Grid.Row verticalAlign="middle">
@@ -117,6 +124,7 @@ const GrantPage: NextPageWithLayout = () => {
 							<Grid.Column>
 								{data?.grant.budgets.length !== 0 && (
 									<Tab
+										defaultActiveIndex={currentBudgetIndex}
 										menu={{ secondary: true, pointing: true }}
 										panes={data?.grant.budgets.map((b) => ({
 											menuItem: new Date(b?.year).getFullYear().toString(),

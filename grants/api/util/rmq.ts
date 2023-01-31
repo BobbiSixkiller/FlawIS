@@ -17,27 +17,31 @@ class Messagebroker {
 	private static channel: Channel;
 
 	private static async createConnection() {
-		if (!this.connection) {
-			this.connection = await client.connect(
-				process.env.RABBITMQ_URI || "amqp://rabbitmq:5672"
-			);
+		try {
+			if (!this.connection) {
+				this.connection = await client.connect(
+					process.env.RABBITMQ_URI || "amqp://rabbitmq:5672"
+				);
+			}
+
+			this.connection.on("error", (err) => {
+				console.log("RMQ Error: ", err);
+				this.connection = undefined;
+				setTimeout(this.createConnection, 1000 * 60);
+			});
+
+			this.connection.on("close", () => {
+				console.log(
+					"Connection to RMQ server closed! Trying to establish new one..."
+				);
+				this.connection = undefined;
+				setTimeout(this.createConnection, 1000 * 60);
+			});
+		} catch (error) {
+			console.log("Catch error: ", error)
+			this.connection = undefined;
+			setTimeout(this.createConnection, 1000 * 60);
 		}
-
-		this.connection.on("error", (err) => {
-			console.log(err);
-			this.connection = undefined;
-			setTimeout(this.createConnection, 1000 * 60);
-		});
-
-		this.connection.on("close", () => {
-			console.log(
-				"Connection to RMQ server closed! Trying to establish new one..."
-			);
-			this.connection = undefined;
-			setTimeout(this.createConnection, 1000 * 60);
-		});
-
-		return this.connection;
 	}
 
 	private static async createChannel() {
