@@ -18,7 +18,7 @@ export class FileResolver {
     if (
       mimetype != "application/pdf" &&
       mimetype !=
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
       mimetype !== "image/jpeg" &&
       mimetype !== "image/png"
     ) {
@@ -39,8 +39,7 @@ export class FileResolver {
         .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
         .on("finish", () =>
           resolve(
-            `${
-              process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
+            `${process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
             }`
           )
         )
@@ -51,11 +50,13 @@ export class FileResolver {
   @Authorized()
   @Mutation(() => Boolean)
   async deleteFile(@Arg("url") url: string) {
-    const path = url.split(process.env.BASE_URL || "http://localhost:5000")[1];
+    const path = "." + url.split(process.env.BASE_URL || "http://localhost:5000")[1];
 
-    unlink(path, (error) => {
-      if (error) throw new Error(error.message);
-      return true;
+    return new Promise((resolve, reject) => {
+      unlink(path, (error) => {
+        if (error) reject(error);
+        resolve(true);
+      });
     });
   }
 }

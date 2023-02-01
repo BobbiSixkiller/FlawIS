@@ -24,14 +24,7 @@ import { CustomResolver } from './custom.resolver';
     MailerModule.forRootAsync({
       useFactory(config: ConfigService, i18n: I18nService) {
         return {
-          transport: {
-            host: 'smtp.mailtrap.io',
-            secure: false,
-            auth: {
-              user: 'dfe6cc63fd2380',
-              pass: 'b7e520dba14a13',
-            },
-          },
+          transport: config.get<any>('transport'),
           defaults: {
             from: `"No Reply" <${config.get<string>('MAIL_FROM')}>`,
           },
@@ -49,4 +42,4 @@ import { CustomResolver } from './custom.resolver';
   ],
   providers: [EmailService],
 })
-export class EmailModule {}
+export class EmailModule { }

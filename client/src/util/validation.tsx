@@ -34,7 +34,14 @@ export default function Validation() {
 
 	const registerInputSchema = object({
 		name: string().required(),
-		email: string().required().email(),
+		email: string()
+			.required()
+			.email()
+			.test(
+				"isUniba",
+				t("unibaEmail"),
+				(val) => val !== undefined && val?.split("@")[1].includes("uniba")
+			),
 		password: string()
 			.required()
 			.matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),

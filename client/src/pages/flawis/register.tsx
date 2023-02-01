@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import logo from "public/images/Flaw-logo-notext.png";
-import { FC, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 
 import {
 	Button,
@@ -18,34 +18,13 @@ import {
 	Segment,
 } from "semantic-ui-react";
 
-import { InferType, object, ref, string } from "yup";
-import { InputField, InputFieldProps } from "../../components/form/InputField";
+import { InferType } from "yup";
+import { InputField } from "../../components/form/InputField";
 import LocalizedLink from "../../components/LocalizedLink";
 import { useRegisterMutation } from "../../graphql/generated/schema";
 import { ActionTypes, AuthContext } from "../../providers/Auth";
 import parseErrors from "../../util/parseErrors";
 import Validation from "../../util/validation";
-
-const EmailField: FC<InputFieldProps> = (props) => {
-	const { registerInputSchema } = Validation();
-	type Values = InferType<typeof registerInputSchema>;
-	const { values, setFieldValue, errors, touched } = useFormikContext<Values>();
-
-	useEffect(() => {
-		if (
-			touched["email"] &&
-			!errors["email"] &&
-			values["email"].split("@")[1] === "flaw.uniba.sk"
-		) {
-			setFieldValue(
-				"organisation",
-				"Univerzita Komenského v Bratislave, Právnická fakulta"
-			);
-		}
-	}, [values, setFieldValue, errors, touched]);
-
-	return <InputField {...props} />;
-};
 
 const Register: NextPage = () => {
 	const { dispatch, user } = useContext(AuthContext);
@@ -137,7 +116,7 @@ const Register: NextPage = () => {
 										control={Input}
 									/>
 
-									<EmailField
+									<InputField
 										fluid
 										icon="at"
 										iconPosition="left"

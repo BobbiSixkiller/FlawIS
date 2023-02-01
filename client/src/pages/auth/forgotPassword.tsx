@@ -76,6 +76,7 @@ const ForgotPassword: NextPage = () => {
 									/>
 
 									<Button
+										primary
 										type="submit"
 										loading={isSubmitting}
 										disabled={isSubmitting}
