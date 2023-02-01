@@ -40,7 +40,7 @@ export default function Validation() {
 			.test(
 				"isUniba",
 				t("unibaEmail"),
-				(val) => !val && !val?.split("@")[1].includes("uniba.sk")
+				(val) => val !== undefined && val?.split("@")[1].includes("uniba")
 			),
 		password: string()
 			.required()

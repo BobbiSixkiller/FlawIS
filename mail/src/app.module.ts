@@ -22,4 +22,4 @@ import * as Joi from 'joi';
     EmailModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
