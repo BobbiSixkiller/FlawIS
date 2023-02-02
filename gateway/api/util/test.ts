@@ -15,9 +15,9 @@ import BaseFormData from "form-data";
 
 class FormData extends BaseFormData {
 	/*
-    This is a workaround to make node-fetch to work properly
-    with unknown length streams, which was not released yet.
-    https://github.com/node-fetch/node-fetch/pull/707
+	This is a workaround to make node-fetch to work properly
+	with unknown length streams, which was not released yet.
+	https://github.com/node-fetch/node-fetch/pull/707
    */
 	getLength(callback: (err: Error | null, length: number) => void): void {
 		const cb = (err: Error | null, length: number): void => {
@@ -68,11 +68,11 @@ const addChunkedDataToForm: AddDataHandler = (
 				contentType,
 				filename,
 				/*
-            Set knownLength to NaN so node-fetch does not set the
-            Content-Length header and properly set the enconding
-            to chunked.
-            https://github.com/form-data/form-data/pull/397#issuecomment-471976669
-          */
+			Set knownLength to NaN so node-fetch does not set the
+			Content-Length header and properly set the enconding
+			to chunked.
+			https://github.com/form-data/form-data/pull/397#issuecomment-471976669
+		  */
 				knownLength: Number.NaN,
 			});
 		}
@@ -140,9 +140,9 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 										v: Promise<FileUpload> | Upload,
 										idx: number
 									): FileVariablesTuple => [
-										`${key}.${idx}`,
-										v instanceof Upload ? v.promise : v,
-									]
+											`${key}.${idx}`,
+											v instanceof Upload ? v.promise : v,
+										]
 								)
 							);
 						}
@@ -234,8 +234,8 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 		const headers = {
 			// ...Object.fromEntries(request?.http?.headers || []),
 			...Object.fromEntries([
-				["user", context["user"]],
-				["locale", context["locale"]],
+				["user", JSON.stringify(context["user"])],
+				["locale", JSON.stringify(context["locale"])],
 			]),
 			...form.getHeaders(),
 		};
