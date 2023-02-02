@@ -6782,7 +6782,7 @@
       {
         "kind": "OBJECT",
         "name": "User",
-        "description": "The user model entity",
+        "description": "User reference type from users microservice with contributed billings field",
         "fields": [
           {
             "name": "billings",

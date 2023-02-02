@@ -234,8 +234,8 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 		const headers = {
 			// ...Object.fromEntries(request?.http?.headers || []),
 			...Object.fromEntries([
-				["user", JSON.stringify(context["user"])],
-				["locale", JSON.stringify(context["locale"])],
+				["user", context["user"]],
+				["locale", context["locale"]],
 			]),
 			...form.getHeaders(),
 		};
