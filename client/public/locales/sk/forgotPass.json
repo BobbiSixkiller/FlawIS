@@ -1,0 +1,9 @@
+{
+  "header": "Zabudli ste heslo?",
+  "submit": "Poslať link na obnovenie",
+  "message": "Alebo ste si spomenuli? <lnk>Prihláste sa!</lnk>",
+  "email": {
+    "label": "Email",
+    "placeholder": "Email adresa..."
+  }
+}

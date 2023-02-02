@@ -805,7 +805,7 @@ export type TranslationInput = {
   name: Scalars['String'];
 };
 
-/** User reference type from users microservice with contributed billings field */
+/** The user model entity */
 export type User = {
   __typename?: 'User';
   billings: Array<Maybe<Billing>>;
@@ -822,7 +822,7 @@ export type User = {
 };
 
 
-/** User reference type from users microservice with contributed billings field */
+/** The user model entity */
 export type UserGrantsArgs = {
   year?: InputMaybe<Scalars['DateTime']>;
 };
@@ -912,6 +912,20 @@ export type MeQueryVariables = Exact<{
 
 
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+
+export type ForgotPasswordQueryVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type ForgotPasswordQuery = { __typename?: 'Query', forgotPassword: string };
+
+export type PasswordResetMutationVariables = Exact<{
+  data: PasswordInput;
+}>;
+
+
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
@@ -1362,6 +1376,92 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const ForgotPasswordDocument = gql`
+    query forgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+    `;
+
+/**
+ * __useForgotPasswordQuery__
+ *
+ * To run a query within a React component, call `useForgotPasswordQuery` and pass it any options that fit your needs.
+ * When your component renders, `useForgotPasswordQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useForgotPasswordQuery({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useForgotPasswordQuery(baseOptions: Apollo.QueryHookOptions<ForgotPasswordQuery, ForgotPasswordQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ForgotPasswordQuery, ForgotPasswordQueryVariables>(ForgotPasswordDocument, options);
+      }
+export function useForgotPasswordLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ForgotPasswordQuery, ForgotPasswordQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ForgotPasswordQuery, ForgotPasswordQueryVariables>(ForgotPasswordDocument, options);
+        }
+export type ForgotPasswordQueryHookResult = ReturnType<typeof useForgotPasswordQuery>;
+export type ForgotPasswordLazyQueryHookResult = ReturnType<typeof useForgotPasswordLazyQuery>;
+export type ForgotPasswordQueryResult = Apollo.QueryResult<ForgotPasswordQuery, ForgotPasswordQueryVariables>;
+export const PasswordResetDocument = gql`
+    mutation passwordReset($data: PasswordInput!) {
+  passwordReset(data: $data) {
+    id
+    name
+    email
+    role
+    verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+    `;
+export type PasswordResetMutationFn = Apollo.MutationFunction<PasswordResetMutation, PasswordResetMutationVariables>;
+
+/**
+ * __usePasswordResetMutation__
+ *
+ * To run a mutation, you first call `usePasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [passwordResetMutation, { data, loading, error }] = usePasswordResetMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function usePasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<PasswordResetMutation, PasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PasswordResetMutation, PasswordResetMutationVariables>(PasswordResetDocument, options);
+      }
+export type PasswordResetMutationHookResult = ReturnType<typeof usePasswordResetMutation>;
+export type PasswordResetMutationResult = Apollo.MutationResult<PasswordResetMutation>;
+export type PasswordResetMutationOptions = Apollo.BaseMutationOptions<PasswordResetMutation, PasswordResetMutationVariables>;
 export const RegisterDocument = gql`
     mutation register($data: RegisterInput!) {
   register(data: $data) {

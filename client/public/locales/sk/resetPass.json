@@ -1,0 +1,12 @@
+{
+  "header": "Reset hesla",
+  "submit": "Obnoviť heslo",
+  "password": {
+    "label": "Heslo",
+    "placeholder": "Heslo..."
+  },
+  "repeatPass": {
+    "label": "Zopakujte heslo",
+    "placeholder": "Heslo..."
+  }
+}

@@ -118,14 +118,12 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
 		}
 
 		//rest of the headers i.e. reset token
-		// const headers = context.req?.headers;
-		// for (const key in headers) {
-		// 	const value = headers[key];
-		// 	if (value) {
-		// 		request.http?.headers.set(key, String(value));
-		// 	}
-		// }
-
-		// console.log(request.http?.headers);
+		const headers = context.req?.headers;
+		for (const key in headers) {
+			const value = headers[key];
+			if (value) {
+				request.http?.headers.set(key, String(value));
+			}
+		}
 	}
 }

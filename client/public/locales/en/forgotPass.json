@@ -1,0 +1,9 @@
+{
+  "header": "Forgot your password?",
+  "submit": "Send me a reset link",
+  "message": "Or do you remember it? <lnk>Log In!</lnk>",
+  "email": {
+    "label": "Email",
+    "placeholder": "Email address..."
+  }
+}
