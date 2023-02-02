@@ -7,10 +7,12 @@ export default function ProtectedRouteProvider({
   children,
   protect,
   admin,
+  onlyFlaw,
 }: {
   children: ReactNode;
   protect?: boolean;
   admin?: boolean;
+  onlyFlaw?: boolean;
 }) {
   const { user } = useContext(AuthContext);
 
@@ -24,6 +26,13 @@ export default function ProtectedRouteProvider({
   }
 
   if (admin && user.role !== Role.Admin) {
+    globalThis.sessionStorage.setItem("intendedPath", router.asPath);
+
+    router.push("/login");
+    return null;
+  }
+
+  if (onlyFlaw && !user.email?.split("@")[1].includes("uniba")) {
     globalThis.sessionStorage.setItem("intendedPath", router.asPath);
 
     router.push("/login");
