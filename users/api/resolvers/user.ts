@@ -220,7 +220,7 @@ export class UserResolver {
   ) {
     const user = await this.userService.findOne({ email });
     if (!user)
-      throw new UserInputError("No user with provided email address found!");
+      throw new Error("No user with provided email address found!");
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
@@ -236,9 +236,10 @@ export class UserResolver {
   @UseMiddleware([RateLimit(10)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
-    @Ctx() { req }: Context
+    @Ctx() { req, res }: Context
   ) {
     const token = req.headers.resettoken;
+
     const userId: ResetToken = verifyJwt(token as string);
     if (!userId) throw new Error("Reset token expired!");
 
@@ -246,6 +247,13 @@ export class UserResolver {
     if (!user) throw new Error("User not found!");
 
     user.password = password;
+
+    res.cookie("accessToken", user.token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
 
     return await user.save();
   }

@@ -63,6 +63,36 @@ query me($year: DateTime) {
   }
 }
 
+query forgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+
+mutation passwordReset($data: PasswordInput!) {
+  passwordReset(data: $data) {
+    id
+    name
+    email
+    role
+    verified
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      IBAN
+      SWIFT
+    }
+  }
+}
+
 mutation register($data: RegisterInput!) {
   register(data: $data) {
     id
