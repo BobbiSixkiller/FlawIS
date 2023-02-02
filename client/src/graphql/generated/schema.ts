@@ -805,7 +805,7 @@ export type TranslationInput = {
   name: Scalars['String'];
 };
 
-/** The user model entity */
+/** User reference type from users microservice with contributed billings field */
 export type User = {
   __typename?: 'User';
   billings: Array<Maybe<Billing>>;
@@ -822,7 +822,7 @@ export type User = {
 };
 
 
-/** The user model entity */
+/** User reference type from users microservice with contributed billings field */
 export type UserGrantsArgs = {
   year?: InputMaybe<Scalars['DateTime']>;
 };
@@ -858,8 +858,6 @@ export type VenueInput = {
   address: AddressInput;
   name: Scalars['String'];
 };
-
-export type AnnouncementFragment = { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any };
 
 export type AnnouncementsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -1066,23 +1064,19 @@ export type UserTextSearchQueryVariables = Exact<{
 
 export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string }> };
 
-export const AnnouncementFragmentDoc = gql`
-    fragment Announcement on Announcement {
-  id
-  name
-  text
-  files
-  createdAt
-  updatedAt
-}
-    `;
+
 export const AnnouncementsDocument = gql`
     query announcements($after: ObjectId, $first: Int = 20) {
   announcements(after: $after, first: $first) {
     edges {
       cursor
       node {
-        ...Announcement
+        id
+        name
+        text
+        files
+        createdAt
+        updatedAt
       }
     }
     pageInfo {
@@ -1091,7 +1085,7 @@ export const AnnouncementsDocument = gql`
     }
   }
 }
-    ${AnnouncementFragmentDoc}`;
+    `;
 
 /**
  * __useAnnouncementsQuery__
@@ -1124,10 +1118,15 @@ export type AnnouncementsQueryResult = Apollo.QueryResult<AnnouncementsQuery, An
 export const AnnouncementDocument = gql`
     query announcement($id: ObjectId!) {
   announcement(id: $id) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
-    ${AnnouncementFragmentDoc}`;
+    `;
 
 /**
  * __useAnnouncementQuery__
@@ -1159,10 +1158,15 @@ export type AnnouncementQueryResult = Apollo.QueryResult<AnnouncementQuery, Anno
 export const CreateAnnouncementDocument = gql`
     mutation createAnnouncement($data: AnnouncementInput!) {
   createAnnouncement(data: $data) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
-    ${AnnouncementFragmentDoc}`;
+    `;
 export type CreateAnnouncementMutationFn = Apollo.MutationFunction<CreateAnnouncementMutation, CreateAnnouncementMutationVariables>;
 
 /**
@@ -1192,10 +1196,15 @@ export type CreateAnnouncementMutationOptions = Apollo.BaseMutationOptions<Creat
 export const UpdateAnnouncementDocument = gql`
     mutation updateAnnouncement($id: ObjectId!, $data: AnnouncementInput!) {
   updateAnnouncement(id: $id, data: $data) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
-    ${AnnouncementFragmentDoc}`;
+    `;
 export type UpdateAnnouncementMutationFn = Apollo.MutationFunction<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>;
 
 /**

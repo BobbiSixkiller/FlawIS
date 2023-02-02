@@ -1,18 +1,14 @@
-fragment Announcement on Announcement {
-  id
-  name
-  text
-  files
-  createdAt
-  updatedAt
-}
-
 query announcements($after: ObjectId, $first: Int = 20) {
   announcements(after: $after, first: $first) {
     edges {
       cursor
       node {
-        ...Announcement
+        id
+        name
+        text
+        files
+        createdAt
+        updatedAt
       }
     }
     pageInfo {
@@ -24,19 +20,34 @@ query announcements($after: ObjectId, $first: Int = 20) {
 
 query announcement($id: ObjectId!) {
   announcement(id: $id) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
 
 mutation createAnnouncement($data: AnnouncementInput!) {
   createAnnouncement(data: $data) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
 
 mutation updateAnnouncement($id: ObjectId!, $data: AnnouncementInput!) {
   updateAnnouncement(id: $id, data: $data) {
-    ...Announcement
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
   }
 }
 
