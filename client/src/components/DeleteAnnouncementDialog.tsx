@@ -2,7 +2,6 @@ import { useContext, useEffect } from "react";
 import { Button } from "semantic-ui-react";
 import {
 	AnnouncementEdge,
-	AnnouncementsDocument,
 	useDeleteAnnouncementMutation,
 } from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";

@@ -10,7 +10,7 @@ import logo from "public/images/Flaw-logo-notext.png";
 
 import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
-import { useLogoutMutation } from "../graphql/generated/schema";
+import { Role, useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import { ControlsContext } from "../providers/ControlsProvider";
 import { useTranslation } from "next-i18next";
@@ -133,23 +133,34 @@ export default function Nav({
 						</Menu.Item>
 					</>
 				) : (
-					<Menu.Item>
-						<Menu.Header>{user.name}</Menu.Header>
-						<Menu vertical inverted>
+					<>
+						{user?.role === Role.Admin && (
 							<Menu.Item
 								as={Link}
-								href="/users/profile"
-								name={t("menu.profile")}
-								active={router.asPath === "/user/profile"}
-							/>
-							<Menu.Item
-								as={Link}
-								href="/"
-								name={t("menu.logout")}
-								onClick={() => logout()}
-							/>
-						</Menu>
-					</Menu.Item>
+								href="/users"
+								active={router.asPath === "/users"}
+							>
+								<b>{t("menu.users")}</b>
+							</Menu.Item>
+						)}
+						<Menu.Item>
+							<Menu.Header>{user.name}</Menu.Header>
+							<Menu vertical inverted>
+								<Menu.Item
+									as={Link}
+									href="/users/profile"
+									name={t("menu.profile")}
+									active={router.asPath === "/user/profile"}
+								/>
+								<Menu.Item
+									as={Link}
+									href="/"
+									name={t("menu.logout")}
+									onClick={() => logout()}
+								/>
+							</Menu>
+						</Menu.Item>
+					</>
 				)}
 
 				{drawerItems}

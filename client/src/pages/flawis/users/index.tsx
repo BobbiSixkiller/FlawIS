@@ -1,30 +1,45 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useContext, useEffect } from "react";
 import { InView } from "react-intersection-observer";
-import { Grid, Header, Message, Placeholder, Table } from "semantic-ui-react";
-import AddAnnouncementDialog from "../../components/AddAnnouncementDialog";
-
-import Dashboard from "../../components/Dashboard";
-import DeleteAnnouncementDialog from "../../components/DeleteAnnouncementDialog";
-import { useAnnouncementsQuery } from "../../graphql/generated/schema";
-import useWidth from "../../hooks/useWidth";
-import { NextPageWithLayout } from "../_app";
+import {
+	Grid,
+	Header,
+	Icon,
+	Message,
+	Placeholder,
+	Table,
+} from "semantic-ui-react";
+import Dashboard from "../../../components/Dashboard";
+import DeleteUserDialog from "../../../components/DeleteUserDialog";
+import { useUsersQuery } from "../../../graphql/generated/schema";
+import useWidth from "../../../hooks/useWidth";
+import {
+	ActionTypes,
+	ControlsContext,
+} from "../../../providers/ControlsProvider";
+import { NextPageWithLayout } from "../../_app";
 
 const AnnouncementsPage: NextPageWithLayout = () => {
+	const { dispatch } = useContext(ControlsContext);
 	const width = useWidth();
 
-	const { data, error, loading, fetchMore } = useAnnouncementsQuery({
+	const { data, error, loading, fetchMore } = useUsersQuery({
 		variables: { first: 20 },
 		notifyOnNetworkStatusChange: true,
 	});
+
+	useEffect(() => {
+		dispatch({
+			type: ActionTypes.SetRightPanel,
+			payload: { rightPanelItems: null },
+		});
+	}, [dispatch]);
 
 	return (
 		<Grid padded={width < 400 ? "vertically" : true}>
 			<Grid.Row verticalAlign="middle">
 				<Grid.Column width={8}>
-					<Header>Oznamy</Header>
-				</Grid.Column>
-				<Grid.Column width={8}>
-					<AddAnnouncementDialog />
+					<Header>Používatelia</Header>
 				</Grid.Column>
 			</Grid.Row>
 			<Grid.Row>
@@ -34,9 +49,10 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 					<Table basic="very" celled>
 						<Table.Header>
 							<Table.Row>
-								<Table.HeaderCell>Názov</Table.HeaderCell>
-								<Table.HeaderCell>Text</Table.HeaderCell>
-								<Table.HeaderCell>Súbory</Table.HeaderCell>
+								<Table.HeaderCell>Meno</Table.HeaderCell>
+								<Table.HeaderCell>Email</Table.HeaderCell>
+								<Table.HeaderCell>Rola</Table.HeaderCell>
+								<Table.HeaderCell>Overený</Table.HeaderCell>
 								<Table.HeaderCell>Akcia</Table.HeaderCell>
 							</Table.Row>
 						</Table.Header>
@@ -49,24 +65,31 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 										</Table.Cell>
 									</Table.Row>
 								))}
-							{data?.announcements.edges.map((edge) => (
+							{data?.users.edges.map((edge) => (
 								<Table.Row key={edge?.cursor}>
 									<Table.Cell>{edge?.node.name}</Table.Cell>
-									<Table.Cell>{edge?.node.text}</Table.Cell>
-									<Table.Cell>{edge?.node.files?.length || 0}</Table.Cell>
+									<Table.Cell>{edge?.node.email}</Table.Cell>
+									<Table.Cell>{edge?.node.role}</Table.Cell>
 									<Table.Cell>
-										<DeleteAnnouncementDialog id={edge?.cursor} />
+										{edge?.node.verified ? (
+											<Icon color="green" name="checkmark" />
+										) : (
+											<Icon color="red" name="x" />
+										)}
+									</Table.Cell>
+									<Table.Cell>
+										<DeleteUserDialog id={edge?.cursor} />
 									</Table.Cell>
 								</Table.Row>
 							))}
-							{data?.announcements.pageInfo.hasNextPage && (
+							{data?.users.pageInfo.hasNextPage && (
 								<InView
 									onChange={async (inView) => {
 										if (inView) {
 											await fetchMore({
 												variables: {
-													after: data?.announcements.pageInfo.endCursor,
-													first: 5,
+													after: data?.users.pageInfo.endCursor,
+													first: 20,
 												},
 											});
 										}

@@ -2,7 +2,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NextPageWithLayout } from "../../_app";
 import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
 import { InferType } from "yup";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Formik, FormikProps } from "formik";
 
 import Dashboard from "../../../components/Dashboard";
@@ -13,10 +13,15 @@ import { InputField } from "../../../components/form/InputField";
 import { useTranslation } from "next-i18next";
 import Validation from "../../../util/validation";
 import useWidth from "../../../hooks/useWidth";
+import {
+	ActionTypes as ControlsActionTypes,
+	ControlsContext,
+} from "../../../providers/ControlsProvider";
 
 const ProfilePage: NextPageWithLayout = () => {
 	const [update, setUpdate] = useState(false);
 	const { user, dispatch } = useContext(AuthContext);
+	const { dispatch: controlsDispatch } = useContext(ControlsContext);
 	const { t } = useTranslation(["common", "profile"]);
 	const width = useWidth();
 
@@ -30,6 +35,13 @@ const ProfilePage: NextPageWithLayout = () => {
 			setUpdate(false);
 		},
 	});
+
+	useEffect(() => {
+		controlsDispatch({
+			type: ControlsActionTypes.SetRightPanel,
+			payload: { rightPanelItems: null },
+		});
+	}, [controlsDispatch]);
 
 	return (
 		<Grid padded={width < 400 ? "vertically" : true}>

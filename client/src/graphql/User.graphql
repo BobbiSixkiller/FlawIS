@@ -24,9 +24,28 @@ mutation updateUser($id: ObjectId!, $data: UserInput!) {
 	}
 }
 
+mutation deleteUser($id: ObjectId!) {
+	deleteUser(id: $id)
+}
+
 query userTextSearch($text: String!) {
 	userTextSearch(text: $text) {
 		id
 		name
+	}
+}
+
+query users($after: ObjectId, $first: Int = 20) {
+	users(after: $after, first: $first) {
+		edges {
+			cursor
+			node {
+				...User
+			}
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
 	}
 }

@@ -8,17 +8,19 @@ import { ActionTypes, AuthContext } from "../providers/Auth";
 import { useRouter } from "next/router";
 import useWith from "../hooks/useWidth";
 import Nav, { ContentWrapper } from "./Nav";
-import { useLogoutMutation } from "../graphql/generated/schema";
+import { Role, useLogoutMutation } from "../graphql/generated/schema";
 import Footer from "./Footer";
 import GrantSearch from "./GrantSearch";
 import { useTranslation } from "next-i18next";
+import { ControlsContext } from "../providers/ControlsProvider";
 
 interface dashboardProps {
 	children: ReactNode;
 }
 
 export default function Dashboard({ children }: dashboardProps) {
-	const { dispatch } = useContext(AuthContext);
+	const { dispatch, user } = useContext(AuthContext);
+	const { rightPanelItems } = useContext(ControlsContext);
 	const router = useRouter();
 	const width = useWith();
 
@@ -62,6 +64,15 @@ export default function Dashboard({ children }: dashboardProps) {
 					<Menu.Item as={Link} href="/" active={router.asPath === "/"}>
 						<b>{t("menu.home")}</b>
 					</Menu.Item>
+					{user?.role === Role.Admin && (
+						<Menu.Item
+							as={Link}
+							href="/users"
+							active={router.asPath === "/users"}
+						>
+							<b>{t("menu.users")}</b>
+						</Menu.Item>
+					)}
 					<Menu.Item
 						as={Link}
 						href="/users/profile"
@@ -86,9 +97,7 @@ export default function Dashboard({ children }: dashboardProps) {
 						height: "calc(100vh - 48px)",
 					}}
 				>
-					<div>
-						<GrantSearch />
-					</div>
+					<div>{rightPanelItems}</div>
 					<List link size="small">
 						<List.Item as="a" href="#">
 							{t("footer.menu.contact")}
