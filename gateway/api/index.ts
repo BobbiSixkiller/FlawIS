@@ -45,7 +45,7 @@ const main = async () => {
 	app.use(
 		cors({
 			credentials: true,
-			origin: ["https://flawis.flaw.uniba.sk"],
+			origin: ["https://flawis.flaw.uniba.sk", "https://flawis-backend.flaw.uniba.sk"],
 		})
 	);
 	app.use(cookieParser());
