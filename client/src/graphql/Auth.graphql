@@ -1,132 +1,118 @@
+fragment User on User {
+	id
+	name
+	email
+	role
+	verified
+}
+
 mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    id
-    name
-    email
-    role
-    verified
-    organisation
-    telephone
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      IBAN
-      SWIFT
-    }
-  }
+	login(email: $email, password: $password) {
+		...User
+		organisation
+		telephone
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			IBAN
+			SWIFT
+		}
+	}
 }
 
 query me($year: DateTime) {
-  me {
-    id
-    name
-    email
-    organisation
-    telephone
-    role
-    verified
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      IBAN
-      SWIFT
-    }
-    grants(year: $year) {
-      grants {
-        id
-        name
-        type
-        start
-        end
-        createdAt
-        updatedAt
-      }
-      hours
-      availableYears
-    }
-  }
+	me {
+		...User
+		organisation
+		telephone
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			IBAN
+			SWIFT
+		}
+		grants(year: $year) {
+			grants {
+				...Grant
+			}
+			hours
+			availableYears
+		}
+	}
 }
 
 query forgotPassword($email: String!) {
-  forgotPassword(email: $email)
+	forgotPassword(email: $email)
 }
 
 mutation passwordReset($data: PasswordInput!) {
-  passwordReset(data: $data) {
-    id
-    name
-    email
-    role
-    verified
-    organisation
-    telephone
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      IBAN
-      SWIFT
-    }
-  }
+	passwordReset(data: $data) {
+		...User
+		organisation
+		telephone
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			IBAN
+			SWIFT
+		}
+	}
 }
 
 mutation register($data: RegisterInput!) {
-  register(data: $data) {
-    id
-    name
-    email
-    role
-    verified
-    organisation
-    telephone
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      IBAN
-      SWIFT
-    }
-  }
+	register(data: $data) {
+		...User
+		organisation
+		telephone
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			IBAN
+			SWIFT
+		}
+	}
 }
 
 mutation resendActivationLink {
-  resendActivationLink
+	resendActivationLink
 }
 
 mutation activateUser($token: String!) {
-  activateUser(token: $token)
+	activateUser(token: $token)
 }
 
 mutation logout {
-  logout
+	logout
 }

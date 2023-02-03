@@ -1,12 +1,16 @@
+fragment Grant on Grant {
+	id
+	name
+	type
+	start
+	end
+	createdAt
+	updatedAt
+}
+
 mutation createGrant($data: GrantInput!) {
 	createGrant(data: $data) {
-		id
-		name
-		type
-		start
-		end
-		createdAt
-		updatedAt
+		...Grant
 	}
 }
 
@@ -16,11 +20,7 @@ mutation deleteGrant($id: ObjectId!) {
 
 mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
 	addApprovedBudget(id: $id, data: $data) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -58,18 +58,12 @@ mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 
 mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
 	addSpentBudget(id: $id, data: $data) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -106,18 +100,12 @@ mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 
 mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
 	addMember(id: $id, year: $year, data: $data) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -154,18 +142,12 @@ mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 
 mutation deleteMember($id: ObjectId!, $year: DateTime!, $user: ObjectId!) {
 	deleteMember(id: $id, year: $year, user: $user) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -202,18 +184,12 @@ mutation deleteMember($id: ObjectId!, $year: DateTime!, $user: ObjectId!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 
 mutation deleteBudget($id: ObjectId!, $year: DateTime!) {
 	deleteBudget(id: $id, year: $year) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -250,8 +226,6 @@ mutation deleteBudget($id: ObjectId!, $year: DateTime!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 
@@ -276,11 +250,7 @@ query grants($after: ObjectId, $first: Int = 20) {
 
 query grant($id: ObjectId!) {
 	grant(id: $id) {
-		id
-		name
-		type
-		start
-		end
+		...Grant
 		announcements {
 			id
 			name
@@ -318,8 +288,6 @@ query grant($id: ObjectId!) {
 			createdAt
 			updatedAt
 		}
-		createdAt
-		updatedAt
 	}
 }
 

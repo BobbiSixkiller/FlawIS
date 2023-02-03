@@ -667,10 +667,8 @@ export type QueryUserTextSearchArgs = {
 
 
 export type QueryUsersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
 };
 
 /** New user input data */
@@ -896,20 +894,22 @@ export type DeleteAnnouncementMutationVariables = Exact<{
 
 export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
 
+export type UserFragment = { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean };
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type MeQueryVariables = Exact<{
   year?: InputMaybe<Scalars['DateTime']>;
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String'];
@@ -923,14 +923,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -970,6 +970,8 @@ export type DeleteFileMutationVariables = Exact<{
 
 
 export type DeleteFileMutation = { __typename?: 'Mutation', deleteFile: boolean };
+
+export type GrantFragment = { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any };
 
 export type CreateGrantMutationVariables = Exact<{
   data: GrantInput;
@@ -1057,6 +1059,13 @@ export type UpdateUserMutationVariables = Exact<{
 
 export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+
 export type UserTextSearchQueryVariables = Exact<{
   text: Scalars['String'];
 }>;
@@ -1064,7 +1073,34 @@ export type UserTextSearchQueryVariables = Exact<{
 
 export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string }> };
 
+export type UsersQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']>;
+  first?: InputMaybe<Scalars['Int']>;
+}>;
 
+
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
+
+export const UserFragmentDoc = gql`
+    fragment User on User {
+  id
+  name
+  email
+  role
+  verified
+}
+    `;
+export const GrantFragmentDoc = gql`
+    fragment Grant on Grant {
+  id
+  name
+  type
+  start
+  end
+  createdAt
+  updatedAt
+}
+    `;
 export const AnnouncementsDocument = gql`
     query announcements($after: ObjectId, $first: Int = 20) {
   announcements(after: $after, first: $first) {
@@ -1273,11 +1309,7 @@ export type DeleteAnnouncementMutationOptions = Apollo.BaseMutationOptions<Delet
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
-    id
-    name
-    email
-    role
-    verified
+    ...User
     organisation
     telephone
     billings {
@@ -1296,7 +1328,7 @@ export const LoginDocument = gql`
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -1327,13 +1359,9 @@ export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, Log
 export const MeDocument = gql`
     query me($year: DateTime) {
   me {
-    id
-    name
-    email
+    ...User
     organisation
     telephone
-    role
-    verified
     billings {
       name
       address {
@@ -1350,20 +1378,15 @@ export const MeDocument = gql`
     }
     grants(year: $year) {
       grants {
-        id
-        name
-        type
-        start
-        end
-        createdAt
-        updatedAt
+        ...Grant
       }
       hours
       availableYears
     }
   }
 }
-    `;
+    ${UserFragmentDoc}
+${GrantFragmentDoc}`;
 
 /**
  * __useMeQuery__
@@ -1428,11 +1451,7 @@ export type ForgotPasswordQueryResult = Apollo.QueryResult<ForgotPasswordQuery, 
 export const PasswordResetDocument = gql`
     mutation passwordReset($data: PasswordInput!) {
   passwordReset(data: $data) {
-    id
-    name
-    email
-    role
-    verified
+    ...User
     organisation
     telephone
     billings {
@@ -1451,7 +1470,7 @@ export const PasswordResetDocument = gql`
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 export type PasswordResetMutationFn = Apollo.MutationFunction<PasswordResetMutation, PasswordResetMutationVariables>;
 
 /**
@@ -1481,11 +1500,7 @@ export type PasswordResetMutationOptions = Apollo.BaseMutationOptions<PasswordRe
 export const RegisterDocument = gql`
     mutation register($data: RegisterInput!) {
   register(data: $data) {
-    id
-    name
-    email
-    role
-    verified
+    ...User
     organisation
     telephone
     billings {
@@ -1504,7 +1519,7 @@ export const RegisterDocument = gql`
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
@@ -1741,16 +1756,10 @@ export type DeleteFileMutationOptions = Apollo.BaseMutationOptions<DeleteFileMut
 export const CreateGrantDocument = gql`
     mutation createGrant($data: GrantInput!) {
   createGrant(data: $data) {
-    id
-    name
-    type
-    start
-    end
-    createdAt
-    updatedAt
+    ...Grant
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type CreateGrantMutationFn = Apollo.MutationFunction<CreateGrantMutation, CreateGrantMutationVariables>;
 
 /**
@@ -1811,11 +1820,7 @@ export type DeleteGrantMutationOptions = Apollo.BaseMutationOptions<DeleteGrantM
 export const AddApprovedBudgetDocument = gql`
     mutation addApprovedBudget($id: ObjectId!, $data: BudgetInput!) {
   addApprovedBudget(id: $id, data: $data) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -1853,11 +1858,9 @@ export const AddApprovedBudgetDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type AddApprovedBudgetMutationFn = Apollo.MutationFunction<AddApprovedBudgetMutation, AddApprovedBudgetMutationVariables>;
 
 /**
@@ -1888,11 +1891,7 @@ export type AddApprovedBudgetMutationOptions = Apollo.BaseMutationOptions<AddApp
 export const AddSpentBudgetDocument = gql`
     mutation addSpentBudget($id: ObjectId!, $data: BudgetInput!) {
   addSpentBudget(id: $id, data: $data) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -1929,11 +1928,9 @@ export const AddSpentBudgetDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type AddSpentBudgetMutationFn = Apollo.MutationFunction<AddSpentBudgetMutation, AddSpentBudgetMutationVariables>;
 
 /**
@@ -1964,11 +1961,7 @@ export type AddSpentBudgetMutationOptions = Apollo.BaseMutationOptions<AddSpentB
 export const AddMemberDocument = gql`
     mutation addMember($id: ObjectId!, $year: DateTime!, $data: MemberInput!) {
   addMember(id: $id, year: $year, data: $data) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -2005,11 +1998,9 @@ export const AddMemberDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type AddMemberMutationFn = Apollo.MutationFunction<AddMemberMutation, AddMemberMutationVariables>;
 
 /**
@@ -2041,11 +2032,7 @@ export type AddMemberMutationOptions = Apollo.BaseMutationOptions<AddMemberMutat
 export const DeleteMemberDocument = gql`
     mutation deleteMember($id: ObjectId!, $year: DateTime!, $user: ObjectId!) {
   deleteMember(id: $id, year: $year, user: $user) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -2082,11 +2069,9 @@ export const DeleteMemberDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type DeleteMemberMutationFn = Apollo.MutationFunction<DeleteMemberMutation, DeleteMemberMutationVariables>;
 
 /**
@@ -2118,11 +2103,7 @@ export type DeleteMemberMutationOptions = Apollo.BaseMutationOptions<DeleteMembe
 export const DeleteBudgetDocument = gql`
     mutation deleteBudget($id: ObjectId!, $year: DateTime!) {
   deleteBudget(id: $id, year: $year) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -2159,11 +2140,9 @@ export const DeleteBudgetDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 export type DeleteBudgetMutationFn = Apollo.MutationFunction<DeleteBudgetMutation, DeleteBudgetMutationVariables>;
 
 /**
@@ -2243,11 +2222,7 @@ export type GrantsQueryResult = Apollo.QueryResult<GrantsQuery, GrantsQueryVaria
 export const GrantDocument = gql`
     query grant($id: ObjectId!) {
   grant(id: $id) {
-    id
-    name
-    type
-    start
-    end
+    ...Grant
     announcements {
       id
       name
@@ -2285,11 +2260,9 @@ export const GrantDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
-    updatedAt
   }
 }
-    `;
+    ${GrantFragmentDoc}`;
 
 /**
  * __useGrantQuery__
@@ -2409,6 +2382,37 @@ export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export const DeleteUserDocument = gql`
+    mutation deleteUser($id: ObjectId!) {
+  deleteUser(id: $id)
+}
+    `;
+export type DeleteUserMutationFn = Apollo.MutationFunction<DeleteUserMutation, DeleteUserMutationVariables>;
+
+/**
+ * __useDeleteUserMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserMutation, { data, loading, error }] = useDeleteUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserMutation, DeleteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, options);
+      }
+export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
+export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
+export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const UserTextSearchDocument = gql`
     query userTextSearch($text: String!) {
   userTextSearch(text: $text) {
@@ -2445,3 +2449,48 @@ export function useUserTextSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type UserTextSearchQueryHookResult = ReturnType<typeof useUserTextSearchQuery>;
 export type UserTextSearchLazyQueryHookResult = ReturnType<typeof useUserTextSearchLazyQuery>;
 export type UserTextSearchQueryResult = Apollo.QueryResult<UserTextSearchQuery, UserTextSearchQueryVariables>;
+export const UsersDocument = gql`
+    query users($after: ObjectId, $first: Int = 20) {
+  users(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        ...User
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    ${UserFragmentDoc}`;
+
+/**
+ * __useUsersQuery__
+ *
+ * To run a query within a React component, call `useUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useUsersQuery(baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
+      }
+export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
+        }
+export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
+export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
+export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;

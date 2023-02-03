@@ -1,16 +1,16 @@
 import { useContext, useEffect } from "react";
 import { Button } from "semantic-ui-react";
 import {
-	GrantsDocument,
-	useDeleteGrantMutation,
+	useDeleteUserMutation,
+	UsersDocument,
 } from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 
-export default function DeleteGrantDialog({ id }: { id: string }) {
+export default function DeleteUserDialog({ id }: { id: string }) {
 	const { handleOpen, handleClose, displayError } = useContext(DialogContext);
-	const [deleteGrant, { error }] = useDeleteGrantMutation({
+	const [deleteGrant, { error }] = useDeleteUserMutation({
 		onCompleted: () => handleClose(),
-		refetchQueries: [{ query: GrantsDocument }, "grants"],
+		refetchQueries: [{ query: UsersDocument }, "users"],
 	});
 
 	useEffect(() => displayError(error?.message || ""), [error, displayError]);
@@ -22,9 +22,9 @@ export default function DeleteGrantDialog({ id }: { id: string }) {
 			icon="trash"
 			onClick={() =>
 				handleOpen({
-					content: <p>Naozaj chcete zmazať vybraný grant?</p>,
+					content: <p>Naozaj chcete zmazať vybraného používateľa?</p>,
 					size: "tiny",
-					header: "Zmazať grant",
+					header: "Zmazať používateľa",
 					canceltext: "Zrušiť",
 					confirmText: "Potvrdiť",
 					confirmCb: async () =>
