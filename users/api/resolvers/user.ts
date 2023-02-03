@@ -111,7 +111,7 @@ export class UserResolver {
   @Authorized()
   @UseMiddleware([RateLimit(100)])
   @Query(() => User)
-  async me(@Ctx() { user, locale }: Context) {
+  async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
     if (!loggedInUser)
       throw new AuthenticationError("User account has been deleted!");
@@ -125,7 +125,6 @@ export class UserResolver {
     @Arg("data") registerInput: RegisterInput,
     @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
   ) {
-    console.log(locale);
     const user = await this.userService.create(registerInput);
 
     res.cookie("accessToken", user.token, {

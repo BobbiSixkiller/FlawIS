@@ -240,8 +240,6 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
 			...form.getHeaders(),
 		};
 
-		console.log(headers);
-
 		Object.assign(headers, form.getHeaders() || {});
 
 		const httpRequest = {

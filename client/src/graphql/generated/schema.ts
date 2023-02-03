@@ -366,7 +366,7 @@ export type Mutation = {
   createConference: Conference;
   createGrant: Grant;
   createSection: Section;
-  deleteAnnouncement: Scalars['Boolean'];
+  deleteAnnouncement: Announcement;
   deleteBudget: Grant;
   deleteConference: Scalars['Boolean'];
   deleteFile: Scalars['Boolean'];
@@ -894,7 +894,7 @@ export type DeleteAnnouncementMutationVariables = Exact<{
 }>;
 
 
-export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: boolean };
+export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -1234,7 +1234,14 @@ export type UpdateAnnouncementMutationResult = Apollo.MutationResult<UpdateAnnou
 export type UpdateAnnouncementMutationOptions = Apollo.BaseMutationOptions<UpdateAnnouncementMutation, UpdateAnnouncementMutationVariables>;
 export const DeleteAnnouncementDocument = gql`
     mutation deleteAnnouncement($id: ObjectId!) {
-  deleteAnnouncement(id: $id)
+  deleteAnnouncement(id: $id) {
+    id
+    name
+    text
+    files
+    createdAt
+    updatedAt
+  }
 }
     `;
 export type DeleteAnnouncementMutationFn = Apollo.MutationFunction<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>;

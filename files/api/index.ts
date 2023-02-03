@@ -9,6 +9,7 @@ import { FileResolver } from "./resolvers.ts/file";
 import { Context, authChecker } from "./util/auth";
 
 import env from "dotenv";
+import Messagebroker from "./util/rmq";
 
 env.config();
 
@@ -39,6 +40,9 @@ async function main() {
 		}),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 	});
+
+	await Messagebroker.init();
+	Messagebroker.consumeMessages(["file.delete"])
 
 	await server.start();
 

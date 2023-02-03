@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { Button, Form, Input, Select, TextArea } from "semantic-ui-react";
 import { InferType, object, string, array, mixed } from "yup";
 import {
+	AnnouncementsDocument,
 	FileType,
 	GrantType,
 	useCreateAnnouncementMutation,
@@ -45,6 +46,7 @@ export default function AddAnnouncementDialog({
 	const { handleOpen, handleClose } = useContext(DialogContext);
 
 	const [addAnnouncement] = useCreateAnnouncementMutation({
+		refetchQueries: [{ query: AnnouncementsDocument }, "announcements"],
 		onCompleted: () => handleClose(),
 		update(cache, { data }) {
 			if (grantId) {

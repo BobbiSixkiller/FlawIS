@@ -147,7 +147,7 @@ type Mutation {
   addSpentBudget(data: BudgetInput!, id: ObjectId!): Grant!
   createAnnouncement(data: AnnouncementInput!): Announcement!
   createGrant(data: GrantInput!): Grant!
-  deleteAnnouncement(id: ObjectId!): Boolean!
+  deleteAnnouncement(id: ObjectId!): Announcement!
   deleteBudget(id: ObjectId!, year: DateTime!): Grant!
   deleteGrant(id: ObjectId!): Boolean!
   deleteMember(id: ObjectId!, user: ObjectId!, year: DateTime!): Grant!
