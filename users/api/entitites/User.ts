@@ -16,7 +16,6 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { hash } from "bcrypt";
 import { signJwt } from "../util/auth";
-import CreateConnection from "../resolvers/types/pagination";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 
 export enum Role {
@@ -105,10 +104,10 @@ export class User extends TimeStamps {
     after?: ObjectId
   ) {
     return await this.aggregate([
+      { $sort: { _id: -1 } },
       {
         $facet: {
           data: [
-            { $sort: { _id: -1 } },
             {
               $match: {
                 $expr: {
@@ -143,9 +142,6 @@ export class User extends TimeStamps {
             { $limit: 1 }, // just to check if there's any element
           ],
         },
-      },
-      {
-        $unwind: { path: "$hasNextPage", preserveNullAndEmptyArrays: true },
       },
       {
         $project: {
