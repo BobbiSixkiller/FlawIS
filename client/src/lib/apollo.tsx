@@ -66,6 +66,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
 					fields: {
 						grants: relayStylePagination(),
 						announcements: relayStylePagination(),
+						users: relayStylePagination()
 					},
 				},
 			},
