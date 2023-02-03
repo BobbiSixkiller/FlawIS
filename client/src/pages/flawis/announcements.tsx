@@ -1,13 +1,6 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { InView } from "react-intersection-observer";
-import {
-	Grid,
-	Header,
-	Message,
-	Placeholder,
-	Segment,
-	Table,
-} from "semantic-ui-react";
+import { Grid, Header, Message, Placeholder, Table } from "semantic-ui-react";
 import AddAnnouncementDialog from "../../components/AddAnnouncementDialog";
 
 import Dashboard from "../../components/Dashboard";

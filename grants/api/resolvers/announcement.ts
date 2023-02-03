@@ -12,7 +12,7 @@ import { Service } from "typedi";
 import { CRUDservice } from "../services/CRUDservice";
 
 import env from "dotenv";
-import { LoadAnnouncement, LoadGrant } from "../util/decorators";
+import { LoadAnnouncement, } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose/lib/types";
 import { Announcement } from "../entitites/Announcement";
 import {
@@ -22,6 +22,7 @@ import {
 } from "./types/announcement";
 import { Context } from "../util/auth";
 import { Grant } from "../entitites/Grant";
+import Messagebroker from "../util/rmq";
 
 env.config();
 
@@ -31,7 +32,7 @@ export class AnnouncementResolver {
 	constructor(
 		private readonly announcementService = new CRUDservice(Announcement),
 		private readonly grantService = new CRUDservice(Grant)
-	) {}
+	) { }
 
 	@Authorized()
 	@Query(() => AnnouncementConnection)
@@ -89,7 +90,7 @@ export class AnnouncementResolver {
 	async updateAnnouncement(
 		@Arg("data") data: AnnouncementInput,
 		@Arg("id") _id: ObjectId,
-		@LoadGrant() announcement: DocumentType<Announcement>
+		@LoadAnnouncement() announcement: DocumentType<Announcement>
 	) {
 		for (const [key, value] of Object.entries(data)) {
 			announcement[key as keyof Announcement] = value;
@@ -99,9 +100,15 @@ export class AnnouncementResolver {
 	}
 
 	@Authorized()
-	@Mutation(() => Boolean)
-	async deleteAnnouncement(@Arg("id") id: ObjectId) {
-		const { deletedCount } = await this.announcementService.delete({ _id: id });
-		return deletedCount > 0;
+	@Mutation(() => Announcement)
+	async deleteAnnouncement(@Arg("id") _id: ObjectId, @LoadAnnouncement() announcement: DocumentType<Announcement>) {
+		if (announcement.files.length !== 0) {
+			for (const file of announcement.files) {
+				Messagebroker.produceMessage(JSON.stringify({ path: file }), "file.delete")
+
+			}
+		}
+
+		return await announcement.remove()
 	}
 }

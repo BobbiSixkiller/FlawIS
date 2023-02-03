@@ -59,7 +59,7 @@ async function main() {
     context: ({ req, res }: Context) => ({
       req,
       res,
-      user: req.headers.user ? JSON.parse(req.headers.user as string) : null,
+      user: req.headers.user ? JSON.parse(decodeURIComponent(req.headers.user as string)) : null,
       locale: req.headers.locale
         ? JSON.parse(req.headers.locale as string)
         : "sk",

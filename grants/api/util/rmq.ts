@@ -10,7 +10,7 @@ type RoutingKey =
 	| "user.delete"
 	| "user.update.email"
 	| "user.update.billings"
-	| "mail.invoice";
+	| "mail.invoice" | "file.delete";
 
 class Messagebroker {
 	private static connection?: Connection;
