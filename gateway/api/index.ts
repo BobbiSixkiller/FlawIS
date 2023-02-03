@@ -55,7 +55,7 @@ const main = async () => {
 		isAuthMiddleware,
 		createProxyMiddleware({
 			target: "http://files:5002/",
-			changeOrigin: false,
+			changeOrigin: true,
 		})
 	);
 	app.use(
@@ -63,14 +63,14 @@ const main = async () => {
 		isAuthMiddleware,
 		createProxyMiddleware({
 			target: "http://files:5002/",
-			changeOrigin: false,
+			changeOrigin: true,
 		})
 	);
 	app.use(
 		"/public",
 		createProxyMiddleware({
 			target: "http://files:5002/",
-			changeOrigin: false,
+			changeOrigin: true,
 		})
 	);
 
