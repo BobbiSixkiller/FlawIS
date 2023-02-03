@@ -33,48 +33,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
 		}).then((response) => response);
 	};
 
-<<<<<<< HEAD
-  return new ApolloClient({
-    // SSR only for Node.js
-    ssrMode: typeof window === "undefined",
-    link: ApolloLink.from([
-      onError(({ graphQLErrors, networkError }) => {
-        if (graphQLErrors)
-          graphQLErrors.forEach(({ message, locations, path }) => {
-            console.log(
-              `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-            );
-          });
-        if (networkError)
-          console.log(
-            `[Network error]: ${networkError}. Backend is unreachable. Is it running?`
-          );
-      }),
-      // this uses apollo-link-http under the hood, so all the options here come from that package
-      createUploadLink({
-        uri: "https://flawis-backend.flaw.uniba.sk/graphql",
-        // Make sure that CORS and cookies work
-        fetchOptions: {
-          mode: "cors",
-        },
-        credentials: "include",
-        fetch: enhancedFetch,
-      }),
-    ]),
-    cache: new InMemoryCache({
-      typePolicies: {
-        Query: {
-          fields: {
-            grants: relayStylePagination(),
-            announcements: relayStylePagination(),
-          },
-        },
-      },
-    }),
-  });
-=======
 	return new ApolloClient({
-		connectToDevTools: process.env.NODE_ENV === "production" ? false : true,
 		// SSR only for Node.js
 		ssrMode: typeof window === "undefined",
 		link: ApolloLink.from([
@@ -92,7 +51,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
 			}),
 			// this uses apollo-link-http under the hood, so all the options here come from that package
 			createUploadLink({
-				uri: "http://localhost:5000/graphql",
+				uri: "https://flawis-backend.flaw.uniba.sk/graphql",
 				// Make sure that CORS and cookies work
 				fetchOptions: {
 					mode: "cors",
@@ -112,7 +71,6 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
 			},
 		}),
 	});
->>>>>>> dev
 };
 
 type InitialState = NormalizedCacheObject | undefined;
