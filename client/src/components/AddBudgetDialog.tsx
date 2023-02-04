@@ -23,18 +23,18 @@ const budgetInputSchema = object({
 type Values = InferType<typeof budgetInputSchema>;
 
 export default function AddBudgetDialog({ year }: { year?: Date }) {
-	const { handleOpen, handleClose, displayError } = useContext(DialogContext);
+	const { handleOpen, handleClose, setError } = useContext(DialogContext);
 	const { query } = useRouter();
 
 	const [addBudget, { error }] = useAddApprovedBudgetMutation({
 		onCompleted: () => handleClose(),
 	});
 
-	useEffect(() => displayError(error?.message || ""), [error, displayError]);
+	useEffect(() => setError(error?.message || ""), [error, setError]);
 
 	const [addSpending] = useAddSpentBudgetMutation({
 		onCompleted: () => handleClose(),
-		onError: (err) => displayError(err.message),
+		onError: (err) => setError(err.message),
 	});
 
 	return (

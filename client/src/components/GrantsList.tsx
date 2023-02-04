@@ -26,7 +26,7 @@ export default function GrantsList() {
 		notifyOnNetworkStatusChange: true,
 	});
 
-	const [deleteGrant, { error: deleteError }] = useDeleteGrantMutation({
+	const [deleteGrant] = useDeleteGrantMutation({
 		refetchQueries: [{ query: GrantsDocument }, "grants"],
 	});
 
@@ -126,7 +126,6 @@ export default function GrantsList() {
 												variables: { id: edge?.cursor },
 											})) as Promise<void>
 										}
-										error={deleteError}
 										header="Zmazať grant"
 										content={<p>Naozaj chcete zmazať vybraný grant?</p>}
 										cancelText="Zrušiť"

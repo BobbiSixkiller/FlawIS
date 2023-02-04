@@ -10,8 +10,12 @@ import {
 	Table,
 } from "semantic-ui-react";
 import Dashboard from "../../../components/Dashboard";
-import DeleteUserDialog from "../../../components/DeleteUserDialog";
-import { useUsersQuery } from "../../../graphql/generated/schema";
+import DeleteDialog from "../../../components/DeleteDialog";
+import {
+	useDeleteUserMutation,
+	UsersDocument,
+	useUsersQuery,
+} from "../../../graphql/generated/schema";
 import useWidth from "../../../hooks/useWidth";
 import {
 	ActionTypes,
@@ -26,6 +30,10 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 	const { data, error, loading, fetchMore } = useUsersQuery({
 		variables: { first: 20 },
 		notifyOnNetworkStatusChange: true,
+	});
+
+	const [deleteUser] = useDeleteUserMutation({
+		refetchQueries: [{ query: UsersDocument }, "users"],
 	});
 
 	useEffect(() => {
@@ -78,7 +86,19 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 										)}
 									</Table.Cell>
 									<Table.Cell>
-										<DeleteUserDialog id={edge?.cursor} />
+										<DeleteDialog
+											confirmCb={async () =>
+												(await deleteUser({
+													variables: { id: edge?.cursor },
+												})) as Promise<void>
+											}
+											cancelText="Zrušiť"
+											confirmText="Potvrdiť"
+											content={
+												<p>Naozaj chcete zmazať vybraného používateľa?</p>
+											}
+											header="Zmazať používateľa"
+										/>
 									</Table.Cell>
 								</Table.Row>
 							))}

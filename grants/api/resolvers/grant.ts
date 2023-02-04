@@ -149,15 +149,8 @@ export class GrantResolver {
     @Arg("year") year: Date,
     @LoadGrant() grant: DocumentType<Grant>
   ) {
-    const budget = grant.budgets.find(
-      (b) => b.year.getFullYear() === year.getFullYear()
-    );
-    if (!budget) {
-      throw new Error("Budget not found!");
-    }
-
     grant.budgets = grant.budgets.filter(
-      (b) => b.year.getFullYear() !== budget.year.getFullYear()
+      (b) => b.year.getFullYear() !== year.getFullYear()
     );
 
     return await grant.save();

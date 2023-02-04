@@ -25,14 +25,14 @@ interface DialogContextProps {
 	state: DialogState;
 	handleOpen: (val: DialogState) => void;
 	handleClose: () => void;
-	displayError: (msg: string) => void;
+	setError: (msg: string) => void;
 }
 
 export const DialogContext = createContext<DialogContextProps>({
 	state: { content: null },
 	handleOpen: () => null,
 	handleClose: () => null,
-	displayError: () => null,
+	setError: () => null,
 });
 
 export function DialogProvider({ children }: { children: ReactNode }) {
@@ -53,14 +53,12 @@ export function DialogProvider({ children }: { children: ReactNode }) {
 	};
 
 	const handleConfirm = useCallback(async () => {
-		setError("");
 		if (values.confirmCb) {
 			setLoading(true);
 			await values.confirmCb();
 			setLoading(false);
 		}
-		if (!error) setOpen(false);
-	}, [error, values]);
+	}, [values]);
 
 	const handleCancel = () => {
 		if (values.cancelCb) {
@@ -69,14 +67,9 @@ export function DialogProvider({ children }: { children: ReactNode }) {
 		setOpen(false);
 	};
 
-	const displayError = useCallback((msg: string) => {
-		setLoading(false);
-		setError(msg);
-	}, []);
-
 	return (
 		<DialogContext.Provider
-			value={{ state: values, handleOpen, handleClose, displayError }}
+			value={{ state: values, handleOpen, handleClose, setError }}
 		>
 			<Modal
 				open={!userloading && open}
@@ -87,7 +80,9 @@ export function DialogProvider({ children }: { children: ReactNode }) {
 				{values.header && <Modal.Header>{values.header}</Modal.Header>}
 				<Modal.Content>
 					{values.content}
-					{error && <Message error content={error} />}
+					{error && (
+						<Message error content={error} onDismiss={() => setError("")} />
+					)}
 				</Modal.Content>
 				{values.confirmCb && (
 					<Modal.Actions>

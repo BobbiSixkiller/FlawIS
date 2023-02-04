@@ -1,30 +1,22 @@
-import { ApolloError } from "@apollo/client";
-import { ReactNode, useContext, useEffect } from "react";
+import { ReactNode, useContext } from "react";
 import { Button } from "semantic-ui-react";
-import {
-	AnnouncementEdge,
-	useDeleteAnnouncementMutation,
-} from "../graphql/generated/schema";
+
 import { DialogContext } from "../providers/Dialog";
 
 export default function DeleteDialog({
 	confirmCb,
-	error,
 	header,
 	content,
 	confirmText,
 	cancelText,
 }: {
 	confirmCb: () => void | Promise<void>;
-	error: ApolloError | undefined;
 	header: string;
 	content: ReactNode;
 	confirmText: string;
 	cancelText: string;
 }) {
-	const { handleOpen, displayError } = useContext(DialogContext);
-
-	useEffect(() => displayError(error?.message || ""), [error, displayError]);
+	const { handleOpen, handleClose, setError } = useContext(DialogContext);
 
 	return (
 		<Button
@@ -38,7 +30,14 @@ export default function DeleteDialog({
 					header,
 					cancelText,
 					confirmText,
-					confirmCb,
+					confirmCb: async () => {
+						try {
+							await confirmCb();
+							handleClose();
+						} catch (error: any) {
+							setError(error.message);
+						}
+					},
 				})
 			}
 		/>

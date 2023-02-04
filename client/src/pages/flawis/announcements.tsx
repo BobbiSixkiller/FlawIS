@@ -21,24 +21,23 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 		notifyOnNetworkStatusChange: true,
 	});
 
-	const [deleteAnnouncement, { error: deleteError }] =
-		useDeleteAnnouncementMutation({
-			update(cache, { data }) {
-				cache.modify({
-					fields: {
-						announcements(existing) {
-							return {
-								...existing,
-								edges: existing.edges.filter(
-									(n: AnnouncementEdge) =>
-										n.cursor !== data?.deleteAnnouncement.id
-								),
-							};
-						},
+	const [deleteAnnouncement] = useDeleteAnnouncementMutation({
+		update(cache, { data }) {
+			cache.modify({
+				fields: {
+					announcements(existing) {
+						return {
+							...existing,
+							edges: existing.edges.filter(
+								(n: AnnouncementEdge) =>
+									n.cursor !== data?.deleteAnnouncement.id
+							),
+						};
 					},
-				});
-			},
-		});
+				},
+			});
+		},
+	});
 
 	return (
 		<Grid padded={width < 400 ? "vertically" : true}>
@@ -84,7 +83,6 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 														variables: { id: edge?.cursor },
 													})) as Promise<void>
 												}
-												error={deleteError}
 												header="Zmazať oznam"
 												content={<p>Naozaj chcete zmazať oznam?</p>}
 												cancelText="Zrušiť"

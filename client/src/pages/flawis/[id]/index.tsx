@@ -38,10 +38,8 @@ const GrantPage: NextPageWithLayout = () => {
 	const { data, loading, error } = useGrantQuery({
 		variables: { id: query.id },
 	});
-	const [deleteBudget, { error: deleteBudgetError }] =
-		useDeleteBudgetMutation();
-	const [deleteMember, { error: deleteMemberError }] =
-		useDeleteMemberMutation();
+	const [deleteBudget] = useDeleteBudgetMutation();
+	const [deleteMember] = useDeleteMemberMutation();
 
 	if (loading) {
 		return <Loader active />;
@@ -152,7 +150,6 @@ const GrantPage: NextPageWithLayout = () => {
 																					},
 																				})) as Promise<void>
 																			}
-																			error={deleteBudgetError}
 																			content={
 																				<p>
 																					Naozaj chcete zmazať vybraný rozpočet?
@@ -239,8 +236,7 @@ const GrantPage: NextPageWithLayout = () => {
 																										riešiteľa?
 																									</p>
 																								}
-																								error={deleteMemberError}
-																								header="Zmazať rieśiteľa"
+																								header="Zmazať riešiteľa"
 																								cancelText="Zrušiť"
 																								confirmText="Potvrdiť"
 																								confirmCb={async () =>
