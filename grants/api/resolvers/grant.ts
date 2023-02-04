@@ -37,7 +37,7 @@ export class GrantResolver {
   constructor(
     private readonly grantService = new CRUDservice(Grant),
     private readonly announcementService = new CRUDservice(Announcement)
-  ) {}
+  ) { }
 
   @Authorized()
   @Query(() => GrantConnection)
@@ -46,6 +46,7 @@ export class GrantResolver {
       first,
       after
     );
+    if (grants[0].edges.length === 0) throw new Error("No grants!")
 
     return grants[0] as GrantConnection;
   }
