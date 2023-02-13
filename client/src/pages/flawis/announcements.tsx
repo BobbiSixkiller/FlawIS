@@ -4,8 +4,12 @@ import { Grid, Header, Message, Placeholder, Table } from "semantic-ui-react";
 import AddAnnouncementDialog from "../../components/AddAnnouncementDialog";
 
 import Dashboard from "../../components/Dashboard";
-import DeleteAnnouncementDialog from "../../components/DeleteAnnouncementDialog";
-import { useAnnouncementsQuery } from "../../graphql/generated/schema";
+import DeleteDialog from "../../components/DeleteDialog";
+import {
+	AnnouncementEdge,
+	useAnnouncementsQuery,
+	useDeleteAnnouncementMutation,
+} from "../../graphql/generated/schema";
 import useWidth from "../../hooks/useWidth";
 import { NextPageWithLayout } from "../_app";
 
@@ -15,6 +19,24 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 	const { data, error, loading, fetchMore } = useAnnouncementsQuery({
 		variables: { first: 20 },
 		notifyOnNetworkStatusChange: true,
+	});
+
+	const [deleteAnnouncement] = useDeleteAnnouncementMutation({
+		update(cache, { data }) {
+			cache.modify({
+				fields: {
+					announcements(existing) {
+						return {
+							...existing,
+							edges: existing.edges.filter(
+								(n: AnnouncementEdge) =>
+									n.cursor !== data?.deleteAnnouncement.id
+							),
+						};
+					},
+				},
+			});
+		},
 	});
 
 	return (
@@ -30,57 +52,68 @@ const AnnouncementsPage: NextPageWithLayout = () => {
 			<Grid.Row>
 				<Grid.Column>
 					{error && <Message error content={error.message} />}
-
-					<Table basic="very" celled>
-						<Table.Header>
-							<Table.Row>
-								<Table.HeaderCell>Názov</Table.HeaderCell>
-								<Table.HeaderCell>Text</Table.HeaderCell>
-								<Table.HeaderCell>Súbory</Table.HeaderCell>
-								<Table.HeaderCell>Akcia</Table.HeaderCell>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{loading &&
-								[...Array(3)].map((i, key) => (
-									<Table.Row key={key}>
+					{data && (
+						<Table basic="very" celled>
+							<Table.Header>
+								<Table.Row>
+									<Table.HeaderCell>Názov</Table.HeaderCell>
+									<Table.HeaderCell>Text</Table.HeaderCell>
+									<Table.HeaderCell>Súbory</Table.HeaderCell>
+									<Table.HeaderCell>Akcia</Table.HeaderCell>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{loading &&
+									[...Array(3)].map((i, key) => (
+										<Table.Row key={key}>
+											<Table.Cell>
+												<Placeholder.Line />
+											</Table.Cell>
+										</Table.Row>
+									))}
+								{data?.announcements.edges.map((edge) => (
+									<Table.Row key={edge?.cursor}>
+										<Table.Cell>{edge?.node.name}</Table.Cell>
+										<Table.Cell>{edge?.node.text}</Table.Cell>
+										<Table.Cell>{edge?.node.files?.length || 0}</Table.Cell>
 										<Table.Cell>
-											<Placeholder.Line />
+											<DeleteDialog
+												confirmCb={async () =>
+													(await deleteAnnouncement({
+														variables: { id: edge?.cursor },
+													})) as Promise<void>
+												}
+												header="Zmazať oznam"
+												content={<p>Naozaj chcete zmazať oznam?</p>}
+												cancelText="Zrušiť"
+												confirmText="Potvrdiť"
+											/>
 										</Table.Cell>
 									</Table.Row>
 								))}
-							{data?.announcements.edges.map((edge) => (
-								<Table.Row key={edge?.cursor}>
-									<Table.Cell>{edge?.node.name}</Table.Cell>
-									<Table.Cell>{edge?.node.text}</Table.Cell>
-									<Table.Cell>{edge?.node.files?.length || 0}</Table.Cell>
-									<Table.Cell>
-										<DeleteAnnouncementDialog id={edge?.cursor} />
-									</Table.Cell>
-								</Table.Row>
-							))}
-							{data?.announcements.pageInfo.hasNextPage && (
-								<InView
-									onChange={async (inView) => {
-										if (inView) {
-											await fetchMore({
-												variables: {
-													after: data?.announcements.pageInfo.endCursor,
-													first: 5,
-												},
-											});
-										}
-									}}
-								>
-									<Table.Row key={4}>
-										<Table.Cell>
-											<Placeholder.Line />
-										</Table.Cell>
-									</Table.Row>
-								</InView>
-							)}
-						</Table.Body>
-					</Table>
+								{data?.announcements.pageInfo.hasNextPage && (
+									<InView
+										onChange={async (inView) => {
+											if (inView) {
+												await fetchMore({
+													variables: {
+														after: data?.announcements.pageInfo.endCursor,
+														first: 5,
+													},
+												});
+											}
+										}}
+									>
+										<Table.Row key={4}>
+											<Table.Cell>
+												<Placeholder.Line />
+											</Table.Cell>
+										</Table.Row>
+									</InView>
+								)}
+							</Table.Body>
+						</Table>
+					)}
 				</Grid.Column>
 			</Grid.Row>
 		</Grid>

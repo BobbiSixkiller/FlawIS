@@ -9,10 +9,14 @@ import {
 	Placeholder,
 	Segment,
 } from "semantic-ui-react";
-import { useGrantsQuery } from "../graphql/generated/schema";
+import {
+	GrantsDocument,
+	useDeleteGrantMutation,
+	useGrantsQuery,
+} from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import AddGrantDialog from "./AddGrantDialog";
-import DeleteGrantDialog from "./DeleteGrantDialog";
+import DeleteDialog from "./DeleteDialog";
 
 export default function GrantsList() {
 	const width = useWidth();
@@ -20,6 +24,10 @@ export default function GrantsList() {
 	const { data, error, loading, fetchMore } = useGrantsQuery({
 		variables: { first: 20 },
 		notifyOnNetworkStatusChange: true,
+	});
+
+	const [deleteGrant] = useDeleteGrantMutation({
+		refetchQueries: [{ query: GrantsDocument }, "grants"],
 	});
 
 	const router = useRouter();
@@ -112,7 +120,17 @@ export default function GrantsList() {
 									</Card.Description>
 								</Card.Content>
 								<Card.Content extra>
-									<DeleteGrantDialog id={edge?.cursor} />
+									<DeleteDialog
+										confirmCb={async () =>
+											(await deleteGrant({
+												variables: { id: edge?.cursor },
+											})) as Promise<void>
+										}
+										header="Zmazať grant"
+										content={<p>Naozaj chcete zmazať vybraný grant?</p>}
+										cancelText="Zrušiť"
+										confirmText="Potvrdiť"
+									/>
 									<Button
 										primary
 										size="tiny"

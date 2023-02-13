@@ -23,11 +23,11 @@ const grantInputSchema = object({
 type Values = InferType<typeof grantInputSchema>;
 
 function AddGrant() {
-  const { handleClose, displayError } = useContext(DialogContext);
+  const { handleClose, setError } = useContext(DialogContext);
 
   const [addGrant] = useCreateGrantMutation({
     onCompleted: () => handleClose(),
-    onError: (err) => displayError(err.message),
+    onError: (err) => setError(err.message),
     refetchQueries: [{ query: GrantsDocument }, "grants"],
   });
 

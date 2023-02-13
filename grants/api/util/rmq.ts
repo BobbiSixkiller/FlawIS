@@ -27,7 +27,7 @@ class Messagebroker {
 			this.connection.on("error", (err) => {
 				console.log("RMQ Error: ", err);
 				this.connection = undefined;
-				setTimeout(this.createConnection, 1000 * 60);
+				setTimeout(() => this.createConnection(), 1000 * 15);
 			});
 
 			this.connection.on("close", () => {
@@ -35,12 +35,12 @@ class Messagebroker {
 					"Connection to RMQ server closed! Trying to establish new one..."
 				);
 				this.connection = undefined;
-				setTimeout(this.createConnection, 1000 * 60);
+				setTimeout(() => this.createConnection(), 1000 * 15);
 			});
 		} catch (error) {
 			console.log("Catch error: ", error)
 			this.connection = undefined;
-			setTimeout(this.createConnection, 1000 * 60);
+			setTimeout(() => this.createConnection(), 1000 * 15);
 		}
 	}
 
@@ -55,9 +55,10 @@ class Messagebroker {
 	static async init() {
 		await this.createConnection();
 		await this.createChannel();
+		await this.consumeMessages(["user.delete", "user.new"]);
 	}
 
-	static async consumeMessages(keys: RoutingKey[]) {
+	private static async consumeMessages(keys: RoutingKey[]) {
 		const q = await this.channel.assertQueue("", { durable: true });
 		console.log(" [*] Receiving messages with keys:", keys.toString());
 

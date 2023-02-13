@@ -5,7 +5,6 @@ import { InferType, object, string, array, mixed } from "yup";
 import {
 	AnnouncementsDocument,
 	FileType,
-	GrantType,
 	useCreateAnnouncementMutation,
 	useUploadFileMutation,
 } from "../graphql/generated/schema";

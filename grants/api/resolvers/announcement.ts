@@ -43,6 +43,8 @@ export class AnnouncementResolver {
 				after
 			);
 
+		if (data[0].edges.length === 0) throw new Error("No announcements!")
+
 		return data[0] as AnnouncementConnection;
 	}
 

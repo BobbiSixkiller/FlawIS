@@ -37,7 +37,7 @@ export class GrantResolver {
   constructor(
     private readonly grantService = new CRUDservice(Grant),
     private readonly announcementService = new CRUDservice(Announcement)
-  ) {}
+  ) { }
 
   @Authorized()
   @Query(() => GrantConnection)
@@ -46,6 +46,7 @@ export class GrantResolver {
       first,
       after
     );
+    if (grants[0].edges.length === 0) throw new Error("No grants!")
 
     return grants[0] as GrantConnection;
   }
@@ -148,15 +149,8 @@ export class GrantResolver {
     @Arg("year") year: Date,
     @LoadGrant() grant: DocumentType<Grant>
   ) {
-    const budget = grant.budgets.find(
-      (b) => b.year.getFullYear() === year.getFullYear()
-    );
-    if (!budget) {
-      throw new Error("Budget not found!");
-    }
-
     grant.budgets = grant.budgets.filter(
-      (b) => b.year.getFullYear() !== budget.year.getFullYear()
+      (b) => b.year.getFullYear() !== year.getFullYear()
     );
 
     return await grant.save();

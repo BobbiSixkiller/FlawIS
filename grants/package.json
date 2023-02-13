@@ -1,53 +1,53 @@
 {
-	"name": "FlawIS-grants",
-	"version": "1.0.0",
-	"description": "Backend service implemented as a Federated subgraph GraphQL API.",
-	"main": "index.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "tsc",
-		"serve": "node dist/api/index.js",
-		"dev": "nodemon --config nodemon.json api/index.ts"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/BobbiSixkiller/FlawIS.git"
-	},
-	"keywords": [
-		"Apollo",
-		"Federation",
-		"Microservice",
-		"MongoDB"
-	],
-	"author": "Matúš Muránsky",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/BobbiSixkiller/FlawIS/issues"
-	},
-	"homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
-	"dependencies": {
-		"@apollo/federation": "^0.25.1",
-		"@typegoose/typegoose": "^9.8.1",
-		"amqplib": "^0.10.3",
-		"apollo-graphql": "^0.9.7",
-		"apollo-server": "^3.7.0",
-		"class-validator": "^0.13.2",
-		"dotenv": "^16.0.0",
-		"graphql": "^15.8.0",
-		"jsonwebtoken": "^8.5.1",
-		"mongoose": "^6.3.1",
-		"redis": "^4.5.1",
-		"reflect-metadata": "^0.1.13",
-		"type-graphql": "^1.1.1",
-		"typedi": "^0.10.0",
-		"uuid": "^8.3.2"
-	},
-	"devDependencies": {
-		"@types/amqplib": "^0.10.1",
-		"@types/jsonwebtoken": "^8.5.8",
-		"@types/uuid": "^8.3.4",
-		"nodemon": "^2.0.15",
-		"ts-node": "^10.7.0",
-		"typescript": "^4.6.3"
-	}
+  "name": "FlawIS-grants",
+  "version": "1.0.0",
+  "description": "Backend service implemented as a Federated subgraph GraphQL API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "serve": "node dist/api/index.js",
+    "dev": "nodemon --config nodemon.json api/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BobbiSixkiller/FlawIS.git"
+  },
+  "keywords": [
+    "Apollo",
+    "Federation",
+    "Microservice",
+    "MongoDB"
+  ],
+  "author": "Matúš Muránsky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BobbiSixkiller/FlawIS/issues"
+  },
+  "homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
+  "dependencies": {
+    "@apollo/federation": "^0.25.1",
+    "@typegoose/typegoose": "^9.8.1",
+    "amqplib": "^0.10.3",
+    "apollo-graphql": "^0.9.7",
+    "apollo-server": "^3.7.0",
+    "class-validator": "^0.13.2",
+    "dotenv": "^16.0.0",
+    "graphql": "^15.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.1",
+    "redis": "^4.5.1",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^1.1.1",
+    "typedi": "^0.10.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.1",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/uuid": "^8.3.4",
+    "nodemon": "^2.0.16",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3"
+  }
 }
