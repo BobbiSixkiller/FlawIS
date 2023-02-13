@@ -30,6 +30,7 @@ services:
     depends_on:
       - rabbitmq
       - mongo
+      - redis
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
