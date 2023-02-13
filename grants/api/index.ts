@@ -61,6 +61,8 @@ async function main() {
 				? JSON.parse(req.headers.locale as string)
 				: "sk",
 		}),
+		csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
+		persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
 	});
 
 	// create mongoose connection

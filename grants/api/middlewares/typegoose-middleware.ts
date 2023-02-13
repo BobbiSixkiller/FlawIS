@@ -37,7 +37,6 @@ export function transformIds(doc: object) {
 			Array.isArray(value) &&
 			!value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
 		) {
-			console.log(value);
 			value = value.map((v) => transformIds(v));
 		}
 

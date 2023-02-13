@@ -57,7 +57,6 @@ export class GrantResolver {
     @Arg("id") _id: ObjectId,
     @LoadGrant() grant: DocumentType<Grant>
   ) {
-    console.log(grant);
     return grant;
   }
 
@@ -69,8 +68,7 @@ export class GrantResolver {
         ? { $text: { $search: text } }
         : { $text: { $search: text }, "budgets.members.user": user?.id };
 
-    console.log(user?.role);
-    console.log(filter);
+
 
     return await this.grantService.findAll(filter);
   }

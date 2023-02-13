@@ -15,7 +15,7 @@ env.config();
 @Service()
 @Resolver(() => User)
 export class UserResolver {
-  constructor(private readonly grantService = new CRUDservice(Grant)) {}
+  constructor(private readonly grantService = new CRUDservice(Grant)) { }
 
   @Authorized()
   @FieldResolver(() => GrantInfo)
@@ -99,7 +99,6 @@ export class UserResolver {
       },
     ]);
 
-    console.log(data[0]);
 
     return data[0];
   }
