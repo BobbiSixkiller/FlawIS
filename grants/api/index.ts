@@ -68,7 +68,6 @@ async function main() {
 	console.log(mongoose.connection && "Database connected!");
 
 	await MessageBroker.init();
-	MessageBroker.consumeMessages(["user.delete", "user.new"]);
 
 	await server.listen({ port }, () =>
 		console.log(

@@ -63,7 +63,6 @@ async function main() {
 	console.log(mongoose.connection && "Database connected!");
 
 	await Messagebroker.init();
-	Messagebroker.consumeMessages(["user.update.billings"]);
 
 	await initRedis();
 

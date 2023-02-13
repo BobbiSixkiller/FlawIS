@@ -45,6 +45,8 @@ services:
     command: npm run dev
     env_file:
       - ./files/.env
+    depends_on:
+      - rabbitmq
     volumes:
       - ./files:/usr/app
       - /usr/app/node_modules

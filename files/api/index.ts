@@ -42,7 +42,6 @@ async function main() {
 	});
 
 	await Messagebroker.init();
-	Messagebroker.consumeMessages(["file.delete"])
 
 	await server.start();
 
