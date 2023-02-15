@@ -28,6 +28,7 @@ query userTextSearch($text: String!) {
   userTextSearch(text: $text) {
     id
     name
+    email
   }
 }
 

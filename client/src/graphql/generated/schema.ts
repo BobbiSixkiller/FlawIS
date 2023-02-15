@@ -1071,7 +1071,7 @@ export type UserTextSearchQueryVariables = Exact<{
 }>;
 
 
-export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string }> };
+export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string, email: string }> };
 
 export type UsersQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -2422,6 +2422,7 @@ export const UserTextSearchDocument = gql`
   userTextSearch(text: $text) {
     id
     name
+    email
   }
 }
     `;

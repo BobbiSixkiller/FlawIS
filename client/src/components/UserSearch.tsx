@@ -22,9 +22,10 @@ export default function UserSearch() {
         setValue(value as string);
         await search({ variables: { text: value as string } });
       }}
-      results={data?.userTextSearch.map((g) => ({
-        title: g.name,
-        id: g.id,
+      results={data?.userTextSearch.map((u) => ({
+        title: u.name,
+        description: u.email,
+        id: u.id,
       }))}
       value={value}
     />
