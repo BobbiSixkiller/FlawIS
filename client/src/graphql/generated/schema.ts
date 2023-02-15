@@ -1057,7 +1057,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean, organisation: string, telephone: string, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1079,7 +1079,15 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', organisation: string, id: string, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
+
+export type UserQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+  year?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export const UserFragmentDoc = gql`
     fragment User on User {
@@ -2331,11 +2339,7 @@ export type GrantTextSearchQueryResult = Apollo.QueryResult<GrantTextSearchQuery
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
-    id
-    name
-    email
-    role
-    verified
+    ...User
     organisation
     telephone
     billings {
@@ -2354,7 +2358,7 @@ export const UpdateUserDocument = gql`
     }
   }
 }
-    `;
+    ${UserFragmentDoc}`;
 export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
 
 /**
@@ -2456,6 +2460,7 @@ export const UsersDocument = gql`
       cursor
       node {
         ...User
+        organisation
       }
     }
     pageInfo {
@@ -2494,3 +2499,50 @@ export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<User
 export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
 export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
 export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;
+export const UserDocument = gql`
+    query user($id: ObjectId!, $year: DateTime) {
+  user(id: $id) {
+    ...User
+    ...User
+    organisation
+    telephone
+    grants(year: $year) {
+      grants {
+        ...Grant
+      }
+      hours
+      availableYears
+    }
+  }
+}
+    ${UserFragmentDoc}
+${GrantFragmentDoc}`;
+
+/**
+ * __useUserQuery__
+ *
+ * To run a query within a React component, call `useUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      year: // value for 'year'
+ *   },
+ * });
+ */
+export function useUserQuery(baseOptions: Apollo.QueryHookOptions<UserQuery, UserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+      }
+export function useUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(UserDocument, options);
+        }
+export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
+export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
+export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;

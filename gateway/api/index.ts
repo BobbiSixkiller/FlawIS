@@ -82,6 +82,8 @@ const main = async () => {
 			ApolloServerPluginLandingPageGraphQLPlayground,
 			new ApolloComplexityPlugin(100),
 		],
+		csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
+		persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
 	});
 
 	await server.start();
