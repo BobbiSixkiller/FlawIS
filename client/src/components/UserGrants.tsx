@@ -52,7 +52,7 @@ export default function UserGrants() {
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row verticalAlign="middle">
-        <Grid.Column>
+        <Grid.Column width={12}>
           <Header>{data?.user.name}</Header>
         </Grid.Column>
         <Grid.Column floated="right">
