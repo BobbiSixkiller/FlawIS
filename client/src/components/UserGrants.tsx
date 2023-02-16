@@ -13,13 +13,22 @@ import {
   Placeholder,
   Segment,
 } from "semantic-ui-react";
-import { useUserQuery } from "../graphql/generated/schema";
+import {
+  useDeleteUserMutation,
+  UsersDocument,
+  useUserQuery,
+} from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
+import DeleteDialog from "./DeleteDialog";
 
 export default function UserGrants() {
   const router = useRouter();
   const width = useWidth();
   const [options, setOptions] = useState<DropdownItemProps[]>([]);
+
+  const [deleteUser] = useDeleteUserMutation({
+    refetchQueries: [{ query: UsersDocument }, "users"],
+  });
 
   const { data, error, loading, refetch } = useUserQuery({
     variables: { id: router.query.id, year: router.query.year },
@@ -45,6 +54,21 @@ export default function UserGrants() {
       <Grid.Row verticalAlign="middle">
         <Grid.Column>
           <Header>{data?.user.name}</Header>
+        </Grid.Column>
+        <Grid.Column floated="right">
+          <DeleteDialog
+            buttonProps={{ floated: "right" }}
+            confirmCb={async () => {
+              (await deleteUser({
+                variables: { id: data?.user.id },
+              })) as Promise<void>;
+              router.back();
+            }}
+            header="Zmazať používateľa"
+            content={<p>Naozaj chcete zmazať vybraného používateľa?</p>}
+            cancelText="Zrušiť"
+            confirmText="Potvrdiť"
+          />
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>
