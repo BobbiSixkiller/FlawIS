@@ -13,16 +13,16 @@ import {
   Placeholder,
   Segment,
 } from "semantic-ui-react";
-import { useUserQuery } from "../graphql/generated/schema";
+import { useMeQuery } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 
-export default function UserGrants() {
+export default function MyGrants() {
   const router = useRouter();
   const width = useWidth();
   const [options, setOptions] = useState<DropdownItemProps[]>([]);
 
-  const { data, error, loading, refetch } = useUserQuery({
-    variables: { id: router.query.id, year: router.query.year },
+  const { data, error, loading, refetch } = useMeQuery({
+    variables: { year: null },
     notifyOnNetworkStatusChange: true,
   });
 
@@ -31,7 +31,7 @@ export default function UserGrants() {
     if (data) {
       setOptions((prev) => [
         ...prev,
-        ...data.user.grants.availableYears.map((y, i) => ({
+        ...data.me.grants.availableYears.map((y, i) => ({
           key: i + 1,
           text: new Date(y).getFullYear().toString(),
           value: y,
@@ -44,7 +44,7 @@ export default function UserGrants() {
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row verticalAlign="middle">
         <Grid.Column>
-          <Header>{data?.user.name}</Header>
+          <Header>Moje Granty</Header>
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>
@@ -63,12 +63,12 @@ export default function UserGrants() {
                 .toString();
               if (year !== "NaN") {
                 router.replace({
-                  pathname: `/users/${router.query.id}`,
+                  pathname: "/",
                   query: { year },
                 });
               } else {
                 router.replace({
-                  pathname: `/users/${router.query.id}`,
+                  pathname: "/",
                   query: {},
                 });
               }
@@ -76,7 +76,7 @@ export default function UserGrants() {
             }}
           />
           <Label size="large" color="black">
-            <Icon name="hourglass" /> {data?.user.grants.hours}
+            <Icon name="hourglass" /> {data?.me.grants.hours}
             <Label.Detail>Hodín</Label.Detail>
           </Label>
           {error && <Message error content={error.message} />}
@@ -121,7 +121,7 @@ export default function UserGrants() {
             </>
           )}
           {data &&
-            data.user.grants?.grants.map((g) => (
+            data.me.grants?.grants.map((g) => (
               <Card fluid key={g?.id}>
                 <Card.Content>
                   <Card.Header> {g?.name}</Card.Header>
@@ -139,9 +139,7 @@ export default function UserGrants() {
                     onClick={() =>
                       router.push({
                         pathname: `/${g?.id}`,
-                        query: router.query.year
-                          ? { year: router.query.year }
-                          : null,
+                        query: { year: router.query.year },
                       })
                     }
                   />
