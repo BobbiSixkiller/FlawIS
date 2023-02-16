@@ -1,4 +1,4 @@
-import { Arg, Authorized, Ctx, FieldResolver, Resolver } from "type-graphql";
+import { Arg, Authorized, Ctx, FieldResolver, Resolver, Root } from "type-graphql";
 import { Service } from "typedi";
 import { CRUDservice } from "../services/CRUDservice";
 import { ObjectId } from "mongodb";
@@ -9,6 +9,7 @@ import { Grant } from "../entitites/Grant";
 import { Context } from "../util/auth";
 
 import env from "dotenv";
+import { DocumentType } from "@typegoose/typegoose";
 
 env.config();
 
@@ -20,20 +21,20 @@ export class UserResolver {
   @Authorized()
   @FieldResolver(() => GrantInfo)
   async grants(
-    @Ctx() { user }: Context,
-    @Arg("year", { nullable: true }) year?: Date
+    @Root() user: DocumentType<User>,
+    @Arg("year", { nullable: true }) year?: Date,
   ) {
     //return count of numbers spent as a grant member based on selected year
     const data = await this.grantService.aggregate([
       {
         $match: {
-          "budgets.members.user": new ObjectId(user?.id),
+          "budgets.members.user": new ObjectId(user.id),
         },
       },
+      { $unwind: "$budgets" },
       {
         $facet: {
           grants: [
-            { $unwind: "$budgets" },
             {
               $match: {
                 $expr: {
@@ -62,7 +63,6 @@ export class UserResolver {
             { $addFields: { id: "$_id" } },
           ],
           hours: [
-            { $unwind: "$budgets" },
             {
               $match: {
                 $expr: {
@@ -75,9 +75,10 @@ export class UserResolver {
               },
             },
             { $unwind: "$budgets.members" },
+            { $match: { "budgets.members.user": new ObjectId(user.id) } }
           ],
           availableYears: [
-            { $unwind: "$budgets" },
+            { $match: { "budgets.members.user": new ObjectId(user.id) } },
             { $group: { _id: null, years: { $addToSet: "$budgets.year" } } },
           ],
         },

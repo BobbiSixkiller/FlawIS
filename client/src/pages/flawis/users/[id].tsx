@@ -1,17 +1,10 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 import Dashboard from "../../../components/Dashboard";
-import { useUserQuery } from "../../../graphql/generated/schema";
+import UserGrants from "../../../components/UserGrants";
 import { NextPageWithLayout } from "../../_app";
 
 const UserPage: NextPageWithLayout = () => {
-  const router = useRouter();
-
-  const { data, error, loading } = useUserQuery({
-    variables: { id: router.query.id },
-  });
-
-  return <div>{router.query.id}</div>;
+  return <UserGrants />;
 };
 
 UserPage.getLayout = function getLayout(page) {

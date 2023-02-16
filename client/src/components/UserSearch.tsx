@@ -16,7 +16,7 @@ export default function UserSearch() {
       loading={loading}
       onResultSelect={(e, data) => {
         setValue("");
-        router.push(`/${data.result.id}`);
+        router.push(`/users/${data.result.id}`);
       }}
       onSearchChange={async (e, { value }) => {
         setValue(value as string);
