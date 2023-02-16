@@ -136,7 +136,7 @@ const AnnouncementsPage: NextPageWithLayout = () => {
                         variables: { id: edge?.cursor },
                       })) as Promise<void>
                     }
-                    header="Zmazať grant"
+                    header="Zmazať používateľa"
                     content={<p>Naozaj chcete zmazať vybraného používateľa?</p>}
                     cancelText="Zrušiť"
                     confirmText="Potvrdiť"
