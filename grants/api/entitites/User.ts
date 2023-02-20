@@ -26,6 +26,9 @@ export class User {
   @Property()
   email: string;
 
+  @Property()
+  name: string;
+
   @Field(() => GrantInfo)
   grants: GrantInfo;
 }

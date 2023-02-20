@@ -8,9 +8,9 @@ env.config();
 type RoutingKey =
 	| "user.new"
 	| "user.delete"
-	| "user.update.email"
-	| "user.update.billings"
-	| "mail.invoice" | "file.delete";
+	| "user.update.personal"
+	| "file.delete"
+	| "mail.grantAnnouncemenet";
 
 class Messagebroker {
 	private static connection?: Connection;
@@ -38,7 +38,7 @@ class Messagebroker {
 				setTimeout(() => this.createConnection(), 1000 * 15);
 			});
 		} catch (error) {
-			console.log("Catch error: ", error)
+			console.log("Catch error: ", error);
 			this.connection = undefined;
 			setTimeout(() => this.createConnection(), 1000 * 15);
 		}
@@ -55,7 +55,11 @@ class Messagebroker {
 	static async init() {
 		await this.createConnection();
 		await this.createChannel();
-		await this.consumeMessages(["user.delete", "user.new"]);
+		await this.consumeMessages([
+			"user.delete",
+			"user.new",
+			"user.update.personal",
+		]);
 	}
 
 	private static async consumeMessages(keys: RoutingKey[]) {
@@ -89,13 +93,14 @@ class Messagebroker {
 				return await getModelForClass(User).create({
 					_id: user.id,
 					email: user.email,
+					name: user.name,
 				});
-			case "user.update.email":
+			case "user.update.personal":
 				return await getModelForClass(User).updateOne(
 					{
 						_id: user.id,
 					},
-					{ $set: { email: user.email } }
+					{ $set: { email: user.email, name: user.name } }
 				);
 			case "user.delete":
 				return await getModelForClass(User).deleteOne({ _id: user.id });

@@ -22,6 +22,9 @@ export class User {
   @Property()
   email: string;
 
+  @Property()
+  name: string;
+
   @Field(() => [Billing], { nullable: "items" })
   @Property({ type: () => [Billing], _id: false })
   billings: Billing[];

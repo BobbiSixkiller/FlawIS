@@ -7,12 +7,12 @@ import {
 	Query,
 	Resolver,
 } from "type-graphql";
-import { ObjectId } from "mongodb";
+import { ObjectId, ChangeStreamDocument } from "mongodb";
 import { Service } from "typedi";
 import { CRUDservice } from "../services/CRUDservice";
 
 import env from "dotenv";
-import { LoadAnnouncement, } from "../util/decorators";
+import { LoadAnnouncement } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose/lib/types";
 import { Announcement } from "../entitites/Announcement";
 import {
@@ -23,6 +23,7 @@ import {
 import { Context } from "../util/auth";
 import { Grant } from "../entitites/Grant";
 import Messagebroker from "../util/rmq";
+import { User } from "../entitites/User";
 
 env.config();
 
@@ -32,7 +33,7 @@ export class AnnouncementResolver {
 	constructor(
 		private readonly announcementService = new CRUDservice(Announcement),
 		private readonly grantService = new CRUDservice(Grant)
-	) { }
+	) {}
 
 	@Authorized()
 	@Query(() => AnnouncementConnection)
@@ -43,7 +44,7 @@ export class AnnouncementResolver {
 				after
 			);
 
-		if (data[0].edges.length === 0) throw new Error("No announcements!")
+		if (data[0].edges.length === 0) throw new Error("No announcements!");
 
 		return data[0] as AnnouncementConnection;
 	}
@@ -60,7 +61,7 @@ export class AnnouncementResolver {
 	@Authorized()
 	@Mutation(() => Announcement)
 	async createAnnouncement(
-		@Ctx() { user }: Context,
+		@Ctx() { user, locale }: Context,
 		@Arg("data") { name, text, files, grantType, grantId }: AnnouncementInput
 	) {
 		const announcement = await this.announcementService.create({
@@ -70,19 +71,54 @@ export class AnnouncementResolver {
 			user: user?.id,
 		});
 
-		if (grantType) {
-			await this.grantService.update(
-				{ type: grantType },
-				{ $addToSet: { announcements: announcement.id } }
-			);
-		}
+		await this.grantService.update(
+			{ $or: [{ type: grantType }, { _id: grantId }] },
+			{ $addToSet: { announcements: announcement.id } }
+		);
 
-		if (grantId) {
-			await this.grantService.update(
-				{ _id: grantId },
-				{ $addToSet: { announcements: announcement._id } }
-			);
-		}
+		const aggregation = await this.grantService.aggregate([
+			{
+				$match: { announcements: new ObjectId(announcement.id) },
+			},
+			{ $unwind: "$budgets" },
+			{
+				$match: {
+					$expr: {
+						$eq: [{ $year: "$budgets.year" }, { $year: new Date() }],
+					},
+				},
+			},
+			{ $unwind: "$budgets.members" },
+			{
+				$lookup: {
+					from: "users",
+					localField: "budgets.members.user",
+					foreignField: "_id",
+					as: "user_doc",
+				},
+			},
+			{ $unwind: "$user_doc" },
+			{
+				$group: {
+					_id: null,
+					users: { $addToSet: "$user_doc" },
+					grants: { $addToSet: { id: "$_id", name: "$name" } },
+				},
+			},
+		]);
+
+		aggregation[0].users.forEach((user: User) =>
+			Messagebroker.produceMessage(
+				JSON.stringify({
+					locale,
+					email: user.email,
+					name: user.name,
+					announcement: announcement.name,
+					grants: aggregation[0].grants,
+				}),
+				"mail.grantAnnouncemenet"
+			)
+		);
 
 		return announcement;
 	}
@@ -103,14 +139,24 @@ export class AnnouncementResolver {
 
 	@Authorized()
 	@Mutation(() => Announcement)
-	async deleteAnnouncement(@Arg("id") _id: ObjectId, @LoadAnnouncement() announcement: DocumentType<Announcement>) {
+	async deleteAnnouncement(
+		@Arg("id") _id: ObjectId,
+		@LoadAnnouncement() announcement: DocumentType<Announcement>
+	) {
 		if (announcement.files.length !== 0) {
 			for (const file of announcement.files) {
-				Messagebroker.produceMessage(JSON.stringify({ path: file }), "file.delete")
-
+				Messagebroker.produceMessage(
+					JSON.stringify({ path: file }),
+					"file.delete"
+				);
 			}
 		}
 
-		return await announcement.remove()
+		await this.grantService.update(
+			{ announcements: announcement.id },
+			{ $pull: { announcements: announcement.id } }
+		);
+
+		return await announcement.remove();
 	}
 }
