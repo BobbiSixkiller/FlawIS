@@ -1,191 +1,191 @@
 import { Field, InputType, Int } from "type-graphql";
 import {
-  IsBoolean,
-  IsDate,
-  IsLocale,
-  IsNumberString,
-  IsString,
+	IsBoolean,
+	IsDate,
+	IsLocale,
+	IsNumberString,
+	IsString,
 } from "class-validator";
 
-import { Host, Ticket, Venue } from "../../entitites/Conference";
-import { Address, Billing } from "../../entitites/Billing";
+import { Host, Ticket, Venue } from "../../entities/Conference";
+import { Address, Billing } from "../../entities/Billing";
 
 @InputType()
 class TicketInputTranslation {
-  @Field()
-  @IsLocale()
-  language: string;
+	@Field()
+	@IsLocale()
+	language: string;
 
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field()
-  @IsString()
-  description: string;
+	@Field()
+	@IsString()
+	description: string;
 }
 
 @InputType()
 class ConferenceInputTranslation {
-  @Field()
-  @IsLocale()
-  language: string;
+	@Field()
+	@IsLocale()
+	language: string;
 
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field()
-  @IsString()
-  description: string;
+	@Field()
+	@IsString()
+	description: string;
 
-  @Field()
-  @IsString()
-  logoUrl: string;
+	@Field()
+	@IsString()
+	logoUrl: string;
 
-  @Field(() => [TicketInputTranslation], { nullable: true })
-  tickets?: TicketInputTranslation[];
+	@Field(() => [TicketInputTranslation], { nullable: true })
+	tickets?: TicketInputTranslation[];
 }
 
 @InputType()
 class AddressInput implements Address {
-  @Field()
-  @IsString()
-  street: string;
+	@Field()
+	@IsString()
+	street: string;
 
-  @Field()
-  @IsString()
-  city: string;
+	@Field()
+	@IsString()
+	city: string;
 
-  @Field()
-  @IsString()
-  postal: string;
+	@Field()
+	@IsString()
+	postal: string;
 
-  @Field()
-  @IsString()
-  country: string;
+	@Field()
+	@IsString()
+	country: string;
 }
 
 @InputType()
 export class BillingInput implements Billing {
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field(() => AddressInput)
-  address: AddressInput;
+	@Field(() => AddressInput)
+	address: AddressInput;
 
-  @Field()
-  @IsString()
-  DIC: string;
+	@Field()
+	@IsString()
+	DIC: string;
 
-  @Field()
-  @IsString()
-  ICDPH: string;
+	@Field()
+	@IsString()
+	ICDPH: string;
 
-  @Field()
-  @IsString()
-  ICO: string;
+	@Field()
+	@IsString()
+	ICO: string;
 
-  @Field({ nullable: true })
-  @IsString()
-  IBAN?: string;
+	@Field({ nullable: true })
+	@IsString()
+	IBAN?: string;
 
-  @Field({ nullable: true })
-  @IsString()
-  SWIFT?: string;
+	@Field({ nullable: true })
+	@IsString()
+	SWIFT?: string;
 }
 
 @InputType()
 export class HostInput implements Host {
-  @Field()
-  @IsString()
-  logoUrl: string;
+	@Field()
+	@IsString()
+	logoUrl: string;
 
-  @Field()
-  @IsString()
-  stampUrl: string;
+	@Field()
+	@IsString()
+	stampUrl: string;
 
-  @Field(() => BillingInput)
-  billing: BillingInput;
+	@Field(() => BillingInput)
+	billing: BillingInput;
 }
 
 @InputType()
 export class VenueInput implements Partial<Venue> {
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field(() => AddressInput)
-  address: AddressInput;
+	@Field(() => AddressInput)
+	address: AddressInput;
 }
 
 @InputType()
 export class TicketInput implements Partial<Ticket> {
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field()
-  @IsString()
-  description: string;
+	@Field()
+	@IsString()
+	description: string;
 
-  @Field()
-  @IsBoolean()
-  online: boolean;
+	@Field()
+	@IsBoolean()
+	online: boolean;
 
-  @Field()
-  @IsBoolean()
-  withSubmission: boolean;
+	@Field()
+	@IsBoolean()
+	withSubmission: boolean;
 
-  @Field(() => Int)
-  @IsNumberString()
-  price: number;
+	@Field(() => Int)
+	@IsNumberString()
+	price: number;
 }
 
 @InputType()
 export class ConferenceInput {
-  @Field()
-  @IsString()
-  name: string;
+	@Field()
+	@IsString()
+	name: string;
 
-  @Field()
-  @IsString()
-  slug: string;
+	@Field()
+	@IsString()
+	slug: string;
 
-  @Field()
-  @IsString()
-  description: string;
+	@Field()
+	@IsString()
+	description: string;
 
-  @Field()
-  @IsString()
-  logoUrl: string;
+	@Field()
+	@IsString()
+	logoUrl: string;
 
-  @Field()
-  @IsString()
-  variableSymbol: string;
+	@Field()
+	@IsString()
+	variableSymbol: string;
 
-  @Field({ nullable: true })
-  @IsDate()
-  regStart?: Date;
+	@Field({ nullable: true })
+	@IsDate()
+	regStart?: Date;
 
-  @Field({ nullable: true })
-  @IsDate()
-  start?: Date;
+	@Field({ nullable: true })
+	@IsDate()
+	start?: Date;
 
-  @Field({ nullable: true })
-  @IsDate()
-  end?: Date;
+	@Field({ nullable: true })
+	@IsDate()
+	end?: Date;
 
-  @Field(() => HostInput, { nullable: true })
-  host?: HostInput;
+	@Field(() => HostInput, { nullable: true })
+	host?: HostInput;
 
-  @Field(() => VenueInput, { nullable: true })
-  venue?: VenueInput;
+	@Field(() => VenueInput, { nullable: true })
+	venue?: VenueInput;
 
-  @Field(() => [TicketInput], { nullable: true })
-  tickets?: TicketInput[];
+	@Field(() => [TicketInput], { nullable: true })
+	tickets?: TicketInput[];
 
-  @Field(() => [ConferenceInputTranslation], { nullable: true })
-  translations?: ConferenceInputTranslation[];
+	@Field(() => [ConferenceInputTranslation], { nullable: true })
+	translations?: ConferenceInputTranslation[];
 }

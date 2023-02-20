@@ -11,8 +11,8 @@ import {
 	Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Section } from "../entitites/Section";
-import { Submission } from "../entitites/Submission";
+import { Section } from "../entities/Section";
+import { Submission } from "../entities/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
 import { localizeInput } from "../util/locale";
