@@ -43,8 +43,9 @@ export class UserResolver {
               JSON.stringify({
                 id: data.documentKey?._id,
                 email: data.updateDescription?.updatedFields?.email,
+                name: data.updateDescription?.updatedFields?.name
               }),
-              "user.update.email"
+              "user.update.personal"
             );
           case "delete":
             console.log(data.documentKey, data.operationType);

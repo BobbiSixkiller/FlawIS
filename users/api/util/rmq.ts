@@ -8,7 +8,7 @@ env.config();
 type RoutingKey =
   | "user.delete"
   | "user.new"
-  | "user.update.email"
+  | "user.update.personal"
   | "user.update.billings"
   | "mail.registration"
   | "mail.reset";

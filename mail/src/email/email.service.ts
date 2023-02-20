@@ -4,11 +4,23 @@ import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
 
-interface AuthMsg {
+interface Msg {
   locale: 'en' | 'sk';
   name: string;
   email: string;
+}
+interface AuthMsg extends Msg {
   token: string;
+}
+
+interface Grant {
+  name: string;
+  id: string;
+}
+
+interface GrantAnnouncementMsg extends Msg {
+  announcement: string;
+  grants: Grant[];
 }
 
 @Injectable()
@@ -17,7 +29,7 @@ export class EmailService {
     private mailerService: MailerService,
     private i18n: I18nService,
     private configService: ConfigService,
-  ) { }
+  ) {}
 
   @RabbitSubscribe({
     exchange: 'FlawIS',
@@ -25,7 +37,9 @@ export class EmailService {
   })
   async sendActivationLink(msg: AuthMsg) {
     console.log(msg);
-    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${msg.locale}/activate?token=${msg.token}`;
+    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
+      msg.locale
+    }/activate?token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -47,7 +61,9 @@ export class EmailService {
   })
   async sendResetLink(msg: AuthMsg) {
     console.log(msg);
-    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${msg.locale}/resetPassword?token=${msg.token}`;
+    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
+      msg.locale
+    }/resetPassword?token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -67,5 +83,32 @@ export class EmailService {
     exchange: 'FlawIS',
     routingKey: 'mail.#',
   })
-  async sendConferenceInvoice() { }
+  async sendGrantAnnouncement() {}
+
+  @RabbitSubscribe({
+    exchange: 'FlawIS',
+    routingKey: 'mail.grantAnnouncemenet',
+  })
+  async sendConferenceInvoice(msg: GrantAnnouncementMsg) {
+    const urls = msg.grants.map((grant) => ({
+      text: grant.name,
+      url: `${this.configService.get<string>('CLIENT_APP_URL')}/${msg.locale}/${
+        grant.id
+      }`,
+    }));
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: this.i18n.t('grantAnnouncement.subject', { lang: msg.locale }),
+      template: 'grantAnnouncement',
+      context: {
+        // ✏️ filling curly brackets with content
+        name: msg.name,
+        announcement: msg.announcement,
+        urls,
+        i18nLang: msg.locale,
+      },
+    });
+  }
 }
