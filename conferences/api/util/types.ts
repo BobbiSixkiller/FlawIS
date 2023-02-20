@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-import { Conference, Ticket } from "../entitites/Conference";
-import { Section } from "../entitites/Section";
+import { Conference, Ticket } from "../entities/Conference";
+import { Section } from "../entities/Section";
 
 export type Ref<T> = T | ObjectId;
 

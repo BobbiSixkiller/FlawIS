@@ -2,7 +2,7 @@ import { Field, InputType } from "type-graphql";
 import { IsLocale, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
-import { Section } from "../../entitites/Section";
+import { Section } from "../../entities/Section";
 
 @InputType()
 class TranslationInput {
