@@ -30,7 +30,6 @@ export class UserResolver {
 			.on("change", (data: ChangeStreamDocument<User>) => {
 				switch (data.operationType) {
 					case "insert":
-						console.log(data.fullDocument);
 						return messageBroker.produceMessage(
 							JSON.stringify({
 								id: data.documentKey?._id,
@@ -49,13 +48,15 @@ export class UserResolver {
 							"user.update.personal"
 						);
 					case "delete":
-						console.log(data.documentKey, data.operationType);
 						return messageBroker.produceMessage(
 							JSON.stringify({
 								id: data.documentKey?._id,
 							}),
 							"user.delete"
 						);
+					case "invalidate":
+						console.log("invalidate");
+						console.log(data);
 
 					default:
 						console.log("Unhandled operation type: ", data.operationType);
