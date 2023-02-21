@@ -36,7 +36,6 @@ export class EmailService {
     routingKey: 'mail.registration',
   })
   async sendActivationLink(msg: AuthMsg) {
-    console.log(msg);
     const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
       msg.locale
     }/activate?token=${msg.token}`;
@@ -60,7 +59,6 @@ export class EmailService {
     routingKey: 'mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
-    console.log(msg);
     const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
       msg.locale
     }/resetPassword?token=${msg.token}`;

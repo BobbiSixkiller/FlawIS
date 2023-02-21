@@ -9,9 +9,13 @@ export default function middleware(req: NextRequest) {
 	const hostname = req.headers.get("host");
 
 	if (
-		["/login", "/forgotPassword", "/resetPassword", "/activate"].includes(
-			url.pathname
-		)
+		[
+			"/login",
+			"/forgotPassword",
+			"/resetPassword",
+			"/activate",
+			"/profile",
+		].includes(url.pathname)
 	) {
 		url.pathname = `/auth${url.pathname}`;
 		return NextResponse.rewrite(url);
