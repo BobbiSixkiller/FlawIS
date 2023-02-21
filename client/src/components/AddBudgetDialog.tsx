@@ -87,7 +87,7 @@ export default function AddBudgetDialog({ year }: { year?: Date }) {
 										label="Rok"
 										name="year"
 										control={Input}
-										type="month"
+										type="text"
 									/>
 									<InputField
 										placeholder="Cestovné..."

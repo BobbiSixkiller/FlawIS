@@ -10,7 +10,6 @@ import useWith from "../hooks/useWidth";
 import Nav, { ContentWrapper } from "./Nav";
 import { Role, useLogoutMutation } from "../graphql/generated/schema";
 import Footer from "./Footer";
-import GrantSearch from "./GrantSearch";
 import { useTranslation } from "next-i18next";
 import { ControlsContext } from "../providers/ControlsProvider";
 
@@ -75,8 +74,8 @@ export default function Dashboard({ children }: dashboardProps) {
 					)}
 					<Menu.Item
 						as={Link}
-						href="/users/profile"
-						active={router.asPath === "/users/profile"}
+						href="/profile"
+						active={router.asPath === "/profile"}
 					>
 						<b>{t("menu.profile")}</b>
 					</Menu.Item>
