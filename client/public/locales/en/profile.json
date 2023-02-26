@@ -1,5 +1,5 @@
 {
-	"header": "Profile",
+	"header": "Account",
 	"form": {
 		"name": { "label": "Name including titles", "placeholder": "Name..." },
 		"telephone": { "label": "Phone", "placeholder": "Phone..." },

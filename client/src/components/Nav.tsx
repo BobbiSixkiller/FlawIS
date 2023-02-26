@@ -131,13 +131,22 @@ export default function Nav({
 				) : (
 					<>
 						{user?.role === Role.Admin && (
-							<Menu.Item
-								as={Link}
-								href="/users"
-								active={router.asPath === "/users"}
-							>
-								<b>{t("menu.users")}</b>
-							</Menu.Item>
+							<>
+								<Menu.Item
+									as={Link}
+									href="/users"
+									active={router.asPath === "/users"}
+								>
+									<b>{t("menu.users")}</b>
+								</Menu.Item>
+								{/* <Menu.Item
+									as={Link}
+									href="/grants"
+									active={router.asPath === "/grants"}
+								>
+									<b>{t("menu.grants")}</b>
+								</Menu.Item> */}
+							</>
 						)}
 						<Menu.Item>
 							<Menu.Header>{user.name}</Menu.Header>

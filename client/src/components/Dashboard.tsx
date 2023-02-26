@@ -19,7 +19,7 @@ interface dashboardProps {
 
 export default function Dashboard({ children }: dashboardProps) {
 	const { dispatch, user } = useContext(AuthContext);
-	const { rightPanelItems } = useContext(ControlsContext);
+	const { drawerItems, rightPanelItems } = useContext(ControlsContext);
 	const router = useRouter();
 	const width = useWith();
 
@@ -39,7 +39,10 @@ export default function Dashboard({ children }: dashboardProps) {
 				<ContentWrapper>
 					<Grid container>
 						<Grid.Row>
-							<Grid.Column>{children}</Grid.Column>
+							<Grid.Column>
+								<div style={{ paddingTop: "1rem" }}>{rightPanelItems}</div>
+								{children}
+							</Grid.Column>
 						</Grid.Row>
 					</Grid>
 				</ContentWrapper>
@@ -63,19 +66,29 @@ export default function Dashboard({ children }: dashboardProps) {
 					<Menu.Item as={Link} href="/" active={router.asPath === "/"}>
 						<b>{t("menu.home")}</b>
 					</Menu.Item>
-					{user?.role === Role.Admin && (
-						<Menu.Item
-							as={Link}
-							href="/users"
-							active={router.asPath === "/users"}
-						>
-							<b>{t("menu.users")}</b>
-						</Menu.Item>
-					)}
+					{drawerItems}
+					{/* {user?.role === Role.Admin && (
+						<>
+							<Menu.Item
+								as={Link}
+								href="/users"
+								active={router.asPath === "/users"}
+							>
+								<b>{t("menu.users")}</b>
+							</Menu.Item>
+							<Menu.Item
+								as={Link}
+								href="/grants"
+								active={router.asPath === "/grants"}
+							>
+								<b>{t("menu.grants")}</b>
+							</Menu.Item>
+						</>
+					)} */}
 					<Menu.Item
 						as={Link}
-						href="/profile"
-						active={router.asPath === "/profile"}
+						href={"/profile"}
+						active={router.asPath.includes("/profile")}
 					>
 						<b>{t("menu.profile")}</b>
 					</Menu.Item>

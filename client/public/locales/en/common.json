@@ -26,6 +26,8 @@
 		"home": "Home",
 		"users": "Users",
 		"profile": "Profile",
+		"grants": "Grants",
+		"conferences": "Conferences",
 		"logout": "Sign Out",
 		"login": "Sign In",
 		"register": "Register"

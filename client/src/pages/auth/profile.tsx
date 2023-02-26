@@ -1,184 +1,110 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NextPageWithLayout } from "../_app";
-import { Button, Form, Grid, Header, Input, Segment } from "semantic-ui-react";
-import { InferType } from "yup";
+import { Grid, Header, Tab } from "semantic-ui-react";
 import { useState, useContext, useEffect } from "react";
-import { Formik, FormikProps } from "formik";
 
 import Dashboard from "../../components/Dashboard";
-import {
-	useUpdateConferenceUserMutation,
-	useUpdateUserMutation,
-} from "../../graphql/generated/schema";
-import { ActionTypes, AuthContext } from "../../providers/Auth";
-import parseErrors from "../../util/parseErrors";
-import { InputField } from "../../components/form/InputField";
+import { useMeQuery } from "../../graphql/generated/schema";
+import { AuthContext } from "../../providers/Auth";
 import { useTranslation } from "next-i18next";
-import Validation from "../../util/validation";
 import useWidth from "../../hooks/useWidth";
 import {
 	ActionTypes as ControlsActionTypes,
 	ControlsContext,
 } from "../../providers/ControlsProvider";
+import PersonalInfo from "../../components/PersonalInfo";
+import UserGrants from "../../components/UserGrants";
+import { useRouter } from "next/router";
 
 const ProfilePage: NextPageWithLayout = () => {
-	const [update, setUpdate] = useState(false);
-	const { user, dispatch } = useContext(AuthContext);
-	const { dispatch: controlsDispatch } = useContext(ControlsContext);
+	const { user } = useContext(AuthContext);
+	const { dispatch } = useContext(ControlsContext);
 	const { t } = useTranslation(["common", "profile"]);
 	const width = useWidth();
+	const router = useRouter();
 
-	const { perosnalInfoInputSchema } = Validation();
-
-	type Values = InferType<typeof perosnalInfoInputSchema>;
-
-	const [updateUser] = useUpdateUserMutation({
-		onCompleted: ({ updateUser }) => {
-			dispatch({ type: ActionTypes.Login, payload: { user: updateUser } });
-			setUpdate(false);
-		},
+	const { data, error, loading, refetch } = useMeQuery({
+		variables: { year: null },
+		notifyOnNetworkStatusChange: true,
 	});
 
-	const [updateConferenceUser] = useUpdateConferenceUserMutation();
+	const [panes, setPanes] = useState([
+		{
+			menuItem: t("header", { ns: "profile" }),
+			render: () => (
+				<Tab.Pane basic attached={false} style={{ padding: 0 }}>
+					<PersonalInfo />
+				</Tab.Pane>
+			),
+		},
+		{
+			menuItem: t("menu.conferences", { ns: "common" }),
+			render: () => (
+				<Tab.Pane basic attached={false} style={{ padding: 0 }}>
+					Konferencie...
+				</Tab.Pane>
+			),
+		},
+	]);
 
 	useEffect(() => {
-		controlsDispatch({
+		dispatch({
 			type: ControlsActionTypes.SetRightPanel,
 			payload: { rightPanelItems: null },
 		});
-	}, [controlsDispatch]);
+	}, [dispatch]);
+
+	useEffect(() => {
+		if (user?.email?.split("@")[1].includes("uniba")) {
+			setPanes((prev) => [
+				...prev,
+				{
+					menuItem: t("menu.grants", { ns: "common" }),
+					render: () => (
+						<Tab.Pane basic attached={false} style={{ padding: 0 }}>
+							<UserGrants
+								onProfilePage={true}
+								error={error}
+								loading={loading}
+								data={data?.me.grants}
+								refetch={refetch}
+							/>
+						</Tab.Pane>
+					),
+				},
+			]);
+		}
+		return () => {
+			setPanes((prev) =>
+				prev.filter((i) => i.menuItem !== t("menu.grants", { ns: "common" }))
+			);
+		};
+	}, [user, t, data, error, loading, refetch]);
+
+	const activeIndex = panes.findIndex((p) => p.menuItem === router.query.tab);
 
 	return (
 		<Grid padded={width < 400 ? "vertically" : true}>
-			<Grid.Row verticalAlign="middle">
+			<Grid.Row>
 				<Grid.Column>
-					<Header>{t("header", { ns: "profile" })}</Header>
+					<Header>{data?.me.name}</Header>
 				</Grid.Column>
 			</Grid.Row>
 			<Grid.Row>
 				<Grid.Column>
-					<Formik
-						initialValues={{
-							name: user?.name || "",
-							email: user?.email || "",
-							organisation: user?.organisation || "",
-							telephone: user?.telephone || "",
-						}}
-						validationSchema={perosnalInfoInputSchema}
-						onSubmit={async (values, actions) => {
-							try {
-								await updateUser({
-									variables: {
-										id: user?.id,
-										data: {
-											email: values.email,
-											name: values.name,
-										},
-									},
-								});
-								await updateConferenceUser({
-									variables: {
-										data: {
-											organisation: values.organisation,
-											telephone: values.telephone,
-										},
-									},
-								});
-							} catch (err: any) {
-								actions.setStatus(
-									parseErrors(
-										err.graphQLErrors[0].extensions.exception.validationErrors
-									)
-								);
-							}
-						}}
-					>
-						{({
-							handleSubmit,
-							isSubmitting,
-							resetForm,
-						}: FormikProps<Values>) => (
-							<Form onSubmit={handleSubmit}>
-								<Segment>
-									<InputField
-										fluid
-										disabled={!update}
-										icon="user"
-										iconPosition="left"
-										placeholder={t("form.name.placeholder", { ns: "profile" })}
-										label={t("form.name.label", { ns: "profile" })}
-										name="name"
-										control={Input}
-									/>
-
-									<InputField
-										fluid
-										disabled={!update}
-										icon="at"
-										iconPosition="left"
-										placeholder="E-mail address"
-										label="Email"
-										name="email"
-										control={Input}
-									/>
-
-									<InputField
-										fluid
-										disabled={!update}
-										icon="building"
-										iconPosition="left"
-										placeholder={t("form.organisation.placeholder", {
-											ns: "profile",
-										})}
-										label={t("form.organisation.label", { ns: "profile" })}
-										name="organisation"
-										control={Input}
-									/>
-
-									<InputField
-										fluid
-										disabled={!update}
-										icon="phone"
-										iconPosition="left"
-										placeholder="Telephone number"
-										label="Telephone"
-										name="telephone"
-										control={Input}
-									/>
-
-									{update ? (
-										<Button.Group>
-											<Button
-												type="reset"
-												onClick={() => {
-													resetForm();
-													setUpdate(false);
-												}}
-											>
-												{t("actions.cancel", { ns: "common" })}
-											</Button>
-											<Button.Or text={"/"} />
-											<Button
-												type="submit"
-												positive
-												disabled={isSubmitting}
-												loading={isSubmitting}
-											>
-												{t("actions.save", { ns: "common" })}
-											</Button>
-										</Button.Group>
-									) : (
-										<Button
-											primary
-											type="button"
-											content={t("actions.updateToggle", { ns: "common" })}
-											onClick={() => setUpdate(true)}
-										/>
-									)}
-								</Segment>
-							</Form>
-						)}
-					</Formik>
+					<Tab
+						menu={{ secondary: true, pointing: true }}
+						activeIndex={activeIndex > -1 ? activeIndex : 0}
+						panes={panes}
+						onTabChange={(e, { activeIndex, panes }) =>
+							router.push({
+								pathname: `/profile`,
+								query: {
+									tab: panes?.find((p, i) => i === activeIndex)?.menuItem,
+								},
+							})
+						}
+					/>
 				</Grid.Column>
 			</Grid.Row>
 		</Grid>

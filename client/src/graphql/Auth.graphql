@@ -48,11 +48,7 @@ query me($year: DateTime) {
 			SWIFT
 		}
 		grants(year: $year) {
-			grants {
-				...Grant
-			}
-			hours
-			availableYears
+			...GrantInfo
 		}
 	}
 }
