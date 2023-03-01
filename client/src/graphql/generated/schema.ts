@@ -1081,6 +1081,8 @@ export type UsersQueryVariables = Exact<{
 
 export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', organisation: string, id: string, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
 
+export type GrantInfoFragment = { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> };
+
 export type UserQueryVariables = Exact<{
   id: Scalars['ObjectId'];
   year?: InputMaybe<Scalars['DateTime']>;
@@ -1109,6 +1111,15 @@ export const GrantFragmentDoc = gql`
   updatedAt
 }
     `;
+export const GrantInfoFragmentDoc = gql`
+    fragment GrantInfo on GrantInfo {
+  grants {
+    ...Grant
+  }
+  hours
+  availableYears
+}
+    ${GrantFragmentDoc}`;
 export const AnnouncementsDocument = gql`
     query announcements($after: ObjectId, $first: Int = 20) {
   announcements(after: $after, first: $first) {
@@ -1385,16 +1396,12 @@ export const MeDocument = gql`
       SWIFT
     }
     grants(year: $year) {
-      grants {
-        ...Grant
-      }
-      hours
-      availableYears
+      ...GrantInfo
     }
   }
 }
     ${UserFragmentDoc}
-${GrantFragmentDoc}`;
+${GrantInfoFragmentDoc}`;
 
 /**
  * __useMeQuery__
@@ -2508,16 +2515,12 @@ export const UserDocument = gql`
     organisation
     telephone
     grants(year: $year) {
-      grants {
-        ...Grant
-      }
-      hours
-      availableYears
+      ...GrantInfo
     }
   }
 }
     ${UserFragmentDoc}
-${GrantFragmentDoc}`;
+${GrantInfoFragmentDoc}`;
 
 /**
  * __useUserQuery__
