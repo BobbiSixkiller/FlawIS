@@ -3,7 +3,7 @@ import { Grid } from "semantic-ui-react";
 
 import { array, boolean, InferType, number, object, string } from "yup";
 import Footer from "../../components/Footer";
-import Nav, { ContentWrapper, PageWrapper } from "../../components/Nav";
+import Nav, { ContentWrapper, PageWrapper } from "../../components/MobileNav";
 import { NextPageWithLayout } from "../_app";
 
 const conferenceInputSchema = object({

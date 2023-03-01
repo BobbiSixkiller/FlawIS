@@ -1,35 +1,36 @@
 {
-	"footer": {
-		"heading": "About this system",
-		"text": "This system is being developed and maitained by Faculty of Law, Comenius University in Bratislava. If you encounter any problems, please do not hesitate to contact us!",
-		"menu": {
-			"contact": "Contact Us",
-			"terms": "Terms & Privacy"
-		}
-	},
-	"actions": {
-		"updateToggle": "Click to update",
-		"save": "save",
-		"cancel": "cancel"
-	},
-	"header": {
-		"masthead": {
-			"heading": "Conferences",
-			"subHeading": "Faculty of Law, Comenius university in Bratislava",
-			"button": "Log In"
-		}
-	},
-	"menu": {
-		"lang": "language",
-		"sk": "Slovak",
-		"en": "English",
-		"home": "Home",
-		"users": "Users",
-		"profile": "Profile",
-		"grants": "Grants",
-		"conferences": "Conferences",
-		"logout": "Sign Out",
-		"login": "Sign In",
-		"register": "Register"
-	}
+  "footer": {
+    "heading": "About this system",
+    "text": "This system is being developed and maitained by Faculty of Law, Comenius University in Bratislava. If you encounter any problems, please do not hesitate to contact us!",
+    "menu": {
+      "contact": "Contact Us",
+      "terms": "Terms & Privacy"
+    }
+  },
+  "actions": {
+    "updateToggle": "Click to update",
+    "save": "save",
+    "cancel": "cancel"
+  },
+  "header": {
+    "masthead": {
+      "heading": "Conferences",
+      "subHeading": "Faculty of Law, Comenius university in Bratislava",
+      "button": "Log In"
+    }
+  },
+  "menu": {
+    "lang": "language",
+    "sk": "Slovak",
+    "en": "English",
+    "home": "Home",
+    "back": "Back",
+    "users": "Users",
+    "profile": "Profile",
+    "grants": "Grants",
+    "conferences": "Conferences",
+    "logout": "Sign Out",
+    "login": "Sign In",
+    "register": "Register"
+  }
 }
