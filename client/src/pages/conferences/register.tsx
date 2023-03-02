@@ -1,5 +1,6 @@
 import { Formik, FormikProps, useFormikContext } from "formik";
 import { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -27,23 +28,9 @@ import { ActionTypes, AuthContext } from "../../providers/Auth";
 import parseErrors from "../../util/parseErrors";
 import Validation from "../../util/validation";
 
-const registerInputSchema = object({
-  name: string().required(),
-  email: string().required().email(),
-  organisation: string().required(),
-  telephone: string().required(),
-  password: string().required(),
-  repeatPass: string()
-    .required()
-    .oneOf([ref("password")]),
-  terms: boolean()
-    .oneOf([true], "You must agree with the Privacy policy")
-    .required(),
-});
-
 const EmailField: FC<InputFieldProps> = (props) => {
-  const { perosnalInfoInputSchema } = Validation();
-  type Values = InferType<typeof perosnalInfoInputSchema>;
+  const { conferencesRegisterInputSchme } = Validation();
+  type Values = InferType<typeof conferencesRegisterInputSchme>;
 
   const { values, setFieldValue, errors, touched } = useFormikContext<Values>();
 
@@ -67,12 +54,9 @@ const Register: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
   const router = useRouter();
 
-  const { perosnalInfoInputSchema, passwordInputSchema, termsInputSchmema } =
-    Validation();
-  const registerInputSchema = perosnalInfoInputSchema
-    .concat(passwordInputSchema)
-    .concat(termsInputSchmema);
-  type Values = InferType<typeof registerInputSchema>;
+  const { conferencesRegisterInputSchme } = Validation();
+
+  type Values = InferType<typeof conferencesRegisterInputSchme>;
 
   const [register] = useRegisterMutation({
     onCompleted: ({ register }) => {
@@ -120,7 +104,7 @@ const Register: NextPage = () => {
               repeatPass: "",
               terms: false,
             }}
-            validationSchema={registerInputSchema}
+            validationSchema={conferencesRegisterInputSchme}
             onSubmit={async (values, actions) => {
               try {
                 await register({
@@ -249,5 +233,11 @@ const Register: NextPage = () => {
     </Grid>
   );
 };
+
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ["register", "validation"])),
+  },
+});
 
 export default Register;

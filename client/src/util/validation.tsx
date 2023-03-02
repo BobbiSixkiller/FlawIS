@@ -32,7 +32,7 @@ export default function Validation() {
     password: string().trim().required(),
   });
 
-  const registerInputSchema = object({
+  const flawisRegisterInputSchema = object({
     name: string().trim().required(),
     email: string()
       .required()
@@ -53,6 +53,22 @@ export default function Validation() {
       .trim()
       .required()
       .oneOf([ref("password")], t("passNoMatch")),
+  });
+
+  const conferencesRegisterInputSchme = object({
+    name: string().trim().required(),
+    email: string().required().email(),
+    password: string()
+      .trim()
+      .required()
+      .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),
+    repeatPass: string()
+      .trim()
+      .required()
+      .oneOf([ref("password")], t("passNoMatch")),
+    organisation: string().trim().required(),
+    telephone: string().trim().required(),
+    terms: boolean().oneOf([true], t("terms")).required(),
   });
 
   const forgotPasswordInputSchema = object({
@@ -77,16 +93,12 @@ export default function Validation() {
     telephone: string().trim().required(),
   });
 
-  const termsInputSchmema = object({
-    terms: boolean().oneOf([true], t("terms")).required(),
-  });
-
   return {
     loginInputSchema,
-    registerInputSchema,
+    flawisRegisterInputSchema,
+    conferencesRegisterInputSchme,
     forgotPasswordInputSchema,
     passwordInputSchema,
     perosnalInfoInputSchema,
-    termsInputSchmema,
   };
 }
