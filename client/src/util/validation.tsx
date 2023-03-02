@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { object, ref, setLocale, string } from "yup";
+import { boolean, object, ref, setLocale, string } from "yup";
 
 export function checkIfFilesAreTooBig(file: File): boolean {
   console.log(file.size, 10000000);
@@ -77,11 +77,16 @@ export default function Validation() {
     telephone: string().trim().required(),
   });
 
+  const termsInputSchmema = object({
+    terms: boolean().oneOf([true], t("terms")).required(),
+  });
+
   return {
     loginInputSchema,
     registerInputSchema,
     forgotPasswordInputSchema,
     passwordInputSchema,
     perosnalInfoInputSchema,
+    termsInputSchmema,
   };
 }
