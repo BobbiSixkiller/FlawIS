@@ -108,6 +108,12 @@ function ConferencesMenuItems() {
     },
   });
 
+  if (router.pathname === "/conferences/[slug]") {
+  }
+
+  if (router.pathname === "/conferences/[slug]/dashboard") {
+  }
+
   if (router.asPath.includes("/profile")) {
     if (width < 768) {
       return (
@@ -144,10 +150,42 @@ function ConferencesMenuItems() {
 
   return (
     <>
-      <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-        {width < 768 && <Icon name="home" />}
-        <b>{t("menu.home")}</b>
-      </Menu.Item>
+      {router.pathname === "/conferences/[slug]" && (
+        <>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="signup" />
+            <b>{t("confMenu.register")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="tag" />
+            <b>{t("confMenu.sections")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.programme")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.fee")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.guidelines")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.dates")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.archive")}</b>
+          </Menu.Item>
+          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Icon name="home" />
+            <b>{t("confMenu.contact")}</b>
+          </Menu.Item>
+        </>
+      )}
       {!user ? (
         <>
           <Menu.Item
@@ -208,11 +246,9 @@ function ConferencesMenuItems() {
 }
 
 export default function MainMenuItems() {
-  console.log(window.location.hostname);
-
   if (window.location.hostname === "conferences.flaw.uniba.sk") {
     return <ConferencesMenuItems />;
   }
 
-  return <FlawisMenuItems />;
+  return <ConferencesMenuItems />;
 }

@@ -126,7 +126,7 @@ export class Ticket {
     const conferenceExists = await getModelForClass(Conference)
       .findOne({ slug: this.slug })
       .exec();
-    if (conferenceExists && conferenceExists.id !== this.id) {
+    if (conferenceExists) {
       throw new ArgumentValidationError([
         {
           target: Conference, // Object that was validated.

@@ -1,21 +1,30 @@
 {
-	"header": "Registrovať",
-	"submit": "Registrovať",
-	"message": "Máte už účet? <lnk>Prihláste sa!</lnk>",
-	"name": {
-		"label": "Meno vrátane titulov",
-		"placeholder": "Meno vrátane titulov..."
-	},
-	"email": {
-		"label": "Email",
-		"placeholder": "Email adresa..."
-	},
-	"password": {
-		"label": "Heslo",
-		"placeholder": "Heslo..."
-	},
-	"repeatPass": {
-		"label": "Zopakujte heslo",
-		"placeholder": "Heslo..."
-	}
+  "header": "Registrovať",
+  "submit": "Registrovať",
+  "message": "Máte už účet? <lnk>Prihláste sa!</lnk>",
+  "name": {
+    "label": "Meno vrátane titulov",
+    "placeholder": "Meno vrátane titulov..."
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Email adresa..."
+  },
+  "password": {
+    "label": "Heslo",
+    "placeholder": "Heslo..."
+  },
+  "repeatPass": {
+    "label": "Zopakujte heslo",
+    "placeholder": "Heslo..."
+  },
+  "phone": {
+    "label": "Telefón",
+    "placeholder": "Telefón..."
+  },
+  "organisation": {
+    "label": "Organizácia",
+    "placeholder": "Organizácia..."
+  },
+  "terms": "Súhlasím s <lnk>podmienkami ochrany súkromia</lnk>"
 }

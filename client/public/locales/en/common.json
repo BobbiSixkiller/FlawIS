@@ -32,5 +32,15 @@
     "logout": "Sign Out",
     "login": "Sign In",
     "register": "Register"
+  },
+  "confMenu": {
+    "register": "Conference Registration",
+    "sections": "Sections & Topics",
+    "programme": "Programme",
+    "fee": "Conference Fee",
+    "guidelines": "Submission Guidelines",
+    "dates": "Terms & Dates",
+    "archive": "Archive",
+    "contact": "Contact"
   }
 }

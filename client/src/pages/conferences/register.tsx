@@ -1,5 +1,6 @@
 import { Formik, FormikProps, useFormikContext } from "formik";
 import { NextPage } from "next";
+import { Trans, useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,9 +18,10 @@ import {
   Segment,
 } from "semantic-ui-react";
 
-import { boolean, InferType, object, ref, string } from "yup";
+import { InferType } from "yup";
 import CheckboxField from "../../components/form/CheckboxField";
 import { InputField, InputFieldProps } from "../../components/form/InputField";
+import LocalizedLink from "../../components/LocalizedLink";
 import {
   useRegisterMutation,
   useUpdateConferenceUserMutation,
@@ -55,7 +57,6 @@ const Register: NextPage = () => {
   const router = useRouter();
 
   const { conferencesRegisterInputSchme } = Validation();
-
   type Values = InferType<typeof conferencesRegisterInputSchme>;
 
   const [register] = useRegisterMutation({
@@ -65,6 +66,8 @@ const Register: NextPage = () => {
   });
 
   const [updateConferenceUser] = useUpdateConferenceUserMutation();
+
+  const { t } = useTranslation("register");
 
   return (
     <Grid container centered>
@@ -92,7 +95,7 @@ const Register: NextPage = () => {
           </div>
 
           <Header as="h2" textAlign="center">
-            Register
+            {t("header")}
           </Header>
           <Formik
             initialValues={{
@@ -141,8 +144,8 @@ const Register: NextPage = () => {
                     fluid
                     icon="user"
                     iconPosition="left"
-                    placeholder="Name including titles"
-                    label="Name including titles"
+                    placeholder={t("name.placeholder")}
+                    label={t("name.label")}
                     name="name"
                     control={Input}
                   />
@@ -151,8 +154,8 @@ const Register: NextPage = () => {
                     fluid
                     icon="at"
                     iconPosition="left"
-                    placeholder="E-mail address"
-                    label="Email"
+                    placeholder={t("email.placeholder")}
+                    label={t("email.label")}
                     name="email"
                     control={Input}
                   />
@@ -161,8 +164,8 @@ const Register: NextPage = () => {
                     fluid
                     icon="phone"
                     iconPosition="left"
-                    placeholder="Telephone number"
-                    label="Telephone"
+                    placeholder={t("phone.placeholder")}
+                    label={t("phone.label")}
                     name="telephone"
                     control={Input}
                   />
@@ -171,8 +174,8 @@ const Register: NextPage = () => {
                     fluid
                     icon="building"
                     iconPosition="left"
-                    placeholder="Name of the organisation"
-                    label="Organisation"
+                    placeholder={t("organisation.placeholder")}
+                    label={t("organisation.label")}
                     name="organisation"
                     control={Input}
                   />
@@ -181,9 +184,9 @@ const Register: NextPage = () => {
                     fluid
                     icon="lock"
                     iconPosition="left"
-                    placeholder="Password"
+                    placeholder={t("password.placeholder")}
                     type="password"
-                    label="Password"
+                    label={t("password.label")}
                     name="password"
                     control={Input}
                   />
@@ -192,9 +195,9 @@ const Register: NextPage = () => {
                     fluid
                     icon="lock"
                     iconPosition="left"
-                    placeholder="Password"
+                    placeholder={t("repeatPass.placeholder")}
                     type="password"
-                    label="Repeat Password"
+                    label={t("repeatPass.label")}
                     name="repeatPass"
                     control={Input}
                   />
@@ -203,10 +206,15 @@ const Register: NextPage = () => {
                     name="terms"
                     label={
                       <label>
-                        I agree with the{" "}
-                        <Link href="https://uniba.sk/en/privacy-policy/">
-                          Privacy policy
-                        </Link>
+                        <Trans
+                          i18nKey="terms"
+                          t={t}
+                          components={{
+                            lnk: (
+                              <LocalizedLink href="https://uniba.sk/en/privacy-policy/" />
+                            ),
+                          }}
+                        />
                       </label>
                     }
                   />
@@ -226,7 +234,11 @@ const Register: NextPage = () => {
           </Formik>
 
           <Message style={{ textAlign: "center" }}>
-            Already have an account? <Link href="/login">Log In!</Link>
+            <Trans
+              i18nKey="message"
+              t={t}
+              components={{ lnk: <LocalizedLink href="/login" /> }}
+            />
           </Message>
         </Grid.Column>
       </Grid.Row>
