@@ -1,114 +1,106 @@
 fragment User on User {
-	id
-	name
-	email
-	role
-	verified
+  id
+  name
+  email
+  role
+  verified
 }
 
 mutation login($email: String!, $password: String!) {
-	login(email: $email, password: $password) {
-		...User
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+  login(email: $email, password: $password) {
+    ...User
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+  }
 }
 
 query me($year: DateTime) {
-	me {
-		...User
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-		grants(year: $year) {
-			...GrantInfo
-		}
-	}
+  me {
+    ...User
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+    grants(year: $year) {
+      ...GrantInfo
+    }
+  }
 }
 
 query forgotPassword($email: String!) {
-	forgotPassword(email: $email)
+  forgotPassword(email: $email)
 }
 
 mutation passwordReset($data: PasswordInput!) {
-	passwordReset(data: $data) {
-		...User
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+  passwordReset(data: $data) {
+    ...User
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+  }
 }
 
 mutation register($data: RegisterInput!) {
-	register(data: $data) {
-		...User
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+  register(data: $data) {
+    ...User
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+  }
 }
 
 mutation resendActivationLink {
-	resendActivationLink
+  resendActivationLink
 }
 
 mutation activateUser($token: String!) {
-	activateUser(token: $token)
+  activateUser(token: $token)
 }
 
 mutation logout {
-	logout
+  logout
 }

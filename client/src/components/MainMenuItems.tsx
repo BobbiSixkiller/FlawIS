@@ -151,40 +151,35 @@ function ConferencesMenuItems() {
   return (
     <>
       {router.pathname === "/conferences/[slug]" && (
-        <>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="signup" />
-            <b>{t("confMenu.register")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="tag" />
-            <b>{t("confMenu.sections")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.programme")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.fee")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.guidelines")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.dates")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.archive")}</b>
-          </Menu.Item>
-          <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-            <Icon name="home" />
-            <b>{t("confMenu.contact")}</b>
-          </Menu.Item>
-        </>
+        <Menu.Item>
+          <Menu.Header>conference name</Menu.Header>
+          <Menu vertical inverted>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.register")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.sections")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.programme")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.fee")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.guidelines")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.dates")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.archive")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.contact")}
+            </Menu.Item>
+          </Menu>
+        </Menu.Item>
       )}
       {!user ? (
         <>
@@ -206,40 +201,23 @@ function ConferencesMenuItems() {
           </Menu.Item>
         </>
       ) : (
-        <>
-          {width < 768 ? (
-            <Menu.Item>
-              <Menu.Header>{user.name}</Menu.Header>
-              <Menu vertical inverted>
-                <Menu.Item
-                  as={Link}
-                  href="/profile"
-                  name={t("menu.profile")}
-                  active={router.asPath.includes("/profile")}
-                />
-                <Menu.Item
-                  as={Link}
-                  href="/"
-                  name={t("menu.logout")}
-                  onClick={() => logout()}
-                />
-              </Menu>
-            </Menu.Item>
-          ) : (
-            <>
-              <Menu.Item
-                as={Link}
-                href={"/profile"}
-                active={router.asPath.includes("/profile")}
-              >
-                <b>{t("menu.profile")}</b>
-              </Menu.Item>
-              <Menu.Item as={Link} href="/" onClick={() => logout()}>
-                <b>{t("menu.logout")}</b>
-              </Menu.Item>
-            </>
-          )}
-        </>
+        <Menu.Item>
+          <Menu.Header>{user.name}</Menu.Header>
+          <Menu vertical inverted>
+            <Menu.Item
+              as={Link}
+              href="/profile"
+              name={t("menu.profile")}
+              active={router.asPath.includes("/profile")}
+            />
+            <Menu.Item
+              as={Link}
+              href="/"
+              name={t("menu.logout")}
+              onClick={() => logout()}
+            />
+          </Menu>
+        </Menu.Item>
       )}
     </>
   );

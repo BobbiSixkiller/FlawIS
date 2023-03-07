@@ -23,9 +23,11 @@ export class User {
   @Field(() => ID)
   id: ObjectId;
 
+  @Field()
   @Property()
   email: string;
 
+  @Field()
   @Property()
   name: string;
 

@@ -902,14 +902,14 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type MeQueryVariables = Exact<{
   year?: InputMaybe<Scalars['DateTime']>;
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String'];
@@ -923,14 +923,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -1057,7 +1057,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1342,8 +1342,6 @@ export const LoginDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
   }
 }
@@ -1392,8 +1390,6 @@ export const MeDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
     grants(year: $year) {
       ...GrantInfo
@@ -1480,8 +1476,6 @@ export const PasswordResetDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
   }
 }
@@ -1529,8 +1523,6 @@ export const RegisterDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
   }
 }
@@ -2360,8 +2352,6 @@ export const UpdateUserDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
   }
 }

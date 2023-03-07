@@ -5,7 +5,12 @@ import {
   Int,
   ObjectType,
 } from "type-graphql";
-import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
+import {
+  getModelForClass,
+  pre,
+  prop as Property,
+  Ref,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
@@ -49,23 +54,46 @@ class ConferenceTranslation extends Translation {
   tickets: TicketTranslation[];
 }
 
-@ObjectType({ description: "Conference hosting organization" })
-export class Host {
+@ObjectType({ description: "Conference billing organization" })
+export class ConferenceBilling extends Billing {
   @Field()
   @Property()
-  logoUrl: string;
+  variableSymbol: string;
+
+  @Field()
+  @Property()
+  IBAN: string;
+
+  @Field()
+  @Property()
+  SWIFT: string;
 
   @Field()
   @Property()
   stampUrl: string;
-
-  @Field(() => Billing)
-  @Property({ _id: false })
-  billing: Billing;
 }
 
-@ObjectType({ description: "Venue that conference takes place in" })
-export class Venue {
+@ObjectType({ description: "Important dates regarding conference" })
+export class ImportantDates {
+  @Field()
+  @Property()
+  start: Date;
+
+  @Field()
+  @Property()
+  end: Date;
+
+  @Field({ nullable: true })
+  @Property()
+  regEnd?: Date;
+
+  @Field({ nullable: true })
+  @Property()
+  submissionDeadline?: Date;
+}
+
+@ObjectType({ description: "Conference contact information" })
+export class Contact {
   @Field()
   @Property()
   name: string;
@@ -73,9 +101,21 @@ export class Venue {
   @Field()
   @Property({ _id: false })
   address: Address;
+
+  @Field(() => [String])
+  @Property({ type: () => [String] })
+  conferenceTeam: string[];
+
+  @Field(() => [String])
+  @Property({ type: () => [String] })
+  scientificTeam: string[];
+
+  @Field()
+  @Property()
+  email: string;
 }
 
-@ObjectType({ description: "Conference ticket type" })
+@ObjectType({ description: "Conference ticket" })
 export class Ticket {
   @Field(() => ID)
   id: ObjectId;
@@ -144,7 +184,7 @@ export class Ticket {
 })
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
-  @Field(() => ID)
+  @Field(() => ObjectId)
   id: ObjectId;
 
   @Field()
@@ -152,7 +192,7 @@ export class Conference extends TimeStamps {
   name: string;
 
   @Field()
-  @Property({ unique: true })
+  @Property()
   slug: string;
 
   @Field()
@@ -163,36 +203,25 @@ export class Conference extends TimeStamps {
   @Property()
   description: string;
 
-  @Field()
-  @Property()
-  variableSymbol: string;
+  @Field(() => ConferenceBilling)
+  @Property({ type: () => ConferenceBilling, _id: false })
+  billing: ConferenceBilling;
 
-  @Field(() => Host, { nullable: true })
+  @Field(() => ImportantDates)
+  @Property({ type: () => ImportantDates, _id: false })
+  dates: ImportantDates;
+
+  @Field(() => Contact, { nullable: true })
   @Property({ _id: false })
-  host?: Host;
-
-  @Field(() => Venue, { nullable: true })
-  @Property({ _id: false })
-  venue?: Venue;
-
-  @Field(() => [Section])
-  sections: Section[];
+  contact?: Contact;
 
   @Field(() => [Ticket])
   @Property({ type: () => Ticket, default: [] })
   tickets: Ticket[];
 
-  @Field({ nullable: true })
-  @Property()
-  regStart?: Date;
-
-  @Field({ nullable: true })
-  @Property()
-  start?: Date;
-
-  @Field({ nullable: true })
-  @Property()
-  end?: Date;
+  @Field(() => [Section])
+  @Property({ ref: () => Section })
+  sections: Ref<Section>[];
 
   @Field(() => [ConferenceTranslation])
   @Property({ type: () => ConferenceTranslation, default: [], _id: false })

@@ -21,6 +21,7 @@
   "homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
   "dependencies": {
     "@apollo/federation": "^0.25.1",
+    "@typegoose/typegoose": "^10.3.0",
     "amqplib": "^0.10.3",
     "apollo-graphql": "^0.9.7",
     "apollo-server": "^3.6.7",
@@ -32,6 +33,7 @@
     "graphql": "^15.8.0",
     "graphql-upload": "^13.0.0",
     "jsonwebtoken": "^8.5.1",
+    "mongoose": "^7.0.1",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "uuid": "^8.3.2"
