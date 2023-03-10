@@ -5,9 +5,16 @@ import { createWriteStream, unlink } from "fs";
 import * as path from "path";
 import { v4 as uuid } from "uuid";
 import { UserInputError } from "apollo-server-core";
+import { File } from "../entities/File";
+import { CRUDservice } from "../services/CRUDservice";
+import { Service } from "typedi";
+import { Context } from "../util/auth";
 
+@Service()
 @Resolver()
 export class FileResolver {
+  constructor(private readonly fileService = new CRUDservice(File)) {}
+
   @Authorized()
   @Mutation(() => String)
   async uploadFile(
@@ -18,7 +25,7 @@ export class FileResolver {
     if (
       mimetype != "application/pdf" &&
       mimetype !=
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
       mimetype !== "image/jpeg" &&
       mimetype !== "image/png"
     ) {
@@ -39,7 +46,8 @@ export class FileResolver {
         .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
         .on("finish", () =>
           resolve(
-            `${process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
+            `${
+              process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
             }`
           )
         )
@@ -50,7 +58,8 @@ export class FileResolver {
   @Authorized()
   @Mutation(() => Boolean)
   async deleteFile(@Arg("url") url: string) {
-    const path = "." + url.split(process.env.BASE_URL || "http://localhost:5000")[1];
+    const path =
+      "." + url.split(process.env.BASE_URL || "http://localhost:5000")[1];
 
     return new Promise((resolve, reject) => {
       unlink(path, (error) => {

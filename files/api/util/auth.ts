@@ -24,6 +24,8 @@ export const authChecker: AuthChecker<Context> = (
   roles
 ) => {
   console.log(user);
+  console.log(roles);
+
   //checks for user inside the context
   if (roles.length === 0) {
     return user !== null;

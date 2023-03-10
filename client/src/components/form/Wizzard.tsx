@@ -55,7 +55,7 @@ export function Wizzard({
         <Form autoComplete="off" onSubmit={handleSubmit} loading={isSubmitting}>
           <Step.Group fluid>
             {childrenArray.map((s, i) => (
-              <Step key={i} active={i === step}>
+              <Step key={i} active={i === step} completed={i < step}>
                 <Icon name={s.props.icon} />
                 <Step.Content>
                   <Step.Title>{s.props.title}</Step.Title>

@@ -175,6 +175,8 @@ type Spent {
 }
 
 type User {
+  email: String!
   grants(year: DateTime): GrantInfo!
-  id: ID!
+  id: ObjectId!
+  name: String!
 }

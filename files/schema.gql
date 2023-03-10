@@ -25,7 +25,17 @@ type Mutation {
   uploadFile(file: Upload!, type: FileType!): String!
 }
 
+"""Mongo object id scalar type"""
+scalar ObjectId
+
 type Query
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+type User {
+  email: String!
+  id: ObjectId!
+  name: String!
+  organisation: String!
+}

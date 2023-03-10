@@ -345,7 +345,9 @@ User reference type from users microservice with contributed billings field
 """
 type User {
   billings: [Billing]!
-  id: ID!
+  email: String!
+  id: ObjectId!
+  name: String!
   organisation: String!
   telephone: String!
 }

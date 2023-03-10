@@ -1,5 +1,14 @@
 import { useTranslation } from "next-i18next";
-import { boolean, object, ref, setLocale, string } from "yup";
+import {
+  array,
+  boolean,
+  date,
+  mixed,
+  object,
+  ref,
+  setLocale,
+  string,
+} from "yup";
 
 export function checkIfFilesAreTooBig(file: File): boolean {
   console.log(file.size, 10000000);
@@ -93,6 +102,54 @@ export default function Validation() {
     telephone: string().trim().required(),
   });
 
+  const conferenceInputSchema = object({
+    name: string().trim().required(),
+    slug: string().trim().required(),
+    description: string().trim().required(),
+    dates: object({
+      start: date().required(),
+      end: date()
+        .min(ref("start"), "end date can't be before start date")
+        .required(),
+    }),
+    files: array()
+      .of(
+        mixed()
+          .test(
+            "is-correct-file",
+            "VALIDATION_FIELD_FILE_BIG",
+            checkIfFilesAreTooBig
+          )
+          .test(
+            "is-big-file",
+            "VALIDATION_FIELD_FILE_WRONG_TYPE",
+            checkIfFilesAreCorrectType
+          )
+      )
+      .test({
+        message: "Pole musí obsahovať presne 3 súbory",
+        test: (arr) => arr?.length === 3,
+      }),
+  });
+
+  const conferenceInvoiceInputSchema = object({
+    billing: object({
+      name: string().trim().required(),
+      address: object({
+        street: string().trim().required(),
+        city: string().trim().required(),
+        postal: string().trim().required(),
+        country: string().trim().required(),
+      }),
+      variableSymbol: string().trim().required(),
+      IBAN: string().trim().required(),
+      SWIFT: string().trim().required(),
+      ICO: string().trim().required(),
+      DIC: string().trim().required(),
+      ICDPH: string().trim().required(),
+    }),
+  });
+
   return {
     loginInputSchema,
     flawisRegisterInputSchema,
@@ -100,5 +157,7 @@ export default function Validation() {
     forgotPasswordInputSchema,
     passwordInputSchema,
     perosnalInfoInputSchema,
+    conferenceInputSchema,
+    conferenceInvoiceInputSchema,
   };
 }

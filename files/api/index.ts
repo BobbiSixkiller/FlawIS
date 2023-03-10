@@ -11,20 +11,23 @@ import { Context, authChecker } from "./util/auth";
 import env from "dotenv";
 import Messagebroker from "./util/rmq";
 import { connect } from "mongoose";
+import { ObjectId } from "mongodb";
 import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
 import User from "./entities/File";
+import { ObjectIdScalar } from "./util/scalars";
 
 env.config();
 
 const port = process.env.PORT || 5002;
 const mongooseUri =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/files";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/FLAWIS-files";
 
 async function main() {
   //Build schema
   const schema = await buildFederatedSchema({
     resolvers: [FileResolver],
     orphanedTypes: [User],
+    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
     globalMiddlewares: [TypegooseMiddleware],
     emitSchemaFile: true,
     authChecker,
@@ -41,8 +44,9 @@ async function main() {
     context: ({ req, res }: Context) => ({
       req,
       res,
-      user: req.headers.user ? req.headers.user : null,
-      locale: req.headers.locale ? req.headers.locale : "sk",
+      user: req.headers.user
+        ? JSON.parse(decodeURIComponent(req.headers.user as string))
+        : null,
     }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
@@ -51,6 +55,7 @@ async function main() {
 
   await Messagebroker.init();
   const mongoose = await connect(mongooseUri);
+  mongoose.set("strictQuery", false);
   console.log(mongoose.connection && "Database connected!");
 
   await server.start();

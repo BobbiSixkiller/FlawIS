@@ -56,7 +56,7 @@ registerEnumType(Role, {
 @Directive('@key(fields: "id")')
 @ObjectType({ description: "The user model entity" })
 export class User extends TimeStamps {
-  @Field(() => ID)
+  @Field(() => ObjectId)
   id: ObjectId;
 
   @Field()

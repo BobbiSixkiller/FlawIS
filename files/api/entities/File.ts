@@ -26,6 +26,7 @@ export default class User {
   name: string;
 }
 
+@ObjectType()
 export class File extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;

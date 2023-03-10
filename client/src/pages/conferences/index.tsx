@@ -161,7 +161,7 @@ Home.getLayout = function getLayout(page) {
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common"])),
+    ...(await serverSideTranslations(locale, ["common", "validation"])),
   },
 });
 
