@@ -23,13 +23,16 @@ export const authChecker: AuthChecker<Context> = (
   { context: { user } },
   roles
 ) => {
-  console.log(user);
   //checks for user inside the context
   if (roles.length === 0) {
     return user !== null;
   }
   //roles exists but no user in the context
   if (!user) return false;
+
+  if (roles.includes(user.role)) {
+    return true;
+  }
 
   //no roles matched
   return false;

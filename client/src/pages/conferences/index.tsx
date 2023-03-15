@@ -2,14 +2,18 @@ import { Segment, Grid, Header, Button, Label } from "semantic-ui-react";
 import Link from "next/link";
 import Image from "next/image";
 import useWith from "../../hooks/useWidth";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import MastHead from "../../components/MastHead";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";
 import Nav from "../../components/MobileNav";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { AuthContext } from "../../providers/Auth";
+import { Role } from "../../graphql/generated/schema";
+import AddConference from "../../components/AddConference";
 
 const Home: NextPageWithLayout = () => {
+  const { user } = useContext(AuthContext);
   const width = useWith();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -49,6 +53,13 @@ const Home: NextPageWithLayout = () => {
           vertical
         >
           <Grid stackable container verticalAlign="middle" divided="vertically">
+            {user?.role === Role.Admin && (
+              <Grid.Row>
+                <Grid.Column textAlign="center">
+                  <AddConference />
+                </Grid.Column>
+              </Grid.Row>
+            )}
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
                 <div style={{ position: "relative", height: "150px" }}>
@@ -72,7 +83,9 @@ const Home: NextPageWithLayout = () => {
                   bananas can be bioengineered.
                 </p>
                 <Link href="/1">
-                  <Button size="huge">More</Button>
+                  <Button size="huge" primary>
+                    More
+                  </Button>
                 </Link>
               </Grid.Column>
               <Grid.Column floated="right" width={6} only="tablet computer">
@@ -86,7 +99,6 @@ const Home: NextPageWithLayout = () => {
                 </div>
               </Grid.Column>
             </Grid.Row>
-
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
                 <div style={{ position: "relative", height: "250px" }}>
@@ -124,10 +136,11 @@ const Home: NextPageWithLayout = () => {
                 </div>
               </Grid.Column>
             </Grid.Row>
-
             <Grid.Row>
               <Grid.Column textAlign="center">
-                <Button size="huge">Previous...</Button>
+                <Button size="huge" secondary>
+                  Previous...
+                </Button>
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -148,7 +161,7 @@ Home.getLayout = function getLayout(page) {
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common"])),
+    ...(await serverSideTranslations(locale, ["common", "validation"])),
   },
 });
 

@@ -66,7 +66,7 @@ enum Role {
 type User {
   createdAt: DateTime!
   email: String!
-  id: ID!
+  id: ObjectId!
   name: String!
   role: Role!
   updatedAt: DateTime!

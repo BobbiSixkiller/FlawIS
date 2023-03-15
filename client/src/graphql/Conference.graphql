@@ -18,8 +18,44 @@ mutation updateConferenceUser($data: ConferenceUserInput!) {
       ICO
       DIC
       ICDPH
+    }
+  }
+}
+
+mutation createConference($data: ConferenceInput!) {
+  createConference(data: $data) {
+    id
+    name
+    description
+    slug
+    logoUrl
+    dates {
+      start
+      end
+    }
+    billing {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      variableSymbol
       IBAN
       SWIFT
+      stampUrl
     }
+    translations {
+      language
+      name
+      description
+      logoUrl
+    }
+    createdAt
+    updatedAt
   }
 }

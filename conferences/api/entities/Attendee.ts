@@ -7,7 +7,7 @@ import CreateConnection from "../resolvers/types/pagination";
 import { Ref } from "../util/types";
 import { Billing } from "./Billing";
 
-import { Conference, Host } from "./Conference";
+import { Conference } from "./Conference";
 import { Submission } from "./Submission";
 import { User } from "./User";
 
@@ -56,9 +56,9 @@ export class Invoice {
   @Property({ type: () => Billing, _id: false })
   payer: Billing;
 
-  @Field(() => Host)
-  @Property({ type: () => Host, _id: false })
-  issuer: Host;
+  @Field()
+  @Property()
+  issuer: string;
 
   @Field(() => InvoiceData)
   @Property({ type: () => InvoiceData, _id: false })

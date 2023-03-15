@@ -108,6 +108,12 @@ function ConferencesMenuItems() {
     },
   });
 
+  if (router.pathname === "/conferences/[slug]") {
+  }
+
+  if (router.pathname === "/conferences/[slug]/dashboard") {
+  }
+
   if (router.asPath.includes("/profile")) {
     if (width < 768) {
       return (
@@ -144,10 +150,37 @@ function ConferencesMenuItems() {
 
   return (
     <>
-      <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
-        {width < 768 && <Icon name="home" />}
-        <b>{t("menu.home")}</b>
-      </Menu.Item>
+      {router.pathname === "/conferences/[slug]" && (
+        <Menu.Item>
+          <Menu.Header>conference name</Menu.Header>
+          <Menu vertical inverted>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.register")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.sections")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.programme")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.fee")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.guidelines")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.dates")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.archive")}
+            </Menu.Item>
+            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+              {t("confMenu.contact")}
+            </Menu.Item>
+          </Menu>
+        </Menu.Item>
+      )}
       {!user ? (
         <>
           <Menu.Item
@@ -168,51 +201,32 @@ function ConferencesMenuItems() {
           </Menu.Item>
         </>
       ) : (
-        <>
-          {width < 768 ? (
-            <Menu.Item>
-              <Menu.Header>{user.name}</Menu.Header>
-              <Menu vertical inverted>
-                <Menu.Item
-                  as={Link}
-                  href="/profile"
-                  name={t("menu.profile")}
-                  active={router.asPath.includes("/profile")}
-                />
-                <Menu.Item
-                  as={Link}
-                  href="/"
-                  name={t("menu.logout")}
-                  onClick={() => logout()}
-                />
-              </Menu>
-            </Menu.Item>
-          ) : (
-            <>
-              <Menu.Item
-                as={Link}
-                href={"/profile"}
-                active={router.asPath.includes("/profile")}
-              >
-                <b>{t("menu.profile")}</b>
-              </Menu.Item>
-              <Menu.Item as={Link} href="/" onClick={() => logout()}>
-                <b>{t("menu.logout")}</b>
-              </Menu.Item>
-            </>
-          )}
-        </>
+        <Menu.Item>
+          <Menu.Header>{user.name}</Menu.Header>
+          <Menu vertical inverted>
+            <Menu.Item
+              as={Link}
+              href="/profile"
+              name={t("menu.profile")}
+              active={router.asPath.includes("/profile")}
+            />
+            <Menu.Item
+              as={Link}
+              href="/"
+              name={t("menu.logout")}
+              onClick={() => logout()}
+            />
+          </Menu>
+        </Menu.Item>
       )}
     </>
   );
 }
 
 export default function MainMenuItems() {
-  console.log(window.location.hostname);
-
   if (window.location.hostname === "conferences.flaw.uniba.sk") {
     return <ConferencesMenuItems />;
   }
 
-  return <FlawisMenuItems />;
+  return <ConferencesMenuItems />;
 }

@@ -1,4 +1,5 @@
 import { useField, useFormikContext } from "formik";
+import { useTranslation } from "next-i18next";
 import React, { ChangeEvent, FC, useRef, useState } from "react";
 import {
   Form,
@@ -53,6 +54,8 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
   const error = (meta.touched && meta.error) || (status && status[field.name]);
   const localizedError = localizedMeta.touched && localizedMeta.error;
 
+  const { i18n } = useTranslation();
+
   return (
     <Form.Field>
       <div ref={inputRef}>
@@ -67,7 +70,12 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
           error={error}
         />
         <Transition visible={toggle} animation="scale" duration={500}>
-          <Form.Field {...props} {...localizedField} error={localizedError} />
+          <Form.Field
+            {...props}
+            label={`${props.label} ${i18n.language.toUpperCase()}`}
+            {...localizedField}
+            error={localizedError}
+          />
         </Transition>
       </div>
     </Form.Field>

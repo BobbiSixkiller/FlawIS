@@ -1,69 +1,67 @@
 mutation updateUser($id: ObjectId!, $data: UserInput!) {
-	updateUser(id: $id, data: $data) {
-		...User
-		organisation
-		telephone
-		billings {
-			name
-			address {
-				street
-				city
-				postal
-				country
-			}
-			ICO
-			DIC
-			ICDPH
-			IBAN
-			SWIFT
-		}
-	}
+  updateUser(id: $id, data: $data) {
+    ...User
+    organisation
+    telephone
+    billings {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+  }
 }
 
 mutation deleteUser($id: ObjectId!) {
-	deleteUser(id: $id)
+  deleteUser(id: $id)
 }
 
 query userTextSearch($text: String!) {
-	userTextSearch(text: $text) {
-		id
-		name
-		email
-	}
+  userTextSearch(text: $text) {
+    id
+    name
+    email
+  }
 }
 
 query users($after: ObjectId, $first: Int = 20) {
-	users(after: $after, first: $first) {
-		edges {
-			cursor
-			node {
-				...User
-				organisation
-			}
-		}
-		pageInfo {
-			hasNextPage
-			endCursor
-		}
-	}
+  users(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        ...User
+        organisation
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
 }
 
 fragment GrantInfo on GrantInfo {
-	grants {
-		...Grant
-	}
-	hours
-	availableYears
+  grants {
+    ...Grant
+  }
+  hours
+  availableYears
 }
 
 query user($id: ObjectId!, $year: DateTime) {
-	user(id: $id) {
-		...User
-		...User
-		organisation
-		telephone
-		grants(year: $year) {
-			...GrantInfo
-		}
-	}
+  user(id: $id) {
+    ...User
+    ...User
+    organisation
+    telephone
+    grants(year: $year) {
+      ...GrantInfo
+    }
+  }
 }

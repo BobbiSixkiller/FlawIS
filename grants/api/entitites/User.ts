@@ -20,12 +20,14 @@ export class GrantInfo {
 @Directive(`@key(fields: "id")`)
 export class User {
   @Directive("@external")
-  @Field(() => ID)
+  @Field(() => ObjectId)
   id: ObjectId;
 
+  @Field()
   @Property()
   email: string;
 
+  @Field()
   @Property()
   name: string;
 

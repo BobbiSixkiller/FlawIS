@@ -23,77 +23,10 @@ import { NextPageWithLayout } from "../../_app";
 
 const ConferencePage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
-  // const { setMenuItems } = useContext(MenuItemsContext);
   const [active, setActive] = useState<string | number | undefined>();
   const router = useRouter();
   const width = useWith();
   const { slug } = router.query;
-
-  // useEffect(() => {
-  //   setMenuItems(
-  //     <Menu.Item>
-  //       <Menu.Header>Conference</Menu.Header>
-  //       <Menu vertical inverted>
-  //         <Link href="#register" scroll={false}>
-  //           <Menu.Item as="a" name="register" />
-  //         </Link>
-  //         {user && user.role === Role.Admin && (
-  //           <Link href={`/${slug}/attendees`}>
-  //             <Menu.Item
-  //               as="a"
-  //               name="Attendees"
-  //               active={router.asPath === `/${slug}/attendees`}
-  //             />
-  //           </Link>
-  //         )}
-  //         <Link href="#intro" scroll={false}>
-  //           <Menu.Item
-  //             as="a"
-  //             name="Introduction"
-  //             active={router.asPath === `/${slug}#intro`}
-  //           />
-  //         </Link>
-  //         <Link href="#sections">
-  //           <Menu.Item
-  //             as="a"
-  //             name="Sections"
-  //             active={router.asPath === `/${slug}#sections`}
-  //           />
-  //         </Link>
-  //         <Link href="#programme">
-  //           <Menu.Item
-  //             as="a"
-  //             name="Programme"
-  //             active={router.asPath === `/${slug}#programme`}
-  //           />
-  //         </Link>
-  //         <Link href="#fees">
-  //           <Menu.Item
-  //             as="a"
-  //             name="Fees"
-  //             active={router.asPath === `/${slug}#fees`}
-  //           />
-  //         </Link>
-  //         <Link href="#dates">
-  //           <Menu.Item
-  //             as="a"
-  //             name="Important Dates"
-  //             active={router.asPath === `/${slug}#dates`}
-  //           />
-  //         </Link>
-  //         <Link href="#guidelines">
-  //           <Menu.Item
-  //             as="a"
-  //             name="Submission guidelines"
-  //             active={router.asPath === `/${slug}#guidelines`}
-  //           />
-  //         </Link>
-  //       </Menu>
-  //     </Menu.Item>
-  //   );
-
-  //   return () => setMenuItems(null);
-  // }, []);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -254,7 +187,6 @@ ConferencePage.getLayout = function getLayout(page) {
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {
-    protect: true,
     ...(await serverSideTranslations(locale, ["common"])),
   },
 });

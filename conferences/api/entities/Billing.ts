@@ -30,23 +30,15 @@ export class Billing {
   @Property({ _id: false })
   address: Address;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  ICO: string;
-
-  @Field()
-  @Property()
-  DIC: string;
-
-  @Field()
-  @Property()
-  ICDPH: string;
+  ICO?: string;
 
   @Field({ nullable: true })
   @Property()
-  IBAN?: string;
+  DIC?: string;
 
   @Field({ nullable: true })
   @Property()
-  SWIFT?: string;
+  ICDPH?: string;
 }

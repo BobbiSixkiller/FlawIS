@@ -1,21 +1,30 @@
 {
-	"header": "Register",
-	"submit": "Register",
-	"message": "Already have an account? <lnk>Log In!</lnk>",
-	"name": {
-		"label": "Name including titles",
-		"placeholder": "Name including titles..."
-	},
-	"email": {
-		"label": "Email",
-		"placeholder": "Email address..."
-	},
-	"password": {
-		"label": "Password",
-		"placeholder": "Password..."
-	},
-	"repeatPass": {
-		"label": "Repeat Password",
-		"placeholder": "Password..."
-	}
+  "header": "Register",
+  "submit": "Register",
+  "message": "Already have an account? <lnk>Log In!</lnk>",
+  "name": {
+    "label": "Name including titles",
+    "placeholder": "Name including titles..."
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Email address..."
+  },
+  "phone": {
+    "label": "Phone number",
+    "placeholder": "Phone number..."
+  },
+  "organisation": {
+    "label": "Organisation",
+    "placeholder": "Organisation..."
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "Password..."
+  },
+  "repeatPass": {
+    "label": "Repeat Password",
+    "placeholder": "Password..."
+  },
+  "terms": "I agree with the <lnk>Privacy policy</lnk>"
 }

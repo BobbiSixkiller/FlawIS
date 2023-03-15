@@ -59,23 +59,23 @@ input AttendeeInput {
 
 """Billing information"""
 type Billing {
-  DIC: String!
-  IBAN: String
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String
+  DIC: String
+  ICDPH: String
+  ICO: String
   address: Address!
   name: String!
 }
 
 input BillingInput {
   DIC: String!
-  IBAN: String
+  IBAN: String!
   ICDPH: String!
   ICO: String!
-  SWIFT: String
+  SWIFT: String!
   address: AddressInput!
   name: String!
+  stampUrl: String!
+  variableSymbol: String!
 }
 
 """Conference model type"""
@@ -83,37 +83,43 @@ type Conference {
   attendees(after: String, first: Int = 20): AttendeeConnection!
   attendeesCount: Int!
   attending: Boolean!
+  billing: ConferenceBilling!
+  contact: Contact
   createdAt: DateTime!
+  dates: ImportantDates!
   description: String!
-  end: DateTime
-  host: Host
-  id: ID!
+  id: ObjectId!
   logoUrl: String!
   name: String!
-  regStart: DateTime
   sections: [Section!]!
   slug: String!
-  start: DateTime
   tickets: [Ticket!]!
   translations: [ConferenceTranslation!]!
   updatedAt: DateTime!
-  variableSymbol: String!
-  venue: Venue
 }
 
+"""Conference billing organization"""
+type ConferenceBilling {
+  DIC: String
+  IBAN: String!
+  ICDPH: String
+  ICO: String
+  SWIFT: String!
+  address: Address!
+  name: String!
+  stampUrl: String!
+  variableSymbol: String!
+}
+
+"""Conference input type"""
 input ConferenceInput {
+  billing: BillingInput!
+  dates: DatesInput!
   description: String!
-  end: DateTime
-  host: HostInput
   logoUrl: String!
   name: String!
-  regStart: DateTime
   slug: String!
-  start: DateTime
-  tickets: [TicketInput!]
   translations: [ConferenceInputTranslation!]
-  variableSymbol: String!
-  venue: VenueInput
 }
 
 input ConferenceInputTranslation {
@@ -138,28 +144,39 @@ input ConferenceUserInput {
   telephone: String!
 }
 
+"""Conference contact information"""
+type Contact {
+  address: Address!
+  conferenceTeam: [String!]!
+  email: String!
+  name: String!
+  scientificTeam: [String!]!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
-"""Conference hosting organization"""
-type Host {
-  billing: Billing!
-  logoUrl: String!
-  stampUrl: String!
+input DatesInput {
+  end: DateTime!
+  regEnd: DateTime
+  start: DateTime!
+  submissionDeadline: DateTime
 }
 
-input HostInput {
-  billing: BillingInput!
-  logoUrl: String!
-  stampUrl: String!
+"""Important dates regarding conference"""
+type ImportantDates {
+  end: DateTime!
+  regEnd: DateTime
+  start: DateTime!
+  submissionDeadline: DateTime
 }
 
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
-  issuer: Host!
+  issuer: String!
   payer: Billing!
 }
 
@@ -295,18 +312,10 @@ type SubmissionTranslation {
   name: String!
 }
 
-"""Conference ticket type"""
+"""Conference ticket"""
 type Ticket {
   description: String!
   id: ID!
-  name: String!
-  online: Boolean!
-  price: Int!
-  withSubmission: Boolean!
-}
-
-input TicketInput {
-  description: String!
   name: String!
   online: Boolean!
   price: Int!
@@ -336,18 +345,9 @@ User reference type from users microservice with contributed billings field
 """
 type User {
   billings: [Billing]!
-  id: ID!
+  email: String!
+  id: ObjectId!
+  name: String!
   organisation: String!
   telephone: String!
-}
-
-"""Venue that conference takes place in"""
-type Venue {
-  address: Address!
-  name: String!
-}
-
-input VenueInput {
-  address: AddressInput!
-  name: String!
 }

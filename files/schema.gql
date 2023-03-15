@@ -13,6 +13,37 @@ directive @provides(fields: String!) on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION
 
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type File {
+  createdAt: DateTime!
+  id: ObjectId!
+  name: String!
+  type: FileType!
+  updatedAt: DateTime!
+  url: String!
+  user: User!
+}
+
+"""Cursor based pagination return object type"""
+type FileConnection {
+  edges: [FileEdge]!
+  pageInfo: FilePageInfo!
+}
+
+type FileEdge {
+  cursor: ObjectId!
+  node: File!
+}
+
+type FilePageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
+}
+
 """Supported file types for upload mutation"""
 enum FileType {
   GRANT
@@ -25,7 +56,17 @@ type Mutation {
   uploadFile(file: Upload!, type: FileType!): String!
 }
 
-type Query
+"""Mongo object id scalar type"""
+scalar ObjectId
+
+type Query {
+  files(after: ObjectId, first: Int = 20): FileConnection!
+}
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+type User {
+  email: String!
+  id: ObjectId!
+}
