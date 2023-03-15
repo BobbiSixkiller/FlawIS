@@ -65,11 +65,11 @@ export default function AddBudgetDialog({
             <Formik
               initialValues={{
                 year: year !== undefined ? year : new Date("yyyy-MM-dd"),
-                travel,
-                material,
-                services,
-                salaries,
-                indirect,
+                travel: travel || 0,
+                material: material || 0,
+                services: services || 0,
+                salaries: salaries || 0,
+                indirect: indirect || 0,
               }}
               validationSchema={budgetInputSchema}
               onSubmit={async (values, formik) => {
