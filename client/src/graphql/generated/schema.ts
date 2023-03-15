@@ -114,23 +114,23 @@ export type AttendeeInput = {
 /** Billing information */
 export type Billing = {
   __typename?: 'Billing';
-  DIC: Scalars['String'];
-  IBAN?: Maybe<Scalars['String']>;
-  ICDPH: Scalars['String'];
-  ICO: Scalars['String'];
-  SWIFT?: Maybe<Scalars['String']>;
+  DIC?: Maybe<Scalars['String']>;
+  ICDPH?: Maybe<Scalars['String']>;
+  ICO?: Maybe<Scalars['String']>;
   address: Address;
   name: Scalars['String'];
 };
 
 export type BillingInput = {
   DIC: Scalars['String'];
-  IBAN?: InputMaybe<Scalars['String']>;
+  IBAN: Scalars['String'];
   ICDPH: Scalars['String'];
   ICO: Scalars['String'];
-  SWIFT?: InputMaybe<Scalars['String']>;
+  SWIFT: Scalars['String'];
   address: AddressInput;
   name: Scalars['String'];
+  stampUrl: Scalars['String'];
+  variableSymbol: Scalars['String'];
 };
 
 /** Budget schema type */
@@ -159,22 +159,19 @@ export type Conference = {
   attendees: AttendeeConnection;
   attendeesCount: Scalars['Int'];
   attending: Scalars['Boolean'];
+  billing: ConferenceBilling;
+  contact?: Maybe<Contact>;
   createdAt: Scalars['DateTime'];
+  dates: ImportantDates;
   description: Scalars['String'];
-  end?: Maybe<Scalars['DateTime']>;
-  host?: Maybe<Host>;
-  id: Scalars['ID'];
+  id: Scalars['ObjectId'];
   logoUrl: Scalars['String'];
   name: Scalars['String'];
-  regStart?: Maybe<Scalars['DateTime']>;
   sections: Array<Section>;
   slug: Scalars['String'];
-  start?: Maybe<Scalars['DateTime']>;
   tickets: Array<Ticket>;
   translations: Array<ConferenceTranslation>;
   updatedAt: Scalars['DateTime'];
-  variableSymbol: Scalars['String'];
-  venue?: Maybe<Venue>;
 };
 
 
@@ -184,19 +181,29 @@ export type ConferenceAttendeesArgs = {
   first?: InputMaybe<Scalars['Int']>;
 };
 
+/** Conference billing organization */
+export type ConferenceBilling = {
+  __typename?: 'ConferenceBilling';
+  DIC?: Maybe<Scalars['String']>;
+  IBAN: Scalars['String'];
+  ICDPH?: Maybe<Scalars['String']>;
+  ICO?: Maybe<Scalars['String']>;
+  SWIFT: Scalars['String'];
+  address: Address;
+  name: Scalars['String'];
+  stampUrl: Scalars['String'];
+  variableSymbol: Scalars['String'];
+};
+
+/** Conference input type */
 export type ConferenceInput = {
+  billing: BillingInput;
+  dates: DatesInput;
   description: Scalars['String'];
-  end?: InputMaybe<Scalars['DateTime']>;
-  host?: InputMaybe<HostInput>;
   logoUrl: Scalars['String'];
   name: Scalars['String'];
-  regStart?: InputMaybe<Scalars['DateTime']>;
   slug: Scalars['String'];
-  start?: InputMaybe<Scalars['DateTime']>;
-  tickets?: InputMaybe<Array<TicketInput>>;
   translations?: InputMaybe<Array<ConferenceInputTranslation>>;
-  variableSymbol: Scalars['String'];
-  venue?: InputMaybe<VenueInput>;
 };
 
 export type ConferenceInputTranslation = {
@@ -220,6 +227,23 @@ export type ConferenceTranslation = {
 export type ConferenceUserInput = {
   organisation: Scalars['String'];
   telephone: Scalars['String'];
+};
+
+/** Conference contact information */
+export type Contact = {
+  __typename?: 'Contact';
+  address: Address;
+  conferenceTeam: Array<Scalars['String']>;
+  email: Scalars['String'];
+  name: Scalars['String'];
+  scientificTeam: Array<Scalars['String']>;
+};
+
+export type DatesInput = {
+  end: Scalars['DateTime'];
+  regEnd?: InputMaybe<Scalars['DateTime']>;
+  start: Scalars['DateTime'];
+  submissionDeadline?: InputMaybe<Scalars['DateTime']>;
 };
 
 /** Supported file types for upload mutation */
@@ -283,25 +307,20 @@ export enum GrantType {
   Vega = 'VEGA'
 }
 
-/** Conference hosting organization */
-export type Host = {
-  __typename?: 'Host';
-  billing: Billing;
-  logoUrl: Scalars['String'];
-  stampUrl: Scalars['String'];
-};
-
-export type HostInput = {
-  billing: BillingInput;
-  logoUrl: Scalars['String'];
-  stampUrl: Scalars['String'];
+/** Important dates regarding conference */
+export type ImportantDates = {
+  __typename?: 'ImportantDates';
+  end: Scalars['DateTime'];
+  regEnd?: Maybe<Scalars['DateTime']>;
+  start: Scalars['DateTime'];
+  submissionDeadline?: Maybe<Scalars['DateTime']>;
 };
 
 /** Invoice entity subdocument type */
 export type Invoice = {
   __typename?: 'Invoice';
   body: InvoiceData;
-  issuer: Host;
+  issuer: Scalars['String'];
   payer: Billing;
 };
 
@@ -765,19 +784,11 @@ export type SubmissionTranslation = {
   name: Scalars['String'];
 };
 
-/** Conference ticket type */
+/** Conference ticket */
 export type Ticket = {
   __typename?: 'Ticket';
   description: Scalars['String'];
   id: Scalars['ID'];
-  name: Scalars['String'];
-  online: Scalars['Boolean'];
-  price: Scalars['Int'];
-  withSubmission: Scalars['Boolean'];
-};
-
-export type TicketInput = {
-  description: Scalars['String'];
   name: Scalars['String'];
   online: Scalars['Boolean'];
   price: Scalars['Int'];
@@ -810,7 +821,7 @@ export type User = {
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   grants: GrantInfo;
-  id: Scalars['ID'];
+  id: Scalars['ObjectId'];
   name: Scalars['String'];
   organisation: Scalars['String'];
   role: Role;
@@ -843,18 +854,6 @@ export type UserInput = {
   email: Scalars['String'];
   name: Scalars['String'];
   role?: InputMaybe<Scalars['String']>;
-};
-
-/** Venue that conference takes place in */
-export type Venue = {
-  __typename?: 'Venue';
-  address: Address;
-  name: Scalars['String'];
-};
-
-export type VenueInput = {
-  address: AddressInput;
-  name: Scalars['String'];
 };
 
 export type AnnouncementsQueryVariables = Exact<{
@@ -894,7 +893,7 @@ export type DeleteAnnouncementMutationVariables = Exact<{
 
 export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
 
-export type UserFragment = { __typename?: 'User', id: string, name: string, email: string, role: Role, verified: boolean };
+export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, role: Role, verified: boolean };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
@@ -902,14 +901,14 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type MeQueryVariables = Exact<{
   year?: InputMaybe<Scalars['DateTime']>;
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null>, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String'];
@@ -923,14 +922,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -954,7 +953,14 @@ export type UpdateConferenceUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser: { __typename?: 'User', id: string, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, IBAN?: string | null, SWIFT?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser: { __typename?: 'User', id: any, name: string, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+
+export type CreateConferenceMutationVariables = Exact<{
+  data: ConferenceInput;
+}>;
+
+
+export type CreateConferenceMutation = { __typename?: 'Mutation', createConference: { __typename?: 'Conference', id: any, name: string, description: string, slug: string, logoUrl: string, createdAt: any, updatedAt: any, dates: { __typename?: 'ImportantDates', start: any, end: any }, billing: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, translations: Array<{ __typename?: 'ConferenceTranslation', language: string, name: string, description: string, logoUrl: string }> } };
 
 export type UploadFileMutationVariables = Exact<{
   type: FileType;
@@ -993,7 +999,7 @@ export type AddApprovedBudgetMutationVariables = Exact<{
 }>;
 
 
-export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type AddApprovedBudgetMutation = { __typename?: 'Mutation', addApprovedBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type AddSpentBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1001,7 +1007,7 @@ export type AddSpentBudgetMutationVariables = Exact<{
 }>;
 
 
-export type AddSpentBudgetMutation = { __typename?: 'Mutation', addSpentBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type AddSpentBudgetMutation = { __typename?: 'Mutation', addSpentBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type AddMemberMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1010,7 +1016,7 @@ export type AddMemberMutationVariables = Exact<{
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type DeleteMemberMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1019,7 +1025,7 @@ export type DeleteMemberMutationVariables = Exact<{
 }>;
 
 
-export type DeleteMemberMutation = { __typename?: 'Mutation', deleteMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type DeleteMemberMutation = { __typename?: 'Mutation', deleteMember: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type DeleteBudgetMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1027,7 +1033,7 @@ export type DeleteBudgetMutationVariables = Exact<{
 }>;
 
 
-export type DeleteBudgetMutation = { __typename?: 'Mutation', deleteBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type DeleteBudgetMutation = { __typename?: 'Mutation', deleteBudget: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type GrantsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -1042,7 +1048,7 @@ export type GrantQueryVariables = Exact<{
 }>;
 
 
-export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, name: string, email: string } } | null> } | null> } };
+export type GrantQuery = { __typename?: 'Query', grant: { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any, announcements: Array<{ __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, updatedAt: any } | null>, budgets: Array<{ __typename?: 'Budget', year: any, createdAt: any, updatedAt: any, approved: { __typename?: 'Approved', material: number, services: number, travel: number, indirect: number, salaries: number }, spent?: { __typename?: 'Spent', material: number, services: number, travel: number, indirect: number, salaries: number } | null, members: Array<{ __typename?: 'Member', hours: number, isMain: boolean, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string } } | null> } | null> } };
 
 export type GrantTextSearchQueryVariables = Exact<{
   text: Scalars['String'];
@@ -1057,7 +1063,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1071,7 +1077,7 @@ export type UserTextSearchQueryVariables = Exact<{
 }>;
 
 
-export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: string, name: string, email: string }> };
+export type UserTextSearchQuery = { __typename?: 'Query', userTextSearch: Array<{ __typename?: 'User', id: any, name: string, email: string }> };
 
 export type UsersQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
@@ -1079,7 +1085,7 @@ export type UsersQueryVariables = Exact<{
 }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', organisation: string, id: string, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', organisation: string, id: any, name: string, email: string, role: Role, verified: boolean } } | null>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: any } } };
 
 export type GrantInfoFragment = { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> };
 
@@ -1089,7 +1095,7 @@ export type UserQueryVariables = Exact<{
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', organisation: string, telephone: string, id: string, name: string, email: string, role: Role, verified: boolean, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, grants: { __typename?: 'GrantInfo', hours: number, availableYears: Array<any | null>, grants: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export const UserFragmentDoc = gql`
     fragment User on User {
@@ -1665,8 +1671,6 @@ export const UpdateConferenceUserDocument = gql`
       ICO
       DIC
       ICDPH
-      IBAN
-      SWIFT
     }
   }
 }
@@ -1697,6 +1701,71 @@ export function useUpdateConferenceUserMutation(baseOptions?: Apollo.MutationHoo
 export type UpdateConferenceUserMutationHookResult = ReturnType<typeof useUpdateConferenceUserMutation>;
 export type UpdateConferenceUserMutationResult = Apollo.MutationResult<UpdateConferenceUserMutation>;
 export type UpdateConferenceUserMutationOptions = Apollo.BaseMutationOptions<UpdateConferenceUserMutation, UpdateConferenceUserMutationVariables>;
+export const CreateConferenceDocument = gql`
+    mutation createConference($data: ConferenceInput!) {
+  createConference(data: $data) {
+    id
+    name
+    description
+    slug
+    logoUrl
+    dates {
+      start
+      end
+    }
+    billing {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      variableSymbol
+      IBAN
+      SWIFT
+      stampUrl
+    }
+    translations {
+      language
+      name
+      description
+      logoUrl
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateConferenceMutationFn = Apollo.MutationFunction<CreateConferenceMutation, CreateConferenceMutationVariables>;
+
+/**
+ * __useCreateConferenceMutation__
+ *
+ * To run a mutation, you first call `useCreateConferenceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateConferenceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createConferenceMutation, { data, loading, error }] = useCreateConferenceMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateConferenceMutation(baseOptions?: Apollo.MutationHookOptions<CreateConferenceMutation, CreateConferenceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateConferenceMutation, CreateConferenceMutationVariables>(CreateConferenceDocument, options);
+      }
+export type CreateConferenceMutationHookResult = ReturnType<typeof useCreateConferenceMutation>;
+export type CreateConferenceMutationResult = Apollo.MutationResult<CreateConferenceMutation>;
+export type CreateConferenceMutationOptions = Apollo.BaseMutationOptions<CreateConferenceMutation, CreateConferenceMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($type: FileType!, $file: Upload!) {
   uploadFile(type: $type, file: $file)

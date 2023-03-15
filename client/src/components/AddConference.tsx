@@ -1,14 +1,14 @@
 import { useTranslation } from "next-i18next";
 import { useContext } from "react";
 import { Button, Input, TextArea } from "semantic-ui-react";
-import { array, date, mixed, object, ref, string } from "yup";
-import { FileType } from "../graphql/generated/schema";
+import {
+  ConferenceInput,
+  FileType,
+  useCreateConferenceMutation,
+} from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
-import Validation, {
-  checkIfFilesAreCorrectType,
-  checkIfFilesAreTooBig,
-} from "../util/validation";
-import FileUpload from "./form/FileUpload";
+import parseErrors from "../util/parseErrors";
+import Validation from "../util/validation";
 
 import { InputField, LocalizedInputField } from "./form/InputField";
 import MultipleFileUploadField from "./form/Upload/MultipleFileUploadField";
@@ -18,6 +18,8 @@ export default function AddConference() {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
 
   const { conferenceInputSchema, conferenceInvoiceInputSchema } = Validation();
+
+  const [newConference] = useCreateConferenceMutation();
 
   const { i18n } = useTranslation();
 
@@ -39,10 +41,62 @@ export default function AddConference() {
                 description: "",
                 dates: { start: undefined, end: undefined },
                 files: [],
-                translations: [{ language: i18n.language }],
+                billing: {
+                  name: "",
+                  address: {
+                    street: "",
+                    city: "",
+                    postal: "",
+                    country: "",
+                  },
+                  variableSymbol: "",
+                  ICO: "",
+                  DIC: "",
+                  ICDPH: "",
+                  IBAN: "",
+                  SWIFT: "",
+                },
+                translations: [
+                  { language: i18n.language === "sk" ? "en" : "sk" },
+                ],
               }}
               onSubmit={async (values, formik) => {
                 console.log(values);
+                try {
+                  await newConference({
+                    variables: {
+                      data: {
+                        name: values.name,
+                        description: values.description,
+                        slug: values.slug,
+                        dates: {
+                          start: values.dates.start,
+                          end: values.dates.end,
+                        },
+                        logoUrl: values.files[0].url,
+                        billing: {
+                          ...values.billing,
+                          stampUrl: values.files[2].url,
+                        },
+                        translations: [
+                          {
+                            ...values.translations[0],
+                            logoUrl: values.files[1].url,
+                          },
+                        ],
+                      } as ConferenceInput,
+                    },
+                  });
+                  handleClose();
+                } catch (error: any) {
+                  setError(error?.message || "");
+                  formik.setStatus(
+                    parseErrors(
+                      error.graphQLErrors[0].extensions.exception
+                        .validationErrors
+                    )
+                  );
+                }
               }}
             >
               <WizzardStep
@@ -95,9 +149,11 @@ export default function AddConference() {
 
                 <MultipleFileUploadField
                   name="files"
+                  label="Nahrajte v nasledovnom poradí: Logo SK, Logo EN, Pečiatku"
+                  filetype={FileType.Image}
                   accept={{ "image/*": [] }}
                   maxFiles={3}
-                  maxSize={100 * 1024}
+                  maxSize={200 * 1024}
                 />
               </WizzardStep>
               <WizzardStep

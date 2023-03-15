@@ -1,26 +1,34 @@
 import { Stream } from "stream";
-import { Field, InputType, registerEnumType } from "type-graphql";
+import {
+  ArgsType,
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
+import { File } from "../../entities/File";
+import { CreateConnection, CreatePaginationArgs } from "./pagination";
 
 export interface Upload {
-	filename: string;
-	mimetype: string;
-	encoding: string;
-	createReadStream: () => Stream;
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: () => Stream;
 }
 
 export enum FileType {
-	IMAGE = "images",
-	SUBMISSION = "submissions",
-	GRANT = "grants",
+  IMAGE = "images",
+  SUBMISSION = "submissions",
+  GRANT = "grants",
 }
 
 registerEnumType(FileType, {
-	name: "FileType", // this one is mandatory
-	description: "Supported file types for upload mutation", // this one is optional
+  name: "FileType", // this one is mandatory
+  description: "Supported file types for upload mutation", // this one is optional
 });
 
-@InputType({ description: "Input file for graphql file upload mutation" })
-class FileTypeInput {
-	@Field(() => FileType) // it's very important
-	filetype: FileType;
-}
+@ObjectType({ description: "Cursor based pagination return object type" })
+export class FileConnection extends CreateConnection(File) {}
+
+@ArgsType()
+export class FileArgs extends CreatePaginationArgs(File) {}

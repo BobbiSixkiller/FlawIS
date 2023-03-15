@@ -1,6 +1,14 @@
-import { Arg, Authorized, Mutation, Resolver } from "type-graphql";
+import {
+  Arg,
+  Args,
+  Authorized,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+} from "type-graphql";
 import { GraphQLUpload } from "graphql-upload";
-import { FileType, Upload } from "./types/file";
+import { FileArgs, FileConnection, FileType, Upload } from "./types/file";
 import { createWriteStream, unlink } from "fs";
 import * as path from "path";
 import { v4 as uuid } from "uuid";
@@ -9,18 +17,28 @@ import { File } from "../entities/File";
 import { CRUDservice } from "../services/CRUDservice";
 import { Service } from "typedi";
 import { Context } from "../util/auth";
+import { ObjectId } from "mongodb";
 
 @Service()
 @Resolver()
 export class FileResolver {
   constructor(private readonly fileService = new CRUDservice(File)) {}
 
+  @Authorized(["ADMIN"])
+  @Query(() => FileConnection)
+  async files(@Args() { first, after }: FileArgs) {
+    const data = await this.fileService.dataModel.paginatedFiles(first, after);
+
+    return data[0];
+  }
+
   @Authorized()
   @Mutation(() => String)
   async uploadFile(
     @Arg("file", () => GraphQLUpload)
     { createReadStream, filename, mimetype }: Upload,
-    @Arg("type", () => FileType) filetype: FileType
+    @Arg("type", () => FileType) filetype: FileType,
+    @Ctx() { user }: Context
   ): Promise<string> {
     if (
       mimetype != "application/pdf" &&
@@ -40,6 +58,15 @@ export class FileResolver {
       uuid() +
       "-" +
       filename.toLowerCase().split(" ").join("-");
+
+    const file = await this.fileService.create({
+      name: filename,
+      type: filetype,
+      user,
+      url: `${
+        process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
+      }`,
+    });
 
     return new Promise(async (resolve, reject) =>
       createReadStream()

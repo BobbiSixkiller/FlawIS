@@ -1,28 +1,5 @@
 import { useTranslation } from "next-i18next";
-import {
-  array,
-  boolean,
-  date,
-  mixed,
-  object,
-  ref,
-  setLocale,
-  string,
-} from "yup";
-
-export function checkIfFilesAreTooBig(file: File): boolean {
-  console.log(file.size, 10000000);
-  return file.size < 10000000; //1MB
-}
-
-export function checkIfFilesAreCorrectType(file: File): boolean {
-  return [
-    "application/pdf",
-    "image/jpeg",
-    "image/png",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ].includes(file.type);
-}
+import { array, boolean, date, object, ref, setLocale, string } from "yup";
 
 export default function Validation() {
   const { t } = useTranslation("validation");
@@ -112,24 +89,10 @@ export default function Validation() {
         .min(ref("start"), "end date can't be before start date")
         .required(),
     }),
-    files: array()
-      .of(
-        mixed()
-          .test(
-            "is-correct-file",
-            "VALIDATION_FIELD_FILE_BIG",
-            checkIfFilesAreTooBig
-          )
-          .test(
-            "is-big-file",
-            "VALIDATION_FIELD_FILE_WRONG_TYPE",
-            checkIfFilesAreCorrectType
-          )
-      )
-      .test({
-        message: "Pole musí obsahovať presne 3 súbory",
-        test: (arr) => arr?.length === 3,
-      }),
+    files: array().test({
+      message: "Pole musí obsahovať presne 3 súbory",
+      test: (arr) => arr?.length === 3,
+    }),
   });
 
   const conferenceInvoiceInputSchema = object({
