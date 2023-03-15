@@ -31,11 +31,11 @@ export default function AddBudgetDialog({
   indirect,
 }: {
   year?: Date;
-  travel: number;
-  material: number;
-  services: number;
-  salaries: number;
-  indirect: number;
+  travel?: number;
+  material?: number;
+  services?: number;
+  salaries?: number;
+  indirect?: number;
 }) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
   const { query } = useRouter();
