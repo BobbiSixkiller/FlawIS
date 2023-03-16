@@ -246,6 +246,36 @@ export type DatesInput = {
   submissionDeadline?: InputMaybe<Scalars['DateTime']>;
 };
 
+export type File = {
+  __typename?: 'File';
+  createdAt: Scalars['DateTime'];
+  id: Scalars['ObjectId'];
+  name: Scalars['String'];
+  type: FileType;
+  updatedAt: Scalars['DateTime'];
+  url: Scalars['String'];
+  user: User;
+};
+
+/** Cursor based pagination return object type */
+export type FileConnection = {
+  __typename?: 'FileConnection';
+  edges: Array<Maybe<FileEdge>>;
+  pageInfo: FilePageInfo;
+};
+
+export type FileEdge = {
+  __typename?: 'FileEdge';
+  cursor: Scalars['ObjectId'];
+  node: File;
+};
+
+export type FilePageInfo = {
+  __typename?: 'FilePageInfo';
+  endCursor: Scalars['ObjectId'];
+  hasNextPage: Scalars['Boolean'];
+};
+
 /** Supported file types for upload mutation */
 export enum FileType {
   Grant = 'GRANT',
@@ -604,6 +634,7 @@ export type Query = {
   attendee: Attendee;
   conference: Conference;
   conferences: Array<Conference>;
+  files: FileConnection;
   forgotPassword: Scalars['String'];
   grant: Grant;
   grantTextSearch: Array<Grant>;
@@ -640,6 +671,12 @@ export type QueryConferenceArgs = {
 
 export type QueryConferencesArgs = {
   year: Scalars['DateTime'];
+};
+
+
+export type QueryFilesArgs = {
+  after?: InputMaybe<Scalars['ObjectId']>;
+  first?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -2569,7 +2606,6 @@ export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariable
 export const UserDocument = gql`
     query user($id: ObjectId!, $year: DateTime) {
   user(id: $id) {
-    ...User
     ...User
     organisation
     telephone

@@ -53,9 +53,10 @@ export default function AddBudgetDialog({
 
   return (
     <Button
-      positive
+      positive={year === undefined}
+      primary={year !== undefined}
       floated="right"
-      icon="plus"
+      icon={year === undefined ? "plus" : "edit"}
       size="tiny"
       onClick={() =>
         handleOpen({

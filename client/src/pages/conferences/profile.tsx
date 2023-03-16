@@ -13,14 +13,16 @@ import {
 } from "../../providers/ControlsProvider";
 import PersonalInfo from "../../components/PersonalInfo";
 import { useRouter } from "next/router";
+import { AuthContext } from "../../providers/Auth";
 
 const ProfilePage: NextPageWithLayout = () => {
+  const { user } = useContext(AuthContext);
   const { dispatch } = useContext(ControlsContext);
   const { t } = useTranslation(["common", "profile"]);
   const width = useWidth();
   const router = useRouter();
 
-  const { data } = useMeQuery({
+  const { data, loading } = useMeQuery({
     variables: { year: null },
     notifyOnNetworkStatusChange: true,
   });
@@ -29,15 +31,25 @@ const ProfilePage: NextPageWithLayout = () => {
     {
       menuItem: t("header", { ns: "profile" }),
       render: () => (
-        <Tab.Pane basic attached={false} style={{ padding: 0 }}>
-          <PersonalInfo />
+        <Tab.Pane
+          loading={loading}
+          basic
+          attached={false}
+          style={{ padding: 0 }}
+        >
+          <PersonalInfo user={user} />
         </Tab.Pane>
       ),
     },
     {
       menuItem: t("menu.conferences", { ns: "common" }),
       render: () => (
-        <Tab.Pane basic attached={false} style={{ padding: 0 }}>
+        <Tab.Pane
+          loading={loading}
+          basic
+          attached={false}
+          style={{ padding: 0 }}
+        >
           Konferencie...
         </Tab.Pane>
       ),

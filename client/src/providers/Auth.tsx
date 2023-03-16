@@ -19,7 +19,7 @@ export enum ActionTypes {
 }
 
 type ActionPayload = {
-  [ActionTypes.Login]: { user: Partial<User> };
+  [ActionTypes.Login]: { user: User };
   [ActionTypes.Logout]: undefined;
 };
 
@@ -27,7 +27,7 @@ type AuthActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
 type AuthStateType = {
   loading: boolean;
-  user: Partial<User> | null;
+  user: User | undefined;
 };
 
 function authReducer(state: AuthStateType, action: AuthActions) {
@@ -36,7 +36,7 @@ function authReducer(state: AuthStateType, action: AuthActions) {
       return { user: action.payload.user, loading: false };
 
     case ActionTypes.Logout:
-      return { user: null, loading: false };
+      return { user: undefined, loading: false };
 
     default:
       return state;
@@ -47,14 +47,14 @@ const AuthContext = createContext<
   AuthStateType & { dispatch: Dispatch<AuthActions> }
 >({
   loading: true,
-  user: null,
+  user: undefined,
   dispatch: () => null,
 });
 
 function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, {
     loading: true,
-    user: null,
+    user: undefined,
   });
 
   const { loading } = useMeQuery({

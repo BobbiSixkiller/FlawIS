@@ -27,7 +27,7 @@ export default function middleware(req: NextRequest) {
       return NextResponse.rewrite(url);
 
     case "localhost:3000":
-      url.pathname = `/conferences${url.pathname}`;
+      url.pathname = `/flawis${url.pathname}`;
       return NextResponse.rewrite(url);
 
     default:
