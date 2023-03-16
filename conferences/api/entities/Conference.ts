@@ -154,7 +154,7 @@ export class Ticket {
           value: this.name, // Value that haven't pass a validation.
           constraints: {
             // Constraints that failed validation with error messages.
-            EmailExists: "Conference with provided name already exists!",
+            name: "Conference with provided name already exists!",
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },
@@ -174,7 +174,7 @@ export class Ticket {
           value: this.slug, // Value that haven't pass a validation.
           constraints: {
             // Constraints that failed validation with error messages.
-            EmailExists: "Conference with provided slug already exists!",
+            slug: "Conference with provided slug already exists!",
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },

@@ -9,9 +9,11 @@ import useWidth from "../../hooks/useWidth";
 import PersonalInfo from "../../components/PersonalInfo";
 import { useContext, useEffect } from "react";
 import { ActionTypes, ControlsContext } from "../../providers/ControlsProvider";
+import { AuthContext } from "../../providers/Auth";
 
 const ProfilePage: NextPageWithLayout = () => {
   const { t } = useTranslation(["common", "profile"]);
+  const { user } = useContext(AuthContext);
   const { dispatch } = useContext(ControlsContext);
   const width = useWidth();
 
@@ -31,7 +33,7 @@ const ProfilePage: NextPageWithLayout = () => {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
-          <PersonalInfo />
+          <PersonalInfo user={user!} />
         </Grid.Column>
       </Grid.Row>
     </Grid>
