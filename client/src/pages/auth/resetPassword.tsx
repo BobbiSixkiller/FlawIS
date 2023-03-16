@@ -19,7 +19,7 @@ import {
 } from "semantic-ui-react";
 import { InferType } from "yup";
 import { InputField } from "../../components/form/InputField";
-import { usePasswordResetMutation } from "../../graphql/generated/schema";
+import { usePasswordResetMutation, User } from "../../graphql/generated/schema";
 import { ActionTypes, AuthContext } from "../../providers/Auth";
 import parseErrors from "../../util/parseErrors";
 import Validation from "../../util/validation";
@@ -35,7 +35,10 @@ const ResetPassword: NextPage = () => {
       },
     },
     onCompleted: ({ passwordReset }) => {
-      dispatch({ type: ActionTypes.Login, payload: { user: passwordReset } });
+      dispatch({
+        type: ActionTypes.Login,
+        payload: { user: passwordReset as User },
+      });
       router.push("/");
     },
   });
