@@ -4,6 +4,8 @@ fragment User on User {
   email
   role
   verified
+  createdAt
+  updatedAt
 }
 
 mutation login($email: String!, $password: String!) {

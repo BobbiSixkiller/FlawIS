@@ -21,7 +21,7 @@ import {
 import { InferType } from "yup";
 import { InputField } from "../../components/form/InputField";
 import LocalizedLink from "../../components/LocalizedLink";
-import { useRegisterMutation } from "../../graphql/generated/schema";
+import { User, useRegisterMutation } from "../../graphql/generated/schema";
 import { ActionTypes, AuthContext } from "../../providers/Auth";
 import parseErrors from "../../util/parseErrors";
 import Validation from "../../util/validation";
@@ -42,7 +42,10 @@ const Register: NextPage = () => {
 
   const [register] = useRegisterMutation({
     onCompleted: ({ register }) => {
-      dispatch({ type: ActionTypes.Login, payload: { user: register } });
+      dispatch({
+        type: ActionTypes.Login,
+        payload: { user: register as User },
+      });
       router.push("/");
     },
   });

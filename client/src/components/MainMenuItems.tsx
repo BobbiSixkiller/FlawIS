@@ -228,5 +228,5 @@ export default function MainMenuItems() {
     return <ConferencesMenuItems />;
   }
 
-  return <FlawisMenuItems />;
+  return <ConferencesMenuItems />;
 }

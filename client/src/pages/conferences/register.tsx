@@ -23,6 +23,7 @@ import CheckboxField from "../../components/form/CheckboxField";
 import { InputField, InputFieldProps } from "../../components/form/InputField";
 import LocalizedLink from "../../components/LocalizedLink";
 import {
+  User,
   useRegisterMutation,
   useUpdateConferenceUserMutation,
 } from "../../graphql/generated/schema";
@@ -61,7 +62,10 @@ const Register: NextPage = () => {
 
   const [register] = useRegisterMutation({
     onCompleted: ({ register }) => {
-      dispatch({ type: ActionTypes.Login, payload: { user: register } });
+      dispatch({
+        type: ActionTypes.Login,
+        payload: { user: register as User },
+      });
     },
   });
 
