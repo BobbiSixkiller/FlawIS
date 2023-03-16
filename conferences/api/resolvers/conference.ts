@@ -47,7 +47,7 @@ export class ConferenceResolver {
   async conferences(@Arg("year") year: Date): Promise<Conference[]> {
     return await this.conferenceService.findAll(
       {
-        $expr: { $eq: [{ $year: "$start" }, year.getFullYear()] },
+        $expr: { $lte: [{ $year: "$start" }, year.getFullYear()] },
       },
       {},
       { sort: { _id: -1 } }

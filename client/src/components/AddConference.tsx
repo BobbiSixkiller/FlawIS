@@ -106,8 +106,8 @@ export default function AddConference() {
                 validationSchema={conferenceInputSchema}
               >
                 <LocalizedInputField
-                  placeholder="name..."
-                  label="name"
+                  placeholder="Názov..."
+                  label="Názov"
                   name="name"
                   control={Input}
                   type="text"
@@ -122,8 +122,8 @@ export default function AddConference() {
                 />
 
                 <LocalizedInputField
-                  placeholder="description..."
-                  label="Description"
+                  placeholder="Popis..."
+                  label="Popis"
                   name="description"
                   control={TextArea}
                   type="text"

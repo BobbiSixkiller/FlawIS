@@ -11,9 +11,8 @@ import merge from "deepmerge";
 import { IncomingHttpHeaders } from "http";
 import fetch from "isomorphic-unfetch";
 import isEqual from "lodash/isEqual";
-import type { AppProps } from "next/app";
+import { AppProps } from "next/app";
 import { useMemo } from "react";
-import { setContext } from "@apollo/client/link/context";
 
 const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
@@ -52,7 +51,10 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
       }),
       // this uses apollo-link-http under the hood, so all the options here come from that package
       createUploadLink({
-        uri: "http://localhost:5000/graphql",
+        uri:
+          typeof window === "undefined"
+            ? "http://gateway:5000/graphql"
+            : "http://localhost:5000/graphql",
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",
@@ -118,14 +120,6 @@ export const initializeApollo = (
 
   return _apolloClient;
 };
-
-export const setResetpassToken = (token: string) =>
-  setContext((_, { headers }) => ({
-    headers: {
-      ...headers,
-      resettoken: token,
-    },
-  }));
 
 export const addApolloState = (
   client: ApolloClient<NormalizedCacheObject>,

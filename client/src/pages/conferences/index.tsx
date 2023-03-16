@@ -9,15 +9,26 @@ import { NextPageWithLayout } from "../_app";
 import Nav from "../../components/MobileNav";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { AuthContext } from "../../providers/Auth";
-import { Role } from "../../graphql/generated/schema";
+import {
+  ConferencesDocument,
+  Role,
+  useConferencesQuery,
+} from "../../graphql/generated/schema";
 import AddConference from "../../components/AddConference";
+import { addApolloState, initializeApollo } from "../../lib/apollo";
 
-const Home: NextPageWithLayout = () => {
+const Home: NextPageWithLayout = ({}) => {
   const { user } = useContext(AuthContext);
   const width = useWith();
   const ref = useRef<HTMLDivElement>(null);
 
   const scrollToRef = () => ref.current?.scrollIntoView({ behavior: "smooth" });
+
+  // const { data, error, loading } = useConferencesQuery({
+  //   variables: { year: new Date() },
+  // });
+
+  // console.log(data);
 
   return (
     <>
@@ -60,6 +71,7 @@ const Home: NextPageWithLayout = () => {
                 </Grid.Column>
               </Grid.Row>
             )}
+            {}
             <Grid.Row>
               <Grid.Column floated="right" width={6} only="mobile">
                 <div style={{ position: "relative", height: "150px" }}>
@@ -99,43 +111,7 @@ const Home: NextPageWithLayout = () => {
                 </div>
               </Grid.Column>
             </Grid.Row>
-            <Grid.Row>
-              <Grid.Column floated="right" width={6} only="mobile">
-                <div style={{ position: "relative", height: "250px" }}>
-                  <Image
-                    src="/images/SK-CIERNO-BIELE.png"
-                    alt="Picture of the author"
-                    fill={true}
-                    style={{ objectFit: "contain" }}
-                  />
-                </div>
-              </Grid.Column>
-              <Grid.Column width={8}>
-                <Header as="h3" style={{ fontSize: "2em" }}>
-                  We Help Companies and Companions
-                </Header>
-                <p style={{ fontSize: "1.33em" }}>
-                  We can give your company superpowers to do things that they
-                  never thought possible. Let us delight your customers and
-                  empower your needs... through pure data analytics. Yes thats
-                  right, you thought it was the stuff of dreams, but even
-                  bananas can be bioengineered.
-                </p>
-                <Link href="/2">
-                  <Button size="huge">More</Button>
-                </Link>
-              </Grid.Column>
-              <Grid.Column floated="right" width={6} only="tablet computer">
-                <div style={{ position: "relative", height: "250px" }}>
-                  <Image
-                    src="/images/SK-CIERNO-BIELE.png"
-                    alt="Picture of the author"
-                    fill={true}
-                    style={{ objectFit: "contain" }}
-                  />
-                </div>
-              </Grid.Column>
-            </Grid.Row>
+
             <Grid.Row>
               <Grid.Column textAlign="center">
                 <Button size="huge" secondary>
@@ -159,10 +135,19 @@ Home.getLayout = function getLayout(page) {
   );
 };
 
-export const getStaticProps = async ({ locale }: { locale: string }) => ({
-  props: {
-    ...(await serverSideTranslations(locale, ["common", "validation"])),
-  },
-});
+export const getServerSideProps = async ({ locale }: { locale: string }) => {
+  const client = initializeApollo({ initialState: {} });
+
+  await client.query({
+    query: ConferencesDocument,
+    variables: { year: new Date() },
+  });
+
+  return addApolloState(client, {
+    props: {
+      ...(await serverSideTranslations(locale, ["common", "validation"])),
+    },
+  });
+};
 
 export default Home;

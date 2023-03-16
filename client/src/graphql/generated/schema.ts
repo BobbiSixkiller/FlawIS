@@ -985,6 +985,13 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
+export type ConferencesQueryVariables = Exact<{
+  year: Scalars['DateTime'];
+}>;
+
+
+export type ConferencesQuery = { __typename?: 'Query', conferences: Array<{ __typename?: 'Conference', id: any, name: string, description: string, logoUrl: string }> };
+
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
 }>;
@@ -1689,6 +1696,44 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const ConferencesDocument = gql`
+    query conferences($year: DateTime!) {
+  conferences(year: $year) {
+    id
+    name
+    description
+    logoUrl
+  }
+}
+    `;
+
+/**
+ * __useConferencesQuery__
+ *
+ * To run a query within a React component, call `useConferencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConferencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConferencesQuery({
+ *   variables: {
+ *      year: // value for 'year'
+ *   },
+ * });
+ */
+export function useConferencesQuery(baseOptions: Apollo.QueryHookOptions<ConferencesQuery, ConferencesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConferencesQuery, ConferencesQueryVariables>(ConferencesDocument, options);
+      }
+export function useConferencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferencesQuery, ConferencesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConferencesQuery, ConferencesQueryVariables>(ConferencesDocument, options);
+        }
+export type ConferencesQueryHookResult = ReturnType<typeof useConferencesQuery>;
+export type ConferencesLazyQueryHookResult = ReturnType<typeof useConferencesLazyQuery>;
+export type ConferencesQueryResult = Apollo.QueryResult<ConferencesQuery, ConferencesQueryVariables>;
 export const UpdateConferenceUserDocument = gql`
     mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {

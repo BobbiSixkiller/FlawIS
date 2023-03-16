@@ -14,37 +14,36 @@ import { AppProps } from "next/app";
 import { ControlsProvider } from "../providers/ControlsProvider";
 import { DialogProvider } from "../providers/Dialog";
 import UserVerifiedDialog from "../components/UserVerifiedDialog";
-// import UserVerifiedDialog from "../components/UserVerifiedDialog";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-	getLayout?: (page: ReactElement) => ReactNode;
+  getLayout?: (page: ReactElement) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
-	Component: NextPageWithLayout;
+  Component: NextPageWithLayout;
 };
 
 const App: NextPage<AppPropsWithLayout> = ({ Component, pageProps }) => {
-	const apolloClient = useApollo(pageProps);
+  const apolloClient = useApollo(pageProps);
 
-	const protect = pageProps.protect as boolean;
+  const protect = pageProps.protect as boolean;
 
-	const getLayout = Component.getLayout || ((page) => page);
+  const getLayout = Component.getLayout || ((page) => page);
 
-	return (
-		<ApolloProvider client={apolloClient}>
-			<AuthProvider>
-				<ProtectedRouteProvider protect={protect}>
-					<ControlsProvider>
-						<DialogProvider>
-							{getLayout(<Component {...pageProps} />)}
-							<UserVerifiedDialog />
-						</DialogProvider>
-					</ControlsProvider>
-				</ProtectedRouteProvider>
-			</AuthProvider>
-		</ApolloProvider>
-	);
+  return (
+    <ApolloProvider client={apolloClient}>
+      <AuthProvider>
+        <ProtectedRouteProvider protect={protect}>
+          <ControlsProvider>
+            <DialogProvider>
+              {getLayout(<Component {...pageProps} />)}
+              <UserVerifiedDialog />
+            </DialogProvider>
+          </ControlsProvider>
+        </ProtectedRouteProvider>
+      </AuthProvider>
+    </ApolloProvider>
+  );
 };
 
 export default appWithTranslation(App);
