@@ -22,7 +22,7 @@ import { Context } from "../util/auth";
 import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { AttendeeArgs } from "./types/attendee";
-import { ConferenceInput } from "./types/conference";
+import { ConferenceConnection, ConferenceInput } from "./types/conference";
 import { ConferenceUserInput } from "./types/user";
 
 @Service()
@@ -43,15 +43,48 @@ export class ConferenceResolver {
     return conference;
   }
 
-  @Query(() => [Conference])
-  async conferences(@Arg("year") year: Date): Promise<Conference[]> {
-    return await this.conferenceService.findAll(
+  @Query(() => ConferenceConnection)
+  async conferences(@Arg("year", () => Int) year: number) {
+    const data = await this.conferenceService.aggregate([
+      { $sort: { _id: -1 } },
       {
-        $expr: { $lte: [{ $year: "$start" }, year.getFullYear()] },
+        $facet: {
+          data: [
+            {
+              $match: {
+                $expr: { $eq: [{ $year: "$dates.start" }, year] },
+              },
+            },
+            { $addFields: { id: "$_id" } },
+          ],
+          hasNextDoc: [
+            {
+              $match: {
+                $expr: { $lt: [{ $year: "$dates.start" }, year] },
+              },
+            },
+            { $limit: 1 },
+          ],
+        },
       },
-      {},
-      { sort: { _id: -1 } }
-    );
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "doc",
+              in: { cursor: "$$doc._id", node: "$$doc" },
+            },
+          },
+          pageInfo: {
+            endCursor: { $last: "$data._id" },
+            hasNextPage: { $eq: [{ $size: "$hasNextDoc" }, 1] },
+          },
+        },
+      },
+    ]);
+
+    return data[0] as ConferenceConnection;
   }
 
   @Authorized(["ADMIN"])

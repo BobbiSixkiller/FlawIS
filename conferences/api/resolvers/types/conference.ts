@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
 import {
   IsBoolean,
   IsDate,
@@ -8,11 +8,13 @@ import {
 } from "class-validator";
 
 import {
+  Conference,
   ConferenceBilling,
   ImportantDates,
   Ticket,
 } from "../../entities/Conference";
 import { Address } from "../../entities/Billing";
+import CreateConnection from "./pagination";
 
 @InputType()
 class TicketInputTranslation {
@@ -196,3 +198,6 @@ export class ConferenceInput {
   @Field(() => [ConferenceInputTranslation], { nullable: true })
   translations?: ConferenceInputTranslation[];
 }
+
+@ObjectType()
+export class ConferenceConnection extends CreateConnection(Conference) {}

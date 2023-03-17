@@ -1,9 +1,18 @@
-query conferences($year: DateTime!) {
+query conferences($year: Int!) {
   conferences(year: $year) {
-    id
-    name
-    description
-    logoUrl
+    edges {
+      cursor
+      node {
+        id
+        name
+        description
+        logoUrl
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
   }
 }
 

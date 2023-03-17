@@ -43,7 +43,7 @@ type Attendee {
 """AttendeeConnection type enabling cursor based pagination"""
 type AttendeeConnection {
   edges: [AttendeeEdge]!
-  pageInfo: PageInfo!
+  pageInfo: AttendeePageInfo!
 }
 
 type AttendeeEdge {
@@ -55,6 +55,11 @@ input AttendeeInput {
   billing: BillingInput!
   conferenceId: ObjectId!
   ticketId: ObjectId!
+}
+
+type AttendeePageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
 }
 
 """Billing information"""
@@ -111,6 +116,16 @@ type ConferenceBilling {
   variableSymbol: String!
 }
 
+type ConferenceConnection {
+  edges: [ConferenceEdge]!
+  pageInfo: ConferencePageInfo!
+}
+
+type ConferenceEdge {
+  cursor: ObjectId!
+  node: Conference!
+}
+
 """Conference input type"""
 input ConferenceInput {
   billing: BillingInput!
@@ -128,6 +143,11 @@ input ConferenceInputTranslation {
   logoUrl: String!
   name: String!
   tickets: [TicketInputTranslation!]
+}
+
+type ConferencePageInfo {
+  endCursor: ObjectId!
+  hasNextPage: Boolean!
 }
 
 type ConferenceTranslation {
@@ -231,15 +251,10 @@ type Mutation {
 """Mongo object id scalar type"""
 scalar ObjectId
 
-type PageInfo {
-  endCursor: ObjectId!
-  hasNextPage: Boolean!
-}
-
 type Query {
   attendee(id: ObjectId!): Attendee!
   conference(slug: String!): Conference!
-  conferences(year: DateTime!): [Conference!]!
+  conferences(year: Int!): ConferenceConnection!
   section(id: ObjectId!): Section!
   submission(id: ObjectId!): Submission!
 }

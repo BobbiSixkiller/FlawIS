@@ -2,7 +2,7 @@ import { Segment, Grid, Header, Button, Label } from "semantic-ui-react";
 import Link from "next/link";
 import Image from "next/image";
 import useWith from "../../hooks/useWidth";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import MastHead from "../../components/MastHead";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";
@@ -16,6 +16,7 @@ import {
 } from "../../graphql/generated/schema";
 import AddConference from "../../components/AddConference";
 import { addApolloState, initializeApollo } from "../../lib/apollo";
+import { NetworkStatus } from "@apollo/client";
 
 const Home: NextPageWithLayout = ({}) => {
   const { user } = useContext(AuthContext);
@@ -24,11 +25,16 @@ const Home: NextPageWithLayout = ({}) => {
 
   const scrollToRef = () => ref.current?.scrollIntoView({ behavior: "smooth" });
 
-  // const { data, error, loading } = useConferencesQuery({
-  //   variables: { year: new Date() },
-  // });
+  const { data, error, loading, networkStatus, fetchMore } =
+    useConferencesQuery({
+      variables: { year: new Date().getFullYear() },
+      notifyOnNetworkStatusChange: true,
+    });
 
-  // console.log(data);
+  const loadingMoreConferences = networkStatus === NetworkStatus.fetchMore;
+  console.log(data);
+  console.log(error);
+  console.log(loading);
 
   return (
     <>
@@ -112,13 +118,24 @@ const Home: NextPageWithLayout = ({}) => {
               </Grid.Column>
             </Grid.Row>
 
-            <Grid.Row>
-              <Grid.Column textAlign="center">
-                <Button size="huge" secondary>
-                  Previous...
-                </Button>
-              </Grid.Column>
-            </Grid.Row>
+            {data?.conferences.pageInfo.hasNextPage && (
+              <Grid.Row>
+                <Grid.Column textAlign="center">
+                  <Button
+                    loading={loadingMoreConferences}
+                    size="huge"
+                    secondary
+                    onClick={async () =>
+                      await fetchMore({
+                        variables: { year: new Date().getFullYear() - 1 },
+                      })
+                    }
+                  >
+                    Previous...
+                  </Button>
+                </Grid.Column>
+              </Grid.Row>
+            )}
           </Grid>
         </Segment>
       </div>
@@ -136,11 +153,11 @@ Home.getLayout = function getLayout(page) {
 };
 
 export const getServerSideProps = async ({ locale }: { locale: string }) => {
-  const client = initializeApollo({ initialState: {} });
+  const client = initializeApollo();
 
   await client.query({
     query: ConferencesDocument,
-    variables: { year: new Date() },
+    variables: { year: new Date().getFullYear() },
   });
 
   return addApolloState(client, {
