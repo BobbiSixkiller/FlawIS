@@ -1014,7 +1014,7 @@ export type ConferencesQueryVariables = Exact<{
 }>;
 
 
-export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, description: string, logoUrl: string } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
+export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
@@ -1728,6 +1728,7 @@ export const ConferencesDocument = gql`
       node {
         id
         name
+        slug
         description
         logoUrl
       }

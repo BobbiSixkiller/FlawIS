@@ -1,79 +1,80 @@
 query conferences($year: Int!) {
-  conferences(year: $year) {
-    edges {
-      cursor
-      node {
-        id
-        name
-        description
-        logoUrl
-      }
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
+	conferences(year: $year) {
+		edges {
+			cursor
+			node {
+				id
+				name
+				slug
+				description
+				logoUrl
+			}
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
+	}
 }
 
 mutation updateConferenceUser($data: ConferenceUserInput!) {
-  updateConferenceUser(data: $data) {
-    id
-    name
-    email
-    organisation
-    telephone
-    role
-    verified
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-    }
-  }
+	updateConferenceUser(data: $data) {
+		id
+		name
+		email
+		organisation
+		telephone
+		role
+		verified
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+		}
+	}
 }
 
 mutation createConference($data: ConferenceInput!) {
-  createConference(data: $data) {
-    id
-    name
-    description
-    slug
-    logoUrl
-    dates {
-      start
-      end
-    }
-    billing {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      variableSymbol
-      IBAN
-      SWIFT
-      stampUrl
-    }
-    translations {
-      language
-      name
-      description
-      logoUrl
-    }
-    createdAt
-    updatedAt
-  }
+	createConference(data: $data) {
+		id
+		name
+		description
+		slug
+		logoUrl
+		dates {
+			start
+			end
+		}
+		billing {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			variableSymbol
+			IBAN
+			SWIFT
+			stampUrl
+		}
+		translations {
+			language
+			name
+			description
+			logoUrl
+		}
+		createdAt
+		updatedAt
+	}
 }
