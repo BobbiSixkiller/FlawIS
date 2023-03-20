@@ -13,6 +13,7 @@ import { ActionTypes, AuthContext } from "../providers/Auth";
 import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import MainMenu from "./MainMenuItems";
+import { useApolloClient } from "@apollo/client";
 
 interface navProps {
   inView: boolean;
@@ -65,6 +66,7 @@ export default function MobileNav({
 }) {
   const { ref, inView } = useInView({ threshold: 1, initialInView: true });
   const [opened, toggle] = useState(false);
+  const client = useApolloClient();
 
   const { user, dispatch } = useContext(AuthContext);
 
@@ -197,11 +199,17 @@ export default function MobileNav({
                           key={1}
                           text={"English"}
                           value={"English"}
-                          onClick={() => {
-                            document.cookie = `NEXT_LOCALE=en; max-age=31536000; path=/`;
-                            router.push(router.asPath, router.asPath, {
+                          onClick={async () => {
+                            document.cookie = `NEXT_LOCALE=en; max-age=31536000; SameSite=${
+                              process.env.NODE_ENV === "production"
+                                ? "strict"
+                                : "lax"
+                            };
+                            secure=${process.env.NODE_ENV === "production"};`;
+                            router.push(router.asPath, undefined, {
                               locale: "en",
                             });
+                            await client.refetchQueries({});
                           }}
                         />
                         <Dropdown.Item
@@ -209,11 +217,17 @@ export default function MobileNav({
                           key={2}
                           text={"Slovak"}
                           value={"Slovak"}
-                          onClick={() => {
-                            document.cookie = `NEXT_LOCALE=sk; max-age=31536000; path=/`;
-                            router.push(router.asPath, router.asPath, {
+                          onClick={async () => {
+                            document.cookie = `NEXT_LOCALE=sk; max-age=31536000; SameSite=${
+                              process.env.NODE_ENV === "production"
+                                ? "strict"
+                                : "lax"
+                            };
+                            secure=${process.env.NODE_ENV === "production"};`;
+                            router.push(router.asPath, undefined, {
                               locale: "sk",
                             });
+                            await client.refetchQueries({});
                           }}
                         />
                       </Dropdown.Menu>

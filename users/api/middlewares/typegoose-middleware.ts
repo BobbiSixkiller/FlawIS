@@ -1,54 +1,54 @@
+import { getClass } from "@typegoose/typegoose";
 import { Model, Document, Types } from "mongoose";
-import { getClassForDocument } from "@typegoose/typegoose";
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
 
 export const TypegooseMiddleware: MiddlewareFn = async ({ context }, next) => {
-	const result = await next();
+  const result = await next();
 
-	const { locale } = context as Context;
+  const { locale } = context as Context;
 
-	if (Array.isArray(result)) {
-		return result.map((item) =>
-			item instanceof Model ? convertDocument(item, locale) : item
-		);
-	}
+  if (Array.isArray(result)) {
+    return result.map((item) =>
+      item instanceof Model ? convertDocument(item, locale) : item
+    );
+  }
 
-	if (result instanceof Model) {
-		return convertDocument(result, locale);
-	}
+  if (result instanceof Model) {
+    return convertDocument(result, locale);
+  }
 
-	return result;
+  return result;
 };
 
 export function transformIds(doc: object) {
-	const transformed = [];
+  const transformed = [];
 
-	for (let [key, value] of Object.entries(doc)) {
-		if (key === "_id") key = "id";
+  for (let [key, value] of Object.entries(doc)) {
+    if (key === "_id") key = "id";
 
-		if (typeof value === "object" && value?.hasOwnProperty("_id")) {
-			value = transformIds(value);
-		}
+    if (typeof value === "object" && value?.hasOwnProperty("_id")) {
+      value = transformIds(value);
+    }
 
-		if (
-			typeof value === "object" &&
-			Array.isArray(value) &&
-			!value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
-		) {
-			console.log(value);
-			value = value.map((v) => transformIds(v));
-		}
+    if (
+      typeof value === "object" &&
+      Array.isArray(value) &&
+      !value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
+    ) {
+      console.log(value);
+      value = value.map((v) => transformIds(v));
+    }
 
-		transformed.push([key, value]);
-	}
+    transformed.push([key, value]);
+  }
 
-	return Object.fromEntries(transformed);
+  return Object.fromEntries(transformed);
 }
 
 function convertDocument(doc: Document, locale: string) {
-	const convertedDocument = transformIds(doc.toObject());
-	const DocumentClass = getClassForDocument(doc)!;
-	Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);
-	return convertedDocument;
+  const convertedDocument = transformIds(doc.toObject());
+  const DocumentClass = getClass(doc)!;
+  Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);
+  return convertedDocument;
 }
