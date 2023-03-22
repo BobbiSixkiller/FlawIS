@@ -1,5 +1,5 @@
 import { Model, Document, Types } from "mongoose";
-import { getClassForDocument } from "@typegoose/typegoose";
+import { getClass } from "@typegoose/typegoose";
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
 import { localizeOutput } from "../util/locale";
@@ -49,7 +49,7 @@ export function transformIds(doc: object) {
 function convertDocument(doc: Document, locale: string) {
   const convertedDocument = transformIds(doc.toObject());
   localizeOutput(convertedDocument, convertedDocument.translations, locale);
-  const DocumentClass = getClassForDocument(doc)!;
+  const DocumentClass = getClass(doc)!;
   Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);
   return convertedDocument;
 }

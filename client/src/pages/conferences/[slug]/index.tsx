@@ -1,4 +1,7 @@
+import { NextPageContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -14,10 +17,13 @@ import {
 import Footer from "../../../components/Footer";
 import MastHead from "../../../components/MastHead";
 import Nav from "../../../components/MobileNav";
-import { Role } from "../../../graphql/generated/schema";
+import {
+  ConferenceDocument,
+  useConferenceQuery,
+} from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";
+import { addApolloState, initializeApollo } from "../../../lib/apollo";
 import { AuthContext } from "../../../providers/Auth";
-// import { MenuItemsContext } from "../../../providers/ControlsProvider";
 
 import { NextPageWithLayout } from "../../_app";
 
@@ -26,11 +32,16 @@ const ConferencePage: NextPageWithLayout = () => {
   const [active, setActive] = useState<string | number | undefined>();
   const router = useRouter();
   const width = useWith();
+  const { t } = useTranslation(["conference"]);
   const { slug } = router.query;
 
   const ref = useRef<HTMLDivElement>(null);
 
   const scrollToRef = () => ref.current?.scrollIntoView({ behavior: "smooth" });
+
+  const { data, error, loading } = useConferenceQuery({
+    variables: { slug: router.query.slug?.toString() || "" },
+  });
 
   return (
     <>
@@ -64,31 +75,20 @@ const ConferencePage: NextPageWithLayout = () => {
           vertical
         >
           <Grid divided="vertically" container>
-            <Grid.Row textAlign="center" id="intro">
+            <Grid.Row id="intro">
               <Grid.Column>
                 <Header as="h3" style={{ fontSize: "2em" }}>
-                  Introduction
+                  {t("headings.introduction")}
                 </Header>
                 <p style={{ fontSize: "1.33em" }}>
-                  Univerzita Komenského v Bratislave, Právnická fakulta
-                  organizuje 16. ročník medzinárodnej vedeckej konferencie
-                  doktorandov a mladých vedeckých pracovníkov „Míľniky práva v
-                  stredoeurópskom priestore 2022“. Konferencia sa bude konať pod
-                  záštitou dekana Právnickej fakulty Univerzity Komenského v
-                  Bratislave, doc. JUDr. Eduarda Burdu, PhD. dňa 24. júna 2022 a
-                  uskutoční sa hybridnou formou, t. j. prezenčne v priestoroch
-                  Právnickej fakulty UK v Bratislave a súčasne aj audiovizuálnou
-                  online formou prostredníctvom aplikácie Microsoft TEAMS.
-                  Konferencia je určená všetkým doktorandom, vedeckým a
-                  vedecko-pedagogickým pracovníkom v odbore právo, ktorí
-                  doposiaľ nezískali vedecko-pedagogický titul docent.
+                  {data?.conference.description}
                 </p>
                 <Button
                   onClick={() => router.push(`/${slug}/dashboard`)}
                   size="massive"
                   id="register"
                 >
-                  Register
+                  {data?.conference.attending ? "To dashboard" : "Register"}
                 </Button>
               </Grid.Column>
             </Grid.Row>
@@ -96,7 +96,7 @@ const ConferencePage: NextPageWithLayout = () => {
             <Grid.Row centered id="sections">
               <Grid.Column computer={10} tablet={12} mobile={16}>
                 <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
-                  Sections
+                  {t("headings.sections")}
                 </Header>
                 <Accordion styled>
                   <Accordion.Title
@@ -158,16 +158,32 @@ const ConferencePage: NextPageWithLayout = () => {
               </Grid.Column>
             </Grid.Row>
             <Grid.Row id="programme">
-              <Grid.Column>Program</Grid.Column>
+              <Grid.Column>
+                <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
+                  {t("headings.programme")}
+                </Header>
+              </Grid.Column>
             </Grid.Row>
             <Grid.Row id="fees">
-              <Grid.Column>Fees</Grid.Column>
+              <Grid.Column>
+                <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
+                  {t("headings.fees")}
+                </Header>
+              </Grid.Column>
             </Grid.Row>
             <Grid.Row id="dates">
-              <Grid.Column>Important Dates</Grid.Column>
+              <Grid.Column>
+                <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
+                  {t("headings.dates")}
+                </Header>
+              </Grid.Column>
             </Grid.Row>
-            <Grid.Row id="guildelines">
-              <Grid.Column>Guidelines</Grid.Column>
+            <Grid.Row id="guidelines">
+              <Grid.Column>
+                <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
+                  {t("headings.guidelines")}
+                </Header>
+              </Grid.Column>
             </Grid.Row>
           </Grid>
         </Segment>
@@ -185,10 +201,37 @@ ConferencePage.getLayout = function getLayout(page) {
   );
 };
 
-export const getServerSideProps = async ({ locale }: { locale: string }) => ({
-  props: {
-    ...(await serverSideTranslations(locale, ["common"])),
-  },
-});
+export const getServerSideProps = async ({
+  locale,
+  req,
+  query,
+}: NextPageContext) => {
+  const client = initializeApollo({ headers: { ...req?.headers } });
+
+  try {
+    await client.query({
+      query: ConferenceDocument,
+      variables: { slug: query.slug?.toString() || "" },
+    });
+
+    return addApolloState(client, {
+      props: {
+        ...(await serverSideTranslations(locale || "sk", [
+          "common",
+          "conference",
+        ])),
+      },
+    });
+  } catch (error) {
+    return {
+      props: {
+        ...(await serverSideTranslations(locale || "sk", [
+          "common",
+          "conference",
+        ])),
+      },
+    };
+  }
+};
 
 export default ConferencePage;

@@ -114,8 +114,7 @@ export class UserResolver {
   @Authorized()
   @UseMiddleware([RateLimit(100)])
   @Query(() => User)
-  async me(@Ctx() { user, locale }: Context) {
-    console.log(user, locale);
+  async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
     if (!loggedInUser)
       throw new AuthenticationError("User account has been deleted!");

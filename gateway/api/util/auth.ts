@@ -117,7 +117,6 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
       );
     }
     if (context.locale) {
-      console.log(context.locale);
       request.http?.headers.set(
         "locale",
         encodeURIComponent(JSON.stringify(context.locale))

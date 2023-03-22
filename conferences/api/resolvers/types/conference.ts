@@ -200,4 +200,7 @@ export class ConferenceInput {
 }
 
 @ObjectType()
-export class ConferenceConnection extends CreateConnection(Conference) {}
+export class ConferenceConnection extends CreateConnection(Conference) {
+  @Field(() => Int)
+  year: number;
+}

@@ -68,7 +68,6 @@ const main = async () => {
   );
   app.use(
     "/public",
-    cors(),
     createProxyMiddleware({
       target: "http://files:5002/",
       changeOrigin: true,

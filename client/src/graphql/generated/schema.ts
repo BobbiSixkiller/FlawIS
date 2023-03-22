@@ -205,6 +205,7 @@ export type ConferenceConnection = {
   __typename?: 'ConferenceConnection';
   edges: Array<Maybe<ConferenceEdge>>;
   pageInfo: ConferencePageInfo;
+  year: Scalars['Int'];
 };
 
 export type ConferenceEdge = {
@@ -1014,7 +1015,14 @@ export type ConferencesQueryVariables = Exact<{
 }>;
 
 
-export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
+export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
+
+export type ConferenceQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
 
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
@@ -1723,6 +1731,7 @@ export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, L
 export const ConferencesDocument = gql`
     query conferences($year: Int!) {
   conferences(year: $year) {
+    year
     edges {
       cursor
       node {
@@ -1768,6 +1777,52 @@ export function useConferencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type ConferencesQueryHookResult = ReturnType<typeof useConferencesQuery>;
 export type ConferencesLazyQueryHookResult = ReturnType<typeof useConferencesLazyQuery>;
 export type ConferencesQueryResult = Apollo.QueryResult<ConferencesQuery, ConferencesQueryVariables>;
+export const ConferenceDocument = gql`
+    query conference($slug: String!) {
+  conference(slug: $slug) {
+    id
+    name
+    slug
+    description
+    logoUrl
+    sections {
+      id
+      name
+      description
+      languages
+    }
+    attending
+  }
+}
+    `;
+
+/**
+ * __useConferenceQuery__
+ *
+ * To run a query within a React component, call `useConferenceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConferenceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConferenceQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useConferenceQuery(baseOptions: Apollo.QueryHookOptions<ConferenceQuery, ConferenceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConferenceQuery, ConferenceQueryVariables>(ConferenceDocument, options);
+      }
+export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferenceQuery, ConferenceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConferenceQuery, ConferenceQueryVariables>(ConferenceDocument, options);
+        }
+export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
+export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
+export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
 export const UpdateConferenceUserDocument = gql`
     mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {

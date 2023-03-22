@@ -25,8 +25,10 @@ export default function AddConference() {
 
   return (
     <Button
-      content="Nova konfera"
+      style={{ margin: 0 }}
       size="huge"
+      icon="plus"
+      circular
       positive
       onClick={() =>
         handleOpen({

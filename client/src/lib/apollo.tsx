@@ -70,7 +70,27 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             grants: relayStylePagination(),
             announcements: relayStylePagination(),
             users: relayStylePagination(),
-            conferences: relayStylePagination(),
+            conferences: {
+              keyArgs: false,
+              // While args.cursor may still be important for requesting
+              // a given page, it no longer has any role to play in the
+              // merge function.
+              merge(existing = {}, incoming) {
+                const cache = { ...existing };
+                if (cache.edges === undefined) return incoming;
+
+                cache.edges = [...cache.edges, ...incoming.edges];
+                cache.pageInfo = incoming.pageInfo;
+                cache.year = incoming.year;
+
+                return cache;
+              },
+              // Return all items stored so far, to avoid ambiguities
+              // about the order of the items.
+              // read(existing) {
+              //   return existing && Object.values(existing);
+              // },
+            },
           },
         },
       },

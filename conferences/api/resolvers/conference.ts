@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
   Arg,
@@ -38,7 +37,7 @@ export class ConferenceResolver {
   @Query(() => Conference)
   async conference(@Arg("slug") slug: string): Promise<Conference> {
     const conference = await this.conferenceService.findOne({ slug });
-    if (!conference) throw new UserInputError("Conference not found!");
+    if (!conference) throw new Error("Conference not found!");
 
     return conference;
   }
@@ -46,9 +45,8 @@ export class ConferenceResolver {
   @Query(() => ConferenceConnection)
   async conferences(
     @Arg("year", () => Int) year: number,
-    @Ctx() { locale, user }: Context
+    @Ctx() { locale }: Context
   ) {
-    console.log(user, locale);
     const data = await this.conferenceService.aggregate([
       { $sort: { _id: -1 } },
       {
@@ -84,6 +82,7 @@ export class ConferenceResolver {
             endCursor: { $last: "$data._id" },
             hasNextPage: { $eq: [{ $size: "$hasNextDoc" }, 1] },
           },
+          year: { $year: { $last: "$data.dates.start" } },
         },
       },
     ]);
@@ -119,7 +118,7 @@ export class ConferenceResolver {
     @Ctx() { locale }: Context
   ) {
     const conference = await this.conferenceService.findOne({ _id: id });
-    if (!conference) throw new UserInputError("Conference not found!");
+    if (!conference) throw new Error("Conference not found!");
 
     for (const [key, value] of Object.entries(
       localizeInput(conferenceInput, conferenceInput.translations, locale)

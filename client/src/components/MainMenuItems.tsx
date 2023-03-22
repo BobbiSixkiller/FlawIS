@@ -154,28 +154,40 @@ function ConferencesMenuItems() {
         <Menu.Item>
           <Menu.Header>conference name</Menu.Header>
           <Menu vertical inverted>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item as={Link} href="#intro" active={router.asPath === "/"}>
               {t("confMenu.register")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item
+              as={Link}
+              href="#sections"
+              active={router.asPath === "/"}
+            >
               {t("confMenu.sections")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item
+              as={Link}
+              href="#programme"
+              active={router.asPath === "/"}
+            >
               {t("confMenu.programme")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item as={Link} href="#fee" active={router.asPath === "/"}>
               {t("confMenu.fee")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item
+              as={Link}
+              href="#guidelines"
+              active={router.asPath === "/"}
+            >
               {t("confMenu.guidelines")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item as={Link} href="#dates" active={router.asPath === "/"}>
               {t("confMenu.dates")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item as={Link} href="#archive" active={router.asPath === "/"}>
               {t("confMenu.archive")}
             </Menu.Item>
-            <Menu.Item as={Link} href="/" active={router.asPath === "/"}>
+            <Menu.Item as={Link} href="#contact" active={router.asPath === "/"}>
               {t("confMenu.contact")}
             </Menu.Item>
           </Menu>

@@ -119,6 +119,7 @@ type ConferenceBilling {
 type ConferenceConnection {
   edges: [ConferenceEdge]!
   pageInfo: ConferencePageInfo!
+  year: Int!
 }
 
 type ConferenceEdge {
