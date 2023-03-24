@@ -49,22 +49,27 @@ const ConferencePage: NextPageWithLayout = () => {
         <div
           style={{
             margin: "auto",
+            position: "relative",
+            width: "100%",
+            maxHeight: "845px",
           }}
         >
-          <Header
+          {/* <Header
             as="h1"
             content="Míľniky práva v stredoeurópskom priestore 2022"
             inverted
             style={{ fontSize: width > 992 ? "4em" : "2em" }}
-          />
-          {/* <Image
-            alt="conference logo"
-            src={"/images/SK-CIERNO-BIELE.png"}
-            width={3219}
-            height={845}
-            quality={50}
-            layout="responsive"
           /> */}
+          {data?.conference.logoUrl && (
+            <Image
+              alt="conference logo"
+              src={data.conference.logoUrl}
+              width={3219}
+              height={845}
+              quality={50}
+              layout="responsive"
+            />
+          )}
         </div>
       </MastHead>
       <div ref={ref}>
@@ -76,17 +81,18 @@ const ConferencePage: NextPageWithLayout = () => {
         >
           <Grid divided="vertically" container>
             <Grid.Row id="intro">
-              <Grid.Column>
-                <Header as="h3" style={{ fontSize: "2em" }}>
+              <Grid.Column textAlign="center">
+                <Header as="h3" textAlign="center" style={{ fontSize: "2em" }}>
                   {t("headings.introduction")}
                 </Header>
-                <p style={{ fontSize: "1.33em" }}>
+                <p style={{ fontSize: "1.33em", textAlign: "justify" }}>
                   {data?.conference.description}
                 </p>
                 <Button
                   onClick={() => router.push(`/${slug}/dashboard`)}
                   size="massive"
                   id="register"
+                  primary
                 >
                   {data?.conference.attending ? "To dashboard" : "Register"}
                 </Button>
@@ -98,7 +104,7 @@ const ConferencePage: NextPageWithLayout = () => {
                 <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
                   {t("headings.sections")}
                 </Header>
-                <Accordion styled>
+                <Accordion styled fluid>
                   <Accordion.Title
                     active={active === 0}
                     index={0}

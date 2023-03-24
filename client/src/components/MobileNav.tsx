@@ -209,7 +209,13 @@ export default function MobileNav({
                             router.push(router.asPath, undefined, {
                               locale: "en",
                             });
-                            await client.refetchQueries({ include: "active" });
+                            try {
+                              await client.refetchQueries({
+                                include: "active",
+                              });
+                            } catch (error) {
+                              console.log(error);
+                            }
                           }}
                         />
                         <Dropdown.Item
@@ -227,7 +233,13 @@ export default function MobileNav({
                             router.push(router.asPath, undefined, {
                               locale: "sk",
                             });
-                            await client.refetchQueries({ include: "active" });
+                            try {
+                              await client.refetchQueries({
+                                include: "active",
+                              });
+                            } catch (error) {
+                              console.log(error);
+                            }
                           }}
                         />
                       </Dropdown.Menu>

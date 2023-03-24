@@ -43,7 +43,14 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             console.log(
               `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
             );
+            if (
+              message ===
+              "Access denied! You need to be authorized to perform this action!"
+            ) {
+              localStorage.removeItem("loggedIn");
+            }
           });
+
         if (networkError)
           console.log(
             `[Network error]: ${networkError}. Backend is unreachable. Is it running?`

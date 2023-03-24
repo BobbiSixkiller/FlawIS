@@ -10,7 +10,9 @@
   "actions": {
     "updateToggle": "Kliknite pre úpravu",
     "save": "Uložiť",
-    "cancel": "Zrušiť"
+    "cancel": "Zrušiť",
+    "more": "Viac...",
+    "previous": "Predchádzajúce..."
   },
   "header": {
     "masthead": {
@@ -31,10 +33,11 @@
     "conferences": "Konferencie",
     "logout": "Odhlásiť sa",
     "login": "Prihlásiť sa",
-    "register": "Registrovať"
+    "register": "Registrovať",
+    "conference": "Konferencia"
   },
   "confMenu": {
-    "register": "Registrácia na konferenciu",
+    "register": "Registrácia",
     "sections": "Sekcie & Témy",
     "programme": "Program",
     "fee": "Konferenčný poplatok",

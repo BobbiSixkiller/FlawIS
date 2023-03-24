@@ -5,13 +5,10 @@ import {
   Button,
   Label,
   Message,
-  Item,
-  Icon,
 } from "semantic-ui-react";
 import Link from "next/link";
-import Image from "next/image";
 import useWidth from "../../hooks/useWidth";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import MastHead from "../../components/MastHead";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";
@@ -26,13 +23,79 @@ import {
 import AddConference from "../../components/AddConference";
 import { addApolloState, initializeApollo } from "../../lib/apollo";
 import { NetworkStatus } from "@apollo/client";
-import { useRouter } from "next/router";
 import { NextPageContext } from "next";
-import TimelineCard from "../../components/Timeline";
+import styled from "styled-components";
+import { useTranslation } from "next-i18next";
+
+const Timeline = styled(Grid)`
+  width: 100%;
+  margin: 0 !important;
+  position: relative;
+  &:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: #c5c5c5;
+  }
+  @media (max-width: 767px) {
+    &:before {
+      left: 20px;
+    }
+  }
+`;
+const Container = styled(Grid.Row)`
+  padding: 25px 0 20px 0 !important;
+  &:nth-child(even) {
+    flex-direction: row-reverse !important;
+  }
+  &:before {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 30px;
+    left: calc(50% - 4px);
+    background: #b46b7a;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(233, 33, 99, 0.2);
+  }
+  @media (max-width: 767px) {
+    padding-left: 40px !important;
+    flex-direction: column-reverse !important;
+    &:nth-child(even) {
+      flex-direction: column-reverse !important;
+    }
+    &:before {
+      top: 43px;
+      left: 16px;
+    }
+  }
+`;
+const Item = styled(Grid.Column)<{ index: number }>`
+  &:nth-child(odd) {
+    text-align: ${(p) => (p.index % 2 == 0 ? "right" : "left")};
+    padding: ${(p) =>
+      p.index % 2 == 0 ? "0 40px 0 0 !important" : "0 0 0 40px !important"};
+    @media (max-width: 767px) {
+      text-align: left;
+      padding: 0;
+    }
+  }
+  &:nth-child(even) {
+    text-align: ${(p) => (p.index % 2 == 0 ? "left" : "right")};
+    padding: ${(p) =>
+      p.index % 2 == 0 ? "0 0 0 40px !important" : "0 40px 0 0 !important"};
+  }
+  @media (max-width: 767px) {
+    text-align: left !important;
+    padding: 0;
+  }
+`;
 
 const Home: NextPageWithLayout = ({}) => {
   const { user } = useContext(AuthContext);
-  const router = useRouter();
   const width = useWidth();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -46,9 +109,8 @@ const Home: NextPageWithLayout = ({}) => {
     });
 
   const loadingMoreConferences = networkStatus === NetworkStatus.fetchMore;
-  console.log(data?.conferences.year);
-  console.log(error);
-  console.log(loading);
+
+  const { t } = useTranslation();
 
   return (
     <>
@@ -60,7 +122,7 @@ const Home: NextPageWithLayout = ({}) => {
           href="https://github.com/BobbiSixkiller/FlawIS"
           target="_blank"
         >
-          2.0.0
+          1.0.0
         </Label>
         <Header
           as="h1"
@@ -83,7 +145,7 @@ const Home: NextPageWithLayout = ({}) => {
           style={{ padding: width > 992 ? "8em 0em" : "4em 0em" }}
           vertical
         >
-          <Grid stackable container verticalAlign="middle">
+          <Grid container verticalAlign="middle">
             {user?.role === Role.Admin && (
               <Grid.Row>
                 <Grid.Column textAlign="center">
@@ -100,37 +162,45 @@ const Home: NextPageWithLayout = ({}) => {
             )}
 
             {data && (
-              <div className="timeline">
-                <ul>
-                  {data?.conferences.edges.map((edge) => (
-                    <li key={edge?.cursor}>
-                      <div className="content">
-                        <h3>{edge?.node.name}</h3>
-                        <p>{edge?.node.description}</p>
-                      </div>
-                      <div className="time">
-                        <h4>January 2018</h4>
-                      </div>
-                      {/* <div style={{ position: "relative", height: "150px" }}>
-                        <Image
-                          src={edge?.node.logoUrl || ""}
-                          alt="Conference Logo"
-                          fill={true}
-                          style={{ objectFit: "contain" }}
-                        />
-                      </div> */}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* {data?.conferences.edges.map((edge) => (
-              <Grid.Row key={edge?.cursor} columns={2} style={{}}>
-                <Grid.Column textAlign="right">1</Grid.Column>
-                <Grid.Column>2</Grid.Column>
+              <Grid.Row>
+                <Grid.Column>
+                  <Timeline stackable>
+                    {data?.conferences.edges.map((edge, i) => (
+                      <Container
+                        key={edge?.cursor}
+                        columns={2}
+                        verticalAlign="top"
+                      >
+                        <Item index={i}>
+                          <Header>{edge?.node.name}</Header>
+                          <p>{edge?.node.description}</p>
+                          <Button
+                            as={Link}
+                            href={`/${edge?.node.slug}`}
+                            circular
+                            primary
+                            size="huge"
+                          >
+                            {t("actions.more")}
+                          </Button>
+                        </Item>
+                        <Item index={i}>
+                          <h4>
+                            {new Date(
+                              edge?.node.dates.start
+                            ).toLocaleDateString() +
+                              " - " +
+                              new Date(
+                                edge?.node.dates.end
+                              ).toLocaleDateString()}
+                          </h4>
+                        </Item>
+                      </Container>
+                    ))}
+                  </Timeline>
+                </Grid.Column>
               </Grid.Row>
-            ))} */}
+            )}
 
             {data?.conferences.pageInfo.hasNextPage && (
               <Grid.Row>
@@ -148,7 +218,7 @@ const Home: NextPageWithLayout = ({}) => {
                       })
                     }
                   >
-                    Previous...
+                    {t("actions.previous")}
                   </Button>
                 </Grid.Column>
               </Grid.Row>

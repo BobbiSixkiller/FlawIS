@@ -154,8 +154,8 @@ export class ConferenceResolver {
 
   @Authorized()
   @FieldResolver(() => [Section])
-  async sections(@Root() { id }: Conference): Promise<Section[]> {
-    return await this.sectionService.findAll({ conference: id });
+  async sections(@Root() { sections }: Conference): Promise<Section[]> {
+    return await this.sectionService.findAll({ _id: sections });
   }
 
   @Authorized()

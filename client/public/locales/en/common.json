@@ -10,7 +10,9 @@
   "actions": {
     "updateToggle": "Click to update",
     "save": "save",
-    "cancel": "cancel"
+    "cancel": "cancel",
+    "more": "More...",
+    "previous": "Previous..."
   },
   "header": {
     "masthead": {
@@ -31,10 +33,11 @@
     "conferences": "Conferences",
     "logout": "Sign Out",
     "login": "Sign In",
-    "register": "Register"
+    "register": "Register",
+    "conference": "Conference"
   },
   "confMenu": {
-    "register": "Conference Registration",
+    "register": "Registration",
     "sections": "Sections & Topics",
     "programme": "Programme",
     "fee": "Conference Fee",

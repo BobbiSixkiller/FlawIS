@@ -9,6 +9,10 @@ query conferences($year: Int!) {
         slug
         description
         logoUrl
+        dates {
+          start
+          end
+        }
       }
     }
     pageInfo {

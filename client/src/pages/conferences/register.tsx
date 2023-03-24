@@ -61,12 +61,11 @@ const Register: NextPage = () => {
   type Values = InferType<typeof conferencesRegisterInputSchme>;
 
   const [register] = useRegisterMutation({
-    onCompleted: ({ register }) => {
+    onCompleted: ({ register }) =>
       dispatch({
         type: ActionTypes.Login,
         payload: { user: register as User },
-      });
-    },
+      }),
   });
 
   const [updateConferenceUser] = useUpdateConferenceUserMutation();

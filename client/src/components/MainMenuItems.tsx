@@ -152,9 +152,13 @@ function ConferencesMenuItems() {
     <>
       {router.pathname === "/conferences/[slug]" && (
         <Menu.Item>
-          <Menu.Header>conference name</Menu.Header>
+          <Menu.Header>{t("menu.conference")}</Menu.Header>
           <Menu vertical inverted>
-            <Menu.Item as={Link} href="#intro" active={router.asPath === "/"}>
+            <Menu.Item
+              as={Link}
+              href="#register"
+              active={router.asPath === "/"}
+            >
               {t("confMenu.register")}
             </Menu.Item>
             <Menu.Item
