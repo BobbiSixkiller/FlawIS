@@ -117,7 +117,10 @@ export class AuthenticatedDataSource extends FileUploadDataSource {
       );
     }
     if (context.locale) {
-      request.http?.headers.set("locale", JSON.stringify(context.locale));
+      request.http?.headers.set(
+        "locale",
+        encodeURIComponent(JSON.stringify(context.locale))
+      );
     }
 
     //rest of the headers i.e. reset token

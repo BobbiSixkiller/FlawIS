@@ -10,6 +10,20 @@ const nextConfig = {
     styledComponents: true,
   },
   i18n,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "gateway",
+        port: "5000",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "5000",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

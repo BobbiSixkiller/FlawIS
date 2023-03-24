@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { verify } from "jsonwebtoken";
 
 import env from "dotenv";
 import { AuthChecker } from "type-graphql";

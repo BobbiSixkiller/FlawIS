@@ -39,7 +39,7 @@ Dashboard.getLayout = function getLayout(page) {
 
 Dashboard.getInitialProps = () => {
   return {
-    // protect: true,
+    protect: true,
   };
 };
 

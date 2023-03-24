@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
   Arg,
@@ -19,10 +18,10 @@ import { Section } from "../entities/Section";
 import { User } from "../entities/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
-import { localizeInput } from "../util/locale";
+import { localizeInput, localizeOutput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { AttendeeArgs } from "./types/attendee";
-import { ConferenceInput } from "./types/conference";
+import { ConferenceConnection, ConferenceInput } from "./types/conference";
 import { ConferenceUserInput } from "./types/user";
 
 @Service()
@@ -38,20 +37,66 @@ export class ConferenceResolver {
   @Query(() => Conference)
   async conference(@Arg("slug") slug: string): Promise<Conference> {
     const conference = await this.conferenceService.findOne({ slug });
-    if (!conference) throw new UserInputError("Conference not found!");
+    if (!conference) throw new Error("Conference not found!");
 
     return conference;
   }
 
-  @Query(() => [Conference])
-  async conferences(@Arg("year") year: Date): Promise<Conference[]> {
-    return await this.conferenceService.findAll(
+  @Query(() => ConferenceConnection)
+  async conferences(
+    @Arg("year", () => Int) year: number,
+    @Ctx() { locale }: Context
+  ) {
+    const data = await this.conferenceService.aggregate([
+      { $sort: { _id: -1 } },
       {
-        $expr: { $eq: [{ $year: "$start" }, year.getFullYear()] },
+        $facet: {
+          data: [
+            {
+              $match: {
+                $expr: { $eq: [{ $year: "$dates.start" }, year] },
+              },
+            },
+            { $addFields: { id: "$_id" } },
+          ],
+          hasNextDoc: [
+            {
+              $match: {
+                $expr: { $lt: [{ $year: "$dates.start" }, year] },
+              },
+            },
+            { $limit: 1 },
+          ],
+        },
       },
-      {},
-      { sort: { _id: -1 } }
-    );
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "doc",
+              in: { cursor: "$$doc._id", node: "$$doc" },
+            },
+          },
+          pageInfo: {
+            endCursor: { $last: "$data._id" },
+            hasNextPage: { $eq: [{ $size: "$hasNextDoc" }, 1] },
+          },
+          year: { $year: { $last: "$data.dates.start" } },
+        },
+      },
+    ]);
+
+    if (data[0].edges.length === 0) {
+      throw new Error("No conferences found!");
+    }
+
+    data[0].edges = data[0].edges.map((e: any) => ({
+      cursor: e.cursor,
+      node: localizeOutput(e.node, e.node.translations, locale),
+    }));
+
+    return data[0] as ConferenceConnection;
   }
 
   @Authorized(["ADMIN"])
@@ -73,7 +118,7 @@ export class ConferenceResolver {
     @Ctx() { locale }: Context
   ) {
     const conference = await this.conferenceService.findOne({ _id: id });
-    if (!conference) throw new UserInputError("Conference not found!");
+    if (!conference) throw new Error("Conference not found!");
 
     for (const [key, value] of Object.entries(
       localizeInput(conferenceInput, conferenceInput.translations, locale)
@@ -109,8 +154,8 @@ export class ConferenceResolver {
 
   @Authorized()
   @FieldResolver(() => [Section])
-  async sections(@Root() { id }: Conference): Promise<Section[]> {
-    return await this.sectionService.findAll({ conference: id });
+  async sections(@Root() { sections }: Conference): Promise<Section[]> {
+    return await this.sectionService.findAll({ _id: sections });
   }
 
   @Authorized()

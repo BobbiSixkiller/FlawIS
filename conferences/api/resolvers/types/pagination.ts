@@ -13,7 +13,7 @@ export default function CreateConnection<TNode>(TNodeClass: ClassType<TNode>) {
     cursor: ObjectId;
   }
 
-  @ObjectType({ isAbstract: true })
+  @ObjectType(`${TNodeClass.name}PageInfo`)
   abstract class PageInfo {
     @Field()
     endCursor: ObjectId;

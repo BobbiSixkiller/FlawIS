@@ -96,7 +96,7 @@ export type Attendee = {
 export type AttendeeConnection = {
   __typename?: 'AttendeeConnection';
   edges: Array<Maybe<AttendeeEdge>>;
-  pageInfo: PageInfo;
+  pageInfo: AttendeePageInfo;
 };
 
 export type AttendeeEdge = {
@@ -109,6 +109,12 @@ export type AttendeeInput = {
   billing: BillingInput;
   conferenceId: Scalars['ObjectId'];
   ticketId: Scalars['ObjectId'];
+};
+
+export type AttendeePageInfo = {
+  __typename?: 'AttendeePageInfo';
+  endCursor: Scalars['ObjectId'];
+  hasNextPage: Scalars['Boolean'];
 };
 
 /** Billing information */
@@ -195,6 +201,19 @@ export type ConferenceBilling = {
   variableSymbol: Scalars['String'];
 };
 
+export type ConferenceConnection = {
+  __typename?: 'ConferenceConnection';
+  edges: Array<Maybe<ConferenceEdge>>;
+  pageInfo: ConferencePageInfo;
+  year: Scalars['Int'];
+};
+
+export type ConferenceEdge = {
+  __typename?: 'ConferenceEdge';
+  cursor: Scalars['ObjectId'];
+  node: Conference;
+};
+
 /** Conference input type */
 export type ConferenceInput = {
   billing: BillingInput;
@@ -212,6 +231,12 @@ export type ConferenceInputTranslation = {
   logoUrl: Scalars['String'];
   name: Scalars['String'];
   tickets?: InputMaybe<Array<TicketInputTranslation>>;
+};
+
+export type ConferencePageInfo = {
+  __typename?: 'ConferencePageInfo';
+  endCursor: Scalars['ObjectId'];
+  hasNextPage: Scalars['Boolean'];
 };
 
 export type ConferenceTranslation = {
@@ -633,7 +658,7 @@ export type Query = {
   announcements: AnnouncementConnection;
   attendee: Attendee;
   conference: Conference;
-  conferences: Array<Conference>;
+  conferences: ConferenceConnection;
   files: FileConnection;
   forgotPassword: Scalars['String'];
   grant: Grant;
@@ -670,7 +695,7 @@ export type QueryConferenceArgs = {
 
 
 export type QueryConferencesArgs = {
-  year: Scalars['DateTime'];
+  year: Scalars['Int'];
 };
 
 
@@ -984,6 +1009,20 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
+export type ConferencesQueryVariables = Exact<{
+  year: Scalars['Int'];
+}>;
+
+
+export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
+
+export type ConferenceQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
 
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
@@ -1689,6 +1728,105 @@ export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<Logou
 export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
+export const ConferencesDocument = gql`
+    query conferences($year: Int!) {
+  conferences(year: $year) {
+    year
+    edges {
+      cursor
+      node {
+        id
+        name
+        slug
+        description
+        logoUrl
+        dates {
+          start
+          end
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useConferencesQuery__
+ *
+ * To run a query within a React component, call `useConferencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConferencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConferencesQuery({
+ *   variables: {
+ *      year: // value for 'year'
+ *   },
+ * });
+ */
+export function useConferencesQuery(baseOptions: Apollo.QueryHookOptions<ConferencesQuery, ConferencesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConferencesQuery, ConferencesQueryVariables>(ConferencesDocument, options);
+      }
+export function useConferencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferencesQuery, ConferencesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConferencesQuery, ConferencesQueryVariables>(ConferencesDocument, options);
+        }
+export type ConferencesQueryHookResult = ReturnType<typeof useConferencesQuery>;
+export type ConferencesLazyQueryHookResult = ReturnType<typeof useConferencesLazyQuery>;
+export type ConferencesQueryResult = Apollo.QueryResult<ConferencesQuery, ConferencesQueryVariables>;
+export const ConferenceDocument = gql`
+    query conference($slug: String!) {
+  conference(slug: $slug) {
+    id
+    name
+    slug
+    description
+    logoUrl
+    sections {
+      id
+      name
+      description
+      languages
+    }
+    attending
+  }
+}
+    `;
+
+/**
+ * __useConferenceQuery__
+ *
+ * To run a query within a React component, call `useConferenceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConferenceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConferenceQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useConferenceQuery(baseOptions: Apollo.QueryHookOptions<ConferenceQuery, ConferenceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConferenceQuery, ConferenceQueryVariables>(ConferenceDocument, options);
+      }
+export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferenceQuery, ConferenceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConferenceQuery, ConferenceQueryVariables>(ConferenceDocument, options);
+        }
+export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
+export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
+export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
 export const UpdateConferenceUserDocument = gql`
     mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {

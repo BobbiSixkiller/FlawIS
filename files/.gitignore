@@ -105,6 +105,6 @@ typings/
 # typescript js output
 .dist
 
-public/grants
+public
 
-public/submissions
+public

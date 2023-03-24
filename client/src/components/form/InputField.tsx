@@ -72,7 +72,9 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
         <Transition visible={toggle} animation="scale" duration={500}>
           <Form.Field
             {...props}
-            label={`${props.label} ${i18n.language.toUpperCase()}`}
+            label={`${props.label} ${
+              i18n.language === "sk" ? "anglicky" : "in slovak"
+            }`}
             {...localizedField}
             error={localizedError}
           />

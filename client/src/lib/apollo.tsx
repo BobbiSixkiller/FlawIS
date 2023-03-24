@@ -11,9 +11,8 @@ import merge from "deepmerge";
 import { IncomingHttpHeaders } from "http";
 import fetch from "isomorphic-unfetch";
 import isEqual from "lodash/isEqual";
-import type { AppProps } from "next/app";
+import { AppProps } from "next/app";
 import { useMemo } from "react";
-import { setContext } from "@apollo/client/link/context";
 
 const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
@@ -43,7 +42,14 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             console.log(
               `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
             );
+            if (
+              message ===
+              "Access denied! You need to be authorized to perform this action!"
+            ) {
+              localStorage.removeItem("loggedIn");
+            }
           });
+
         if (networkError)
           console.log(
             `[Network error]: ${networkError}. Backend is unreachable. Is it running?`
@@ -51,7 +57,10 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
       }),
       // this uses apollo-link-http under the hood, so all the options here come from that package
       createUploadLink({
-        uri: "https://flawis-backend.flaw.uniba.sk/graphql",
+        uri:
+          typeof window === "undefined"
+            ? "http://gateway:5000/graphql"
+            : "https://flawis-backend.flaw.uniba.sk/graphql",
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",
@@ -67,6 +76,27 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             grants: relayStylePagination(),
             announcements: relayStylePagination(),
             users: relayStylePagination(),
+            conferences: {
+              keyArgs: false,
+              // While args.cursor may still be important for requesting
+              // a given page, it no longer has any role to play in the
+              // merge function.
+              merge(existing = {}, incoming) {
+                const cache = { ...existing };
+                if (cache.edges === undefined) return incoming;
+
+                cache.edges = [...cache.edges, ...incoming.edges];
+                cache.pageInfo = incoming.pageInfo;
+                cache.year = incoming.year;
+
+                return cache;
+              },
+              // Return all items stored so far, to avoid ambiguities
+              // about the order of the items.
+              // read(existing) {
+              //   return existing && Object.values(existing);
+              // },
+            },
           },
         },
       },
@@ -117,14 +147,6 @@ export const initializeApollo = (
 
   return _apolloClient;
 };
-
-export const setResetpassToken = (token: string) =>
-  setContext((_, { headers }) => ({
-    headers: {
-      ...headers,
-      resettoken: token,
-    },
-  }));
 
 export const addApolloState = (
   client: ApolloClient<NormalizedCacheObject>,

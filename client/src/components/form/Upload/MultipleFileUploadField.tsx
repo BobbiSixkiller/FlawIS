@@ -137,11 +137,7 @@ export default function MultipleFileUploadField({
       ))}
 
       {meta.touched && meta.error && (
-        <Label
-          basic
-          style={{ color: "#9f3a38", border: "1px solid #e0b4b4" }}
-          pointing
-        >
+        <Label prompt pointing>
           {meta.error}
         </Label>
       )}
