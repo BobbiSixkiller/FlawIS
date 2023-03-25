@@ -518,6 +518,7 @@ export type MutationCreateGrantArgs = {
 
 export type MutationCreateSectionArgs = {
   data: SectionInput;
+  id: Scalars['ObjectId'];
 };
 
 
@@ -781,7 +782,6 @@ export type Section = {
 
 /** Conference section input type */
 export type SectionInput = {
-  conference: Scalars['String'];
   description: Scalars['String'];
   languages: Array<Scalars['String']>;
   name: Scalars['String'];
@@ -1132,6 +1132,29 @@ export type GrantTextSearchQueryVariables = Exact<{
 
 
 export type GrantTextSearchQuery = { __typename?: 'Query', grantTextSearch: Array<{ __typename?: 'Grant', id: string, name: string, type: GrantType }> };
+
+export type SectionQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type SectionQuery = { __typename?: 'Query', section: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
+
+export type CreateSectionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: SectionInput;
+}>;
+
+
+export type CreateSectionMutation = { __typename?: 'Mutation', createSection: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
+
+export type UpdateSectionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: SectionInput;
+}>;
+
+
+export type UpdateSectionMutation = { __typename?: 'Mutation', updateSection: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -2581,6 +2604,124 @@ export function useGrantTextSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type GrantTextSearchQueryHookResult = ReturnType<typeof useGrantTextSearchQuery>;
 export type GrantTextSearchLazyQueryHookResult = ReturnType<typeof useGrantTextSearchLazyQuery>;
 export type GrantTextSearchQueryResult = Apollo.QueryResult<GrantTextSearchQuery, GrantTextSearchQueryVariables>;
+export const SectionDocument = gql`
+    query section($id: ObjectId!) {
+  section(id: $id) {
+    id
+    name
+    description
+    languages
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useSectionQuery__
+ *
+ * To run a query within a React component, call `useSectionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSectionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSectionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSectionQuery(baseOptions: Apollo.QueryHookOptions<SectionQuery, SectionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SectionQuery, SectionQueryVariables>(SectionDocument, options);
+      }
+export function useSectionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SectionQuery, SectionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SectionQuery, SectionQueryVariables>(SectionDocument, options);
+        }
+export type SectionQueryHookResult = ReturnType<typeof useSectionQuery>;
+export type SectionLazyQueryHookResult = ReturnType<typeof useSectionLazyQuery>;
+export type SectionQueryResult = Apollo.QueryResult<SectionQuery, SectionQueryVariables>;
+export const CreateSectionDocument = gql`
+    mutation createSection($id: ObjectId!, $data: SectionInput!) {
+  createSection(id: $id, data: $data) {
+    id
+    name
+    description
+    languages
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateSectionMutationFn = Apollo.MutationFunction<CreateSectionMutation, CreateSectionMutationVariables>;
+
+/**
+ * __useCreateSectionMutation__
+ *
+ * To run a mutation, you first call `useCreateSectionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSectionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSectionMutation, { data, loading, error }] = useCreateSectionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useCreateSectionMutation(baseOptions?: Apollo.MutationHookOptions<CreateSectionMutation, CreateSectionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateSectionMutation, CreateSectionMutationVariables>(CreateSectionDocument, options);
+      }
+export type CreateSectionMutationHookResult = ReturnType<typeof useCreateSectionMutation>;
+export type CreateSectionMutationResult = Apollo.MutationResult<CreateSectionMutation>;
+export type CreateSectionMutationOptions = Apollo.BaseMutationOptions<CreateSectionMutation, CreateSectionMutationVariables>;
+export const UpdateSectionDocument = gql`
+    mutation updateSection($id: ObjectId!, $data: SectionInput!) {
+  updateSection(id: $id, data: $data) {
+    id
+    name
+    description
+    languages
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type UpdateSectionMutationFn = Apollo.MutationFunction<UpdateSectionMutation, UpdateSectionMutationVariables>;
+
+/**
+ * __useUpdateSectionMutation__
+ *
+ * To run a mutation, you first call `useUpdateSectionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSectionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSectionMutation, { data, loading, error }] = useUpdateSectionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateSectionMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSectionMutation, UpdateSectionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSectionMutation, UpdateSectionMutationVariables>(UpdateSectionDocument, options);
+      }
+export type UpdateSectionMutationHookResult = ReturnType<typeof useUpdateSectionMutation>;
+export type UpdateSectionMutationResult = Apollo.MutationResult<UpdateSectionMutation>;
+export type UpdateSectionMutationOptions = Apollo.BaseMutationOptions<UpdateSectionMutation, UpdateSectionMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {

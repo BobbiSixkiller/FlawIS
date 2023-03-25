@@ -1,6 +1,5 @@
 import { Field, InputType } from "type-graphql";
 import { IsLocale, IsString } from "class-validator";
-import { ObjectId } from "mongodb";
 
 import { Section } from "../../entities/Section";
 
@@ -32,8 +31,4 @@ export class SectionInput implements Partial<Section> {
 	@Field(() => [String])
 	@IsLocale({ each: true })
 	languages: string[];
-
-	@Field(() => String)
-	@IsString()
-	conference: ObjectId;
 }
