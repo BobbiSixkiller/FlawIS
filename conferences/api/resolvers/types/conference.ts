@@ -54,7 +54,7 @@ class ConferenceInputTranslation {
 }
 
 @InputType()
-class AddressInput implements Address {
+export class AddressInput implements Address {
   @Field()
   @IsString()
   street: string;

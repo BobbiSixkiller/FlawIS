@@ -40,6 +40,14 @@ type Attendee {
   withSubmission: Boolean!
 }
 
+input AttendeeBillingInput {
+  DIC: String!
+  ICDPH: String!
+  ICO: String!
+  address: AddressInput!
+  name: String!
+}
+
 """AttendeeConnection type enabling cursor based pagination"""
 type AttendeeConnection {
   edges: [AttendeeEdge]!
@@ -52,7 +60,7 @@ type AttendeeEdge {
 }
 
 input AttendeeInput {
-  billing: BillingInput!
+  billing: AttendeeBillingInput!
   conferenceId: ObjectId!
   ticketId: ObjectId!
 }
