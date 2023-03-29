@@ -1,5 +1,14 @@
 import { useTranslation } from "next-i18next";
-import { array, boolean, date, object, ref, setLocale, string } from "yup";
+import {
+  array,
+  boolean,
+  date,
+  number,
+  object,
+  ref,
+  setLocale,
+  string,
+} from "yup";
 
 export default function Validation() {
   const { t } = useTranslation("validation");
@@ -128,6 +137,8 @@ export default function Validation() {
     }),
   });
 
+  const ticketInputSchema = object().required();
+
   return {
     loginInputSchema,
     flawisRegisterInputSchema,
@@ -138,5 +149,6 @@ export default function Validation() {
     conferenceInputSchema,
     conferenceInvoiceInputSchema,
     attendeeBillingInputSchema,
+    ticketInputSchema,
   };
 }

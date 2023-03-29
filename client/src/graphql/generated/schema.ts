@@ -238,7 +238,6 @@ export type ConferenceInputTranslation = {
   language: Scalars['String'];
   logoUrl: Scalars['String'];
   name: Scalars['String'];
-  tickets?: InputMaybe<Array<TicketInputTranslation>>;
 };
 
 export type ConferencePageInfo = {
@@ -444,6 +443,7 @@ export type Mutation = {
   addMember: Grant;
   addSpentBudget: Grant;
   addSubmission: Submission;
+  addTicket: Conference;
   createAnnouncement: Announcement;
   createConference: Conference;
   createGrant: Grant;
@@ -462,6 +462,7 @@ export type Mutation = {
   passwordReset: User;
   register: User;
   removeAttendee: Scalars['Boolean'];
+  removeTicket: Conference;
   resendActivationLink: Scalars['Boolean'];
   updateAnnouncement: Announcement;
   updateConference: Conference;
@@ -506,6 +507,12 @@ export type MutationAddSpentBudgetArgs = {
 
 export type MutationAddSubmissionArgs = {
   data: SubmissionInput;
+};
+
+
+export type MutationAddTicketArgs = {
+  data: TicketInput;
+  id: Scalars['ObjectId'];
 };
 
 
@@ -596,6 +603,12 @@ export type MutationRegisterArgs = {
 
 export type MutationRemoveAttendeeArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type MutationRemoveTicketArgs = {
+  id: Scalars['ObjectId'];
+  ticketId: Scalars['ObjectId'];
 };
 
 
@@ -865,6 +878,15 @@ export type Ticket = {
   withSubmission: Scalars['Boolean'];
 };
 
+export type TicketInput = {
+  description: Scalars['String'];
+  name: Scalars['String'];
+  online: Scalars['Boolean'];
+  price: Scalars['Int'];
+  translations: Array<TicketInputTranslation>;
+  withSubmission: Scalars['Boolean'];
+};
+
 export type TicketInputTranslation = {
   description: Scalars['String'];
   language: Scalars['String'];
@@ -1031,6 +1053,22 @@ export type ConferenceQueryVariables = Exact<{
 
 
 export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+
+export type AddTicketMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: TicketInput;
+}>;
+
+
+export type AddTicketMutation = { __typename?: 'Mutation', addTicket: { __typename?: 'Conference', id: any, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }> } };
+
+export type RemoveTicketMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  ticketId: Scalars['ObjectId'];
+}>;
+
+
+export type RemoveTicketMutation = { __typename?: 'Mutation', removeTicket: { __typename?: 'Conference', id: any, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }> } };
 
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
@@ -1866,6 +1904,90 @@ export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
+export const AddTicketDocument = gql`
+    mutation addTicket($id: ObjectId!, $data: TicketInput!) {
+  addTicket(id: $id, data: $data) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+  }
+}
+    `;
+export type AddTicketMutationFn = Apollo.MutationFunction<AddTicketMutation, AddTicketMutationVariables>;
+
+/**
+ * __useAddTicketMutation__
+ *
+ * To run a mutation, you first call `useAddTicketMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddTicketMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addTicketMutation, { data, loading, error }] = useAddTicketMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddTicketMutation(baseOptions?: Apollo.MutationHookOptions<AddTicketMutation, AddTicketMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddTicketMutation, AddTicketMutationVariables>(AddTicketDocument, options);
+      }
+export type AddTicketMutationHookResult = ReturnType<typeof useAddTicketMutation>;
+export type AddTicketMutationResult = Apollo.MutationResult<AddTicketMutation>;
+export type AddTicketMutationOptions = Apollo.BaseMutationOptions<AddTicketMutation, AddTicketMutationVariables>;
+export const RemoveTicketDocument = gql`
+    mutation removeTicket($id: ObjectId!, $ticketId: ObjectId!) {
+  removeTicket(id: $id, ticketId: $ticketId) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+  }
+}
+    `;
+export type RemoveTicketMutationFn = Apollo.MutationFunction<RemoveTicketMutation, RemoveTicketMutationVariables>;
+
+/**
+ * __useRemoveTicketMutation__
+ *
+ * To run a mutation, you first call `useRemoveTicketMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveTicketMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeTicketMutation, { data, loading, error }] = useRemoveTicketMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      ticketId: // value for 'ticketId'
+ *   },
+ * });
+ */
+export function useRemoveTicketMutation(baseOptions?: Apollo.MutationHookOptions<RemoveTicketMutation, RemoveTicketMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveTicketMutation, RemoveTicketMutationVariables>(RemoveTicketDocument, options);
+      }
+export type RemoveTicketMutationHookResult = ReturnType<typeof useRemoveTicketMutation>;
+export type RemoveTicketMutationResult = Apollo.MutationResult<RemoveTicketMutation>;
+export type RemoveTicketMutationOptions = Apollo.BaseMutationOptions<RemoveTicketMutation, RemoveTicketMutationVariables>;
 export const UpdateConferenceUserDocument = gql`
     mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {

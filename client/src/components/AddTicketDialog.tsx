@@ -1,29 +1,51 @@
 import { Formik, FormikProps } from "formik";
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import { useContext, useRef } from "react";
-import { Button, Form, Input } from "semantic-ui-react";
-import { InferType, object, number, boolean, string } from "yup";
-import { useAddMemberMutation } from "../graphql/generated/schema";
+import { Button, Form, Input, TextArea } from "semantic-ui-react";
+import { InferType, object, number, boolean, string, array } from "yup";
+import { useAddTicketMutation } from "../graphql/generated/schema";
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
-import AutocompleteInputField from "./form/AutocompleteInputField";
 import CheckboxField from "./form/CheckboxField";
-import { InputField } from "./form/InputField";
+import { InputField, LocalizedInputField } from "./form/InputField";
 
-const budgetInputSchema = object({
-  user: string().required(),
-  isMain: boolean().required(),
-  hours: number().required(),
+const ticketInputSchema = object({
+  name: string().required(),
+  description: string().required(),
+  online: boolean().required(),
+  withSubmission: boolean().required(),
+  price: number().required(),
+  translations: array()
+    .of(
+      object({
+        language: string().required(),
+        name: string().required(),
+        description: string().required(),
+      })
+    )
+    .required(),
 });
 
-type Values = InferType<typeof budgetInputSchema>;
+type Values = InferType<typeof ticketInputSchema>;
 
-export default function AddTicketDialog() {
+export default function AddTicketDialog({ id }: { id: string }) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
-  const { query } = useRouter();
   const formikRef = useRef<FormikProps<Values>>(null);
 
-  const [addMember] = useAddMemberMutation();
+  const [addTicket] = useAddTicketMutation({
+    update(cache, { data }) {
+      cache.modify({
+        id: cache.identify({ __ref: `Conference:${data?.addTicket.id}` }),
+        fields: {
+          tickets() {
+            return data?.addTicket.tickets;
+          },
+        },
+      });
+    },
+  });
+
+  const { i18n } = useTranslation();
 
   return (
     <Button
@@ -41,10 +63,24 @@ export default function AddTicketDialog() {
           content: (
             <Formik
               innerRef={formikRef}
-              initialValues={{ user: "", isMain: false, hours: 0 }}
-              validationSchema={budgetInputSchema}
+              initialValues={{
+                name: "",
+                description: "",
+                online: false,
+                withSubmission: false,
+                price: 0,
+                translations: [
+                  {
+                    language: i18n.language === "sk" ? "en" : "sk",
+                    description: "",
+                    name: "",
+                  },
+                ],
+              }}
+              validationSchema={ticketInputSchema}
               onSubmit={async (values, formik) => {
                 try {
+                  await addTicket({ variables: { id, data: values } });
                   handleClose();
                 } catch (error: any) {
                   setError(error?.message || "");
@@ -59,21 +95,31 @@ export default function AddTicketDialog() {
             >
               {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
                 <Form loading={isSubmitting} onSubmit={handleSubmit}>
-                  <AutocompleteInputField
-                    placeholder="Riešiteľ..."
-                    label="Riešiteľ"
-                    name="user"
+                  <LocalizedInputField
+                    placeholder="Name..."
+                    label="Name"
+                    name="name"
+                    control={Input}
+                    type="text"
+                  />
+                  <LocalizedInputField
+                    placeholder="Description..."
+                    label="Description"
+                    name="description"
+                    control={TextArea}
+                    type="text"
                   />
                   <InputField
-                    placeholder="Hodiny..."
-                    label="Hodiny"
-                    name="hours"
+                    placeholder="Cena v centoch..."
+                    label="Cena v centoch"
+                    name="price"
                     control={Input}
                     type="number"
                   />
+                  <CheckboxField name="online" label={<label>Online</label>} />
                   <CheckboxField
-                    name="isMain"
-                    label={<label>Hlavný riešiteľ</label>}
+                    name="withSubmission"
+                    label={<label>S príspevkom</label>}
                   />
                 </Form>
               )}

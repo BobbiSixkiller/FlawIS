@@ -3,13 +3,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Grid, Header, Input, Message, Segment } from "semantic-ui-react";
-import Dashboard from "../../../components/Dashboard";
 import {
   InputField,
   LocalizedInputField,
 } from "../../../components/form/InputField";
 import { Wizzard, WizzardStep } from "../../../components/form/Wizzard";
-import TicketSelect from "../../../components/TicketSelect";
 import parseErrors from "../../../util/parseErrors";
 import { NextPageWithLayout } from "../../_app";
 
@@ -17,19 +15,23 @@ import logo from "public/images/Flaw-logo-notext.png";
 import Image from "next/image";
 import {
   ConferenceDocument,
+  Ticket,
   useConferenceQuery,
 } from "../../../graphql/generated/schema";
 import { NextPageContext } from "next";
 import { addApolloState, initializeApollo } from "../../../lib/apollo";
 import Validation from "../../../util/validation";
 import BillingInput from "../../../components/form/BillingInput";
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { AuthContext } from "../../../providers/Auth";
+import RadioGroup from "../../../components/form/RadioGroup";
+import { FormikBag } from "formik";
 
 const RegisterAttendee: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
   const { i18n, t } = useTranslation("conference");
+  const formikRef = useRef<FormikBag<>>(null);
 
   const { data, error } = useConferenceQuery({
     variables: { slug: router.query.slug as string },
@@ -40,7 +42,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
     },
   });
 
-  const { attendeeBillingInputSchema } = Validation();
+  const { attendeeBillingInputSchema, ticketInputSchema } = Validation();
 
   return (
     <Grid centered padded>
@@ -70,6 +72,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
         </Header>
         {error && <Message error content={error.message} />}
         <Wizzard
+          innerRef={formikRef}
           goBackCb={() => router.push(`/${router.query.slug}`)}
           initialValues={{
             billing: {
@@ -79,8 +82,15 @@ const RegisterAttendee: NextPageWithLayout = () => {
               DIC: "",
               ICDPH: "",
             },
-            conferenceId: "",
-            ticket: { id: "", withSubmission: false },
+            conference: { confereceId: "" },
+            ticket: {
+              id: "",
+              name: "",
+              description: "",
+              online: false,
+              withSubmission: false,
+              price: 0,
+            },
           }}
           onSubmit={async (values, formik) => {
             console.log(values);
@@ -160,14 +170,24 @@ const RegisterAttendee: NextPageWithLayout = () => {
             icon="ticket"
             title={t("registration.stepper.tickets.title")}
             description={t("registration.stepper.tickets.description")}
+            validationSchema={ticketInputSchema}
           >
-            <TicketSelect tickets={data?.conference.tickets} />
+            <RadioGroup
+              label="Select a ticket"
+              name="ticket"
+              options={data?.conference.tickets.map((t) => ({
+                label: `${t.name} - ${t.description}`,
+                value: t,
+              }))}
+            />
           </WizzardStep>
-          <WizzardStep
-            icon="inbox"
-            title={t("registration.stepper.submission.title")}
-            description={t("registration.stepper.submission.description")}
-          ></WizzardStep>
+          {formikRef.current?.values.ticket.withSubmission && (
+            <WizzardStep
+              icon="inbox"
+              title={t("registration.stepper.submission.title")}
+              description={t("registration.stepper.submission.description")}
+            ></WizzardStep>
+          )}
         </Wizzard>
       </Grid.Column>
     </Grid>

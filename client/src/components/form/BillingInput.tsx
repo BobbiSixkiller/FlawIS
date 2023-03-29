@@ -1,7 +1,7 @@
 import { useField, useFormikContext } from "formik";
 import { useTranslation } from "next-i18next";
 import { useState } from "react";
-import { Dropdown, DropdownItemProps, Form, Label } from "semantic-ui-react";
+import { Dropdown, Form, Label } from "semantic-ui-react";
 
 export default function BillingInput({
   placeholder,

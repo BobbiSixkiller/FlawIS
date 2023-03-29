@@ -1,3 +1,4 @@
+import { DocumentType } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import {
   Arg,
@@ -13,15 +14,20 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Attendee, AttendeeConnection } from "../entities/Attendee";
-import { Conference } from "../entities/Conference";
+import { Conference, Ticket } from "../entities/Conference";
 import { Section } from "../entities/Section";
 import { User } from "../entities/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
+import { LoadConference } from "../util/decorators";
 import { localizeInput, localizeOutput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { AttendeeArgs } from "./types/attendee";
-import { ConferenceConnection, ConferenceInput } from "./types/conference";
+import {
+  ConferenceConnection,
+  ConferenceInput,
+  TicketInput,
+} from "./types/conference";
 import { ConferenceUserInput } from "./types/user";
 
 @Service()
@@ -108,6 +114,33 @@ export class ConferenceResolver {
     return await this.conferenceService.create(
       localizeInput(conferenceInput, conferenceInput.translations, locale)
     );
+  }
+
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
+  async addTicket(
+    @Arg("data") ticketInput: TicketInput,
+    @Arg("id") _id: ObjectId,
+    @LoadConference() conference: DocumentType<Conference>
+  ) {
+    conference.tickets.push(ticketInput as any);
+
+    return await conference.save();
+  }
+
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
+  async removeTicket(
+    @Arg("ticketId") ticketId: ObjectId,
+    @Arg("id") _id: ObjectId,
+    @LoadConference() conference: DocumentType<Conference>
+  ) {
+    const ticket = conference.tickets.find((t) => t.id === ticketId);
+    if (!ticket) throw new Error("Ticket not found!");
+
+    conference.tickets = conference.tickets.filter((t) => t !== ticket);
+
+    return await conference.save();
   }
 
   @Authorized(["ADMIN"])

@@ -47,6 +47,34 @@ query conference($slug: String!) {
   }
 }
 
+mutation addTicket($id: ObjectId!, $data: TicketInput!) {
+  addTicket(id: $id, data: $data) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+  }
+}
+
+mutation removeTicket($id: ObjectId!, $ticketId: ObjectId!) {
+  removeTicket(id: $id, ticketId: $ticketId) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+  }
+}
+
 mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {
     id
