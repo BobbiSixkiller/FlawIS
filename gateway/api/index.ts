@@ -42,47 +42,14 @@ const main = async () => {
 
   const app = Express();
 
-<<<<<<< HEAD
-	app.use(
-		cors({
-			credentials: true,
-			origin: [
-				"https://flawis.flaw.uniba.sk",
-				"https://conferences.flaw.uniba.sk",
-			],
-		})
-	);
-	app.use(cookieParser());
-	app.use(graphqlUploadExpress());
-	app.use(
-		"/public/submissions",
-		isAuthMiddleware,
-		createProxyMiddleware({
-			target: "http://files:5002/",
-			changeOrigin: true,
-		})
-	);
-	app.use(
-		"/public/grants",
-		isAuthMiddleware,
-		createProxyMiddleware({
-			target: "http://files:5002/",
-			changeOrigin: true,
-		})
-	);
-	app.use(
-		"/public",
-		cors(),
-		createProxyMiddleware({
-			target: "http://files:5002/",
-			changeOrigin: true,
-		})
-	);
-=======
   app.use(
     cors({
       credentials: true,
-      origin: ["http://localhost:3000", "http://client:3000"],
+      origin: [
+        "https://flawis.flaw.uniba.sk",
+        "https://conferences.flaw.uniba.sk",
+        "http://client:3000",
+      ],
     })
   );
   app.use(cookieParser());
@@ -105,12 +72,12 @@ const main = async () => {
   );
   app.use(
     "/public",
+    cors(),
     createProxyMiddleware({
       target: "http://files:5002/",
       changeOrigin: true,
     })
   );
->>>>>>> dev
 
   const server = new ApolloServer({
     gateway,
