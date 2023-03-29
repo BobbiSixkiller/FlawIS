@@ -79,7 +79,7 @@ const ProfilePage: NextPageWithLayout = () => {
             activeIndex={activeIndex > -1 ? activeIndex : 0}
             panes={panes}
             onTabChange={(e, { activeIndex, panes }) =>
-              router.push({
+              router.replace({
                 pathname: `/profile`,
                 query: {
                   tab: panes?.find((p, i) => i === activeIndex)?.menuItem,

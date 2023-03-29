@@ -1,5 +1,5 @@
 import { ReactNode, useContext } from "react";
-import { Grid, List, Menu } from "semantic-ui-react";
+import { Button, Dropdown, Grid, Image, List, Menu } from "semantic-ui-react";
 
 import useWith from "../hooks/useWidth";
 import Nav, { ContentWrapper } from "./MobileNav";
@@ -7,9 +7,23 @@ import Footer from "./Footer";
 import { useTranslation } from "next-i18next";
 import { ControlsContext } from "../providers/ControlsProvider";
 import MainMenuItems from "./MainMenuItems";
-import Image from "next/image";
+import NextImage from "next/image";
 import logo from "public/images/Flaw-logo-notext.png";
 import Link from "next/link";
+import styled from "styled-components";
+
+const StickyContainer = styled.div`
+  position: sticky;
+  top: 16;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 48px);
+  & div a {
+    display: flex;
+    justify-content: center;
+  }
+`;
 
 interface dashboardProps {
   children: ReactNode;
@@ -46,26 +60,24 @@ export default function Dashboard({ children }: dashboardProps) {
       divided
       style={{ marginTop: 0, marginBottom: 0, minHeight: "100vh" }}
     >
-      <Grid.Column floated="right" width={3} only="tablet computer">
-        <Menu text vertical compact style={{ position: "fixed" }}>
-          <Menu.Item as={Link} href="/">
-            <Image alt="flaw-logo-notext" src={logo} height={35} width={35} />
-          </Menu.Item>
-          <MainMenuItems />
-        </Menu>
+      <Grid.Column width={3} only="tablet computer">
+        <StickyContainer>
+          <Menu text vertical compact>
+            <Menu.Item as={Link} href="/">
+              <NextImage
+                alt="flaw-logo-notext"
+                src={logo}
+                height={35}
+                width={35}
+              />
+            </Menu.Item>
+            <MainMenuItems />
+          </Menu>
+        </StickyContainer>
       </Grid.Column>
       <Grid.Column width={9}>{children}</Grid.Column>
       <Grid.Column width={4} only="tablet computer">
-        <div
-          style={{
-            position: "sticky",
-            top: 16,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "calc(100vh - 48px)",
-          }}
-        >
+        <StickyContainer>
           <div>{rightPanelItems}</div>
           <List link size="small">
             <List.Item as="a" href="#">
@@ -75,7 +87,7 @@ export default function Dashboard({ children }: dashboardProps) {
               {t("footer.menu.terms")}
             </List.Item>
           </List>
-        </div>
+        </StickyContainer>
       </Grid.Column>
     </Grid>
   );

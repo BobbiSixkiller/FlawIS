@@ -1,6 +1,14 @@
 import { Formik, FormikConfig, FormikProps, FormikValues } from "formik";
 import { Children, ReactElement, ReactNode, useState } from "react";
-import { Button, Form, Icon, SemanticICONS, Step } from "semantic-ui-react";
+import {
+  Button,
+  Form,
+  Grid,
+  Icon,
+  Segment,
+  SemanticICONS,
+  Step,
+} from "semantic-ui-react";
 
 interface WizzardStepProps
   extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {
@@ -53,31 +61,38 @@ export function Wizzard({
     >
       {({ handleSubmit, isSubmitting }: FormikProps<FormikValues>) => (
         <Form autoComplete="off" onSubmit={handleSubmit} loading={isSubmitting}>
-          <Step.Group fluid>
-            {childrenArray.map((s, i) => (
-              <Step key={i} active={i === step} completed={i < step}>
-                <Icon name={s.props.icon} />
-                <Step.Content>
-                  <Step.Title>{s.props.title}</Step.Title>
-                  <Step.Description>{s.props.description}</Step.Description>
-                </Step.Content>
-              </Step>
-            ))}
-          </Step.Group>
+          <Grid columns={2} stackable>
+            <Grid.Column width={6}>
+              <Step.Group fluid vertical>
+                {childrenArray.map((s, i) => (
+                  <Step key={i} active={i === step} completed={i < step}>
+                    <Icon name={s.props.icon} />
+                    <Step.Content>
+                      <Step.Title>{s.props.title}</Step.Title>
+                      <Step.Description>{s.props.description}</Step.Description>
+                    </Step.Content>
+                  </Step>
+                ))}
+              </Step.Group>
+            </Grid.Column>
+            <Grid.Column width={10}>
+              <Segment>
+                {currentChild}
 
-          {currentChild}
-
-          <Button
-            type="button"
-            onClick={() => goBack()}
-            content={step === 0 ? "Zrušiť" : "Back"}
-          />
-          <Button
-            positive
-            type="submit"
-            content={isLastStep() ? "Submit" : "Next"}
-            floated="right"
-          />
+                <Button
+                  type="button"
+                  onClick={() => goBack()}
+                  content={step === 0 ? "Zrušiť" : "Back"}
+                />
+                <Button
+                  positive
+                  type="submit"
+                  content={isLastStep() ? "Submit" : "Next"}
+                  floated="right"
+                />
+              </Segment>
+            </Grid.Column>
+          </Grid>
         </Form>
       )}
     </Formik>

@@ -13,6 +13,20 @@ import { Billing } from "./Billing";
   if (this.email.split("@")[1].includes("uniba")) {
     this.organisation = "Univerzita Komenského v Bratislave, Právnická fakulta";
   }
+  if (this.isNew && this.email.split("@")[1].includes("uniba")) {
+    this.billings.push({
+      name: "Univerzita Komenského v Bratislave, Právnická fakulta",
+      address: {
+        street: "Šafárikovo nám. č. 6",
+        city: "Bratislava",
+        postal: "810 00",
+        country: "Slovensko",
+      },
+      ICO: "00397865",
+      DIC: "2020845332",
+      ICDPH: "SK2020845332 ",
+    });
+  }
 })
 export class User {
   @Directive("@external")

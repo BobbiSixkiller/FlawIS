@@ -32,7 +32,7 @@ export default function AddConference() {
       positive
       onClick={() =>
         handleOpen({
-          size: "small",
+          size: "large",
           header: "Nová konferencia",
           content: (
             <Wizzard
