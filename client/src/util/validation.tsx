@@ -113,6 +113,21 @@ export default function Validation() {
     }),
   });
 
+  const attendeeBillingInputSchema = object({
+    billing: object({
+      name: string().trim().required(),
+      address: object({
+        street: string().trim().required(),
+        city: string().trim().required(),
+        postal: string().trim().required(),
+        country: string().trim().required(),
+      }),
+      ICO: string().trim().required(),
+      DIC: string().trim().required(),
+      ICDPH: string().trim().required(),
+    }),
+  });
+
   return {
     loginInputSchema,
     flawisRegisterInputSchema,
@@ -122,5 +137,6 @@ export default function Validation() {
     perosnalInfoInputSchema,
     conferenceInputSchema,
     conferenceInvoiceInputSchema,
+    attendeeBillingInputSchema,
   };
 }

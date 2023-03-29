@@ -6,5 +6,34 @@
     "fees": "Fees",
     "dates": "Important dates",
     "guidelines": "Submission guidelines"
+  },
+  "registration": {
+    "header": "Registration",
+    "stepper": {
+      "billing": {
+        "title": "Billing",
+        "description": "Attendee's billing information"
+      },
+      "tickets": {
+        "title": "Tickets",
+        "description": "Please select a ticket"
+      },
+      "submission": {
+        "title": "Submission",
+        "description": "Information about attendee's submission"
+      }
+    },
+    "billing": {
+      "name": { "label": "Name", "placeholder": "Billing name..." },
+      "street": { "label": "Street", "placeholder": "Street..." },
+      "city": { "label": "City", "placeholder": "City..." },
+      "postal": { "label": "Postal", "placeholder": "Postal..." },
+      "country": { "label": "Country", "placeholder": "Country..." },
+      "ICO": { "label": "IČO", "placeholder": "IČO..." },
+      "DIC": { "label": "DIČ", "placeholder": "DIČ..." },
+      "ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
+    },
+    "tickets": {},
+    "submission": {}
   }
 }

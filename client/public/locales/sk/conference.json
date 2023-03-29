@@ -6,5 +6,34 @@
     "fees": "Konferenčný poplatok",
     "dates": "Dôležité termíny",
     "guidelines": "Pokyny k príspevku"
+  },
+  "registration": {
+    "header": "Registrácia",
+    "stepper": {
+      "billing": {
+        "title": "Fakturačné údaje",
+        "description": "Fakturačné údaje účastníka konferencie"
+      },
+      "tickets": {
+        "title": "Forma účasti",
+        "description": "Prosí vyberte formu účasti"
+      },
+      "submission": {
+        "title": "Príspevok",
+        "description": "Informácie o príspevku účastníka"
+      }
+    },
+    "billing": {
+      "name": { "label": "Meno", "placeholder": "Meno..." },
+      "street": { "label": "Ulica", "placeholder": "Ulica..." },
+      "city": { "label": "Mesto", "placeholder": "Mesto..." },
+      "postal": { "label": "PSČ", "placeholder": "PSČ..." },
+      "country": { "label": "Krajina", "placeholder": "Krajina..." },
+      "ICO": { "label": "IČO", "placeholder": "IČO..." },
+      "DIC": { "label": "DIČ", "placeholder": "DIČ..." },
+      "ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
+    },
+    "tickets": {},
+    "submission": {}
   }
 }

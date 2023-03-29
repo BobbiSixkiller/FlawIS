@@ -92,6 +92,14 @@ export type Attendee = {
   withSubmission: Scalars['Boolean'];
 };
 
+export type AttendeeBillingInput = {
+  DIC: Scalars['String'];
+  ICDPH: Scalars['String'];
+  ICO: Scalars['String'];
+  address: AddressInput;
+  name: Scalars['String'];
+};
+
 /** AttendeeConnection type enabling cursor based pagination */
 export type AttendeeConnection = {
   __typename?: 'AttendeeConnection';
@@ -106,7 +114,7 @@ export type AttendeeEdge = {
 };
 
 export type AttendeeInput = {
-  billing: BillingInput;
+  billing: AttendeeBillingInput;
   conferenceId: Scalars['ObjectId'];
   ticketId: Scalars['ObjectId'];
 };
@@ -1022,7 +1030,7 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
 
 export type UpdateConferenceUserMutationVariables = Exact<{
   data: ConferenceUserInput;
@@ -1812,6 +1820,14 @@ export const ConferenceDocument = gql`
     slug
     description
     logoUrl
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
     sections {
       id
       name
