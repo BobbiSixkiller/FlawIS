@@ -63,9 +63,14 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
           {...props}
           {...field}
           onFocus={() => setToggle(true)}
-          onChange={(e: ChangeEvent) => {
-            field.onChange(e);
-            setStatus({ ...status, [field.name]: undefined });
+          onChange={(e: ChangeEvent, { value }: SelectProps) => {
+            //Form field is a react semantic UI Select Component
+            if (value) {
+              console.log(value);
+            } else {
+              field.onChange(e);
+              setStatus({ ...status, [field.name]: undefined });
+            }
           }}
           error={error}
         />

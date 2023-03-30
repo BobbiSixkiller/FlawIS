@@ -137,7 +137,9 @@ export default function Validation() {
     }),
   });
 
-  const ticketInputSchema = object().required();
+  const ticketInputSchema = object({
+    ticket: object().required(),
+  });
 
   return {
     loginInputSchema,

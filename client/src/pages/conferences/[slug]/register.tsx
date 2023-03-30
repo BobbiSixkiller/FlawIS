@@ -2,7 +2,17 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Grid, Header, Input, Message, Segment } from "semantic-ui-react";
+import {
+  Form,
+  Grid,
+  Header,
+  Input,
+  Label,
+  Message,
+  Radio,
+  Select,
+  TextArea,
+} from "semantic-ui-react";
 import {
   InputField,
   LocalizedInputField,
@@ -15,6 +25,7 @@ import logo from "public/images/Flaw-logo-notext.png";
 import Image from "next/image";
 import {
   ConferenceDocument,
+  Section,
   Ticket,
   useConferenceQuery,
 } from "../../../graphql/generated/schema";
@@ -22,16 +33,113 @@ import { NextPageContext } from "next";
 import { addApolloState, initializeApollo } from "../../../lib/apollo";
 import Validation from "../../../util/validation";
 import BillingInput from "../../../components/form/BillingInput";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../../providers/Auth";
-import RadioGroup from "../../../components/form/RadioGroup";
-import { FormikBag } from "formik";
+import { useField, useFormikContext } from "formik";
+
+function SelectTicket({
+  label,
+  name,
+  tickets,
+  setSubmissionRegistration,
+}: {
+  label: string;
+  name: string;
+  tickets?: Ticket[];
+  setSubmissionRegistration: (withSubmission: boolean) => void;
+}) {
+  const [field, meta, helpers] = useField(name);
+  const { setFieldValue } = useFormikContext();
+
+  if (!tickets) {
+    return null;
+  }
+
+  return (
+    <Form.Field error={meta.error && meta.touched}>
+      <label>{label}</label>
+      {tickets.map((ticket) => (
+        <Form.Field key={ticket.id}>
+          <Radio
+            label={ticket.name}
+            name={name}
+            value={ticket.name}
+            checked={field.value?.name === ticket.name}
+            onChange={() => setFieldValue("ticket", ticket)}
+            onClick={() => setSubmissionRegistration(ticket.withSubmission)}
+          />
+        </Form.Field>
+      ))}
+      {meta.touched && meta.error && (
+        <Label prompt pointing>
+          {meta.error}
+        </Label>
+      )}
+    </Form.Field>
+  );
+}
+
+function RegisterSubmission({ sections }: { sections?: Section[] }) {
+  const { values } = useFormikContext<{ ticket: any; submission: any }>();
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <InputField
+        name="submission.sectionId"
+        label="Section"
+        placeholder="Choose a section"
+        search
+        searchInput={{
+          name: "submission.sectionId",
+          id: "form-control-section",
+        }}
+        allowMultiple
+        control={Select}
+        options={sections?.map((s) => ({
+          key: s.id,
+          text: s.name,
+          value: s.id,
+        }))}
+      />
+      <LocalizedInputField
+        name="submission.name"
+        label="Name"
+        placeholder="Name of the submission"
+        type="text"
+        control={Input}
+      />
+      <LocalizedInputField
+        name="submission.abstract"
+        label="Abstract"
+        placeholder="Abstract of the submission"
+        type="text"
+        control={TextArea}
+      />
+      <LocalizedInputField
+        name="submission.keywords"
+        label="Keywords"
+        placeholder="Keywords..."
+        control={Select}
+        allowAdditions
+        multiple
+        search
+        searchInput={{
+          name: "submission.sectionId",
+          id: "form-control-section",
+        }}
+      />
+    </>
+  );
+}
 
 const RegisterAttendee: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const router = useRouter();
   const { i18n, t } = useTranslation("conference");
-  const formikRef = useRef<FormikBag<>>(null);
+  const [submissionRegistration, setSubmissionRegistration] = useState(false);
+
+  const { attendeeBillingInputSchema, ticketInputSchema } = Validation();
 
   const { data, error } = useConferenceQuery({
     variables: { slug: router.query.slug as string },
@@ -41,9 +149,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
       }
     },
   });
-
-  const { attendeeBillingInputSchema, ticketInputSchema } = Validation();
-
+  console.log(submissionRegistration);
   return (
     <Grid centered padded>
       <Grid.Column computer={8} tablet={10} mobile={16}>
@@ -72,7 +178,6 @@ const RegisterAttendee: NextPageWithLayout = () => {
         </Header>
         {error && <Message error content={error.message} />}
         <Wizzard
-          innerRef={formikRef}
           goBackCb={() => router.push(`/${router.query.slug}`)}
           initialValues={{
             billing: {
@@ -83,14 +188,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
               ICDPH: "",
             },
             conference: { confereceId: "" },
-            ticket: {
-              id: "",
-              name: "",
-              description: "",
-              online: false,
-              withSubmission: false,
-              price: 0,
-            },
+            ticket: undefined,
           }}
           onSubmit={async (values, formik) => {
             console.log(values);
@@ -172,21 +270,21 @@ const RegisterAttendee: NextPageWithLayout = () => {
             description={t("registration.stepper.tickets.description")}
             validationSchema={ticketInputSchema}
           >
-            <RadioGroup
-              label="Select a ticket"
+            <SelectTicket
+              label="Listky"
               name="ticket"
-              options={data?.conference.tickets.map((t) => ({
-                label: `${t.name} - ${t.description}`,
-                value: t,
-              }))}
+              tickets={data?.conference.tickets}
+              setSubmissionRegistration={setSubmissionRegistration}
             />
           </WizzardStep>
-          {formikRef.current?.values.ticket.withSubmission && (
+          {submissionRegistration && (
             <WizzardStep
               icon="inbox"
               title={t("registration.stepper.submission.title")}
               description={t("registration.stepper.submission.description")}
-            ></WizzardStep>
+            >
+              <RegisterSubmission sections={data?.conference.sections} />
+            </WizzardStep>
           )}
         </Wizzard>
       </Grid.Column>
