@@ -1052,7 +1052,14 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+
+export type ConferenceDashboardQueryVariables = Exact<{
+  slug: Scalars['String'];
+}>;
+
+
+export type ConferenceDashboardQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1858,13 +1865,10 @@ export const ConferenceDocument = gql`
     slug
     description
     logoUrl
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
+    dates {
+      start
+      end
+      regEnd
     }
     sections {
       id
@@ -1872,7 +1876,6 @@ export const ConferenceDocument = gql`
       description
       languages
     }
-    attending
   }
 }
     `;
@@ -1904,6 +1907,65 @@ export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
+export const ConferenceDashboardDocument = gql`
+    query conferenceDashboard($slug: String!) {
+  conference(slug: $slug) {
+    id
+    name
+    slug
+    description
+    logoUrl
+    dates {
+      start
+      end
+      regEnd
+    }
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+    sections {
+      id
+      name
+      description
+      languages
+    }
+    attending
+  }
+}
+    `;
+
+/**
+ * __useConferenceDashboardQuery__
+ *
+ * To run a query within a React component, call `useConferenceDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useConferenceDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useConferenceDashboardQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useConferenceDashboardQuery(baseOptions: Apollo.QueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
+      }
+export function useConferenceDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
+        }
+export type ConferenceDashboardQueryHookResult = ReturnType<typeof useConferenceDashboardQuery>;
+export type ConferenceDashboardLazyQueryHookResult = ReturnType<typeof useConferenceDashboardLazyQuery>;
+export type ConferenceDashboardQueryResult = Apollo.QueryResult<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>;
 export const AddTicketDocument = gql`
     mutation addTicket($id: ObjectId!, $data: TicketInput!) {
   addTicket(id: $id, data: $data) {

@@ -16,11 +16,11 @@ import * as Joi from 'joi';
         MAIL_FROM: Joi.string().required(),
         MAIL_USER: Joi.string().required(),
         MAIL_PASSWORD: Joi.string().required(),
-        CLIENT_APP_URL: Joi.string().required()
+        CLIENT_APP_URL: Joi.string().required(),
       }),
     }),
     RmqModule,
     EmailModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

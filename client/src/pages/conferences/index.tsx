@@ -253,6 +253,7 @@ export const getServerSideProps = async ({ locale, req }: NextPageContext) => {
 				...(await serverSideTranslations(locale || "sk", [
 					"common",
 					"validation",
+					"activation",
 				])),
 			},
 		});
@@ -262,6 +263,7 @@ export const getServerSideProps = async ({ locale, req }: NextPageContext) => {
 				...(await serverSideTranslations(locale || "sk", [
 					"common",
 					"validation",
+					"activation",
 				])),
 			},
 		};

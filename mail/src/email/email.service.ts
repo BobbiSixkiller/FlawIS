@@ -36,22 +36,27 @@ export class EmailService {
     routingKey: 'mail.registration',
   })
   async sendActivationLink(msg: AuthMsg) {
-    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
-      msg.locale
-    }/activate?token=${msg.token}`;
+    try {
+      const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
+        msg.locale
+      }/activate?token=${msg.token}`;
+      console.log(url);
 
-    await this.mailerService.sendMail({
-      to: msg.email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: this.i18n.t('activation.subject', { lang: msg.locale }),
-      template: 'activation',
-      context: {
-        // ✏️ filling curly brackets with content
-        name: msg.name,
-        url,
-        i18nLang: msg.locale,
-      },
-    });
+      await this.mailerService.sendMail({
+        to: msg.email,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: this.i18n.t('activation.subject', { lang: msg.locale }),
+        template: 'activation',
+        context: {
+          // ✏️ filling curly brackets with content
+          name: msg.name,
+          url,
+          i18nLang: msg.locale,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @RabbitSubscribe({
@@ -79,15 +84,9 @@ export class EmailService {
 
   @RabbitSubscribe({
     exchange: 'FlawIS',
-    routingKey: 'mail.#',
-  })
-  async sendGrantAnnouncement() {}
-
-  @RabbitSubscribe({
-    exchange: 'FlawIS',
     routingKey: 'mail.grantAnnouncemenet',
   })
-  async sendConferenceInvoice(msg: GrantAnnouncementMsg) {
+  async sendGrantAnnouncement(msg: GrantAnnouncementMsg) {
     const urls = msg.grants.map((grant) => ({
       text: grant.name,
       url: `${this.configService.get<string>('CLIENT_APP_URL')}/${msg.locale}/${

@@ -1,138 +1,164 @@
 query conferences($year: Int!) {
-  conferences(year: $year) {
-    year
-    edges {
-      cursor
-      node {
-        id
-        name
-        slug
-        description
-        logoUrl
-        dates {
-          start
-          end
-        }
-      }
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
+	conferences(year: $year) {
+		year
+		edges {
+			cursor
+			node {
+				id
+				name
+				slug
+				description
+				logoUrl
+				dates {
+					start
+					end
+				}
+			}
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
+	}
 }
 
 query conference($slug: String!) {
-  conference(slug: $slug) {
-    id
-    name
-    slug
-    description
-    logoUrl
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
-    }
-    sections {
-      id
-      name
-      description
-      languages
-    }
-    attending
-  }
+	conference(slug: $slug) {
+		id
+		name
+		slug
+		description
+		logoUrl
+		dates {
+			start
+			end
+			regEnd
+		}
+		sections {
+			id
+			name
+			description
+			languages
+		}
+	}
+}
+
+query conferenceDashboard($slug: String!) {
+	conference(slug: $slug) {
+		id
+		name
+		slug
+		description
+		logoUrl
+		dates {
+			start
+			end
+			regEnd
+		}
+		tickets {
+			id
+			name
+			description
+			price
+			withSubmission
+			online
+		}
+		sections {
+			id
+			name
+			description
+			languages
+		}
+		attending
+	}
 }
 
 mutation addTicket($id: ObjectId!, $data: TicketInput!) {
-  addTicket(id: $id, data: $data) {
-    id
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
-    }
-  }
+	addTicket(id: $id, data: $data) {
+		id
+		tickets {
+			id
+			name
+			description
+			price
+			withSubmission
+			online
+		}
+	}
 }
 
 mutation removeTicket($id: ObjectId!, $ticketId: ObjectId!) {
-  removeTicket(id: $id, ticketId: $ticketId) {
-    id
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
-    }
-  }
+	removeTicket(id: $id, ticketId: $ticketId) {
+		id
+		tickets {
+			id
+			name
+			description
+			price
+			withSubmission
+			online
+		}
+	}
 }
 
 mutation updateConferenceUser($data: ConferenceUserInput!) {
-  updateConferenceUser(data: $data) {
-    id
-    name
-    email
-    organisation
-    telephone
-    role
-    verified
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-    }
-  }
+	updateConferenceUser(data: $data) {
+		id
+		name
+		email
+		organisation
+		telephone
+		role
+		verified
+		billings {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+		}
+	}
 }
 
 mutation createConference($data: ConferenceInput!) {
-  createConference(data: $data) {
-    id
-    name
-    description
-    slug
-    logoUrl
-    dates {
-      start
-      end
-    }
-    billing {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-      variableSymbol
-      IBAN
-      SWIFT
-      stampUrl
-    }
-    translations {
-      language
-      name
-      description
-      logoUrl
-    }
-    createdAt
-    updatedAt
-  }
+	createConference(data: $data) {
+		id
+		name
+		description
+		slug
+		logoUrl
+		dates {
+			start
+			end
+		}
+		billing {
+			name
+			address {
+				street
+				city
+				postal
+				country
+			}
+			ICO
+			DIC
+			ICDPH
+			variableSymbol
+			IBAN
+			SWIFT
+			stampUrl
+		}
+		translations {
+			language
+			name
+			description
+			logoUrl
+		}
+		createdAt
+		updatedAt
+	}
 }
