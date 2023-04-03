@@ -143,7 +143,7 @@ input ConferenceInput {
   logoUrl: String!
   name: String!
   slug: String!
-  translations: [ConferenceInputTranslation!]
+  translations: [ConferenceInputTranslation!]!
 }
 
 input ConferenceInputTranslation {
@@ -204,7 +204,7 @@ type ImportantDates {
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
-  issuer: String!
+  issuer: ConferenceBilling!
   payer: Billing!
 }
 

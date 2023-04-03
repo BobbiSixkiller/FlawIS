@@ -197,8 +197,8 @@ export class ConferenceInput {
   // @Field(() => [TicketInput], { nullable: true })
   // tickets?: TicketInput[];
 
-  @Field(() => [ConferenceInputTranslation], { nullable: true })
-  translations?: ConferenceInputTranslation[];
+  @Field(() => [ConferenceInputTranslation])
+  translations: ConferenceInputTranslation[];
 }
 
 @ObjectType()

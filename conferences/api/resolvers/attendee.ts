@@ -96,6 +96,11 @@ export class AttendeeResolver {
       },
     });
 
+    Messagebroker.produceMessage(
+      JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
+      "user.update.billings"
+    );
+
     return attendee;
   }
 

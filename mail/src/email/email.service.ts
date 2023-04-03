@@ -3,8 +3,9 @@ import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
+import { InvoiceMsg } from './templates/invoice';
 
-interface Msg {
+export interface Msg {
   locale: 'en' | 'sk';
   name: string;
   email: string;
@@ -40,7 +41,6 @@ export class EmailService {
       const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
         msg.locale
       }/activate?token=${msg.token}`;
-      console.log(url);
 
       await this.mailerService.sendMail({
         to: msg.email,
@@ -107,5 +107,27 @@ export class EmailService {
         i18nLang: msg.locale,
       },
     });
+  }
+
+  @RabbitSubscribe({
+    exchange: 'FlawIS',
+    routingKey: 'mail.invoice',
+  })
+  async sendConferenceInvoice(msg: InvoiceMsg) {
+    try {
+      await this.mailerService.sendMail({
+        to: msg.email,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: this.i18n.t('activation.subject', { lang: msg.locale }),
+        template: 'activation',
+        context: {
+          // ✏️ filling curly brackets with content
+          name: msg.name,
+          i18nLang: msg.locale,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

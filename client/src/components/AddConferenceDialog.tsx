@@ -14,7 +14,7 @@ import { InputField, LocalizedInputField } from "./form/InputField";
 import MultipleFileUploadField from "./form/Upload/MultipleFileUploadField";
 import { Wizzard, WizzardStep } from "./form/Wizzard";
 
-export default function AddConference() {
+export default function AddConferenceDialog() {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
 
   const { conferenceInputSchema, conferenceInvoiceInputSchema } = Validation();
