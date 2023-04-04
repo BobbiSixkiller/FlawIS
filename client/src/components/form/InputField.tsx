@@ -57,12 +57,9 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
 
   const [field, meta, helpers] = useField(props.name);
   const namePathsArray = props.name.split(".");
-  console.log(namePathsArray);
-  const firstPath = namePathsArray.shift();
-  console.log(firstPath);
   const [localizedField, localizedMeta, localizedHelpers] = useField(
     namePathsArray.length > 1
-      ? firstPath + ".translations[0]." + namePathsArray.join(".")
+      ? namePathsArray.shift() + ".translations[0]." + namePathsArray.join(".")
       : "translations[0]." + props.name
   );
 
@@ -84,13 +81,13 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
             //Form field is a react semantic UI Select Component
             if (props.multiple && value) {
               console.log(field.value);
-              // helpers.setValue(value);
+              helpers.setValue(value);
             } else {
               field.onChange(e);
             }
             setStatus({ ...status, [field.name]: undefined });
           }}
-          error={error}
+          error={error || localizedError}
         />
         <Transition visible={toggle} animation="scale" duration={500}>
           <Form.Field
@@ -103,7 +100,7 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
               //Form field is a react semantic UI Select Component
               if (props.multiple && value) {
                 console.log(field.value);
-                // helpers.setValue(value);
+                localizedHelpers.setValue(value);
               } else {
                 localizedField.onChange(e);
               }

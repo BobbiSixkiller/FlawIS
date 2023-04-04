@@ -33,7 +33,26 @@
       "DIC": { "label": "DIČ", "placeholder": "DIČ..." },
       "ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
     },
-    "tickets": {},
-    "submission": {}
-  }
+    "tickets": {
+      "label": "Select ticket"
+    },
+    "submission": {
+      "section": { "label": "Section", "placeholder": "Choose a section..." },
+      "name": { "label": "Title", "placeholder": "Submission's title..." },
+      "abstract": {
+        "label": "Abstract",
+        "placeholder": "Submission's abstract..."
+      },
+      "keywords": {
+        "label": "Keywords",
+        "placeholder": "Submission's keywords..."
+      },
+      "authors": {
+        "label": "Authors",
+        "placeholder": "Co-author's email address..."
+      },
+      "message": "The authors agree to the publication of the contribution in the anthology, which will be stored in the permanent repository of the Comenius University."
+    }
+  },
+  "dashboard": { "button": "Dashboard" }
 }

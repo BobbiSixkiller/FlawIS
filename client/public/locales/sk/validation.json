@@ -4,5 +4,6 @@
   "unibaEmail": "Email adresa musí pochádzať z domény uniba.sk!",
   "password": "Minimálne osem znakov, aspoň jedno písmeno a jedno číslo!",
   "passNoMatch": "Heslá sa nezhodujú!",
-  "terms": "Musíte súhlasiť s podmienkami používania"
+  "terms": "Musíte súhlasiť s podmienkami používania",
+  "keywords": "Musí obsahovať minimálne 1 Kľúčové slovo!"
 }

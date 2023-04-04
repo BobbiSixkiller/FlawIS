@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <link
+      rel='stylesheet'
+      href='https://flawis-backend.flaw.uniba.sk/public/UKsans/styles.css'
+    />
+    <link
+      href='https://fonts.googleapis.com/css2?family=Roboto&display=swap'
+      rel='stylesheet'
+    />
+
+    <style>
+      h1 {font-family: UKsans, Roboto, sans-serif;} p, a{font-family: Roboto,
+      sans-serif;}
+    </style>
+  </head>
+  <body>
+    <h1>{{t 'author.subject'}} {{conferenceName}}</h1>
+    <p>{{t 'common.greetings'}}</p>
+    <p>{{name}} {{t 'author.requestedBy'}}</p>
+    <p>{{t 'author.body'}}</p>
+    <table>
+      <tr>
+        <td>{{t 'author.submission.name'}}</td>
+        <td>{{submissionName}}</td>
+      </tr>
+      <tr>
+        <td>{{t 'author.submission.abstract'}}</td>
+        <td>{{submissionAbstract}}</td>
+      </tr>
+      <tr>
+        <td>{{t 'author.submission.keywords'}}</td>
+        <td>
+          <ul>
+            {{#each submissionKeywords}}
+              <li>{{this}}</li>
+            {{/each}}
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <a href={{url}}>{{t 'author.link'}}</a>
+  </body>
+</html>

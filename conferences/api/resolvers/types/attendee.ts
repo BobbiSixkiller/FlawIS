@@ -6,6 +6,7 @@ import { Attendee } from "../../entities/Attendee";
 import { RefDocExists } from "../../util/decorators";
 import { AddressInput, BillingInput } from "./conference";
 import { Billing } from "../../entities/Billing";
+import { SubmissionInput } from "./submission";
 
 @InputType()
 export class AttendeeBillingInput implements Billing {
@@ -39,6 +40,9 @@ export class AttendeeInput {
 
   @Field()
   billing: AttendeeBillingInput;
+
+  @Field({ nullable: true })
+  submission?: SubmissionInput;
 }
 
 @InputType()

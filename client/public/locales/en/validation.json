@@ -4,5 +4,6 @@
   "unibaEmail": "Email adress must be from uniba.sk domain!",
   "password": "Minimum eight characters, at least one letter and one number!",
   "passNoMatch": "Passwords do not match!",
-  "terms": "You must agree with the Privacy policy"
+  "terms": "You must agree with the Privacy policy",
+  "keywords": "Provide at least one keyword!"
 }

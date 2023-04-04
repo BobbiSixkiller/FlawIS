@@ -129,7 +129,7 @@ export default function Validation() {
   });
 
   const ticketInputSchema = object({
-    ticket: object().required(),
+    ticketId: string().required(),
   });
 
   const submissionInputSchema = object({
@@ -137,13 +137,14 @@ export default function Validation() {
       sectionId: string().required(),
       name: string().trim().required(),
       abstract: string().trim().required(),
-      keywords: array().of(string().trim()).min(1),
+      keywords: array().of(string().trim()).min(1, t("keywords")),
+      authors: array().of(string().email()),
       translations: array().of(
         object({
           language: string(),
           name: string().trim().required(),
           abstract: string().trim().required(),
-          keywords: array().of(string().trim()).min(1),
+          keywords: array().of(string().trim()).min(1, t("keywords")),
         })
       ),
     }),

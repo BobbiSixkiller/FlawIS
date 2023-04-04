@@ -1,0 +1,11 @@
+{
+  "subject": "Co-author request",
+  "requestedBy": "submitted your email address to the list of authors of his submission to the upcoming conference.",
+  "body": "If you wish to participate, please click on the following link and complete a registration process.",
+  "submission": {
+    "name": "Name",
+    "abstract": "Abstract",
+    "keywords": "Keywords"
+  },
+  "link": "I wish to be a co-author"
+}

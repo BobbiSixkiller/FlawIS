@@ -12,6 +12,7 @@ import { UserInputError } from "apollo-server";
 import { Attendee } from "../entities/Attendee";
 import { Context } from "./auth";
 import { Section } from "../entities/Section";
+import { convertDocument } from "../middlewares/typegoose-middleware";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
 class RefDocValidator implements ValidatorConstraintInterface {
@@ -53,7 +54,7 @@ export function CheckTicket(): ParameterDecorator {
     );
     if (!ticket) throw new UserInputError("Invalid ticket!");
 
-    const { user } = context as Context;
+    const { user, locale } = context as Context;
     const attendeeExists = await getModelForClass(Attendee).findOne({
       conference: conference.id,
       user: user?.id,
@@ -61,7 +62,10 @@ export function CheckTicket(): ParameterDecorator {
     if (attendeeExists)
       throw new UserInputError("You are already signed up for the conference!");
 
-    return { ticket, conference };
+    return {
+      ticket,
+      conference: convertDocument(conference, locale),
+    };
   });
 }
 

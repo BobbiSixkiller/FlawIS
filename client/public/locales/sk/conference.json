@@ -33,7 +33,24 @@
       "DIC": { "label": "DIČ", "placeholder": "DIČ..." },
       "ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
     },
-    "tickets": {},
-    "submission": {}
-  }
+    "tickets": { "label": "Vyberte formu účasti" },
+    "submission": {
+      "section": { "label": "Sekcia", "placeholder": "Vyberte sekciu..." },
+      "name": { "label": "Názov", "placeholder": "Názov príspevku..." },
+      "abstract": {
+        "label": "Abstrakt",
+        "placeholder": "Abstrakt príspevku..."
+      },
+      "keywords": {
+        "label": "Kľúčové slová",
+        "placeholder": "Kľúčové slová..."
+      },
+      "authors": {
+        "label": "Autori",
+        "placeholder": "Email adresa spoluatora..."
+      },
+      "message": "Autori súhlasia s uverejnením príspevku v zborníku, ktorý bude uložený na trvalom úložisku Univerzity Komenského."
+    }
+  },
+  "dashboard": { "button": "Nástenka" }
 }

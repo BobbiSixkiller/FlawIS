@@ -37,7 +37,6 @@ type Attendee {
   submissions: [Submission!]!
   updatedAt: DateTime!
   user: User!
-  withSubmission: Boolean!
 }
 
 input AttendeeBillingInput {
@@ -62,6 +61,7 @@ type AttendeeEdge {
 input AttendeeInput {
   billing: AttendeeBillingInput!
   conferenceId: ObjectId!
+  submission: SubmissionInput
   ticketId: ObjectId!
 }
 
@@ -314,10 +314,10 @@ type Submission {
 input SubmissionInput {
   abstract: String!
   authors: [String!]
-  conferenceId: ObjectId
+  conferenceId: ObjectId!
   keywords: [String!]!
   name: String!
-  sectionId: ObjectId
+  sectionId: ObjectId!
   submissionUrl: String
   translations: [SubmissionInputTranslation!]!
 }

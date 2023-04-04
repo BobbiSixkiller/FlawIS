@@ -1,0 +1,22 @@
+mutation addAttendee($data: AttendeeInput!) {
+  addAttendee(data: $data) {
+    id
+    # invoice {
+
+    # }
+    submissions {
+      id
+      name
+      abstract
+      keywords
+      authors {
+        id
+        name
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}

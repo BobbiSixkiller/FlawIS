@@ -720,22 +720,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "withSubmission",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -957,6 +941,18 @@
                 "name": "ObjectId",
                 "ofType": null
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "submission",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "SubmissionInput",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -2151,15 +2147,19 @@
             "name": "translations",
             "description": null,
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ConferenceInputTranslation",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ConferenceInputTranslation",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -3494,8 +3494,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "ConferenceBilling",
                 "ofType": null
               }
             },
@@ -6927,9 +6927,13 @@
             "name": "conferenceId",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "ObjectId",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ObjectId",
+                "ofType": null
+              }
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -6979,9 +6983,13 @@
             "name": "sectionId",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "ObjectId",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ObjectId",
+                "ofType": null
+              }
             },
             "defaultValue": null,
             "isDeprecated": false,

@@ -88,10 +88,6 @@ export class Attendee extends TimeStamps {
 
   @Field()
   @Property()
-  withSubmission: boolean;
-
-  @Field()
-  @Property()
   online: boolean;
 
   //invoice subdoc added so individual invoice customization is possible

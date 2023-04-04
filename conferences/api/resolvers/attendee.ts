@@ -26,6 +26,8 @@ import { CheckTicket } from "../util/decorators";
 
 import env from "dotenv";
 import Messagebroker from "../util/rmq";
+import { localizeInput, localizeOutput } from "../util/locale";
+import { convertDocument } from "../middlewares/typegoose-middleware";
 
 env.config();
 
@@ -52,12 +54,15 @@ export class AttendeeResolver {
   @Authorized()
   @Mutation(() => Attendee)
   async addAttendee(
-    @Arg("data") { conferenceId, billing }: AttendeeInput,
+    @Arg("data") { conferenceId, billing, submission }: AttendeeInput,
     @CheckTicket() { ticket, conference }: VerifiedTicket,
-    @Ctx() { user }: Context
+    @Ctx() { user, locale }: Context
   ): Promise<Attendee> {
-    const ticketPrice = ticket.price / Number(process.env.VAT || 1.2);
+    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
+
+    console.log(conference, ticket);
+    console.log(priceWithouTax);
 
     await this.userService.update(
       { _id: user?.id },
@@ -74,32 +79,69 @@ export class AttendeeResolver {
       "user.update.billings"
     );
 
+    const currentDate = new Date();
+
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
-      withSubmission: ticket.withSubmission,
       online: ticket.online,
-      user: {
-        _id: user?.id,
-        email: user?.email,
-      },
+      user: user?.id,
       invoice: {
-        payer: { ...billing, name: user?.name },
+        issuer: { ...conference.billing },
+        payer: { ...billing },
         body: {
-          ticketPrice: Math.round((ticketPrice / 100) * 100) / 100,
+          price: Math.round((priceWithouTax / 100) * 100) / 100,
           vat: isFlaw
             ? 0
-            : Math.round((ticket.price - ticketPrice) * 100) / 100,
+            : Math.round((ticket.price - priceWithouTax) * 100) / 100,
           body: "Test invoice",
           comment:
             "In case of not due payment the host organisation is reserving the right to cancel attendee",
+          issueDate: currentDate,
+          dueDate: currentDate.setDate(currentDate.getDate() + 30),
+          vatDate: currentDate.setDate(currentDate.getDate() + 30),
         },
       },
     });
 
     Messagebroker.produceMessage(
-      JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
-      "user.update.billings"
+      JSON.stringify({
+        name: user?.name,
+        email: user?.email,
+        conferenceName: conference.name,
+        conferenceLogo: conference.logoUrl,
+        invoice: attendee.invoice,
+      }),
+      "mail.conference.invoice"
     );
+
+    if (submission) {
+      const registeredSubmission = await this.submissionService.create({
+        ...localizeInput(submission, submission.translations, locale),
+        authors: [],
+      });
+      const localizedSubmission = convertDocument(registeredSubmission, locale);
+
+      await this.attendeeService.update(
+        { _id: attendee.id },
+        { $addToSet: { submissions: registeredSubmission.id } }
+      );
+
+      submission.authors?.forEach((author) =>
+        Messagebroker.produceMessage(
+          JSON.stringify({
+            name: user?.name,
+            email: author,
+            conferenceName: conference.name,
+            conferenceSlug: conference.slug,
+            submissionId: localizedSubmission.id,
+            submissionName: localizedSubmission.name,
+            submissionAbstract: localizedSubmission.abstract,
+            submissionKeywords: localizedSubmission.keywords,
+          }),
+          "mail.conference.coAuthor"
+        )
+      );
+    }
 
     return attendee;
   }
@@ -149,7 +191,7 @@ export class AttendeeResolver {
   ): Promise<Submission[]> {
     return await this.submissionService.findAll({
       conference: conference,
-      authors: { id: user.id },
+      authors: user.id,
     });
   }
 }

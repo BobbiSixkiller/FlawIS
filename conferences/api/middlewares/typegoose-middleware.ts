@@ -46,7 +46,7 @@ export function transformIds(doc: object) {
   return Object.fromEntries(transformed);
 }
 
-function convertDocument(doc: Document, locale: string) {
+export function convertDocument(doc: Document, locale: string) {
   const convertedDocument = transformIds(doc.toObject());
   localizeOutput(convertedDocument, convertedDocument.translations, locale);
   const DocumentClass = getClass(doc)!;

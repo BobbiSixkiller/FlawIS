@@ -21,15 +21,20 @@
                 margin-right: auto;
                 display: flex;
                 flex-direction: column;                
-                padding: 1rem;
                 gap: 2rem;
             }
+            .header {
+                background-color: #B46B7A;
+                padding: 1rem;
+            }
             .row {
+                padding: 1rem;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-around;
             }
             table {
+                padding: 1rem;
                 border-collapse: collapse;
                 width: 100%;
             }
@@ -44,7 +49,7 @@
     <body>
         <div class="container">
             <div class="row">
-                <img src="Flaw-logo-notext.png" alt="flaw logo" width="100" height="100"> 
+                <img src="{{{conferenceLogo}}}" alt="flaw logo" width="100" height="100"> 
                 <h1>{{t 'conference.subject'}} {{invoice.issue}}</h1>
             </div>
             <div class="row">
@@ -95,7 +100,7 @@
                 <p>{{invoice.body.body}}</p>
                 <p>{{invoice.body.comment}}</p>
             </div>
-            <img style="align-self: center;" src="peciatka-FLAW.jpeg" alt="flaw stamp" width="300" height="100"> 
+            <img style="align-self: center;" src="{{{invoice.issuer.stampUrl}}}" alt="flaw stamp" width="300" height="100"> 
         </div>
     </body>
 </html>

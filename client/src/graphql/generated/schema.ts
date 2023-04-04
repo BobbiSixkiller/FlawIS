@@ -89,7 +89,6 @@ export type Attendee = {
   submissions: Array<Submission>;
   updatedAt: Scalars['DateTime'];
   user: User;
-  withSubmission: Scalars['Boolean'];
 };
 
 export type AttendeeBillingInput = {
@@ -116,6 +115,7 @@ export type AttendeeEdge = {
 export type AttendeeInput = {
   billing: AttendeeBillingInput;
   conferenceId: Scalars['ObjectId'];
+  submission?: InputMaybe<SubmissionInput>;
   ticketId: Scalars['ObjectId'];
 };
 
@@ -230,7 +230,7 @@ export type ConferenceInput = {
   logoUrl: Scalars['String'];
   name: Scalars['String'];
   slug: Scalars['String'];
-  translations?: InputMaybe<Array<ConferenceInputTranslation>>;
+  translations: Array<ConferenceInputTranslation>;
 };
 
 export type ConferenceInputTranslation = {
@@ -382,7 +382,7 @@ export type ImportantDates = {
 export type Invoice = {
   __typename?: 'Invoice';
   body: InvoiceData;
-  issuer: Scalars['String'];
+  issuer: ConferenceBilling;
   payer: Billing;
 };
 
@@ -844,10 +844,10 @@ export type Submission = {
 export type SubmissionInput = {
   abstract: Scalars['String'];
   authors?: InputMaybe<Array<Scalars['String']>>;
-  conferenceId?: InputMaybe<Scalars['ObjectId']>;
+  conferenceId: Scalars['ObjectId'];
   keywords: Array<Scalars['String']>;
   name: Scalars['String'];
-  sectionId?: InputMaybe<Scalars['ObjectId']>;
+  sectionId: Scalars['ObjectId'];
   submissionUrl?: InputMaybe<Scalars['String']>;
   translations: Array<SubmissionInputTranslation>;
 };
@@ -985,6 +985,13 @@ export type DeleteAnnouncementMutationVariables = Exact<{
 
 export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
 
+export type AddAttendeeMutationVariables = Exact<{
+  data: AttendeeInput;
+}>;
+
+
+export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, createdAt: any, updatedAt: any, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, authors: Array<{ __typename?: 'User', id: any, name: string }> }> } };
+
 export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, role: Role, verified: boolean, createdAt: any, updatedAt: any };
 
 export type LoginMutationVariables = Exact<{
@@ -1052,7 +1059,7 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
 
 export type ConferenceDashboardQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -1485,6 +1492,53 @@ export function useDeleteAnnouncementMutation(baseOptions?: Apollo.MutationHookO
 export type DeleteAnnouncementMutationHookResult = ReturnType<typeof useDeleteAnnouncementMutation>;
 export type DeleteAnnouncementMutationResult = Apollo.MutationResult<DeleteAnnouncementMutation>;
 export type DeleteAnnouncementMutationOptions = Apollo.BaseMutationOptions<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>;
+export const AddAttendeeDocument = gql`
+    mutation addAttendee($data: AttendeeInput!) {
+  addAttendee(data: $data) {
+    id
+    submissions {
+      id
+      name
+      abstract
+      keywords
+      authors {
+        id
+        name
+      }
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type AddAttendeeMutationFn = Apollo.MutationFunction<AddAttendeeMutation, AddAttendeeMutationVariables>;
+
+/**
+ * __useAddAttendeeMutation__
+ *
+ * To run a mutation, you first call `useAddAttendeeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddAttendeeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addAttendeeMutation, { data, loading, error }] = useAddAttendeeMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddAttendeeMutation(baseOptions?: Apollo.MutationHookOptions<AddAttendeeMutation, AddAttendeeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddAttendeeMutation, AddAttendeeMutationVariables>(AddAttendeeDocument, options);
+      }
+export type AddAttendeeMutationHookResult = ReturnType<typeof useAddAttendeeMutation>;
+export type AddAttendeeMutationResult = Apollo.MutationResult<AddAttendeeMutation>;
+export type AddAttendeeMutationOptions = Apollo.BaseMutationOptions<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -1876,6 +1930,7 @@ export const ConferenceDocument = gql`
       description
       languages
     }
+    attending
   }
 }
     `;

@@ -25,9 +25,10 @@ import { NextPageWithLayout } from "../../_app";
 import logo from "public/images/Flaw-logo-notext.png";
 import Image from "next/image";
 import {
+  AttendeeInput,
   ConferenceDocument,
   Section,
-  Ticket,
+  useAddAttendeeMutation,
   useConferenceDashboardQuery,
 } from "../../../graphql/generated/schema";
 import { NextPageContext } from "next";
@@ -37,45 +38,53 @@ import BillingInput from "../../../components/form/BillingInput";
 import { SyntheticEvent, useContext, useState } from "react";
 import { AuthContext } from "../../../providers/Auth";
 import { useField, useFormikContext } from "formik";
-import { object, string } from "yup";
 import SelectInput from "../../../components/form/SelectInput";
 
 function SelectTicket({
   label,
   name,
-  tickets,
   setSubmissionRegistration,
 }: {
   label: string;
   name: string;
-  tickets?: Ticket[];
   setSubmissionRegistration: (withSubmission: boolean) => void;
 }) {
   const [field, meta, _helpers] = useField(name);
   const { setFieldValue } = useFormikContext();
   const { i18n } = useTranslation();
+  const router = useRouter();
 
-  if (!tickets) {
+  console.log(field.value);
+
+  const { data, error } = useConferenceDashboardQuery({
+    variables: { slug: router.query.slug as string },
+  });
+
+  if (!data || error) {
     return null;
   }
 
   return (
     <Form.Field error={meta.error && meta.touched}>
       <label>{label}</label>
-      {tickets.map((ticket) => (
+      {data.conference.tickets.map((ticket) => (
         <Form.Field key={ticket.id}>
           <Radio
-            label={ticket.name}
+            label={`${ticket.name} - ${ticket.description} - ${
+              ticket.price / 100
+            } €`}
             name={name}
             value={ticket.name}
-            checked={field.value?.name === ticket.name}
+            checked={field.value === ticket.id}
             onChange={() => {
               if (ticket.withSubmission) {
                 setFieldValue("submission", {
-                  sectiondId: "",
+                  conferenceId: data.conference.id,
+                  sectionId: "",
                   name: "",
                   abstract: "",
                   keywords: [],
+                  authors: [],
                   translations: [
                     {
                       language: i18n.language === "sk" ? "en" : "sk",
@@ -86,7 +95,7 @@ function SelectTicket({
                   ],
                 });
               }
-              setFieldValue("ticket", ticket);
+              setFieldValue("ticketId", ticket.id);
             }}
             onClick={() => setSubmissionRegistration(ticket.withSubmission)}
           />
@@ -106,24 +115,40 @@ function RegisterSubmission({
 }: {
   sections?: Pick<Section, "id" | "name" | "description" | "languages">[];
 }) {
-  const [options, setOptions] = useState<
-    { key: number; text: string; value: string }[]
-  >([]);
-  const [localizedOptions, setLocalizedOptions] = useState<
-    { key: number; text: string; value: string }[]
-  >([]);
   const { values, setFieldValue } = useFormikContext<{
     ticket: any;
     submission: any;
   }>();
-  const { t } = useTranslation();
+  const [options, setOptions] = useState(
+    values.submission.keywords.map((w: any, i: number) => ({
+      key: i,
+      text: w,
+      value: w,
+    }))
+  );
+  const [localizedOptions, setLocalizedOptions] = useState(
+    values.submission.translations[0].keywords.map((w: any, i: number) => ({
+      key: i,
+      text: w,
+      value: w,
+    }))
+  );
+  const [authors, setAuthors] = useState(
+    values.submission.authors.map((w: any, i: number) => ({
+      key: i,
+      text: w,
+      value: w,
+    }))
+  );
+
+  const { t } = useTranslation("conference");
 
   return (
     <>
       <SelectInput
         name="submission.sectionId"
-        label="Section"
-        placeholder="Choose a section"
+        label={t("registration.submission.section.label")}
+        placeholder={t("registration.submission.section.placeholder")}
         options={sections!.map((s) => ({
           key: s.id,
           text: s.name,
@@ -153,33 +178,38 @@ function RegisterSubmission({
 			/> */}
       <LocalizedInputField
         name="submission.name"
-        label="Name"
-        placeholder="Name of the submission"
+        label={t("registration.submission.name.label")}
+        placeholder={t("registration.submission.name.placeholder")}
         type="text"
         control={Input}
       />
       <LocalizedInputField
         name="submission.abstract"
-        label="Abstract"
-        placeholder="Abstract of the submission"
+        label={t("registration.submission.abstract.label")}
+        placeholder={t("registration.submission.abstract.placeholder")}
         type="text"
         control={TextArea}
       />
       <LocalizedInputField
         name="submission.keywords"
-        label="Keywords"
-        placeholder="Keywords..."
+        label={t("registration.submission.keywords.label")}
+        placeholder={t("registration.submission.keywords.placeholder")}
         control={Select}
         allowAdditions
         multiple
         search
         searchInput={{
           name: "submission.keywords",
-          id: "form-control-section",
+          id: "form-control-keywords",
         }}
+        value={values.submission.keywords.map((k: any, i: number) => ({
+          key: i,
+          text: k,
+          value: k,
+        }))}
         options={options}
         onAddItem={(e: SyntheticEvent, { value }: SelectProps) => {
-          setOptions((prev) =>
+          setOptions((prev: any) =>
             Array.from(
               new Set([...prev]).add({
                 key: prev.length,
@@ -195,7 +225,7 @@ function RegisterSubmission({
         }}
         localizedOptions={localizedOptions}
         onAddItemLocalized={(e: SyntheticEvent, { value }: SelectProps) => {
-          setLocalizedOptions((prev) =>
+          setLocalizedOptions((prev: any) =>
             Array.from(
               new Set([...prev]).add({
                 key: prev.length,
@@ -214,14 +244,46 @@ function RegisterSubmission({
           );
         }}
       />
+      <InputField
+        name="submission.authors"
+        label={t("registration.submission.authors.label")}
+        placeholder={t("registration.submission.authors.placeholder")}
+        control={Select}
+        allowAdditions
+        multiple
+        search
+        searchInput={{
+          name: "submission.keywords",
+          id: "form-control-keywords",
+        }}
+        options={authors}
+        onAddItem={(e: SyntheticEvent, { value }: SelectProps) => {
+          setAuthors((prev: any) =>
+            Array.from(
+              new Set([...prev]).add({
+                key: prev.length,
+                text: value as string,
+                value: value as string,
+              })
+            )
+          );
+          setFieldValue(
+            "submission.authors",
+            Array.from(new Set([...values.submission.authors]).add(value))
+          );
+        }}
+      />
+
+      <Message info content={t("registration.submission.message")} />
     </>
   );
 }
 
 const RegisterAttendee: NextPageWithLayout = () => {
+  const [errorMsg, setErrorMsg] = useState("");
   const { user } = useContext(AuthContext);
   const router = useRouter();
-  const { i18n, t } = useTranslation("conference");
+  const { t } = useTranslation("conference");
   const [submissionRegistration, setSubmissionRegistration] = useState(false);
 
   const {
@@ -232,12 +294,9 @@ const RegisterAttendee: NextPageWithLayout = () => {
 
   const { data, error } = useConferenceDashboardQuery({
     variables: { slug: router.query.slug as string },
-    onCompleted: ({ conference }) => {
-      if (conference.attending) {
-        router.replace(`/${router.query.slug}/dashboard`);
-      }
-    },
   });
+
+  const [register] = useAddAttendeeMutation();
 
   return (
     <Grid centered padded>
@@ -266,6 +325,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
           {t("registration.header") + " " + data?.conference.name}
         </Header>
         {error && <Message error content={error.message} />}
+        {errorMsg && <Message error content={errorMsg} />}
         <Wizzard
           goBackCb={() => router.push(`/${router.query.slug}`)}
           initialValues={{
@@ -276,13 +336,25 @@ const RegisterAttendee: NextPageWithLayout = () => {
               DIC: "",
               ICDPH: "",
             },
-            conferenceId: undefined,
-            ticket: undefined,
+            conferenceId: "",
+            ticketId: "",
           }}
           onSubmit={async (values, formik) => {
             console.log({ ...values, conferenceId: data?.conference.id });
+
             try {
+              await register({
+                variables: {
+                  data: {
+                    ...values,
+                    ticketId: values.ticketId,
+                    conferenceId: data?.conference.id,
+                  } as AttendeeInput,
+                },
+              });
             } catch (error: any) {
+              console.log(error);
+              setErrorMsg(error.message);
               formik.setStatus(
                 parseErrors(
                   error.graphQLErrors[0].extensions.exception.validationErrors
@@ -360,9 +432,8 @@ const RegisterAttendee: NextPageWithLayout = () => {
             validationSchema={ticketInputSchema}
           >
             <SelectTicket
-              label="Listky"
-              name="ticket"
-              tickets={data?.conference.tickets}
+              label={t("registration.tickets.label")}
+              name="ticketId"
               setSubmissionRegistration={setSubmissionRegistration}
             />
           </WizzardStep>
@@ -390,13 +461,23 @@ export const getServerSideProps = async ({
   const client = initializeApollo({ headers: { ...req?.headers } });
 
   try {
-    await client.query({
+    const { data } = await client.query({
       query: ConferenceDocument,
       variables: { slug: query.slug?.toString() || "" },
     });
 
+    if (data && data.conference.attending) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: `/${data.conference.slug}/dashboard`,
+        },
+      };
+    }
+
     return addApolloState(client, {
       props: {
+        protect: true,
         ...(await serverSideTranslations(locale || "sk", [
           "common",
           "validation",
@@ -408,6 +489,7 @@ export const getServerSideProps = async ({
   } catch (error) {
     return {
       props: {
+        protect: true,
         ...(await serverSideTranslations(locale || "sk", [
           "common",
           "validation",
