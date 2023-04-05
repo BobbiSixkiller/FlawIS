@@ -1,3 +1,4 @@
+import { DocumentType } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import {
   Arg,
@@ -13,15 +14,20 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Attendee, AttendeeConnection } from "../entities/Attendee";
-import { Conference } from "../entities/Conference";
+import { Conference, Ticket } from "../entities/Conference";
 import { Section } from "../entities/Section";
 import { User } from "../entities/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
+import { LoadConference } from "../util/decorators";
 import { localizeInput, localizeOutput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { AttendeeArgs } from "./types/attendee";
-import { ConferenceConnection, ConferenceInput } from "./types/conference";
+import {
+  ConferenceConnection,
+  ConferenceInput,
+  TicketInput,
+} from "./types/conference";
 import { ConferenceUserInput } from "./types/user";
 
 @Service()
@@ -112,18 +118,43 @@ export class ConferenceResolver {
 
   @Authorized(["ADMIN"])
   @Mutation(() => Conference)
+  async addTicket(
+    @Arg("data") ticketInput: TicketInput,
+    @Arg("id") _id: ObjectId,
+    @LoadConference() conference: DocumentType<Conference>
+  ) {
+    conference.tickets.push(ticketInput as any);
+
+    return await conference.save();
+  }
+
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
+  async removeTicket(
+    @Arg("ticketId") ticketId: ObjectId,
+    @Arg("id") _id: ObjectId,
+    @LoadConference() conference: DocumentType<Conference>
+  ) {
+    const ticket = conference.tickets.find((t) => t.id === ticketId);
+    if (!ticket) throw new Error("Ticket not found!");
+
+    conference.tickets = conference.tickets.filter((t) => t !== ticket);
+
+    return await conference.save();
+  }
+
+  @Authorized(["ADMIN"])
+  @Mutation(() => Conference)
   async updateConference(
-    @Arg("id", () => ObjectIdScalar) id: ObjectId,
+    @Arg("id", () => ObjectIdScalar) _id: ObjectId,
     @Arg("data") conferenceInput: ConferenceInput,
+    @LoadConference() conference: DocumentType<Conference>,
     @Ctx() { locale }: Context
   ) {
-    const conference = await this.conferenceService.findOne({ _id: id });
-    if (!conference) throw new Error("Conference not found!");
-
     for (const [key, value] of Object.entries(
       localizeInput(conferenceInput, conferenceInput.translations, locale)
     )) {
-      conference[key as keyof Conference] = value;
+      conference[key as keyof ConferenceInput] = value as any;
     }
 
     return await conference.save();
@@ -152,7 +183,6 @@ export class ConferenceResolver {
     return await conferenceUser.save();
   }
 
-  @Authorized()
   @FieldResolver(() => [Section])
   async sections(@Root() { sections }: Conference): Promise<Section[]> {
     return await this.sectionService.findAll({ _id: sections });
@@ -242,17 +272,5 @@ export class ConferenceResolver {
         "user.id": user!.id,
       })) !== null
     );
-  }
-
-  @Authorized()
-  @FieldResolver(() => Int)
-  async attendeesCount(
-    @Root() { id }: Conference,
-    @Ctx() { user }: Context
-  ): Promise<number> {
-    return await this.attendeeService.dataModel.countDocuments({
-      conference: id,
-      "user.id": user!.id,
-    });
   }
 }

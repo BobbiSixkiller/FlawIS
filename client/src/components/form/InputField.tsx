@@ -1,9 +1,18 @@
 import { useField, useFormikContext } from "formik";
 import { useTranslation } from "next-i18next";
-import React, { ChangeEvent, FC, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  FC,
+  SyntheticEvent,
+  useRef,
+  useState,
+} from "react";
 import {
+  DropdownProps,
   Form,
   FormFieldProps,
+  Label,
+  Select,
   SelectProps,
   Transition,
 } from "semantic-ui-react";
@@ -13,6 +22,8 @@ export interface InputFieldProps extends FormFieldProps {
   name: string;
   fluid?: boolean;
   placeholder?: string;
+  localizedOptions?: { key: number; text: string; value: string }[];
+  onAddItemLocalized?: (e: SyntheticEvent, data: SelectProps) => void;
 }
 
 export const InputField: FC<InputFieldProps> = (props) => {
@@ -44,9 +55,12 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
   const inputRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(inputRef, () => setToggle(false));
 
-  const [field, meta, _helpers] = useField(props.name);
-  const [localizedField, localizedMeta, _localizedHelpers] = useField(
-    "translations[0]." + props.name
+  const [field, meta, helpers] = useField(props.name);
+  const namePathsArray = props.name.split(".");
+  const [localizedField, localizedMeta, localizedHelpers] = useField(
+    namePathsArray.length > 1
+      ? namePathsArray.shift() + ".translations[0]." + namePathsArray.join(".")
+      : "translations[0]." + props.name
   );
 
   const { status, setStatus } = useFormikContext();
@@ -63,11 +77,17 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
           {...props}
           {...field}
           onFocus={() => setToggle(true)}
-          onChange={(e: ChangeEvent) => {
-            field.onChange(e);
+          onChange={(e: ChangeEvent, { value }: SelectProps) => {
+            //Form field is a react semantic UI Select Component
+            if (props.multiple && value) {
+              console.log(field.value);
+              helpers.setValue(value);
+            } else {
+              field.onChange(e);
+            }
             setStatus({ ...status, [field.name]: undefined });
           }}
-          error={error}
+          error={error || localizedError}
         />
         <Transition visible={toggle} animation="scale" duration={500}>
           <Form.Field
@@ -76,6 +96,18 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
               i18n.language === "sk" ? "anglicky" : "in slovak"
             }`}
             {...localizedField}
+            onChange={(e: ChangeEvent, { value }: SelectProps) => {
+              //Form field is a react semantic UI Select Component
+              if (props.multiple && value) {
+                console.log(field.value);
+                localizedHelpers.setValue(value);
+              } else {
+                localizedField.onChange(e);
+              }
+              setStatus({ ...status, [localizedField.name]: undefined });
+            }}
+            options={props.localizedOptions}
+            onAddItem={props.onAddItemLocalized}
             error={localizedError}
           />
         </Transition>

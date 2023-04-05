@@ -1,0 +1,11 @@
+{
+  "subject": "Spoluautorstvo",
+  "requestedBy": "zadal Vašu email adresu do zoznamu spoluautorov svojho príspevku v rámci nadchádzajúcej konferencie.",
+  "body": "Ak si želáte stať sa spoluautorom a vystupovať s príspevkom na konferencii, prosím kliknite na nasledujúci link a dokončite registračný proces.",
+  "submission": {
+    "name": "Názov príspevku",
+    "abstract": "Abstrakt",
+    "keywords": "Kľúčové slová"
+  },
+  "link": "Chcem sa stať spoluautorom"
+}

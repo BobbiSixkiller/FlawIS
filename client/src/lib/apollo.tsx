@@ -42,12 +42,6 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
             console.log(
               `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
             );
-            if (
-              message ===
-              "Access denied! You need to be authorized to perform this action!"
-            ) {
-              localStorage.removeItem("loggedIn");
-            }
           });
 
         if (networkError)
@@ -84,10 +78,6 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
               merge(existing = {}, incoming) {
                 const cache = { ...existing };
                 if (cache.edges === undefined) return incoming;
-
-                cache.edges = [...cache.edges, ...incoming.edges];
-                cache.pageInfo = incoming.pageInfo;
-                cache.year = incoming.year;
 
                 return cache;
               },

@@ -64,7 +64,6 @@ export default function MultipleFileUploadField({
 }) {
   const [field, meta, helpers] = useField(name);
   const [files, setFiles] = useState<UploadableFile[]>(field.value);
-  console.log(files);
 
   useEffect(() => {
     helpers.setValue(files.filter((fw) => fw.url !== undefined));

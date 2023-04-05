@@ -3,7 +3,7 @@
 import { getModelForClass } from "@typegoose/typegoose";
 import client, { Connection, Channel, Message } from "amqplib";
 import env from "dotenv";
-import User from "../entities/File";
+import User, { File } from "../entities/File";
 
 env.config();
 
@@ -12,8 +12,6 @@ type RoutingKey =
   | "user.new"
   | "user.delete"
   | "user.update.personal";
-
-type File = { path: string };
 
 class Messagebroker {
   private static connection?: Connection;

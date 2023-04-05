@@ -96,9 +96,9 @@ const ConferencePage: NextPageWithLayout = () => {
                   primary
                   circular
                 >
-                  {data?.conference.attending || user?.role === Role.Admin
-                    ? "To dashboard"
-                    : "Register"}
+                  {data?.conference.attending
+                    ? t("dashboard.button")
+                    : t("registration.header")}
                 </Button>
               </Grid.Column>
             </Grid.Row>
@@ -192,6 +192,7 @@ export const getServerSideProps = async ({
         ...(await serverSideTranslations(locale || "sk", [
           "common",
           "conference",
+          "activation",
         ])),
       },
     });
@@ -201,6 +202,7 @@ export const getServerSideProps = async ({
         ...(await serverSideTranslations(locale || "sk", [
           "common",
           "conference",
+          "activation",
         ])),
       },
     };

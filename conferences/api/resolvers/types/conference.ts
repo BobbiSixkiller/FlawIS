@@ -2,9 +2,11 @@ import { Field, InputType, Int, ObjectType } from "type-graphql";
 import {
   IsBoolean,
   IsDate,
+  IsInt,
   IsLocale,
   IsNumberString,
   IsString,
+  Min,
 } from "class-validator";
 
 import {
@@ -48,9 +50,6 @@ class ConferenceInputTranslation {
   @Field()
   @IsString()
   logoUrl: string;
-
-  @Field(() => [TicketInputTranslation], { nullable: true })
-  tickets?: TicketInputTranslation[];
 }
 
 @InputType()
@@ -129,8 +128,11 @@ export class TicketInput implements Partial<Ticket> {
   withSubmission: boolean;
 
   @Field(() => Int)
-  @IsNumberString()
+  @Min(1)
   price: number;
+
+  @Field(() => [TicketInputTranslation])
+  translations: TicketInputTranslation[];
 }
 
 @InputType()
@@ -195,8 +197,8 @@ export class ConferenceInput {
   // @Field(() => [TicketInput], { nullable: true })
   // tickets?: TicketInput[];
 
-  @Field(() => [ConferenceInputTranslation], { nullable: true })
-  translations?: ConferenceInputTranslation[];
+  @Field(() => [ConferenceInputTranslation])
+  translations: ConferenceInputTranslation[];
 }
 
 @ObjectType()

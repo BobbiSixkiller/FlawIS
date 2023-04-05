@@ -1,3 +1,28 @@
 {
-  "subject": "Invoice"
+  "subject": "Invoice",
+  "invoice": {
+    "issuer": "Issued by",
+    "payer": "Payer",
+    "name": "Name",
+    "address": {
+      "street": "Street",
+      "city": "City",
+      "postal": "Postal",
+      "country": "Country"
+    },
+    "ICO": "IČO",
+    "DIC": "DIČ",
+    "ICDPH": "IČDPH",
+    "variableSymbol": "Variable symbol",
+    "IBAN": "IBAN",
+    "SWIFT": "SWIFT",
+    "issueDate": "Issue Date",
+    "dueDate": "Due Date",
+    "vatDate": "VAT Date"
+  },
+  "fee": "Conference Fee",
+  "sum": "Sum",
+  "item": "Item",
+  "price": "Price",
+  "vat": "VAT"
 }

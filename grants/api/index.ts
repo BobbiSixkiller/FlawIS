@@ -18,6 +18,7 @@ import { resolveUserReference } from "./resolvers/resolveUserReference";
 import env from "dotenv";
 import MessageBroker from "./util/rmq";
 import { AnnouncementResolver } from "./resolvers/announcement";
+import { initRedis } from "./util/redis";
 
 env.config();
 
@@ -72,6 +73,8 @@ async function main() {
   console.log(mongoose.connection && "Database connected!");
 
   await MessageBroker.init();
+
+  // await initRedis();
 
   await server.listen({ port }, () =>
     console.log(

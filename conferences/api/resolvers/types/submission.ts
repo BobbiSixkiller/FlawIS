@@ -49,18 +49,17 @@ export class SubmissionInput {
   })
   keywords: string[];
 
-  @Field({ nullable: true })
-  conferenceId?: ObjectId;
+  @Field()
+  conferenceId: ObjectId;
 
-  @Field({ nullable: true })
-  sectionId?: ObjectId;
+  @Field()
+  sectionId: ObjectId;
 
   @Field({ nullable: true })
   @IsUrl()
   submissionUrl?: string;
 
   @Field(() => [String], { nullable: true })
-  @IsEmail({}, { each: true })
   authors?: string[];
 
   @Field(() => [SubmissionInputTranslation])

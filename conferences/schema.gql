@@ -37,7 +37,6 @@ type Attendee {
   submissions: [Submission!]!
   updatedAt: DateTime!
   user: User!
-  withSubmission: Boolean!
 }
 
 input AttendeeBillingInput {
@@ -62,6 +61,7 @@ type AttendeeEdge {
 input AttendeeInput {
   billing: AttendeeBillingInput!
   conferenceId: ObjectId!
+  submission: SubmissionInput
   ticketId: ObjectId!
 }
 
@@ -143,7 +143,7 @@ input ConferenceInput {
   logoUrl: String!
   name: String!
   slug: String!
-  translations: [ConferenceInputTranslation!]
+  translations: [ConferenceInputTranslation!]!
 }
 
 input ConferenceInputTranslation {
@@ -151,7 +151,6 @@ input ConferenceInputTranslation {
   language: String!
   logoUrl: String!
   name: String!
-  tickets: [TicketInputTranslation!]
 }
 
 type ConferencePageInfo {
@@ -205,7 +204,7 @@ type ImportantDates {
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
-  issuer: String!
+  issuer: ConferenceBilling!
   payer: Billing!
 }
 
@@ -215,7 +214,7 @@ type InvoiceData {
   comment: String!
   dueDate: DateTime!
   issueDate: DateTime!
-  ticketPrice: Int!
+  price: Int!
   type: String!
   variableSymbol: String!
   vat: Int!
@@ -244,12 +243,14 @@ input InvoiceInput {
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   addSubmission(data: SubmissionInput!): Submission!
+  addTicket(data: TicketInput!, id: ObjectId!): Conference!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!, id: ObjectId!): Section!
   deleteConference(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): Boolean!
   deleteSubmission(id: ObjectId!): Boolean!
   removeAttendee(id: ObjectId!): Boolean!
+  removeTicket(id: ObjectId!, ticketId: ObjectId!): Conference!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
   updateConferenceUser(data: ConferenceUserInput!): User!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
@@ -313,10 +314,10 @@ type Submission {
 input SubmissionInput {
   abstract: String!
   authors: [String!]
-  conferenceId: ObjectId
+  conferenceId: ObjectId!
   keywords: [String!]!
   name: String!
-  sectionId: ObjectId
+  sectionId: ObjectId!
   submissionUrl: String
   translations: [SubmissionInputTranslation!]!
 }
@@ -342,6 +343,15 @@ type Ticket {
   name: String!
   online: Boolean!
   price: Int!
+  withSubmission: Boolean!
+}
+
+input TicketInput {
+  description: String!
+  name: String!
+  online: Boolean!
+  price: Int!
+  translations: [TicketInputTranslation!]!
   withSubmission: Boolean!
 }
 

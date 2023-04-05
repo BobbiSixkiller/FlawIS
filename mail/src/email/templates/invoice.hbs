@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    {{! <link
+      rel='stylesheet'
+      href='https://flawis-backend.flaw.uniba.sk/public/UKsans/styles.css'
+    />
+    <link
+      href='https://fonts.googleapis.com/css2?family=Roboto&display=swap'
+      rel='stylesheet'
+    /> }}
+    <link href='https://fonts.cdnfonts.com/css/corbel' rel='stylesheet' />
+
+    <style>
+      body{ font-family: "UKsans", "Roboto", "corbel", sans-serif ; } .container
+      { max-width: 900px; margin-left: auto; margin-right: auto; display: flex;
+      flex-direction: column; gap: 2rem; } .header { background-color: #B46B7A;
+      } .row { padding: 1rem; display: flex; flex-direction: row;
+      justify-content: space-between; } .items { padding: 1rem; border-collapse:
+      collapse; width: 100%; } .items td, .items th { border: 1px solid #dddddd; text-align:
+      left; padding: 8px; } 
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row header'>
+        <img src='{{{conferenceLogo}}}' alt='flaw logo' height='100' />
+        <h1>{{t 'conference.subject'}} {{invoice.issuer.variableSymbol}}</h1>
+
+      </div>
+      <div class='row'>
+        <table style="width: 50%; border: none; padding: 0">
+          <tr>
+            <td>{{t 'conference.invoice.issuer'}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.name'}}</td><td></td>{{invoice.issuer.name}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.address.street'}}</td><td>{{invoice.issuer.address.street}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.address.city'}}</td><td>{{invoice.issuer.address.city}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.address.postal'}}</td><td>{{invoice.issuer.address.postal}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.address.country'}}</td><td>{{invoice.issuer.address.country}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.ICO'}}</td><td>{{invoice.issuer.ICO}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.DIC'}}</td><td>{{invoice.issuer.DIC}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.ICDPH'}}</td><td>{{invoice.issuer.ICDPH}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.variableSymbol'}}</td><td>{{invoice.issuer.variableSymbol}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.IBAN'}}</td><td>{{invoice.issuer.IBAN}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.SWIFT'}}</td><td>{{invoice.issuer.SWIFT}}</td>
+          </tr>
+          <tr>
+          `<td>{{t 'conference.invoice.issueDate'}}</div><td>{{DATE invoice.body.issueDate}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.vatDate'}}</td><td>{{DATE invoice.body.issueDate}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.invoice.dueDate'}}</td><td>{{DATE invoice.body.issueDate}}</td>
+          </tr>
+        </table>
+        <div style='display: flex; flex-direction: column;'>
+          <p>{{t 'conference.invoice.name'}} {{invoice.payer.name}}</p>
+          <p>{{t 'conference.invoice.address.street'}}
+            {{invoice.payer.address.street}}</p>
+          <p>{{t 'conference.invoice.address.city'}}
+            {{invoice.payer.address.city}}</p>
+          <p>{{t 'conference.invoice.address.postal'}}
+            {{invoice.payer.address.postal}}</p>
+          <p>{{t 'conference.invoice.address.country'}}
+            {{invoice.payer.address.country}}</p>
+          <p>{{t 'conference.invoice.ICO'}} {{invoice.payer.ICO}}</p>
+          <p>{{t 'conference.invoice.DIC'}} {{invoice.payer.DIC}}</p>
+          <p>{{t 'conference.invoice.ICDPH'}} {{invoice.payer.ICDPH}}</p>
+        </div>
+      </div>
+      <div class='row'>
+        <table class="items">
+          <tr>
+            <th>{{t 'conference.item'}}</th><th>{{t 'conference.price'}}</th>
+          </tr>
+          <tr>
+            <td>{{t 'conference.fee'}}</td><td>{{invoice.body.price}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.vat'}}</td><td>{{invoice.body.vat}}</td>
+          </tr>
+          <tr>
+            <td>{{t 'conference.sum'}}</td>
+            <td>
+              {{SUM invoice.body.price invoice.body.vat}}
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div style='text-align: center;'>
+        <p>{{invoice.body.body}}</p>
+        <p>{{invoice.body.comment}}</p>
+      </div>
+      <img
+        style='align-self: center;'
+        src='{{{invoice.issuer.stampUrl}}}'
+        alt='flaw stamp'
+        width='300'
+        height='100'
+      />
+    </div>
+  </body>
+</html>

@@ -30,7 +30,11 @@ import { CustomResolver } from './custom.resolver';
           },
           template: {
             dir: join(__dirname, '/templates/'),
-            adapter: new HandlebarsAdapter({ t: i18n.hbsHelper }),
+            adapter: new HandlebarsAdapter({
+              t: i18n.hbsHelper,
+              SUM: (a, b) => a + b,
+              DATE: (date) => new Date(date).toLocaleDateString(),
+            }),
             options: {
               strict: true,
             },
@@ -42,4 +46,4 @@ import { CustomResolver } from './custom.resolver';
   ],
   providers: [EmailService],
 })
-export class EmailModule { }
+export class EmailModule {}

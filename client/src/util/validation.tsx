@@ -128,6 +128,28 @@ export default function Validation() {
     }),
   });
 
+  const ticketInputSchema = object({
+    ticketId: string().required(),
+  });
+
+  const submissionInputSchema = object({
+    submission: object({
+      sectionId: string().required(),
+      name: string().trim().required(),
+      abstract: string().trim().required(),
+      keywords: array().of(string().trim()).min(1, t("keywords")),
+      authors: array().of(string().email()),
+      translations: array().of(
+        object({
+          language: string(),
+          name: string().trim().required(),
+          abstract: string().trim().required(),
+          keywords: array().of(string().trim()).min(1, t("keywords")),
+        })
+      ),
+    }),
+  });
+
   return {
     loginInputSchema,
     flawisRegisterInputSchema,
@@ -138,5 +160,7 @@ export default function Validation() {
     conferenceInputSchema,
     conferenceInvoiceInputSchema,
     attendeeBillingInputSchema,
+    ticketInputSchema,
+    submissionInputSchema,
   };
 }

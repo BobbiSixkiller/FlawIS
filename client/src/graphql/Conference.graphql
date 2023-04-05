@@ -29,6 +29,33 @@ query conference($slug: String!) {
     slug
     description
     logoUrl
+    dates {
+      start
+      end
+      regEnd
+    }
+    sections {
+      id
+      name
+      description
+      languages
+    }
+    attending
+  }
+}
+
+query conferenceDashboard($slug: String!) {
+  conference(slug: $slug) {
+    id
+    name
+    slug
+    description
+    logoUrl
+    dates {
+      start
+      end
+      regEnd
+    }
     tickets {
       id
       name
@@ -44,6 +71,34 @@ query conference($slug: String!) {
       languages
     }
     attending
+  }
+}
+
+mutation addTicket($id: ObjectId!, $data: TicketInput!) {
+  addTicket(id: $id, data: $data) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+  }
+}
+
+mutation removeTicket($id: ObjectId!, $ticketId: ObjectId!) {
+  removeTicket(id: $id, ticketId: $ticketId) {
+    id
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
   }
 }
 

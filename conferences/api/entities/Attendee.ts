@@ -1,4 +1,4 @@
-import { prop as Property } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Field, ID, Int, ObjectType } from "type-graphql";
@@ -7,7 +7,7 @@ import CreateConnection from "../resolvers/types/pagination";
 import { Ref } from "../util/types";
 import { Billing } from "./Billing";
 
-import { Conference } from "./Conference";
+import { Conference, ConferenceBilling } from "./Conference";
 import { Submission } from "./Submission";
 import { User } from "./User";
 
@@ -35,7 +35,7 @@ class InvoiceData {
 
   @Field(() => Int)
   @Property()
-  ticketPrice: Number;
+  price: Number;
 
   @Field(() => Int)
   @Property()
@@ -56,15 +56,23 @@ export class Invoice {
   @Property({ type: () => Billing, _id: false })
   payer: Billing;
 
-  @Field()
-  @Property()
-  issuer: string;
+  @Field(() => ConferenceBilling)
+  @Property({ type: () => ConferenceBilling, _id: false })
+  issuer: ConferenceBilling;
 
   @Field(() => InvoiceData)
   @Property({ type: () => InvoiceData, _id: false })
   body: InvoiceData;
 }
 
+@pre<Attendee>("save", async function () {
+  if (this.isNew) {
+    await getModelForClass(Conference).updateOne(
+      { _id: this.id },
+      { $inc: { attendeesCount: 1 } }
+    );
+  }
+})
 @ObjectType({ description: "Attendee model type" })
 export class Attendee extends TimeStamps {
   @Field(() => ID)
@@ -77,10 +85,6 @@ export class Attendee extends TimeStamps {
   @Field(() => User)
   @Property({ ref: () => User })
   user: Ref<User>;
-
-  @Field()
-  @Property()
-  withSubmission: boolean;
 
   @Field()
   @Property()
