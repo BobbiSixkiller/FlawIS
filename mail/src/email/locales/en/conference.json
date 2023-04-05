@@ -1,6 +1,8 @@
 {
   "subject": "Invoice",
   "invoice": {
+    "issuer": "Issued by",
+    "payer": "Payer",
     "name": "Name",
     "address": {
       "street": "Street",

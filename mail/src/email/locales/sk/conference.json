@@ -1,6 +1,8 @@
 {
   "subject": "Faktúra",
   "invoice": {
+    "issuer": "Vydal",
+    "payer": "Platca",
     "name": "Meno",
     "address": {
       "street": "Ulica",

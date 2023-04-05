@@ -4,9 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
 import { InvoiceMsg } from './templates/invoice';
-import { join } from 'path';
-import { renderFile } from 'ejs';
-import * as pdfkit from 'pdfkit';
+import { compile } from 'handlebars';
 import { AuthorMsg } from './templates/author';
 
 export interface Msg {
@@ -35,25 +33,6 @@ export class EmailService {
     private i18n: I18nService,
     private configService: ConfigService,
   ) {}
-
-  private async generatePdfStream(
-    html: string,
-  ): Promise<NodeJS.ReadableStream> {
-    const pdfStream = new pdfkit({ size: 'A4', margin: 50 });
-    pdfStream.font('Helvetica');
-    pdfStream.text(html, { align: 'justify' });
-    pdfStream.end();
-    return pdfStream;
-  }
-
-  private async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
-    const chunks = [];
-    return new Promise((resolve, reject) => {
-      stream.on('data', (chunk) => chunks.push(chunk));
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', (error) => reject(error));
-    });
-  }
 
   @RabbitSubscribe({
     exchange: 'FlawIS',
@@ -137,14 +116,6 @@ export class EmailService {
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
-    const templateHtml = await renderFile(
-      join(__dirname, './templates/invoice.hbs'),
-      msg.invoice,
-    );
-    const pdfStream = await this.generatePdfStream(templateHtml);
-    const pdfBuffer = await this.streamToBuffer(pdfStream);
-    const fileName = `invoice-${new Date().getTime()}.pdf`;
-
     await this.mailerService.sendMail({
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
@@ -158,9 +129,10 @@ export class EmailService {
         name: msg.name,
         i18nLang: msg.locale,
         conferenceLogo: msg.conferenceLogo,
+        conferenceName: msg.conferenceName,
         invoice: msg.invoice,
       },
-      attachments: [{ filename: fileName, content: pdfBuffer }],
+      // attachments: [{ filename: fileName, content: pdfBuffer }],
     });
   }
 
@@ -169,25 +141,27 @@ export class EmailService {
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    try {
-      const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
-        msg.locale
-      }/${msg.conferenceSlug}/register?submission=${msg.submissionId}`;
+    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
+      msg.locale
+    }/${msg.conferenceSlug}/register?submission=${msg.submissionId}`;
 
-      await this.mailerService.sendMail({
-        to: msg.email,
-        // from: '"Support Team" <support@example.com>', // override default from
-        subject: this.i18n.t('author.subject', { lang: msg.locale }),
-        template: 'author',
-        context: {
-          // ✏️ filling curly brackets with content
-          name: msg.name,
-          url,
-          i18nLang: msg.locale,
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    await this.mailerService.sendMail({
+      to: msg.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: this.i18n.t('author.subject', { lang: msg.locale }),
+      template: 'author',
+      context: {
+        // ✏️ filling curly brackets with content
+        name: msg.name,
+        url,
+        i18nLang: msg.locale,
+        conferenceName: msg.conferenceName,
+        conferenceSlug: msg.conferenceSlug,
+        submissionId: msg.submissionId,
+        submissionName: msg.submissionName,
+        submissionAbstract: msg.submissionAbstract,
+        submissionKeywords: msg.submissionKeywords,
+      },
+    });
   }
 }

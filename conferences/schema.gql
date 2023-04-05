@@ -214,7 +214,7 @@ type InvoiceData {
   comment: String!
   dueDate: DateTime!
   issueDate: DateTime!
-  ticketPrice: Int!
+  price: Int!
   type: String!
   variableSymbol: String!
   vat: Int!

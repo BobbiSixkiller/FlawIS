@@ -61,9 +61,6 @@ export class AttendeeResolver {
     const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
-    console.log(conference, ticket);
-    console.log(priceWithouTax);
-
     await this.userService.update(
       { _id: user?.id },
       {
@@ -78,8 +75,6 @@ export class AttendeeResolver {
       JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
       "user.update.billings"
     );
-
-    const currentDate = new Date();
 
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
@@ -96,15 +91,13 @@ export class AttendeeResolver {
           body: "Test invoice",
           comment:
             "In case of not due payment the host organisation is reserving the right to cancel attendee",
-          issueDate: currentDate,
-          dueDate: currentDate.setDate(currentDate.getDate() + 30),
-          vatDate: currentDate.setDate(currentDate.getDate() + 30),
         },
       },
     });
 
     Messagebroker.produceMessage(
       JSON.stringify({
+        locale,
         name: user?.name,
         email: user?.email,
         conferenceName: conference.name,
@@ -129,6 +122,7 @@ export class AttendeeResolver {
       submission.authors?.forEach((author) =>
         Messagebroker.produceMessage(
           JSON.stringify({
+            locale,
             name: user?.name,
             email: author,
             conferenceName: conference.name,

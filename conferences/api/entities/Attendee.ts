@@ -35,7 +35,7 @@ class InvoiceData {
 
   @Field(() => Int)
   @Property()
-  ticketPrice: Number;
+  price: Number;
 
   @Field(() => Int)
   @Property()
