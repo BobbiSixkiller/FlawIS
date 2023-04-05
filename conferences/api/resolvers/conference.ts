@@ -269,7 +269,7 @@ export class ConferenceResolver {
     return (
       (await this.attendeeService.exists({
         conference: id,
-        "user.id": user!.id,
+        user: user!.id,
       })) !== null
     );
   }

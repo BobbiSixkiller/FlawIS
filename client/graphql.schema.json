@@ -3594,7 +3594,7 @@
             "deprecationReason": null
           },
           {
-            "name": "ticketPrice",
+            "name": "price",
             "description": null,
             "args": [],
             "type": {

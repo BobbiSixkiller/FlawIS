@@ -393,7 +393,7 @@ export type InvoiceData = {
   comment: Scalars['String'];
   dueDate: Scalars['DateTime'];
   issueDate: Scalars['DateTime'];
-  ticketPrice: Scalars['Int'];
+  price: Scalars['Int'];
   type: Scalars['String'];
   variableSymbol: Scalars['String'];
   vat: Scalars['Int'];
