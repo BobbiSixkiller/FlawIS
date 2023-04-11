@@ -19,6 +19,7 @@ import { CheckConferenceSection } from "../util/decorators";
 import { localizeInput } from "../util/locale";
 import { ConferenceSection } from "../util/types";
 import { SubmissionInput } from "./types/submission";
+import { User } from "../entities/User";
 
 @Service()
 @Resolver(() => Submission)
@@ -26,7 +27,8 @@ export class SubmissionResolver {
 	constructor(
 		private readonly submissionService = new CRUDservice(Submission),
 		private readonly conferenceService = new CRUDservice(Conference),
-		private readonly sectionService = new CRUDservice(Section)
+		private readonly sectionService = new CRUDservice(Section),
+		private readonly userService = new CRUDservice(User)
 	) {}
 
 	@Authorized()
@@ -51,13 +53,6 @@ export class SubmissionResolver {
 			section: section.id,
 			authors: [{ id: user!.id }],
 		});
-
-		if (data.authors) {
-			const token = signJwt(
-				{ submissionId: submission.id, conferenceId: conference.id },
-				{ expiresIn: "7d" }
-			);
-		}
 
 		return submission;
 	}
@@ -90,15 +85,19 @@ export class SubmissionResolver {
 
 	@Authorized()
 	@FieldResolver(() => Conference, { nullable: true })
-	async conference(
-		@Root() { conference }: Submission
-	): Promise<Conference | null> {
+	async conference(@Root() { conference }: Submission) {
 		return await this.conferenceService.findOne({ _id: conference });
 	}
 
 	@Authorized()
 	@FieldResolver(() => Section, { nullable: true })
-	async section(@Root() { section }: Submission): Promise<Section | null> {
+	async section(@Root() { section }: Submission) {
 		return await this.sectionService.findOne({ _id: section });
+	}
+
+	@Authorized()
+	@FieldResolver(() => [User])
+	async authors(@Root() { authors }: Submission) {
+		return await this.userService.findAll({ _id: { $in: authors } });
 	}
 }

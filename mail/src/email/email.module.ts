@@ -34,6 +34,8 @@ import { CustomResolver } from './custom.resolver';
               t: i18n.hbsHelper,
               SUM: (a, b) => a + b,
               DATE: (date) => new Date(date).toLocaleDateString(),
+              transformUrl: (url: string) =>
+                url.replace('localhost', 'gateway'),
             }),
             options: {
               strict: true,

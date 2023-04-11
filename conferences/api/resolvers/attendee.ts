@@ -1,12 +1,12 @@
 import {
-  Arg,
-  Authorized,
-  Ctx,
-  FieldResolver,
-  Mutation,
-  Query,
-  Resolver,
-  Root,
+	Arg,
+	Authorized,
+	Ctx,
+	FieldResolver,
+	Mutation,
+	Query,
+	Resolver,
+	Root,
 } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { UserInputError } from "apollo-server";
@@ -34,158 +34,158 @@ env.config();
 @Service()
 @Resolver(() => Attendee)
 export class AttendeeResolver {
-  constructor(
-    private readonly attendeeService = new CRUDservice(Attendee),
-    private readonly conferenceService = new CRUDservice(Conference),
-    private readonly submissionService = new CRUDservice(Submission),
-    private readonly userService = new CRUDservice(User)
-  ) {}
+	constructor(
+		private readonly attendeeService = new CRUDservice(Attendee),
+		private readonly conferenceService = new CRUDservice(Conference),
+		private readonly submissionService = new CRUDservice(Submission),
+		private readonly userService = new CRUDservice(User)
+	) {}
 
-  @Authorized()
-  @Query(() => Attendee)
-  async attendee(@Arg("id") id: ObjectId): Promise<Attendee> {
-    const attendee = await this.attendeeService.findOne({ _id: id });
-    if (!attendee) throw new Error("Attendee not found!");
+	@Authorized()
+	@Query(() => Attendee)
+	async attendee(@Arg("id") id: ObjectId): Promise<Attendee> {
+		const attendee = await this.attendeeService.findOne({ _id: id });
+		if (!attendee) throw new Error("Attendee not found!");
 
-    return attendee;
-  }
+		return attendee;
+	}
 
-  //Refactor to check for co-author header and run a submission update to push new coauthor into the authors array
-  @Authorized()
-  @Mutation(() => Attendee)
-  async addAttendee(
-    @Arg("data") { conferenceId, billing, submission }: AttendeeInput,
-    @CheckTicket() { ticket, conference }: VerifiedTicket,
-    @Ctx() { user, locale }: Context
-  ): Promise<Attendee> {
-    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
-    const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
+	//Refactor to check for co-author header and run a submission update to push new coauthor into the authors array
+	@Authorized()
+	@Mutation(() => Attendee)
+	async addAttendee(
+		@Arg("data") { conferenceId, billing, submission }: AttendeeInput,
+		@CheckTicket() { ticket, conference }: VerifiedTicket,
+		@Ctx() { user, locale }: Context
+	): Promise<Attendee> {
+		const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
+		const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
-    await this.userService.update(
-      { _id: user?.id },
-      {
-        _id: user?.id,
-        email: user?.email,
-        $addToSet: { billings: billing },
-      },
-      { upsert: true }
-    );
+		await this.userService.update(
+			{ _id: user?.id },
+			{
+				_id: user?.id,
+				email: user?.email,
+				$addToSet: { billings: billing },
+			},
+			{ upsert: true }
+		);
 
-    Messagebroker.produceMessage(
-      JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
-      "user.update.billings"
-    );
+		Messagebroker.produceMessage(
+			JSON.stringify({ id: user?.id, updatedAt: new Date(Date.now()) }),
+			"user.update.billings"
+		);
 
-    const attendee = await this.attendeeService.create({
-      conference: conferenceId,
-      online: ticket.online,
-      user: user?.id,
-      invoice: {
-        issuer: { ...conference.billing },
-        payer: { ...billing },
-        body: {
-          price: Math.round((priceWithouTax / 100) * 100) / 100,
-          vat: isFlaw
-            ? 0
-            : Math.round((ticket.price - priceWithouTax) * 100) / 100,
-          body: "Test invoice",
-          comment:
-            "In case of not due payment the host organisation is reserving the right to cancel attendee",
-        },
-      },
-    });
+		const attendee = await this.attendeeService.create({
+			conference: conferenceId,
+			online: ticket.online,
+			user: user?.id,
+			invoice: {
+				issuer: { ...conference.billing },
+				payer: { ...billing },
+				body: {
+					price: Math.round((priceWithouTax / 100) * 100) / 100,
+					vat: isFlaw
+						? 0
+						: Math.round((ticket.price - priceWithouTax) * 100) / 100,
+					body: "Test invoice",
+					comment:
+						"In case of not due payment the host organisation is reserving the right to cancel attendee",
+				},
+			},
+		});
 
-    Messagebroker.produceMessage(
-      JSON.stringify({
-        locale,
-        name: user?.name,
-        email: user?.email,
-        conferenceName: conference.name,
-        conferenceLogo: conference.logoUrl,
-        invoice: attendee.invoice,
-      }),
-      "mail.conference.invoice"
-    );
+		Messagebroker.produceMessage(
+			JSON.stringify({
+				locale,
+				name: user?.name,
+				email: user?.email,
+				conferenceName: conference.name,
+				conferenceLogo: conference.logoUrl,
+				invoice: attendee.invoice,
+			}),
+			"mail.conference.invoice"
+		);
 
-    if (submission) {
-      const registeredSubmission = await this.submissionService.create({
-        ...localizeInput(submission, submission.translations, locale),
-        authors: [],
-      });
-      const localizedSubmission = convertDocument(registeredSubmission, locale);
+		if (submission) {
+			const registeredSubmission = await this.submissionService.create({
+				...localizeInput(submission, submission.translations, locale),
+				authors: [user?.id],
+				conference: submission.conferenceId,
+				section: submission.sectionId,
+			});
+			const localizedSubmission = convertDocument(registeredSubmission, locale);
 
-      await this.attendeeService.update(
-        { _id: attendee.id },
-        { $addToSet: { submissions: registeredSubmission.id } }
-      );
+			await this.attendeeService.update(
+				{ _id: attendee.id },
+				{ $addToSet: { submissions: registeredSubmission.id } }
+			);
 
-      submission.authors?.forEach((author) =>
-        Messagebroker.produceMessage(
-          JSON.stringify({
-            locale,
-            name: user?.name,
-            email: author,
-            conferenceName: conference.name,
-            conferenceSlug: conference.slug,
-            submissionId: localizedSubmission.id,
-            submissionName: localizedSubmission.name,
-            submissionAbstract: localizedSubmission.abstract,
-            submissionKeywords: localizedSubmission.keywords,
-          }),
-          "mail.conference.coAuthor"
-        )
-      );
-    }
+			submission.authors?.forEach((author) =>
+				Messagebroker.produceMessage(
+					JSON.stringify({
+						locale,
+						name: user?.name,
+						email: author,
+						conferenceName: conference.name,
+						conferenceSlug: conference.slug,
+						submissionId: localizedSubmission.id,
+						submissionName: localizedSubmission.name,
+						submissionAbstract: localizedSubmission.abstract,
+						submissionKeywords: localizedSubmission.keywords,
+					}),
+					"mail.conference.coAuthor"
+				)
+			);
+		}
 
-    return attendee;
-  }
+		return attendee;
+	}
 
-  @Authorized()
-  @Mutation(() => Attendee)
-  async updateInvoice(
-    @Arg("id") id: ObjectId,
-    @Arg("data") invoiceInput: InvoiceInput
-  ): Promise<Attendee> {
-    const attendee = await this.attendeeService.findOne({ _id: id });
-    if (!attendee) throw new UserInputError("Attendee not found!");
+	@Authorized()
+	@Mutation(() => Attendee)
+	async updateInvoice(
+		@Arg("id") id: ObjectId,
+		@Arg("data") invoiceInput: InvoiceInput
+	): Promise<Attendee> {
+		const attendee = await this.attendeeService.findOne({ _id: id });
+		if (!attendee) throw new UserInputError("Attendee not found!");
 
-    for (const [key, value] of Object.entries(invoiceInput)) {
-      attendee.invoice[key as keyof InvoiceInput] = value;
-    }
+		for (const [key, value] of Object.entries(invoiceInput)) {
+			attendee.invoice[key as keyof InvoiceInput] = value;
+		}
 
-    return attendee.save();
-  }
+		return attendee.save();
+	}
 
-  @Authorized(["ADMIN"])
-  @Mutation(() => Boolean)
-  async removeAttendee(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.attendeeService.delete({ _id: id });
+	@Authorized(["ADMIN"])
+	@Mutation(() => Boolean)
+	async removeAttendee(@Arg("id") id: ObjectId): Promise<boolean> {
+		const { deletedCount } = await this.attendeeService.delete({ _id: id });
 
-    return deletedCount > 0;
-  }
+		return deletedCount > 0;
+	}
 
-  @Authorized()
-  @FieldResolver(() => Conference, { nullable: true })
-  async conference(
-    @Root() { conference }: Attendee
-  ): Promise<Conference | null> {
-    return await this.conferenceService.findOne({ _id: conference });
-  }
+	@Authorized()
+	@FieldResolver(() => Conference, { nullable: true })
+	async conference(
+		@Root() { conference }: Attendee
+	): Promise<Conference | null> {
+		return await this.conferenceService.findOne({ _id: conference });
+	}
 
-  @Authorized()
-  @FieldResolver(() => User, { nullable: true })
-  async user(@Root() { user }: Attendee): Promise<User | null> {
-    return await this.userService.findOne({ _id: user });
-  }
+	@Authorized()
+	@FieldResolver(() => User, { nullable: true })
+	async user(@Root() { user }: Attendee) {
+		return await this.userService.findOne({ _id: user });
+	}
 
-  @Authorized()
-  @FieldResolver(() => [Submission], { nullable: true })
-  async submissions(
-    @Root() { conference, user }: Attendee
-  ): Promise<Submission[]> {
-    return await this.submissionService.findAll({
-      conference: conference,
-      authors: user.id,
-    });
-  }
+	@Authorized()
+	@FieldResolver(() => [Submission])
+	async submissions(@Root() { conference, user }: Attendee) {
+		return await this.submissionService.findAll({
+			conference: conference,
+			authors: user,
+		});
+	}
 }

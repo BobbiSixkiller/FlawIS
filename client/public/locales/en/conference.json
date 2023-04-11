@@ -1,58 +1,65 @@
 {
-  "headings": {
-    "introduction": "Introduction",
-    "sections": "Sections",
-    "programme": "Programme",
-    "fees": "Fees",
-    "dates": "Important dates",
-    "guidelines": "Submission guidelines"
-  },
-  "registration": {
-    "header": "Registration",
-    "stepper": {
-      "billing": {
-        "title": "Billing",
-        "description": "Attendee's billing information"
-      },
-      "tickets": {
-        "title": "Tickets",
-        "description": "Please select a ticket"
-      },
-      "submission": {
-        "title": "Submission",
-        "description": "Information about attendee's submission"
-      }
-    },
-    "billing": {
-      "name": { "label": "Name", "placeholder": "Billing name..." },
-      "street": { "label": "Street", "placeholder": "Street..." },
-      "city": { "label": "City", "placeholder": "City..." },
-      "postal": { "label": "Postal", "placeholder": "Postal..." },
-      "country": { "label": "Country", "placeholder": "Country..." },
-      "ICO": { "label": "IČO", "placeholder": "IČO..." },
-      "DIC": { "label": "DIČ", "placeholder": "DIČ..." },
-      "ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
-    },
-    "tickets": {
-      "label": "Select ticket"
-    },
-    "submission": {
-      "section": { "label": "Section", "placeholder": "Choose a section..." },
-      "name": { "label": "Title", "placeholder": "Submission's title..." },
-      "abstract": {
-        "label": "Abstract",
-        "placeholder": "Submission's abstract..."
-      },
-      "keywords": {
-        "label": "Keywords",
-        "placeholder": "Submission's keywords..."
-      },
-      "authors": {
-        "label": "Authors",
-        "placeholder": "Co-author's email address..."
-      },
-      "message": "The authors agree to the publication of the contribution in the anthology, which will be stored in the permanent repository of the Comenius University."
-    }
-  },
-  "dashboard": { "button": "Dashboard" }
+	"headings": {
+		"introduction": "Introduction",
+		"sections": "Sections",
+		"programme": "Programme",
+		"fees": "Fees",
+		"dates": "Important dates",
+		"guidelines": "Submission guidelines"
+	},
+	"registration": {
+		"header": "Registration",
+		"stepper": {
+			"billing": {
+				"title": "Billing",
+				"description": "Attendee's billing information"
+			},
+			"tickets": {
+				"title": "Tickets",
+				"description": "Please select a ticket"
+			},
+			"submission": {
+				"title": "Submission",
+				"description": "Information about attendee's submission"
+			}
+		},
+		"billing": {
+			"name": { "label": "Name", "placeholder": "Billing name..." },
+			"street": { "label": "Street", "placeholder": "Street..." },
+			"city": { "label": "City", "placeholder": "City..." },
+			"postal": { "label": "Postal", "placeholder": "Postal..." },
+			"country": { "label": "Country", "placeholder": "Country..." },
+			"ICO": { "label": "IČO", "placeholder": "IČO..." },
+			"DIC": { "label": "DIČ", "placeholder": "DIČ..." },
+			"ICDPH": { "label": "IČDPH", "placeholder": "IČDPH..." }
+		},
+		"tickets": {
+			"label": "Select ticket"
+		},
+		"submission": {
+			"section": { "label": "Section", "placeholder": "Choose a section..." },
+			"name": { "label": "Title", "placeholder": "Submission's title..." },
+			"abstract": {
+				"label": "Abstract",
+				"placeholder": "Submission's abstract..."
+			},
+			"keywords": {
+				"label": "Keywords",
+				"placeholder": "Submission's keywords..."
+			},
+			"authors": {
+				"label": "Co-Authors",
+				"placeholder": "Co-author's email address..."
+			},
+			"message": "The authors agree to the publication of the contribution in the anthology, which will be stored in the permanent repository of the Comenius University."
+		}
+	},
+	"dashboard": {
+		"button": "Dashboard",
+		"attendee": {
+			"submission": "Submission",
+			"invoice": "Invoice",
+			"upload": "Upload submission"
+		}
+	}
 }

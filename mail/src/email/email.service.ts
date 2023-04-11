@@ -4,8 +4,12 @@ import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
 import { InvoiceMsg } from './templates/invoice';
-import { compile } from 'handlebars';
 import { AuthorMsg } from './templates/author';
+
+import Handlebars from 'handlebars';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import puppeteer from 'puppeteer';
 
 export interface Msg {
   locale: 'en' | 'sk';
@@ -33,6 +37,42 @@ export class EmailService {
     private i18n: I18nService,
     private configService: ConfigService,
   ) {}
+
+  private async createPDF(
+    data: Record<string, any>,
+    templateName: string,
+  ): Promise<Buffer> {
+    try {
+      const templatePath = join(
+        __dirname,
+        '..',
+        'email/templates',
+        templateName,
+      );
+      const template = Handlebars.compile(readFileSync(templatePath, 'utf-8'));
+      const html = template(data);
+
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-gpu'],
+        executablePath: '/usr/bin/chromium-browser',
+        headless: true,
+      });
+      const page = await browser.newPage();
+
+      await page.setContent(html, { waitUntil: 'networkidle0' });
+
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+      });
+
+      await browser.close();
+
+      return pdfBuffer;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   @RabbitSubscribe({
     exchange: 'FlawIS',
@@ -116,6 +156,17 @@ export class EmailService {
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
+    const pdfBuffer = await this.createPDF(
+      {
+        name: msg.name,
+        i18nLang: msg.locale,
+        conferenceLogo: msg.conferenceLogo,
+        conferenceName: msg.conferenceName,
+        invoice: msg.invoice,
+      },
+      'invoice-attachement.hbs',
+    );
+
     await this.mailerService.sendMail({
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
@@ -132,7 +183,7 @@ export class EmailService {
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
       },
-      // attachments: [{ filename: fileName, content: pdfBuffer }],
+      attachments: [{ filename: 'invoice.pdf', content: pdfBuffer }],
     });
   }
 
@@ -148,7 +199,10 @@ export class EmailService {
     await this.mailerService.sendMail({
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
-      subject: this.i18n.t('author.subject', { lang: msg.locale }),
+      subject:
+        this.i18n.t('author.subject', { lang: msg.locale }) +
+        ' ' +
+        msg.conferenceName,
       template: 'author',
       context: {
         // ✏️ filling curly brackets with content

@@ -172,7 +172,7 @@ export type Conference = {
   __typename?: 'Conference';
   attendees: AttendeeConnection;
   attendeesCount: Scalars['Int'];
-  attending: Scalars['Boolean'];
+  attending?: Maybe<Attendee>;
   billing: ConferenceBilling;
   contact?: Maybe<Contact>;
   createdAt: Scalars['DateTime'];
@@ -393,10 +393,9 @@ export type InvoiceData = {
   comment: Scalars['String'];
   dueDate: Scalars['DateTime'];
   issueDate: Scalars['DateTime'];
-  price: Scalars['Int'];
+  price: Scalars['Float'];
   type: Scalars['String'];
-  variableSymbol: Scalars['String'];
-  vat: Scalars['Int'];
+  vat: Scalars['Float'];
   vatDate: Scalars['DateTime'];
 };
 
@@ -1054,19 +1053,14 @@ export type ConferencesQueryVariables = Exact<{
 
 export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
+export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
-
-export type ConferenceDashboardQueryVariables = Exact<{
-  slug: Scalars['String'];
-}>;
-
-
-export type ConferenceDashboardQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1265,6 +1259,79 @@ export const UserFragmentDoc = gql`
   verified
   createdAt
   updatedAt
+}
+    `;
+export const AttendeeFragmentFragmentDoc = gql`
+    fragment AttendeeFragment on Attendee {
+  id
+  invoice {
+    payer {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+    issuer {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      variableSymbol
+      IBAN
+      SWIFT
+      stampUrl
+    }
+    body {
+      type
+      issueDate
+      vatDate
+      dueDate
+      price
+      vat
+      body
+      comment
+    }
+  }
+  submissions {
+    id
+    name
+    abstract
+    keywords
+    conference {
+      id
+      name
+    }
+    section {
+      id
+      name
+    }
+    authors {
+      id
+      name
+      email
+    }
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+    submissionUrl
+    createdAt
+    updatedAt
+  }
 }
     `;
 export const GrantFragmentDoc = gql`
@@ -1930,10 +1997,20 @@ export const ConferenceDocument = gql`
       description
       languages
     }
-    attending
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+    attending {
+      ...AttendeeFragment
+    }
   }
 }
-    `;
+    ${AttendeeFragmentFragmentDoc}`;
 
 /**
  * __useConferenceQuery__
@@ -1962,65 +2039,6 @@ export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
-export const ConferenceDashboardDocument = gql`
-    query conferenceDashboard($slug: String!) {
-  conference(slug: $slug) {
-    id
-    name
-    slug
-    description
-    logoUrl
-    dates {
-      start
-      end
-      regEnd
-    }
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
-    }
-    sections {
-      id
-      name
-      description
-      languages
-    }
-    attending
-  }
-}
-    `;
-
-/**
- * __useConferenceDashboardQuery__
- *
- * To run a query within a React component, call `useConferenceDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useConferenceDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useConferenceDashboardQuery({
- *   variables: {
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useConferenceDashboardQuery(baseOptions: Apollo.QueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
-      }
-export function useConferenceDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
-        }
-export type ConferenceDashboardQueryHookResult = ReturnType<typeof useConferenceDashboardQuery>;
-export type ConferenceDashboardLazyQueryHookResult = ReturnType<typeof useConferenceDashboardLazyQuery>;
-export type ConferenceDashboardQueryResult = Apollo.QueryResult<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>;
 export const AddTicketDocument = gql`
     mutation addTicket($id: ObjectId!, $data: TicketInput!) {
   addTicket(id: $id, data: $data) {
