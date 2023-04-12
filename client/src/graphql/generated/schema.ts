@@ -842,7 +842,7 @@ export type Submission = {
 
 export type SubmissionInput = {
   abstract: Scalars['String'];
-  authors?: InputMaybe<Array<Scalars['String']>>;
+  authors: Array<InputMaybe<Scalars['String']>>;
   conferenceId: Scalars['ObjectId'];
   keywords: Array<Scalars['String']>;
   name: Scalars['String'];
@@ -1209,6 +1209,28 @@ export type UpdateSectionMutationVariables = Exact<{
 
 
 export type UpdateSectionMutation = { __typename?: 'Mutation', updateSection: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
+
+export type AddSubmissionMutationVariables = Exact<{
+  data: SubmissionInput;
+}>;
+
+
+export type AddSubmissionMutation = { __typename?: 'Mutation', addSubmission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
+export type UpdateSubmissionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: SubmissionInput;
+}>;
+
+
+export type UpdateSubmissionMutation = { __typename?: 'Mutation', updateSubmission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
+export type DeleteSubmissionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: boolean };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -2995,6 +3017,140 @@ export function useUpdateSectionMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateSectionMutationHookResult = ReturnType<typeof useUpdateSectionMutation>;
 export type UpdateSectionMutationResult = Apollo.MutationResult<UpdateSectionMutation>;
 export type UpdateSectionMutationOptions = Apollo.BaseMutationOptions<UpdateSectionMutation, UpdateSectionMutationVariables>;
+export const AddSubmissionDocument = gql`
+    mutation addSubmission($data: SubmissionInput!) {
+  addSubmission(data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+export type AddSubmissionMutationFn = Apollo.MutationFunction<AddSubmissionMutation, AddSubmissionMutationVariables>;
+
+/**
+ * __useAddSubmissionMutation__
+ *
+ * To run a mutation, you first call `useAddSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSubmissionMutation, { data, loading, error }] = useAddSubmissionMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<AddSubmissionMutation, AddSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSubmissionMutation, AddSubmissionMutationVariables>(AddSubmissionDocument, options);
+      }
+export type AddSubmissionMutationHookResult = ReturnType<typeof useAddSubmissionMutation>;
+export type AddSubmissionMutationResult = Apollo.MutationResult<AddSubmissionMutation>;
+export type AddSubmissionMutationOptions = Apollo.BaseMutationOptions<AddSubmissionMutation, AddSubmissionMutationVariables>;
+export const UpdateSubmissionDocument = gql`
+    mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
+  updateSubmission(id: $id, data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+export type UpdateSubmissionMutationFn = Apollo.MutationFunction<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>;
+
+/**
+ * __useUpdateSubmissionMutation__
+ *
+ * To run a mutation, you first call `useUpdateSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSubmissionMutation, { data, loading, error }] = useUpdateSubmissionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>(UpdateSubmissionDocument, options);
+      }
+export type UpdateSubmissionMutationHookResult = ReturnType<typeof useUpdateSubmissionMutation>;
+export type UpdateSubmissionMutationResult = Apollo.MutationResult<UpdateSubmissionMutation>;
+export type UpdateSubmissionMutationOptions = Apollo.BaseMutationOptions<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>;
+export const DeleteSubmissionDocument = gql`
+    mutation deleteSubmission($id: ObjectId!) {
+  deleteSubmission(id: $id)
+}
+    `;
+export type DeleteSubmissionMutationFn = Apollo.MutationFunction<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
+
+/**
+ * __useDeleteSubmissionMutation__
+ *
+ * To run a mutation, you first call `useDeleteSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSubmissionMutation, { data, loading, error }] = useDeleteSubmissionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>(DeleteSubmissionDocument, options);
+      }
+export type DeleteSubmissionMutationHookResult = ReturnType<typeof useDeleteSubmissionMutation>;
+export type DeleteSubmissionMutationResult = Apollo.MutationResult<DeleteSubmissionMutation>;
+export type DeleteSubmissionMutationOptions = Apollo.BaseMutationOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {

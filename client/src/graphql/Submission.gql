@@ -1,0 +1,51 @@
+mutation addSubmission($data: SubmissionInput!) {
+  addSubmission(data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+
+mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
+  updateSubmission(id: $id, data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+
+mutation deleteSubmission($id: ObjectId!) {
+  deleteSubmission(id: $id)
+}

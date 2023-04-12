@@ -7,40 +7,44 @@ import Validation from "../util/validation";
 import { InferType } from "yup";
 import parseErrors from "../util/parseErrors";
 import {
+  FileType,
   SubmissionInput,
-  useAddSubmissionMutation,
-  useConferenceQuery,
+  useUpdateSubmissionMutation,
+  useUploadFileMutation,
 } from "../graphql/generated/schema";
-import { RegisterSubmission } from "../pages/conferences/[slug]/register";
 import { useTranslation } from "next-i18next";
+import MultipleFileUploadField from "./form/Upload/MultipleFileUploadField";
 
-export default function AddSubmissionDialog() {
+export default function AddSubmissionFileDialog({
+  id,
+  input,
+}: {
+  id: string;
+  input: SubmissionInput;
+}) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
   const { query } = useRouter();
 
-  const { submissionInputSchema } = Validation();
-  type Values = InferType<typeof submissionInputSchema>;
+  const { submissionFileSchema } = Validation();
+  type Values = InferType<typeof submissionFileSchema>;
 
   const formikRef = useRef<FormikProps<Values>>(null);
 
-  const { data } = useConferenceQuery({
-    variables: { slug: query.slug as string },
-  });
+  const { t } = useTranslation("conference");
 
-  const [registerSubmission] = useAddSubmissionMutation();
-
-  const { t, i18n } = useTranslation("conference");
+  const [update] = useUpdateSubmissionMutation();
 
   return (
     <Button
       positive
       floated="right"
-      icon="plus"
+      icon="inbox"
+      content={t("dashboard.attendee.upload")}
       size="tiny"
       onClick={() =>
         handleOpen({
           size: "tiny",
-          header: t("registerSubmission"),
+          header: t("registration.submission.file.header"),
           confirmText: t("actions.save", {
             ns: "common",
           }),
@@ -52,30 +56,16 @@ export default function AddSubmissionDialog() {
             <Formik
               innerRef={formikRef}
               initialValues={{
-                submission: {
-                  abstract: "",
-                  authors: [],
-                  keywords: [],
-                  name: "",
-                  conferenceId: data?.conference.id,
-                  sectionId: "",
-                  translations: [
-                    {
-                      language: i18n.language === "sk" ? "en" : "sk",
-                      name: "",
-                      abstract: "",
-                      keywords: [],
-                    },
-                  ],
-                },
+                files: [],
               }}
-              validationSchema={submissionInputSchema}
+              validationSchema={submissionFileSchema}
               onSubmit={async (values, formik) => {
                 try {
                   console.log(values);
-                  await registerSubmission({
+                  await update({
                     variables: {
-                      data: values.submission as SubmissionInput,
+                      data: { ...input, submissionUrl: values.files[0].url },
+                      id,
                     },
                   });
                   handleClose();
@@ -92,7 +82,17 @@ export default function AddSubmissionDialog() {
             >
               {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
                 <Form loading={isSubmitting} onSubmit={handleSubmit}>
-                  <RegisterSubmission sections={data?.conference.sections} />
+                  <MultipleFileUploadField
+                    name="files"
+                    label={t("registration.submission.file.label")}
+                    filetype={FileType.Submission}
+                    accept={{
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                        [],
+                    }}
+                    maxFiles={1}
+                    maxSize={200 * 1024}
+                  />
                 </Form>
               )}
             </Formik>

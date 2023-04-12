@@ -8,13 +8,19 @@ import { InferType } from "yup";
 import parseErrors from "../util/parseErrors";
 import {
   SubmissionInput,
-  useAddSubmissionMutation,
   useConferenceQuery,
+  useUpdateSubmissionMutation,
 } from "../graphql/generated/schema";
 import { RegisterSubmission } from "../pages/conferences/[slug]/register";
 import { useTranslation } from "next-i18next";
 
-export default function AddSubmissionDialog() {
+export default function UpdateSubmissionDialog({
+  id,
+  input,
+}: {
+  id: string;
+  input: SubmissionInput;
+}) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
   const { query } = useRouter();
 
@@ -27,20 +33,19 @@ export default function AddSubmissionDialog() {
     variables: { slug: query.slug as string },
   });
 
-  const [registerSubmission] = useAddSubmissionMutation();
+  const [updateSubmission] = useUpdateSubmissionMutation();
 
-  const { t, i18n } = useTranslation("conference");
+  const { t } = useTranslation("conference");
 
   return (
     <Button
-      positive
-      floated="right"
-      icon="plus"
+      primary
       size="tiny"
+      icon="pencil alternate"
       onClick={() =>
         handleOpen({
           size: "tiny",
-          header: t("registerSubmission"),
+          header: t("editSubmission"),
           confirmText: t("actions.save", {
             ns: "common",
           }),
@@ -53,28 +58,22 @@ export default function AddSubmissionDialog() {
               innerRef={formikRef}
               initialValues={{
                 submission: {
-                  abstract: "",
-                  authors: [],
-                  keywords: [],
-                  name: "",
                   conferenceId: data?.conference.id,
-                  sectionId: "",
-                  translations: [
-                    {
-                      language: i18n.language === "sk" ? "en" : "sk",
-                      name: "",
-                      abstract: "",
-                      keywords: [],
-                    },
-                  ],
+                  sectionId: input.sectionId,
+                  name: input.name,
+                  abstract: input.abstract,
+                  keywords: input.keywords,
+                  authors: [],
+                  translations: input.translations,
                 },
               }}
               validationSchema={submissionInputSchema}
               onSubmit={async (values, formik) => {
                 try {
-                  console.log(values);
-                  await registerSubmission({
+                  console.log(values.submission);
+                  await updateSubmission({
                     variables: {
+                      id,
                       data: values.submission as SubmissionInput,
                     },
                   });

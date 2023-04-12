@@ -5,5 +5,6 @@
   "password": "Minimálne osem znakov, aspoň jedno písmeno a jedno číslo!",
   "passNoMatch": "Heslá sa nezhodujú!",
   "terms": "Musíte súhlasiť s podmienkami používania",
-  "keywords": "Musí obsahovať minimálne 1 Kľúčové slovo!"
+  "keywords": "Musí obsahovať minimálne 1 Kľúčové slovo!",
+  "file": "Prosím nahrajte súbor!"
 }
