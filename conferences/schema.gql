@@ -312,7 +312,7 @@ type Submission {
 
 input SubmissionInput {
   abstract: String!
-  authors: [String!]
+  authors: [String]!
   conferenceId: ObjectId!
   keywords: [String!]!
   name: String!
