@@ -2,7 +2,7 @@ import {
   ArrayMinSize,
   IsEmail,
   IsLocale,
-  IsUrl,
+  IsString,
   MaxLength,
 } from "class-validator";
 import { ObjectId } from "mongodb";
@@ -56,7 +56,7 @@ export class SubmissionInput {
   sectionId: ObjectId;
 
   @Field({ nullable: true })
-  @IsUrl()
+  @IsString()
   submissionUrl?: string;
 
   @Field(() => [String], { nullable: "items" })

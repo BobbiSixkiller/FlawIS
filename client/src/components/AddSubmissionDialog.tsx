@@ -23,7 +23,7 @@ export default function AddSubmissionDialog() {
 
   const formikRef = useRef<FormikProps<Values>>(null);
 
-  const { data } = useConferenceQuery({
+  const { data, refetch } = useConferenceQuery({
     variables: { slug: query.slug as string },
   });
 
@@ -75,9 +75,10 @@ export default function AddSubmissionDialog() {
                   console.log(values);
                   await registerSubmission({
                     variables: {
-                      data: values.submission as SubmissionInput,
+                      data: values.submission,
                     },
                   });
+                  await refetch();
                   handleClose();
                 } catch (error: any) {
                   setError(error?.message || "");

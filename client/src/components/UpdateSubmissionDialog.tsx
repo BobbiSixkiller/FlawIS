@@ -33,7 +33,7 @@ export default function UpdateSubmissionDialog({
     variables: { slug: query.slug as string },
   });
 
-  const [updateSubmission] = useUpdateSubmissionMutation();
+  const [update] = useUpdateSubmissionMutation();
 
   const { t } = useTranslation("conference");
 
@@ -70,11 +70,10 @@ export default function UpdateSubmissionDialog({
               validationSchema={submissionInputSchema}
               onSubmit={async (values, formik) => {
                 try {
-                  console.log(values.submission);
-                  await updateSubmission({
+                  await update({
                     variables: {
-                      id,
-                      data: values.submission as SubmissionInput,
+                      id: id,
+                      data: values.submission,
                     },
                   });
                   handleClose();

@@ -1210,6 +1210,13 @@ export type UpdateSectionMutationVariables = Exact<{
 
 export type UpdateSectionMutation = { __typename?: 'Mutation', updateSection: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
 
+export type SubmissionQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type SubmissionQuery = { __typename?: 'Query', submission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
 export type AddSubmissionMutationVariables = Exact<{
   data: SubmissionInput;
 }>;
@@ -3017,6 +3024,62 @@ export function useUpdateSectionMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateSectionMutationHookResult = ReturnType<typeof useUpdateSectionMutation>;
 export type UpdateSectionMutationResult = Apollo.MutationResult<UpdateSectionMutation>;
 export type UpdateSectionMutationOptions = Apollo.BaseMutationOptions<UpdateSectionMutation, UpdateSectionMutationVariables>;
+export const SubmissionDocument = gql`
+    query submission($id: ObjectId!) {
+  submission(id: $id) {
+    id
+    name
+    abstract
+    keywords
+    conference {
+      id
+    }
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+
+/**
+ * __useSubmissionQuery__
+ *
+ * To run a query within a React component, call `useSubmissionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSubmissionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSubmissionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSubmissionQuery(baseOptions: Apollo.QueryHookOptions<SubmissionQuery, SubmissionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SubmissionQuery, SubmissionQueryVariables>(SubmissionDocument, options);
+      }
+export function useSubmissionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SubmissionQuery, SubmissionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SubmissionQuery, SubmissionQueryVariables>(SubmissionDocument, options);
+        }
+export type SubmissionQueryHookResult = ReturnType<typeof useSubmissionQuery>;
+export type SubmissionLazyQueryHookResult = ReturnType<typeof useSubmissionLazyQuery>;
+export type SubmissionQueryResult = Apollo.QueryResult<SubmissionQuery, SubmissionQueryVariables>;
 export const AddSubmissionDocument = gql`
     mutation addSubmission($data: SubmissionInput!) {
   addSubmission(data: $data) {

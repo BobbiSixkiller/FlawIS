@@ -64,8 +64,8 @@ export default function AddSubmissionFileDialog({
                   console.log(values);
                   await update({
                     variables: {
-                      data: { ...input, submissionUrl: values.files[0].url },
                       id,
+                      data: { ...input, submissionUrl: values.files[0].url },
                     },
                   });
                   handleClose();

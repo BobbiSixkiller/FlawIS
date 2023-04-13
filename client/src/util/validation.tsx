@@ -138,16 +138,24 @@ export default function Validation() {
       sectionId: string().required(),
       name: string().trim().required(),
       abstract: string().trim().required(),
-      keywords: array().of(string().trim()).min(1, t("keywords")),
+      keywords: array()
+        .of(string().required().trim())
+        .min(1, t("keywords"))
+        .required(),
       authors: array().of(string().email().required()).required(),
-      translations: array().of(
-        object({
-          language: string(),
-          name: string().trim().required(),
-          abstract: string().trim().required(),
-          keywords: array().of(string().trim()).min(1, t("keywords")),
-        })
-      ),
+      translations: array()
+        .of(
+          object({
+            language: string().required(),
+            name: string().required().trim(),
+            abstract: string().required().trim(),
+            keywords: array()
+              .of(string().required().trim())
+              .min(1, t("keywords"))
+              .required(),
+          })
+        )
+        .required(),
     }),
   });
 

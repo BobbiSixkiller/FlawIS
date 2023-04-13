@@ -99,6 +99,9 @@ export default function AttendeeComponent({
                     confirmCb={async () =>
                       (await deleteSubmission({
                         variables: { id: submission.id },
+                        update(cache) {
+                          cache.evict({ id: `Submission:${submission.id}` });
+                        },
                       })) as Promise<void>
                     }
                     header="Zmazať príspevok"
@@ -115,7 +118,12 @@ export default function AttendeeComponent({
                       keywords: submission.keywords,
                       name: submission.name,
                       sectionId: submission.section.id,
-                      translations: submission.translations,
+                      translations: submission.translations.map((t) => ({
+                        language: t.language,
+                        name: t.name,
+                        abstract: t.abstract,
+                        keywords: t.keywords,
+                      })),
                     }}
                   />
                   <AddSubmissionFileDialog
@@ -127,7 +135,12 @@ export default function AttendeeComponent({
                       keywords: submission.keywords,
                       name: submission.name,
                       sectionId: submission.section.id,
-                      translations: submission.translations,
+                      translations: submission.translations.map((t) => ({
+                        language: t.language,
+                        name: t.name,
+                        abstract: t.abstract,
+                        keywords: t.keywords,
+                      })),
                     }}
                   />
                 </Card.Content>

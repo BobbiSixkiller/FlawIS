@@ -20,6 +20,8 @@ import { localizeInput } from "../util/locale";
 import { ConferenceSection } from "../util/types";
 import { SubmissionInput } from "./types/submission";
 import { User } from "../entities/User";
+import Messagebroker from "../util/rmq";
+import { convertDocument } from "../middlewares/typegoose-middleware";
 
 @Service()
 @Resolver(() => Submission)
@@ -62,20 +64,40 @@ export class SubmissionResolver {
   async updateSubmission(
     @Arg("id") id: ObjectId,
     @Arg("data") data: SubmissionInput,
-    @Ctx() { locale }: Context
+    @CheckConferenceSection() { conference }: ConferenceSection,
+    @Ctx() { locale, user }: Context
   ) {
-    console.log("FIRED");
     const submission = await this.submissionService.findOne({ _id: id });
     if (!submission) throw new Error("Submission not found!");
 
     for (const [key, value] of Object.entries(
       localizeInput(data, data.translations, locale)
     )) {
-      submission[key as keyof Submission] = value;
-      if (key === "authors") {
-        return submission[key as keyof Submission];
+      if (key !== "authors") {
+        submission[key as keyof Submission] = value;
       }
     }
+
+    const localizedSubmission = convertDocument(submission, locale);
+
+    data.authors?.forEach((author) =>
+      Messagebroker.produceMessage(
+        JSON.stringify({
+          locale,
+          name: user?.name,
+          email: author,
+          conferenceName: conference.name,
+          conferenceSlug: conference.slug,
+          submissionId: localizedSubmission.id,
+          submissionName: localizedSubmission.name,
+          submissionAbstract: localizedSubmission.abstract,
+          submissionKeywords: localizedSubmission.keywords,
+        }),
+        "mail.conference.coAuthor"
+      )
+    );
+
+    console.log(submission);
 
     return await submission.save();
   }

@@ -1,3 +1,30 @@
+query submission($id: ObjectId!) {
+  submission(id: $id) {
+    id
+    name
+    abstract
+    keywords
+    conference {
+      id
+    }
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+
 mutation addSubmission($data: SubmissionInput!) {
   addSubmission(data: $data) {
     id
