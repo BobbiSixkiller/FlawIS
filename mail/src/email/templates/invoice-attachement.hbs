@@ -24,7 +24,11 @@
   <body>
     <div class='container'>
       <div class='row header'>
-        <img src='{{{conferenceLogo}}}' alt='flaw logo' height='100' />
+        <img
+          src='{{{transformUrl conferenceLogo}}}'
+          alt='flaw logo'
+          height='100'
+        />
         <h1>{{t 'conference.subject'}} {{invoice.issuer.variableSymbol}}</h1>
       </div>
       <div class='row'>
@@ -152,7 +156,7 @@
       </div>
       <img
         style='align-self: center;'
-        src='{{{invoice.issuer.stampUrl}}}'
+        src='{{{transformUrl invoice.issuer.stampUrl}}}'
         alt='flaw stamp'
         width='300'
         height='100'

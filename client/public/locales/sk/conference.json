@@ -46,11 +46,25 @@
         "placeholder": "Kľúčové slová..."
       },
       "authors": {
-        "label": "Autori",
+        "label": "Spoluautori",
         "placeholder": "Email adresa spoluatora..."
+      },
+      "file": {
+        "label": "Súbor príspevku vo formáte MS Word",
+        "header": "Nahrať súbor príspevku"
       },
       "message": "Autori súhlasia s uverejnením príspevku v zborníku, ktorý bude uložený na trvalom úložisku Univerzity Komenského."
     }
   },
-  "dashboard": { "button": "Nástenka" }
+  "dashboard": {
+    "button": "Nástenka",
+    "attendee": {
+      "submission": "Príspevok",
+      "invoice": "Faktúra",
+      "upload": "Nahrať príspevok"
+    }
+  },
+  "editSubmission": "Aktualizovať príspevok",
+  "deleteSubmission": "Zmazať príspevok",
+  "registerSubmission": "Registrovať nový príspevok"
 }

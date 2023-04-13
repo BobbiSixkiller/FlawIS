@@ -110,14 +110,11 @@ export class AttendeeResolver {
     if (submission) {
       const registeredSubmission = await this.submissionService.create({
         ...localizeInput(submission, submission.translations, locale),
-        authors: [],
+        authors: [user?.id],
+        conference: submission.conferenceId,
+        section: submission.sectionId,
       });
       const localizedSubmission = convertDocument(registeredSubmission, locale);
-
-      await this.attendeeService.update(
-        { _id: attendee.id },
-        { $addToSet: { submissions: registeredSubmission.id } }
-      );
 
       submission.authors?.forEach((author) =>
         Messagebroker.produceMessage(
@@ -174,18 +171,16 @@ export class AttendeeResolver {
 
   @Authorized()
   @FieldResolver(() => User, { nullable: true })
-  async user(@Root() { user }: Attendee): Promise<User | null> {
+  async user(@Root() { user }: Attendee) {
     return await this.userService.findOne({ _id: user });
   }
 
   @Authorized()
-  @FieldResolver(() => [Submission], { nullable: true })
-  async submissions(
-    @Root() { conference, user }: Attendee
-  ): Promise<Submission[]> {
+  @FieldResolver(() => [Submission])
+  async submissions(@Root() { conference, user }: Attendee) {
     return await this.submissionService.findAll({
       conference: conference,
-      authors: user.id,
+      authors: user,
     });
   }
 }

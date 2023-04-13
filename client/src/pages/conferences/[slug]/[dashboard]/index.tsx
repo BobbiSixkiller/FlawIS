@@ -4,14 +4,14 @@ import { useRouter } from "next/router";
 import { useContext } from "react";
 import { Card, Grid, Header, Message } from "semantic-ui-react";
 import AddTicketDialog from "../../../../components/AddTicketDialog";
-import Attendee from "../../../../components/Attendee";
+import Attendee from "../../../../components/AttendeeComponent";
 import Dashboard from "../../../../components/Dashboard";
 import DeleteDialog from "../../../../components/DeleteDialog";
 import {
   ConferenceDocument,
   Role,
   Ticket,
-  useConferenceDashboardQuery,
+  useConferenceQuery,
   useRemoveTicketMutation,
 } from "../../../../graphql/generated/schema";
 import useWidth from "../../../../hooks/useWidth";
@@ -24,7 +24,7 @@ const DashboardPage: NextPageWithLayout = () => {
   const router = useRouter();
   const width = useWidth();
 
-  const { data, error, loading } = useConferenceDashboardQuery({
+  const { data, error, loading } = useConferenceQuery({
     variables: { slug: router.query.slug as string },
   });
 
@@ -37,7 +37,12 @@ const DashboardPage: NextPageWithLayout = () => {
   if (error) return <Message negative content={error.message} />;
 
   return user?.role === Role.Basic ? (
-    <Attendee />
+    <Attendee
+      loading={loading}
+      title={data?.conference.name}
+      conferenceId={data?.conference.id}
+      data={data?.conference.attending}
+    />
   ) : (
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row>
@@ -104,6 +109,14 @@ const DashboardPage: NextPageWithLayout = () => {
               </Card.Content>
             </Card>
           ))}
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row columns={2}>
+        <Grid.Column>
+          <Header>Sekcie</Header>
+        </Grid.Column>
+        <Grid.Column>
+          <AddTicketDialog id={data?.conference.id} />
         </Grid.Column>
       </Grid.Row>
     </Grid>

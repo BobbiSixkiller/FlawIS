@@ -29,16 +29,17 @@ import {
   ConferenceDocument,
   Section,
   useAddAttendeeMutation,
-  useConferenceDashboardQuery,
+  useConferenceQuery,
+  useSubmissionLazyQuery,
 } from "../../../graphql/generated/schema";
 import { NextPageContext } from "next";
 import { addApolloState, initializeApollo } from "../../../lib/apollo";
 import Validation from "../../../util/validation";
 import BillingInput from "../../../components/form/BillingInput";
-import { SyntheticEvent, useContext, useState } from "react";
+import { SyntheticEvent, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../providers/Auth";
-import { useField, useFormikContext } from "formik";
-import SelectInput from "../../../components/form/SelectInput";
+import { useField, useFormikContext, yupToFormErrors } from "formik";
+import { object } from "yup";
 
 function SelectTicket({
   label,
@@ -54,9 +55,7 @@ function SelectTicket({
   const { i18n } = useTranslation();
   const router = useRouter();
 
-  console.log(field.value);
-
-  const { data, error } = useConferenceDashboardQuery({
+  const { data, error } = useConferenceQuery({
     variables: { slug: router.query.slug as string },
   });
 
@@ -73,6 +72,9 @@ function SelectTicket({
             label={`${ticket.name} - ${ticket.description} - ${
               ticket.price / 100
             } €`}
+            disabled={
+              router.query.submission !== undefined && !ticket.withSubmission
+            }
             name={name}
             value={ticket.name}
             checked={field.value === ticket.id}
@@ -110,22 +112,22 @@ function SelectTicket({
   );
 }
 
-function RegisterSubmission({
+export function RegisterSubmission({
   sections,
 }: {
   sections?: Pick<Section, "id" | "name" | "description" | "languages">[];
 }) {
+  const router = useRouter();
   const { values, setFieldValue } = useFormikContext<{
-    ticket: any;
     submission: any;
   }>();
-  const [options, setOptions] = useState(
+  const [options, setOptions] = useState([
     values.submission.keywords.map((w: any, i: number) => ({
       key: i,
       text: w,
       value: w,
-    }))
-  );
+    })),
+  ]);
   const [localizedOptions, setLocalizedOptions] = useState(
     values.submission.translations[0].keywords.map((w: any, i: number) => ({
       key: i,
@@ -143,40 +145,59 @@ function RegisterSubmission({
 
   const { t } = useTranslation("conference");
 
+  const [loadSubmission] = useSubmissionLazyQuery({
+    onCompleted: ({ submission }) => {
+      console.log(submission);
+      setFieldValue(
+        "submission",
+        {
+          conferenceId: submission.conference.id,
+          sectionId: submission.section.id,
+          name: submission.name,
+          abstract: submission.abstract,
+          keywords: submission.keywords,
+          authors: [],
+          translations: submission.translations.map((t) => ({
+            language: t.language,
+            name: t.name,
+            abstract: t.abstract,
+            keywords: t.keywords,
+          })),
+        },
+        true
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (router.query.submission !== undefined) {
+      loadSubmission({
+        variables: { id: router.query.submission as string },
+      });
+    }
+  }, [router]);
+
   return (
     <>
-      <SelectInput
+      <InputField
+        disabled={router.query.submission !== undefined}
         name="submission.sectionId"
-        label={t("registration.submission.section.label")}
-        placeholder={t("registration.submission.section.placeholder")}
-        options={sections!.map((s) => ({
-          key: s.id,
-          text: s.name,
-          value: s.id,
-        }))}
+        label="Section"
+        placeholder="Choose a section"
         search
         searchInput={{
           name: "submission.sectionId",
           id: "form-control-section",
         }}
+        control={Select}
+        options={sections?.map((s) => ({
+          key: s.id,
+          text: s.name,
+          value: s.id,
+        }))}
       />
-      {/* <InputField
-				name="submission.sectionId"
-				label="Section"
-				placeholder="Choose a section"
-				search
-				searchInput={{
-					name: "submission.sectionId",
-					id: "form-control-section",
-				}}
-				control={Select}
-				options={sections?.map((s) => ({
-					key: s.id,
-					text: s.name,
-					value: s.id,
-				}))}
-			/> */}
       <LocalizedInputField
+        disabled={router.query.submission !== undefined}
         name="submission.name"
         label={t("registration.submission.name.label")}
         placeholder={t("registration.submission.name.placeholder")}
@@ -184,6 +205,7 @@ function RegisterSubmission({
         control={Input}
       />
       <LocalizedInputField
+        disabled={router.query.submission !== undefined}
         name="submission.abstract"
         label={t("registration.submission.abstract.label")}
         placeholder={t("registration.submission.abstract.placeholder")}
@@ -191,6 +213,7 @@ function RegisterSubmission({
         control={TextArea}
       />
       <LocalizedInputField
+        disabled={router.query.submission !== undefined}
         name="submission.keywords"
         label={t("registration.submission.keywords.label")}
         placeholder={t("registration.submission.keywords.placeholder")}
@@ -245,6 +268,7 @@ function RegisterSubmission({
         }}
       />
       <InputField
+        disabled={router.query.submission !== undefined}
         name="submission.authors"
         label={t("registration.submission.authors.label")}
         placeholder={t("registration.submission.authors.placeholder")}
@@ -292,7 +316,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
     submissionInputSchema,
   } = Validation();
 
-  const { data, error } = useConferenceDashboardQuery({
+  const { data, error } = useConferenceQuery({
     variables: { slug: router.query.slug as string },
   });
 
@@ -340,8 +364,6 @@ const RegisterAttendee: NextPageWithLayout = () => {
             ticketId: "",
           }}
           onSubmit={async (values, formik) => {
-            console.log({ ...values, conferenceId: data?.conference.id });
-
             try {
               await register({
                 variables: {
@@ -352,6 +374,8 @@ const RegisterAttendee: NextPageWithLayout = () => {
                   } as AttendeeInput,
                 },
               });
+
+              router.push(`/${router.query.slug}/dashboard`);
             } catch (error: any) {
               console.log(error);
               setErrorMsg(error.message);

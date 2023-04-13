@@ -95,7 +95,7 @@ input BillingInput {
 type Conference {
   attendees(after: String, first: Int = 20): AttendeeConnection!
   attendeesCount: Int!
-  attending: Boolean!
+  attending: Attendee
   billing: ConferenceBilling!
   contact: Contact
   createdAt: DateTime!
@@ -214,10 +214,9 @@ type InvoiceData {
   comment: String!
   dueDate: DateTime!
   issueDate: DateTime!
-  price: Int!
+  price: Float!
   type: String!
-  variableSymbol: String!
-  vat: Int!
+  vat: Float!
   vatDate: DateTime!
 }
 
@@ -313,7 +312,7 @@ type Submission {
 
 input SubmissionInput {
   abstract: String!
-  authors: [String!]
+  authors: [String]!
   conferenceId: ObjectId!
   keywords: [String!]!
   name: String!

@@ -48,11 +48,25 @@
         "placeholder": "Submission's keywords..."
       },
       "authors": {
-        "label": "Authors",
+        "label": "Co-Authors",
         "placeholder": "Co-author's email address..."
+      },
+      "file": {
+        "label": "Submission MS Word file",
+        "header": "Upload submission file"
       },
       "message": "The authors agree to the publication of the contribution in the anthology, which will be stored in the permanent repository of the Comenius University."
     }
   },
-  "dashboard": { "button": "Dashboard" }
+  "dashboard": {
+    "button": "Dashboard",
+    "attendee": {
+      "submission": "Submission",
+      "invoice": "Invoice",
+      "upload": "Upload submission"
+    }
+  },
+  "editSubmission": "Update submission",
+  "deleteSubmission": "Delete submission",
+  "registerSubmission": "Register submission"
 }

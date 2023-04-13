@@ -134,20 +134,38 @@ export default function Validation() {
 
   const submissionInputSchema = object({
     submission: object({
+      conferenceId: string().required(),
       sectionId: string().required(),
       name: string().trim().required(),
       abstract: string().trim().required(),
-      keywords: array().of(string().trim()).min(1, t("keywords")),
-      authors: array().of(string().email()),
-      translations: array().of(
-        object({
-          language: string(),
-          name: string().trim().required(),
-          abstract: string().trim().required(),
-          keywords: array().of(string().trim()).min(1, t("keywords")),
-        })
-      ),
+      keywords: array()
+        .of(string().required().trim())
+        .min(1, t("keywords"))
+        .required(),
+      authors: array().of(string().email().required()).required(),
+      translations: array()
+        .of(
+          object({
+            language: string().required(),
+            name: string().required().trim(),
+            abstract: string().required().trim(),
+            keywords: array()
+              .of(string().required().trim())
+              .min(1, t("keywords"))
+              .required(),
+          })
+        )
+        .required(),
     }),
+  });
+
+  const submissionFileSchema = object({
+    files: array()
+      .required()
+      .test({
+        message: t("file"),
+        test: (arr) => arr?.length === 1,
+      }),
   });
 
   return {
@@ -162,5 +180,6 @@ export default function Validation() {
     attendeeBillingInputSchema,
     ticketInputSchema,
     submissionInputSchema,
+    submissionFileSchema,
   };
 }

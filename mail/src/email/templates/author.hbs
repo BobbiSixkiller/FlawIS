@@ -1,24 +1,26 @@
 <html>
   <head>
     <meta charset='UTF-8' />
-    {{! <link
+    <link
       rel='stylesheet'
       href='https://flawis-backend.flaw.uniba.sk/public/UKsans/styles.css'
     />
     <link
       href='https://fonts.googleapis.com/css2?family=Roboto&display=swap'
       rel='stylesheet'
-    /> }}
+    />
     <link href='https://fonts.cdnfonts.com/css/corbel' rel='stylesheet' />
 
     <style>
       h1 {font-family: UKsans, Roboto, corbel,sans-serif;} p, a{font-family:
-      Roboto,corbel, sans-serif;}
+      Roboto,corbel, sans-serif;} .hashtag-list { list-style: none; padding: 0;
+      margin: 0; } .hashtag-item { display: inline-block; margin-right: 5px;
+      padding: 2px 8px; } .hashtag-item:before { content: "#";} td
+      {padding-right: 2rem;}
     </style>
   </head>
   <body>
     <h1>{{t 'author.subject'}} {{conferenceName}}</h1>
-    <p>{{t 'common.greetings'}}</p>
     <p>{{name}} {{t 'author.requestedBy'}}</p>
     <p>{{t 'author.body'}}</p>
     <table>
@@ -33,9 +35,9 @@
       <tr>
         <td>{{t 'author.submission.keywords'}}</td>
         <td>
-          <ul>
+          <ul class='hashtag-list'>
             {{#each submissionKeywords}}
-              <li>{{this}}</li>
+              <li class='hashtag-item'>{{this}}</li>
             {{/each}}
           </ul>
         </td>

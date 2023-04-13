@@ -56,16 +56,19 @@ const EmailField: FC<InputFieldProps> = (props) => {
 const RegisterPage: NextPage = () => {
   const { dispatch } = useContext(AuthContext);
   const router = useRouter();
+  const intendedPath = globalThis.sessionStorage.getItem("intendedPath");
 
   const { conferencesRegisterInputSchme } = Validation();
   type Values = InferType<typeof conferencesRegisterInputSchme>;
 
   const [register] = useRegisterMutation({
-    onCompleted: ({ register }) =>
+    onCompleted: ({ register }) => {
       dispatch({
         type: ActionTypes.Login,
         payload: { user: register as User },
-      }),
+      });
+      router.push(intendedPath ? intendedPath : "/");
+    },
   });
 
   const [updateConferenceUser] = useUpdateConferenceUserMutation();
@@ -130,7 +133,6 @@ const RegisterPage: NextPage = () => {
                     },
                   },
                 });
-                router.push("/");
               } catch (err: any) {
                 actions.setStatus(
                   parseErrors(
@@ -228,6 +230,7 @@ const RegisterPage: NextPage = () => {
                     disabled={isSubmitting}
                     fluid
                     size="large"
+                    positive
                   >
                     Register
                   </Button>

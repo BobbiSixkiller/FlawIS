@@ -2,7 +2,7 @@ import {
   ArrayMinSize,
   IsEmail,
   IsLocale,
-  IsUrl,
+  IsString,
   MaxLength,
 } from "class-validator";
 import { ObjectId } from "mongodb";
@@ -56,11 +56,12 @@ export class SubmissionInput {
   sectionId: ObjectId;
 
   @Field({ nullable: true })
-  @IsUrl()
+  @IsString()
   submissionUrl?: string;
 
-  @Field(() => [String], { nullable: true })
-  authors?: string[];
+  @Field(() => [String], { nullable: "items" })
+  @IsEmail({}, { each: true })
+  authors: string[];
 
   @Field(() => [SubmissionInputTranslation])
   @ArrayMinSize(1, { message: "You must include a translation!" })

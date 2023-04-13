@@ -172,7 +172,7 @@ export type Conference = {
   __typename?: 'Conference';
   attendees: AttendeeConnection;
   attendeesCount: Scalars['Int'];
-  attending: Scalars['Boolean'];
+  attending?: Maybe<Attendee>;
   billing: ConferenceBilling;
   contact?: Maybe<Contact>;
   createdAt: Scalars['DateTime'];
@@ -393,10 +393,9 @@ export type InvoiceData = {
   comment: Scalars['String'];
   dueDate: Scalars['DateTime'];
   issueDate: Scalars['DateTime'];
-  ticketPrice: Scalars['Int'];
+  price: Scalars['Float'];
   type: Scalars['String'];
-  variableSymbol: Scalars['String'];
-  vat: Scalars['Int'];
+  vat: Scalars['Float'];
   vatDate: Scalars['DateTime'];
 };
 
@@ -843,7 +842,7 @@ export type Submission = {
 
 export type SubmissionInput = {
   abstract: Scalars['String'];
-  authors?: InputMaybe<Array<Scalars['String']>>;
+  authors: Array<InputMaybe<Scalars['String']>>;
   conferenceId: Scalars['ObjectId'];
   keywords: Array<Scalars['String']>;
   name: Scalars['String'];
@@ -1054,19 +1053,14 @@ export type ConferencesQueryVariables = Exact<{
 
 export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
+export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
-
-export type ConferenceDashboardQueryVariables = Exact<{
-  slug: Scalars['String'];
-}>;
-
-
-export type ConferenceDashboardQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, attending: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }> } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1216,6 +1210,35 @@ export type UpdateSectionMutationVariables = Exact<{
 
 export type UpdateSectionMutation = { __typename?: 'Mutation', updateSection: { __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, createdAt: any, updatedAt: any } };
 
+export type SubmissionQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type SubmissionQuery = { __typename?: 'Query', submission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
+export type AddSubmissionMutationVariables = Exact<{
+  data: SubmissionInput;
+}>;
+
+
+export type AddSubmissionMutation = { __typename?: 'Mutation', addSubmission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
+export type UpdateSubmissionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  data: SubmissionInput;
+}>;
+
+
+export type UpdateSubmissionMutation = { __typename?: 'Mutation', updateSubmission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+
+export type DeleteSubmissionMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: boolean };
+
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
   data: UserInput;
@@ -1265,6 +1288,79 @@ export const UserFragmentDoc = gql`
   verified
   createdAt
   updatedAt
+}
+    `;
+export const AttendeeFragmentFragmentDoc = gql`
+    fragment AttendeeFragment on Attendee {
+  id
+  invoice {
+    payer {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+    }
+    issuer {
+      name
+      address {
+        street
+        city
+        postal
+        country
+      }
+      ICO
+      DIC
+      ICDPH
+      variableSymbol
+      IBAN
+      SWIFT
+      stampUrl
+    }
+    body {
+      type
+      issueDate
+      vatDate
+      dueDate
+      price
+      vat
+      body
+      comment
+    }
+  }
+  submissions {
+    id
+    name
+    abstract
+    keywords
+    conference {
+      id
+      name
+    }
+    section {
+      id
+      name
+    }
+    authors {
+      id
+      name
+      email
+    }
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+    submissionUrl
+    createdAt
+    updatedAt
+  }
 }
     `;
 export const GrantFragmentDoc = gql`
@@ -1930,10 +2026,20 @@ export const ConferenceDocument = gql`
       description
       languages
     }
-    attending
+    tickets {
+      id
+      name
+      description
+      price
+      withSubmission
+      online
+    }
+    attending {
+      ...AttendeeFragment
+    }
   }
 }
-    `;
+    ${AttendeeFragmentFragmentDoc}`;
 
 /**
  * __useConferenceQuery__
@@ -1962,65 +2068,6 @@ export function useConferenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
-export const ConferenceDashboardDocument = gql`
-    query conferenceDashboard($slug: String!) {
-  conference(slug: $slug) {
-    id
-    name
-    slug
-    description
-    logoUrl
-    dates {
-      start
-      end
-      regEnd
-    }
-    tickets {
-      id
-      name
-      description
-      price
-      withSubmission
-      online
-    }
-    sections {
-      id
-      name
-      description
-      languages
-    }
-    attending
-  }
-}
-    `;
-
-/**
- * __useConferenceDashboardQuery__
- *
- * To run a query within a React component, call `useConferenceDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useConferenceDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useConferenceDashboardQuery({
- *   variables: {
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useConferenceDashboardQuery(baseOptions: Apollo.QueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
-      }
-export function useConferenceDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>(ConferenceDashboardDocument, options);
-        }
-export type ConferenceDashboardQueryHookResult = ReturnType<typeof useConferenceDashboardQuery>;
-export type ConferenceDashboardLazyQueryHookResult = ReturnType<typeof useConferenceDashboardLazyQuery>;
-export type ConferenceDashboardQueryResult = Apollo.QueryResult<ConferenceDashboardQuery, ConferenceDashboardQueryVariables>;
 export const AddTicketDocument = gql`
     mutation addTicket($id: ObjectId!, $data: TicketInput!) {
   addTicket(id: $id, data: $data) {
@@ -2977,6 +3024,196 @@ export function useUpdateSectionMutation(baseOptions?: Apollo.MutationHookOption
 export type UpdateSectionMutationHookResult = ReturnType<typeof useUpdateSectionMutation>;
 export type UpdateSectionMutationResult = Apollo.MutationResult<UpdateSectionMutation>;
 export type UpdateSectionMutationOptions = Apollo.BaseMutationOptions<UpdateSectionMutation, UpdateSectionMutationVariables>;
+export const SubmissionDocument = gql`
+    query submission($id: ObjectId!) {
+  submission(id: $id) {
+    id
+    name
+    abstract
+    keywords
+    conference {
+      id
+    }
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+
+/**
+ * __useSubmissionQuery__
+ *
+ * To run a query within a React component, call `useSubmissionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSubmissionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSubmissionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSubmissionQuery(baseOptions: Apollo.QueryHookOptions<SubmissionQuery, SubmissionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SubmissionQuery, SubmissionQueryVariables>(SubmissionDocument, options);
+      }
+export function useSubmissionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SubmissionQuery, SubmissionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SubmissionQuery, SubmissionQueryVariables>(SubmissionDocument, options);
+        }
+export type SubmissionQueryHookResult = ReturnType<typeof useSubmissionQuery>;
+export type SubmissionLazyQueryHookResult = ReturnType<typeof useSubmissionLazyQuery>;
+export type SubmissionQueryResult = Apollo.QueryResult<SubmissionQuery, SubmissionQueryVariables>;
+export const AddSubmissionDocument = gql`
+    mutation addSubmission($data: SubmissionInput!) {
+  addSubmission(data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+export type AddSubmissionMutationFn = Apollo.MutationFunction<AddSubmissionMutation, AddSubmissionMutationVariables>;
+
+/**
+ * __useAddSubmissionMutation__
+ *
+ * To run a mutation, you first call `useAddSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSubmissionMutation, { data, loading, error }] = useAddSubmissionMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<AddSubmissionMutation, AddSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSubmissionMutation, AddSubmissionMutationVariables>(AddSubmissionDocument, options);
+      }
+export type AddSubmissionMutationHookResult = ReturnType<typeof useAddSubmissionMutation>;
+export type AddSubmissionMutationResult = Apollo.MutationResult<AddSubmissionMutation>;
+export type AddSubmissionMutationOptions = Apollo.BaseMutationOptions<AddSubmissionMutation, AddSubmissionMutationVariables>;
+export const UpdateSubmissionDocument = gql`
+    mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
+  updateSubmission(id: $id, data: $data) {
+    id
+    name
+    abstract
+    keywords
+    section {
+      id
+      name
+    }
+    authors {
+      name
+      email
+    }
+    updatedAt
+    translations {
+      language
+      name
+      abstract
+      keywords
+    }
+  }
+}
+    `;
+export type UpdateSubmissionMutationFn = Apollo.MutationFunction<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>;
+
+/**
+ * __useUpdateSubmissionMutation__
+ *
+ * To run a mutation, you first call `useUpdateSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSubmissionMutation, { data, loading, error }] = useUpdateSubmissionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>(UpdateSubmissionDocument, options);
+      }
+export type UpdateSubmissionMutationHookResult = ReturnType<typeof useUpdateSubmissionMutation>;
+export type UpdateSubmissionMutationResult = Apollo.MutationResult<UpdateSubmissionMutation>;
+export type UpdateSubmissionMutationOptions = Apollo.BaseMutationOptions<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>;
+export const DeleteSubmissionDocument = gql`
+    mutation deleteSubmission($id: ObjectId!) {
+  deleteSubmission(id: $id)
+}
+    `;
+export type DeleteSubmissionMutationFn = Apollo.MutationFunction<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
+
+/**
+ * __useDeleteSubmissionMutation__
+ *
+ * To run a mutation, you first call `useDeleteSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSubmissionMutation, { data, loading, error }] = useDeleteSubmissionMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteSubmissionMutation(baseOptions?: Apollo.MutationHookOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>(DeleteSubmissionDocument, options);
+      }
+export type DeleteSubmissionMutationHookResult = ReturnType<typeof useDeleteSubmissionMutation>;
+export type DeleteSubmissionMutationResult = Apollo.MutationResult<DeleteSubmissionMutation>;
+export type DeleteSubmissionMutationOptions = Apollo.BaseMutationOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
