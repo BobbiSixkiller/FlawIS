@@ -63,20 +63,14 @@ export class FileResolver {
       name: filename,
       type: filetype,
       user,
-      url: `${
-        process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
-      }`,
+      url: `${"http://localhost:5000/" + "public/" + url}`,
     });
 
     return new Promise(async (resolve, reject) =>
       createReadStream()
         .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
         .on("finish", () =>
-          resolve(
-            `${
-              process.env.BASE_URL || "http://localhost:5000/" + "public/" + url
-            }`
-          )
+          resolve(`${"http://localhost:5000/" + "public/" + url}`)
         )
         .on("error", () => reject(new Error("File upload failed!")))
     );
