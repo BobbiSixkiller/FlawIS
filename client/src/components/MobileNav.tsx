@@ -10,7 +10,11 @@ import logo from "public/images/Flaw-logo-notext.png";
 
 import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
-import { useLogoutMutation } from "../graphql/generated/schema";
+import {
+	ConferenceDocument,
+	ConferencesDocument,
+	useLogoutMutation,
+} from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import MainMenu from "./MainMenuItems";
 import { useApolloClient } from "@apollo/client";
@@ -91,10 +95,14 @@ export default function MobileNav({
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
-		console.log(i18n.language);
-		client.refetchQueries({
-			include: "active",
-		});
+		async function fetchLocalized() {
+			client.cache.reset();
+			await client.refetchQueries({
+				include: [ConferenceDocument, ConferencesDocument],
+			});
+		}
+
+		fetchLocalized();
 	}, [i18n]);
 
 	return (
