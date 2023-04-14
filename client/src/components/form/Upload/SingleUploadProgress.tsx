@@ -84,6 +84,8 @@ export default function SingleUploadProgress({
       formData.append("map", JSON.stringify({ "0": ["variables.file"] }));
       formData.append("0", file);
 
+      // xhr.setRequestHeader("x-apollo-operation-name", "fileUpload");
+      // xhr.setRequestHeader("content-type", "application/octet-stream");
       xhr.withCredentials = true;
       xhr.send(formData);
     });

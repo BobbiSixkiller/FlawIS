@@ -49,7 +49,7 @@ async function main() {
         : null,
     }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
-    csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
+    // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
   });
 
