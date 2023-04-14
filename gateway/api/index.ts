@@ -49,6 +49,7 @@ const main = async () => {
         "https://flawis.flaw.uniba.sk",
         "https://conferences.flaw.uniba.sk",
         "http://client:3000",
+        "http://localhost:3000",
       ],
     })
   );
@@ -72,7 +73,6 @@ const main = async () => {
   );
   app.use(
     "/public",
-    cors(),
     createProxyMiddleware({
       target: "http://files:5002/",
       changeOrigin: true,
