@@ -41,14 +41,9 @@ export class ConferenceResolver {
 	) {}
 
 	@Query(() => Conference)
-	async conference(
-		@Arg("slug") slug: string,
-		@Ctx() { locale }: Context
-	): Promise<Conference> {
+	async conference(@Arg("slug") slug: string): Promise<Conference> {
 		const conference = await this.conferenceService.findOne({ slug });
 		if (!conference) throw new Error("Conference not found!");
-
-		console.log(locale);
 
 		return conference;
 	}

@@ -112,7 +112,7 @@ const ConferencePage: NextPageWithLayout = () => {
 								{data?.conference.sections.length !== 0 && (
 									<Accordion styled fluid>
 										{data?.conference.sections.map((section) => (
-											<>
+											<div key={section.id}>
 												<Accordion.Title
 													active={active === section.id}
 													index={section.id}
@@ -124,7 +124,7 @@ const ConferencePage: NextPageWithLayout = () => {
 												<Accordion.Content active={active === section.id}>
 													<p>{section.description}</p>
 												</Accordion.Content>
-											</>
+											</div>
 										))}
 									</Accordion>
 								)}
