@@ -140,7 +140,7 @@ export const getServerSideProps = async ({
       variables: { slug: query.slug?.toString() || "" },
     });
 
-    if (data && !data.conference.attending) {
+    if (data && !data.conference.attending && !data.conference.isAdmin) {
       return {
         redirect: {
           permanent: false,

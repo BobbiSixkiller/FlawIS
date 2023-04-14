@@ -103,6 +103,7 @@ type Conference {
   dates: ImportantDates!
   description: String!
   id: ObjectId!
+  isAdmin: Boolean!
   logoUrl: String!
   name: String!
   sections: [Section!]!
