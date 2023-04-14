@@ -1,6 +1,10 @@
 mutation addAttendee($data: AttendeeInput!) {
   addAttendee(data: $data) {
     id
+    conference {
+      id
+      name
+    }
     # invoice {
 
     # }
@@ -9,12 +13,24 @@ mutation addAttendee($data: AttendeeInput!) {
       name
       abstract
       keywords
-      authors {
+      conference {
+        id
+      }
+      section {
         id
         name
       }
-      createdAt
+      authors {
+        name
+        email
+      }
       updatedAt
+      translations {
+        language
+        name
+        abstract
+        keywords
+      }
     }
     createdAt
     updatedAt

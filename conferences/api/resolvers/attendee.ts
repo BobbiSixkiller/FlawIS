@@ -116,7 +116,7 @@ export class AttendeeResolver {
     if (submission) {
       if (submissionId) {
         await this.submissionService.update(
-          { _id: user?.id },
+          { _id: submissionId },
           { $addToSet: { authors: user?.id } }
         );
       } else {

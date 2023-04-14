@@ -374,6 +374,16 @@ const RegisterAttendee: NextPageWithLayout = () => {
                     conferenceId: data?.conference.id,
                   } as AttendeeInput,
                 },
+                update(cache, { data }) {
+                  cache.modify({
+                    id: `Conference:${data?.addAttendee.conference.id}`,
+                    fields: {
+                      attending() {
+                        return data?.addAttendee;
+                      },
+                    },
+                  });
+                },
               });
 
               router.push(`/${router.query.slug}/dashboard`);
