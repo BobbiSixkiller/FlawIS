@@ -39,7 +39,7 @@ import { CustomResolver } from './custom.resolver';
                   process.env.NODE_ENV === 'development'
                     ? 'localhost'
                     : 'flawis-backend.flaw.uniba.sk',
-                  'gateway',
+                  'gateway:5000/',
                 ),
             }),
             options: {
