@@ -44,8 +44,8 @@ services:
       - rabbitmq
       - mongo
       - redis
-    # volumes:
-    #   - ./files:/usr/app
+    volumes:
+      - ./files/public:/usr/app/public
     #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
