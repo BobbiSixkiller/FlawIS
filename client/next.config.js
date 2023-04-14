@@ -11,18 +11,26 @@ const nextConfig = {
   },
   i18n,
   images: {
-    remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "gateway",
-        port: "5000",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "5000",
-      },
+    domains: [
+      "localhost",
+      "client",
+      "gateway",
+      "conferences.flaw.uniba.sk",
+      "flawis.flaw.uniba.sk",
+      "flawis-backend.flaw.uniba.sk",
     ],
+    // remotePatterns: [
+    //   {
+    //     protocol: "http",
+    //     hostname: "gateway",
+    //     port: "5000",
+    //   },
+    //   {
+    //     protocol: "http",
+    //     hostname: "localhost",
+    //     port: "5000",
+    //   },
+    // ],
   },
 };
 
