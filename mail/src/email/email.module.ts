@@ -35,7 +35,12 @@ import { CustomResolver } from './custom.resolver';
               SUM: (a, b) => a + b,
               DATE: (date) => new Date(date).toLocaleDateString(),
               transformUrl: (url: string) =>
-                url.replace('localhost', 'gateway'),
+                url.replace(
+                  process.env.NODE_ENV === 'development'
+                    ? 'localhost'
+                    : 'flawis-backend.flaw.uniba.sk',
+                  'gateway',
+                ),
             }),
             options: {
               strict: true,
