@@ -218,12 +218,16 @@ export default function MobileNav({
 													text={"English"}
 													value={"English"}
 													onClick={async () => {
-														document.cookie = `NEXT_LOCALE=en; max-age=31536000; SameSite=lax;
+														document.cookie = `NEXT_LOCALE=en; max-age=31536000; SameSite=${
+															process.env.NODE_ENV === "production"
+																? "none"
+																: "lax"
+														};
                             secure=${
 															process.env.NODE_ENV === "production"
 														};domain=${
 															process.env.NODE_ENV === "production"
-																? "flaw.uniba.sk"
+																? ".flaw.uniba.sk"
 																: "localhost"
 														};`;
 														router.push(router.asPath, undefined, {
@@ -237,12 +241,16 @@ export default function MobileNav({
 													text={"Slovak"}
 													value={"Slovak"}
 													onClick={() => {
-														document.cookie = `NEXT_LOCALE=sk; max-age=31536000; SameSite=lax;
+														document.cookie = `NEXT_LOCALE=sk; max-age=31536000; SameSite=${
+															process.env.NODE_ENV === "production"
+																? "none"
+																: "lax"
+														};
                             secure=${
 															process.env.NODE_ENV === "production"
 														};domain=${
 															process.env.NODE_ENV === "production"
-																? "flaw.uniba.sk"
+																? ".flaw.uniba.sk"
 																: "localhost"
 														};`;
 														router.push(router.asPath, undefined, {
