@@ -264,7 +264,7 @@ export class ConferenceResolver {
   async attending(@Root() { id }: Conference, @Ctx() { user }: Context) {
     return await this.attendeeService.findOne({
       conference: id,
-      user: user!.id,
+      user: user?.id,
     });
   }
 }
