@@ -63,12 +63,7 @@ const ConferencePage: NextPageWithLayout = () => {
           {data?.conference.logoUrl && (
             <Image
               alt="conference logo"
-              src={data.conference.logoUrl.replace(
-                process.env.NODE_ENV === "development"
-                  ? "localhost"
-                  : "flawis-backend.flaw.uniba.sk",
-                "gateway:5000"
-              )}
+              src={data.conference.logoUrl}
               quality={50}
               style={{ objectFit: "contain" }}
               fill
