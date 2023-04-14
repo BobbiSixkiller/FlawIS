@@ -17,7 +17,6 @@ import { File } from "../entities/File";
 import { CRUDservice } from "../services/CRUDservice";
 import { Service } from "typedi";
 import { Context } from "../util/auth";
-import { ObjectId } from "mongodb";
 
 @Service()
 @Resolver()
@@ -63,14 +62,14 @@ export class FileResolver {
       name: filename,
       type: filetype,
       user,
-      url: `${"http://localhost:5000/" + "public/" + url}`,
+      url: `${"https://flawis-backend.flaw.uniba.sk" + "public/" + url}`,
     });
 
     return new Promise(async (resolve, reject) =>
       createReadStream()
         .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
         .on("finish", () =>
-          resolve(`${"http://localhost:5000/" + "public/" + url}`)
+          resolve(`${"https://flawis-backend.flaw.uniba.sk" + "public/" + url}`)
         )
         .on("error", () => reject(new Error("File upload failed!")))
     );
