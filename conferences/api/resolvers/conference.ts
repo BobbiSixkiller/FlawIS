@@ -267,4 +267,10 @@ export class ConferenceResolver {
       user: user?.id,
     });
   }
+
+  @Authorized()
+  @FieldResolver(() => Boolean)
+  async isAdmin(@Ctx() { user }: Context) {
+    return user?.role === "ADMIN";
+  }
 }
