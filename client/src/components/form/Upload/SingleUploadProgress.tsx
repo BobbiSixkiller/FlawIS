@@ -85,6 +85,7 @@ export default function SingleUploadProgress({
       formData.append("0", file);
 
       // xhr.setRequestHeader("x-apollo-operation-name", "fileUpload");
+      // xhr.setRequestHeader("content-type", "application/octet-stream");.
       // xhr.setRequestHeader("content-type", "application/octet-stream");
       xhr.withCredentials = true;
       xhr.send(formData);
