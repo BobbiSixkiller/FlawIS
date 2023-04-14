@@ -45,7 +45,11 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: ["http://localhost:3000", "http://client:3000"],
+      origin: [
+        "https://flawis.flaw.uniba.sk",
+        "https://conferences.flaw.uniba.sk",
+        "http://client:3000",
+      ],
     })
   );
   app.use(cookieParser());
@@ -68,6 +72,7 @@ const main = async () => {
   );
   app.use(
     "/public",
+    cors(),
     createProxyMiddleware({
       target: "http://files:5002/",
       changeOrigin: true,
