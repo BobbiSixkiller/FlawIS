@@ -116,6 +116,7 @@ export type AttendeeInput = {
   billing: AttendeeBillingInput;
   conferenceId: Scalars['ObjectId'];
   submission?: InputMaybe<SubmissionInput>;
+  submissionId?: InputMaybe<Scalars['ObjectId']>;
   ticketId: Scalars['ObjectId'];
 };
 

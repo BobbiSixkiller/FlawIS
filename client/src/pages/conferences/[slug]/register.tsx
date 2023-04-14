@@ -362,6 +362,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
             },
             conferenceId: "",
             ticketId: "",
+            submissionId: router.query.submission as string,
           }}
           onSubmit={async (values, formik) => {
             try {

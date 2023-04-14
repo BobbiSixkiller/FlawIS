@@ -38,6 +38,9 @@ export class AttendeeInput {
   @Field()
   ticketId: ObjectId;
 
+  @Field({ nullable: true })
+  submissionId?: ObjectId;
+
   @Field()
   billing: AttendeeBillingInput;
 

@@ -959,6 +959,18 @@
             "deprecationReason": null
           },
           {
+            "name": "submissionId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "ObjectId",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ticketId",
             "description": null,
             "type": {

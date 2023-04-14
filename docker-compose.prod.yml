@@ -42,6 +42,8 @@ services:
       - ./files/.env
     depends_on:
       - rabbitmq
+      - mongo
+      - redis
     # volumes:
     #   - ./files:/usr/app
     #   - /usr/app/node_modules
@@ -58,6 +60,7 @@ services:
     depends_on:
       - rabbitmq
       - mongo
+      - redis
     # volumes:
     #   - ./conferences:/usr/app
     #   - /usr/app/node_modules

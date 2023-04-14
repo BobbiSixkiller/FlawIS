@@ -48,6 +48,7 @@ services:
       - ./files/.env
     depends_on:
       - rabbitmq
+      - mongo
     volumes:
       - ./files:/usr/app
       - /usr/app/node_modules

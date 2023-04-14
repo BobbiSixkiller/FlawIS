@@ -54,7 +54,8 @@ export class AttendeeResolver {
   @Authorized()
   @Mutation(() => Attendee)
   async addAttendee(
-    @Arg("data") { conferenceId, billing, submission }: AttendeeInput,
+    @Arg("data")
+    { conferenceId, billing, submission, submissionId }: AttendeeInput,
     @CheckTicket() { ticket, conference }: VerifiedTicket,
     @Ctx() { user, locale }: Context
   ): Promise<Attendee> {
@@ -88,9 +89,14 @@ export class AttendeeResolver {
           vat: isFlaw
             ? 0
             : Math.round((ticket.price - priceWithouTax) * 100) / 100,
-          body: "Test invoice",
+          body:
+            locale === "sk"
+              ? `Faktúra vystavená na úhradu konferenčného poplatku.`
+              : `This invoice has been issued in order to pay the conference fee.`,
           comment:
-            "In case of not due payment the host organisation is reserving the right to cancel attendee",
+            locale === "sk"
+              ? "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača."
+              : "In case of not due payment the host organisation is reserving the right to cancel attendee",
         },
       },
     });
@@ -108,30 +114,40 @@ export class AttendeeResolver {
     );
 
     if (submission) {
-      const registeredSubmission = await this.submissionService.create({
-        ...localizeInput(submission, submission.translations, locale),
-        authors: [user?.id],
-        conference: submission.conferenceId,
-        section: submission.sectionId,
-      });
-      const localizedSubmission = convertDocument(registeredSubmission, locale);
+      if (submissionId) {
+        await this.submissionService.update(
+          { _id: user?.id },
+          { $addToSet: { authors: user?.id } }
+        );
+      } else {
+        const registeredSubmission = await this.submissionService.create({
+          ...localizeInput(submission, submission.translations, locale),
+          authors: [user?.id],
+          conference: submission.conferenceId,
+          section: submission.sectionId,
+        });
+        const localizedSubmission = convertDocument(
+          registeredSubmission,
+          locale
+        );
 
-      submission.authors?.forEach((author) =>
-        Messagebroker.produceMessage(
-          JSON.stringify({
-            locale,
-            name: user?.name,
-            email: author,
-            conferenceName: conference.name,
-            conferenceSlug: conference.slug,
-            submissionId: localizedSubmission.id,
-            submissionName: localizedSubmission.name,
-            submissionAbstract: localizedSubmission.abstract,
-            submissionKeywords: localizedSubmission.keywords,
-          }),
-          "mail.conference.coAuthor"
-        )
-      );
+        submission.authors?.forEach((author) =>
+          Messagebroker.produceMessage(
+            JSON.stringify({
+              locale,
+              name: user?.name,
+              email: author,
+              conferenceName: conference.name,
+              conferenceSlug: conference.slug,
+              submissionId: localizedSubmission.id,
+              submissionName: localizedSubmission.name,
+              submissionAbstract: localizedSubmission.abstract,
+              submissionKeywords: localizedSubmission.keywords,
+            }),
+            "mail.conference.coAuthor"
+          )
+        );
+      }
     }
 
     return attendee;
