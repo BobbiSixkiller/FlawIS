@@ -990,7 +990,7 @@ export type AddAttendeeMutationVariables = Exact<{
 }>;
 
 
-export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, createdAt: any, updatedAt: any, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, authors: Array<{ __typename?: 'User', id: any, name: string }> }> } };
+export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
 
 export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, role: Role, verified: boolean, createdAt: any, updatedAt: any };
 
@@ -1593,17 +1593,33 @@ export const AddAttendeeDocument = gql`
     mutation addAttendee($data: AttendeeInput!) {
   addAttendee(data: $data) {
     id
+    conference {
+      id
+      name
+    }
     submissions {
       id
       name
       abstract
       keywords
-      authors {
+      conference {
+        id
+      }
+      section {
         id
         name
       }
-      createdAt
+      authors {
+        name
+        email
+      }
       updatedAt
+      translations {
+        language
+        name
+        abstract
+        keywords
+      }
     }
     createdAt
     updatedAt
