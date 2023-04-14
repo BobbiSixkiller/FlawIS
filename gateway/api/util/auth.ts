@@ -44,8 +44,6 @@ export function createContext({ req, res }: ExpressContext): Context {
 		user: null,
 	};
 
-	console.log(req.cookies.NEXT_LOCALE);
-
 	if (req.cookies.accessToken) {
 		const token = req.cookies.accessToken.split("Bearer%20")[1];
 		if (token) {
