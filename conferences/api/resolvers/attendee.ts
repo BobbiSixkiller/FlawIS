@@ -26,7 +26,7 @@ import { CheckTicket } from "../util/decorators";
 
 import env from "dotenv";
 import Messagebroker from "../util/rmq";
-import { localizeInput, localizeOutput } from "../util/locale";
+import { localizeInput } from "../util/locale";
 import { convertDocument } from "../middlewares/typegoose-middleware";
 
 env.config();
@@ -77,12 +77,24 @@ export class AttendeeResolver {
       "user.update.billings"
     );
 
+    console.log(conference.billing.variableSymbol);
+    console.log(conference.attendeesCount);
+    console.log(
+      conference.billing.variableSymbol +
+        String(conference.attendeesCount + 1).padStart(4, "0")
+    );
+
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
       online: ticket.online,
       user: user?.id,
       invoice: {
-        issuer: { ...conference.billing },
+        issuer: {
+          ...conference.billing,
+          variableSymbol:
+            conference.billing.variableSymbol +
+            String(conference.attendeesCount + 1).padStart(4, "0"),
+        },
         payer: { ...billing },
         body: {
           price: Math.round((priceWithouTax / 100) * 100) / 100,
