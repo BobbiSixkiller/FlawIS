@@ -33,6 +33,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
   };
 
   return new ApolloClient({
+    connectToDevTools: process.env.NODE_ENV === "production" ? false : true,
     // SSR only for Node.js
     ssrMode: typeof window === "undefined",
     link: ApolloLink.from([
