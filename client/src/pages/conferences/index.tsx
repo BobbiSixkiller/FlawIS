@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import Link from "next/link";
 import useWidth from "../../hooks/useWidth";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import MastHead from "../../components/MastHead";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";
@@ -94,7 +94,7 @@ const Item = styled(Grid.Column)<{ index: number }>`
 	}
 `;
 
-const HomePage: NextPageWithLayout = ({}) => {
+const HomePage: NextPageWithLayout = () => {
 	const { user } = useContext(AuthContext);
 	const width = useWidth();
 	const ref = useRef<HTMLDivElement>(null);
@@ -110,7 +110,7 @@ const HomePage: NextPageWithLayout = ({}) => {
 
 	const loadingMoreConferences = networkStatus === NetworkStatus.fetchMore;
 
-	const { t } = useTranslation("common");
+	const { t, i18n } = useTranslation("common");
 
 	return (
 		<>

@@ -94,7 +94,7 @@ input BillingInput {
 
 """Conference model type"""
 type Conference {
-  attendees(after: String, first: Int = 20): AttendeeConnection!
+  attendees(after: ObjectId, first: Int = 20): AttendeeConnection!
   attendeesCount: Int!
   attending: Attendee
   billing: ConferenceBilling!

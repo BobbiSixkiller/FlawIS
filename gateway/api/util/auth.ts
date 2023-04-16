@@ -40,7 +40,7 @@ export function createContext({ req, res }: ExpressContext): Context {
 	const appContext: Context = {
 		req,
 		res,
-		locale: req.cookies.NEXT_LOCALE,
+		locale: req.cookies.NEXT_locale,
 		user: null,
 	};
 
