@@ -4,20 +4,17 @@ import { Container, Dropdown, Menu, Icon, Sidebar } from "semantic-ui-react";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Cookies from "js-cookie";
 
 import logoInverted from "public/images/Flaw-logo-notext-inverted.png";
 import logo from "public/images/Flaw-logo-notext.png";
 
 import { useRouter } from "next/router";
 import { ActionTypes, AuthContext } from "../providers/Auth";
-import {
-	ConferenceDocument,
-	ConferencesDocument,
-	useLogoutMutation,
-} from "../graphql/generated/schema";
+import { useLogoutMutation } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
 import MainMenu from "./MainMenuItems";
-import { useApolloClient } from "@apollo/client";
+import { useApollo } from "../lib/apollo";
 import { useTranslation } from "next-i18next";
 
 interface navProps {
@@ -71,7 +68,6 @@ export default function MobileNav({
 }) {
 	const { ref, inView } = useInView({ threshold: 1, initialInView: true });
 	const [opened, toggle] = useState(false);
-	const client = useApolloClient();
 
 	const { user, dispatch } = useContext(AuthContext);
 
@@ -92,18 +88,23 @@ export default function MobileNav({
 		},
 	});
 
+	const client = useApollo({});
 	const { i18n } = useTranslation();
 
 	useEffect(() => {
-		async function fetchLocalized() {
-			client.cache.reset();
-			await client.refetchQueries({
-				include: [ConferenceDocument, ConferencesDocument],
-			});
-		}
-
-		fetchLocalized();
-	}, [i18n]);
+		Cookies.set("NEXT_locale", i18n.language, {
+			path: "/",
+			expires: 31536000,
+			domain:
+				process.env.NODE_ENV === "production" ? "flaw.uniba.sk" : "localhost",
+			secure: process.env.NODE_ENV === "production",
+			sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+		});
+		client.cache.reset();
+		client.refetchQueries({
+			include: "active",
+		});
+	}, [i18n.language]);
 
 	return (
 		<Sidebar.Pushable>
@@ -217,46 +218,22 @@ export default function MobileNav({
 													key={1}
 													text={"English"}
 													value={"English"}
-													onClick={async () => {
-														document.cookie = `NEXT_LOCALE=en; max-age=31536000; SameSite=${
-															process.env.NODE_ENV === "production"
-																? "none"
-																: "lax"
-														};
-                            secure=${
-															process.env.NODE_ENV === "production"
-														};domain=${
-															process.env.NODE_ENV === "production"
-																? ".flaw.uniba.sk"
-																: "localhost"
-														};`;
+													onClick={async () =>
 														router.push(router.asPath, undefined, {
 															locale: "en",
-														});
-													}}
+														})
+													}
 												/>
 												<Dropdown.Item
 													style={{ textAlign: "center" }}
 													key={2}
 													text={"Slovak"}
 													value={"Slovak"}
-													onClick={() => {
-														document.cookie = `NEXT_LOCALE=sk; max-age=31536000; SameSite=${
-															process.env.NODE_ENV === "production"
-																? "none"
-																: "lax"
-														};
-                            secure=${
-															process.env.NODE_ENV === "production"
-														};domain=${
-															process.env.NODE_ENV === "production"
-																? ".flaw.uniba.sk"
-																: "localhost"
-														};`;
+													onClick={() =>
 														router.push(router.asPath, undefined, {
 															locale: "sk",
-														});
-													}}
+														})
+													}
 												/>
 											</Dropdown.Menu>
 										</Dropdown>
