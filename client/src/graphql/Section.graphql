@@ -30,3 +30,7 @@ mutation updateSection($id: ObjectId!, $data: SectionInput!) {
 		updatedAt
 	}
 }
+
+mutation deleteSection($id: ObjectId!) {
+	deleteSection(id: $id)
+}

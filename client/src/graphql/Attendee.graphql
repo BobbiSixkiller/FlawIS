@@ -1,38 +1,45 @@
 mutation addAttendee($data: AttendeeInput!) {
-  addAttendee(data: $data) {
-    id
-    conference {
-      id
-      name
-    }
-    # invoice {
+	addAttendee(data: $data) {
+		id
+		user {
+			id
+			name
+			email
+		}
+		conference {
+			id
+			name
+			slug
+		}
+		# invoice {
 
-    # }
-    submissions {
-      id
-      name
-      abstract
-      keywords
-      conference {
-        id
-      }
-      section {
-        id
-        name
-      }
-      authors {
-        name
-        email
-      }
-      updatedAt
-      translations {
-        language
-        name
-        abstract
-        keywords
-      }
-    }
-    createdAt
-    updatedAt
-  }
+		# }
+		submissions {
+			id
+			name
+			abstract
+			keywords
+			conference {
+				id
+			}
+			section {
+				id
+				name
+			}
+			authors {
+				id
+				name
+				email
+			}
+			updatedAt
+			translations {
+				language
+				name
+				abstract
+				keywords
+			}
+		}
+		createdAt
+		updatedAt
+	}
 }

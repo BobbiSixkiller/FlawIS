@@ -1506,7 +1506,7 @@
                 "description": null,
                 "type": {
                   "kind": "SCALAR",
-                  "name": "String",
+                  "name": "ObjectId",
                   "ofType": null
                 },
                 "defaultValue": null,
