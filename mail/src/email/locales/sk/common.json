@@ -1,3 +1,5 @@
 {
-  "greetings": "Vážená/ý"
+  "greetings": "Vážená/ý",
+  "bye": "S pozdravom,",
+  "no-reply": "Tento email bol vygenerovaný systémom FlawIS. Prosím neodpovedajte."
 }
