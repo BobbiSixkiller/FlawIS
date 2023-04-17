@@ -174,7 +174,7 @@ export class EmailService {
         this.i18n.t('conference.subject', { lang: msg.locale }) +
         ' ' +
         msg.conferenceName,
-      template: 'invoice',
+      template: 'conferenceRegistration',
       context: {
         // ✏️ filling curly brackets with content
         name: msg.name,

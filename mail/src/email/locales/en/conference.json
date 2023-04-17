@@ -24,5 +24,6 @@
   "sum": "Sum",
   "item": "Item",
   "price": "Price",
-  "vat": "VAT"
+  "vat": "VAT",
+  "conferenceRegistrationText": "Your registration has been successful. Your invoice can be found in the email attachements. In the case of not paying the conference fee in due time, the hosting organisation is reserving the right to cancel your registration."
 }
