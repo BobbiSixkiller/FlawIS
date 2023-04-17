@@ -77,17 +77,10 @@ export class AttendeeResolver {
       "user.update.billings"
     );
 
-    console.log(conference.billing.variableSymbol);
-    console.log(conference.attendeesCount);
-    console.log(
-      conference.billing.variableSymbol +
-        String(conference.attendeesCount + 1).padStart(4, "0")
-    );
-
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
-      online: ticket.online,
       user: user?.id,
+      ticket: { ...ticket, _id: ticket.id },
       invoice: {
         issuer: {
           ...conference.billing,
