@@ -164,7 +164,7 @@ export class EmailService {
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
       },
-      'invoice-attachement.hbs',
+      'invoice.hbs',
     );
 
     await this.mailerService.sendMail({

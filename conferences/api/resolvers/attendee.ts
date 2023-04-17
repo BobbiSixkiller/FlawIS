@@ -100,7 +100,7 @@ export class AttendeeResolver {
           price: Math.round((priceWithouTax / 100) * 100) / 100,
           vat: isFlaw
             ? 0
-            : Math.round((ticket.price - priceWithouTax) * 100) / 100,
+            : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
           body:
             locale === "sk"
               ? `Faktúra vystavená na úhradu konferenčného poplatku.`
