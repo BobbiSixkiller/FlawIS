@@ -986,13 +986,6 @@ export type DeleteAnnouncementMutationVariables = Exact<{
 
 export type DeleteAnnouncementMutation = { __typename?: 'Mutation', deleteAnnouncement: { __typename?: 'Announcement', id: string, name: string, text: string, files?: Array<string> | null, createdAt: any, updatedAt: any } };
 
-export type AddAttendeeMutationVariables = Exact<{
-  data: AttendeeInput;
-}>;
-
-
-export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: any, name: string, email: string }, conference: { __typename?: 'Conference', id: any, name: string, slug: string }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
-
 export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, role: Role, verified: boolean, createdAt: any, updatedAt: any };
 
 export type LoginMutationVariables = Exact<{
@@ -1055,14 +1048,21 @@ export type ConferencesQueryVariables = Exact<{
 
 export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
-export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+
+export type AttendeeQueryVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
 
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, isAdmin: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, isAdmin: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
 
 export type ConferenceAttendeesQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -1071,7 +1071,7 @@ export type ConferenceAttendeesQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
+export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1102,6 +1102,20 @@ export type CreateConferenceMutationVariables = Exact<{
 
 
 export type CreateConferenceMutation = { __typename?: 'Mutation', createConference: { __typename?: 'Conference', id: any, name: string, description: string, slug: string, logoUrl: string, createdAt: any, updatedAt: any, dates: { __typename?: 'ImportantDates', start: any, end: any }, billing: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, translations: Array<{ __typename?: 'ConferenceTranslation', language: string, name: string, description: string, logoUrl: string }> } };
+
+export type AddAttendeeMutationVariables = Exact<{
+  data: AttendeeInput;
+}>;
+
+
+export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO?: string | null, DIC?: string | null, ICDPH?: string | null, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+
+export type RemoveAttendeeMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+}>;
+
+
+export type RemoveAttendeeMutation = { __typename?: 'Mutation', removeAttendee: boolean };
 
 export type UploadFileMutationVariables = Exact<{
   type: FileType;
@@ -1311,6 +1325,16 @@ export const UserFragmentDoc = gql`
 export const AttendeeFragmentFragmentDoc = gql`
     fragment AttendeeFragment on Attendee {
   id
+  conference {
+    id
+    name
+  }
+  user {
+    id
+    name
+    email
+    organisation
+  }
   invoice {
     payer {
       name
@@ -1606,76 +1630,6 @@ export function useDeleteAnnouncementMutation(baseOptions?: Apollo.MutationHookO
 export type DeleteAnnouncementMutationHookResult = ReturnType<typeof useDeleteAnnouncementMutation>;
 export type DeleteAnnouncementMutationResult = Apollo.MutationResult<DeleteAnnouncementMutation>;
 export type DeleteAnnouncementMutationOptions = Apollo.BaseMutationOptions<DeleteAnnouncementMutation, DeleteAnnouncementMutationVariables>;
-export const AddAttendeeDocument = gql`
-    mutation addAttendee($data: AttendeeInput!) {
-  addAttendee(data: $data) {
-    id
-    user {
-      id
-      name
-      email
-    }
-    conference {
-      id
-      name
-      slug
-    }
-    submissions {
-      id
-      name
-      abstract
-      keywords
-      conference {
-        id
-      }
-      section {
-        id
-        name
-      }
-      authors {
-        id
-        name
-        email
-      }
-      updatedAt
-      translations {
-        language
-        name
-        abstract
-        keywords
-      }
-    }
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export type AddAttendeeMutationFn = Apollo.MutationFunction<AddAttendeeMutation, AddAttendeeMutationVariables>;
-
-/**
- * __useAddAttendeeMutation__
- *
- * To run a mutation, you first call `useAddAttendeeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddAttendeeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [addAttendeeMutation, { data, loading, error }] = useAddAttendeeMutation({
- *   variables: {
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useAddAttendeeMutation(baseOptions?: Apollo.MutationHookOptions<AddAttendeeMutation, AddAttendeeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddAttendeeMutation, AddAttendeeMutationVariables>(AddAttendeeDocument, options);
-      }
-export type AddAttendeeMutationHookResult = ReturnType<typeof useAddAttendeeMutation>;
-export type AddAttendeeMutationResult = Apollo.MutationResult<AddAttendeeMutation>;
-export type AddAttendeeMutationOptions = Apollo.BaseMutationOptions<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
@@ -2048,6 +2002,41 @@ export function useConferencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type ConferencesQueryHookResult = ReturnType<typeof useConferencesQuery>;
 export type ConferencesLazyQueryHookResult = ReturnType<typeof useConferencesLazyQuery>;
 export type ConferencesQueryResult = Apollo.QueryResult<ConferencesQuery, ConferencesQueryVariables>;
+export const AttendeeDocument = gql`
+    query attendee($id: ObjectId!) {
+  attendee(id: $id) {
+    ...AttendeeFragment
+  }
+}
+    ${AttendeeFragmentFragmentDoc}`;
+
+/**
+ * __useAttendeeQuery__
+ *
+ * To run a query within a React component, call `useAttendeeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAttendeeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAttendeeQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useAttendeeQuery(baseOptions: Apollo.QueryHookOptions<AttendeeQuery, AttendeeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AttendeeQuery, AttendeeQueryVariables>(AttendeeDocument, options);
+      }
+export function useAttendeeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AttendeeQuery, AttendeeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AttendeeQuery, AttendeeQueryVariables>(AttendeeDocument, options);
+        }
+export type AttendeeQueryHookResult = ReturnType<typeof useAttendeeQuery>;
+export type AttendeeLazyQueryHookResult = ReturnType<typeof useAttendeeLazyQuery>;
+export type AttendeeQueryResult = Apollo.QueryResult<AttendeeQuery, AttendeeQueryVariables>;
 export const ConferenceDocument = gql`
     query conference($slug: String!) {
   conference(slug: $slug) {
@@ -2359,6 +2348,70 @@ export function useCreateConferenceMutation(baseOptions?: Apollo.MutationHookOpt
 export type CreateConferenceMutationHookResult = ReturnType<typeof useCreateConferenceMutation>;
 export type CreateConferenceMutationResult = Apollo.MutationResult<CreateConferenceMutation>;
 export type CreateConferenceMutationOptions = Apollo.BaseMutationOptions<CreateConferenceMutation, CreateConferenceMutationVariables>;
+export const AddAttendeeDocument = gql`
+    mutation addAttendee($data: AttendeeInput!) {
+  addAttendee(data: $data) {
+    ...AttendeeFragment
+  }
+}
+    ${AttendeeFragmentFragmentDoc}`;
+export type AddAttendeeMutationFn = Apollo.MutationFunction<AddAttendeeMutation, AddAttendeeMutationVariables>;
+
+/**
+ * __useAddAttendeeMutation__
+ *
+ * To run a mutation, you first call `useAddAttendeeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddAttendeeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addAttendeeMutation, { data, loading, error }] = useAddAttendeeMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useAddAttendeeMutation(baseOptions?: Apollo.MutationHookOptions<AddAttendeeMutation, AddAttendeeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddAttendeeMutation, AddAttendeeMutationVariables>(AddAttendeeDocument, options);
+      }
+export type AddAttendeeMutationHookResult = ReturnType<typeof useAddAttendeeMutation>;
+export type AddAttendeeMutationResult = Apollo.MutationResult<AddAttendeeMutation>;
+export type AddAttendeeMutationOptions = Apollo.BaseMutationOptions<AddAttendeeMutation, AddAttendeeMutationVariables>;
+export const RemoveAttendeeDocument = gql`
+    mutation removeAttendee($id: ObjectId!) {
+  removeAttendee(id: $id)
+}
+    `;
+export type RemoveAttendeeMutationFn = Apollo.MutationFunction<RemoveAttendeeMutation, RemoveAttendeeMutationVariables>;
+
+/**
+ * __useRemoveAttendeeMutation__
+ *
+ * To run a mutation, you first call `useRemoveAttendeeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveAttendeeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeAttendeeMutation, { data, loading, error }] = useRemoveAttendeeMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRemoveAttendeeMutation(baseOptions?: Apollo.MutationHookOptions<RemoveAttendeeMutation, RemoveAttendeeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveAttendeeMutation, RemoveAttendeeMutationVariables>(RemoveAttendeeDocument, options);
+      }
+export type RemoveAttendeeMutationHookResult = ReturnType<typeof useRemoveAttendeeMutation>;
+export type RemoveAttendeeMutationResult = Apollo.MutationResult<RemoveAttendeeMutation>;
+export type RemoveAttendeeMutationOptions = Apollo.BaseMutationOptions<RemoveAttendeeMutation, RemoveAttendeeMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($type: FileType!, $file: Upload!) {
   uploadFile(type: $type, file: $file)

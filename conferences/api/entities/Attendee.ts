@@ -7,7 +7,7 @@ import CreateConnection from "../resolvers/types/pagination";
 import { Ref } from "../util/types";
 import { Billing } from "./Billing";
 
-import { Conference, ConferenceBilling } from "./Conference";
+import { Conference, ConferenceBilling, Ticket } from "./Conference";
 import { Submission } from "./Submission";
 import { User } from "./User";
 
@@ -82,9 +82,9 @@ export class Attendee extends TimeStamps {
   @Property({ ref: () => User })
   user: Ref<User>;
 
-  @Field()
-  @Property()
-  online: boolean;
+  @Field(() => Ticket)
+  @Property({ type: () => Ticket })
+  ticket: Ticket;
 
   //invoice subdoc added so individual invoice customization is possible
   @Field(() => Invoice)
