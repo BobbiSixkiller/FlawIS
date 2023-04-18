@@ -123,6 +123,7 @@ services:
     restart: unless-stopped
 
   rabbitmq:
+    hostname: rabbitmq
     image: rabbitmq
     # restart: unless-stopped
     ports:
