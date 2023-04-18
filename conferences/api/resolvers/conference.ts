@@ -138,7 +138,9 @@ export class ConferenceResolver {
     @Arg("id") _id: ObjectId,
     @LoadConference() conference: DocumentType<Conference>
   ) {
-    const ticket = conference.tickets.find((t) => t.id === ticketId);
+    const ticket = conference.tickets.find(
+      (t) => t.id.toString() === ticketId.toString()
+    );
     if (!ticket) throw new Error("Ticket not found!");
 
     conference.tickets = conference.tickets.filter((t) => t !== ticket);

@@ -1,13 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import {
-  IsBoolean,
-  IsDate,
-  IsInt,
-  IsLocale,
-  IsNumberString,
-  IsString,
-  Min,
-} from "class-validator";
+import { IsBoolean, IsDate, IsLocale, IsString, Min } from "class-validator";
 
 import {
   Conference,
