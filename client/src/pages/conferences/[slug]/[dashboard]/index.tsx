@@ -42,7 +42,6 @@ const DashboardPage: NextPageWithLayout = () => {
     <Attendee
       loading={loading}
       title={data?.conference.name}
-      conferenceId={data?.conference.id}
       data={data?.conference.attending}
     />
   ) : (
