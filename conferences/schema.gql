@@ -165,7 +165,6 @@ type ConferenceTranslation {
   language: String!
   logoUrl: String!
   name: String!
-  tickets: [TicketTranslation!]!
 }
 
 """User input type"""
@@ -344,6 +343,7 @@ type Ticket {
   name: String!
   online: Boolean!
   price: Int!
+  translations: [TicketTranslation!]!
   withSubmission: Boolean!
 }
 

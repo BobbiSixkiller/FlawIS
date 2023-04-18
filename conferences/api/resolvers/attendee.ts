@@ -80,7 +80,7 @@ export class AttendeeResolver {
     const attendee = await this.attendeeService.create({
       conference: conferenceId,
       user: user?.id,
-      ticket: { ...ticket, _id: ticket.id },
+      ticket,
       invoice: {
         issuer: {
           ...conference.billing,

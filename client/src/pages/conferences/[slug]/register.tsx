@@ -505,7 +505,7 @@ export const getServerSideProps = async ({
       return {
         redirect: {
           permanent: false,
-          destination: `/${data.conference.slug}/dashboard`,
+          destination: `/${locale}/${data.conference.slug}/dashboard`,
         },
       };
     }
