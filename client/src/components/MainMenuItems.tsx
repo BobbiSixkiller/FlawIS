@@ -145,16 +145,6 @@ function ProfileMenuItems() {
 function ConferencePageMenuItems() {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const { dispatch, user } = useContext(AuthContext);
-  const width = useWidth();
-
-  const [logout] = useLogoutMutation({
-    onCompleted: () => dispatch({ type: ActionTypes.Logout }),
-    update(cache) {
-      cache.evict({});
-      cache.gc();
-    },
-  });
 
   return (
     <>
@@ -211,7 +201,7 @@ function DashboardMenuItems() {
 
   return (
     <>
-      <Menu.Item as="a" onClick={() => router.push(`/${router.query.slug}`)}>
+      <Menu.Item as="a" onClick={() => router.back()}>
         <b>{t("menu.back")}</b>
       </Menu.Item>
       {user?.role === Role.Admin && (
