@@ -1,7 +1,9 @@
-import { Card, Grid, Header, List, Message } from "semantic-ui-react";
+import { Card, Grid, Header, List, Loader, Message } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
+  Invoice,
+  Role,
   useDeleteSubmissionMutation,
 } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
@@ -9,6 +11,10 @@ import DeleteDialog from "./DeleteDialog";
 import AddSubmissionDialog from "./AddSubmissionDialog";
 import UpdateSubmissionDialog from "./UpdateSubmissionDialog";
 import AddSubmissionFileDialog from "./AddSubmissionFileDialog";
+import InvoiceDownload from "./InvoiceDownload";
+import { useContext } from "react";
+import { AuthContext } from "../providers/Auth";
+import UpdateInvoiceForm from "./UpdateInvoiceForm";
 
 export default function AttendeeComponent({
   title,
@@ -22,12 +28,17 @@ export default function AttendeeComponent({
   loading: boolean;
 }) {
   const { t } = useTranslation("conference");
+  const { user } = useContext(AuthContext);
   const width = useWidth();
 
   const [deleteSubmission] = useDeleteSubmissionMutation();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Grid.Column style={{ height: "400px" }}>
+        <Loader active />
+      </Grid.Column>
+    );
   }
 
   if (error) {
@@ -36,7 +47,7 @@ export default function AttendeeComponent({
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
-      <Grid.Row columns={2}>
+      <Grid.Row>
         <Grid.Column>
           <Header>{title}</Header>
         </Grid.Column>
@@ -46,9 +57,26 @@ export default function AttendeeComponent({
           </Grid.Column>
         )}
       </Grid.Row>
-      {/* <Grid.Row>
-				<Grid.Column>Fakturka</Grid.Column>
-			</Grid.Row> */}
+      <Grid.Row>
+        <Grid.Column>
+          {user?.role === Role.Admin ? (
+            <UpdateInvoiceForm
+              data={data?.invoice}
+              downloadLink={
+                <InvoiceDownload
+                  data={data?.invoice as Invoice}
+                  conferenceLogo={data?.conference.logoUrl as string}
+                />
+              }
+            />
+          ) : (
+            <InvoiceDownload
+              data={data?.invoice as Invoice}
+              conferenceLogo={data?.conference.logoUrl as string}
+            />
+          )}
+        </Grid.Column>
+      </Grid.Row>
       {data?.submissions?.length !== 0 && (
         <Grid.Row>
           <Grid.Column>

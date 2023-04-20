@@ -38,8 +38,7 @@ import Validation from "../../../util/validation";
 import BillingInput from "../../../components/form/BillingInput";
 import { SyntheticEvent, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../providers/Auth";
-import { useField, useFormikContext, yupToFormErrors } from "formik";
-import { object } from "yup";
+import { useField, useFormikContext } from "formik";
 
 function SelectTicket({
   label,

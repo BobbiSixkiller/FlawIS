@@ -73,9 +73,9 @@ type AttendeePageInfo {
 
 """Billing information"""
 type Billing {
-  DIC: String
-  ICDPH: String
-  ICO: String
+  DIC: String!
+  ICDPH: String!
+  ICO: String!
   address: Address!
   name: String!
 }
@@ -115,10 +115,10 @@ type Conference {
 
 """Conference billing organization"""
 type ConferenceBilling {
-  DIC: String
+  DIC: String!
   IBAN: String!
-  ICDPH: String
-  ICO: String
+  ICDPH: String!
+  ICO: String!
   SWIFT: String!
   address: Address!
   name: String!
@@ -226,18 +226,17 @@ input InvoiceDataInput {
   comment: String!
   dueDate: DateTime!
   issueDate: DateTime!
-  ticketPrice: Int!
+  price: Int!
   type: String!
-  variableSymbol: String!
   vat: Int!
   vatDate: DateTime!
 }
 
 """Invoice data input type facilitating attendee's invoice update"""
 input InvoiceInput {
-  body: InvoiceDataInput
-  issuer: BillingInput
-  payer: BillingInput
+  body: InvoiceDataInput!
+  issuer: BillingInput!
+  payer: AttendeeBillingInput!
 }
 
 type Mutation {
