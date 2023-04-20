@@ -64,7 +64,7 @@ const DashboardPage: NextPageWithLayout = () => {
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
-          {data?.conference.tickets.map((ticket: Ticket) => (
+          {data?.conference.tickets.map((ticket) => (
             <Card fluid key={ticket.id}>
               <Card.Content>
                 <Card.Header>
@@ -187,6 +187,7 @@ export const getServerSideProps = async ({
           "validation",
           "conference",
           "activation",
+          "invoice",
         ])),
       },
     });
@@ -199,6 +200,7 @@ export const getServerSideProps = async ({
           "validation",
           "conference",
           "activation",
+          "invoice",
         ])),
       },
     };

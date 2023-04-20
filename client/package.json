@@ -15,6 +15,7 @@
     "@graphql-codegen/cli": "^2.13.12",
     "@graphql-codegen/typescript": "^2.8.1",
     "@graphql-codegen/typescript-react-apollo": "^3.3.6",
+    "@react-pdf/renderer": "^3.1.9",
     "@types/node": "18.11.9",
     "@types/react-dom": "18.0.9",
     "apollo-upload-client": "^17.0.0",

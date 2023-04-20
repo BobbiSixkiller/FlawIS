@@ -1,21 +1,30 @@
 import { NextPageContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
+import { Grid, Loader, Message } from "semantic-ui-react";
 import AttendeeComponent from "../../../../../components/AttendeeComponent";
 import Dashboard from "../../../../../components/Dashboard";
 import { useAttendeeQuery } from "../../../../../graphql/generated/schema";
-import useWidth from "../../../../../hooks/useWidth";
 import { NextPageWithLayout } from "../../../../_app";
 
 const AttendeePage: NextPageWithLayout = () => {
   const router = useRouter();
-  const width = useWidth();
 
   const { data, error, loading } = useAttendeeQuery({
     variables: { id: router.query.attendee as string },
   });
 
-  console.log(data, error, loading);
+  if (loading) {
+    return (
+      <Grid.Column style={{ height: "400px" }}>
+        <Loader active />
+      </Grid.Column>
+    );
+  }
+
+  if (error) {
+    return <Message negative content={error.message} />;
+  }
 
   return (
     <AttendeeComponent

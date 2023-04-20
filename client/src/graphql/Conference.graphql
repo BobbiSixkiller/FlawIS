@@ -27,6 +27,7 @@ fragment AttendeeFragment on Attendee {
   conference {
     id
     name
+    logoUrl
   }
   user {
     id
@@ -259,4 +260,10 @@ mutation addAttendee($data: AttendeeInput!) {
 
 mutation removeAttendee($id: ObjectId!) {
   removeAttendee(id: $id)
+}
+
+mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {
+  updateInvoice(id: $id, data: $data) {
+    ...AttendeeFragment
+  }
 }

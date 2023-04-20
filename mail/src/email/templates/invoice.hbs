@@ -78,15 +78,15 @@
           </tr>
           <tr>
             <td>{{t 'conference.invoice.issueDate'}}</td>
-            <td>{{DATE invoice.body.issueDate}}</td>
+            <td>{{DATE invoice.body.issueDate i18nLang}}</td>
           </tr>
           <tr>
             <td>{{t 'conference.invoice.vatDate'}}</td>
-            <td>{{DATE invoice.body.issueDate}}</td>
+            <td>{{DATE invoice.body.issueDate i18nLang}}</td>
           </tr>
           <tr>
             <td>{{t 'conference.invoice.dueDate'}}</td>
-            <td>{{DATE invoice.body.issueDate}}</td>
+            <td>{{DATE invoice.body.issueDate i18nLang}}</td>
           </tr>
         </table>
         <table style='width: 50%; border: none; padding: 0'>
@@ -133,15 +133,16 @@
             <th>{{t 'conference.item'}}</th><th>{{t 'conference.price'}}</th>
           </tr>
           <tr>
-            <td>{{t 'conference.fee'}}</td><td>{{invoice.body.price}}</td>
+            <td>{{t 'conference.fee'}}</td><td>{{invoice.body.price}} €</td>
           </tr>
           <tr>
-            <td>{{t 'conference.vat'}}</td><td>{{invoice.body.vat}}</td>
+            <td>{{t 'conference.vat'}}</td><td>{{invoice.body.vat}} €</td>
           </tr>
           <tr>
             <td>{{t 'conference.sum'}}</td>
             <td>
               {{SUM invoice.body.price invoice.body.vat}}
+              €
             </td>
           </tr>
         </table>
