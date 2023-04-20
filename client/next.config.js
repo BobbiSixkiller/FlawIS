@@ -19,18 +19,9 @@ const nextConfig = {
       "flawis.flaw.uniba.sk",
       "flawis-backend.flaw.uniba.sk",
     ],
-    // remotePatterns: [
-    //   {
-    //     protocol: "http",
-    //     hostname: "gateway",
-    //     port: "5000",
-    //   },
-    //   {
-    //     protocol: "http",
-    //     hostname: "localhost",
-    //     port: "5000",
-    //   },
-    // ],
+  },
+  compress: {
+    brotli: true,
   },
 };
 
