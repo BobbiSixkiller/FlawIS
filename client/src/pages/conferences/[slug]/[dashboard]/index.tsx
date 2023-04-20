@@ -10,7 +10,6 @@ import DeleteDialog from "../../../../components/DeleteDialog";
 import {
   ConferenceDocument,
   Role,
-  Ticket,
   useConferenceQuery,
   useDeleteSectionMutation,
   useRemoveTicketMutation,
@@ -31,8 +30,6 @@ const DashboardPage: NextPageWithLayout = () => {
 
   const [removeTicket] = useRemoveTicketMutation();
   const [deleteSection] = useDeleteSectionMutation();
-
-  console.log(data, error, loading);
 
   if (loading) return <div>Loading...</div>;
 
