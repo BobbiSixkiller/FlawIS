@@ -2,6 +2,8 @@
 FROM node:16-alpine AS development
 ENV NODE_ENV=development
 
+RUN apk add --no-cache brotli-dev
+
 # Create app directory
 WORKDIR /usr/app
 
@@ -18,6 +20,8 @@ FROM node:16-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+
+RUN apk add --no-cache brotli-dev
 
 WORKDIR /usr/app
 
