@@ -327,6 +327,7 @@ export default function InvoiceDownload({
           content={t("download")}
           color="red"
           icon="file pdf outline"
+          type="button"
         />
       )}
     </PDFDownloadLink>
