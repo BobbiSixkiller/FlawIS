@@ -1,4 +1,4 @@
-import { Card, Grid, Header, List } from "semantic-ui-react";
+import { Button, Card, Grid, Header, List } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
@@ -16,7 +16,18 @@ import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
 
-const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), {
+  ssr: false,
+  loading: () => (
+    <Button
+      loading={true}
+      disabled={true}
+      content="loading"
+      color="red"
+      icon="file pdf outline"
+    />
+  ),
+});
 
 export default function AttendeeComponent({
   title,
