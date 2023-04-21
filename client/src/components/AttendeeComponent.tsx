@@ -11,16 +11,13 @@ import DeleteDialog from "./DeleteDialog";
 import AddSubmissionDialog from "./AddSubmissionDialog";
 import UpdateSubmissionDialog from "./UpdateSubmissionDialog";
 import AddSubmissionFileDialog from "./AddSubmissionFileDialog";
-import { lazy, useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 
-// Lazily import when rendered on UI
-const PDFGenerator = lazy(() => import("./InvoiceDownload"));
+import dynamic from "next/dynamic";
 
-// import dynamic from "next/dynamic";
-
-// const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
 
 export default function AttendeeComponent({
   title,
@@ -29,6 +26,7 @@ export default function AttendeeComponent({
   title?: string;
   data?: AttendeeFragmentFragment | null;
 }) {
+  const [clientSide, _setClientSide] = useState(true);
   const { t } = useTranslation("conference");
   const { user } = useContext(AuthContext);
   const width = useWidth();
@@ -47,26 +45,28 @@ export default function AttendeeComponent({
           </Grid.Column>
         )}
       </Grid.Row>
-      <Grid.Row>
-        <Grid.Column>
-          {user?.role === Role.Admin ? (
-            <UpdateInvoiceForm
-              data={data?.invoice}
-              downloadLink={
-                <PDFGenerator
-                  data={data?.invoice as Invoice}
-                  conferenceLogo={data?.conference.logoUrl as string}
-                />
-              }
-            />
-          ) : (
-            <PDFGenerator
-              data={data?.invoice as Invoice}
-              conferenceLogo={data?.conference.logoUrl as string}
-            />
-          )}
-        </Grid.Column>
-      </Grid.Row>
+      {clientSide && (
+        <Grid.Row>
+          <Grid.Column>
+            {user?.role === Role.Admin ? (
+              <UpdateInvoiceForm
+                data={data?.invoice}
+                downloadLink={
+                  <PDFGenerator
+                    data={data?.invoice as Invoice}
+                    conferenceLogo={data?.conference.logoUrl as string}
+                  />
+                }
+              />
+            ) : (
+              <PDFGenerator
+                data={data?.invoice as Invoice}
+                conferenceLogo={data?.conference.logoUrl as string}
+              />
+            )}
+          </Grid.Column>
+        </Grid.Row>
+      )}
       {data?.submissions?.length !== 0 && (
         <Grid.Row>
           <Grid.Column>
