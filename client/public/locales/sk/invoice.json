@@ -25,6 +25,5 @@
   "sum": "Spolu",
   "item": "Položka",
   "price": "Cena",
-  "vat": "DPH",
-  "conferenceRegistrationText": "Vaša registrácia bola úspešná. Faktúra s konferenčným poplatkom je priložená v rámci prílohy k tomuto emailu. V prípade včasného neuhradenia konferenčného poplatku si organizátor vyhradzuje právo na zrušenie Vašej registrácie."
+  "vat": "DPH"
 }

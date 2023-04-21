@@ -20,7 +20,6 @@ const nextConfig = {
       "flawis-backend.flaw.uniba.sk",
     ],
   },
-  compress: false,
 };
 
 module.exports = nextConfig;
