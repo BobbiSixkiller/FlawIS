@@ -55,23 +55,20 @@ export default function UpdateInvoiceForm({
   downloadLink: ReactElement;
 }) {
   return (
-    <div>
-      <Formik
-        initialValues={{
-          body: data!.body,
-          issuer: data!.issuer,
-          payer: data!.payer,
-        }}
-        onSubmit={(values, formik) => console.log(removeTypename(values))}
-        validationSchema={invoiceInputSchema}
-      >
-        {({ handleSubmit }: FormikProps<Values>) => (
-          <Form onSubmit={handleSubmit}>
-            <Button type="submit">submit</Button>
-          </Form>
-        )}
-      </Formik>
-      {downloadLink}
-    </div>
+    <Formik
+      initialValues={{
+        body: data!.body,
+        issuer: data!.issuer,
+        payer: data!.payer,
+      }}
+      onSubmit={(values, formik) => console.log(removeTypename(values))}
+      validationSchema={invoiceInputSchema}
+    >
+      {({ handleSubmit }: FormikProps<Values>) => (
+        <Form onSubmit={handleSubmit}>
+          <Button type="submit">submit</Button> {downloadLink}
+        </Form>
+      )}
+    </Formik>
   );
 }
