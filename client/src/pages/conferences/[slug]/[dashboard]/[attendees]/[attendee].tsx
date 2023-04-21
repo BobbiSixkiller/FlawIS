@@ -38,7 +38,7 @@ AttendeePage.getLayout = function getLayout(page) {
 export const getServerSideProps = async ({ locale }: NextPageContext) => {
   return {
     props: {
-      protect: true,
+      admin: true,
       ...(await serverSideTranslations(locale || "sk", [
         "common",
         "validation",

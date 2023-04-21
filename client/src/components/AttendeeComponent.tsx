@@ -16,7 +16,11 @@ import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 
 // Lazily import when rendered on UI
-const PDFGenerator = lazy(() => import("./InvoiceDownload"));
+// const PDFGenerator = lazy(() => import("./InvoiceDownload"));
+
+import dynamic from "next/dynamic";
+
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
 
 export default function AttendeeComponent({
   title,
