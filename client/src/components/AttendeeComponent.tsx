@@ -16,7 +16,7 @@ import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
 
-const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: true });
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
 
 export default function AttendeeComponent({
   title,
