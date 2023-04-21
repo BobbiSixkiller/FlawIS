@@ -8,45 +8,46 @@ import { useAttendeeQuery } from "../../../../../graphql/generated/schema";
 import { NextPageWithLayout } from "../../../../_app";
 
 const AttendeePage: NextPageWithLayout = () => {
-	const router = useRouter();
+  const router = useRouter();
 
-	const { data, error, loading } = useAttendeeQuery({
-		variables: { id: router.query.attendee as string },
-	});
+  const { data, error, loading } = useAttendeeQuery({
+    variables: { id: router.query.attendee as string },
+  });
 
-	if (loading) {
-		return (
-			<Grid.Column style={{ height: "400px" }}>
-				<Loader active />
-			</Grid.Column>
-		);
-	}
+  if (loading) {
+    return (
+      <Grid.Column style={{ height: "400px" }}>
+        <Loader active />
+      </Grid.Column>
+    );
+  }
 
-	if (error) {
-		return <Message negative content={error.message} />;
-	}
+  if (error) {
+    return <Message negative content={error.message} />;
+  }
 
-	return (
-		<AttendeeComponent title={data?.attendee.user.name} data={data?.attendee} />
-	);
+  return (
+    <AttendeeComponent title={data?.attendee.user.name} data={data?.attendee} />
+  );
 };
 
 AttendeePage.getLayout = function getLayout(page) {
-	return <Dashboard>{page}</Dashboard>;
+  return <Dashboard>{page}</Dashboard>;
 };
 
 export const getServerSideProps = async ({ locale }: NextPageContext) => {
-	return {
-		props: {
-			protect: true,
-			...(await serverSideTranslations(locale || "sk", [
-				"common",
-				"validation",
-				"conference",
-				"activation",
-			])),
-		},
-	};
+  return {
+    props: {
+      protect: true,
+      ...(await serverSideTranslations(locale || "sk", [
+        "common",
+        "validation",
+        "conference",
+        "activation",
+        "invoice",
+      ])),
+    },
+  };
 };
 
 export default AttendeePage;
