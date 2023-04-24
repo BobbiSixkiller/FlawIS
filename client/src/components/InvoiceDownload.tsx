@@ -11,7 +11,6 @@ import {
 } from "@react-pdf/renderer";
 import { Button } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
-import { useEffect, useState } from "react";
 
 Font.register({
   family: "UKsans",
@@ -61,22 +60,6 @@ export default function InvoiceDownload({
   data: Invoice;
 }) {
   const { t } = useTranslation("invoice");
-  // const [client, setClient] = useState(false);
-
-  // useEffect(() => setClient(true), []);
-
-  // if (!client) {
-  //   return (
-  //     <Button
-  //       loading={true}
-  //       disabled={true}
-  //       content={t("download")}
-  //       color="red"
-  //       icon="file pdf outline"
-  //       type="button"
-  //     />
-  //   );
-  // }
 
   return (
     <PDFDownloadLink
