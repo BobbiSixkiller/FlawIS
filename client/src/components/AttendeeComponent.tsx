@@ -17,7 +17,6 @@ import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
 
 const PDFGenerator = dynamic(() => import("./InvoiceDownload"), {
-  ssr: false,
   loading: () => (
     <Button
       loading={true}
@@ -42,6 +41,8 @@ export default function AttendeeComponent({
 
   const [deleteSubmission] = useDeleteSubmissionMutation();
 
+  console.log(PDFGenerator);
+
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row columns={2}>
@@ -54,28 +55,26 @@ export default function AttendeeComponent({
           </Grid.Column>
         )}
       </Grid.Row>
-      {typeof window !== undefined && (
-        <Grid.Row>
-          <Grid.Column>
-            {user?.role === Role.Admin ? (
-              <UpdateInvoiceForm
-                data={data?.invoice}
-                downloadLink={
-                  <PDFGenerator
-                    data={data?.invoice as Invoice}
-                    conferenceLogo={data?.conference.logoUrl as string}
-                  />
-                }
-              />
-            ) : (
-              <PDFGenerator
-                data={data?.invoice as Invoice}
-                conferenceLogo={data?.conference.logoUrl as string}
-              />
-            )}
-          </Grid.Column>
-        </Grid.Row>
-      )}
+      <Grid.Row>
+        <Grid.Column>
+          {user?.role === Role.Admin ? (
+            <UpdateInvoiceForm
+              data={data?.invoice}
+              downloadLink={
+                <PDFGenerator
+                  data={data?.invoice as Invoice}
+                  conferenceLogo={data?.conference.logoUrl as string}
+                />
+              }
+            />
+          ) : (
+            <PDFGenerator
+              data={data?.invoice as Invoice}
+              conferenceLogo={data?.conference.logoUrl as string}
+            />
+          )}
+        </Grid.Column>
+      </Grid.Row>
       {data?.submissions?.length !== 0 && (
         <Grid.Row>
           <Grid.Column>
