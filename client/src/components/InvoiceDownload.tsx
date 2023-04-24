@@ -13,46 +13,6 @@ import { Button } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import { useEffect, useState } from "react";
 
-Font.register({
-  family: "UKsans",
-  fontWeight: 400,
-  src: "https://flawis-backend.flaw.uniba.sk/public/UKsans/UKSans-Regular.otf",
-});
-
-Font.register({
-  family: "UKsans",
-  fontWeight: 700,
-  src: "https://flawis-backend.flaw.uniba.sk/public/UKsans/UKSans-Bold.otf",
-});
-
-const styles = StyleSheet.create({
-  page: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px",
-    paddingHorizontal: "5px",
-    paddingVertical: "5px",
-    fontFamily: "UKsans",
-    fontSize: "12px",
-  },
-  header: {
-    flexDirection: "row",
-    padding: "10px",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#b46b7a",
-    fontWeight: 700,
-    fontSize: "24px",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  table: {
-    border: "1px solid #dddddd",
-  },
-});
-
 export default function InvoiceDownload({
   conferenceLogo,
   data,
@@ -77,6 +37,46 @@ export default function InvoiceDownload({
       />
     );
   }
+
+  Font.register({
+    family: "UKsans",
+    fontWeight: 400,
+    src: "https://flawis-backend.flaw.uniba.sk/public/UKsans/UKSans-Regular.otf",
+  });
+
+  Font.register({
+    family: "UKsans",
+    fontWeight: 700,
+    src: "https://flawis-backend.flaw.uniba.sk/public/UKsans/UKSans-Bold.otf",
+  });
+
+  const styles = StyleSheet.create({
+    page: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "20px",
+      paddingHorizontal: "5px",
+      paddingVertical: "5px",
+      fontFamily: "UKsans",
+      fontSize: "12px",
+    },
+    header: {
+      flexDirection: "row",
+      padding: "10px",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: "#b46b7a",
+      fontWeight: 700,
+      fontSize: "24px",
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    table: {
+      border: "1px solid #dddddd",
+    },
+  });
 
   return (
     <PDFDownloadLink
