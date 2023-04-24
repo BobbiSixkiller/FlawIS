@@ -54,7 +54,7 @@ export default function AttendeeComponent({
           </Grid.Column>
         )}
       </Grid.Row>
-      {typeof window !== "undefined" && (
+      {typeof window !== undefined && (
         <Grid.Row>
           <Grid.Column>
             {user?.role === Role.Admin ? (
