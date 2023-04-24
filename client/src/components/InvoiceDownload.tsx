@@ -61,8 +61,6 @@ export default function InvoiceDownload({
 }) {
   const { t } = useTranslation("invoice");
 
-  console.log("LOADED");
-
   return (
     <PDFDownloadLink
       document={
