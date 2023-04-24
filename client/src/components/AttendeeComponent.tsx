@@ -11,24 +11,12 @@ import DeleteDialog from "./DeleteDialog";
 import AddSubmissionDialog from "./AddSubmissionDialog";
 import UpdateSubmissionDialog from "./UpdateSubmissionDialog";
 import AddSubmissionFileDialog from "./AddSubmissionFileDialog";
-import { lazy, Suspense, useContext } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
 
-const PDFGenerator = dynamic(() => import("./InvoiceDownload"), {
-  loading: () => (
-    <Button
-      loading={true}
-      disabled={true}
-      content="loading"
-      color="red"
-      icon="file pdf outline"
-    />
-  ),
-});
-
-// const PDFGenerator = lazy(() => import("./InvoiceDownload"));
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
 
 export default function AttendeeComponent({
   title,
