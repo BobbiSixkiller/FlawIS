@@ -15,19 +15,19 @@ import { useContext } from "react";
 import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
-import InvoiceDownload from "./InvoiceDownload";
 
-// const PDFGenerator = dynamic(() => import("./InvoiceDownload"), {
-//   loading: () => (
-//     <Button
-//       loading={true}
-//       disabled={true}
-//       content="loading"
-//       color="red"
-//       icon="file pdf outline"
-//     />
-//   ),
-// });
+const PDFGenerator = dynamic(() => import("./InvoiceDownload"), {
+  ssr: false,
+  // loading: () => (
+  //   <Button
+  //     loading={true}
+  //     disabled={true}
+  //     content="loading"
+  //     color="red"
+  //     icon="file pdf outline"
+  //   />
+  // ),
+});
 
 export default function AttendeeComponent({
   title,
@@ -60,14 +60,14 @@ export default function AttendeeComponent({
             <UpdateInvoiceForm
               data={data?.invoice}
               downloadLink={
-                <InvoiceDownload
+                <PDFGenerator
                   data={data?.invoice as Invoice}
                   conferenceLogo={data?.conference.logoUrl as string}
                 />
               }
             />
           ) : (
-            <InvoiceDownload
+            <PDFGenerator
               data={data?.invoice as Invoice}
               conferenceLogo={data?.conference.logoUrl as string}
             />
