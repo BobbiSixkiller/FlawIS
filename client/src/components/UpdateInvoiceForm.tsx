@@ -73,7 +73,6 @@ export default function UpdateInvoiceForm({
       }}
       onSubmit={async (values, formik) => {
         try {
-          console.log(removeTypename(values));
           await update({
             variables: {
               id: router.query.attendee,
@@ -86,7 +85,7 @@ export default function UpdateInvoiceForm({
       }}
       validationSchema={invoiceInputSchema}
     >
-      {({ handleSubmit }: FormikProps<Values>) => (
+      {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
         <Segment>
           <Form onSubmit={handleSubmit}>
             <InputField label="Meno platcu" name="payer.name" control={Input} />
@@ -148,7 +147,12 @@ export default function UpdateInvoiceForm({
               control={Input}
               type="number"
             />
-            <Button type="submit" positive>
+            <Button
+              type="submit"
+              positive
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
               Aktualizovať
             </Button>
             {downloadLink}
