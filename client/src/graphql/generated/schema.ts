@@ -405,9 +405,9 @@ export type InvoiceDataInput = {
   comment: Scalars['String'];
   dueDate: Scalars['DateTime'];
   issueDate: Scalars['DateTime'];
-  price: Scalars['Int'];
+  price: Scalars['Float'];
   type: Scalars['String'];
-  vat: Scalars['Int'];
+  vat: Scalars['Float'];
   vatDate: Scalars['DateTime'];
 };
 
