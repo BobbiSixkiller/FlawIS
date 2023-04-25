@@ -1,4 +1,4 @@
-import { Field, ArgsType, Int, InputType } from "type-graphql";
+import { Field, ArgsType, Int, InputType, Float } from "type-graphql";
 import { Min, Max, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
@@ -62,10 +62,10 @@ class InvoiceDataInput {
   @Field()
   dueDate: Date;
 
-  @Field(() => Int)
+  @Field(() => Float)
   price: Number;
 
-  @Field(() => Int)
+  @Field(() => Float)
   vat: Number;
 
   @Field()

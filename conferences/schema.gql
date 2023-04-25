@@ -226,9 +226,9 @@ input InvoiceDataInput {
   comment: String!
   dueDate: DateTime!
   issueDate: DateTime!
-  price: Int!
+  price: Float!
   type: String!
-  vat: Int!
+  vat: Float!
   vatDate: DateTime!
 }
 

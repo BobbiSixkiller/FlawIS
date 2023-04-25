@@ -1,4 +1,4 @@
-import { Button, Card, Grid, Header, List } from "semantic-ui-react";
+import { Card, Grid, Header, List } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
@@ -45,7 +45,6 @@ export default function AttendeeComponent({
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
-          {/* <Suspense fallback={<div>Loading...</div>}> */}
           {user?.role === Role.Admin ? (
             <UpdateInvoiceForm
               data={data?.invoice}
@@ -62,7 +61,6 @@ export default function AttendeeComponent({
               conferenceLogo={data?.conference.logoUrl as string}
             />
           )}
-          {/* </Suspense> */}
         </Grid.Column>
       </Grid.Row>
       {data?.submissions?.length !== 0 && (

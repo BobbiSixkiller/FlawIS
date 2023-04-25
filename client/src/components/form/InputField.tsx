@@ -4,6 +4,7 @@ import React, {
   ChangeEvent,
   FC,
   SyntheticEvent,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -29,6 +30,14 @@ export interface InputFieldProps extends FormFieldProps {
 export const InputField: FC<InputFieldProps> = (props) => {
   const [field, meta, helpers] = useField(props.name);
   const { status, setStatus } = useFormikContext();
+
+  useEffect(() => {
+    if (props.type === "date") {
+      if (field.value) {
+        helpers.setValue(field.value.split("T")[0]);
+      }
+    }
+  }, []);
 
   const error = (meta.touched && meta.error) || (status && status[field.name]);
 
