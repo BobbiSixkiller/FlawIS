@@ -12,6 +12,4 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - name: Build and Deploy
-        run: |
-          sudo docker system prune -f
-          sudo docker-compose -f docker-compose.prod.yml up -d --build
+        run: sudo docker-compose -f docker-compose.prod.yml up -d --build
