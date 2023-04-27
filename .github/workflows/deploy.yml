@@ -1,0 +1,16 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build and Deploy
+        run: |
+          docker system prune -f
+          docker-compose down
+          docker-compose -f docker-compose.prod.yml up -d --build
