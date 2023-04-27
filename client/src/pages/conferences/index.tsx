@@ -112,7 +112,7 @@ const HomePage: NextPageWithLayout = () => {
 
   const { t, i18n } = useTranslation("common");
 
-  console.log("TEST");
+  console.log("TEST 3");
 
   return (
     <>
