@@ -123,13 +123,11 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    hostname: rabbitmq
     image: rabbitmq
-    # restart: unless-stopped
+    restart: unless-stopped
     ports:
       - "5672:5672"
   redis:
-    hostname: redis
     image: redis
     restart: unless-stopped
     ports:
