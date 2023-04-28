@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    env_file:
-      - ./gateway/.env
+    environment:
+      SECRET: ${SECRET}
     depends_on:
       - users
       - conferences
@@ -25,8 +25,9 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    env_file:
-      - ./users/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${USERS_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
@@ -44,8 +45,9 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    env_file:
-      - ./files/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${FILES_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
@@ -62,8 +64,9 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    env_file:
-      - ./conferences/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${CONFERENCES_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
@@ -81,8 +84,9 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    env_file:
-      - ./grants/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${GRANTS_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
@@ -114,6 +118,14 @@ services:
       context: ./mail
       dockerfile: Dockerfile
       target: development
+    environment:
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
     command: npm run start:dev
     depends_on:
       - rabbitmq

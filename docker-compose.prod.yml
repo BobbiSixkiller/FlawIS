@@ -3,16 +3,13 @@ services:
     build:
       context: ./gateway
       dockerfile: Dockerfile
-    env_file:
-      - ./gateway/.env
+    environment:
+      SECRET: ${SECRET}
     depends_on:
       - users
       - conferences
       - files
       - grants
-    # volumes:
-    #   - ./gateway:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -21,15 +18,13 @@ services:
     build:
       context: ./users
       dockerfile: Dockerfile
-    env_file:
-      - ./users/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${USERS_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
       - redis
-    # volumes:
-    #   - ./users:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5001:5001"
@@ -38,15 +33,15 @@ services:
     build:
       context: ./files
       dockerfile: Dockerfile
-    env_file:
-      - ./files/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${FILES_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
       - redis
     volumes:
       - ./files/public:/usr/app/public
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5002:5002"
@@ -55,15 +50,13 @@ services:
     build:
       context: ./conferences
       dockerfile: Dockerfile
-    env_file:
-      - ./conferences/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${CONFERENCES_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
       - redis
-    # volumes:
-    #   - ./conferences:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5003:5003"
@@ -72,14 +65,12 @@ services:
     build:
       context: ./grants
       dockerfile: Dockerfile
-    env_file:
-      - ./grants/.env
+    environment:
+      SECRET: ${SECRET}
+      MONGODB_URI: ${GRANTS_MONGODB_URI}
     depends_on:
       - rabbitmq
       - mongo
-    # volumes:
-    #   - ./grants:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5004:5004"
@@ -90,9 +81,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - gateway
-    # volumes:
-    #   - ./client/:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -101,13 +89,16 @@ services:
     build:
       context: ./mail
       dockerfile: Dockerfile
-    env_file:
-      - ./mail/.env
+    environment:
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
     depends_on:
       - rabbitmq
-    # volumes:
-    #   - ./mail:/usr/app
-    #   - /usr/app/node_modules
     restart: unless-stopped
 
   rabbitmq:
