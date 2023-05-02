@@ -6,7 +6,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
     depends_on:
       - users
       - conferences
@@ -21,8 +21,8 @@ services:
       context: ./users
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
-      MONGODB_URI: ${{ env.USERS_MONGODB_URI }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
+      MONGODB_URI: ${{ env.USERS_MONGODB_URI/$/\$/g }}
     depends_on:
       - rabbitmq
       - mongo
@@ -36,8 +36,8 @@ services:
       context: ./files
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
-      MONGODB_URI: ${{ env.FILES_MONGODB_URI }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
+      MONGODB_URI: ${{ env.FILES_MONGODB_URI/$/\$/g }}
     depends_on:
       - rabbitmq
       - mongo
@@ -53,8 +53,8 @@ services:
       context: ./conferences
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
-      MONGODB_URI: ${{ env.CONFERENCES_MONGODB_URI }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
+      MONGODB_URI: ${{ env.CONFERENCES_MONGODB_URI/$/\$/g }}
     depends_on:
       - rabbitmq
       - mongo
@@ -68,8 +68,8 @@ services:
       context: ./grants
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
-      MONGODB_URI: ${{ env.GRANTS_MONGODB_URI }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
+      MONGODB_URI: ${{ env.GRANTS_MONGODB_URI/$/\$/g }}
     depends_on:
       - rabbitmq
       - mongo
@@ -92,13 +92,13 @@ services:
       context: ./mail
       dockerfile: Dockerfile
     environment:
-      SECRET: ${{ env.SECRET }}
-      MAIL_HOST: ${{ env.MAIL_HOST }}
-      MAIL_PORT: ${{ env.MAIL_PORT }}
-      MAIL_USER: ${{ env.MAIL_USER }}
-      MAIL_PASSWORD: ${{ env.MAIL_PASSWORD }}
-      MAIL_FROM: ${{ env.MAIL_FROM }}
-      CLIENT_APP_URL: ${{ env.CLIENT_APP_URL }}
+      SECRET: ${{ env.SECRET/$/\$/g }}
+      MAIL_HOST: ${{ env.MAIL_HOST/$/\$/g }}
+      MAIL_PORT: ${{ env.MAIL_PORT/$/\$/g }}
+      MAIL_USER: ${{ env.MAIL_USER/$/\$/g }}
+      MAIL_PASSWORD: ${{ env.MAIL_PASSWORD/$/\$/g }}
+      MAIL_FROM: ${{ env.MAIL_FROM/$/\$/g }}
+      CLIENT_APP_URL: ${{ env.CLIENT_APP_URL/$/\$/g }}
     depends_on:
       - rabbitmq
     restart: unless-stopped
