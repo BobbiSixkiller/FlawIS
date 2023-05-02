@@ -43,7 +43,7 @@ services:
       - mongo
       - redis
     volumes:
-      - ./files/public:/usr/app/public
+      - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
     restart: unless-stopped
     ports:
       - "5002:5002"
