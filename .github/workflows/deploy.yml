@@ -14,10 +14,6 @@ jobs:
           
       - name: Build and Deploy
         env:
-          USERS_MONGODB_URI: ${{ secrets.USERS_MONGODB_URI }}
-          GRANTS_MONGODB_URI: ${{ secrets.GRANTS_MONGODB_URI }}
-          CONFERENCES_MONGODB_URI: ${{ secrets.CONFERENCES_MONGODB_URI }}
-          FILES_MONGODB_URI: ${{ secrets.FILES_MONGODB_URI }}
           SECRET: ${{ secrets.SECRET }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
