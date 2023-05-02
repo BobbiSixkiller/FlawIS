@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: "$${ env.SECRET }"
-      MONGODB_URI: "$${ env.USERS_MONGODB_URI }"
+      MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
     depends_on:
       - rabbitmq
       - mongo
@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: "$${ env.SECRET }"
-      MONGODB_URI: "$${ env.FILES_MONGODB_URI }"
+      MONGODB_URI: "mongodb://mongo:27017/FLAWIS-files?replicaSet=rs0"
     depends_on:
       - rabbitmq
       - mongo
@@ -54,7 +54,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: "$${ env.SECRET }"
-      MONGODB_URI: "$${ env.CONFERENCES_MONGODB_URI }"
+      MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
     depends_on:
       - rabbitmq
       - mongo
@@ -69,7 +69,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: "$${ env.SECRET }"
-      MONGODB_URI: "$${ env.GRANTS_MONGODB_URI }"
+      MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
     depends_on:
       - rabbitmq
       - mongo
