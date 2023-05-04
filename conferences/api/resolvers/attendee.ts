@@ -26,8 +26,11 @@ import { CheckTicket } from "../util/decorators";
 
 import env from "dotenv";
 import Messagebroker from "../util/rmq";
-import { localizeInput } from "../util/locale";
-import { convertDocument } from "../middlewares/typegoose-middleware";
+import { localizeInput, localizeOutput } from "../util/locale";
+import {
+  convertDocument,
+  transformIds,
+} from "../middlewares/typegoose-middleware";
 
 env.config();
 
@@ -50,7 +53,36 @@ export class AttendeeResolver {
     return attendee;
   }
 
-  //Refactor to check for co-author header and run a submission update to push new coauthor into the authors array
+  @Authorized(["ADMIN"])
+  @Query(() => [Attendee])
+  async searchAttendee(
+    @Arg("conferenceId") conferenceId: ObjectId,
+    @Arg("text") text: string
+  ) {
+    const data = await this.userService.aggregate([
+      {
+        $match: {
+          $text: {
+            $search: text,
+          },
+        },
+      },
+      {
+        $lookup: {
+          localField: "_id",
+          from: "attendees",
+          foreignField: "user",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $match: { "user.conference": conferenceId } },
+      { $replaceRoot: { newRoot: "$user" } },
+    ]);
+
+    return data.map((i) => transformIds(i));
+  }
+
   @Authorized()
   @Mutation(() => Attendee)
   async addAttendee(
@@ -158,7 +190,7 @@ export class AttendeeResolver {
     return attendee;
   }
 
-  @Authorized()
+  @Authorized(["ADMIN"])
   @Mutation(() => Attendee)
   async updateInvoice(
     @Arg("id") id: ObjectId,

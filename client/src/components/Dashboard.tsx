@@ -13,6 +13,7 @@ import Link from "next/link";
 import styled from "styled-components";
 
 const StickyContainer = styled.div`
+  width: calc(25% - 2rem);
   position: fixed;
   top: 16;
   display: flex;

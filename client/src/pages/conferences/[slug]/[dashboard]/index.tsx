@@ -1,7 +1,7 @@
 import { NextPageContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Card, Grid, Header, Loader, Message } from "semantic-ui-react";
 import AddTicketDialog from "../../../../components/AddTicketDialog";
 import Attendee from "../../../../components/AttendeeComponent";
@@ -17,12 +17,26 @@ import {
 import useWidth from "../../../../hooks/useWidth";
 import { addApolloState, initializeApollo } from "../../../../lib/apollo";
 import { AuthContext } from "../../../../providers/Auth";
+import {
+  ActionTypes,
+  ControlsContext,
+} from "../../../../providers/ControlsProvider";
 import { NextPageWithLayout } from "../../../_app";
 
 const DashboardPage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
+  const { dispatch } = useContext(ControlsContext);
   const router = useRouter();
   const width = useWidth();
+
+  useEffect(() => {
+    dispatch({
+      type: ActionTypes.SetRightPanel,
+      payload: {
+        rightPanelItems: null,
+      },
+    });
+  }, [dispatch]);
 
   const { data, error, loading } = useConferenceQuery({
     variables: { slug: router.query.slug as string },

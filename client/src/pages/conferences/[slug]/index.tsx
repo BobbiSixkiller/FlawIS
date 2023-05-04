@@ -18,7 +18,6 @@ import Nav from "../../../components/MobileNav";
 import SectionDialog from "../../../components/SectionDialog";
 import {
   ConferenceDocument,
-  Role,
   useConferenceQuery,
 } from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";

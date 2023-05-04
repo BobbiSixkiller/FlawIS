@@ -264,6 +264,7 @@ type Query {
   attendee(id: ObjectId!): Attendee!
   conference(slug: String!): Conference!
   conferences(year: Int!): ConferenceConnection!
+  searchAttendee(conferenceId: ObjectId!, text: String!): [Attendee!]!
   section(id: ObjectId!): Section!
   submission(id: ObjectId!): Submission!
 }

@@ -53,6 +53,7 @@ export class ConferenceResolver {
     @Arg("year", () => Int) year: number,
     @Ctx() { locale }: Context
   ) {
+    await this.conferenceService.dataModel.syncIndexes();
     const data = await this.conferenceService.aggregate([
       { $sort: { _id: -1 } },
       {
