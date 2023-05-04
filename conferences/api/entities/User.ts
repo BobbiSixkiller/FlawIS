@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { pre, prop as Property } from "@typegoose/typegoose";
+import { index, pre, prop as Property } from "@typegoose/typegoose";
 import { Directive, Field, ID, ObjectType } from "type-graphql";
 import { Billing } from "./Billing";
 
@@ -28,6 +28,7 @@ import { Billing } from "./Billing";
     });
   }
 })
+@index({ name: "text", email: "text" })
 export class User {
   @Directive("@external")
   @Field(() => ObjectId)

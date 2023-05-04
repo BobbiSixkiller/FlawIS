@@ -18,14 +18,30 @@ import {
 import { InView } from "react-intersection-observer";
 import DeleteDialog from "../../../../../components/DeleteDialog";
 import useWidth from "../../../../../hooks/useWidth";
+import { useContext, useEffect } from "react";
+import {
+  ActionTypes,
+  ControlsContext,
+} from "../../../../../providers/ControlsProvider";
+import AttendeeSearch from "../../../../../components/AttendeeSearch";
 
 const AttendeesPage: NextPageWithLayout = () => {
+  const { dispatch } = useContext(ControlsContext);
   const router = useRouter();
   const width = useWidth();
 
   const { data, error, loading, fetchMore } = useConferenceAttendeesQuery({
     variables: { slug: router.query.slug as string },
   });
+
+  useEffect(() => {
+    dispatch({
+      type: ActionTypes.SetRightPanel,
+      payload: {
+        rightPanelItems: <AttendeeSearch conferenceId={data?.conference.id} />,
+      },
+    });
+  }, [dispatch, data]);
 
   const [deleteAttednee] = useRemoveAttendeeMutation();
 

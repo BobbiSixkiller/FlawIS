@@ -111,6 +111,12 @@ query attendee($id: ObjectId!) {
   }
 }
 
+query searchAttendee($conferenceId: ObjectId!, $text: String!) {
+  searchAttendee(conferenceId: $conferenceId, text: $text) {
+    ...AttendeeFragment
+  }
+}
+
 query conference($slug: String!) {
   conference(slug: $slug) {
     id

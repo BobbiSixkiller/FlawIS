@@ -166,7 +166,7 @@ export default function MobileNav({
                   style={{ marginLeft: 0, marginRight: 0 }}
                   onClick={() => toggle(true)}
                 >
-                  <Icon name="sidebar" style={{ margin: 0 }} />
+                  <Icon name="sidebar" />
                   {width > 550 && "Menu"}
                 </Menu.Item>
 
@@ -175,7 +175,7 @@ export default function MobileNav({
                     href="/"
                     style={{
                       marginLeft: "auto",
-                      marginRight: locales ? "-60px" : 0,
+                      marginRight: locales ? "-50px" : 0,
                     }}
                   >
                     <Menu.Item>

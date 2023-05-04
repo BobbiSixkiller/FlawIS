@@ -686,6 +686,7 @@ export type Query = {
   grantTextSearch: Array<Grant>;
   grants: GrantConnection;
   me: User;
+  searchAttendee: Array<Attendee>;
   section: Section;
   submission: Submission;
   user: User;
@@ -744,6 +745,12 @@ export type QueryGrantTextSearchArgs = {
 export type QueryGrantsArgs = {
   after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
+};
+
+
+export type QuerySearchAttendeeArgs = {
+  conferenceId: Scalars['ObjectId'];
+  text: Scalars['String'];
 };
 
 
@@ -1055,6 +1062,14 @@ export type AttendeeQueryVariables = Exact<{
 
 
 export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+
+export type SearchAttendeeQueryVariables = Exact<{
+  conferenceId: Scalars['ObjectId'];
+  text: Scalars['String'];
+}>;
+
+
+export type SearchAttendeeQuery = { __typename?: 'Query', searchAttendee: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> }> };
 
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -2045,6 +2060,42 @@ export function useAttendeeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<A
 export type AttendeeQueryHookResult = ReturnType<typeof useAttendeeQuery>;
 export type AttendeeLazyQueryHookResult = ReturnType<typeof useAttendeeLazyQuery>;
 export type AttendeeQueryResult = Apollo.QueryResult<AttendeeQuery, AttendeeQueryVariables>;
+export const SearchAttendeeDocument = gql`
+    query searchAttendee($conferenceId: ObjectId!, $text: String!) {
+  searchAttendee(conferenceId: $conferenceId, text: $text) {
+    ...AttendeeFragment
+  }
+}
+    ${AttendeeFragmentFragmentDoc}`;
+
+/**
+ * __useSearchAttendeeQuery__
+ *
+ * To run a query within a React component, call `useSearchAttendeeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchAttendeeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchAttendeeQuery({
+ *   variables: {
+ *      conferenceId: // value for 'conferenceId'
+ *      text: // value for 'text'
+ *   },
+ * });
+ */
+export function useSearchAttendeeQuery(baseOptions: Apollo.QueryHookOptions<SearchAttendeeQuery, SearchAttendeeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchAttendeeQuery, SearchAttendeeQueryVariables>(SearchAttendeeDocument, options);
+      }
+export function useSearchAttendeeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchAttendeeQuery, SearchAttendeeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchAttendeeQuery, SearchAttendeeQueryVariables>(SearchAttendeeDocument, options);
+        }
+export type SearchAttendeeQueryHookResult = ReturnType<typeof useSearchAttendeeQuery>;
+export type SearchAttendeeLazyQueryHookResult = ReturnType<typeof useSearchAttendeeLazyQuery>;
+export type SearchAttendeeQueryResult = Apollo.QueryResult<SearchAttendeeQuery, SearchAttendeeQueryVariables>;
 export const ConferenceDocument = gql`
     query conference($slug: String!) {
   conference(slug: $slug) {
