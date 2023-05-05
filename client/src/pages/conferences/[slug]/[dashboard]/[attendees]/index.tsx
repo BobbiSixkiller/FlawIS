@@ -9,30 +9,40 @@ import {
 import {
   Button,
   Card,
+  Dropdown,
+  Form,
   Grid,
   Header,
   Message,
   Placeholder,
+  Popup,
+  Radio,
   Segment,
 } from "semantic-ui-react";
 import { InView } from "react-intersection-observer";
 import DeleteDialog from "../../../../../components/DeleteDialog";
 import useWidth from "../../../../../hooks/useWidth";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   ActionTypes,
   ControlsContext,
 } from "../../../../../providers/ControlsProvider";
 import AttendeeSearch from "../../../../../components/AttendeeSearch";
+import useOnClickOutside from "../../../../../hooks/useOnClickOutside";
 
 const AttendeesPage: NextPageWithLayout = () => {
   const { dispatch } = useContext(ControlsContext);
   const router = useRouter();
   const width = useWidth();
+  const [open, setOpen] = useState(false);
 
-  const { data, error, loading, fetchMore } = useConferenceAttendeesQuery({
-    variables: { slug: router.query.slug as string },
-  });
+  const dropdownContainerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(dropdownContainerRef, () => setOpen(false));
+
+  const { data, error, loading, fetchMore, refetch } =
+    useConferenceAttendeesQuery({
+      variables: { slug: router.query.slug as string },
+    });
 
   useEffect(() => {
     dispatch({
@@ -49,9 +59,36 @@ const AttendeesPage: NextPageWithLayout = () => {
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
-      <Grid.Row verticalAlign="middle">
+      <Grid.Row verticalAlign="middle" columns={2}>
         <Grid.Column>
           <Header>Účastníci</Header>
+        </Grid.Column>
+        <Grid.Column>
+          <div
+            ref={dropdownContainerRef}
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <Dropdown
+              onClick={() => setOpen(true)}
+              open={open}
+              className="button secondary icon"
+              icon="filter"
+              floating
+              style={{ alignSelf: "flex-end" }}
+            >
+              <Dropdown.Menu direction="left">
+                <Segment>
+                  <Form>
+                    {data?.conference.sections.map((s) => (
+                      <Form.Field key={s.id}>
+                        <Radio label={s.name} toggle />
+                      </Form.Field>
+                    ))}
+                  </Form>
+                </Segment>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </Grid.Column>
       </Grid.Row>
       <Grid.Row>

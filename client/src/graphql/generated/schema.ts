@@ -1085,7 +1085,7 @@ export type ConferenceAttendeesQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
+export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -2162,6 +2162,12 @@ export const ConferenceAttendeesDocument = gql`
     query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int) {
   conference(slug: $slug) {
     id
+    sections {
+      id
+      name
+      description
+      languages
+    }
     attendees(after: $after, first: $first) {
       edges {
         cursor
