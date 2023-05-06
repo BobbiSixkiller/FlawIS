@@ -24,6 +24,5 @@ jobs:
         run: |
           whoami
           groups
-          ls -la /var/run/docker.sock
           docker-compose -f docker-compose.prod.yml up -d --build
 
