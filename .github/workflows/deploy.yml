@@ -24,5 +24,5 @@ jobs:
         run: |
           id
           ls -la /var/run/docker.sock
-          sudo docker-compose -f docker-compose.prod.yml up -d --build
+          sudo -u weby docker-compose -f docker-compose.prod.yml up -d --build
 
