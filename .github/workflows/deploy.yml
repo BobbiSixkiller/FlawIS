@@ -22,7 +22,7 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           CLIENT_APP_URL: ${{ secrets.CLIENT_APP_URL }}
         run: |
-          newgrp docker
           id
           ls -la /var/run/docker.sock
-          docker-compose -f docker-compose.prod.yml up -d --build
+          sudo docker-compose -f docker-compose.prod.yml up -d --build
+
