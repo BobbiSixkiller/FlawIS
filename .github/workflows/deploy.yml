@@ -22,5 +22,4 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           CLIENT_APP_URL: ${{ secrets.CLIENT_APP_URL }}
         run: |
-          whoami
           docker-compose -f docker-compose.prod.yml up -d --build
