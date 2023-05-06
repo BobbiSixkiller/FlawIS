@@ -153,6 +153,12 @@ query conference($slug: String!) {
 query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int) {
   conference(slug: $slug) {
     id
+    sections {
+      id
+      name
+      description
+      languages
+    }
     attendees(after: $after, first: $first) {
       edges {
         cursor
