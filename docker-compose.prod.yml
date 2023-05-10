@@ -6,7 +6,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
+      SECRET: ${SECRET}
     depends_on:
       - users
       - conferences
@@ -21,7 +21,7 @@ services:
       context: ./users
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
+      SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
     depends_on:
       - rabbitmq
@@ -36,7 +36,7 @@ services:
       context: ./files
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
+      SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/FLAWIS-files?replicaSet=rs0"
     depends_on:
       - rabbitmq
@@ -53,7 +53,7 @@ services:
       context: ./conferences
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
+      SECRET: ${SECRET}
       MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
     depends_on:
       - rabbitmq
@@ -68,7 +68,7 @@ services:
       context: ./grants
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
+      SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
     depends_on:
       - rabbitmq
@@ -92,13 +92,13 @@ services:
       context: ./mail
       dockerfile: Dockerfile
     environment:
-      SECRET: "$${ env.SECRET }"
-      MAIL_HOST: "$${ env.MAIL_HOST }"
-      MAIL_PORT: "$${ env.MAIL_PORT }"
-      MAIL_USER: "$${ env.MAIL_USER }"
-      MAIL_PASSWORD: "$${ env.MAIL_PASSWORD }"
-      MAIL_FROM: "$${ env.MAIL_FROM }"
-      CLIENT_APP_URL: "$${ env.CLIENT_APP_URL }"
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
     depends_on:
       - rabbitmq
     restart: unless-stopped
@@ -108,11 +108,13 @@ services:
     restart: unless-stopped
     ports:
       - "5672:5672"
+
   redis:
     image: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
+
   mongo:
     image: mongo
     restart: unless-stopped
