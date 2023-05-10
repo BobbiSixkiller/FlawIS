@@ -120,13 +120,13 @@ export function RegisterSubmission({
   const { values, setFieldValue } = useFormikContext<{
     submission: any;
   }>();
-  const [options, setOptions] = useState([
+  const [options, setOptions] = useState(
     values.submission.keywords.map((w: any, i: number) => ({
       key: i,
       text: w,
       value: w,
-    })),
-  ]);
+    }))
+  );
   const [localizedOptions, setLocalizedOptions] = useState(
     values.submission.translations[0].keywords.map((w: any, i: number) => ({
       key: i,
@@ -175,6 +175,8 @@ export function RegisterSubmission({
       });
     }
   }, [router]);
+
+  console.log(options, localizedOptions);
 
   return (
     <>

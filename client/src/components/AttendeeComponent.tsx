@@ -37,7 +37,7 @@ export default function AttendeeComponent({
         <Grid.Column>
           <Header>{title}</Header>
         </Grid.Column>
-        {data?.submissions.length !== 0 && (
+        {data?.ticket.withSubmission && (
           <Grid.Column>
             <AddSubmissionDialog />
           </Grid.Column>

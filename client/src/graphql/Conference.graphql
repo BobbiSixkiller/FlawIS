@@ -35,6 +35,10 @@ fragment AttendeeFragment on Attendee {
     email
     organisation
   }
+  ticket {
+    withSubmission
+    online
+  }
   invoice {
     payer {
       name

@@ -63,7 +63,7 @@ const AttendeesPage: NextPageWithLayout = () => {
         <Grid.Column>
           <Header>Účastníci</Header>
         </Grid.Column>
-        <Grid.Column>
+        {/* <Grid.Column>
           <div
             ref={dropdownContainerRef}
             style={{ display: "flex", flexDirection: "column" }}
@@ -89,7 +89,7 @@ const AttendeesPage: NextPageWithLayout = () => {
               </Dropdown.Menu>
             </Dropdown>
           </div>
-        </Grid.Column>
+        </Grid.Column> */}
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
