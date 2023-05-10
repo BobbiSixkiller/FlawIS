@@ -112,8 +112,6 @@ const HomePage: NextPageWithLayout = () => {
 
   const { t, i18n } = useTranslation("common");
 
-  console.log("TEST");
-
   return (
     <>
       <MastHead isHomePage={true} scrollToRef={scrollToRef}>

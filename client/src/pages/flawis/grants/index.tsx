@@ -4,33 +4,33 @@ import Dashboard from "../../../components/Dashboard";
 import GrantSearch from "../../../components/GrantSearch";
 import GrantsList from "../../../components/GrantsList";
 import {
-	ActionTypes,
-	ControlsContext,
+  ActionTypes,
+  ControlsContext,
 } from "../../../providers/ControlsProvider";
 import { NextPageWithLayout } from "../../_app";
 
 const GrantsPage: NextPageWithLayout = () => {
-	const { dispatch } = useContext(ControlsContext);
+  const { dispatch } = useContext(ControlsContext);
 
-	useEffect(() => {
-		dispatch({
-			type: ActionTypes.SetRightPanel,
-			payload: { rightPanelItems: <GrantSearch /> },
-		});
-	}, [dispatch]);
+  useEffect(() => {
+    dispatch({
+      type: ActionTypes.SetRightPanel,
+      payload: { rightPanelItems: <GrantSearch /> },
+    });
+  }, [dispatch]);
 
-	return <GrantsList />;
+  return <GrantsList />;
 };
 
 GrantsPage.getLayout = function getLayout(page) {
-	return <Dashboard>{page}</Dashboard>;
+  return <Dashboard>{page}</Dashboard>;
 };
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
-	props: {
-		admin: true,
-		...(await serverSideTranslations(locale, ["common"])),
-	},
+  props: {
+    admin: true,
+    ...(await serverSideTranslations(locale, ["common", "activation"])),
+  },
 });
 
 export default GrantsPage;
