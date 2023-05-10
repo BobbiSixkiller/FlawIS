@@ -1,10 +1,4 @@
-import {
-  ArrayMinSize,
-  IsEmail,
-  IsLocale,
-  IsString,
-  MaxLength,
-} from "class-validator";
+import { ArrayMinSize, IsEmail, IsLocale, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 import { Field, InputType } from "type-graphql";
 
@@ -15,38 +9,32 @@ class SubmissionInputTranslation {
   language: string;
 
   @Field()
-  @MaxLength(250, { message: "Submission name can have max 250 characters!" })
+  @IsString()
   name: string;
 
   @Field()
-  @MaxLength(1000, { message: "Submission name can have max 1000 characters!" })
+  @IsString()
   abstract: string;
 
   @Field(() => [String])
   @ArrayMinSize(1, { message: "You must include at least one keyword!" })
-  @MaxLength(250, {
-    message: "Keyword can have max 250 characters!",
-    each: true,
-  })
+  @IsString({ each: true })
   keywords: string[];
 }
 
 @InputType()
 export class SubmissionInput {
   @Field()
-  @MaxLength(250, { message: "Submission name can have max 250 characters!" })
+  @IsString()
   name: string;
 
   @Field()
-  @MaxLength(1000, { message: "Submission name can have max 1000 characters!" })
+  @IsString()
   abstract: string;
 
   @Field(() => [String])
   @ArrayMinSize(1, { message: "You must include at least one keyword!" })
-  @MaxLength(250, {
-    message: "Keyword can have max 250 characters!",
-    each: true,
-  })
+  @IsString({ each: true })
   keywords: string[];
 
   @Field()
