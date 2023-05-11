@@ -39,7 +39,9 @@ export default function AttendeeComponent({
         </Grid.Column>
         {data?.ticket.withSubmission && (
           <Grid.Column>
-            <AddSubmissionDialog />
+            <AddSubmissionDialog
+              userId={user?.role === Role.Admin && data.user.id}
+            />
           </Grid.Column>
         )}
       </Grid.Row>

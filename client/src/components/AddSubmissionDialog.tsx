@@ -7,14 +7,17 @@ import Validation from "../util/validation";
 import { InferType } from "yup";
 import parseErrors from "../util/parseErrors";
 import {
+  Role,
   useAddSubmissionMutation,
   useConferenceQuery,
 } from "../graphql/generated/schema";
 import { RegisterSubmission } from "../pages/conferences/[slug]/register";
 import { useTranslation } from "next-i18next";
+import { AuthContext } from "../providers/Auth";
 
-export default function AddSubmissionDialog() {
+export default function AddSubmissionDialog({ userId }: { userId?: string }) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
+  const { user } = useContext(AuthContext);
   const { query } = useRouter();
 
   const { submissionInputSchema } = Validation();
@@ -26,7 +29,24 @@ export default function AddSubmissionDialog() {
     variables: { slug: query.slug as string },
   });
 
-  const [registerSubmission] = useAddSubmissionMutation();
+  const [registerSubmission] = useAddSubmissionMutation({
+    update(cache, { data: submission }) {
+      cache.modify({
+        id: cache.identify({
+          __ref: `Attendee:${
+            user?.role === Role.Admin
+              ? query.attendee
+              : data?.conference.attending?.id
+          }`,
+        }),
+        fields: {
+          submissions(existing) {
+            return [...existing, submission];
+          },
+        },
+      });
+    },
+  });
 
   const { t, i18n } = useTranslation("conference");
 
@@ -55,12 +75,13 @@ export default function AddSubmissionDialog() {
                   innerRef={formikRef}
                   initialValues={{
                     submission: {
+                      conferenceId: data?.conference.id,
+                      sectionId: "",
+                      userId: userId ? userId : undefined,
+                      name: "",
                       abstract: "",
                       authors: [],
                       keywords: [],
-                      name: "",
-                      conferenceId: data?.conference.id,
-                      sectionId: "",
                       translations: [
                         {
                           language: i18n.language === "sk" ? "en" : "sk",

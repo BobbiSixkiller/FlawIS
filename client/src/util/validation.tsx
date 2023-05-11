@@ -136,6 +136,7 @@ export default function Validation() {
     submission: object({
       conferenceId: string().required(),
       sectionId: string().required(),
+      userId: string(),
       name: string().trim().required(),
       abstract: string().trim().required(),
       keywords: array()

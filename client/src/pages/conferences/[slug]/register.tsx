@@ -176,8 +176,6 @@ export function RegisterSubmission({
     }
   }, [router]);
 
-  console.log(options, localizedOptions);
-
   return (
     <>
       <InputField
