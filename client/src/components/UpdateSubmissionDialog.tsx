@@ -58,6 +58,7 @@ export default function UpdateSubmissionDialog({
               innerRef={formikRef}
               initialValues={{
                 submission: {
+                  userId: undefined,
                   conferenceId: data?.conference.id,
                   sectionId: input.sectionId,
                   name: input.name,
