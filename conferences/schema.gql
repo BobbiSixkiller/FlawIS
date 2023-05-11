@@ -320,6 +320,9 @@ input SubmissionInput {
   sectionId: ObjectId!
   submissionUrl: String
   translations: [SubmissionInputTranslation!]!
+
+  """field for admin to create a submission for a given user"""
+  userId: ObjectId
 }
 
 input SubmissionInputTranslation {

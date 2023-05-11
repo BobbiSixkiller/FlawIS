@@ -1,6 +1,6 @@
 import { ArrayMinSize, IsEmail, IsLocale, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
-import { Field, InputType } from "type-graphql";
+import { Authorized, Field, InputType } from "type-graphql";
 
 @InputType()
 class SubmissionInputTranslation {
@@ -42,6 +42,13 @@ export class SubmissionInput {
 
   @Field()
   sectionId: ObjectId;
+
+  @Authorized(["ADMIN"])
+  @Field({
+    nullable: true,
+    description: "field for admin to create a submission for a given user",
+  })
+  userId?: ObjectId;
 
   @Field({ nullable: true })
   @IsString()

@@ -856,6 +856,8 @@ export type SubmissionInput = {
   sectionId: Scalars['ObjectId'];
   submissionUrl?: InputMaybe<Scalars['String']>;
   translations: Array<SubmissionInputTranslation>;
+  /** field for admin to create a submission for a given user */
+  userId?: InputMaybe<Scalars['ObjectId']>;
 };
 
 export type SubmissionInputTranslation = {

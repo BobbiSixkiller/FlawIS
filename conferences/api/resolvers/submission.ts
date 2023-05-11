@@ -53,7 +53,7 @@ export class SubmissionResolver {
       ...localizeInput(data, data.translations, locale),
       conference: conference.id,
       section: section.id,
-      authors: [user?.id],
+      authors: [data.userId ? data.userId : user?.id],
     });
 
     return submission;

@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import Link from "next/link";
 import useWidth from "../../hooks/useWidth";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 import MastHead from "../../components/MastHead";
 import Footer from "../../components/Footer";
 import { NextPageWithLayout } from "../_app";

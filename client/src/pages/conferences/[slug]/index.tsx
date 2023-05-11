@@ -27,7 +27,6 @@ import { AuthContext } from "../../../providers/Auth";
 import { NextPageWithLayout } from "../../_app";
 
 const ConferencePage: NextPageWithLayout = () => {
-  const { user } = useContext(AuthContext);
   const [active, setActive] = useState<string | number | undefined>();
   const router = useRouter();
   const width = useWith();
