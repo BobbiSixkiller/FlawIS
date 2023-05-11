@@ -163,6 +163,7 @@ query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int) {
       description
       languages
     }
+    attendeesCount
     attendees(after: $after, first: $first) {
       edges {
         cursor
@@ -275,7 +276,9 @@ mutation addAttendee($data: AttendeeInput!) {
 }
 
 mutation removeAttendee($id: ObjectId!) {
-  removeAttendee(id: $id)
+  removeAttendee(id: $id) {
+    ...AttendeeFragment
+  }
 }
 
 mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {

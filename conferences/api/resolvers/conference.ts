@@ -13,8 +13,8 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Attendee, AttendeeConnection } from "../entities/Attendee";
-import { Conference, Ticket } from "../entities/Conference";
+import { Attendee } from "../entities/Attendee";
+import { Conference } from "../entities/Conference";
 import { Section } from "../entities/Section";
 import { User } from "../entities/User";
 import { CRUDservice } from "../services/CRUDservice";
@@ -22,7 +22,7 @@ import { Context } from "../util/auth";
 import { LoadConference } from "../util/decorators";
 import { localizeInput, localizeOutput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
-import { AttendeeArgs } from "./types/attendee";
+import { AttendeeArgs, AttendeeConnection } from "./types/attendee";
 import {
   ConferenceConnection,
   ConferenceInput,
@@ -169,7 +169,9 @@ export class ConferenceResolver {
   @Authorized(["ADMIN"])
   @Mutation(() => Boolean)
   async deleteConference(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.conferenceService.delete({ _id: id });
+    const { deletedCount } = await this.conferenceService.deleteOne({
+      _id: id,
+    });
     return deletedCount > 0;
   }
 

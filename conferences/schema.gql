@@ -248,7 +248,7 @@ type Mutation {
   deleteConference(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): Boolean!
   deleteSubmission(id: ObjectId!): Boolean!
-  removeAttendee(id: ObjectId!): Boolean!
+  removeAttendee(id: ObjectId!): Attendee!
   removeTicket(id: ObjectId!, ticketId: ObjectId!): Conference!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
   updateConferenceUser(data: ConferenceUserInput!): User!

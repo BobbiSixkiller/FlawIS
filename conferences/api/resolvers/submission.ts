@@ -105,7 +105,9 @@ export class SubmissionResolver {
   @Authorized()
   @Mutation(() => Boolean)
   async deleteSubmission(@Arg("id") id: ObjectId) {
-    const { deletedCount } = await this.submissionService.delete({ _id: id });
+    const { deletedCount } = await this.submissionService.deleteOne({
+      _id: id,
+    });
     return deletedCount > 0;
   }
 

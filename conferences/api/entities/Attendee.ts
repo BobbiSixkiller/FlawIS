@@ -1,8 +1,12 @@
-import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
+import {
+  getModelForClass,
+  post,
+  pre,
+  prop as Property,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Field, Float, ID, ObjectType } from "type-graphql";
-import CreateConnection from "../resolvers/types/pagination";
 
 import { Ref } from "../util/types";
 import { Billing } from "./Billing";
@@ -69,6 +73,12 @@ export class Invoice {
     );
   }
 })
+@post<Attendee>("remove", async function (attendee) {
+  await getModelForClass(Conference).updateOne(
+    { _id: attendee.conference },
+    { $inc: { attendeesCount: -1 } }
+  );
+})
 @ObjectType({ description: "Attendee model type" })
 export class Attendee extends TimeStamps {
   @Field(() => ID)
@@ -99,8 +109,3 @@ export class Attendee extends TimeStamps {
   @Field()
   updatedAt: Date;
 }
-
-@ObjectType({
-  description: "AttendeeConnection type enabling cursor based pagination",
-})
-export class AttendeeConnection extends CreateConnection(Attendee) {}
