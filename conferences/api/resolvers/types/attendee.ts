@@ -1,4 +1,11 @@
-import { Field, ArgsType, Int, InputType, Float } from "type-graphql";
+import {
+  Field,
+  ArgsType,
+  Int,
+  InputType,
+  Float,
+  ObjectType,
+} from "type-graphql";
 import { Min, Max, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
@@ -7,6 +14,7 @@ import { RefDocExists } from "../../util/decorators";
 import { AddressInput, BillingInput } from "./conference";
 import { Billing } from "../../entities/Billing";
 import { SubmissionInput } from "./submission";
+import { CreateConnection, CreateConnectionArgs } from "./pagination";
 
 @InputType()
 export class AttendeeBillingInput implements Billing {
@@ -89,16 +97,20 @@ export class InvoiceInput {
   body: InvoiceDataInput;
 }
 
-@ArgsType()
-export class AttendeeArgs {
-  @Field(() => ObjectId, { nullable: true })
-  @RefDocExists(Attendee, {
-    message: "Cursor's document not found!",
-  })
-  after?: ObjectId;
+@ObjectType({
+  description: "AttendeeConnection type enabling cursor based pagination",
+})
+export class AttendeeConnection extends CreateConnection(Attendee) {}
 
-  @Field(() => Int, { defaultValue: 20, nullable: true })
-  @Min(1)
-  @Max(50)
-  first?: number;
+@ArgsType()
+export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
+  // @Field(() => ObjectId, { nullable: true })
+  // @RefDocExists(Attendee, {
+  //   message: "Cursor's document not found!",
+  // })
+  // after?: ObjectId;
+  // @Field(() => Int, { defaultValue: 20, nullable: true })
+  // @Min(1)
+  // @Max(50)
+  // first?: number;
 }

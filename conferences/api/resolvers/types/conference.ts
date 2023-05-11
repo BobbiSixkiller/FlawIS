@@ -8,7 +8,7 @@ import {
   Ticket,
 } from "../../entities/Conference";
 import { Address } from "../../entities/Billing";
-import CreateConnection from "./pagination";
+import { CreateConnection } from "./pagination";
 
 @InputType()
 class TicketInputTranslation {

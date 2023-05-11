@@ -79,7 +79,7 @@ export class SectionResolver {
   async deleteSection(
     @Arg("id", () => ObjectIdScalar) id: ObjectId
   ): Promise<boolean> {
-    const { deletedCount } = await this.sectionService.delete({ _id: id });
+    const { deletedCount } = await this.sectionService.deleteOne({ _id: id });
 
     return deletedCount > 0;
   }

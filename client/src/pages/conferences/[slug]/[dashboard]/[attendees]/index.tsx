@@ -37,7 +37,8 @@ const AttendeesPage: NextPageWithLayout = () => {
   const [open, setOpen] = useState(false);
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
-  useOnClickOutside(dropdownContainerRef, () => setOpen(false));
+  const click = useOnClickOutside(dropdownContainerRef, () => setOpen(false));
+  console.log(click);
 
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
@@ -55,28 +56,29 @@ const AttendeesPage: NextPageWithLayout = () => {
 
   const [deleteAttednee] = useRemoveAttendeeMutation();
 
-  console.log(data, error, loading);
-
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row verticalAlign="middle" columns={2}>
         <Grid.Column>
-          <Header>Účastníci</Header>
+          <Header>
+            Účastníci
+            <Header.Subheader>
+              {data?.conference.attendees.edges.length} /{" "}
+              {data?.conference.attendeesCount}
+            </Header.Subheader>
+          </Header>
         </Grid.Column>
-        {/* <Grid.Column>
-          <div
-            ref={dropdownContainerRef}
-            style={{ display: "flex", flexDirection: "column" }}
+        {/* <Grid.Column style={{ display: "flex" }}>
+          <Dropdown
+            open={open}
+            className="button secondary icon"
+            icon="filter"
+            onClick={() => setOpen(true)}
+            floating
+            style={{ alignSelf: "flex-end" }}
           >
-            <Dropdown
-              onClick={() => setOpen(true)}
-              open={open}
-              className="button secondary icon"
-              icon="filter"
-              floating
-              style={{ alignSelf: "flex-end" }}
-            >
-              <Dropdown.Menu direction="left">
+            <Dropdown.Menu direction="left">
+              <div ref={dropdownContainerRef}>
                 <Segment>
                   <Form>
                     {data?.conference.sections.map((s) => (
@@ -86,9 +88,9 @@ const AttendeesPage: NextPageWithLayout = () => {
                     ))}
                   </Form>
                 </Segment>
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
+              </div>
+            </Dropdown.Menu>
+          </Dropdown>
         </Grid.Column> */}
       </Grid.Row>
       <Grid.Row>
@@ -161,6 +163,19 @@ const AttendeesPage: NextPageWithLayout = () => {
                     confirmCb={async () =>
                       (await deleteAttednee({
                         variables: { id: edge?.cursor },
+                        update(cache, { data }) {
+                          cache.evict({
+                            id: `Attendee:${data?.removeAttendee.id}`,
+                          });
+                          cache.modify({
+                            id: `Conference:${data?.removeAttendee.conference.id}`,
+                            fields: {
+                              attendeesCount(existing) {
+                                return existing - 1;
+                              },
+                            },
+                          });
+                        },
                       })) as Promise<void>
                     }
                     header="Zmazať účastníka"

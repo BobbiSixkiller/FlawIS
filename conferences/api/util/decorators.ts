@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
 } from "class-validator";
 import { getModelForClass } from "@typegoose/typegoose";
-import { createParamDecorator } from "type-graphql";
+import { ClassType, createParamDecorator } from "type-graphql";
 import { Conference } from "../entities/Conference";
 import { UserInputError } from "apollo-server";
 import { Attendee } from "../entities/Attendee";
@@ -105,5 +105,18 @@ export function LoadSection(): ParameterDecorator {
     if (!section) throw new UserInputError("Conference not found!");
 
     return section;
+  });
+}
+
+export function LoadResource<TNode>(
+  TNodeClass: ClassType<TNode>
+): ParameterDecorator {
+  return createParamDecorator(async ({ args }) => {
+    const resource = await getModelForClass(TNodeClass).findOne({
+      _id: args.id,
+    });
+    if (!resource) throw new UserInputError("Resource not found!");
+
+    return resource;
   });
 }

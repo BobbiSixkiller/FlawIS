@@ -22,7 +22,7 @@ import { AttendeeInput, InvoiceInput } from "./types/attendee";
 
 import { Context } from "../util/auth";
 import { VerifiedTicket } from "../util/types";
-import { CheckTicket } from "../util/decorators";
+import { CheckTicket, LoadResource } from "../util/decorators";
 
 import env from "dotenv";
 import Messagebroker from "../util/rmq";
@@ -31,6 +31,7 @@ import {
   convertDocument,
   transformIds,
 } from "../middlewares/typegoose-middleware";
+import { ModelType } from "@typegoose/typegoose/lib/types";
 
 env.config();
 
@@ -207,11 +208,12 @@ export class AttendeeResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Mutation(() => Boolean)
-  async removeAttendee(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.attendeeService.delete({ _id: id });
-
-    return deletedCount > 0;
+  @Mutation(() => Attendee)
+  async removeAttendee(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(Attendee) attendee: ModelType<Attendee>
+  ) {
+    return await attendee.remove();
   }
 
   @Authorized()
