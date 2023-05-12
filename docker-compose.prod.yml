@@ -3,7 +3,7 @@ version: "3.4"
 services:
   gateway:
     build:
-      context: ./gateway
+      # context: ./gateway
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -18,7 +18,7 @@ services:
 
   users:
     build:
-      context: ./users
+      # context: ./users
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -34,7 +34,7 @@ services:
 
   files:
     build:
-      context: ./files
+      # context: ./files
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -52,7 +52,7 @@ services:
 
   conferences:
     build:
-      context: ./conferences
+      # context: ./conferences
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -68,7 +68,7 @@ services:
 
   grants:
     build:
-      context: ./grants
+      # context: ./grants
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -83,7 +83,7 @@ services:
 
   client:
     build:
-      context: ./client
+      # context: ./client
       dockerfile: Dockerfile
     depends_on:
       - gateway
@@ -93,7 +93,7 @@ services:
 
   mail:
     build:
-      context: ./mail
+      # context: ./mail
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
