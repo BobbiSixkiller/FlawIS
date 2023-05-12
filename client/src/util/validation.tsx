@@ -107,9 +107,9 @@ export default function Validation() {
       variableSymbol: string().trim().required(),
       IBAN: string().trim().required(),
       SWIFT: string().trim().required(),
-      ICO: string().trim().required(),
-      DIC: string().trim().required(),
-      ICDPH: string().trim().required(),
+      ICO: string().trim(),
+      DIC: string().trim(),
+      ICDPH: string().trim(),
     }),
   });
 
@@ -122,9 +122,9 @@ export default function Validation() {
         postal: string().trim().required(),
         country: string().trim().required(),
       }),
-      ICO: string().trim().required(),
-      DIC: string().trim().required(),
-      ICDPH: string().trim().required(),
+      ICO: string().trim(),
+      DIC: string().trim(),
+      ICDPH: string().trim(),
     }),
   });
 
