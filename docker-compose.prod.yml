@@ -30,6 +30,7 @@ services:
     restart: unless-stopped
     ports:
       - "5001:5001"
+    command: sh -c './wait.sh && python app.py'
 
   files:
     build:
@@ -47,6 +48,7 @@ services:
     restart: unless-stopped
     ports:
       - "5002:5002"
+    command: sh -c './wait.sh && python app.py'
 
   conferences:
     build:
@@ -62,6 +64,7 @@ services:
     restart: unless-stopped
     ports:
       - "5003:5003"
+    command: sh -c './wait.sh && python app.py'
 
   grants:
     build:
@@ -76,6 +79,7 @@ services:
     restart: unless-stopped
     ports:
       - "5004:5004"
+    command: sh -c './wait.sh && python app.py'
 
   client:
     build:
