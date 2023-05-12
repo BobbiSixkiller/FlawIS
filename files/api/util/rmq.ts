@@ -54,9 +54,17 @@ class Messagebroker {
   }
 
   static async init() {
-    await this.createConnection();
-    await this.createChannel();
-    await this.consumeMessages(["file.delete", "user.update.personal"]);
+    try {
+      await this.createConnection();
+      await this.createChannel();
+      await this.consumeMessages(["file.delete", "user.update.personal"]);
+    } catch (error) {
+      console.log(
+        "Can not initialize a connection to RMQ server! Trying again in 15s..."
+      );
+      this.connection = undefined;
+      setTimeout(() => this.init(), 1000 * 15);
+    }
   }
 
   private static async consumeMessages(keys: RoutingKey[]) {
