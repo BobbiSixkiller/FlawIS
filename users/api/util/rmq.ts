@@ -18,6 +18,7 @@ class Messagebroker {
   private static channel: Channel;
 
   private static async createConnection() {
+    console.log(!this.connection);
     try {
       if (!this.connection) {
         this.connection = await client.connect(
@@ -39,7 +40,7 @@ class Messagebroker {
         setTimeout(() => this.createConnection(), 1000 * 15);
       });
     } catch (error) {
-      console.log("Catch error: ", error)
+      console.log("Catch error: ", error);
       this.connection = undefined;
       setTimeout(() => this.createConnection(), 1000 * 15);
     }
@@ -56,7 +57,7 @@ class Messagebroker {
   static async init() {
     await this.createConnection();
     await this.createChannel();
-    await this.consumeMessages(["user.update.billings"])
+    await this.consumeMessages(["user.update.billings"]);
   }
 
   private static async consumeMessages(keys: RoutingKey[]) {
