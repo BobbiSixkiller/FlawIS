@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    command: sh -c 'echo "Waiting for 30 seconds..." && sleep 30 && python app.py'
 
   users:
     build:
@@ -30,7 +31,7 @@ services:
     restart: unless-stopped
     ports:
       - "5001:5001"
-    # command: sh -c '../wait.sh && python app.py'
+    command: sh -c 'echo "Waiting for 30 seconds..." && sleep 30 && python app.py'
 
   files:
     build:
@@ -48,7 +49,7 @@ services:
     restart: unless-stopped
     ports:
       - "5002:5002"
-    # command: sh -c '../wait.sh && python app.py'
+    command: sh -c 'echo "Waiting for 30 seconds..." && sleep 30 && python app.py'
 
   conferences:
     build:
@@ -64,7 +65,7 @@ services:
     restart: unless-stopped
     ports:
       - "5003:5003"
-    # command: sh -c '../wait.sh && python app.py'
+    command: sh -c 'echo "Waiting for 30 seconds..." && sleep 30 && python app.py'
 
   grants:
     build:
@@ -79,7 +80,7 @@ services:
     restart: unless-stopped
     ports:
       - "5004:5004"
-    # command: sh -c '../wait.sh && python app.py'
+    command: sh -c 'echo "Waiting for 30 seconds..." && sleep 30 && python app.py'
 
   client:
     build:
