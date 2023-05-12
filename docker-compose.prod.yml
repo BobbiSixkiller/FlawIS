@@ -3,7 +3,7 @@ version: "3.4"
 services:
   gateway:
     build:
-      # context: ./gateway
+      context: ./gateway
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -18,7 +18,7 @@ services:
 
   users:
     build:
-      # context: ./users
+      context: ./users
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -30,11 +30,11 @@ services:
     restart: unless-stopped
     ports:
       - "5001:5001"
-    command: sh -c './wait.sh && python app.py'
+    command: sh -c '../wait.sh && python app.py'
 
   files:
     build:
-      # context: ./files
+      context: ./files
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -48,11 +48,11 @@ services:
     restart: unless-stopped
     ports:
       - "5002:5002"
-    command: sh -c './wait.sh && python app.py'
+    command: sh -c '../wait.sh && python app.py'
 
   conferences:
     build:
-      # context: ./conferences
+      context: ./conferences
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -64,11 +64,11 @@ services:
     restart: unless-stopped
     ports:
       - "5003:5003"
-    command: sh -c './wait.sh && python app.py'
+    command: sh -c '../wait.sh && python app.py'
 
   grants:
     build:
-      # context: ./grants
+      context: ./grants
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
@@ -79,11 +79,11 @@ services:
     restart: unless-stopped
     ports:
       - "5004:5004"
-    command: sh -c './wait.sh && python app.py'
+    command: sh -c '../wait.sh && python app.py'
 
   client:
     build:
-      # context: ./client
+      context: ./client
       dockerfile: Dockerfile
     depends_on:
       - gateway
@@ -93,7 +93,7 @@ services:
 
   mail:
     build:
-      # context: ./mail
+      context: ./mail
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
