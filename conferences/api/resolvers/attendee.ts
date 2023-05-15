@@ -45,6 +45,12 @@ export class AttendeeResolver {
     private readonly userService = new CRUDservice(User)
   ) {}
 
+  @Authorized(["ADMIN"])
+  @Query(() => [Attendee])
+  async attendeesToCsvExport(@Arg("conferenceId") conferenceId: ObjectId) {
+    return await this.attendeeService.findAll({ conference: conferenceId });
+  }
+
   @Authorized()
   @Query(() => Attendee)
   async attendee(@Arg("id") id: ObjectId): Promise<Attendee> {

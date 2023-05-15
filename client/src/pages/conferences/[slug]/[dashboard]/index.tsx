@@ -7,6 +7,7 @@ import AddTicketDialog from "../../../../components/AddTicketDialog";
 import Attendee from "../../../../components/AttendeeComponent";
 import Dashboard from "../../../../components/Dashboard";
 import DeleteDialog from "../../../../components/DeleteDialog";
+import ExportCSV from "../../../../components/ExportCSV";
 import {
   ConferenceDocument,
   Role,
@@ -62,9 +63,6 @@ const DashboardPage: NextPageWithLayout = () => {
         <Grid.Column>
           <Header>{data?.conference.name}</Header>
         </Grid.Column>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Column>info</Grid.Column>
       </Grid.Row>
       <Grid.Row columns={2}>
         <Grid.Column>

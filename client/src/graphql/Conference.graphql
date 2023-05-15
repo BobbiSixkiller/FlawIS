@@ -109,6 +109,12 @@ fragment AttendeeFragment on Attendee {
   }
 }
 
+query attendeesToCsvExport($conferenceId: ObjectId!) {
+  attendeesToCsvExport(conferenceId: $conferenceId) {
+    ...AttendeeFragment
+  }
+}
+
 query attendee($id: ObjectId!) {
   attendee(id: $id) {
     ...AttendeeFragment

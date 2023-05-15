@@ -103,14 +103,4 @@ export class InvoiceInput {
 export class AttendeeConnection extends CreateConnection(Attendee) {}
 
 @ArgsType()
-export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
-  // @Field(() => ObjectId, { nullable: true })
-  // @RefDocExists(Attendee, {
-  //   message: "Cursor's document not found!",
-  // })
-  // after?: ObjectId;
-  // @Field(() => Int, { defaultValue: 20, nullable: true })
-  // @Min(1)
-  // @Max(50)
-  // first?: number;
-}
+export class AttendeeArgs extends CreateConnectionArgs(Attendee) {}

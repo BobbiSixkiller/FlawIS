@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Dashboard from "../../../../../components/Dashboard";
 import { NextPageWithLayout } from "../../../../_app";
 import {
+  useAttendeesToCsvExportLazyQuery,
   useConferenceAttendeesQuery,
   useRemoveAttendeeMutation,
 } from "../../../../../graphql/generated/schema";
@@ -29,6 +30,7 @@ import {
 } from "../../../../../providers/ControlsProvider";
 import AttendeeSearch from "../../../../../components/AttendeeSearch";
 import useOnClickOutside from "../../../../../hooks/useOnClickOutside";
+import ExportCSV from "../../../../../components/ExportCSV";
 
 const AttendeesPage: NextPageWithLayout = () => {
   const { dispatch } = useContext(ControlsContext);
@@ -45,6 +47,9 @@ const AttendeesPage: NextPageWithLayout = () => {
       variables: { slug: router.query.slug as string },
     });
 
+  const [getExportData, { data: exportData, loading: exportLoading }] =
+    useAttendeesToCsvExportLazyQuery();
+
   useEffect(() => {
     dispatch({
       type: ActionTypes.SetRightPanel,
@@ -52,9 +57,12 @@ const AttendeesPage: NextPageWithLayout = () => {
         rightPanelItems: <AttendeeSearch conferenceId={data?.conference.id} />,
       },
     });
+    getExportData({ variables: { conferenceId: data?.conference.id } });
   }, [dispatch, data]);
 
   const [deleteAttednee] = useRemoveAttendeeMutation();
+
+  console.log(exportLoading, exportData);
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -68,30 +76,52 @@ const AttendeesPage: NextPageWithLayout = () => {
             </Header.Subheader>
           </Header>
         </Grid.Column>
-        {/* <Grid.Column style={{ display: "flex" }}>
-          <Dropdown
-            open={open}
-            className="button secondary icon"
-            icon="filter"
-            onClick={() => setOpen(true)}
-            floating
-            style={{ alignSelf: "flex-end" }}
-          >
-            <Dropdown.Menu direction="left">
-              <div ref={dropdownContainerRef}>
-                <Segment>
-                  <Form>
-                    {data?.conference.sections.map((s) => (
-                      <Form.Field key={s.id}>
-                        <Radio label={s.name} toggle />
-                      </Form.Field>
-                    ))}
-                  </Form>
-                </Segment>
-              </div>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Grid.Column> */}
+        <Grid.Column style={{ display: "flex" }}>
+          <div style={{ alignSelf: "flex-end" }}>
+            {exportData && (
+              <ExportCSV
+                data={exportData.attendeesToCsvExport.flatMap((attendee) =>
+                  attendee.submissions.map((submission) => ({
+                    name: attendee.user.name,
+                    email: attendee.user.email,
+                    organisation: attendee.user.organisation,
+                    variableSymbol: attendee.invoice.issuer.variableSymbol,
+                    price:
+                      attendee.invoice.body.price + attendee.invoice.body.vat,
+                    section: submission.section.name,
+                    submission_name_sk: submission.name,
+                    submission_name_en: submission.translations[0].name,
+                  }))
+                )}
+              />
+            )}
+            {/* <Dropdown
+              open={open}
+              className="button secondary icon"
+              icon="filter"
+              onClick={() => {
+                if (!click && open) {
+                  setOpen(false);
+                } else setOpen(true);
+              }}
+              floating
+            >
+              <Dropdown.Menu direction="left">
+                <div ref={dropdownContainerRef}>
+                  <Segment>
+                    <Form>
+                      {data?.conference.sections.map((s) => (
+                        <Form.Field key={s.id}>
+                          <Radio label={s.name} toggle />
+                        </Form.Field>
+                      ))}
+                    </Form>
+                  </Segment>
+                </div>
+              </Dropdown.Menu>
+            </Dropdown> */}
+          </div>
+        </Grid.Column>
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
