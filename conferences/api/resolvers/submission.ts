@@ -97,8 +97,6 @@ export class SubmissionResolver {
       )
     );
 
-    console.log(submission);
-
     return await submission.save();
   }
 

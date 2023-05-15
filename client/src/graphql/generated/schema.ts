@@ -678,6 +678,7 @@ export type Query = {
   announcement: Announcement;
   announcements: AnnouncementConnection;
   attendee: Attendee;
+  attendeesToCsvExport: Array<Attendee>;
   conference: Conference;
   conferences: ConferenceConnection;
   files: FileConnection;
@@ -708,6 +709,11 @@ export type QueryAnnouncementsArgs = {
 
 export type QueryAttendeeArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type QueryAttendeesToCsvExportArgs = {
+  conferenceId: Scalars['ObjectId'];
 };
 
 
@@ -1057,6 +1063,13 @@ export type ConferencesQueryVariables = Exact<{
 export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
 export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+
+export type AttendeesToCsvExportQueryVariables = Exact<{
+  conferenceId: Scalars['ObjectId'];
+}>;
+
+
+export type AttendeesToCsvExportQuery = { __typename?: 'Query', attendeesToCsvExport: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> }> };
 
 export type AttendeeQueryVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -2031,6 +2044,41 @@ export function useConferencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type ConferencesQueryHookResult = ReturnType<typeof useConferencesQuery>;
 export type ConferencesLazyQueryHookResult = ReturnType<typeof useConferencesLazyQuery>;
 export type ConferencesQueryResult = Apollo.QueryResult<ConferencesQuery, ConferencesQueryVariables>;
+export const AttendeesToCsvExportDocument = gql`
+    query attendeesToCsvExport($conferenceId: ObjectId!) {
+  attendeesToCsvExport(conferenceId: $conferenceId) {
+    ...AttendeeFragment
+  }
+}
+    ${AttendeeFragmentFragmentDoc}`;
+
+/**
+ * __useAttendeesToCsvExportQuery__
+ *
+ * To run a query within a React component, call `useAttendeesToCsvExportQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAttendeesToCsvExportQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAttendeesToCsvExportQuery({
+ *   variables: {
+ *      conferenceId: // value for 'conferenceId'
+ *   },
+ * });
+ */
+export function useAttendeesToCsvExportQuery(baseOptions: Apollo.QueryHookOptions<AttendeesToCsvExportQuery, AttendeesToCsvExportQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AttendeesToCsvExportQuery, AttendeesToCsvExportQueryVariables>(AttendeesToCsvExportDocument, options);
+      }
+export function useAttendeesToCsvExportLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AttendeesToCsvExportQuery, AttendeesToCsvExportQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AttendeesToCsvExportQuery, AttendeesToCsvExportQueryVariables>(AttendeesToCsvExportDocument, options);
+        }
+export type AttendeesToCsvExportQueryHookResult = ReturnType<typeof useAttendeesToCsvExportQuery>;
+export type AttendeesToCsvExportLazyQueryHookResult = ReturnType<typeof useAttendeesToCsvExportLazyQuery>;
+export type AttendeesToCsvExportQueryResult = Apollo.QueryResult<AttendeesToCsvExportQuery, AttendeesToCsvExportQueryVariables>;
 export const AttendeeDocument = gql`
     query attendee($id: ObjectId!) {
   attendee(id: $id) {

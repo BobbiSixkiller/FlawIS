@@ -262,6 +262,7 @@ scalar ObjectId
 
 type Query {
   attendee(id: ObjectId!): Attendee!
+  attendeesToCsvExport(conferenceId: ObjectId!): [Attendee!]!
   conference(slug: String!): Conference!
   conferences(year: Int!): ConferenceConnection!
   searchAttendee(conferenceId: ObjectId!, text: String!): [Attendee!]!
