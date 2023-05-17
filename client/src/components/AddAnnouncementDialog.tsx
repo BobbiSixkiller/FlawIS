@@ -11,7 +11,6 @@ import {
 import { DialogContext } from "../providers/Dialog";
 import parseErrors from "../util/parseErrors";
 
-import FileUpload from "./form/FileUpload";
 import { InputField } from "./form/InputField";
 import MultipleFileUploadField from "./form/Upload/MultipleFileUploadField";
 
