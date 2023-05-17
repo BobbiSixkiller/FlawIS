@@ -67,6 +67,11 @@
     }
   },
   "editSubmission": "Update submission",
-  "deleteSubmission": "Delete submission",
-  "registerSubmission": "Register submission"
+  "deleteSubmission": {
+    "header": "Delete submission",
+    "text": "Are you sure you want to delete this submission?"
+  },
+  "registerSubmission": "Register submission",
+  "deleteSubmissionFile": "Delete submission file",
+  "downloadSubmissionFile": "Download submission file"
 }

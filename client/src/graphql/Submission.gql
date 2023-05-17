@@ -74,5 +74,21 @@ mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
 }
 
 mutation deleteSubmission($id: ObjectId!) {
-  deleteSubmission(id: $id)
+  deleteSubmission(id: $id) {
+    id
+  }
+}
+
+mutation addSubmissionFile($id: ObjectId!, $url: String!) {
+  addSubmissionFile(id: $id, url: $url) {
+    id
+    submissionUrl
+  }
+}
+
+mutation deleteSubmissionFile($id: ObjectId!, $url: String!) {
+  deleteSubmissionFile(id: $id, url: $url) {
+    id
+    submissionUrl
+  }
 }

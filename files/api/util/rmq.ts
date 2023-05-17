@@ -106,6 +106,10 @@ class Messagebroker {
         const deletedUser: User = JSON.parse(msg.content.toString());
 
         return await getModelForClass(User).deleteOne({ _id: deletedUser.id });
+      case "file.delete":
+        const url = msg.content.toString();
+        console.log(url);
+        return await getModelForClass(File).deleteOne({ url });
 
       default:
         return console.log("Message with unhandled routing key!");

@@ -85,6 +85,7 @@ const AttendeesPage: NextPageWithLayout = () => {
                     name: attendee.user.name,
                     email: attendee.user.email,
                     organisation: attendee.user.organisation,
+                    online: attendee.ticket.online.toString(),
                     variableSymbol: attendee.invoice.issuer.variableSymbol,
                     price:
                       attendee.invoice.body.price + attendee.invoice.body.vat,

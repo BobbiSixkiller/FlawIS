@@ -86,28 +86,6 @@ export function CheckConferenceSection(): ParameterDecorator {
   });
 }
 
-export function LoadConference(): ParameterDecorator {
-  return createParamDecorator(async ({ args }) => {
-    const conference = await getModelForClass(Conference).findOne({
-      _id: args.id,
-    });
-    if (!conference) throw new UserInputError("Conference not found!");
-
-    return conference;
-  });
-}
-
-export function LoadSection(): ParameterDecorator {
-  return createParamDecorator(async ({ args }) => {
-    const section = await getModelForClass(Section).findOne({
-      _id: args.id,
-    });
-    if (!section) throw new UserInputError("Conference not found!");
-
-    return section;
-  });
-}
-
 export function LoadResource<TNode>(
   TNodeClass: ClassType<TNode>
 ): ParameterDecorator {
