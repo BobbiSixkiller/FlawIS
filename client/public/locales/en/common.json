@@ -12,7 +12,8 @@
     "save": "save",
     "cancel": "cancel",
     "more": "More...",
-    "previous": "Previous..."
+    "previous": "Previous...",
+    "confirm": "Confirm"
   },
   "header": {
     "masthead": {

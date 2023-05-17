@@ -15,13 +15,14 @@ import { Section } from "../entities/Section";
 import { Submission } from "../entities/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
-import { CheckConferenceSection } from "../util/decorators";
+import { CheckConferenceSection, LoadResource } from "../util/decorators";
 import { localizeInput } from "../util/locale";
 import { ConferenceSection } from "../util/types";
 import { SubmissionInput } from "./types/submission";
 import { User } from "../entities/User";
 import Messagebroker from "../util/rmq";
 import { convertDocument } from "../middlewares/typegoose-middleware";
+import { DocumentType } from "@typegoose/typegoose";
 
 @Service()
 @Resolver(() => Submission)
@@ -62,14 +63,12 @@ export class SubmissionResolver {
   @Authorized()
   @Mutation(() => Submission)
   async updateSubmission(
-    @Arg("id") id: ObjectId,
+    @Arg("id") _id: ObjectId,
     @Arg("data") data: SubmissionInput,
+    @LoadResource(Submission) submission: DocumentType<Submission>,
     @CheckConferenceSection() { conference }: ConferenceSection,
     @Ctx() { locale, user }: Context
   ) {
-    const submission = await this.submissionService.findOne({ _id: id });
-    if (!submission) throw new Error("Submission not found!");
-
     for (const [key, value] of Object.entries(
       localizeInput(data, data.translations, locale)
     )) {
@@ -101,12 +100,38 @@ export class SubmissionResolver {
   }
 
   @Authorized()
-  @Mutation(() => Boolean)
-  async deleteSubmission(@Arg("id") id: ObjectId) {
-    const { deletedCount } = await this.submissionService.deleteOne({
-      _id: id,
-    });
-    return deletedCount > 0;
+  @Mutation(() => Submission)
+  async deleteSubmission(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(Submission) submission: DocumentType<Submission>
+  ) {
+    if (submission.submissionUrl) {
+      Messagebroker.produceMessage(submission.submissionUrl, "file.delete");
+    }
+    return await submission.remove();
+  }
+
+  @Authorized()
+  @Mutation(() => Submission)
+  async addSubmissionFile(
+    @Arg("id") _id: ObjectId,
+    @Arg("url") url: string,
+    @LoadResource(Submission) submission: DocumentType<Submission>
+  ) {
+    submission.submissionUrl = url;
+    return await submission.save();
+  }
+
+  @Authorized()
+  @Mutation(() => Submission)
+  async deleteSubmissionFile(
+    @Arg("id") _id: ObjectId,
+    @Arg("url", { nullable: true }) url: string,
+    @LoadResource(Submission) submission: DocumentType<Submission>
+  ) {
+    Messagebroker.produceMessage(url, "file.delete");
+    submission.submissionUrl = undefined;
+    return await submission.save();
   }
 
   @Authorized()

@@ -242,12 +242,14 @@ input InvoiceInput {
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   addSubmission(data: SubmissionInput!): Submission!
+  addSubmissionFile(id: ObjectId!, url: String!): Submission!
   addTicket(data: TicketInput!, id: ObjectId!): Conference!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!, id: ObjectId!): Section!
   deleteConference(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): Boolean!
-  deleteSubmission(id: ObjectId!): Boolean!
+  deleteSubmission(id: ObjectId!): Submission!
+  deleteSubmissionFile(id: ObjectId!, url: String): Submission!
   removeAttendee(id: ObjectId!): Attendee!
   removeTicket(id: ObjectId!, ticketId: ObjectId!): Conference!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!

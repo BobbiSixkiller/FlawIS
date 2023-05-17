@@ -1,6 +1,6 @@
 import { Directive, Field, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import { prop as Property } from "@typegoose/typegoose";
+import { index, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { FileType } from "../resolvers.ts/types/file";
 import { ReturnModelType } from "@typegoose/typegoose/lib/types";
@@ -19,6 +19,7 @@ export default class User {
   email: string;
 }
 
+@index({ url: 1 })
 @ObjectType()
 export class File extends TimeStamps {
   @Field(() => ObjectId)

@@ -1,7 +1,7 @@
 import { Formik, FormikProps } from "formik";
 import { useRouter } from "next/router";
 import { useContext, useRef } from "react";
-import { Button, Form } from "semantic-ui-react";
+import { Button, Form, Popup } from "semantic-ui-react";
 import { DialogContext } from "../providers/Dialog";
 import Validation from "../util/validation";
 import { InferType } from "yup";
@@ -38,65 +38,72 @@ export default function UpdateSubmissionDialog({
   const { t } = useTranslation("conference");
 
   return (
-    <Button
-      primary
-      size="tiny"
-      icon="pencil alternate"
-      onClick={() =>
-        handleOpen({
-          size: "tiny",
-          header: t("editSubmission"),
-          confirmText: t("actions.save", {
-            ns: "common",
-          }),
-          cancelText: t("actions.cancel", {
-            ns: "common",
-          }),
-          confirmCb: () => formikRef.current?.submitForm(),
-          content: (
-            <Formik
-              innerRef={formikRef}
-              initialValues={{
-                submission: {
-                  userId: undefined,
-                  conferenceId: data?.conference.id,
-                  sectionId: input.sectionId,
-                  name: input.name,
-                  abstract: input.abstract,
-                  keywords: input.keywords,
-                  authors: [],
-                  translations: input.translations,
-                },
-              }}
-              validationSchema={submissionInputSchema}
-              onSubmit={async (values, formik) => {
-                try {
-                  await update({
-                    variables: {
-                      id: id,
-                      data: values.submission,
+    <Popup
+      content={t("editSubmission")}
+      trigger={
+        <Button
+          primary
+          size="tiny"
+          icon="pencil alternate"
+          onClick={() =>
+            handleOpen({
+              size: "tiny",
+              header: t("editSubmission"),
+              confirmText: t("actions.save", {
+                ns: "common",
+              }),
+              cancelText: t("actions.cancel", {
+                ns: "common",
+              }),
+              confirmCb: () => formikRef.current?.submitForm(),
+              content: (
+                <Formik
+                  innerRef={formikRef}
+                  initialValues={{
+                    submission: {
+                      userId: undefined,
+                      conferenceId: data?.conference.id,
+                      sectionId: input.sectionId,
+                      name: input.name,
+                      abstract: input.abstract,
+                      keywords: input.keywords,
+                      authors: [],
+                      translations: input.translations,
                     },
-                  });
-                  handleClose();
-                } catch (error: any) {
-                  setError(error?.message || "");
-                  formik.setStatus(
-                    parseErrors(
-                      error.graphQLErrors[0].extensions.exception
-                        .validationErrors
-                    )
-                  );
-                }
-              }}
-            >
-              {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
-                <Form loading={isSubmitting} onSubmit={handleSubmit}>
-                  <RegisterSubmission sections={data?.conference.sections} />
-                </Form>
-              )}
-            </Formik>
-          ),
-        })
+                  }}
+                  validationSchema={submissionInputSchema}
+                  onSubmit={async (values, formik) => {
+                    try {
+                      await update({
+                        variables: {
+                          id: id,
+                          data: values.submission,
+                        },
+                      });
+                      handleClose();
+                    } catch (error: any) {
+                      setError(error?.message || "");
+                      formik.setStatus(
+                        parseErrors(
+                          error.graphQLErrors[0].extensions.exception
+                            .validationErrors
+                        )
+                      );
+                    }
+                  }}
+                >
+                  {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
+                    <Form loading={isSubmitting} onSubmit={handleSubmit}>
+                      <RegisterSubmission
+                        sections={data?.conference.sections}
+                      />
+                    </Form>
+                  )}
+                </Formik>
+              ),
+            })
+          }
+        />
       }
     />
   );

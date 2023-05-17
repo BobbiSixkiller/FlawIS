@@ -1,5 +1,4 @@
 import { DocumentType } from "@typegoose/typegoose";
-import { UserInputError } from "apollo-server";
 import { ObjectId } from "mongodb";
 import {
   Arg,
@@ -17,7 +16,7 @@ import { Section } from "../entities/Section";
 import { Submission } from "../entities/Submission";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
-import { LoadConference, LoadSection } from "../util/decorators";
+import { LoadResource } from "../util/decorators";
 import { localizeInput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { SectionInput } from "./types/section";
@@ -34,7 +33,7 @@ export class SectionResolver {
   @Query(() => Section)
   async section(
     @Arg("id", () => ObjectIdScalar) _id: ObjectId,
-    @LoadSection() section: DocumentType<Section>
+    @LoadResource(Section) section: DocumentType<Section>
   ) {
     return section;
   }
@@ -44,7 +43,7 @@ export class SectionResolver {
   async createSection(
     @Arg("id") _id: ObjectId,
     @Arg("data") sectionInput: SectionInput,
-    @LoadConference() conference: DocumentType<Conference>,
+    @LoadResource(Conference) conference: DocumentType<Conference>,
     @Ctx() { locale }: Context
   ) {
     const section = await this.sectionService.create(
@@ -62,7 +61,7 @@ export class SectionResolver {
   async updateSection(
     @Arg("id") _id: ObjectId,
     @Arg("data") sectionInput: SectionInput,
-    @LoadSection() section: DocumentType<Section>,
+    @LoadResource(Section) section: DocumentType<Section>,
     @Ctx() { locale }: Context
   ) {
     for (const [key, value] of Object.entries(

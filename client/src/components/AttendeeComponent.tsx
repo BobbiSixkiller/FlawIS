@@ -1,9 +1,10 @@
-import { Card, Grid, Header, List } from "semantic-ui-react";
+import { Button, Card, Grid, Header, List, Popup } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
   Invoice,
   Role,
+  useDeleteSubmissionFileMutation,
   useDeleteSubmissionMutation,
 } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
@@ -30,6 +31,7 @@ export default function AttendeeComponent({
   const width = useWidth();
 
   const [deleteSubmission] = useDeleteSubmissionMutation();
+  const [deleteSubmissionFile, { loading }] = useDeleteSubmissionFileMutation();
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -98,10 +100,14 @@ export default function AttendeeComponent({
                         },
                       })) as Promise<void>
                     }
-                    header="Zmazať príspevok"
-                    content={<p>Naozaj chcete zmazať vybraný príspevok?</p>}
-                    cancelText="Zrušiť"
-                    confirmText="Potvrdiť"
+                    header={t("deleteSubmission.header")}
+                    content={<p>{t("deleteSubmission.text")}</p>}
+                    cancelText={t("actions.cancel", {
+                      ns: "common",
+                    })}
+                    confirmText={t("actions.confirm", {
+                      ns: "common",
+                    })}
                   />
                   <UpdateSubmissionDialog
                     id={submission.id}
@@ -120,23 +126,48 @@ export default function AttendeeComponent({
                       })),
                     }}
                   />
-                  <AddSubmissionFileDialog
-                    id={submission.id}
-                    input={{
-                      conferenceId: data.conference.id,
-                      authors: [],
-                      abstract: submission.abstract,
-                      keywords: submission.keywords,
-                      name: submission.name,
-                      sectionId: submission.section.id,
-                      translations: submission.translations.map((t) => ({
-                        language: t.language,
-                        name: t.name,
-                        abstract: t.abstract,
-                        keywords: t.keywords,
-                      })),
-                    }}
-                  />
+                  {submission.submissionUrl ? (
+                    <>
+                      <Popup
+                        content={t("deleteSubmissionFile")}
+                        trigger={
+                          <Button
+                            loading={loading}
+                            icon
+                            size="tiny"
+                            floated="right"
+                            basic
+                            as="a"
+                            content="Zmazať"
+                            onClick={async () =>
+                              await deleteSubmissionFile({
+                                variables: {
+                                  id: submission.id,
+                                  url: submission.submissionUrl as string,
+                                },
+                              })
+                            }
+                          />
+                        }
+                      />
+
+                      <Popup
+                        content={t("downloadSubmissionFile")}
+                        trigger={
+                          <Button
+                            size="tiny"
+                            floated="right"
+                            secondary
+                            icon="file"
+                            as="a"
+                            href={submission.submissionUrl}
+                          />
+                        }
+                      />
+                    </>
+                  ) : (
+                    <AddSubmissionFileDialog id={submission.id} />
+                  )}
                 </Card.Content>
               </Card>
             ))}

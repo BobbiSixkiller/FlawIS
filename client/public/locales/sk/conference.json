@@ -65,6 +65,11 @@
     }
   },
   "editSubmission": "Aktualizovať príspevok",
-  "deleteSubmission": "Zmazať príspevok",
-  "registerSubmission": "Registrovať nový príspevok"
+  "deleteSubmission": {
+    "header": "Zmazať príspevok",
+    "text": "Naozaj chcete zmazať tento príspevok?"
+  },
+  "registerSubmission": "Registrovať nový príspevok",
+  "deleteSubmissionFile": "Zmazať súbor príspevku",
+  "downloadSubmissionFile": "Stiahnuť súbor príspevku"
 }

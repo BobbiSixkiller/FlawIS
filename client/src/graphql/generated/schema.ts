@@ -442,6 +442,7 @@ export type Mutation = {
   addMember: Grant;
   addSpentBudget: Grant;
   addSubmission: Submission;
+  addSubmissionFile: Submission;
   addTicket: Conference;
   createAnnouncement: Announcement;
   createConference: Conference;
@@ -454,7 +455,8 @@ export type Mutation = {
   deleteGrant: Scalars['Boolean'];
   deleteMember: Grant;
   deleteSection: Scalars['Boolean'];
-  deleteSubmission: Scalars['Boolean'];
+  deleteSubmission: Submission;
+  deleteSubmissionFile: Submission;
   deleteUser: Scalars['Boolean'];
   login: User;
   logout: Scalars['Boolean'];
@@ -506,6 +508,12 @@ export type MutationAddSpentBudgetArgs = {
 
 export type MutationAddSubmissionArgs = {
   data: SubmissionInput;
+};
+
+
+export type MutationAddSubmissionFileArgs = {
+  id: Scalars['ObjectId'];
+  url: Scalars['String'];
 };
 
 
@@ -576,6 +584,12 @@ export type MutationDeleteSectionArgs = {
 
 export type MutationDeleteSubmissionArgs = {
   id: Scalars['ObjectId'];
+};
+
+
+export type MutationDeleteSubmissionFileArgs = {
+  id: Scalars['ObjectId'];
+  url?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1091,7 +1105,7 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, isAdmin: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, isAdmin: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, submissions: Array<{ __typename?: 'Submission', id: string, name: string, submissionUrl?: string | null }> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
 
 export type ConferenceAttendeesQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -1306,7 +1320,23 @@ export type DeleteSubmissionMutationVariables = Exact<{
 }>;
 
 
-export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: boolean };
+export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: { __typename?: 'Submission', id: string } };
+
+export type AddSubmissionFileMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  url: Scalars['String'];
+}>;
+
+
+export type AddSubmissionFileMutation = { __typename?: 'Mutation', addSubmissionFile: { __typename?: 'Submission', id: string, submissionUrl?: string | null } };
+
+export type DeleteSubmissionFileMutationVariables = Exact<{
+  id: Scalars['ObjectId'];
+  url: Scalars['String'];
+}>;
+
+
+export type DeleteSubmissionFileMutation = { __typename?: 'Mutation', deleteSubmissionFile: { __typename?: 'Submission', id: string, submissionUrl?: string | null } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -2168,6 +2198,11 @@ export const ConferenceDocument = gql`
       name
       description
       languages
+      submissions {
+        id
+        name
+        submissionUrl
+      }
     }
     tickets {
       id
@@ -3516,7 +3551,9 @@ export type UpdateSubmissionMutationResult = Apollo.MutationResult<UpdateSubmiss
 export type UpdateSubmissionMutationOptions = Apollo.BaseMutationOptions<UpdateSubmissionMutation, UpdateSubmissionMutationVariables>;
 export const DeleteSubmissionDocument = gql`
     mutation deleteSubmission($id: ObjectId!) {
-  deleteSubmission(id: $id)
+  deleteSubmission(id: $id) {
+    id
+  }
 }
     `;
 export type DeleteSubmissionMutationFn = Apollo.MutationFunction<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
@@ -3545,6 +3582,76 @@ export function useDeleteSubmissionMutation(baseOptions?: Apollo.MutationHookOpt
 export type DeleteSubmissionMutationHookResult = ReturnType<typeof useDeleteSubmissionMutation>;
 export type DeleteSubmissionMutationResult = Apollo.MutationResult<DeleteSubmissionMutation>;
 export type DeleteSubmissionMutationOptions = Apollo.BaseMutationOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
+export const AddSubmissionFileDocument = gql`
+    mutation addSubmissionFile($id: ObjectId!, $url: String!) {
+  addSubmissionFile(id: $id, url: $url) {
+    id
+    submissionUrl
+  }
+}
+    `;
+export type AddSubmissionFileMutationFn = Apollo.MutationFunction<AddSubmissionFileMutation, AddSubmissionFileMutationVariables>;
+
+/**
+ * __useAddSubmissionFileMutation__
+ *
+ * To run a mutation, you first call `useAddSubmissionFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSubmissionFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSubmissionFileMutation, { data, loading, error }] = useAddSubmissionFileMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      url: // value for 'url'
+ *   },
+ * });
+ */
+export function useAddSubmissionFileMutation(baseOptions?: Apollo.MutationHookOptions<AddSubmissionFileMutation, AddSubmissionFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSubmissionFileMutation, AddSubmissionFileMutationVariables>(AddSubmissionFileDocument, options);
+      }
+export type AddSubmissionFileMutationHookResult = ReturnType<typeof useAddSubmissionFileMutation>;
+export type AddSubmissionFileMutationResult = Apollo.MutationResult<AddSubmissionFileMutation>;
+export type AddSubmissionFileMutationOptions = Apollo.BaseMutationOptions<AddSubmissionFileMutation, AddSubmissionFileMutationVariables>;
+export const DeleteSubmissionFileDocument = gql`
+    mutation deleteSubmissionFile($id: ObjectId!, $url: String!) {
+  deleteSubmissionFile(id: $id, url: $url) {
+    id
+    submissionUrl
+  }
+}
+    `;
+export type DeleteSubmissionFileMutationFn = Apollo.MutationFunction<DeleteSubmissionFileMutation, DeleteSubmissionFileMutationVariables>;
+
+/**
+ * __useDeleteSubmissionFileMutation__
+ *
+ * To run a mutation, you first call `useDeleteSubmissionFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSubmissionFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSubmissionFileMutation, { data, loading, error }] = useDeleteSubmissionFileMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      url: // value for 'url'
+ *   },
+ * });
+ */
+export function useDeleteSubmissionFileMutation(baseOptions?: Apollo.MutationHookOptions<DeleteSubmissionFileMutation, DeleteSubmissionFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteSubmissionFileMutation, DeleteSubmissionFileMutationVariables>(DeleteSubmissionFileDocument, options);
+      }
+export type DeleteSubmissionFileMutationHookResult = ReturnType<typeof useDeleteSubmissionFileMutation>;
+export type DeleteSubmissionFileMutationResult = Apollo.MutationResult<DeleteSubmissionFileMutation>;
+export type DeleteSubmissionFileMutationOptions = Apollo.BaseMutationOptions<DeleteSubmissionFileMutation, DeleteSubmissionFileMutationVariables>;
 export const UpdateUserDocument = gql`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {

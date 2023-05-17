@@ -144,6 +144,11 @@ query conference($slug: String!) {
       name
       description
       languages
+      submissions {
+        id
+        name
+        submissionUrl
+      }
     }
     tickets {
       id

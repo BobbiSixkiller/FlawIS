@@ -12,7 +12,8 @@ type RoutingKey =
   | "user.update.personal"
   | "user.update.billings"
   | "mail.conference.invoice"
-  | "mail.conference.coAuthor";
+  | "mail.conference.coAuthor"
+  | "file.delete";
 
 class Messagebroker {
   private static connection?: Connection;

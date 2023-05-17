@@ -59,7 +59,7 @@ export class FileResolver {
       "-" +
       filename.toLowerCase().split(" ").join("-");
 
-    const file = await this.fileService.create({
+    await this.fileService.create({
       name: filename,
       type: filetype,
       user,
@@ -76,7 +76,7 @@ export class FileResolver {
     );
   }
 
-  @Authorized()
+  @Authorized(["ADMIN"])
   @Mutation(() => Boolean)
   async deleteFile(@Arg("url") url: string) {
     const path =

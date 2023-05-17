@@ -19,7 +19,7 @@ import { Section } from "../entities/Section";
 import { User } from "../entities/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
-import { LoadConference } from "../util/decorators";
+import { LoadResource } from "../util/decorators";
 import { localizeInput, localizeOutput } from "../util/locale";
 import { ObjectIdScalar } from "../util/scalars";
 import { AttendeeArgs, AttendeeConnection } from "./types/attendee";
@@ -123,7 +123,7 @@ export class ConferenceResolver {
     @Arg("data") ticketInput: TicketInput,
     @Arg("id") _id: ObjectId,
     @Ctx() { locale }: Context,
-    @LoadConference() conference: DocumentType<Conference>
+    @LoadResource(Conference) conference: DocumentType<Conference>
   ) {
     conference.tickets.push(
       localizeInput(ticketInput, ticketInput.translations, locale)
@@ -137,7 +137,7 @@ export class ConferenceResolver {
   async removeTicket(
     @Arg("ticketId") ticketId: ObjectId,
     @Arg("id") _id: ObjectId,
-    @LoadConference() conference: DocumentType<Conference>
+    @LoadResource(Conference) conference: DocumentType<Conference>
   ) {
     const ticket = conference.tickets.find(
       (t) => t.id.toString() === ticketId.toString()
@@ -154,7 +154,7 @@ export class ConferenceResolver {
   async updateConference(
     @Arg("id", () => ObjectIdScalar) _id: ObjectId,
     @Arg("data") conferenceInput: ConferenceInput,
-    @LoadConference() conference: DocumentType<Conference>,
+    @LoadResource(Conference) conference: DocumentType<Conference>,
     @Ctx() { locale }: Context
   ) {
     for (const [key, value] of Object.entries(

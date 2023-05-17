@@ -1,5 +1,4 @@
 import { Formik, FormikProps } from "formik";
-import { useRouter } from "next/router";
 import { useContext, useRef } from "react";
 import { Button, Form } from "semantic-ui-react";
 import { DialogContext } from "../providers/Dialog";
@@ -8,22 +7,13 @@ import { InferType } from "yup";
 import parseErrors from "../util/parseErrors";
 import {
   FileType,
-  SubmissionInput,
-  useUpdateSubmissionMutation,
-  useUploadFileMutation,
+  useAddSubmissionFileMutation,
 } from "../graphql/generated/schema";
 import { useTranslation } from "next-i18next";
 import MultipleFileUploadField from "./form/Upload/MultipleFileUploadField";
 
-export default function AddSubmissionFileDialog({
-  id,
-  input,
-}: {
-  id: string;
-  input: SubmissionInput;
-}) {
+export default function AddSubmissionFileDialog({ id }: { id: string }) {
   const { handleOpen, handleClose, setError } = useContext(DialogContext);
-  const { query } = useRouter();
 
   const { submissionFileSchema } = Validation();
   type Values = InferType<typeof submissionFileSchema>;
@@ -32,7 +22,7 @@ export default function AddSubmissionFileDialog({
 
   const { t } = useTranslation("conference");
 
-  const [update] = useUpdateSubmissionMutation();
+  const [updateSubmission] = useAddSubmissionFileMutation();
 
   return (
     <Button
@@ -62,10 +52,10 @@ export default function AddSubmissionFileDialog({
               onSubmit={async (values, formik) => {
                 try {
                   console.log(values);
-                  await update({
+                  await updateSubmission({
                     variables: {
                       id,
-                      data: { ...input, submissionUrl: values.files[0].url },
+                      url: values.files[0].url,
                     },
                   });
                   handleClose();

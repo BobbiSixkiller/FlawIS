@@ -135,7 +135,16 @@ const DashboardPage: NextPageWithLayout = () => {
               <Card.Content>
                 <Card.Header>{section.name}</Card.Header>
                 <Card.Meta></Card.Meta>
-                <Card.Description></Card.Description>
+                <Card.Description>
+                  Prispevky: {section.submissions.length} <br />
+                  Subory prispevkov:{" "}
+                  {section.submissions.reduce((prev, sub): number => {
+                    if (sub.submissionUrl) {
+                      return prev + 1;
+                    }
+                    return prev;
+                  }, 0)}
+                </Card.Description>
               </Card.Content>
               <Card.Content extra>
                 <DeleteDialog
