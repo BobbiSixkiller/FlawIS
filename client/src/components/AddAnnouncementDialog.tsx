@@ -1,7 +1,7 @@
 import { Formik, FormikProps } from "formik";
 import { useContext } from "react";
 import { Button, Form, Input, Select, TextArea } from "semantic-ui-react";
-import { InferType, object, string, array, mixed } from "yup";
+import { InferType, object, string, array } from "yup";
 import {
   AnnouncementsDocument,
   FileType,
