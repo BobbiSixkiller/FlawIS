@@ -20,7 +20,7 @@ env.config();
 
 const port = process.env.PORT || 5002;
 const mongooseUri =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/FLAWIS-files";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/files";
 
 async function main() {
   //Build schema
