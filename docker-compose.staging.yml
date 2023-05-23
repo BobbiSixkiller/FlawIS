@@ -23,10 +23,6 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
     restart: unless-stopped
     ports:
       - "6001:6001"
@@ -38,10 +34,6 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
     volumes:
       - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
     restart: unless-stopped
@@ -55,10 +47,6 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
     restart: unless-stopped
     ports:
       - "6003:6003"
