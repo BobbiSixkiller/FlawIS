@@ -67,7 +67,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
     depends_on:
-      - gateway
+      - gateway-staging
     restart: unless-stopped
     ports:
       - "4000:4000"
