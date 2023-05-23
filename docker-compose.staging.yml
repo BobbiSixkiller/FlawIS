@@ -14,7 +14,7 @@ services:
       - grants
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "6000:5000"
 
   users:
     build:
@@ -29,7 +29,7 @@ services:
       - redis
     restart: unless-stopped
     ports:
-      - "5001:5001"
+      - "6001:5001"
 
   files:
     build:
@@ -46,7 +46,7 @@ services:
       - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
     restart: unless-stopped
     ports:
-      - "5002:5002"
+      - "6002:5002"
 
   conferences:
     build:
@@ -61,7 +61,7 @@ services:
       - redis
     restart: unless-stopped
     ports:
-      - "5003:5003"
+      - "6003:5003"
 
   grants:
     build:
@@ -75,7 +75,7 @@ services:
       - mongo
     restart: unless-stopped
     ports:
-      - "5004:5004"
+      - "6004:5004"
 
   client:
     build:
@@ -85,7 +85,7 @@ services:
       - gateway
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4000:3000"
 
   mail:
     build:
