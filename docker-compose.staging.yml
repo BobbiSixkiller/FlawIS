@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
+      PORT: 6000
     depends_on:
       - users-staging
       - conferences-staging
@@ -23,10 +24,7 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      PORT: 6001
     restart: unless-stopped
     ports:
       - "6001:6001"
@@ -38,10 +36,7 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      PORT: 6002
     volumes:
       - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
     restart: unless-stopped
@@ -55,10 +50,7 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
-    depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      PORT: 6003
     restart: unless-stopped
     ports:
       - "6003:6003"
@@ -70,9 +62,7 @@ services:
     environment:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
-    depends_on:
-      - rabbitmq
-      - mongo
+      PORT: 6004
     restart: unless-stopped
     ports:
       - "6004:6004"
@@ -82,11 +72,13 @@ services:
       context: ./client
       dockerfile: Dockerfile
     depends_on:
-      - gateway
+      - gateway-staging
+    environment:
+      PORT: 4000
     restart: unless-stopped
     ports:
       - "4000:4000"
 
 networks:
-  my-flawis_default:
+  flawis_default:
     external: true
