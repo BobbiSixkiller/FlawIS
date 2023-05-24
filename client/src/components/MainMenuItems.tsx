@@ -309,7 +309,10 @@ function ConferencesMenuItems() {
 }
 
 export default function MainMenuItems() {
-  if (window.location.hostname === "conferences.flaw.uniba.sk") {
+  if (
+    window.location.hostname === "conferences.flaw.uniba.sk" ||
+    window.location.hostname === "conferences-staging.flaw.uniba.sk"
+  ) {
     return <ConferencesMenuItems />;
   }
 
