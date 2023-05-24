@@ -62,7 +62,9 @@ export class FileResolver {
       name: filename,
       type: filetype,
       user,
-      url: `${"https://flawis-backend.flaw.uniba.sk/" + "public/" + url}`,
+      url: `${
+        "https://flawis-backend-staging.flaw.uniba.sk/" + "public/" + url
+      }`,
     });
 
     return new Promise(async (resolve, reject) =>
@@ -70,7 +72,9 @@ export class FileResolver {
         .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
         .on("finish", () =>
           resolve(
-            `${"https://flawis-backend.flaw.uniba.sk/" + "public/" + url}`
+            `${
+              "https://flawis-backend-staging.flaw.uniba.sk/" + "public/" + url
+            }`
           )
         )
         .on("error", () => reject(new Error("File upload failed!")))
@@ -81,7 +85,7 @@ export class FileResolver {
   @Mutation(() => Boolean)
   async deleteFile(@Arg("url") url: string) {
     const path =
-      "." + url.split(process.env.BASE_URL || "http://localhost:5000")[1];
+      "." + url.split(process.env.BASE_URL || "http://localhost:6000")[1];
 
     return new Promise((resolve, reject) => {
       unlink(path, (error) => {

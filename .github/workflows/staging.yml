@@ -28,6 +28,10 @@ jobs:
           docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017/grants" --archive=/data/grants_dump.archive --gzip
           docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017/grants_copy" --archive=/data/grants_dump.archive --gzip
 
+      - name: Copy files to staging
+        run: |
+          cp -R /home/weby/Desktop/FlawIS/files/public /home/weby/Desktop/FlawIS-staging/files
+
       - name: Build and Deploy
         env:
           SECRET: ${{ secrets.SECRET }}
