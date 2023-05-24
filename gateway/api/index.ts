@@ -24,7 +24,10 @@ const port = process.env.PORT || 5000;
 const services = [
   { name: "users", url: "http://users:5001/graphql" },
   { name: "files", url: "http://files:5002/graphql" },
-  { name: "conferences", url: "http://conferences:5003/graphql" },
+  {
+    name: "conferences",
+    url: "http://conferences:5003/graphql",
+  },
   { name: "grants", url: "http://grants:5004/graphql" },
 ];
 
@@ -45,12 +48,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: [
-        "https://flawis.flaw.uniba.sk",
-        "https://conferences.flaw.uniba.sk",
-        "http://client:3000",
-        "http://localhost:3000",
-      ],
+      origin: ["http://client:3000", "http://localhost:3000"],
     })
   );
   app.use(cookieParser());

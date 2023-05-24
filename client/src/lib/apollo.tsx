@@ -44,6 +44,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
               `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
             );
           });
+
         if (networkError)
           console.log(
             `[Network error]: ${networkError}. Backend is unreachable. Is it running?`

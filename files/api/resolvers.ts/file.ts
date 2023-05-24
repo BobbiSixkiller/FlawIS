@@ -17,7 +17,6 @@ import { File } from "../entities/File";
 import { CRUDservice } from "../services/CRUDservice";
 import { Service } from "typedi";
 import { Context } from "../util/auth";
-import { ObjectId } from "mongodb";
 
 @Service()
 @Resolver()

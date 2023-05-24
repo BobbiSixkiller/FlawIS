@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo:27017/FLAWIS-files?replicaSet=rs0"
+      MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
     depends_on:
       - rabbitmq
       - mongo

@@ -38,7 +38,7 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
       PORT: 6002
     volumes:
-      - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
+      - /home/weby/Desktop/FlawIS-staging-files:/usr/app/public
     restart: unless-stopped
     ports:
       - "6002:6002"
