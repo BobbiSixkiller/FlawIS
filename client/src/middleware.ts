@@ -18,15 +18,15 @@ export default function middleware(req: NextRequest) {
   }
 
   switch (hostname) {
-    case "conferences.flaw.uniba.sk":
+    case "conferences-staging.flaw.uniba.sk":
       url.pathname = `/conferences${url.pathname}`;
       return NextResponse.rewrite(url);
 
-    case "flawis.flaw.uniba.sk":
+    case "flawis-staging.flaw.uniba.sk":
       url.pathname = `/flawis${url.pathname}`;
       return NextResponse.rewrite(url);
 
-    case "localhost:3000":
+    case "localhost:4000":
       url.pathname = `/conferences${url.pathname}`;
       return NextResponse.rewrite(url);
 
