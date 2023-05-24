@@ -30,7 +30,7 @@ jobs:
 
       - name: Copy files to staging
         run: |
-          cp -R /home/weby/Desktop/FlawIS/files/public /home/weby/Desktop/FlawIS-staging/files
+          cp -R /home/weby/Desktop/FlawIS/files/public /home/weby/Desktop/FlawIS-staging-files
 
       - name: Build and Deploy
         env:
