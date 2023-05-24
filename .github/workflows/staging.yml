@@ -16,10 +16,17 @@ jobs:
         env:
           MONGO_CONTAINER_NAME: "flawis-mongo-1"
         run: |
-          docker exec $MONGO_CONTAINER_NAME mongo --eval "db.copyDatabase('users', 'users_copy')"
-          docker exec $MONGO_CONTAINER_NAME mongo --eval "db.copyDatabase('conferences', 'conferences_copy')"
-          docker exec $MONGO_CONTAINER_NAME mongo --eval "db.copyDatabase('grants', 'grants_copy')"
-          docker exec $MONGO_CONTAINER_NAME mongo --eval "db.copyDatabase('files', 'files_copy')"
+          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --db=users
+          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --nsFrom='users.*' --nsTo='users_copy.*'
+
+          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --db=conferences
+          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --nsFrom='conferences.*' --nsTo='conferences_copy.*'
+
+          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --db=grants
+          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --nsFrom='grants.*' --nsTo='grants_copy.*'
+
+          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --db=files
+          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --nsFrom='files.*' --nsTo='files_copy.*'
 
       - name: Copy files to staging
         run: |
