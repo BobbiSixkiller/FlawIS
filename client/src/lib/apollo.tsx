@@ -54,8 +54,8 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
       createUploadLink({
         uri:
           typeof window === "undefined"
-            ? "http://gateway-staging:6000/graphql"
-            : "https://flawis-backend-staging.flaw.uniba.sk/graphql",
+            ? "http://gateway:5000/graphql"
+            : "https://flawis-backend.flaw.uniba.sk/graphql",
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",
