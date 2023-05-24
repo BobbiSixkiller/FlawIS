@@ -2,7 +2,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - test
+      - staging
 jobs:
   build:
     runs-on: [self-hosted, linux]
