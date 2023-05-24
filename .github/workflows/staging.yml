@@ -12,7 +12,7 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Copy DBs
+      - name: Copy DBs for staging env
         env:
           MONGO_CONTAINER_NAME: "flawis-mongo-1"
         run: |
