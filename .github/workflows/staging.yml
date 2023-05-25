@@ -35,7 +35,7 @@ jobs:
           cp -R /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
 
       - name: Build and Deploy
-         env:
+        env:
           SECRET: ${{ secrets.SECRET }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
