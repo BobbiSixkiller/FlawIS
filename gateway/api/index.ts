@@ -24,8 +24,6 @@ const port = process.env.PORT || 5000;
 const services = [
   { name: "users", url: "http://users:5001/graphql" },
   { name: "files", url: "http://files:5002/graphql" },
-<<<<<<< HEAD
-=======
   {
     name: "conferences",
     url: "http://conferences:5003/graphql",
@@ -36,7 +34,6 @@ const services = [
 const stagingServices = [
   { name: "users-staging", url: "http://users-staging:6001/graphql" },
   { name: "files-staging", url: "http://files-staging:6002/graphql" },
->>>>>>> master
   {
     name: "conferences",
     url: "http://conferences:5003/graphql",
