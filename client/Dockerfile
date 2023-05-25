@@ -1,9 +1,6 @@
 # Developemnt Stage
 FROM node:16-alpine AS development
 
-ARG NODE_ENV=development
-ENV NODE_ENV=${NODE_ENV}
-
 # Create app directory
 WORKDIR /usr/app
 
@@ -17,9 +14,6 @@ COPY . .
 RUN npm run build
 
 FROM node:16-alpine AS production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/app
 

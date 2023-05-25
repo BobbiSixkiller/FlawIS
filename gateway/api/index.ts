@@ -31,12 +31,23 @@ const services = [
   { name: "grants-staging", url: "http://grants-staging:6004/graphql" },
 ];
 
+const stagingServices = [
+  { name: "users-staging", url: "http://users-staging:6001/graphql" },
+  { name: "files-staging", url: "http://files-staging:6002/graphql" },
+  {
+    name: "conferences",
+    url: "http://conferences:5003/graphql",
+  },
+  { name: "grants", url: "http://grants:5004/graphql" },
+];
+
 const main = async () => {
   await waitForServices(services);
 
   const gateway = new ApolloGateway({
     supergraphSdl: new IntrospectAndCompose({
-      subgraphs: services,
+      subgraphs:
+        process.env.NODE_ENV !== "staging" ? services : stagingServices,
     }),
     buildService({ url }) {
       return new AuthenticatedDataSource({ url });
@@ -48,12 +59,20 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: [
-        "https://flawis-staging.flaw.uniba.sk",
-        "https://conferences-staging.flaw.uniba.sk",
-        "http://client-staging:4000",
-        "http://localhost:4000",
-      ],
+      origin:
+        process.env.NODE_ENV !== "staging"
+          ? [
+              `https://flawis.flaw.uniba.sk`,
+              `https://conferences.flaw.uniba.sk`,
+              `http://client:3000`,
+              `http://localhost:3000`,
+            ]
+          : [
+              `https://flawis-staging.flaw.uniba.sk`,
+              `https://conferences-staging.flaw.uniba.sk`,
+              `http://client-staging:4000`,
+              `http://localhost-staging:4000`,
+            ],
     })
   );
   app.use(cookieParser());
@@ -62,7 +81,10 @@ const main = async () => {
     "/public/submissions",
     isAuthMiddleware,
     createProxyMiddleware({
-      target: "http://files-staging:6002/",
+      target:
+        process.env.NODE_ENV !== "staging"
+          ? "http://files:5002/"
+          : "http://files:6002/",
       changeOrigin: true,
     })
   );
@@ -70,7 +92,10 @@ const main = async () => {
     "/public/grants",
     isAuthMiddleware,
     createProxyMiddleware({
-      target: "http://files-staging:6002/",
+      target:
+        process.env.NODE_ENV !== "staging"
+          ? "http://files:5002/"
+          : "http://files:6002/",
       changeOrigin: true,
     })
   );
@@ -78,7 +103,10 @@ const main = async () => {
     "/public",
     cors(),
     createProxyMiddleware({
-      target: "http://files-staging:6002/",
+      target:
+        process.env.NODE_ENV !== "staging"
+          ? "http://files:5002/"
+          : "http://files:6002/",
       changeOrigin: true,
     })
   );
@@ -91,7 +119,11 @@ const main = async () => {
       new ApolloComplexityPlugin(100),
     ],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
-    persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
+    persistedQueries:
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging"
+        ? false
+        : undefined,
   });
 
   await server.start();

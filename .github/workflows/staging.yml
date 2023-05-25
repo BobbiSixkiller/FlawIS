@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, linux]
+    environment:
+      name: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,16 +35,13 @@ jobs:
           cp -R /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
 
       - name: Build and Deploy
-        env:
+         env:
           SECRET: ${{ secrets.SECRET }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ secrets.MAIL_FROM }}
-          CLIENT_APP_URL: ${{ secrets.CLIENT_APP_URL }}
+          MAIL_FROM: ${{ env.MAIL_FROM }}
+          BACKEND_URL: ${{ env.BACKEND_URL }}
         run: |
-          whoami
-          groups
-
           docker-compose -f docker-compose.staging.yml up -d --build

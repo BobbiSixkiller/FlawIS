@@ -6,6 +6,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: staging
       SECRET: ${SECRET}
       PORT: 6000
     depends_on:
@@ -22,6 +23,7 @@ services:
       context: ./users
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
       PORT: 6001
@@ -34,6 +36,7 @@ services:
       context: ./files
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
       PORT: 6002
@@ -48,7 +51,9 @@ services:
       context: ./conferences
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: staging
       SECRET: ${SECRET}
+      BACKEND_URL:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
       PORT: 6003
     restart: unless-stopped
@@ -60,6 +65,7 @@ services:
       context: ./grants
       dockerfile: Dockerfile
     environment:
+      NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
       PORT: 6004
@@ -74,10 +80,28 @@ services:
     depends_on:
       - gateway-staging
     environment:
-      PORT: 4000
+      NODE_ENV: production
+      BACKEND_URL: ${BACKEND_URL}
     restart: unless-stopped
     ports:
       - "4000:4000"
+
+  mail-staging:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: staging
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
 
 networks:
   flawis_default:

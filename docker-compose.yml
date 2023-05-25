@@ -6,7 +6,7 @@ services:
       target: development
     command: npm run dev
     environment:
-      SECRET: ${SECRET}
+      NODE_ENV: development
     depends_on:
       - users
       - conferences
@@ -26,6 +26,7 @@ services:
       target: development
     command: npm run dev
     environment:
+      NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${USERS_MONGODB_URI}
     depends_on:
@@ -46,6 +47,7 @@ services:
       target: development
     command: npm run dev
     environment:
+      NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${FILES_MONGODB_URI}
     depends_on:
@@ -65,6 +67,7 @@ services:
       target: development
     command: npm run dev
     environment:
+      NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${CONFERENCES_MONGODB_URI}
     depends_on:
@@ -85,6 +88,7 @@ services:
       target: development
     command: npm run dev
     environment:
+      NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${GRANTS_MONGODB_URI}
     depends_on:
@@ -103,6 +107,9 @@ services:
       context: ./client
       dockerfile: Dockerfile
       target: development
+    environment:
+      NODE_ENV: development
+      BACKEND: http://localhost:5000/graphql
     command: npm run dev
     depends_on:
       - gateway
@@ -119,6 +126,7 @@ services:
       dockerfile: Dockerfile
       target: development
     environment:
+      NODE_ENV: development
       SECRET: ${SECRET}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}

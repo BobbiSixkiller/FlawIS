@@ -63,7 +63,7 @@ export class FileResolver {
       type: filetype,
       user,
       url: `${
-        "https://flawis-backend-staging.flaw.uniba.sk/" + "public/" + url
+        process.env.BACKEND_URL || "http://localhost:5000" + "public/" + url
       }`,
     });
 
@@ -73,7 +73,8 @@ export class FileResolver {
         .on("finish", () =>
           resolve(
             `${
-              "https://flawis-backend-staging.flaw.uniba.sk/" + "public/" + url
+              process.env.BACKEND_URL ||
+              "http://localhost:5000" + "public/" + url
             }`
           )
         )
@@ -85,7 +86,7 @@ export class FileResolver {
   @Mutation(() => Boolean)
   async deleteFile(@Arg("url") url: string) {
     const path =
-      "." + url.split(process.env.BASE_URL || "http://localhost:6000")[1];
+      "." + url.split(process.env.BACKEND_URL || "http://localhost:5000")[1];
 
     return new Promise((resolve, reject) => {
       unlink(path, (error) => {

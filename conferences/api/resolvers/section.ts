@@ -83,7 +83,7 @@ export class SectionResolver {
     return deletedCount > 0;
   }
 
-  @Authorized(["ADMIN"])
+  // @Authorized(["ADMIN"])
   @FieldResolver(() => [Submission])
   async submissions(@Root() { id }: Section): Promise<Submission[]> {
     return await this.submissionService.findAll({ section: id });

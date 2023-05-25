@@ -2,7 +2,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-import { ConfigService } from '@nestjs/config';
 import { InvoiceMsg } from './templates/invoice';
 import { AuthorMsg } from './templates/author';
 
@@ -18,6 +17,7 @@ export interface Msg {
 }
 interface AuthMsg extends Msg {
   token: string;
+  clientUrl: string;
 }
 
 interface Grant {
@@ -28,6 +28,7 @@ interface Grant {
 interface GrantAnnouncementMsg extends Msg {
   announcement: string;
   grants: Grant[];
+  clientUrl: string;
 }
 
 @Injectable()
@@ -35,7 +36,6 @@ export class EmailService {
   constructor(
     private mailerService: MailerService,
     private i18n: I18nService,
-    private configService: ConfigService,
   ) {}
 
   private async createPDF(
@@ -80,9 +80,7 @@ export class EmailService {
   })
   async sendActivationLink(msg: AuthMsg) {
     try {
-      const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
-        msg.locale
-      }/activate?token=${msg.token}`;
+      const url = `${msg.clientUrl}/${msg.locale}/activate?token=${msg.token}`;
 
       await this.mailerService.sendMail({
         to: msg.email,
@@ -106,9 +104,7 @@ export class EmailService {
     routingKey: 'mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
-    const url = `${this.configService.get<string>('CLIENT_APP_URL')}/${
-      msg.locale
-    }/resetPassword?token=${msg.token}`;
+    const url = `${msg.clientUrl}/${msg.locale}/resetPassword?token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -131,9 +127,7 @@ export class EmailService {
   async sendGrantAnnouncement(msg: GrantAnnouncementMsg) {
     const urls = msg.grants.map((grant) => ({
       text: grant.name,
-      url: `${this.configService.get<string>('CLIENT_APP_URL')}/${msg.locale}/${
-        grant.id
-      }`,
+      url: `${msg.clientUrl}/${msg.locale}/${grant.id}`,
     }));
 
     await this.mailerService.sendMail({
@@ -192,7 +186,7 @@ export class EmailService {
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    const url = `https://conferences.flaw.uniba.sk/${msg.locale}/${msg.conferenceSlug}/register?submission=${msg.submissionId}`;
+    const url = `${msg.clientUrl}/${msg.locale}/${msg.conferenceSlug}/register?submission=${msg.submissionId}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
