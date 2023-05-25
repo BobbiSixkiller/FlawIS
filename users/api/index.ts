@@ -25,6 +25,17 @@ const port = process.env.PORT || 5001;
 const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/users";
 
+async function mongoDbConnect() {
+  try {
+    const mongoose = await connect(mongooseUri);
+    mongoose.set("strictQuery", false);
+    console.log(mongoose.connection && "Database connected!");
+  } catch (error) {
+    console.error("Error in MongoDb connection: " + error);
+    setTimeout(() => mongoDbConnect(), 15 * 1000);
+  }
+}
+
 async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
@@ -59,15 +70,15 @@ async function main() {
         : "sk",
     }),
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
-    persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
+    persistedQueries:
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging"
+        ? false
+        : undefined,
   });
 
-  // create mongoose connection
-  const mongoose = await connect(mongooseUri);
-  console.log(mongoose.connection && "Database connected!");
-
+  await mongoDbConnect();
   await Messagebroker.init();
-
   await initRedis();
 
   await server.listen({ port }, () =>

@@ -26,7 +26,7 @@ import { CheckTicket, LoadResource } from "../util/decorators";
 
 import env from "dotenv";
 import Messagebroker from "../util/rmq";
-import { localizeInput, localizeOutput } from "../util/locale";
+import { localizeInput } from "../util/locale";
 import {
   convertDocument,
   transformIds,
@@ -96,7 +96,7 @@ export class AttendeeResolver {
     @Arg("data")
     { conferenceId, billing, submission, submissionId }: AttendeeInput,
     @CheckTicket() { ticket, conference }: VerifiedTicket,
-    @Ctx() { user, locale }: Context
+    @Ctx() { user, locale, req }: Context
   ): Promise<Attendee> {
     const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
@@ -148,6 +148,7 @@ export class AttendeeResolver {
     Messagebroker.produceMessage(
       JSON.stringify({
         locale,
+        clientUrl: req.hostname,
         name: user?.name,
         email: user?.email,
         conferenceName: conference.name,
