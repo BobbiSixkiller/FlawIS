@@ -50,7 +50,6 @@ export class Section extends TimeStamps {
   @Property({ type: () => String })
   languages: string[];
 
-  @Authorized(["ADMIN"])
   @Field(() => [Submission])
   submissions: Submission[];
 
