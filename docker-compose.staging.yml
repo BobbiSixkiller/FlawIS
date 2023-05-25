@@ -99,8 +99,6 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
       CLIENT_APP_URL: ${CLIENT_APP_URL}
-    depends_on:
-      - rabbitmq
     restart: unless-stopped
 
 networks:
