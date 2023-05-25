@@ -61,7 +61,11 @@ async function main() {
     }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
-    persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
+    persistedQueries:
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging"
+        ? false
+        : undefined,
   });
 
   await mongoDbConnect();
