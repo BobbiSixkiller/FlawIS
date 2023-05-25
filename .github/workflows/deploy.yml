@@ -21,5 +21,7 @@ jobs:
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM: ${{ env.MAIL_FROM }}
+          BACKEND_URL: ${{ env.BACKEND_URL }}
         run: |
           docker-compose -f docker-compose.prod.yml up -d --build
