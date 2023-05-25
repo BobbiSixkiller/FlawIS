@@ -26,6 +26,17 @@ const port = process.env.PORT || 5004;
 const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/grants";
 
+async function mongoDbConnect() {
+  try {
+    const mongoose = await connect(mongooseUri);
+    mongoose.set("strictQuery", false);
+    console.log(mongoose.connection && "Database connected!");
+  } catch (error) {
+    console.error("Error in MongoDb connection: " + error);
+    setTimeout(() => mongoDbConnect(), 15 * 1000);
+  }
+}
+
 async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
@@ -68,10 +79,7 @@ async function main() {
     persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
   });
 
-  // create mongoose connection
-  const mongoose = await connect(mongooseUri);
-  console.log(mongoose.connection && "Database connected!");
-
+  await mongoDbConnect();
   await MessageBroker.init();
 
   // await initRedis();

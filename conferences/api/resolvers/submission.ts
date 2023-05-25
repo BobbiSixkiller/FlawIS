@@ -67,7 +67,7 @@ export class SubmissionResolver {
     @Arg("data") data: SubmissionInput,
     @LoadResource(Submission) submission: DocumentType<Submission>,
     @CheckConferenceSection() { conference }: ConferenceSection,
-    @Ctx() { locale, user }: Context
+    @Ctx() { locale, user, req }: Context
   ) {
     for (const [key, value] of Object.entries(
       localizeInput(data, data.translations, locale)
@@ -83,6 +83,7 @@ export class SubmissionResolver {
       Messagebroker.produceMessage(
         JSON.stringify({
           locale,
+          clientUrl: req.hostname,
           name: user?.name,
           email: author,
           conferenceName: conference.name,

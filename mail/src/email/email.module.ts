@@ -5,7 +5,6 @@ import { I18nModule, I18nService } from 'nestjs-i18n';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { EmailService } from './email.service';
-import { CustomResolver } from './custom.resolver';
 
 @Module({
   imports: [
@@ -19,7 +18,7 @@ import { CustomResolver } from './custom.resolver';
           },
         };
       },
-      resolvers: [new CustomResolver(['en', 'sk'])],
+      resolvers: [],
     }),
     MailerModule.forRootAsync({
       useFactory(config: ConfigService, i18n: I18nService) {
@@ -34,7 +33,6 @@ import { CustomResolver } from './custom.resolver';
               t: i18n.hbsHelper,
               SUM: (a, b) => a + b,
               DATE: (date, locale) => {
-                console.log(locale);
                 return new Date(date).toLocaleDateString(locale as string);
               },
             }),

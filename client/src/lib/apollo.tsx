@@ -55,7 +55,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
         uri:
           typeof window === "undefined"
             ? "http://gateway:5000/graphql"
-            : "https://flawis-backend.flaw.uniba.sk/graphql",
+            : process.env.BACKEND_URI,
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",

@@ -22,6 +22,17 @@ const port = process.env.PORT || 5002;
 const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/files";
 
+async function mongoDbConnect() {
+  try {
+    const mongoose = await connect(mongooseUri);
+    mongoose.set("strictQuery", false);
+    console.log(mongoose.connection && "Database connected!");
+  } catch (error) {
+    console.error("Error in MongoDb connection: " + error);
+    setTimeout(() => mongoDbConnect(), 15 * 1000);
+  }
+}
+
 async function main() {
   //Build schema
   const schema = await buildFederatedSchema({
@@ -53,10 +64,8 @@ async function main() {
     persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
   });
 
+  await mongoDbConnect();
   await Messagebroker.init();
-  const mongoose = await connect(mongooseUri);
-  mongoose.set("strictQuery", false);
-  console.log(mongoose.connection && "Database connected!");
 
   await server.start();
 

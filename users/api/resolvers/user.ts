@@ -126,7 +126,7 @@ export class UserResolver {
   @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { res, locale }: Context //produceMessage for email service and define coresponding routing keys
+    @Ctx() { req, res, locale }: Context //produceMessage for email service and define coresponding routing keys
   ) {
     const user = await this.userService.create(registerInput);
 
@@ -142,6 +142,7 @@ export class UserResolver {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
+        clientUrl: req.hostname,
         name: user.name,
         email: user.email,
         token: signJwt({ id: user.id }, { expiresIn: "1d" }),
@@ -155,10 +156,11 @@ export class UserResolver {
   @Authorized()
   @UseMiddleware([RateLimit(50)])
   @Mutation(() => Boolean)
-  resendActivationLink(@Ctx() { locale, user }: Context) {
+  resendActivationLink(@Ctx() { req, locale, user }: Context) {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
+        clientUrl: req.hostname,
         name: user?.name,
         email: user?.email,
         token: signJwt({ id: user?.id }, { expiresIn: "1d" }),
@@ -229,7 +231,7 @@ export class UserResolver {
   @UseMiddleware([RateLimit(50)])
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { locale }: Context
+    @Ctx() { locale, req }: Context
   ) {
     const user = await this.userService.findOne({ email });
     if (!user) throw new Error("No user with provided email address found!");
@@ -237,7 +239,13 @@ export class UserResolver {
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
     messageBroker.produceMessage(
-      JSON.stringify({ locale, email: user.email, name: user.name, token }),
+      JSON.stringify({
+        locale,
+        clientUrl: req.hostname,
+        email: user.email,
+        name: user.name,
+        token,
+      }),
       "mail.reset"
     );
 

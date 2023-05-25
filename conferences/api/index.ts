@@ -26,61 +26,69 @@ env.config();
 
 const port = process.env.PORT || 5003;
 const mongooseUri =
-	process.env.MONGODB_URI || "mongodb://localhost:27017/conferences";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/conferences";
+
+async function mongoDbConnect() {
+  try {
+    const mongoose = await connect(mongooseUri);
+    mongoose.set("strictQuery", false);
+    console.log(mongoose.connection && "Database connected!");
+  } catch (error) {
+    console.error("Error in MongoDb connection: " + error);
+    setTimeout(() => mongoDbConnect(), 15 * 1000);
+  }
+}
 
 async function main() {
-	//Build schema
-	const schema = await buildFederatedSchema(
-		{
-			resolvers: [
-				ConferenceResolver,
-				SectionResolver,
-				SubmissionResolver,
-				AttendeeResolver,
-			],
-			// use document converting middleware
-			globalMiddlewares: [TypegooseMiddleware],
-			// use ObjectId scalar mapping
-			scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-			emitSchemaFile: true,
-			container: Container,
-			//disabled validation for dev purposes
-			//validate: false,
-			authChecker,
-		},
-		{
-			User: { __resolveReference: resolveUserReference },
-		}
-	);
+  //Build schema
+  const schema = await buildFederatedSchema(
+    {
+      resolvers: [
+        ConferenceResolver,
+        SectionResolver,
+        SubmissionResolver,
+        AttendeeResolver,
+      ],
+      // use document converting middleware
+      globalMiddlewares: [TypegooseMiddleware],
+      // use ObjectId scalar mapping
+      scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+      emitSchemaFile: true,
+      container: Container,
+      //disabled validation for dev purposes
+      //validate: false,
+      authChecker,
+    },
+    {
+      User: { __resolveReference: resolveUserReference },
+    }
+  );
 
-	//Create Apollo server
-	const server = new ApolloServer({
-		schema,
-		context: ({ req, res }: Context) => ({
-			req,
-			res,
-			user: req.headers.user
-				? JSON.parse(decodeURIComponent(req.headers.user as string))
-				: null,
-			locale: req.headers.locale
-				? JSON.parse(decodeURIComponent(req.headers.locale as string))
-				: "sk",
-		}),
-		csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
-		persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
-	});
+  //Create Apollo server
+  const server = new ApolloServer({
+    schema,
+    context: ({ req, res }: Context) => ({
+      req,
+      res,
+      user: req.headers.user
+        ? JSON.parse(decodeURIComponent(req.headers.user as string))
+        : null,
+      locale: req.headers.locale
+        ? JSON.parse(decodeURIComponent(req.headers.locale as string))
+        : "sk",
+    }),
+    csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
+    persistedQueries: process.env.NODE_ENV === "production" ? false : undefined,
+  });
 
-	// create mongoose connection
-	const mongoose = await connect(mongooseUri);
-	console.log(mongoose.connection && "Database connected!");
+  await mongoDbConnect();
+  await MessageBroker.init();
 
-	await MessageBroker.init();
-
-	await server.listen({ port }, () =>
-		console.log(
-			`🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
-		)
-	);
+  await server.listen({ port }, () =>
+    console.log(
+      `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
+    )
+  );
 }
 
 main().catch(console.error);
