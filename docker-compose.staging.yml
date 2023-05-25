@@ -53,6 +53,7 @@ services:
     environment:
       NODE_ENV: staging
       SECRET: ${SECRET}
+      BACKEND_URL:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
       PORT: 6003
     restart: unless-stopped
@@ -80,7 +81,7 @@ services:
       - gateway-staging
     environment:
       NODE_ENV: production
-      BACKEND: ${BACKEND}
+      BACKEND_URL: ${BACKEND_URL}
     restart: unless-stopped
     ports:
       - "4000:4000"

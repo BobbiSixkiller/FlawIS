@@ -39,6 +39,7 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
+      BACKEND_URL: ${BACKEND_URL}
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
     depends_on:
@@ -88,7 +89,7 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
-      BACKEND: ${BACKEND}
+      BACKEND_URL: ${BACKEND_URL}
     depends_on:
       - gateway
     restart: unless-stopped
