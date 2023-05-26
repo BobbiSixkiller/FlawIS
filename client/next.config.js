@@ -25,7 +25,7 @@ const nextConfig = {
       "flawis-backend-staging.flaw.uniba.sk",
     ],
   },
-  env: { BACKEND_URL: process.env.BACKEND_URL },
+  env: { NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL },
 };
 
 module.exports = nextConfig;
