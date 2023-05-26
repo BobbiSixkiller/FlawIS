@@ -6,8 +6,7 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, linux]
-    environment:
-      name: production
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
