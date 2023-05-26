@@ -17,6 +17,8 @@ FROM node:16-alpine AS production
 
 WORKDIR /usr/app
 
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+
 COPY package*.json ./
 
 RUN npm install --only=production
