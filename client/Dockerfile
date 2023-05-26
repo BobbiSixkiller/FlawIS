@@ -17,6 +17,7 @@ FROM node:16-alpine AS production
 
 WORKDIR /usr/app
 
+ARG NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 COPY package*.json ./
