@@ -30,8 +30,6 @@ const ForgotPassword: NextPage = () => {
   const { forgotPasswordInputSchema } = Validation();
   type Values = InferType<typeof forgotPasswordInputSchema>;
 
-  console.log(error);
-
   return (
     <Grid container centered>
       <Grid.Row>
