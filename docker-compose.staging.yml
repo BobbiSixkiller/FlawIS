@@ -80,7 +80,6 @@ services:
     depends_on:
       - gateway-staging
     environment:
-      NODE_ENV: staging
       BACKEND_URL: ${BACKEND_URL}
     restart: unless-stopped
     ports:
@@ -98,7 +97,6 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
-      CLIENT_APP_URL: ${CLIENT_APP_URL}
     restart: unless-stopped
 
 networks:

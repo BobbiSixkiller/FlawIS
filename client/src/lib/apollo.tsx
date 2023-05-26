@@ -16,12 +16,11 @@ import { useMemo } from "react";
 
 const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
-const BACKEND_SERVICE_NAME =
-  (process.env.NODE_ENV as string) !== "staging"
-    ? "http://gateway:5000/graphql"
-    : "http://gateway-staging:6000/graphql";
-
-console.log(process.env.BACKEND_URL, process.env.NODE_ENV);
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/graphql";
+const BACKEND_SERVICE_NAME = BACKEND_URL.includes("staging")
+  ? "http://gateway-staging:6000/graphql"
+  : "http://gateway:5000/graphql";
+console.log(BACKEND_URL, BACKEND_SERVICE_NAME);
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
@@ -59,10 +58,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
       }),
       // this uses apollo-link-http under the hood, so all the options here come from that package
       createUploadLink({
-        uri:
-          typeof window === "undefined"
-            ? "http://gateway:5000/graphql"
-            : process.env.BACKEND_URL,
+        uri: typeof window === "undefined" ? BACKEND_SERVICE_NAME : BACKEND_URL,
         // Make sure that CORS and cookies work
         fetchOptions: {
           mode: "cors",

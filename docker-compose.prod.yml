@@ -88,7 +88,6 @@ services:
       context: ./client
       dockerfile: Dockerfile
     environment:
-      NODE_ENV: production
       BACKEND_URL: ${BACKEND_URL}
     depends_on:
       - gateway
@@ -108,7 +107,6 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
-      CLIENT_APP_URL: ${CLIENT_APP_URL}
     depends_on:
       - rabbitmq
     restart: unless-stopped
