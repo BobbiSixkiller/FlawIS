@@ -109,7 +109,7 @@ services:
       target: development
     environment:
       NODE_ENV: development
-      BACKEND: http://localhost:5000/graphql
+      BACKEND_URL: http://localhost:5000/graphql
     command: npm run dev
     depends_on:
       - gateway
