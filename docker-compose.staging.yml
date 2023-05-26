@@ -87,7 +87,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    command: npm run start -p 4000
+    command: npm run start-staging
     depends_on:
       - gateway-staging
     environment:

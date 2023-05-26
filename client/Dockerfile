@@ -25,4 +25,4 @@ COPY . .
 
 COPY --from=development /usr/app/.next ./.next
 
-CMD ["npm", "run", "start"]
+# CMD ["npm", "run", "start"]
