@@ -91,7 +91,7 @@ services:
     depends_on:
       - gateway-staging
     environment:
-      BACKEND_URL: ${BACKEND_URL}
+      NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL}
       PORT: 4000
     restart: unless-stopped
     # networks:
