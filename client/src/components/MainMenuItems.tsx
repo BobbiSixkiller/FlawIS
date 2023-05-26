@@ -316,5 +316,12 @@ export default function MainMenuItems() {
     return <ConferencesMenuItems />;
   }
 
-  return <FlawisMenuItems />;
+  if (
+    window.location.hostname === "flawis.flaw.uniba.sk" ||
+    window.location.hostname === "flawis-staging.flaw.uniba.sk"
+  ) {
+    return <FlawisMenuItems />;
+  }
+
+  return <ConferencesMenuItems />;
 }

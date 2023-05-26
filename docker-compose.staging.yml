@@ -80,7 +80,7 @@ services:
     depends_on:
       - gateway-staging
     environment:
-      NODE_ENV: production
+      NODE_ENV: staging
       BACKEND_URL: ${BACKEND_URL}
     restart: unless-stopped
     ports:
