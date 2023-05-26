@@ -25,6 +25,8 @@ const BACKEND_URL =
 const BACKEND_SERVICE_NAME = BACKEND_URL.includes("staging")
   ? "http://gateway-staging:6000/graphql"
   : "http://gateway:5000/graphql";
+console.log("HAJZLE" + process.env.NEXT_PUBLIC_BACKEND_URL);
+
 console.log(BACKEND_URL, BACKEND_SERVICE_NAME);
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
