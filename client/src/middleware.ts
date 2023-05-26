@@ -26,6 +26,14 @@ export default function middleware(req: NextRequest) {
       url.pathname = `/flawis${url.pathname}`;
       return NextResponse.rewrite(url);
 
+    case "conferences-staging.flaw.uniba.sk":
+      url.pathname = `/conferences${url.pathname}`;
+      return NextResponse.rewrite(url);
+
+    case "flawis-staging.flaw.uniba.sk":
+      url.pathname = `/flawis${url.pathname}`;
+      return NextResponse.rewrite(url);
+
     case "localhost:3000":
       url.pathname = `/conferences${url.pathname}`;
       return NextResponse.rewrite(url);
