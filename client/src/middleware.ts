@@ -18,11 +18,11 @@ export default function middleware(req: NextRequest) {
   }
 
   switch (hostname) {
-    case "conferences-staging.flaw.uniba.sk":
+    case "conferences.flaw.uniba.sk":
       url.pathname = `/conferences${url.pathname}`;
       return NextResponse.rewrite(url);
 
-    case "flawis-staging.flaw.uniba.sk":
+    case "flawis.flaw.uniba.sk":
       url.pathname = `/flawis${url.pathname}`;
       return NextResponse.rewrite(url);
 
