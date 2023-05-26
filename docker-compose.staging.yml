@@ -87,10 +87,12 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    command: npm run start -p 4000
     depends_on:
       - gateway-staging
     environment:
       BACKEND_URL: ${BACKEND_URL}
+      PORT: 4000
     restart: unless-stopped
     # networks:
     #   - flawis_default
