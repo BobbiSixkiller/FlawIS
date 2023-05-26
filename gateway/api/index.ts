@@ -21,33 +21,47 @@ import env from "dotenv";
 env.config();
 
 const port = process.env.PORT || 5000;
-const services = [
-  { name: "users", url: "http://users:5001/graphql" },
-  { name: "files", url: "http://files:5002/graphql" },
-  {
-    name: "conferences",
-    url: "http://conferences:5003/graphql",
-  },
-  { name: "grants", url: "http://grants:5004/graphql" },
-];
-
-const stagingServices = [
-  { name: "users-staging", url: "http://users-staging:6001/graphql" },
-  { name: "files-staging", url: "http://files-staging:6002/graphql" },
-  {
-    name: "conferences",
-    url: "http://conferences:5003/graphql",
-  },
-  { name: "grants", url: "http://grants:5004/graphql" },
-];
+const services =
+  process.env.NODE_ENV !== "staging"
+    ? [
+        { name: "users", url: "http://users:5001/graphql" },
+        { name: "files", url: "http://files:5002/graphql" },
+        {
+          name: "conferences",
+          url: "http://conferences:5003/graphql",
+        },
+        { name: "grants", url: "http://grants:5004/graphql" },
+      ]
+    : [
+        { name: "users-staging", url: "http://users-staging:6001/graphql" },
+        { name: "files-staging", url: "http://files-staging:6002/graphql" },
+        {
+          name: "conferences",
+          url: "http://conferences:5003/graphql",
+        },
+        { name: "grants", url: "http://grants:5004/graphql" },
+      ];
+const origins =
+  process.env.NODE_ENV !== "staging"
+    ? [
+        `https://flawis.flaw.uniba.sk`,
+        `https://conferences.flaw.uniba.sk`,
+        `http://client:3000`,
+        `http://localhost:3000`,
+      ]
+    : [
+        `https://flawis-staging.flaw.uniba.sk`,
+        `https://conferences-staging.flaw.uniba.sk`,
+        `http://client-staging:4000`,
+        `http://localhost-staging:4000`,
+      ];
 
 const main = async () => {
   await waitForServices(services);
 
   const gateway = new ApolloGateway({
     supergraphSdl: new IntrospectAndCompose({
-      subgraphs:
-        process.env.NODE_ENV !== "staging" ? services : stagingServices,
+      subgraphs: services,
     }),
     buildService({ url }) {
       return new AuthenticatedDataSource({ url });
@@ -59,20 +73,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin:
-        process.env.NODE_ENV !== "staging"
-          ? [
-              `https://flawis.flaw.uniba.sk`,
-              `https://conferences.flaw.uniba.sk`,
-              `http://client:3000`,
-              `http://localhost:3000`,
-            ]
-          : [
-              `https://flawis-staging.flaw.uniba.sk`,
-              `https://conferences-staging.flaw.uniba.sk`,
-              `http://client-staging:4000`,
-              `http://localhost-staging:4000`,
-            ],
+      origin: origins,
     })
   );
   app.use(cookieParser());
