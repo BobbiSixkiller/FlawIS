@@ -89,8 +89,6 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_URL=https://flawis-backend-staging.flaw.uniba.sk/graphql
-    environment:
-      - BACKEND_URL: ${BACKEND_URL}
     command: npm run start-staging
     depends_on:
       - gateway-staging
