@@ -20,7 +20,8 @@ const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 // const { publicRuntimeConfig: config } = getConfig();
 // console.log("config:", JSON.stringify(config));
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000/graphql";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/graphql";
 const BACKEND_SERVICE_NAME = BACKEND_URL.includes("staging")
   ? "http://gateway-staging:6000/graphql"
   : "http://gateway:5000/graphql";
