@@ -21,7 +21,7 @@ const nextConfig = {
     ],
   },
   publicRuntimeConfig: {
-    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+    BACKEND_URL: process.env.BACKEND_URL,
   },
 };
 
