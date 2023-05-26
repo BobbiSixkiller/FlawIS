@@ -18,6 +18,11 @@ const nextConfig = {
       "conferences.flaw.uniba.sk",
       "flawis.flaw.uniba.sk",
       "flawis-backend.flaw.uniba.sk",
+      "client-staging",
+      "gateway-staging",
+      "conferences-staging.flaw.uniba.sk",
+      "flawis-staging.flaw.uniba.sk",
+      "flawis-backend-staging.flaw.uniba.sk",
     ],
   },
   publicRuntimeConfig: {
