@@ -92,7 +92,6 @@ services:
       - gateway-staging
     environment:
       NEXT_PUBLIC_BACKEND_URL: ${BACKEND_URL}
-      PORT: 4000
     restart: unless-stopped
     # networks:
     #   - flawis_default
