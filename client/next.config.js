@@ -20,7 +20,7 @@ const nextConfig = {
       "flawis-backend.flaw.uniba.sk",
     ],
   },
-  env: {
+  publicRuntimeConfig: {
     BACKEND_URL: process.env.BACKEND_URL,
   },
 };
