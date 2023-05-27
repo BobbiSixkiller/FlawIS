@@ -15,8 +15,6 @@ services:
       - files-staging
       - grants-staging
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6000:6000"
 
@@ -30,8 +28,6 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
       PORT: 6001
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6001:6001"
 
@@ -47,8 +43,6 @@ services:
     volumes:
       - /home/weby/Desktop/FlawIS-staging-files:/usr/app/public
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6002:6002"
 
@@ -63,8 +57,6 @@ services:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
       PORT: 6003
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6003:6003"
 
@@ -78,8 +70,6 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
       PORT: 6004
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6004:6004"
 
@@ -93,8 +83,6 @@ services:
     depends_on:
       - gateway-staging
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "4000:4000"
 
@@ -111,8 +99,6 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
 
 networks:
   flawis_default:
