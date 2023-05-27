@@ -4,11 +4,11 @@ FROM node:16-alpine AS development
 # Create app directory
 WORKDIR /usr/app
 
-# Install app dependencies
-COPY package*.json ./
-
 ARG NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+
+# Install app dependencies
+COPY package*.json ./
 
 RUN npm ci --silent --no-fund --no-audit
 
@@ -21,9 +21,6 @@ FROM node:16-alpine AS production
 WORKDIR /usr/app
 
 COPY package*.json ./
-
-# ARG NEXT_PUBLIC_BACKEND_URL
-# ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 RUN npm install --only=production
 
