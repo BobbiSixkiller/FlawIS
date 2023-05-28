@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
         return {
           exchanges: [
             {
-              name: 'FlawIS',
+              name: config.get<string>('rmqExchange'),
               type: 'topic',
               options: { durable: false },
             },
