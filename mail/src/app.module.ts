@@ -16,6 +16,8 @@ import * as Joi from 'joi';
         MAIL_FROM: Joi.string().required(),
         MAIL_USER: Joi.string().required(),
         MAIL_PASSWORD: Joi.string().required(),
+        RMQ_URI: Joi.string(),
+        RMQ_EXCHANGE: Joi.string(),
       }),
     }),
     RmqModule,

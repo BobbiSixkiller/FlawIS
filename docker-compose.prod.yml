@@ -87,9 +87,9 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-prod
-    environment:
-      BACKEND_URL: ${BACKEND_URL}
     depends_on:
       - gateway
     restart: unless-stopped
@@ -108,6 +108,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       - rabbitmq
     restart: unless-stopped

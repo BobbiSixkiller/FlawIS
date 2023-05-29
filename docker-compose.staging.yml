@@ -78,7 +78,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_BACKEND_URL=https://flawis-backend-staging.flaw.uniba.sk/graphql
+        - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-staging
     depends_on:
       - gateway-staging
@@ -98,6 +98,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     restart: unless-stopped
 
 networks:

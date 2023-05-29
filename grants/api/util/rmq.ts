@@ -12,6 +12,9 @@ type RoutingKey =
   | "file.delete"
   | "mail.grantAnnouncemenet";
 
+const uri = process.env.RMQ_URI || "amqp://rabbitmq:5672";
+const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
+
 class Messagebroker {
   private static connection?: Connection;
   private static channel: Channel;
@@ -19,9 +22,7 @@ class Messagebroker {
   private static async createConnection() {
     try {
       if (!this.connection) {
-        this.connection = await client.connect(
-          process.env.RABBITMQ_URI || "amqp://rabbitmq:5672"
-        );
+        this.connection = await client.connect(uri);
       }
 
       this.connection.on("error", (err) => {
@@ -47,7 +48,7 @@ class Messagebroker {
   private static async createChannel() {
     if (!this.channel && this.connection) {
       this.channel = await this.connection.createChannel();
-      await this.channel.assertExchange("FlawIS", "topic", { durable: false });
+      await this.channel.assertExchange(exchange, "topic", { durable: false });
     }
     return this.channel;
   }
@@ -74,7 +75,7 @@ class Messagebroker {
     const q = await this.channel.assertQueue("", { durable: true });
     console.log(" [*] Receiving messages with keys:", keys.toString());
 
-    keys.forEach((key) => this.channel.bindQueue(q.queue, "FlawIS", key));
+    keys.forEach((key) => this.channel.bindQueue(q.queue, exchange, key));
 
     this.channel.consume(
       q.queue,
@@ -89,7 +90,7 @@ class Messagebroker {
   }
 
   static produceMessage(msg: string, key: RoutingKey) {
-    this.channel.publish("FlawIS", key, Buffer.from(msg), { persistent: true });
+    this.channel.publish(exchange, key, Buffer.from(msg), { persistent: true });
   }
 
   private static async triggerMsgResponse(msg: Message) {
