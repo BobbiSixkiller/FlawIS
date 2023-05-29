@@ -165,7 +165,7 @@ export default function InvoiceDownload({
                   </Text>
                 </View>
                 <View style={{ flexDirection: "row", gap: "5px" }}>
-                  <Text style={{ width: "50%" }}>{t("dueDate.dueDate")}</Text>
+                  <Text style={{ width: "50%" }}>{t("invoice.dueDate")}</Text>
                   <Text style={{ width: "50%" }}>
                     {new Date(data.body.dueDate).toLocaleDateString()}
                   </Text>
