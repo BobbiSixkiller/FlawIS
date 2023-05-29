@@ -36,9 +36,9 @@ const invoiceInputSchema = object({
       postal: string().trim().required(),
       country: string().trim().required(),
     }).required(),
-    ICO: string().trim().required(),
-    DIC: string().trim().required(),
-    ICDPH: string().trim().required(),
+    ICO: string().trim(),
+    DIC: string().trim(),
+    ICDPH: string().trim(),
   }).required(),
   body: object({
     body: string().trim().required(),
