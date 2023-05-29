@@ -13,7 +13,7 @@ type RoutingKey =
   | "mail.registration"
   | "mail.reset";
 
-const uri = process.env.RABBITMQ_URI || "amqp://rabbitmq:5672";
+const uri = process.env.RMQ_URI || "amqp://rabbitmq:5672";
 const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
 
 class Messagebroker {

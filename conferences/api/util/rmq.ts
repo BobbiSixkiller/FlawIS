@@ -6,7 +6,7 @@ import { User } from "../entities/User";
 
 env.config();
 
-const uri = process.env.RABBITMQ_URI || "amqp://rabbitmq:5672";
+const uri = process.env.RMQ_URI || "amqp://rabbitmq:5672";
 const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
 
 type RoutingKey =

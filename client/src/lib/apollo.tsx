@@ -16,18 +16,11 @@ import { useMemo } from "react";
 
 const APOLLO_STATE_PROP_NAME = "__APOLLO_STATE__";
 
-// import getConfig from "next/config";
-// const { publicRuntimeConfig: config } = getConfig();
-// console.log("config:", JSON.stringify(config));
-
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/graphql";
 const BACKEND_SERVICE_NAME = BACKEND_URL.includes("staging")
   ? "http://gateway-staging:6000/graphql"
   : "http://gateway:5000/graphql";
-console.log("HAJZLE" + process.env.NEXT_PUBLIC_BACKEND_URL);
-
-console.log(BACKEND_URL, BACKEND_SERVICE_NAME);
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 

@@ -1,139 +1,141 @@
-  version: "3.4"
+version: "3.4"
 
-  services:
-    gateway:
-      build:
-        context: ./gateway
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        SECRET: ${SECRET}
-      depends_on:
-        - users
-        - conferences
-        - files
-        - grants
-      restart: unless-stopped
-      ports:
-        - "5000:5000"
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+    depends_on:
+      - users
+      - conferences
+      - files
+      - grants
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
 
-    users:
-      build:
-        context: ./users
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        SECRET: ${SECRET}
-        MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
-      depends_on:
-        - rabbitmq
-        - mongo
-        - redis
-      restart: unless-stopped
-      ports:
-        - "5001:5001"
+  users:
+    build:
+      context: ./users
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
+    depends_on:
+      - rabbitmq
+      - mongo
+      - redis
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
 
-    files:
-      build:
-        context: ./files
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        BACKEND_URL: ${BACKEND_URL}
-        SECRET: ${SECRET}
-        MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
-      depends_on:
-        - rabbitmq
-        - mongo
-        - redis
-      volumes:
-        - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
-      restart: unless-stopped
-      ports:
-        - "5002:5002"
+  files:
+    build:
+      context: ./files
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: ${BACKEND_URL}
+      SECRET: ${SECRET}
+      MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
+    depends_on:
+      - rabbitmq
+      - mongo
+      - redis
+    volumes:
+      - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
 
-    conferences:
-      build:
-        context: ./conferences
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        SECRET: ${SECRET}
-        MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
-      depends_on:
-        - rabbitmq
-        - mongo
-        - redis
-      restart: unless-stopped
-      ports:
-        - "5003:5003"
+  conferences:
+    build:
+      context: ./conferences
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
+    depends_on:
+      - rabbitmq
+      - mongo
+      - redis
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
 
-    grants:
-      build:
-        context: ./grants
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        SECRET: ${SECRET}
-        MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
-      depends_on:
-        - rabbitmq
-        - mongo
-      restart: unless-stopped
-      ports:
-        - "5004:5004"
+  grants:
+    build:
+      context: ./grants
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
+    depends_on:
+      - rabbitmq
+      - mongo
+    restart: unless-stopped
+    ports:
+      - "5004:5004"
 
-    client:
-      build:
-        context: ./client
-        dockerfile: Dockerfile
-        args:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
-      command: npm run start-prod
-      depends_on:
-        - gateway
-      restart: unless-stopped
-      ports:
-        - "3000:3000"
+    command: npm run start-prod
+    depends_on:
+      - gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
 
-    mail:
-      build:
-        context: ./mail
-        dockerfile: Dockerfile
-      environment:
-        NODE_ENV: production
-        SECRET: ${SECRET}
-        MAIL_HOST: ${MAIL_HOST}
-        MAIL_PORT: ${MAIL_PORT}
-        MAIL_USER: ${MAIL_USER}
-        MAIL_PASSWORD: ${MAIL_PASSWORD}
-        MAIL_FROM: ${MAIL_FROM}
-      depends_on:
-        - rabbitmq
-      restart: unless-stopped
+  mail:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
 
-    rabbitmq:
-      image: rabbitmq
-      restart: unless-stopped
-      ports:
-        - "5672:5672"
+  rabbitmq:
+    image: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
 
-    redis:
-      image: redis
-      restart: unless-stopped
-      ports:
-        - "6379:6379"
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
-    mongo:
-      image: mongo
-      restart: unless-stopped
-      ports:
-        - "27017:27017"
-      volumes:
-        - mongo_data:/data/db
-        - mongo_config:/data/configdb
-      entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
 
-  volumes:
-    mongo_data: {}
-    mongo_config: {}
+volumes:
+  mongo_data: {}
+  mongo_config: {}

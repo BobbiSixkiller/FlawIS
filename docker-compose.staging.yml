@@ -98,6 +98,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     restart: unless-stopped
 
 networks:
