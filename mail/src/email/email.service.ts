@@ -75,7 +75,7 @@ export class EmailService {
   }
 
   @RabbitSubscribe({
-    exchange: 'FlawIS',
+    exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.registration',
   })
   async sendActivationLink(msg: AuthMsg) {
@@ -100,7 +100,7 @@ export class EmailService {
   }
 
   @RabbitSubscribe({
-    exchange: 'FlawIS',
+    exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
@@ -121,7 +121,7 @@ export class EmailService {
   }
 
   @RabbitSubscribe({
-    exchange: 'FlawIS',
+    exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.grantAnnouncemenet',
   })
   async sendGrantAnnouncement(msg: GrantAnnouncementMsg) {
@@ -146,7 +146,7 @@ export class EmailService {
   }
 
   @RabbitSubscribe({
-    exchange: 'FlawIS',
+    exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
@@ -182,7 +182,7 @@ export class EmailService {
   }
 
   @RabbitSubscribe({
-    exchange: 'FlawIS',
+    exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {

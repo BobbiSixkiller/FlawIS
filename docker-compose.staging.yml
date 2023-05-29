@@ -15,8 +15,6 @@ services:
       - files-staging
       - grants-staging
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6000:6000"
 
@@ -28,10 +26,9 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6001
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6001:6001"
 
@@ -43,12 +40,11 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6002
     volumes:
       - /home/weby/Desktop/FlawIS-staging-files:/usr/app/public
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6002:6002"
 
@@ -61,10 +57,9 @@ services:
       SECRET: ${SECRET}
       BACKEND_URL:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6003
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6003:6003"
 
@@ -76,10 +71,9 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6004
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "6004:6004"
 
@@ -87,14 +81,12 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-prod
     depends_on:
       - gateway-staging
-    environment:
-      BACKEND_URL: ${BACKEND_URL}
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
     ports:
       - "4000:4000"
 
@@ -110,9 +102,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     restart: unless-stopped
-    # networks:
-    #   - flawis_default
 
 networks:
   flawis_default:

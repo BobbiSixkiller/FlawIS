@@ -29,6 +29,8 @@ services:
       NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${USERS_MONGODB_URI}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       - rabbitmq
       - mongo
@@ -50,6 +52,8 @@ services:
       NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${FILES_MONGODB_URI}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       - rabbitmq
       - mongo
@@ -70,6 +74,8 @@ services:
       NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${CONFERENCES_MONGODB_URI}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       - rabbitmq
       - mongo
@@ -91,6 +97,8 @@ services:
       NODE_ENV: development
       SECRET: ${SECRET}
       MONGODB_URI: ${GRANTS_MONGODB_URI}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       - rabbitmq
       - mongo
@@ -130,6 +138,8 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     command: npm run start:dev
     depends_on:
       - rabbitmq
