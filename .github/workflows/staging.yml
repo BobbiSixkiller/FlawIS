@@ -42,5 +42,6 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ vars.MAIL_FROM }}
           BACKEND_URL: ${{ vars.BACKEND_URL }}
+          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
         run: |
           docker-compose -f docker-compose.staging.yml up -d --build
