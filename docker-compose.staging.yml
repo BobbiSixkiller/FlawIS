@@ -26,6 +26,7 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6001
     restart: unless-stopped
     ports:
@@ -39,6 +40,7 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6002
     volumes:
       - /home/weby/Desktop/FlawIS-staging-files:/usr/app/public
@@ -55,6 +57,7 @@ services:
       SECRET: ${SECRET}
       BACKEND_URL:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6003
     restart: unless-stopped
     ports:
@@ -68,6 +71,7 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6004
     restart: unless-stopped
     ports:
@@ -98,7 +102,6 @@ services:
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
-      RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     restart: unless-stopped
 
