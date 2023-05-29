@@ -111,6 +111,7 @@ export default function UpdateInvoiceForm({
             />
             <InputField label="IČO" name="payer.ICO" control={Input} />
             <InputField label="IČDPH" name="payer.ICDPH" control={Input} />
+            <InputField label="DIČ" name="payer.DIC" control={Input} />
             <InputField
               label="Dátum vystavenia"
               name="body.issueDate"
