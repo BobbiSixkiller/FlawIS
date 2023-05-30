@@ -53,7 +53,8 @@ export default function SingleUploadProgress({
   }, []);
 
   function uploadFile(file: File, onProgress: (percentage: number) => void) {
-    const url = "https://flawis-backend.flaw.uniba.sk/graphql";
+    const url =
+      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/graphql";
 
     return new Promise<{
       errors?: FileError[];
