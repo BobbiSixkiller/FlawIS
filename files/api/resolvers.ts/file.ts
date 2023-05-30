@@ -63,18 +63,18 @@ export class FileResolver {
       type: filetype,
       user,
       url: `${
-        process.env.BACKEND_URL || "http://localhost:5000" + "public/" + url
+        process.env.BACKEND_URL || "http://localhost:5000" + "/public/" + url
       }`,
     });
 
     return new Promise(async (resolve, reject) =>
       createReadStream()
-        .pipe(createWriteStream(path.join(process.cwd(), "/public", url)))
+        .pipe(createWriteStream(path.join(process.cwd(), "/public/", url)))
         .on("finish", () =>
           resolve(
             `${
               process.env.BACKEND_URL ||
-              "http://localhost:5000" + "public/" + url
+              "http://localhost:5000" + "/public/" + url
             }`
           )
         )
@@ -87,6 +87,8 @@ export class FileResolver {
   async deleteFile(@Arg("url") url: string) {
     const path =
       "." + url.split(process.env.BACKEND_URL || "http://localhost:5000")[1];
+
+    await this.fileService.delete({ url });
 
     return new Promise((resolve, reject) => {
       unlink(path, (error) => {

@@ -231,8 +231,6 @@ export default class FileUploadDataSource extends RemoteGraphQLDataSource {
       await this.willSendRequest(args);
     }
 
-    // console.log(context["user"], context["locale"]);
-
     const headers = {
       // ...Object.fromEntries(request?.http?.headers || []),
 

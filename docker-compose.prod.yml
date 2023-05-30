@@ -40,8 +40,8 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
-      BACKEND_URL: ${BACKEND_URL}
       SECRET: ${SECRET}
+      BACKEND_URL: ${BACKEND_URL}
       MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
