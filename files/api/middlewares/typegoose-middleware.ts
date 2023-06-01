@@ -43,7 +43,7 @@ export function transformIds(doc: object) {
   return Object.fromEntries(transformed);
 }
 
-function convertDocument(doc: Document) {
+export function convertDocument(doc: Document) {
   const convertedDocument = transformIds(doc.toObject());
   const DocumentClass = getClass(doc)!;
   Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);

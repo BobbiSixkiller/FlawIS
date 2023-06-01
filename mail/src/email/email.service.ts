@@ -157,6 +157,10 @@ export class EmailService {
         conferenceLogo: msg.conferenceLogo,
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
+        stamp:
+          process.env.NODE_ENV === 'staging'
+            ? 'http://gateway-staging:6000' + msg.invoice.issuer.stamp.path
+            : 'http://gateway:5000' + msg.invoice.issuer.stamp.path,
       },
       'invoice.hbs',
     );

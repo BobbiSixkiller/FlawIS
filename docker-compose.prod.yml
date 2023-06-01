@@ -41,7 +41,6 @@ services:
     environment:
       NODE_ENV: production
       SECRET: ${SECRET}
-      BACKEND_URL: ${BACKEND_URL}
       MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
@@ -93,6 +92,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+        - NODE_ENV=production
     command: npm run start-prod
     depends_on:
       - gateway

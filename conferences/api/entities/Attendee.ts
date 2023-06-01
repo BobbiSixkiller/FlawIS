@@ -19,19 +19,19 @@ import { User } from "./User";
 class InvoiceData {
   @Field()
   @Property({ default: "Faktúra" })
-  type: String;
+  type?: String;
 
   @Field()
   @Property({ default: Date.now() })
-  issueDate: Date;
+  issueDate?: Date;
 
   @Field()
   @Property({ default: Date.now() })
-  vatDate: Date;
+  vatDate?: Date;
 
   @Field()
   @Property({ default: new Date().setDate(new Date().getDate() + 30) })
-  dueDate: Date;
+  dueDate?: Date;
 
   @Field(() => Float)
   @Property()

@@ -86,7 +86,7 @@ export default function AddAnnouncementDialog({
                       variables: { file, type: FileType.Grant },
                     });
                     if (data) {
-                      urls.push(data?.uploadFile);
+                      urls.push(data?.uploadFile.path);
                     }
                   }
                   console.log(urls);

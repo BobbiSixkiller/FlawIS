@@ -75,15 +75,24 @@ export default function AddConferenceDialog() {
                           start: values.dates.start,
                           end: values.dates.end,
                         },
-                        logoUrl: values.files[0].url,
+                        logo: {
+                          id: values.files[0].uploadedFile.id,
+                          path: values.files[0].uploadedFile.path,
+                        },
                         billing: {
                           ...values.billing,
-                          stampUrl: values.files[2].url,
+                          stamp: {
+                            id: values.files[2].uploadedFile.id,
+                            path: values.files[2].uploadedFile.path,
+                          },
                         },
                         translations: [
                           {
                             ...values.translations[0],
-                            logoUrl: values.files[1].url,
+                            logo: {
+                              id: values.files[1].uploadedFile.id,
+                              path: values.files[1].uploadedFile.path,
+                            },
                           },
                         ],
                       } as ConferenceInput,

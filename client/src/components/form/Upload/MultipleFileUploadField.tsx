@@ -3,7 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Accept, FileError, FileRejection, useDropzone } from "react-dropzone";
 import { Form, Label } from "semantic-ui-react";
 import styled from "styled-components";
-import { FileType } from "../../../graphql/generated/schema";
+import {
+  File as UploadedFile,
+  FileType,
+} from "../../../graphql/generated/schema";
 import SingleUploadProgress from "./SingleUploadProgress";
 
 interface ColorProps {
@@ -43,7 +46,7 @@ const Container = styled.div<ColorProps>`
 
 export interface UploadableFile {
   file: File;
-  url?: string;
+  uploadedFile?: Pick<UploadedFile, "id" | "name" | "path"> | undefined;
   errors: FileError[];
 }
 
@@ -66,7 +69,7 @@ export default function MultipleFileUploadField({
   const [files, setFiles] = useState<UploadableFile[]>(field.value);
 
   useEffect(() => {
-    helpers.setValue(files.filter((fw) => fw.url !== undefined));
+    helpers.setValue(files.filter((fw) => fw.uploadedFile !== undefined));
   }, [files]);
 
   const onDrop = useCallback(
@@ -93,11 +96,15 @@ export default function MultipleFileUploadField({
     setFiles((prev) => prev.filter((f) => f.file !== file));
   }
 
-  function onUpload(file: File, url: string, errors: FileError[]) {
+  function onUpload(
+    file: File,
+    uploadedFile: Pick<UploadedFile, "id" | "name" | "path"> | undefined,
+    errors: FileError[]
+  ) {
     setFiles((prev) =>
       prev.map((f) => {
         if (f.file === file) {
-          return { ...f, url, errors };
+          return { ...f, uploadedFile, errors };
         }
         return f;
       })
@@ -128,7 +135,7 @@ export default function MultipleFileUploadField({
           key={i}
           file={uploadableFile.file}
           fileType={filetype}
-          url={uploadableFile.url}
+          uploadedFile={uploadableFile.uploadedFile}
           errors={uploadableFile.errors}
           onDelete={onDelete}
           onUpload={onUpload}

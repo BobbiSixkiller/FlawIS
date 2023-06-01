@@ -3,6 +3,7 @@ import { FileError } from "react-dropzone";
 import { Button, Progress } from "semantic-ui-react";
 import styled from "styled-components";
 import {
+  File as UploadedFile,
   FileType,
   useDeleteFileMutation,
 } from "../../../graphql/generated/schema";
@@ -25,16 +26,20 @@ export interface SingleUploadProgressProps {
   file: File;
   fileType: FileType;
   errors: FileError[];
-  url?: string;
+  uploadedFile?: Pick<UploadedFile, "id" | "name" | "path"> | undefined;
   onDelete: (file: File) => void;
-  onUpload: (file: File, url: string, errors: FileError[]) => void;
+  onUpload: (
+    file: File,
+    uploadedFile: Pick<UploadedFile, "id" | "name" | "path"> | undefined,
+    errors: FileError[]
+  ) => void;
 }
 
 export default function SingleUploadProgress({
   file,
   fileType,
   errors,
-  url,
+  uploadedFile,
   onDelete,
   onUpload,
 }: SingleUploadProgressProps) {
@@ -44,10 +49,10 @@ export default function SingleUploadProgress({
   useEffect(() => {
     async function upload() {
       const res = await uploadFile(file, setProgress);
-      onUpload(file, res.data?.uploadFile, res.errors || []);
+      onUpload(file, res.data.uploadFile || undefined, res.errors || []);
     }
 
-    if (errors.length === 0 && !url) {
+    if (errors.length === 0 && uploadedFile === undefined) {
       upload();
     }
   }, []);
@@ -79,7 +84,7 @@ export default function SingleUploadProgress({
       formData.append(
         "operations",
         JSON.stringify({
-          query: `mutation uploadFile($file:Upload!) {\n  uploadFile(file: $file, type: ${fileType})\n}`,
+          query: `mutation uploadFile($file:Upload!) { uploadFile(file: $file, type: ${fileType}){id name path}}`,
         })
       );
       formData.append("map", JSON.stringify({ "0": ["variables.file"] }));
@@ -103,15 +108,16 @@ export default function SingleUploadProgress({
           size="mini"
           loading={loading}
           onClick={async () => {
-            if (url) {
-              await deleteFile({ variables: { url } });
+            if (uploadedFile) {
+              console.log("fired", uploadedFile);
+              await deleteFile({ variables: { id: uploadedFile.id } });
             }
             onDelete(file);
           }}
         />
       </LabelContainer>
       <Progress
-        percent={url ? 100 : progress}
+        percent={uploadedFile ? 100 : progress}
         size="tiny"
         error={errors.length !== 0}
         autoSuccess

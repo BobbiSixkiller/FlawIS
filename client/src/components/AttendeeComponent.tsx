@@ -2,20 +2,21 @@ import { Button, Card, Grid, Header, List, Popup } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
+  FileInput,
   Invoice,
   Role,
   useDeleteSubmissionFileMutation,
   useDeleteSubmissionMutation,
 } from "../graphql/generated/schema";
 import useWidth from "../hooks/useWidth";
-import DeleteDialog from "./DeleteDialog";
 import AddSubmissionDialog from "./AddSubmissionDialog";
 import UpdateSubmissionDialog from "./UpdateSubmissionDialog";
-import AddSubmissionFileDialog from "./AddSubmissionFileDialog";
 import { useContext } from "react";
 import { AuthContext } from "../providers/Auth";
 import UpdateInvoiceForm from "./UpdateInvoiceForm";
 import dynamic from "next/dynamic";
+import DeleteDialog from "./DeleteDialog";
+import AddSubmissionFileDialog from "./AddSubmissionFileDialog";
 
 const PDFGenerator = dynamic(() => import("./InvoiceDownload"), { ssr: false });
 
@@ -55,14 +56,14 @@ export default function AttendeeComponent({
               downloadLink={
                 <PDFGenerator
                   data={data?.invoice as Invoice}
-                  conferenceLogo={data?.conference.logoUrl as string}
+                  conferenceLogoPath={data?.conference.logo.path as string}
                 />
               }
             />
           ) : (
             <PDFGenerator
               data={data?.invoice as Invoice}
-              conferenceLogo={data?.conference.logoUrl as string}
+              conferenceLogoPath={data?.conference.logo.path as string}
             />
           )}
         </Grid.Column>
@@ -126,7 +127,7 @@ export default function AttendeeComponent({
                       })),
                     }}
                   />
-                  {submission.submissionUrl ? (
+                  {submission.file ? (
                     <>
                       <Popup
                         content={t("deleteSubmissionFile")}
@@ -143,7 +144,10 @@ export default function AttendeeComponent({
                               await deleteSubmissionFile({
                                 variables: {
                                   id: submission.id,
-                                  url: submission.submissionUrl as string,
+                                  file: {
+                                    id: submission.file!.id,
+                                    path: submission.file!.path,
+                                  },
                                 },
                               })
                             }
@@ -160,7 +164,7 @@ export default function AttendeeComponent({
                             secondary
                             icon="file"
                             as="a"
-                            href={submission.submissionUrl}
+                            href={submission.file.clientSideUrl}
                           />
                         }
                       />

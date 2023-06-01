@@ -8,7 +8,12 @@ query conferences($year: Int!) {
         name
         slug
         description
-        logoUrl
+        logo {
+          id
+          path
+          clientSideUrl
+          serverSideUrl
+        }
         dates {
           start
           end
@@ -27,7 +32,10 @@ fragment AttendeeFragment on Attendee {
   conference {
     id
     name
-    logoUrl
+    logo {
+      id
+      path
+    }
   }
   user {
     id
@@ -66,7 +74,10 @@ fragment AttendeeFragment on Attendee {
       variableSymbol
       IBAN
       SWIFT
-      stampUrl
+      stamp {
+        id
+        path
+      }
     }
     body {
       type
@@ -103,7 +114,12 @@ fragment AttendeeFragment on Attendee {
       abstract
       keywords
     }
-    submissionUrl
+    file {
+      id
+      path
+      clientSideUrl
+      serverSideUrl
+    }
     createdAt
     updatedAt
   }
@@ -133,7 +149,12 @@ query conference($slug: String!) {
     name
     slug
     description
-    logoUrl
+    logo {
+      id
+      path
+      clientSideUrl
+      serverSideUrl
+    }
     dates {
       start
       end
@@ -147,7 +168,12 @@ query conference($slug: String!) {
       submissions {
         id
         name
-        submissionUrl
+        file {
+          id
+          path
+          clientSideUrl
+          serverSideUrl
+        }
       }
     }
     tickets {
@@ -248,7 +274,10 @@ mutation createConference($data: ConferenceInput!) {
     name
     description
     slug
-    logoUrl
+    logo {
+      id
+      path
+    }
     dates {
       start
       end
@@ -267,13 +296,19 @@ mutation createConference($data: ConferenceInput!) {
       variableSymbol
       IBAN
       SWIFT
-      stampUrl
+      stamp {
+        id
+        path
+      }
     }
     translations {
       language
       name
       description
-      logoUrl
+      logo {
+        id
+        path
+      }
     }
     createdAt
     updatedAt
