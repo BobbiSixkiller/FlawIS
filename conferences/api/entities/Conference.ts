@@ -1,5 +1,6 @@
 import {
   ArgumentValidationError,
+  Directive,
   Field,
   ID,
   Int,
@@ -16,6 +17,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Section } from "./Section";
 import { Address, Billing } from "./Billing";
+import File from "./File";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -46,8 +48,8 @@ class ConferenceTranslation extends Translation {
   description: string;
 
   @Field()
-  @Property()
-  logoUrl: string;
+  @Property({ type: () => File, _id: false })
+  logo: File;
 }
 
 @ObjectType({ description: "Conference billing organization" })
@@ -65,8 +67,8 @@ export class ConferenceBilling extends Billing {
   SWIFT: string;
 
   @Field()
-  @Property()
-  stampUrl: string;
+  @Property({ type: () => File, _id: false })
+  stamp: File;
 }
 
 @ObjectType({ description: "Important dates regarding conference" })
@@ -196,8 +198,8 @@ export class Conference extends TimeStamps {
   slug: string;
 
   @Field()
-  @Property()
-  logoUrl: string;
+  @Property({ type: () => File, _id: false })
+  logo: File;
 
   @Field()
   @Property()

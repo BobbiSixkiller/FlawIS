@@ -9,6 +9,7 @@ import {
 } from "../../entities/Conference";
 import { Address } from "../../entities/Billing";
 import { CreateConnection } from "./pagination";
+import { FileInput } from "./file";
 
 @InputType()
 class TicketInputTranslation {
@@ -39,9 +40,8 @@ class ConferenceInputTranslation {
   @IsString()
   description: string;
 
-  @Field()
-  @IsString()
-  logoUrl: string;
+  @Field(() => FileInput)
+  logo: FileInput;
 }
 
 @InputType()
@@ -97,8 +97,8 @@ export class BillingInput implements ConferenceBilling {
   variableSymbol: string;
 
   @Field()
-  @IsString()
-  stampUrl: string;
+  @Field(() => FileInput)
+  stamp: FileInput;
 }
 
 @InputType()
@@ -160,9 +160,8 @@ export class ConferenceInput {
   @IsString()
   description: string;
 
-  @Field()
-  @IsString()
-  logoUrl: string;
+  @Field(() => FileInput)
+  logo: FileInput;
 
   @Field(() => BillingInput)
   billing: BillingInput;

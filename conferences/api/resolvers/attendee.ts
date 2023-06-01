@@ -116,48 +116,6 @@ export class AttendeeResolver {
       "user.update.billings"
     );
 
-    const attendee = await this.attendeeService.create({
-      conference: conferenceId,
-      user: user?.id,
-      ticket,
-      invoice: {
-        issuer: {
-          ...conference.billing,
-          variableSymbol:
-            conference.billing.variableSymbol +
-            String(conference.attendeesCount + 1).padStart(4, "0"),
-        },
-        payer: { ...billing },
-        body: {
-          price: Math.round((priceWithouTax / 100) * 100) / 100,
-          vat: isFlaw
-            ? 0
-            : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
-          body:
-            locale === "sk"
-              ? `Faktúra vystavená na úhradu konferenčného poplatku.`
-              : `This invoice has been issued in order to pay the conference fee.`,
-          comment:
-            locale === "sk"
-              ? "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača."
-              : "In case of not due payment the host organisation is reserving the right to cancel attendee",
-        },
-      },
-    });
-
-    Messagebroker.produceMessage(
-      JSON.stringify({
-        locale,
-        clientUrl: req.hostname,
-        name: user?.name,
-        email: user?.email,
-        conferenceName: conference.name,
-        conferenceLogo: conference.logoUrl,
-        invoice: attendee.invoice,
-      }),
-      "mail.conference.invoice"
-    );
-
     if (submission) {
       if (submissionId) {
         await this.submissionService.update(
@@ -194,6 +152,51 @@ export class AttendeeResolver {
         );
       }
     }
+
+    const attendee = await this.attendeeService.create({
+      conference: conferenceId,
+      user: user?.id,
+      ticket,
+      invoice: {
+        issuer: {
+          ...conference.billing,
+          variableSymbol:
+            conference.billing.variableSymbol +
+            String(conference.attendeesCount + 1).padStart(4, "0"),
+        },
+        payer: { ...billing },
+        body: {
+          price: Math.round((priceWithouTax / 100) * 100) / 100,
+          vat: isFlaw
+            ? 0
+            : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
+          body:
+            locale === "sk"
+              ? `Faktúra vystavená na úhradu konferenčného poplatku.`
+              : `This invoice has been issued in order to pay the conference fee.`,
+          comment:
+            locale === "sk"
+              ? "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača."
+              : "In case of not due payment the host organisation is reserving the right to cancel attendee",
+        },
+      },
+    });
+
+    Messagebroker.produceMessage(
+      JSON.stringify({
+        locale,
+        clientUrl: req.hostname,
+        name: user?.name,
+        email: user?.email,
+        conferenceName: conference.name,
+        conferenceLogo:
+          process.env.NODE_ENV === "staging"
+            ? "http://gateway-staging:6000" + conference.logo.path
+            : "http://gateway:5000" + conference.logo.path,
+        invoice: attendee.invoice,
+      }),
+      "mail.conference.invoice"
+    );
 
     return attendee;
   }

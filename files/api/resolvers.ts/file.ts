@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import {
   Arg,
   Args,
@@ -17,6 +18,8 @@ import { File } from "../entities/File";
 import { CRUDservice } from "../services/CRUDservice";
 import { Service } from "typedi";
 import { Context } from "../util/auth";
+import { LoadResource } from "../util/decorators";
+import { DocumentType } from "@typegoose/typegoose";
 
 @Service()
 @Resolver()
@@ -32,13 +35,13 @@ export class FileResolver {
   }
 
   @Authorized()
-  @Mutation(() => String)
+  @Mutation(() => File)
   async uploadFile(
     @Arg("file", () => GraphQLUpload)
     { createReadStream, filename, mimetype }: Upload,
     @Arg("type", () => FileType) filetype: FileType,
     @Ctx() { user }: Context
-  ): Promise<string> {
+  ) {
     if (
       mimetype != "application/pdf" &&
       mimetype !=
@@ -51,49 +54,42 @@ export class FileResolver {
       );
     }
 
-    const url =
+    const filepath =
+      "/public/" +
       filetype +
       "/" +
       uuid() +
       "-" +
       filename.toLowerCase().split(" ").join("-");
 
-    await this.fileService.create({
-      name: filename,
-      type: filetype,
-      user,
-      url: `${
-        process.env.BACKEND_URL || "http://localhost:5000" + "/public/" + url
-      }`,
-    });
-
     return new Promise(async (resolve, reject) =>
       createReadStream()
-        .pipe(createWriteStream(path.join(process.cwd(), "/public/", url)))
-        .on("finish", () =>
-          resolve(
-            `${
-              process.env.BACKEND_URL ||
-              "http://localhost:5000" + "/public/" + url
-            }`
-          )
-        )
+        .pipe(createWriteStream(path.join(process.cwd(), filepath)))
+        .on("finish", async () => {
+          const file = await this.fileService.create({
+            name: filename,
+            type: filetype,
+            path: filepath,
+            user,
+          });
+          resolve(file);
+        })
         .on("error", () => reject(new Error("File upload failed!")))
     );
   }
 
+  //implement RMQ messaging in order to keep integrity amongst mongo documents that have referenced file document
   @Authorized(["ADMIN"])
-  @Mutation(() => Boolean)
-  async deleteFile(@Arg("url") url: string) {
-    const path =
-      "." + url.split(process.env.BACKEND_URL || "http://localhost:5000")[1];
-
-    await this.fileService.delete({ url });
-
+  @Mutation(() => File)
+  async deleteFile(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(File) file: DocumentType<File>
+  ) {
     return new Promise((resolve, reject) => {
-      unlink(path, (error) => {
+      unlink(path.join(process.cwd(), file.path), async (error) => {
         if (error) reject(error);
-        resolve(true);
+        await file.remove();
+        resolve(file);
       });
     });
   }

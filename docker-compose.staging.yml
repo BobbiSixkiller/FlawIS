@@ -39,7 +39,6 @@ services:
     environment:
       NODE_ENV: staging
       SECRET: ${SECRET}
-      BACKEND_URL: ${BACKEND_URL}
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6002
@@ -84,6 +83,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+        - NODE_ENV=test
     command: npm run start-staging
     depends_on:
       - gateway-staging

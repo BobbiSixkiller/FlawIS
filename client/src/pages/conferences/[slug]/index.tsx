@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Accordion,
   Button,
@@ -22,7 +22,6 @@ import {
 } from "../../../graphql/generated/schema";
 import useWith from "../../../hooks/useWidth";
 import { addApolloState, initializeApollo } from "../../../lib/apollo";
-import { AuthContext } from "../../../providers/Auth";
 
 import { NextPageWithLayout } from "../../_app";
 
@@ -58,10 +57,10 @@ const ConferencePage: NextPageWithLayout = () => {
             inverted
             style={{ fontSize: width > 992 ? "4em" : "2em" }}
           /> */}
-          {data?.conference.logoUrl && (
+          {data?.conference.logo && (
             <Image
               alt="conference logo"
-              src={data.conference.logoUrl}
+              src={data.conference.logo.serverSideUrl}
               quality={50}
               style={{ objectFit: "contain" }}
               fill

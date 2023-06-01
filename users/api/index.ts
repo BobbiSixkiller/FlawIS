@@ -18,6 +18,7 @@ import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
 import { initRedis } from "./util/redis";
+import { User } from "./entitites/User";
 
 env.config();
 
@@ -40,6 +41,7 @@ async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
     {
+      // orphanedTypes: [User],
       resolvers: [UserResolver],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware],

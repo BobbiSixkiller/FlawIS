@@ -18,7 +18,9 @@ import { resolveUserReference } from "./resolvers/resolveUserReference";
 import env from "dotenv";
 import MessageBroker from "./util/rmq";
 import { AnnouncementResolver } from "./resolvers/announcement";
-import { initRedis } from "./util/redis";
+import { Grant } from "./entitites/Grant";
+import { User } from "./entitites/User";
+import { Announcement } from "./entitites/Announcement";
 
 env.config();
 
@@ -41,6 +43,7 @@ async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
     {
+      // orphanedTypes: [Grant, User, Announcement],
       resolvers: [
         GrantResolver,
         MemberResolver,

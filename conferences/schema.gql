@@ -88,7 +88,7 @@ input BillingInput {
   SWIFT: String!
   address: AddressInput!
   name: String!
-  stampUrl: String!
+  stamp: FileInput!
   variableSymbol: String!
 }
 
@@ -104,7 +104,7 @@ type Conference {
   description: String!
   id: ObjectId!
   isAdmin: Boolean!
-  logoUrl: String!
+  logo: File!
   name: String!
   sections: [Section!]!
   slug: String!
@@ -122,7 +122,7 @@ type ConferenceBilling {
   SWIFT: String!
   address: Address!
   name: String!
-  stampUrl: String!
+  stamp: File!
   variableSymbol: String!
 }
 
@@ -142,7 +142,7 @@ input ConferenceInput {
   billing: BillingInput!
   dates: DatesInput!
   description: String!
-  logoUrl: String!
+  logo: FileInput!
   name: String!
   slug: String!
   translations: [ConferenceInputTranslation!]!
@@ -151,7 +151,7 @@ input ConferenceInput {
 input ConferenceInputTranslation {
   description: String!
   language: String!
-  logoUrl: String!
+  logo: FileInput!
   name: String!
 }
 
@@ -163,7 +163,7 @@ type ConferencePageInfo {
 type ConferenceTranslation {
   description: String!
   language: String!
-  logoUrl: String!
+  logo: File!
   name: String!
 }
 
@@ -192,6 +192,17 @@ input DatesInput {
   regEnd: DateTime
   start: DateTime!
   submissionDeadline: DateTime
+}
+
+type File {
+  id: ObjectId!
+  path: String!
+}
+
+"""file input type"""
+input FileInput {
+  id: ObjectId!
+  path: String!
 }
 
 """Important dates regarding conference"""
@@ -242,14 +253,14 @@ input InvoiceInput {
 type Mutation {
   addAttendee(data: AttendeeInput!): Attendee!
   addSubmission(data: SubmissionInput!): Submission!
-  addSubmissionFile(id: ObjectId!, url: String!): Submission!
+  addSubmissionFile(file: FileInput!, id: ObjectId!): Submission!
   addTicket(data: TicketInput!, id: ObjectId!): Conference!
   createConference(data: ConferenceInput!): Conference!
   createSection(data: SectionInput!, id: ObjectId!): Section!
   deleteConference(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): Boolean!
-  deleteSubmission(id: ObjectId!): Submission!
-  deleteSubmissionFile(id: ObjectId!, url: String): Submission!
+  deleteSubmission(file: FileInput, id: ObjectId!): Submission!
+  deleteSubmissionFile(file: FileInput!, id: ObjectId!): Submission!
   removeAttendee(id: ObjectId!): Attendee!
   removeTicket(id: ObjectId!, ticketId: ObjectId!): Conference!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
@@ -305,11 +316,11 @@ type Submission {
   authors: [User!]!
   conference: Conference!
   createdAt: DateTime!
+  file: File
   id: ID!
   keywords: [String!]!
   name: String!
   section: Section!
-  submissionUrl: String
   translations: [SubmissionTranslation!]!
   updatedAt: DateTime!
 }

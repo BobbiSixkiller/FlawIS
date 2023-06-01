@@ -55,7 +55,10 @@ export default function AddSubmissionFileDialog({ id }: { id: string }) {
                   await updateSubmission({
                     variables: {
                       id,
-                      url: values.files[0].url,
+                      file: {
+                        id: values.files[0].uploadedFile.id,
+                        path: values.files[0].uploadedFile.path,
+                      },
                     },
                   });
                   handleClose();
