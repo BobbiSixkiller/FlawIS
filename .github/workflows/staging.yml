@@ -44,4 +44,5 @@ jobs:
           BACKEND_URL: ${{ vars.BACKEND_URL }}
           RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
         run: |
-          docker-compose -f docker-compose.staging.yml up -d --build --no-cache
+          docker-compose -f docker-compose.staging.yml build --no-cache
+          docker-compose up
