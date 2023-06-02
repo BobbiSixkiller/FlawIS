@@ -139,7 +139,7 @@ const DashboardPage: NextPageWithLayout = () => {
                   Prispevky: {section.submissions.length} <br />
                   Subory prispevkov:{" "}
                   {section.submissions.reduce((prev, sub): number => {
-                    if (sub.submissionUrl) {
+                    if (sub.file) {
                       return prev + 1;
                     }
                     return prev;

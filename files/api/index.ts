@@ -13,8 +13,8 @@ import Messagebroker from "./util/rmq";
 import { connect } from "mongoose";
 import { ObjectId } from "mongodb";
 import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
-import User from "./entities/File";
 import { ObjectIdScalar } from "./util/scalars";
+import { resolveFileReference } from "./resolvers.ts/resolveFileReference";
 
 env.config();
 
@@ -35,14 +35,19 @@ async function mongoDbConnect() {
 
 async function main() {
   //Build schema
-  const schema = await buildFederatedSchema({
-    resolvers: [FileResolver],
-    orphanedTypes: [User],
-    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-    globalMiddlewares: [TypegooseMiddleware],
-    emitSchemaFile: true,
-    authChecker,
-  });
+  const schema = await buildFederatedSchema(
+    {
+      // orphanedTypes: [User, File],
+      resolvers: [FileResolver],
+      scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+      globalMiddlewares: [TypegooseMiddleware],
+      emitSchemaFile: true,
+      authChecker,
+    },
+    {
+      File: { __resolveReference: resolveFileReference },
+    }
+  );
 
   const app = Express();
 

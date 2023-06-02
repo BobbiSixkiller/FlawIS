@@ -3,7 +3,9 @@
 import { getModelForClass } from "@typegoose/typegoose";
 import client, { Connection, Channel, Message } from "amqplib";
 import env from "dotenv";
-import User, { File } from "../entities/File";
+import { unlink } from "fs";
+import { join } from "path";
+import { User, File } from "../entities/File";
 
 env.config();
 
@@ -108,12 +110,21 @@ class Messagebroker {
 
         return await getModelForClass(User).deleteOne({ _id: deletedUser.id });
       case "file.delete":
-        const url = msg.content.toString();
-        console.log(url);
-        return await getModelForClass(File).deleteOne({ url });
+        const file: Pick<File, "id" | "path"> = JSON.parse(
+          msg.content.toString()
+        );
+        unlink(join(process.cwd() + file.path), async (err) => {
+          if (err) {
+            console.log(err);
+          }
+          await getModelForClass(File).deleteOne({ _id: file.id });
+        });
+        return;
 
       default:
-        return console.log("Message with unhandled routing key!");
+        return console.log(
+          "Message with unhandled routing key: " + msg.fields.routingKey
+        );
     }
   }
 }

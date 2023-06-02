@@ -4,7 +4,6 @@ import { ReactElement } from "react";
 import { Button, Form, Input, Segment, TextArea } from "semantic-ui-react";
 import { InferType, number, object, string } from "yup";
 import {
-  Invoice,
   InvoiceInput,
   useUpdateInvoiceMutation,
 } from "../graphql/generated/schema";
@@ -26,7 +25,10 @@ const invoiceInputSchema = object({
     ICO: string().trim().required(),
     DIC: string().trim().required(),
     ICDPH: string().trim().required(),
-    stampUrl: string().required(),
+    stamp: object({
+      id: string().required(),
+      path: string().required(),
+    }).required(),
   }).required(),
   payer: object({
     name: string().trim().required(),
@@ -58,7 +60,7 @@ export default function UpdateInvoiceForm({
   data,
   downloadLink,
 }: {
-  data?: Invoice;
+  data?: InvoiceInput;
   downloadLink: ReactElement;
 }) {
   const router = useRouter();

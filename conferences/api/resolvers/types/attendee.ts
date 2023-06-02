@@ -1,16 +1,8 @@
-import {
-  Field,
-  ArgsType,
-  Int,
-  InputType,
-  Float,
-  ObjectType,
-} from "type-graphql";
-import { Min, Max, IsString } from "class-validator";
+import { Field, ArgsType, InputType, Float, ObjectType } from "type-graphql";
+import { IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
 import { Attendee } from "../../entities/Attendee";
-import { RefDocExists } from "../../util/decorators";
 import { AddressInput, BillingInput } from "./conference";
 import { Billing } from "../../entities/Billing";
 import { SubmissionInput } from "./submission";

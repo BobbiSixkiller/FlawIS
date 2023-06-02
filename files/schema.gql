@@ -19,12 +19,14 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type File {
+  clientSideUrl: String!
   createdAt: DateTime!
   id: ObjectId!
   name: String!
+  path: String!
+  serverSideUrl: String!
   type: FileType!
   updatedAt: DateTime!
-  url: String!
   user: User!
 }
 
@@ -52,8 +54,8 @@ enum FileType {
 }
 
 type Mutation {
-  deleteFile(url: String!): Boolean!
-  uploadFile(file: Upload!, type: FileType!): String!
+  deleteFile(id: ObjectId!): File!
+  uploadFile(file: Upload!, type: FileType!): File!
 }
 
 """Mongo object id scalar type"""

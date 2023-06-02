@@ -1,6 +1,6 @@
 import { Directive, Field, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import { index, prop as Property } from "@typegoose/typegoose";
+import { prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { FileType } from "../resolvers.ts/types/file";
 import { ReturnModelType } from "@typegoose/typegoose/lib/types";
@@ -8,7 +8,7 @@ import { ReturnModelType } from "@typegoose/typegoose/lib/types";
 @Directive("@extends")
 @Directive(`@key(fields: "id")`)
 @ObjectType()
-export default class User {
+export class User {
   @Directive("@external")
   @Property()
   @Field(() => ObjectId)
@@ -19,7 +19,7 @@ export default class User {
   email: string;
 }
 
-@index({ url: 1 })
+@Directive('@key(fields: "id")')
 @ObjectType()
 export class File extends TimeStamps {
   @Field(() => ObjectId)
@@ -31,9 +31,36 @@ export class File extends TimeStamps {
 
   @Field()
   @Property()
-  url: string;
+  path: string;
 
-  // @Directive(`@provides(fields: "email")`)
+  @Field()
+  clientSideUrl(): string {
+    switch (process.env.NODE_ENV) {
+      case "staging":
+        return "https://flawis-backend-staging.flaw.uniba.sk" + this.path;
+
+      case "production":
+        return "https://flawis-backend.flaw.uniba.sk" + this.path;
+
+      default:
+        return "http://localhost:5000" + this.path;
+    }
+  }
+
+  @Field()
+  serverSideUrl(): string {
+    switch (process.env.NODE_ENV) {
+      case "staging":
+        return "http://gateway-staging:6000" + this.path;
+
+      case "production":
+        return "http://gateway:5000" + this.path;
+
+      default:
+        return "http://gateway:5000" + this.path;
+    }
+  }
+
   @Field(() => User)
   @Property({ type: () => User, _id: false })
   user: User;

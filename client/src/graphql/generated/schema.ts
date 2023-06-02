@@ -144,7 +144,7 @@ export type BillingInput = {
   SWIFT: Scalars['String'];
   address: AddressInput;
   name: Scalars['String'];
-  stampUrl: Scalars['String'];
+  stamp: FileInput;
   variableSymbol: Scalars['String'];
 };
 
@@ -181,7 +181,7 @@ export type Conference = {
   description: Scalars['String'];
   id: Scalars['ObjectId'];
   isAdmin: Scalars['Boolean'];
-  logoUrl: Scalars['String'];
+  logo: File;
   name: Scalars['String'];
   sections: Array<Section>;
   slug: Scalars['String'];
@@ -207,7 +207,7 @@ export type ConferenceBilling = {
   SWIFT: Scalars['String'];
   address: Address;
   name: Scalars['String'];
-  stampUrl: Scalars['String'];
+  stamp: File;
   variableSymbol: Scalars['String'];
 };
 
@@ -229,7 +229,7 @@ export type ConferenceInput = {
   billing: BillingInput;
   dates: DatesInput;
   description: Scalars['String'];
-  logoUrl: Scalars['String'];
+  logo: FileInput;
   name: Scalars['String'];
   slug: Scalars['String'];
   translations: Array<ConferenceInputTranslation>;
@@ -238,7 +238,7 @@ export type ConferenceInput = {
 export type ConferenceInputTranslation = {
   description: Scalars['String'];
   language: Scalars['String'];
-  logoUrl: Scalars['String'];
+  logo: FileInput;
   name: Scalars['String'];
 };
 
@@ -252,7 +252,7 @@ export type ConferenceTranslation = {
   __typename?: 'ConferenceTranslation';
   description: Scalars['String'];
   language: Scalars['String'];
-  logoUrl: Scalars['String'];
+  logo: File;
   name: Scalars['String'];
 };
 
@@ -281,12 +281,14 @@ export type DatesInput = {
 
 export type File = {
   __typename?: 'File';
+  clientSideUrl: Scalars['String'];
   createdAt: Scalars['DateTime'];
   id: Scalars['ObjectId'];
   name: Scalars['String'];
+  path: Scalars['String'];
+  serverSideUrl: Scalars['String'];
   type: FileType;
   updatedAt: Scalars['DateTime'];
-  url: Scalars['String'];
   user: User;
 };
 
@@ -301,6 +303,12 @@ export type FileEdge = {
   __typename?: 'FileEdge';
   cursor: Scalars['ObjectId'];
   node: File;
+};
+
+/** file input type */
+export type FileInput = {
+  id: Scalars['ObjectId'];
+  path: Scalars['String'];
 };
 
 export type FilePageInfo = {
@@ -451,7 +459,7 @@ export type Mutation = {
   deleteAnnouncement: Announcement;
   deleteBudget: Grant;
   deleteConference: Scalars['Boolean'];
-  deleteFile: Scalars['Boolean'];
+  deleteFile: File;
   deleteGrant: Scalars['Boolean'];
   deleteMember: Grant;
   deleteSection: Scalars['Boolean'];
@@ -473,7 +481,7 @@ export type Mutation = {
   updateSubmission: Submission;
   updateUser: User;
   updategrant: Grant;
-  uploadFile: Scalars['String'];
+  uploadFile: File;
 };
 
 
@@ -512,8 +520,8 @@ export type MutationAddSubmissionArgs = {
 
 
 export type MutationAddSubmissionFileArgs = {
+  file: FileInput;
   id: Scalars['ObjectId'];
-  url: Scalars['String'];
 };
 
 
@@ -561,7 +569,7 @@ export type MutationDeleteConferenceArgs = {
 
 
 export type MutationDeleteFileArgs = {
-  url: Scalars['String'];
+  id: Scalars['ObjectId'];
 };
 
 
@@ -583,13 +591,14 @@ export type MutationDeleteSectionArgs = {
 
 
 export type MutationDeleteSubmissionArgs = {
+  file?: InputMaybe<FileInput>;
   id: Scalars['ObjectId'];
 };
 
 
 export type MutationDeleteSubmissionFileArgs = {
+  file: FileInput;
   id: Scalars['ObjectId'];
-  url?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -858,11 +867,11 @@ export type Submission = {
   authors: Array<User>;
   conference: Conference;
   createdAt: Scalars['DateTime'];
+  file?: Maybe<File>;
   id: Scalars['ID'];
   keywords: Array<Scalars['String']>;
   name: Scalars['String'];
   section: Section;
-  submissionUrl?: Maybe<Scalars['String']>;
   translations: Array<SubmissionTranslation>;
   updatedAt: Scalars['DateTime'];
 };
@@ -1074,23 +1083,23 @@ export type ConferencesQueryVariables = Exact<{
 }>;
 
 
-export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
+export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', year: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logo: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string }, dates: { __typename?: 'ImportantDates', start: any, end: any } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', hasNextPage: boolean, endCursor: any } } };
 
-export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> };
+export type AttendeeFragmentFragment = { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> };
 
 export type AttendeesToCsvExportQueryVariables = Exact<{
   conferenceId: Scalars['ObjectId'];
 }>;
 
 
-export type AttendeesToCsvExportQuery = { __typename?: 'Query', attendeesToCsvExport: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> }> };
+export type AttendeesToCsvExportQuery = { __typename?: 'Query', attendeesToCsvExport: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> }> };
 
 export type AttendeeQueryVariables = Exact<{
   id: Scalars['ObjectId'];
 }>;
 
 
-export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } };
 
 export type SearchAttendeeQueryVariables = Exact<{
   conferenceId: Scalars['ObjectId'];
@@ -1098,14 +1107,14 @@ export type SearchAttendeeQueryVariables = Exact<{
 }>;
 
 
-export type SearchAttendeeQuery = { __typename?: 'Query', searchAttendee: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> }> };
+export type SearchAttendeeQuery = { __typename?: 'Query', searchAttendee: Array<{ __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> }> };
 
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String'];
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, logoUrl: string, isAdmin: boolean, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, submissions: Array<{ __typename?: 'Submission', id: string, name: string, submissionUrl?: string | null }> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } | null } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, name: string, slug: string, description: string, isAdmin: boolean, logo: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null }, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string>, submissions: Array<{ __typename?: 'Submission', id: string, name: string, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> }>, tickets: Array<{ __typename?: 'Ticket', id: string, name: string, description: string, price: number, withSubmission: boolean, online: boolean }>, attending?: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } | null } };
 
 export type ConferenceAttendeesQueryVariables = Exact<{
   slug: Scalars['String'];
@@ -1114,7 +1123,7 @@ export type ConferenceAttendeesQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, attendeesCount: number, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
+export type ConferenceAttendeesQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, attendeesCount: number, sections: Array<{ __typename?: 'Section', id: string, name: string, description: string, languages: Array<string> }>, attendees: { __typename?: 'AttendeeConnection', edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', hasNextPage: boolean, endCursor: any } } } };
 
 export type AddTicketMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1144,21 +1153,21 @@ export type CreateConferenceMutationVariables = Exact<{
 }>;
 
 
-export type CreateConferenceMutation = { __typename?: 'Mutation', createConference: { __typename?: 'Conference', id: any, name: string, description: string, slug: string, logoUrl: string, createdAt: any, updatedAt: any, dates: { __typename?: 'ImportantDates', start: any, end: any }, billing: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, translations: Array<{ __typename?: 'ConferenceTranslation', language: string, name: string, description: string, logoUrl: string }> } };
+export type CreateConferenceMutation = { __typename?: 'Mutation', createConference: { __typename?: 'Conference', id: any, name: string, description: string, slug: string, createdAt: any, updatedAt: any, logo: { __typename?: 'File', id: any, path: string }, dates: { __typename?: 'ImportantDates', start: any, end: any }, billing: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, translations: Array<{ __typename?: 'ConferenceTranslation', language: string, name: string, description: string, logo: { __typename?: 'File', id: any, path: string } }> } };
 
 export type AddAttendeeMutationVariables = Exact<{
   data: AttendeeInput;
 }>;
 
 
-export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } };
 
 export type RemoveAttendeeMutationVariables = Exact<{
   id: Scalars['ObjectId'];
 }>;
 
 
-export type RemoveAttendeeMutation = { __typename?: 'Mutation', removeAttendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+export type RemoveAttendeeMutation = { __typename?: 'Mutation', removeAttendee: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } };
 
 export type UpdateInvoiceMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1166,7 +1175,7 @@ export type UpdateInvoiceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateInvoiceMutation = { __typename?: 'Mutation', updateInvoice: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logoUrl: string }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, stampUrl: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, submissionUrl?: string | null, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> }> } };
+export type UpdateInvoiceMutation = { __typename?: 'Mutation', updateInvoice: { __typename?: 'Attendee', id: string, conference: { __typename?: 'Conference', id: any, name: string, logo: { __typename?: 'File', id: any, path: string } }, user: { __typename?: 'User', id: any, name: string, email: string, organisation: string }, ticket: { __typename?: 'Ticket', withSubmission: boolean, online: boolean }, invoice: { __typename?: 'Invoice', payer: { __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, DIC: string, ICDPH: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string }, stamp: { __typename?: 'File', id: any, path: string } }, body: { __typename?: 'InvoiceData', type: string, issueDate: any, vatDate: any, dueDate: any, price: number, vat: number, body: string, comment: string } }, submissions: Array<{ __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, createdAt: any, updatedAt: any, conference: { __typename?: 'Conference', id: any, name: string }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }>, file?: { __typename?: 'File', id: any, path: string, clientSideUrl: string, serverSideUrl: string } | null }> } };
 
 export type UploadFileMutationVariables = Exact<{
   type: FileType;
@@ -1174,14 +1183,14 @@ export type UploadFileMutationVariables = Exact<{
 }>;
 
 
-export type UploadFileMutation = { __typename?: 'Mutation', uploadFile: string };
+export type UploadFileMutation = { __typename?: 'Mutation', uploadFile: { __typename?: 'File', id: any, name: string, path: string } };
 
 export type DeleteFileMutationVariables = Exact<{
-  url: Scalars['String'];
+  id: Scalars['ObjectId'];
 }>;
 
 
-export type DeleteFileMutation = { __typename?: 'Mutation', deleteFile: boolean };
+export type DeleteFileMutation = { __typename?: 'Mutation', deleteFile: { __typename?: 'File', id: any, name: string, path: string } };
 
 export type GrantFragment = { __typename?: 'Grant', id: string, name: string, type: GrantType, start: any, end: any, createdAt: any, updatedAt: any };
 
@@ -1298,7 +1307,7 @@ export type SubmissionQueryVariables = Exact<{
 }>;
 
 
-export type SubmissionQuery = { __typename?: 'Query', submission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
+export type SubmissionQuery = { __typename?: 'Query', submission: { __typename?: 'Submission', id: string, name: string, abstract: string, keywords: Array<string>, updatedAt: any, conference: { __typename?: 'Conference', id: any }, section: { __typename?: 'Section', id: string, name: string }, authors: Array<{ __typename?: 'User', name: string, email: string }>, file?: { __typename?: 'File', id: any, clientSideUrl: string } | null, translations: Array<{ __typename?: 'SubmissionTranslation', language: string, name: string, abstract: string, keywords: Array<string> }> } };
 
 export type AddSubmissionMutationVariables = Exact<{
   data: SubmissionInput;
@@ -1320,23 +1329,23 @@ export type DeleteSubmissionMutationVariables = Exact<{
 }>;
 
 
-export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: { __typename?: 'Submission', id: string } };
+export type DeleteSubmissionMutation = { __typename?: 'Mutation', deleteSubmission: { __typename?: 'Submission', id: string, file?: { __typename?: 'File', id: any } | null } };
 
 export type AddSubmissionFileMutationVariables = Exact<{
   id: Scalars['ObjectId'];
-  url: Scalars['String'];
+  file: FileInput;
 }>;
 
 
-export type AddSubmissionFileMutation = { __typename?: 'Mutation', addSubmissionFile: { __typename?: 'Submission', id: string, submissionUrl?: string | null } };
+export type AddSubmissionFileMutation = { __typename?: 'Mutation', addSubmissionFile: { __typename?: 'Submission', id: string, file?: { __typename?: 'File', id: any, clientSideUrl: string } | null } };
 
 export type DeleteSubmissionFileMutationVariables = Exact<{
   id: Scalars['ObjectId'];
-  url: Scalars['String'];
+  file: FileInput;
 }>;
 
 
-export type DeleteSubmissionFileMutation = { __typename?: 'Mutation', deleteSubmissionFile: { __typename?: 'Submission', id: string, submissionUrl?: string | null } };
+export type DeleteSubmissionFileMutation = { __typename?: 'Mutation', deleteSubmissionFile: { __typename?: 'Submission', id: string, file?: { __typename?: 'File', id: any } | null } };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId'];
@@ -1395,7 +1404,10 @@ export const AttendeeFragmentFragmentDoc = gql`
   conference {
     id
     name
-    logoUrl
+    logo {
+      id
+      path
+    }
   }
   user {
     id
@@ -1434,7 +1446,10 @@ export const AttendeeFragmentFragmentDoc = gql`
       variableSymbol
       IBAN
       SWIFT
-      stampUrl
+      stamp {
+        id
+        path
+      }
     }
     body {
       type
@@ -1471,7 +1486,12 @@ export const AttendeeFragmentFragmentDoc = gql`
       abstract
       keywords
     }
-    submissionUrl
+    file {
+      id
+      path
+      clientSideUrl
+      serverSideUrl
+    }
     createdAt
     updatedAt
   }
@@ -2032,7 +2052,12 @@ export const ConferencesDocument = gql`
         name
         slug
         description
-        logoUrl
+        logo {
+          id
+          path
+          clientSideUrl
+          serverSideUrl
+        }
         dates {
           start
           end
@@ -2187,7 +2212,12 @@ export const ConferenceDocument = gql`
     name
     slug
     description
-    logoUrl
+    logo {
+      id
+      path
+      clientSideUrl
+      serverSideUrl
+    }
     dates {
       start
       end
@@ -2201,7 +2231,12 @@ export const ConferenceDocument = gql`
       submissions {
         id
         name
-        submissionUrl
+        file {
+          id
+          path
+          clientSideUrl
+          serverSideUrl
+        }
       }
     }
     tickets {
@@ -2445,7 +2480,10 @@ export const CreateConferenceDocument = gql`
     name
     description
     slug
-    logoUrl
+    logo {
+      id
+      path
+    }
     dates {
       start
       end
@@ -2464,13 +2502,19 @@ export const CreateConferenceDocument = gql`
       variableSymbol
       IBAN
       SWIFT
-      stampUrl
+      stamp {
+        id
+        path
+      }
     }
     translations {
       language
       name
       description
-      logoUrl
+      logo {
+        id
+        path
+      }
     }
     createdAt
     updatedAt
@@ -2605,7 +2649,11 @@ export type UpdateInvoiceMutationResult = Apollo.MutationResult<UpdateInvoiceMut
 export type UpdateInvoiceMutationOptions = Apollo.BaseMutationOptions<UpdateInvoiceMutation, UpdateInvoiceMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($type: FileType!, $file: Upload!) {
-  uploadFile(type: $type, file: $file)
+  uploadFile(type: $type, file: $file) {
+    id
+    name
+    path
+  }
 }
     `;
 export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
@@ -2636,8 +2684,12 @@ export type UploadFileMutationHookResult = ReturnType<typeof useUploadFileMutati
 export type UploadFileMutationResult = Apollo.MutationResult<UploadFileMutation>;
 export type UploadFileMutationOptions = Apollo.BaseMutationOptions<UploadFileMutation, UploadFileMutationVariables>;
 export const DeleteFileDocument = gql`
-    mutation deleteFile($url: String!) {
-  deleteFile(url: $url)
+    mutation deleteFile($id: ObjectId!) {
+  deleteFile(id: $id) {
+    id
+    name
+    path
+  }
 }
     `;
 export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, DeleteFileMutationVariables>;
@@ -2655,7 +2707,7 @@ export type DeleteFileMutationFn = Apollo.MutationFunction<DeleteFileMutation, D
  * @example
  * const [deleteFileMutation, { data, loading, error }] = useDeleteFileMutation({
  *   variables: {
- *      url: // value for 'url'
+ *      id: // value for 'id'
  *   },
  * });
  */
@@ -3408,6 +3460,10 @@ export const SubmissionDocument = gql`
       name
       email
     }
+    file {
+      id
+      clientSideUrl
+    }
     updatedAt
     translations {
       language
@@ -3553,6 +3609,9 @@ export const DeleteSubmissionDocument = gql`
     mutation deleteSubmission($id: ObjectId!) {
   deleteSubmission(id: $id) {
     id
+    file {
+      id
+    }
   }
 }
     `;
@@ -3583,10 +3642,13 @@ export type DeleteSubmissionMutationHookResult = ReturnType<typeof useDeleteSubm
 export type DeleteSubmissionMutationResult = Apollo.MutationResult<DeleteSubmissionMutation>;
 export type DeleteSubmissionMutationOptions = Apollo.BaseMutationOptions<DeleteSubmissionMutation, DeleteSubmissionMutationVariables>;
 export const AddSubmissionFileDocument = gql`
-    mutation addSubmissionFile($id: ObjectId!, $url: String!) {
-  addSubmissionFile(id: $id, url: $url) {
+    mutation addSubmissionFile($id: ObjectId!, $file: FileInput!) {
+  addSubmissionFile(id: $id, file: $file) {
     id
-    submissionUrl
+    file {
+      id
+      clientSideUrl
+    }
   }
 }
     `;
@@ -3606,7 +3668,7 @@ export type AddSubmissionFileMutationFn = Apollo.MutationFunction<AddSubmissionF
  * const [addSubmissionFileMutation, { data, loading, error }] = useAddSubmissionFileMutation({
  *   variables: {
  *      id: // value for 'id'
- *      url: // value for 'url'
+ *      file: // value for 'file'
  *   },
  * });
  */
@@ -3618,10 +3680,12 @@ export type AddSubmissionFileMutationHookResult = ReturnType<typeof useAddSubmis
 export type AddSubmissionFileMutationResult = Apollo.MutationResult<AddSubmissionFileMutation>;
 export type AddSubmissionFileMutationOptions = Apollo.BaseMutationOptions<AddSubmissionFileMutation, AddSubmissionFileMutationVariables>;
 export const DeleteSubmissionFileDocument = gql`
-    mutation deleteSubmissionFile($id: ObjectId!, $url: String!) {
-  deleteSubmissionFile(id: $id, url: $url) {
+    mutation deleteSubmissionFile($id: ObjectId!, $file: FileInput!) {
+  deleteSubmissionFile(id: $id, file: $file) {
     id
-    submissionUrl
+    file {
+      id
+    }
   }
 }
     `;
@@ -3641,7 +3705,7 @@ export type DeleteSubmissionFileMutationFn = Apollo.MutationFunction<DeleteSubmi
  * const [deleteSubmissionFileMutation, { data, loading, error }] = useDeleteSubmissionFileMutation({
  *   variables: {
  *      id: // value for 'id'
- *      url: // value for 'url'
+ *      file: // value for 'file'
  *   },
  * });
  */

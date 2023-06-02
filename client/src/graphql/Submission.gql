@@ -15,6 +15,10 @@ query submission($id: ObjectId!) {
       name
       email
     }
+    file {
+      id
+      clientSideUrl
+    }
     updatedAt
     translations {
       language
@@ -76,19 +80,27 @@ mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
 mutation deleteSubmission($id: ObjectId!) {
   deleteSubmission(id: $id) {
     id
+    file {
+      id
+    }
   }
 }
 
-mutation addSubmissionFile($id: ObjectId!, $url: String!) {
-  addSubmissionFile(id: $id, url: $url) {
+mutation addSubmissionFile($id: ObjectId!, $file: FileInput!) {
+  addSubmissionFile(id: $id, file: $file) {
     id
-    submissionUrl
+    file {
+      id
+      clientSideUrl
+    }
   }
 }
 
-mutation deleteSubmissionFile($id: ObjectId!, $url: String!) {
-  deleteSubmissionFile(id: $id, url: $url) {
+mutation deleteSubmissionFile($id: ObjectId!, $file: FileInput!) {
+  deleteSubmissionFile(id: $id, file: $file) {
     id
-    submissionUrl
+    file {
+      id
+    }
   }
 }

@@ -40,7 +40,6 @@ const AttendeesPage: NextPageWithLayout = () => {
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
   const click = useOnClickOutside(dropdownContainerRef, () => setOpen(false));
-  console.log(click);
 
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
@@ -58,11 +57,9 @@ const AttendeesPage: NextPageWithLayout = () => {
       },
     });
     getExportData({ variables: { conferenceId: data?.conference.id } });
-  }, [dispatch, data]);
+  }, [dispatch, data, getExportData]);
 
   const [deleteAttednee] = useRemoveAttendeeMutation();
-
-  console.log(exportLoading, exportData);
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>

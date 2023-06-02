@@ -53,13 +53,17 @@ const styles = StyleSheet.create({
 });
 
 export default function InvoiceDownload({
-  conferenceLogo,
+  conferenceLogoPath,
   data,
 }: {
-  conferenceLogo: string;
+  conferenceLogoPath: string;
   data: Invoice;
 }) {
   const { t } = useTranslation("invoice");
+
+  const BACKEND_URL = (
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/graphql"
+  ).split("/graphql")[0];
 
   return (
     <PDFDownloadLink
@@ -68,7 +72,7 @@ export default function InvoiceDownload({
           <Page size="A4" style={styles.page}>
             <View style={styles.header}>
               <Image
-                src={conferenceLogo}
+                src={BACKEND_URL + conferenceLogoPath}
                 style={{ maxHeight: "100px", maxWidth: "300px" }}
               />
               <View style={{ flexDirection: "column" }}>
@@ -306,7 +310,7 @@ export default function InvoiceDownload({
             <Text style={{ textAlign: "center" }}>{data.body.body}</Text>
             <Text style={{ textAlign: "center" }}>{data.body.comment}</Text>
             <Image
-              src={data.issuer.stampUrl}
+              src={BACKEND_URL + data.issuer.stamp.path}
               style={{
                 maxHeight: "100px",
                 maxWidth: "200px",

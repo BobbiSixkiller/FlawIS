@@ -23,6 +23,7 @@ import { User } from "../entities/User";
 import Messagebroker from "../util/rmq";
 import { convertDocument } from "../middlewares/typegoose-middleware";
 import { DocumentType } from "@typegoose/typegoose";
+import { FileInput } from "./types/file";
 
 @Service()
 @Resolver(() => Submission)
@@ -104,10 +105,11 @@ export class SubmissionResolver {
   @Mutation(() => Submission)
   async deleteSubmission(
     @Arg("id") _id: ObjectId,
+    @Arg("file", { nullable: true }) file: FileInput,
     @LoadResource(Submission) submission: DocumentType<Submission>
   ) {
-    if (submission.submissionUrl) {
-      Messagebroker.produceMessage(submission.submissionUrl, "file.delete");
+    if (submission.file) {
+      Messagebroker.produceMessage(JSON.stringify(file), "file.delete");
     }
     return await submission.remove();
   }
@@ -116,10 +118,10 @@ export class SubmissionResolver {
   @Mutation(() => Submission)
   async addSubmissionFile(
     @Arg("id") _id: ObjectId,
-    @Arg("url") url: string,
+    @Arg("file") file: FileInput,
     @LoadResource(Submission) submission: DocumentType<Submission>
   ) {
-    submission.submissionUrl = url;
+    submission.file = file;
     return await submission.save();
   }
 
@@ -127,11 +129,11 @@ export class SubmissionResolver {
   @Mutation(() => Submission)
   async deleteSubmissionFile(
     @Arg("id") _id: ObjectId,
-    @Arg("url", { nullable: true }) url: string,
+    @Arg("file") file: FileInput,
     @LoadResource(Submission) submission: DocumentType<Submission>
   ) {
-    Messagebroker.produceMessage(url, "file.delete");
-    submission.submissionUrl = undefined;
+    Messagebroker.produceMessage(JSON.stringify(file), "file.delete");
+    submission.file = undefined;
     return await submission.save();
   }
 

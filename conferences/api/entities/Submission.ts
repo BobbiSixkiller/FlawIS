@@ -8,6 +8,7 @@ import { Conference } from "./Conference";
 import { Section } from "./Section";
 import { User } from "./User";
 import Messagebroker from "../util/rmq";
+import File from "./File";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -52,9 +53,6 @@ class SubmissionTranslation extends Translation implements Partial<Submission> {
         },
       ]);
   }
-  if (this.isModified("submissionUrl")) {
-    console.log(this.submissionUrl);
-  }
 })
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
@@ -74,8 +72,8 @@ export class Submission extends TimeStamps {
   keywords: string[];
 
   @Field({ nullable: true })
-  @Property()
-  submissionUrl?: string;
+  @Property({ type: () => File, _id: false })
+  file?: File;
 
   @Field(() => Conference)
   @Property({ ref: () => Conference })

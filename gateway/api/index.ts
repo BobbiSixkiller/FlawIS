@@ -36,10 +36,10 @@ const services =
         { name: "users-staging", url: "http://users-staging:6001/graphql" },
         { name: "files-staging", url: "http://files-staging:6002/graphql" },
         {
-          name: "conferences",
-          url: "http://conferences:5003/graphql",
+          name: "conferences-staging",
+          url: "http://conferences-staging:6003/graphql",
         },
-        { name: "grants", url: "http://grants:5004/graphql" },
+        { name: "grants-staging", url: "http://grants-staging:6004/graphql" },
       ];
 const origins =
   process.env.NODE_ENV !== "staging"
@@ -117,7 +117,7 @@ const main = async () => {
     context: (ctx) => createContext(ctx),
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground,
-      new ApolloComplexityPlugin(100),
+      new ApolloComplexityPlugin(200),
     ],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:

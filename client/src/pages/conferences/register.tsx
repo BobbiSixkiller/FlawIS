@@ -78,7 +78,7 @@ const RegisterPage: NextPage = () => {
   return (
     <Grid container centered>
       <Grid.Row>
-        <Grid.Column style={{ maxWidth: 340 }}>
+        <Grid.Column width={8}>
           <div
             style={{
               width: "100%",
