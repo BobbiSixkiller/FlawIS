@@ -6,7 +6,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
   compiler: {
-    styledComponents: { displayName: true, ssr: true },
+    styledComponents: true,
   },
   i18n,
   images: {
