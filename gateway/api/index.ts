@@ -85,7 +85,7 @@ const main = async () => {
       target:
         process.env.NODE_ENV !== "staging"
           ? "http://files:5002/"
-          : "http://files:6002/",
+          : "http://files-staging:6002/",
       changeOrigin: true,
     })
   );
@@ -96,7 +96,7 @@ const main = async () => {
       target:
         process.env.NODE_ENV !== "staging"
           ? "http://files:5002/"
-          : "http://files:6002/",
+          : "http://files-staging:6002/",
       changeOrigin: true,
     })
   );
@@ -107,7 +107,7 @@ const main = async () => {
       target:
         process.env.NODE_ENV !== "staging"
           ? "http://files:5002/"
-          : "http://files:6002/",
+          : "http://files-staging:6002/",
       changeOrigin: true,
     })
   );
