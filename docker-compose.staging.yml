@@ -83,7 +83,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
-        - NODE_ENV=test
+        - NODE_ENV=production
     command: npm run start-staging
     depends_on:
       - gateway-staging
