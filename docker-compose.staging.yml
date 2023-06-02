@@ -83,7 +83,7 @@ services:
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
-    command: npm run start-prod
+    command: npm run start-staging
     depends_on:
       - gateway-staging
     restart: unless-stopped
