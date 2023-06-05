@@ -121,8 +121,8 @@ const main = async () => {
     plugins: [
       process.env.NODE_ENV === "production" ||
       process.env.NODE_ENV === "staging"
-        ? ApolloServerPluginLandingPageDisabled
-        : ApolloServerPluginLandingPageGraphQLPlayground,
+        ? ApolloServerPluginLandingPageDisabled()
+        : ApolloServerPluginLandingPageGraphQLPlayground(),
       ,
       new ApolloComplexityPlugin(200),
     ],
