@@ -116,7 +116,9 @@ const main = async () => {
     gateway,
     context: (ctx) => createContext(ctx),
     plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground,
+      process.env.NODE_ENV === "development"
+        ? ApolloServerPluginLandingPageGraphQLPlayground
+        : undefined,
       new ApolloComplexityPlugin(200),
     ],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
