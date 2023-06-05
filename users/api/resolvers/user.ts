@@ -142,7 +142,7 @@ export class UserResolver {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
-        clientUrl: req.hostname,
+        clientUrl: req.headers.origin,
         name: user.name,
         email: user.email,
         token: signJwt({ id: user.id }, { expiresIn: "1d" }),
@@ -160,7 +160,7 @@ export class UserResolver {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
-        clientUrl: req.hostname,
+        clientUrl: req.headers.origin,
         name: user?.name,
         email: user?.email,
         token: signJwt({ id: user?.id }, { expiresIn: "1d" }),
@@ -241,7 +241,7 @@ export class UserResolver {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
-        clientUrl: req.hostname,
+        clientUrl: req.headers.origin,
         email: user.email,
         name: user.name,
         token,
