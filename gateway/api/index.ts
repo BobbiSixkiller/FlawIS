@@ -2,10 +2,7 @@ import "reflect-metadata";
 import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway";
 import { ApolloServer } from "apollo-server-express";
 import graphqlUploadExpress from "graphql-upload/graphqlUploadExpress.js";
-import {
-  ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from "apollo-server-core";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import Express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -119,11 +116,7 @@ const main = async () => {
     gateway,
     context: (ctx) => createContext(ctx),
     plugins: [
-      process.env.NODE_ENV === "production" ||
-      process.env.NODE_ENV === "staging"
-        ? ApolloServerPluginLandingPageDisabled()
-        : ApolloServerPluginLandingPageGraphQLPlayground(),
-      ,
+      ApolloServerPluginLandingPageGraphQLPlayground,
       new ApolloComplexityPlugin(200),
     ],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
