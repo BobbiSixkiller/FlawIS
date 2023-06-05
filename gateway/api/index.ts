@@ -115,10 +115,13 @@ const main = async () => {
   const server = new ApolloServer({
     gateway,
     context: (ctx) => createContext(ctx),
-    plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground,
-      new ApolloComplexityPlugin(200),
-    ],
+    plugins:
+      process.env.NODE_ENV === "development"
+        ? [
+            ApolloServerPluginLandingPageGraphQLPlayground(),
+            new ApolloComplexityPlugin(200),
+          ]
+        : [new ApolloComplexityPlugin(200)],
     // csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:
       process.env.NODE_ENV === "production" ||
