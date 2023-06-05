@@ -119,7 +119,8 @@ const main = async () => {
     gateway,
     context: (ctx) => createContext(ctx),
     plugins: [
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === "production" ||
+      process.env.NODE_ENV === "staging"
         ? ApolloServerPluginLandingPageDisabled
         : ApolloServerPluginLandingPageGraphQLPlayground,
       ,
