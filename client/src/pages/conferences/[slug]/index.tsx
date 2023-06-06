@@ -15,7 +15,6 @@ import {
 import Footer from "../../../components/Footer";
 import MastHead from "../../../components/MastHead";
 import Nav from "../../../components/MobileNav";
-import SectionDialog from "../../../components/SectionDialog";
 import {
   ConferenceDocument,
   useConferenceQuery,
@@ -102,7 +101,6 @@ const ConferencePage: NextPageWithLayout = () => {
 
             <Grid.Row centered id="sections">
               <Grid.Column computer={10} tablet={12} mobile={16}>
-                <SectionDialog id={data?.conference.id} />
                 <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
                   {t("headings.sections")}
                 </Header>
