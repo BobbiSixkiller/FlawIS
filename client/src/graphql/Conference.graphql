@@ -247,7 +247,9 @@ mutation removeTicket($id: ObjectId!, $ticketId: ObjectId!) {
 mutation updateConferenceUser($data: ConferenceUserInput!) {
   updateConferenceUser(data: $data) {
     id
+    titlesBefore
     name
+    titlesAfter
     email
     organisation
     telephone

@@ -9,11 +9,8 @@ import React, {
   useState,
 } from "react";
 import {
-  DropdownProps,
   Form,
   FormFieldProps,
-  Label,
-  Select,
   SelectProps,
   Transition,
 } from "semantic-ui-react";

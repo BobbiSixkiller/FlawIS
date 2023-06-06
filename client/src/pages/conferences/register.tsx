@@ -32,8 +32,8 @@ import parseErrors from "../../util/parseErrors";
 import Validation from "../../util/validation";
 
 const EmailField: FC<InputFieldProps> = (props) => {
-  const { conferencesRegisterInputSchme } = Validation();
-  type Values = InferType<typeof conferencesRegisterInputSchme>;
+  const { conferencesRegisterInputSchema } = Validation();
+  type Values = InferType<typeof conferencesRegisterInputSchema>;
 
   const { values, setFieldValue, errors, touched } = useFormikContext<Values>();
 
@@ -48,7 +48,7 @@ const EmailField: FC<InputFieldProps> = (props) => {
         "Univerzita Komenského v Bratislave, Právnická fakulta"
       );
     }
-  }, [values, setFieldValue, errors, touched]);
+  }, [values.email, errors, touched]);
 
   return <InputField {...props} />;
 };
@@ -58,27 +58,20 @@ const RegisterPage: NextPage = () => {
   const router = useRouter();
   const intendedPath = globalThis.sessionStorage.getItem("intendedPath");
 
-  const { conferencesRegisterInputSchme } = Validation();
-  type Values = InferType<typeof conferencesRegisterInputSchme>;
+  const { conferencesRegisterInputSchema } = Validation();
+  type Values = InferType<typeof conferencesRegisterInputSchema>;
 
-  const [register] = useRegisterMutation({
-    onCompleted: ({ register }) => {
-      dispatch({
-        type: ActionTypes.Login,
-        payload: { user: register as User },
-      });
-      router.push(intendedPath ? intendedPath : "/");
-    },
-  });
+  const [register] = useRegisterMutation();
 
-  const [updateConferenceUser] = useUpdateConferenceUserMutation();
+  const [updateConferenceUser, { error: updateError }] =
+    useUpdateConferenceUserMutation();
 
   const { t } = useTranslation("register");
 
   return (
     <Grid container centered>
       <Grid.Row>
-        <Grid.Column width={8}>
+        <Grid.Column computer={10} tablet={14} mobile={16}>
           <div
             style={{
               width: "100%",
@@ -105,7 +98,9 @@ const RegisterPage: NextPage = () => {
           </Header>
           <Formik
             initialValues={{
+              titlesBefore: "",
               name: "",
+              titlesAfter: "" as string | undefined,
               email: "",
               organisation: "",
               telephone: "",
@@ -113,26 +108,35 @@ const RegisterPage: NextPage = () => {
               repeatPass: "",
               terms: false,
             }}
-            validationSchema={conferencesRegisterInputSchme}
+            validationSchema={conferencesRegisterInputSchema}
             onSubmit={async (values, actions) => {
               try {
-                await register({
-                  variables: {
-                    data: {
-                      email: values.email,
-                      name: values.name,
-                      password: values.password,
+                if (!updateError) {
+                  await register({
+                    variables: {
+                      data: {
+                        email: values.email,
+                        name: values.name,
+                        password: values.password,
+                      },
                     },
-                  },
-                });
-                await updateConferenceUser({
+                  });
+                }
+                const { data } = await updateConferenceUser({
                   variables: {
                     data: {
                       organisation: values.organisation,
                       telephone: values.telephone,
+                      titlesAfter: values.titlesAfter,
+                      titlesBefore: values.titlesBefore,
                     },
                   },
                 });
+                dispatch({
+                  type: ActionTypes.Login,
+                  payload: { user: data?.updateConferenceUser as User },
+                });
+                router.push(intendedPath ? intendedPath : "/");
               } catch (err: any) {
                 actions.setStatus(
                   parseErrors(
@@ -145,15 +149,29 @@ const RegisterPage: NextPage = () => {
             {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
               <Form size="large" autoComplete="off" onSubmit={handleSubmit}>
                 <Segment>
-                  <InputField
-                    fluid
-                    icon="user"
-                    iconPosition="left"
-                    placeholder={t("name.placeholder")}
-                    label={t("name.label")}
-                    name="name"
-                    control={Input}
-                  />
+                  <Form.Group>
+                    <InputField
+                      placeholder="JUDr."
+                      label="tituly"
+                      name="titlesBefore"
+                      control={Input}
+                      width={3}
+                    />
+                    <InputField
+                      width={10}
+                      placeholder={t("name.placeholder")}
+                      label={t("name.label")}
+                      name="name"
+                      control={Input}
+                    />
+                    <InputField
+                      placeholder="PhD."
+                      label="tituly"
+                      name="titlesAfter"
+                      control={Input}
+                      width={3}
+                    />
+                  </Form.Group>
 
                   <EmailField
                     fluid

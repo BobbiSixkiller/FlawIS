@@ -176,19 +176,19 @@ export class ConferenceResolver {
   }
 
   @Authorized()
-  @Mutation(() => User)
+  @Mutation(() => User, { nullable: true })
   async updateConferenceUser(
     @Arg("data") userInput: ConferenceUserInput,
     @Ctx() { user }: Context
   ) {
     const conferenceUser = await this.userService.findOne({ _id: user?.id });
-    if (!conferenceUser) throw new Error("Accout has been deleted!");
+    if (conferenceUser) {
+      for (const [key, value] of Object.entries(userInput)) {
+        conferenceUser[key as keyof ConferenceUserInput] = value;
+      }
 
-    for (const [key, value] of Object.entries(userInput)) {
-      conferenceUser[key as keyof User] = value;
+      return await conferenceUser?.save();
     }
-
-    return await conferenceUser.save();
   }
 
   @FieldResolver(() => [Section])
