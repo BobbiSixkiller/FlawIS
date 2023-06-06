@@ -8,6 +8,7 @@ import Attendee from "../../../../components/AttendeeComponent";
 import Dashboard from "../../../../components/Dashboard";
 import DeleteDialog from "../../../../components/DeleteDialog";
 import ExportCSV from "../../../../components/ExportCSV";
+import SectionDialog from "../../../../components/SectionDialog";
 import {
   ConferenceDocument,
   Role,
@@ -126,7 +127,9 @@ const DashboardPage: NextPageWithLayout = () => {
         <Grid.Column>
           <Header>Sekcie</Header>
         </Grid.Column>
-        <Grid.Column></Grid.Column>
+        <Grid.Column>
+          <SectionDialog id={data?.conference.id} />
+        </Grid.Column>
       </Grid.Row>
       <Grid.Row>
         <Grid.Column>
@@ -163,6 +166,7 @@ const DashboardPage: NextPageWithLayout = () => {
                   cancelText="Zrušiť"
                   confirmText="Potvrdiť"
                 />
+                <SectionDialog id={section.id} data={section} />
               </Card.Content>
             </Card>
           ))}

@@ -175,6 +175,11 @@ query conference($slug: String!) {
           serverSideUrl
         }
       }
+      translations {
+        name
+        description
+        language
+      }
     }
     tickets {
       id
