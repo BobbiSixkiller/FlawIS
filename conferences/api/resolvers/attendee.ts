@@ -164,7 +164,10 @@ export class AttendeeResolver {
             conference.billing.variableSymbol +
             String(conference.attendeesCount + 1).padStart(4, "0"),
         },
-        payer: { ...billing },
+        payer: {
+          ...billing,
+          name: isFlaw ? `${user.name}, ${billing.name}` : billing.name,
+        },
         body: {
           price: Math.round((priceWithouTax / 100) * 100) / 100,
           vat: isFlaw
@@ -172,8 +175,8 @@ export class AttendeeResolver {
             : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
           body:
             locale === "sk"
-              ? `Faktúra vystavená na úhradu konferenčného poplatku.`
-              : `This invoice has been issued in order to pay the conference fee.`,
+              ? `Faktúra vystavená na úhradu konferenčného poplatku pre účastníka ${user?.name}.`
+              : `This invoice has been issued in order for ${user?.name} to pay the conference fee .`,
           comment:
             locale === "sk"
               ? "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača."
