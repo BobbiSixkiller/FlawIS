@@ -44,7 +44,7 @@ export default function Validation() {
   const conferencesRegisterInputSchema = object({
     titlesBefore: string().trim().required(),
     name: string().trim().required(),
-    titlesAfter: string().trim(),
+    titlesAfter: string().trim().nullable(),
     email: string().required().email(),
     password: string()
       .trim()
@@ -80,7 +80,7 @@ export default function Validation() {
     organisation: string().trim().required(),
     telephone: string().trim().required(),
     titlesBefore: string().trim().required(),
-    titlesAfter: string().trim(),
+    titlesAfter: string().trim().nullable(),
   });
 
   const conferenceInputSchema = object({

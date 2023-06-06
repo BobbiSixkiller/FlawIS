@@ -100,7 +100,7 @@ const RegisterPage: NextPage = () => {
             initialValues={{
               titlesBefore: "",
               name: "",
-              titlesAfter: "" as string | undefined,
+              titlesAfter: "" as string | null | undefined,
               email: "",
               organisation: "",
               telephone: "",
@@ -152,7 +152,7 @@ const RegisterPage: NextPage = () => {
                   <Form.Group>
                     <InputField
                       placeholder="JUDr."
-                      label="tituly"
+                      label={t("titles.label")}
                       name="titlesBefore"
                       control={Input}
                       width={3}
@@ -166,7 +166,7 @@ const RegisterPage: NextPage = () => {
                     />
                     <InputField
                       placeholder="PhD."
-                      label="tituly"
+                      label={t("titles.label")}
                       name="titlesAfter"
                       control={Input}
                       width={3}

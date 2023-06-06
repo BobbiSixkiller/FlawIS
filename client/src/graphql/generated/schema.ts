@@ -261,7 +261,7 @@ export type ConferenceUserInput = {
   organisation: Scalars['String'];
   telephone: Scalars['String'];
   titlesAfter?: InputMaybe<Scalars['String']>;
-  titlesBefore?: InputMaybe<Scalars['String']>;
+  titlesBefore: Scalars['String'];
 };
 
 /** Conference contact information */
@@ -477,7 +477,7 @@ export type Mutation = {
   resendActivationLink: Scalars['Boolean'];
   updateAnnouncement: Announcement;
   updateConference: Conference;
-  updateConferenceUser: User;
+  updateConferenceUser?: Maybe<User>;
   updateInvoice: Attendee;
   updateSection: Section;
   updateSubmission: Submission;
@@ -1150,7 +1150,7 @@ export type UpdateConferenceUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser: { __typename?: 'User', id: any, titlesBefore?: string | null, name: string, titlesAfter?: string | null, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UpdateConferenceUserMutation = { __typename?: 'Mutation', updateConferenceUser?: { __typename?: 'User', id: any, titlesBefore?: string | null, name: string, titlesAfter?: string | null, email: string, organisation: string, telephone: string, role: Role, verified: boolean, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } | null };
 
 export type CreateConferenceMutationVariables = Exact<{
   data: ConferenceInput;

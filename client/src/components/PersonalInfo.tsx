@@ -48,7 +48,7 @@ const PersonalInfo: FC<{
         organisation: user?.organisation || "",
         telephone: user?.telephone || "",
         titlesBefore: user?.titlesBefore || "",
-        titlesAfter: user?.titlesAfter as string,
+        titlesAfter: user?.titlesAfter,
       }}
       validationSchema={perosnalInfoInputSchema}
       onSubmit={async (values, actions) => {
@@ -65,6 +65,8 @@ const PersonalInfo: FC<{
           await updateConferenceUser({
             variables: {
               data: {
+                titlesBefore: values.titlesBefore,
+                titlesAfter: values.titlesAfter,
                 organisation: values.organisation,
                 telephone: values.telephone,
               },
@@ -85,7 +87,7 @@ const PersonalInfo: FC<{
             <Form.Group>
               <InputField
                 placeholder="JUDr."
-                label="tituly"
+                label={t("titles.label")}
                 name="titlesBefore"
                 control={Input}
                 width={3}
@@ -99,7 +101,7 @@ const PersonalInfo: FC<{
               />
               <InputField
                 placeholder="PhD."
-                label="tituly"
+                label={t("titles.label")}
                 name="titlesAfter"
                 control={Input}
                 width={3}
