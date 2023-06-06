@@ -2,9 +2,10 @@
   "header": "Registrovať",
   "submit": "Registrovať",
   "message": "Máte už účet? <lnk>Prihláste sa!</lnk>",
+  "titles": { "label": "Titul", "placeholder": "Tituly..." },
   "name": {
-    "label": "Meno vrátane titulov",
-    "placeholder": "Meno vrátane titulov..."
+    "label": "Meno",
+    "placeholder": "Meno..."
   },
   "email": {
     "label": "Email",

@@ -2,9 +2,10 @@
   "header": "Register",
   "submit": "Register",
   "message": "Already have an account? <lnk>Log In!</lnk>",
+  "titles": { "label": "Title", "placeholder": "Titles..." },
   "name": {
-    "label": "Name including titles",
-    "placeholder": "Name including titles..."
+    "label": "Name",
+    "placeholder": "Name..."
   },
   "email": {
     "label": "Email",

@@ -79,6 +79,8 @@ export default function Validation() {
     email: string().required().email(),
     organisation: string().trim().required(),
     telephone: string().trim().required(),
+    titlesBefore: string().trim().required(),
+    titlesAfter: string().trim(),
   });
 
   const conferenceInputSchema = object({
