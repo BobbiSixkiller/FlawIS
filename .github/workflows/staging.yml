@@ -13,7 +13,7 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Dropd all existing DBs and Copy DBs from prod to staging env
+      - name: Copy DBs
         env:
           MONGO_CONTAINER_NAME: "flawis-mongo-1"
         run: |
