@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { index, pre, prop as Property } from "@typegoose/typegoose";
-import { Directive, Field, ID, ObjectType } from "type-graphql";
+import { Directive, Field, ObjectType } from "type-graphql";
 import { Billing } from "./Billing";
 
 @Directive("@extends")
@@ -38,9 +38,17 @@ export class User {
   @Property()
   email: string;
 
+  @Field({ nullable: true })
+  @Property()
+  titlesBefore?: string;
+
   @Field()
   @Property()
   name: string;
+
+  @Field({ nullable: true })
+  @Property()
+  titlesAfter?: string;
 
   @Field(() => [Billing], { nullable: "items" })
   @Property({ type: () => [Billing], _id: false })

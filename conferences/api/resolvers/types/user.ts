@@ -1,4 +1,4 @@
-import { IsPhoneNumber, Length } from "class-validator";
+import { IsPhoneNumber, IsString, Length } from "class-validator";
 import { Field, InputType } from "type-graphql";
 
 @InputType({ description: "User input type" })
@@ -12,4 +12,12 @@ export class ConferenceUserInput {
   @Field()
   @IsPhoneNumber()
   telephone: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  titlesBefore?: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  titlesAfter?: string;
 }
