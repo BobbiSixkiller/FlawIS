@@ -91,6 +91,7 @@ const PersonalInfo: FC<{
                 name="titlesBefore"
                 control={Input}
                 width={3}
+                disabled={!update}
               />
               <InputField
                 width={10}
@@ -98,12 +99,14 @@ const PersonalInfo: FC<{
                 label={t("name.label")}
                 name="name"
                 control={Input}
+                disabled={!update}
               />
               <InputField
                 placeholder="PhD."
                 label={t("titles.label")}
                 name="titlesAfter"
                 control={Input}
+                disabled={!update}
                 width={3}
               />
             </Form.Group>
