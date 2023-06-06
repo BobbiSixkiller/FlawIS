@@ -1,6 +1,8 @@
 fragment User on User {
   id
+  titlesBefore
   name
+  titlesAfter
   email
   role
   verified

@@ -41,8 +41,10 @@ export default function Validation() {
       .oneOf([ref("password")], t("passNoMatch")),
   });
 
-  const conferencesRegisterInputSchme = object({
+  const conferencesRegisterInputSchema = object({
+    titlesBefore: string().trim().required(),
     name: string().trim().required(),
+    titlesAfter: string().trim().nullable(),
     email: string().required().email(),
     password: string()
       .trim()
@@ -77,6 +79,8 @@ export default function Validation() {
     email: string().required().email(),
     organisation: string().trim().required(),
     telephone: string().trim().required(),
+    titlesBefore: string().trim().required(),
+    titlesAfter: string().trim().nullable(),
   });
 
   const conferenceInputSchema = object({
@@ -172,7 +176,7 @@ export default function Validation() {
   return {
     loginInputSchema,
     flawisRegisterInputSchema,
-    conferencesRegisterInputSchme,
+    conferencesRegisterInputSchema,
     forgotPasswordInputSchema,
     passwordInputSchema,
     perosnalInfoInputSchema,

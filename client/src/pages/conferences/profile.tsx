@@ -100,7 +100,11 @@ ProfilePage.getLayout = function getLayout(page) {
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
     protect: true,
-    ...(await serverSideTranslations(locale, ["profile", "common"])),
+    ...(await serverSideTranslations(locale, [
+      "profile",
+      "common",
+      "register",
+    ])),
   },
 });
 

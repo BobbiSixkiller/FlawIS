@@ -171,6 +171,8 @@ type ConferenceTranslation {
 input ConferenceUserInput {
   organisation: String!
   telephone: String!
+  titlesAfter: String
+  titlesBefore: String!
 }
 
 """Conference contact information"""
@@ -264,7 +266,7 @@ type Mutation {
   removeAttendee(id: ObjectId!): Attendee!
   removeTicket(id: ObjectId!, ticketId: ObjectId!): Conference!
   updateConference(data: ConferenceInput!, id: ObjectId!): Conference!
-  updateConferenceUser(data: ConferenceUserInput!): User!
+  updateConferenceUser(data: ConferenceUserInput!): User
   updateInvoice(data: InvoiceInput!, id: ObjectId!): Attendee!
   updateSection(data: SectionInput!, id: ObjectId!): Section!
   updateSubmission(data: SubmissionInput!, id: ObjectId!): Submission!
@@ -401,4 +403,6 @@ type User {
   name: String!
   organisation: String!
   telephone: String!
+  titlesAfter: String
+  titlesBefore: String
 }
