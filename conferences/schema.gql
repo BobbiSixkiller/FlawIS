@@ -172,7 +172,7 @@ input ConferenceUserInput {
   organisation: String!
   telephone: String!
   titlesAfter: String
-  titlesBefore: String
+  titlesBefore: String!
 }
 
 """Conference contact information"""
