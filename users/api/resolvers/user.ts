@@ -136,7 +136,10 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
       domain:
-        process.env.NODE_ENV === "production" ? "flaw.uniba.sk" : "localhost",
+        process.env.NODE_ENV === "production" ||
+        process.env.NODE_ENV === "staging"
+          ? "flaw.uniba.sk"
+          : "localhost",
     });
 
     messageBroker.produceMessage(
@@ -206,7 +209,10 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
       domain:
-        process.env.NODE_ENV === "production" ? "flaw.uniba.sk" : "localhost",
+        process.env.NODE_ENV === "production" ||
+        process.env.NODE_ENV === "staging"
+          ? "flaw.uniba.sk"
+          : "localhost",
     });
 
     return user;
