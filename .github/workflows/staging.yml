@@ -13,7 +13,13 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Copy DBs
+      - name: Delete Staging Databases
+        env:
+          MONGO_CONTAINER_NAME: "flawis-mongo-1"
+        run: |
+          docker exec $MONGO_CONTAINER_NAME mongo --eval 'db.getMongo().getDBNames().forEach(function(name) { if (name.endsWith("_copy")) { db.getSiblingDB(name).dropDatabase(); } });'
+
+      - name: Create staging Databases
         env:
           MONGO_CONTAINER_NAME: "flawis-mongo-1"
         run: |

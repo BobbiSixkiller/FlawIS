@@ -1,7 +1,7 @@
 import { Formik, FormikProps } from "formik";
 import { useTranslation } from "next-i18next";
 import { useContext, useRef } from "react";
-import { Button, Form, Input, Select, TextArea } from "semantic-ui-react";
+import { Button, Form, Select, TextArea } from "semantic-ui-react";
 import { InferType, object, string, array } from "yup";
 import {
   useCreateSectionMutation,
@@ -132,7 +132,7 @@ export default function SectionDialog({
                     placeholder="Názov sekcie..."
                     label="Názov"
                     name="name"
-                    control={Input}
+                    control={TextArea}
                   />
                   <LocalizedInputField
                     placeholder="Popis sekcie..."
