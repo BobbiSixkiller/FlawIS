@@ -17,37 +17,37 @@ export default function UserVerifiedDialog() {
   const [resendActivationLink, { error }] = useResendActivationLinkMutation();
   /* eslint-disable */
   useEffect(() => {
-    const content = (
-      <Grid.Column>
-        <Header>{t("dialog.header")}</Header>
-        <p>{t("dialog.body")}</p>
-        <Button
-          primary
-          onClick={() => {
-            resendActivationLink();
-            setMsg(t("dialog.msg"));
-          }}
-        >
-          {t("dialog.button")}
-        </Button>
-        {msg && (
-          <Message
-            positive
-            compact
-            content={msg}
-            onDismiss={() => setMsg("")}
-          />
-        )}
-        {error && <Message error compact content={error.message} />}
-      </Grid.Column>
-    );
-
     if (
       user &&
       !user?.verified &&
       !pathname.includes("/activate") &&
       i18n.hasLoadedNamespace("activation")
     ) {
+      const content = (
+        <Grid.Column>
+          <Header>{t("dialog.header")}</Header>
+          <p>{t("dialog.body")}</p>
+          <Button
+            primary
+            onClick={() => {
+              resendActivationLink();
+              setMsg(t("dialog.msg"));
+            }}
+          >
+            {t("dialog.button")}
+          </Button>
+          {msg && (
+            <Message
+              positive
+              compact
+              content={msg}
+              onDismiss={() => setMsg("")}
+            />
+          )}
+          {error && <Message error compact content={error.message} />}
+        </Grid.Column>
+      );
+
       handleOpen({ content, size: "tiny" });
     }
   }, [user, i18n, msg, error]);
