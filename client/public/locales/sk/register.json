@@ -4,8 +4,8 @@
   "message": "Máte už účet? <lnk>Prihláste sa!</lnk>",
   "titles": { "label": "Titul", "placeholder": "Tituly..." },
   "name": {
-    "label": "Meno",
-    "placeholder": "Meno..."
+    "label": "Meno a priezvisko",
+    "placeholder": "Meno a priezvisko..."
   },
   "email": {
     "label": "Email",
