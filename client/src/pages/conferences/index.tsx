@@ -188,11 +188,20 @@ const HomePage: NextPageWithLayout = () => {
                           <h4>
                             {new Date(
                               edge?.node.dates.start
-                            ).toLocaleDateString() +
+                            ).toLocaleDateString(i18n.language, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }) +
                               " - " +
-                              new Date(
-                                edge?.node.dates.end
-                              ).toLocaleDateString()}
+                              new Date(edge?.node.dates.end).toLocaleDateString(
+                                i18n.language,
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
                           </h4>
                         </Item>
                       </Container>
