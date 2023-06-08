@@ -38,7 +38,7 @@ const PersonalInfo: FC<{
   const { perosnalInfoInputSchema } = Validation();
   type Values = InferType<typeof perosnalInfoInputSchema>;
 
-  const { t } = useTranslation("register");
+  const { t } = useTranslation("profile");
 
   return (
     <Formik
@@ -87,7 +87,7 @@ const PersonalInfo: FC<{
             <Form.Group>
               <InputField
                 placeholder="JUDr."
-                label={t("titles.label")}
+                label={t("titles.label", { ns: "register" })}
                 name="titlesBefore"
                 control={Input}
                 width={3}
@@ -95,15 +95,15 @@ const PersonalInfo: FC<{
               />
               <InputField
                 width={10}
-                placeholder={t("name.placeholder")}
-                label={t("name.label")}
+                placeholder={t("name.placeholder", { ns: "register" })}
+                label={t("name.label", { ns: "register" })}
                 name="name"
                 control={Input}
                 disabled={!update}
               />
               <InputField
                 placeholder="PhD."
-                label={t("titles.label")}
+                label={t("titles.label", { ns: "register" })}
                 name="titlesAfter"
                 control={Input}
                 disabled={!update}
@@ -116,8 +116,8 @@ const PersonalInfo: FC<{
               disabled={!update}
               icon="at"
               iconPosition="left"
-              placeholder="E-mail address"
-              label="Email"
+              placeholder={t("email.placeholder", { ns: "register" })}
+              label={t("email.label", { ns: "register" })}
               name="email"
               control={Input}
             />
@@ -127,8 +127,8 @@ const PersonalInfo: FC<{
               disabled={!update}
               icon="phone"
               iconPosition="left"
-              placeholder="Telephone number"
-              label="Telephone"
+              placeholder={t("phone.placeholder", { ns: "register" })}
+              label={t("phone.label", { ns: "register" })}
               name="telephone"
               control={Input}
             />
@@ -138,8 +138,8 @@ const PersonalInfo: FC<{
               disabled={!update}
               icon="building"
               iconPosition="left"
-              placeholder="Name of the organisation"
-              label="Organisation"
+              placeholder={t("organisation.placeholder", { ns: "register" })}
+              label={t("organisation.label", { ns: "register" })}
               name="organisation"
               control={Input}
             />
@@ -153,23 +153,23 @@ const PersonalInfo: FC<{
                     setUpdate(false);
                   }}
                 >
-                  Cancel
+                  {t("actions.cancel", { ns: "common" })}
                 </Button>
-                <Button.Or />
+                <Button.Or text="/" />
                 <Button
                   type="submit"
                   positive
                   disabled={isSubmitting}
                   loading={isSubmitting}
                 >
-                  Save
+                  {t("actions.save", { ns: "common" })}
                 </Button>
               </Button.Group>
             ) : (
               <Button
                 primary
                 type="button"
-                content="Click to update"
+                content={t("actions.updateToggle", { ns: "common" })}
                 onClick={() => setUpdate(true)}
               />
             )}

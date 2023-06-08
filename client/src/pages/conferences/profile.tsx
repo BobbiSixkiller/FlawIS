@@ -18,7 +18,7 @@ import { AuthContext } from "../../providers/Auth";
 const ProfilePage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
   const { dispatch } = useContext(ControlsContext);
-  const { t } = useTranslation(["common", "profile"]);
+  const { t } = useTranslation("common");
   const width = useWidth();
   const router = useRouter();
 
@@ -29,7 +29,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   const panes = [
     {
-      menuItem: t("header", { ns: "profile" }),
+      menuItem: t("menu.profile"),
       render: () => (
         <Tab.Pane
           loading={loading}
@@ -42,7 +42,7 @@ const ProfilePage: NextPageWithLayout = () => {
       ),
     },
     {
-      menuItem: t("menu.conferences", { ns: "common" }),
+      menuItem: t("menu.conferences"),
       render: () => (
         <Tab.Pane
           loading={loading}
@@ -102,11 +102,7 @@ ProfilePage.getLayout = function getLayout(page) {
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
     protect: true,
-    ...(await serverSideTranslations(locale, [
-      "profile",
-      "common",
-      "register",
-    ])),
+    ...(await serverSideTranslations(locale, ["common", "register"])),
   },
 });
 
