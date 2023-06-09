@@ -43,13 +43,17 @@ const CustomSegment = styled.div<MastHeadProps>`
     content: "";
     background-image: url("/images/background-main.jpg");
     background-attachment: fixed;
-    background-position: center;
     background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
     opacity: 0.4;
     z-index: -1;
     animation: ${opacityChange} 3s ease-in;
-    @media only screen and (max-width: 768px) {
-      background-size: contain no-repeat;
+  }
+
+  @media (max-width: 583px) {
+    &:after {
+      background-attachment: scroll;
     }
   }
 `;
