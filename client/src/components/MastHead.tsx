@@ -35,6 +35,7 @@ const CustomSegment = styled.div<MastHeadProps>`
     rgba(2, 0, 36, 1) 100%
   ); */
   &:after {
+    box-sizing: inherit;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -44,13 +45,11 @@ const CustomSegment = styled.div<MastHeadProps>`
     background-image: url("/images/background-main.jpg");
     background-attachment: fixed;
     background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
     opacity: 0.4;
     z-index: -1;
     animation: ${opacityChange} 3s ease-in;
-    @media only screen and (max-width: 768px) {
-      background-size: contain no-repeat;
-    }
   }
 `;
 
