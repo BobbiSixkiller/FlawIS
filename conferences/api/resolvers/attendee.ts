@@ -246,6 +246,8 @@ export class AttendeeResolver {
   @Authorized()
   @FieldResolver(() => [Submission])
   async submissions(@Root() { conference, user }: Attendee) {
+    await this.submissionService.dataModel.syncIndexes();
+
     return await this.submissionService.findAll({
       conference: conference,
       authors: user,
