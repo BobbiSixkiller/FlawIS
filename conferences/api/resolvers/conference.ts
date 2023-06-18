@@ -229,7 +229,7 @@ export class ConferenceResolver {
       {
         $facet: {
           data: [
-            { $cond: [{ $ne: [sectioIds, null] }, {}] },
+            // { $cond: [{ $ne: [sectioIds, null] }, {}] },
             {
               $match: {
                 $expr: {
