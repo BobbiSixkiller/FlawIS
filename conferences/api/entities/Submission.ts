@@ -1,4 +1,9 @@
-import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
+import {
+  getModelForClass,
+  index,
+  pre,
+  prop as Property,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ArgumentValidationError, Field, ID, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
@@ -54,6 +59,7 @@ class SubmissionTranslation extends Translation implements Partial<Submission> {
       ]);
   }
 })
+@index({ conference: 1, section: 1, authors: 1 })
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
   @Field(() => ID)

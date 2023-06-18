@@ -95,4 +95,7 @@ export class InvoiceInput {
 export class AttendeeConnection extends CreateConnection(Attendee) {}
 
 @ArgsType()
-export class AttendeeArgs extends CreateConnectionArgs(Attendee) {}
+export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
+  @Field()
+  sectioIds: ObjectId[];
+}
