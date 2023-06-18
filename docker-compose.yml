@@ -7,6 +7,7 @@ services:
     command: npm run dev
     environment:
       NODE_ENV: development
+      SECRET: ${SECRET}
     depends_on:
       - users
       - conferences
