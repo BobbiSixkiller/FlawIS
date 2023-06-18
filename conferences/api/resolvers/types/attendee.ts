@@ -1,4 +1,11 @@
-import { Field, ArgsType, InputType, Float, ObjectType } from "type-graphql";
+import {
+  Field,
+  ArgsType,
+  InputType,
+  Float,
+  ObjectType,
+  ID,
+} from "type-graphql";
 import { IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 
@@ -96,6 +103,6 @@ export class AttendeeConnection extends CreateConnection(Attendee) {}
 
 @ArgsType()
 export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
-  @Field()
+  @Field(() => [ID])
   sectioIds: ObjectId[];
 }
