@@ -10,7 +10,6 @@ import {
 import {
   Button,
   Card,
-  Dropdown,
   Form,
   Grid,
   Header,
@@ -23,7 +22,7 @@ import {
 import { InView } from "react-intersection-observer";
 import DeleteDialog from "../../../../../components/DeleteDialog";
 import useWidth from "../../../../../hooks/useWidth";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import {
   ActionTypes,
   ControlsContext,
@@ -36,10 +35,6 @@ const AttendeesPage: NextPageWithLayout = () => {
   const { dispatch } = useContext(ControlsContext);
   const router = useRouter();
   const width = useWidth();
-  const [open, setOpen] = useState(false);
-
-  const dropdownContainerRef = useRef<HTMLDivElement>(null);
-  const click = useOnClickOutside(dropdownContainerRef, () => setOpen(false));
 
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
@@ -64,7 +59,7 @@ const AttendeesPage: NextPageWithLayout = () => {
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row verticalAlign="middle" columns={2}>
-        <Grid.Column>
+        <Grid.Column width={4}>
           <Header>
             Účastníci
             <Header.Subheader>
@@ -73,7 +68,7 @@ const AttendeesPage: NextPageWithLayout = () => {
             </Header.Subheader>
           </Header>
         </Grid.Column>
-        <Grid.Column style={{ display: "flex" }}>
+        <Grid.Column width={12} style={{ display: "flex" }}>
           <div style={{ alignSelf: "flex-end" }}>
             {exportData && (
               <ExportCSV
@@ -93,31 +88,22 @@ const AttendeesPage: NextPageWithLayout = () => {
                 )}
               />
             )}
-            {/* <Dropdown
-              open={open}
-              className="button secondary icon"
-              icon="filter"
-              onClick={() => {
-                if (!click && open) {
-                  setOpen(false);
-                } else setOpen(true);
-              }}
-              floating
+            <Popup
+              wide
+              trigger={
+                <Button className="button secondary icon" icon="filter" />
+              }
+              on="click"
+              position="bottom right"
             >
-              <Dropdown.Menu direction="left">
-                <div ref={dropdownContainerRef}>
-                  <Segment>
-                    <Form>
-                      {data?.conference.sections.map((s) => (
-                        <Form.Field key={s.id}>
-                          <Radio label={s.name} toggle />
-                        </Form.Field>
-                      ))}
-                    </Form>
-                  </Segment>
-                </div>
-              </Dropdown.Menu>
-            </Dropdown> */}
+              <Form>
+                {data?.conference.sections.map((s) => (
+                  <Form.Field key={s.id}>
+                    <Radio label={s.name} toggle />
+                  </Form.Field>
+                ))}
+              </Form>
+            </Popup>
           </div>
         </Grid.Column>
       </Grid.Row>

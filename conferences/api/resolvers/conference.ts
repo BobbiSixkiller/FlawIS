@@ -199,14 +199,37 @@ export class ConferenceResolver {
   @Authorized()
   @FieldResolver(() => AttendeeConnection)
   async attendees(
-    @Args() { after, first }: AttendeeArgs,
+    @Args() { after, first, sectioIds }: AttendeeArgs,
     @Root() { id }: Conference
   ): Promise<AttendeeConnection> {
     const attendees = await this.attendeeService.aggregate([
       { $match: { conference: id } },
       {
+        $lookup: {
+          from: "submissions",
+          let: {
+            conference: "$conference",
+            user: "$user",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $in: ["$$user", "$authors"] },
+                    { $eq: ["$conference", "$$conference"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "submissions",
+        },
+      },
+      {
         $facet: {
           data: [
+            // { $cond: [{ $ne: [sectioIds, null] }, {}] },
             {
               $match: {
                 $expr: {
@@ -264,6 +287,8 @@ export class ConferenceResolver {
         },
       },
     ]);
+
+    console.log(attendees[0].edges);
 
     return attendees[0] as unknown as AttendeeConnection;
   }
