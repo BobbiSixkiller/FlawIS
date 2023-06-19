@@ -22,13 +22,12 @@ import {
 import { InView } from "react-intersection-observer";
 import DeleteDialog from "../../../../../components/DeleteDialog";
 import useWidth from "../../../../../hooks/useWidth";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActionTypes,
   ControlsContext,
 } from "../../../../../providers/ControlsProvider";
 import AttendeeSearch from "../../../../../components/AttendeeSearch";
-import useOnClickOutside from "../../../../../hooks/useOnClickOutside";
 import ExportCSV from "../../../../../components/ExportCSV";
 
 const AttendeesPage: NextPageWithLayout = () => {
@@ -36,9 +35,13 @@ const AttendeesPage: NextPageWithLayout = () => {
   const router = useRouter();
   const width = useWidth();
 
+  const [filter, setFilter] = useState<string[]>([]);
+
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
-      variables: { slug: router.query.slug as string },
+      variables: {
+        slug: router.query.slug as string,
+      },
     });
 
   const [getExportData, { data: exportData, loading: exportLoading }] =
@@ -51,10 +54,19 @@ const AttendeesPage: NextPageWithLayout = () => {
         rightPanelItems: <AttendeeSearch conferenceId={data?.conference.id} />,
       },
     });
-    getExportData({ variables: { conferenceId: data?.conference.id } });
+    if (data) {
+      getExportData({ variables: { conferenceId: data?.conference.id } });
+    }
   }, [dispatch, data, getExportData]);
 
   const [deleteAttednee] = useRemoveAttendeeMutation();
+
+  useEffect(() => {
+    console.log(filter);
+    if (filter.length !== 0) {
+      refetch({ sectionIds: filter });
+    }
+  }, [filter]);
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -91,7 +103,11 @@ const AttendeesPage: NextPageWithLayout = () => {
             <Popup
               wide
               trigger={
-                <Button className="button secondary icon" icon="filter" />
+                <Button
+                  className="button secondary icon"
+                  icon="filter"
+                  loading={loading}
+                />
               }
               on="click"
               position="bottom right"
@@ -99,7 +115,19 @@ const AttendeesPage: NextPageWithLayout = () => {
               <Form>
                 {data?.conference.sections.map((s) => (
                   <Form.Field key={s.id}>
-                    <Radio label={s.name} toggle />
+                    <Radio
+                      label={s.name}
+                      toggle
+                      onChange={(e, data) => {
+                        const filterSet = new Set(filter);
+                        if (data.checked) {
+                          filterSet.add(s.id);
+                        } else {
+                          filterSet.delete(s.id);
+                        }
+                        setFilter(Array.from(filterSet));
+                      }}
+                    />
                   </Form.Field>
                 ))}
               </Form>
