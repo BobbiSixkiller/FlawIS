@@ -199,9 +199,10 @@ export class ConferenceResolver {
   @Authorized()
   @FieldResolver(() => AttendeeConnection)
   async attendees(
-    @Args() { after, first, sectioIds }: AttendeeArgs,
+    @Args() { after, first, sectionIds }: AttendeeArgs,
     @Root() { id }: Conference
   ): Promise<AttendeeConnection> {
+    console.log(sectionIds);
     const attendees = await this.attendeeService.aggregate([
       { $match: { conference: id } },
       {
@@ -229,7 +230,17 @@ export class ConferenceResolver {
       {
         $facet: {
           data: [
-            // { $cond: [{ $ne: [sectioIds, null] }, {}] },
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $isArray: sectionIds },
+                    { $in: [sectionIds, "$submissions.section"] },
+                    {},
+                  ],
+                },
+              },
+            },
             {
               $match: {
                 $expr: {

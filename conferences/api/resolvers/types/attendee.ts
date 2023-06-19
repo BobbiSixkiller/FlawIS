@@ -103,6 +103,6 @@ export class AttendeeConnection extends CreateConnection(Attendee) {}
 
 @ArgsType()
 export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
-  @Field(() => [ID])
-  sectioIds: ObjectId[];
+  @Field(() => [ID], { nullable: true, defaultValue: null })
+  sectionIds?: ObjectId[];
 }

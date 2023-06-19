@@ -196,7 +196,12 @@ query conference($slug: String!) {
   }
 }
 
-query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int) {
+query conferenceAttendees(
+  $slug: String!
+  $after: ObjectId
+  $first: Int
+  $sectionIds: [ID!]
+) {
   conference(slug: $slug) {
     id
     sections {
@@ -206,7 +211,7 @@ query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int) {
       languages
     }
     attendeesCount
-    attendees(after: $after, first: $first) {
+    attendees(after: $after, first: $first, sectionIds: $sectionIds) {
       edges {
         cursor
         node {
