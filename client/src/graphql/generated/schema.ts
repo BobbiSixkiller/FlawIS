@@ -195,7 +195,7 @@ export type Conference = {
 export type ConferenceAttendeesArgs = {
   after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
-  sectionIds?: InputMaybe<Array<Scalars['ID']>>;
+  sectionIds?: InputMaybe<Array<Scalars['ObjectId']>>;
 };
 
 /** Conference billing organization */
@@ -1125,7 +1125,7 @@ export type ConferenceAttendeesQueryVariables = Exact<{
   slug: Scalars['String'];
   after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
-  sectionIds?: InputMaybe<Array<Scalars['ID']> | Scalars['ID']>;
+  sectionIds?: InputMaybe<Array<Scalars['ObjectId']> | Scalars['ObjectId']>;
 }>;
 
 
@@ -2296,7 +2296,7 @@ export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
 export const ConferenceAttendeesDocument = gql`
-    query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int, $sectionIds: [ID!]) {
+    query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int, $sectionIds: [ObjectId!]) {
   conference(slug: $slug) {
     id
     sections {
