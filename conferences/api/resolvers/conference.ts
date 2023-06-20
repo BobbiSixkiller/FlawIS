@@ -202,7 +202,6 @@ export class ConferenceResolver {
     @Args() { after, first, sectionIds }: AttendeeArgs,
     @Root() { id }: Conference
   ): Promise<AttendeeConnection> {
-    console.log(sectionIds);
     const attendees = await this.attendeeService.aggregate([
       { $match: { conference: id } },
       {
@@ -233,11 +232,21 @@ export class ConferenceResolver {
             {
               $match: {
                 $expr: {
-                  $cond: [
-                    { $isArray: sectionIds },
-                    { $in: [sectionIds, "$submissions.section"] },
-                    {},
-                  ],
+                  $cond: {
+                    if: { $ne: [{ $size: [sectionIds] }, 0] },
+                    then: {
+                      $anyElementTrue: {
+                        $map: {
+                          input: "$submissions",
+                          as: "nested",
+                          in: {
+                            $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                          },
+                        },
+                      },
+                    },
+                    else: {},
+                  },
                 },
               },
             },
@@ -298,8 +307,6 @@ export class ConferenceResolver {
         },
       },
     ]);
-
-    console.log(attendees[0].edges);
 
     return attendees[0] as unknown as AttendeeConnection;
   }
