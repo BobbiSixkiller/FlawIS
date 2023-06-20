@@ -200,7 +200,7 @@ query conferenceAttendees(
   $slug: String!
   $after: ObjectId
   $first: Int
-  $sectionIds: [ID!]
+  $sectionIds: [ObjectId!]
 ) {
   conference(slug: $slug) {
     id

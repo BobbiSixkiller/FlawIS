@@ -63,10 +63,11 @@ const AttendeesPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     console.log(filter);
-    if (filter.length !== 0) {
-      refetch({ sectionIds: filter });
-    }
+
+    refetch({ sectionIds: filter });
   }, [filter]);
+
+  console.log(data?.conference.attendees);
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -118,6 +119,7 @@ const AttendeesPage: NextPageWithLayout = () => {
                     <Radio
                       label={s.name}
                       toggle
+                      checked={filter.some((f) => f === s.id)}
                       onChange={(e, data) => {
                         const filterSet = new Set(filter);
                         if (data.checked) {

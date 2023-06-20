@@ -1548,12 +1548,12 @@
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "ID",
+                      "name": "ObjectId",
                       "ofType": null
                     }
                   }
                 },
-                "defaultValue": null,
+                "defaultValue": "[]",
                 "isDeprecated": false,
                 "deprecationReason": null
               }
