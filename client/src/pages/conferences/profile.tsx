@@ -41,19 +41,19 @@ const ProfilePage: NextPageWithLayout = () => {
         </Tab.Pane>
       ),
     },
-    {
-      menuItem: t("menu.conferences"),
-      render: () => (
-        <Tab.Pane
-          loading={loading}
-          basic
-          attached={false}
-          style={{ padding: 0 }}
-        >
-          Konferencie...
-        </Tab.Pane>
-      ),
-    },
+    // {
+    //   menuItem: t("menu.conferences"),
+    //   render: () => (
+    //     <Tab.Pane
+    //       loading={loading}
+    //       basic
+    //       attached={false}
+    //       style={{ padding: 0 }}
+    //     >
+    //       Konferencie...
+    //     </Tab.Pane>
+    //   ),
+    // },
   ];
 
   useEffect(() => {
