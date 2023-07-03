@@ -148,7 +148,7 @@ export class UserResolver {
         clientUrl: req.headers.origin,
         name: user.name,
         email: user.email,
-        token: signJwt({ id: user.id }, { expiresIn: "1d" }),
+        token: signJwt({ id: user.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
     );
@@ -166,7 +166,7 @@ export class UserResolver {
         clientUrl: req.headers.origin,
         name: user?.name,
         email: user?.email,
-        token: signJwt({ id: user?.id }, { expiresIn: "1d" }),
+        token: signJwt({ id: user?.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
     );
