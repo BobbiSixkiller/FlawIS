@@ -36,8 +36,8 @@ const App: NextPage<AppPropsWithLayout> = ({ Component, pageProps }) => {
         <ProtectedRouteProvider protect={protect}>
           <ControlsProvider>
             <DialogProvider>
-              <UserVerifiedDialog />
               {getLayout(<Component {...pageProps} />)}
+              <UserVerifiedDialog />
             </DialogProvider>
           </ControlsProvider>
         </ProtectedRouteProvider>
