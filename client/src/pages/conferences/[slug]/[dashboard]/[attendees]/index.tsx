@@ -280,7 +280,11 @@ AttendeesPage.getLayout = function getLayout(page) {
 export const getServerSideProps = async ({ locale }: { locale: string }) => ({
   props: {
     admin: true,
-    ...(await serverSideTranslations(locale, ["common", "validation"])),
+    ...(await serverSideTranslations(locale, [
+      "common",
+      "validation",
+      "activation",
+    ])),
   },
 });
 

@@ -7,7 +7,7 @@ import { AuthContext } from "../providers/Auth";
 import { DialogContext } from "../providers/Dialog";
 
 export default function UserVerifiedDialog() {
-  const { t, i18n } = useTranslation("activation");
+  const { i18n } = useTranslation();
   const [msg, setMsg] = useState("");
 
   const { pathname } = useRouter();
@@ -15,7 +15,7 @@ export default function UserVerifiedDialog() {
   const { handleOpen } = useContext(DialogContext);
 
   const [resendActivationLink, { error }] = useResendActivationLinkMutation();
-  /* eslint-disable */
+
   useEffect(() => {
     if (
       user &&
@@ -25,16 +25,20 @@ export default function UserVerifiedDialog() {
     ) {
       const content = (
         <Grid.Column>
-          <Header>{t("dialog.header")}</Header>
-          <p>{t("dialog.body")}</p>
+          <Header>
+            {i18n.getResource(i18n.language, "activation", "dialog.header")}
+          </Header>
+          <p>{i18n.getResource(i18n.language, "activation", "dialog.body")}</p>
           <Button
             primary
             onClick={() => {
               resendActivationLink();
-              setMsg(t("dialog.msg"));
+              setMsg(
+                i18n.getResource(i18n.language, "activation", "dialog.msg")
+              );
             }}
           >
-            {t("dialog.button")}
+            {i18n.getResource(i18n.language, "activation", "dialog.button")}
           </Button>
           {msg && (
             <Message
