@@ -7,7 +7,7 @@ import { AuthContext } from "../providers/Auth";
 import { DialogContext } from "../providers/Dialog";
 
 export default function UserVerifiedDialog() {
-  const { t, i18n } = useTranslation("activation");
+  const { t, i18n } = useTranslation();
   const [msg, setMsg] = useState("");
 
   const { pathname } = useRouter();
@@ -21,20 +21,20 @@ export default function UserVerifiedDialog() {
       user &&
       !user?.verified &&
       !pathname.includes("/activate") &&
-      i18n.hasLoadedNamespace("activation")
+      i18n.exists("dialog.header", { ns: "activation" })
     ) {
       const content = (
         <Grid.Column>
-          <Header>{t("dialog.header")}</Header>
-          <p>{t("dialog.body")}</p>
+          <Header>{t("dialog.header", { ns: "activation" })}</Header>
+          <p>{t("dialog.body", { ns: "activation" })}</p>
           <Button
             primary
             onClick={() => {
               resendActivationLink();
-              setMsg(t("dialog.msg"));
+              setMsg(t("dialog.msg", { ns: "activation" }));
             }}
           >
-            {t("dialog.button")}
+            {t("dialog.button", { ns: "activation" })}
           </Button>
           {msg && (
             <Message
@@ -51,6 +51,11 @@ export default function UserVerifiedDialog() {
       handleOpen({ content, size: "tiny" });
     }
   }, [user, i18n, msg, error]);
+
+  console.log(
+    i18n.hasLoadedNamespace("activation"),
+    i18n.exists("dialog.header", { ns: "activation" })
+  );
 
   return <div />;
 }
