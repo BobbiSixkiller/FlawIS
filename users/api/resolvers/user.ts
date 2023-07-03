@@ -148,7 +148,7 @@ export class UserResolver {
         clientUrl: req.headers.origin,
         name: user.name,
         email: user.email,
-        token: signJwt({ id: user.id }, { expiresIn: "1d" }),
+        token: signJwt({ id: user.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
     );
@@ -166,7 +166,7 @@ export class UserResolver {
         clientUrl: req.headers.origin,
         name: user?.name,
         email: user?.email,
-        token: signJwt({ id: user?.id }, { expiresIn: "1d" }),
+        token: signJwt({ id: user?.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
     );
@@ -227,7 +227,10 @@ export class UserResolver {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
       domain:
-        process.env.NODE_ENV === "production" ? "flaw.uniba.sk" : "localhost",
+        process.env.NODE_ENV === "production" ||
+        process.env.NODE_ENV === "staging"
+          ? "flaw.uniba.sk"
+          : "localhost",
     });
 
     return true;
