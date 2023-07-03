@@ -63,10 +63,20 @@ const RegisterPage: NextPage = () => {
 
   const [register] = useRegisterMutation();
 
-  const [updateConferenceUser, { error: updateError }] =
+  const [updateConferenceUser, { data, error: updateError }] =
     useUpdateConferenceUserMutation();
 
   const { t } = useTranslation("register");
+
+  useEffect(() => {
+    if (data) {
+      dispatch({
+        type: ActionTypes.Login,
+        payload: { user: data?.updateConferenceUser as User },
+      });
+      router.push(intendedPath ? intendedPath : "/");
+    }
+  }, [data]);
 
   return (
     <Grid container centered>
@@ -122,7 +132,7 @@ const RegisterPage: NextPage = () => {
                     },
                   });
                 }
-                const { data } = await updateConferenceUser({
+                await updateConferenceUser({
                   variables: {
                     data: {
                       organisation: values.organisation,
@@ -132,11 +142,6 @@ const RegisterPage: NextPage = () => {
                     },
                   },
                 });
-                dispatch({
-                  type: ActionTypes.Login,
-                  payload: { user: data?.updateConferenceUser as User },
-                });
-                router.push(intendedPath ? intendedPath : "/");
               } catch (err: any) {
                 actions.setStatus(
                   parseErrors(
