@@ -227,29 +227,29 @@ export class ConferenceResolver {
         },
       },
       {
-        $facet: {
-          data: [
-            {
-              $match: {
-                $expr: {
-                  $cond: {
-                    if: { $ne: [{ $size: [sectionIds] }, 0] },
-                    then: {
-                      $anyElementTrue: {
-                        $map: {
-                          input: "$submissions",
-                          as: "nested",
-                          in: {
-                            $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
-                          },
-                        },
-                      },
+        $match: {
+          $expr: {
+            $cond: {
+              if: { $ne: [{ $size: [sectionIds] }, 0] },
+              then: {
+                $anyElementTrue: {
+                  $map: {
+                    input: "$submissions",
+                    as: "nested",
+                    in: {
+                      $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
                     },
-                    else: {},
                   },
                 },
               },
+              else: {},
             },
+          },
+        },
+      },
+      {
+        $facet: {
+          data: [
             {
               $match: {
                 $expr: {
