@@ -7,7 +7,7 @@ import { AuthContext } from "../providers/Auth";
 import { DialogContext } from "../providers/Dialog";
 
 export default function UserVerifiedDialog() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [msg, setMsg] = useState("");
 
   const { pathname } = useRouter();
@@ -15,26 +15,30 @@ export default function UserVerifiedDialog() {
   const { handleOpen } = useContext(DialogContext);
 
   const [resendActivationLink, { error }] = useResendActivationLinkMutation();
-  /* eslint-disable */
+
   useEffect(() => {
     if (
       user &&
       !user?.verified &&
       !pathname.includes("/activate") &&
-      i18n.exists("dialog.header", { ns: "activation" })
+      i18n.hasLoadedNamespace("activation")
     ) {
       const content = (
         <Grid.Column>
-          <Header>{t("dialog.header", { ns: "activation" })}</Header>
-          <p>{t("dialog.body", { ns: "activation" })}</p>
+          <Header>
+            {i18n.getResource(i18n.language, "activation", "dialog.header")}
+          </Header>
+          <p>{i18n.getResource(i18n.language, "activation", "dialog.body")}</p>
           <Button
             primary
             onClick={() => {
               resendActivationLink();
-              setMsg(t("dialog.msg", { ns: "activation" }));
+              setMsg(
+                i18n.getResource(i18n.language, "activation", "dialog.msg")
+              );
             }}
           >
-            {t("dialog.button", { ns: "activation" })}
+            {i18n.getResource(i18n.language, "activation", "dialog.button")}
           </Button>
           {msg && (
             <Message
@@ -51,11 +55,6 @@ export default function UserVerifiedDialog() {
       handleOpen({ content, size: "tiny" });
     }
   }, [user, i18n, msg, error]);
-
-  console.log(
-    i18n.hasLoadedNamespace("activation"),
-    i18n.exists("dialog.header", { ns: "activation" })
-  );
 
   return <div />;
 }
