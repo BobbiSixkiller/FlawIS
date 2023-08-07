@@ -94,7 +94,7 @@ input BillingInput {
 
 """Conference model type"""
 type Conference {
-  attendees(after: ObjectId, first: Int = 20, sectionIds: [ObjectId!] = []): AttendeeConnection!
+  attendees(after: ObjectId, first: Int = 20, passive: Boolean!, sectionIds: [ObjectId!] = []): AttendeeConnection!
   attendeesCount: Int!
   attending: Attendee
   billing: ConferenceBilling!

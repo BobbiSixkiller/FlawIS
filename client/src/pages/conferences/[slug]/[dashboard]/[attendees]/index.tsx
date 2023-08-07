@@ -35,12 +35,16 @@ const AttendeesPage: NextPageWithLayout = () => {
   const router = useRouter();
   const width = useWidth();
 
-  const [filter, setFilter] = useState<string[]>([]);
+  const [filter, setFilter] = useState<{
+    sectionIds: string[];
+    passive: boolean;
+  }>({ sectionIds: [], passive: false });
 
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
       variables: {
         slug: router.query.slug as string,
+        passive: true,
       },
     });
 
@@ -62,12 +66,8 @@ const AttendeesPage: NextPageWithLayout = () => {
   const [deleteAttednee] = useRemoveAttendeeMutation();
 
   useEffect(() => {
-    console.log(filter);
-
-    refetch({ sectionIds: filter });
+    refetch(filter);
   }, [filter]);
-
-  console.log(data?.conference.attendees);
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -114,20 +114,37 @@ const AttendeesPage: NextPageWithLayout = () => {
               position="bottom right"
             >
               <Form>
+                <Form.Field>
+                  <Radio
+                    label="Pasívni účastníci"
+                    toggle
+                    checked={filter.passive}
+                    onChange={(e, data) => {
+                      if (data.checked) {
+                        setFilter((prev) => ({ ...prev, passive: true }));
+                      } else {
+                        setFilter((prev) => ({ ...prev, passive: false }));
+                      }
+                    }}
+                  />
+                </Form.Field>
                 {data?.conference.sections.map((s) => (
                   <Form.Field key={s.id}>
                     <Radio
                       label={s.name}
                       toggle
-                      checked={filter.some((f) => f === s.id)}
+                      checked={filter.sectionIds.some((f) => f === s.id)}
                       onChange={(e, data) => {
-                        const filterSet = new Set(filter);
+                        const filterSet = new Set(filter.sectionIds);
                         if (data.checked) {
                           filterSet.add(s.id);
                         } else {
                           filterSet.delete(s.id);
                         }
-                        setFilter(Array.from(filterSet));
+                        setFilter((prev) => ({
+                          ...prev,
+                          sectionIds: Array.from(filterSet),
+                        }));
                       }}
                     />
                   </Form.Field>
