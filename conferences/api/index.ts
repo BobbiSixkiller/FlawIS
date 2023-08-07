@@ -47,7 +47,6 @@ async function main() {
   //Build schema
   const schema = await buildFederatedSchema(
     {
-      // orphanedTypes: [User, File, Conference, Submission],
       resolvers: [
         ConferenceResolver,
         SectionResolver,

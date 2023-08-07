@@ -195,6 +195,7 @@ export type Conference = {
 export type ConferenceAttendeesArgs = {
   after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
+  passive: Scalars['Boolean'];
   sectionIds?: InputMaybe<Array<Scalars['ObjectId']>>;
 };
 
@@ -1126,6 +1127,7 @@ export type ConferenceAttendeesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']>;
   first?: InputMaybe<Scalars['Int']>;
   sectionIds?: InputMaybe<Array<Scalars['ObjectId']> | Scalars['ObjectId']>;
+  passive: Scalars['Boolean'];
 }>;
 
 
@@ -2296,7 +2298,7 @@ export type ConferenceQueryHookResult = ReturnType<typeof useConferenceQuery>;
 export type ConferenceLazyQueryHookResult = ReturnType<typeof useConferenceLazyQuery>;
 export type ConferenceQueryResult = Apollo.QueryResult<ConferenceQuery, ConferenceQueryVariables>;
 export const ConferenceAttendeesDocument = gql`
-    query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int, $sectionIds: [ObjectId!]) {
+    query conferenceAttendees($slug: String!, $after: ObjectId, $first: Int, $sectionIds: [ObjectId!], $passive: Boolean!) {
   conference(slug: $slug) {
     id
     sections {
@@ -2306,7 +2308,12 @@ export const ConferenceAttendeesDocument = gql`
       languages
     }
     attendeesCount
-    attendees(after: $after, first: $first, sectionIds: $sectionIds) {
+    attendees(
+      after: $after
+      first: $first
+      sectionIds: $sectionIds
+      passive: $passive
+    ) {
       edges {
         cursor
         node {
@@ -2338,6 +2345,7 @@ export const ConferenceAttendeesDocument = gql`
  *      after: // value for 'after'
  *      first: // value for 'first'
  *      sectionIds: // value for 'sectionIds'
+ *      passive: // value for 'passive'
  *   },
  * });
  */
