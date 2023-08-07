@@ -238,6 +238,14 @@ export class ConferenceResolver {
               },
               {
                 $and: [
+                  { $eq: [passive, false] },
+                  {
+                    $ne: [{ $size: "$submissions" }, 0], // Include documents with any submissions
+                  },
+                ],
+              },
+              {
+                $and: [
                   { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
                   {
                     $anyElementTrue: {
@@ -249,9 +257,6 @@ export class ConferenceResolver {
                     },
                   },
                 ],
-              },
-              {
-                $eq: [passive, false], // Include documents with any submissions (equivalent to your original $match stage)
               },
             ],
           },
