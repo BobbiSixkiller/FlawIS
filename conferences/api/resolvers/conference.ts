@@ -229,36 +229,41 @@ export class ConferenceResolver {
       {
         $match: {
           $expr: {
-            $or: [
-              {
-                $and: [
-                  { $eq: [passive, true] }, // Include documents with empty submissions
-                  { $eq: [{ $size: "$submissions" }, 0] },
+            $cond: {
+              if: {
+                $or: [
+                  { $ne: [{ $size: [sectionIds] }, 0] },
+                  { $eq: [passive, true] },
                 ],
               },
-              {
-                $and: [
-                  { $eq: [passive, false] },
+              then: {
+                $or: [
                   {
-                    $ne: [{ $size: "$submissions" }, 0], // Include documents with any submissions
-                  },
-                ],
-              },
-              {
-                $and: [
-                  { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
-                  {
-                    $anyElementTrue: {
-                      $map: {
-                        input: "$submissions",
-                        as: "nested",
-                        in: { $in: ["$$nested.section", sectionIds] },
+                    $and: [
+                      { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
+                      {
+                        $anyElementTrue: {
+                          $map: {
+                            input: "$submissions",
+                            as: "nested",
+                            in: {
+                              $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                            },
+                          },
+                        },
                       },
-                    },
+                    ],
+                  },
+                  {
+                    $and: [
+                      { $eq: [passive, true] }, // Include documents with empty submissions
+                      { $eq: [{ $size: "$submissions" }, 0] },
+                    ],
                   },
                 ],
               },
-            ],
+              else: {},
+            },
           },
         },
       },
