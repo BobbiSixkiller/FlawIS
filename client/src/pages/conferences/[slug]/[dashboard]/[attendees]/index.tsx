@@ -22,25 +22,25 @@ import {
 import { InView } from "react-intersection-observer";
 import DeleteDialog from "../../../../../components/DeleteDialog";
 import useWidth from "../../../../../hooks/useWidth";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import {
   ActionTypes,
   ControlsContext,
 } from "../../../../../providers/ControlsProvider";
 import AttendeeSearch from "../../../../../components/AttendeeSearch";
 import ExportCSV from "../../../../../components/ExportCSV";
+import { isArray } from "lodash";
 
 const AttendeesPage: NextPageWithLayout = () => {
   const { dispatch } = useContext(ControlsContext);
   const router = useRouter();
   const width = useWidth();
 
-  const [filter, setFilter] = useState<string[]>([]);
-
   const { data, error, loading, fetchMore, refetch } =
     useConferenceAttendeesQuery({
       variables: {
         slug: router.query.slug as string,
+        passive: true,
       },
     });
 
@@ -62,12 +62,21 @@ const AttendeesPage: NextPageWithLayout = () => {
   const [deleteAttednee] = useRemoveAttendeeMutation();
 
   useEffect(() => {
-    console.log(filter);
+    refetch({
+      passive: router.query.passive === "true",
+      sectionIds: isArray(router.query.sectionId)
+        ? router.query.sectionId
+        : router.query.sectionId
+        ? [router.query.sectionId]
+        : [],
+    });
+  }, [router.query]);
 
-    refetch({ sectionIds: filter });
-  }, [filter]);
-
-  console.log(data?.conference.attendees);
+  const sectionIds = isArray(router.query.sectionId)
+    ? router.query.sectionId
+    : router.query.sectionId
+    ? [router.query.sectionId]
+    : [];
 
   return (
     <Grid padded={width < 400 ? "vertically" : true}>
@@ -114,20 +123,46 @@ const AttendeesPage: NextPageWithLayout = () => {
               position="bottom right"
             >
               <Form>
+                <Form.Field>
+                  <Radio
+                    label="Pasívni účastníci"
+                    toggle
+                    checked={router.query.passive === "true"}
+                    onChange={(e, data) => {
+                      if (data.checked) {
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: { passive: true },
+                        });
+                      } else {
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: { passive: false },
+                        });
+                      }
+                    }}
+                  />
+                </Form.Field>
                 {data?.conference.sections.map((s) => (
                   <Form.Field key={s.id}>
                     <Radio
                       label={s.name}
                       toggle
-                      checked={filter.some((f) => f === s.id)}
+                      checked={sectionIds.some((f) => f === s.id)}
                       onChange={(e, data) => {
-                        const filterSet = new Set(filter);
+                        const filterSet = new Set(sectionIds);
                         if (data.checked) {
                           filterSet.add(s.id);
                         } else {
                           filterSet.delete(s.id);
                         }
-                        setFilter(Array.from(filterSet));
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: {
+                            passive: router.query.passive,
+                            sectionId: Array.from(filterSet),
+                          },
+                        });
                       }}
                     />
                   </Form.Field>

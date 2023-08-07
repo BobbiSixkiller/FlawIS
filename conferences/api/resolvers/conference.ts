@@ -199,7 +199,7 @@ export class ConferenceResolver {
   @Authorized()
   @FieldResolver(() => AttendeeConnection)
   async attendees(
-    @Args() { after, first, sectionIds }: AttendeeArgs,
+    @Args() { after, first, sectionIds, passive }: AttendeeArgs,
     @Root() { id }: Conference
   ): Promise<AttendeeConnection> {
     const attendees = await this.attendeeService.aggregate([
@@ -230,17 +230,37 @@ export class ConferenceResolver {
         $match: {
           $expr: {
             $cond: {
-              if: { $ne: [{ $size: [sectionIds] }, 0] },
+              if: {
+                $or: [
+                  { $ne: [{ $size: [sectionIds] }, 0] },
+                  { $eq: [passive, true] },
+                ],
+              },
               then: {
-                $anyElementTrue: {
-                  $map: {
-                    input: "$submissions",
-                    as: "nested",
-                    in: {
-                      $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
-                    },
+                $or: [
+                  {
+                    $and: [
+                      { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
+                      {
+                        $anyElementTrue: {
+                          $map: {
+                            input: "$submissions",
+                            as: "nested",
+                            in: {
+                              $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                            },
+                          },
+                        },
+                      },
+                    ],
                   },
-                },
+                  {
+                    $and: [
+                      { $eq: [passive, true] }, // Include documents with empty submissions
+                      { $eq: [{ $size: "$submissions" }, 0] },
+                    ],
+                  },
+                ],
               },
               else: {},
             },

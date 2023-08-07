@@ -201,6 +201,7 @@ query conferenceAttendees(
   $after: ObjectId
   $first: Int
   $sectionIds: [ObjectId!]
+  $passive: Boolean!
 ) {
   conference(slug: $slug) {
     id
@@ -211,7 +212,12 @@ query conferenceAttendees(
       languages
     }
     attendeesCount
-    attendees(after: $after, first: $first, sectionIds: $sectionIds) {
+    attendees(
+      after: $after
+      first: $first
+      sectionIds: $sectionIds
+      passive: $passive
+    ) {
       edges {
         cursor
         node {

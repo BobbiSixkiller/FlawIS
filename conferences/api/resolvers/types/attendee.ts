@@ -105,4 +105,7 @@ export class AttendeeConnection extends CreateConnection(Attendee) {}
 export class AttendeeArgs extends CreateConnectionArgs(Attendee) {
   @Field(() => [ObjectId], { defaultValue: [] })
   sectionIds: ObjectId[];
+
+  @Field(() => Boolean)
+  passive: boolean;
 }
