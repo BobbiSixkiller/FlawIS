@@ -112,7 +112,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  @UseMiddleware([RateLimit(200)])
+  @UseMiddleware([RateLimit(300)])
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
@@ -175,7 +175,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseMiddleware([RateLimit(10)])
+  @UseMiddleware([RateLimit(50)])
   async activateUser(@Arg("token") token: string) {
     const user: Partial<User> | null = verifyJwt(token);
     if (user) {
@@ -262,7 +262,7 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  @UseMiddleware([RateLimit(20)])
+  @UseMiddleware([RateLimit(50)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
     @Ctx() { req, res }: Context
@@ -288,7 +288,7 @@ export class UserResolver {
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
-  @UseMiddleware([RateLimit(10)])
+  @UseMiddleware([RateLimit(50)])
   @Mutation(() => User)
   async updateUser(@Arg("id") id: ObjectId, @Arg("data") userInput: UserInput) {
     const user = await this.userService.findOne({ _id: id });
