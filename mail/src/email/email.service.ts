@@ -3,7 +3,7 @@ import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { InvoiceMsg } from './templates/invoice';
-// import { AuthorMsg } from './templates/author';
+import { AuthorMsg } from './templates/author';
 
 import Handlebars from 'handlebars';
 import { readFileSync } from 'fs';
@@ -17,16 +17,6 @@ export interface Msg {
 }
 interface AuthMsg extends Msg {
   token: string;
-  clientUrl: string;
-}
-
-interface AuthorMsg extends Msg {
-  conferenceName: string;
-  conferenceSlug: string;
-  submissionId: string;
-  submissionName: string;
-  submissionAbstract: string;
-  submissionKeywords: string[];
   clientUrl: string;
 }
 
