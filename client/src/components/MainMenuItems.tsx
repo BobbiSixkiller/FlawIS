@@ -157,7 +157,7 @@ function ConferencePageMenuItems() {
           <Menu.Item as={Link} href="#sections" active={router.asPath === "/"}>
             {t("confMenu.sections")}
           </Menu.Item>
-          <Menu.Item as={Link} href="#programme" active={router.asPath === "/"}>
+          {/* <Menu.Item as={Link} href="#programme" active={router.asPath === "/"}>
             {t("confMenu.programme")}
           </Menu.Item>
           <Menu.Item as={Link} href="#fee" active={router.asPath === "/"}>
@@ -178,7 +178,7 @@ function ConferencePageMenuItems() {
           </Menu.Item>
           <Menu.Item as={Link} href="#contact" active={router.asPath === "/"}>
             {t("confMenu.contact")}
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
       </Menu.Item>
       <ProfileMenuItems />
