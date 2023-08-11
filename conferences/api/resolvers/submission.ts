@@ -84,7 +84,7 @@ export class SubmissionResolver {
       Messagebroker.produceMessage(
         JSON.stringify({
           locale,
-          clientUrl: req.hostname,
+          clientUrl: req.headers.origin,
           name: user?.name,
           email: author,
           conferenceName: conference.name,
