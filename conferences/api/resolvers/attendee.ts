@@ -138,6 +138,7 @@ export class AttendeeResolver {
           Messagebroker.produceMessage(
             JSON.stringify({
               locale,
+              clientUrl: req.headers.origin,
               name: user?.name,
               email: author,
               conferenceName: conference.name,
