@@ -125,7 +125,7 @@ const ConferencePage: NextPageWithLayout = () => {
                 )}
               </Grid.Column>
             </Grid.Row>
-            <Grid.Row id="programme">
+            {/* <Grid.Row id="programme">
               <Grid.Column>
                 <Header textAlign="center" as="h3" style={{ fontSize: "2em" }}>
                   {t("headings.programme")}
@@ -152,7 +152,7 @@ const ConferencePage: NextPageWithLayout = () => {
                   {t("headings.guidelines")}
                 </Header>
               </Grid.Column>
-            </Grid.Row>
+            </Grid.Row> */}
           </Grid>
         </Segment>
       </div>
