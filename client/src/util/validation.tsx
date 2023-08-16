@@ -34,7 +34,7 @@ export default function Validation() {
     password: string()
       .trim()
       .required()
-      .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),
+      .matches(/^(?=.*[0-9])(?=.*[a-zA-Z])(?=\S+$).{6,20}$/, t("password")),
     repeatPass: string()
       .trim()
       .required()
@@ -49,7 +49,7 @@ export default function Validation() {
     password: string()
       .trim()
       .required()
-      .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),
+      .matches(/^(?=.*[0-9])(?=.*[a-zA-Z])(?=\S+$).{6,20}$/, t("password")),
     repeatPass: string()
       .trim()
       .required()
@@ -67,7 +67,7 @@ export default function Validation() {
     password: string()
       .trim()
       .required()
-      .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, t("password")),
+      .matches(/^(?=.*[0-9])(?=.*[a-zA-Z])(?=\S+$).{6,20}$/, t("password")),
     repeatPass: string()
       .trim()
       .required()
