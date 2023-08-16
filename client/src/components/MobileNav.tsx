@@ -16,6 +16,7 @@ import useWidth from "../hooks/useWidth";
 import MainMenu from "./MainMenuItems";
 import { useApollo } from "../lib/apollo";
 import { useTranslation } from "next-i18next";
+import LanguageToggler from "./LanguageToggler";
 
 interface navProps {
   inView: boolean;
@@ -205,39 +206,7 @@ export default function MobileNav({
                       <Icon name="sign in" />
                     </Menu.Item>
                   )}
-                  {locales && (
-                    <Dropdown
-                      item
-                      icon="world"
-                      style={{ marginLeft: "auto", marginRight: 0 }}
-                    >
-                      <Dropdown.Menu>
-                        <Dropdown.Header content="Language" />
-                        <Dropdown.Item
-                          style={{ textAlign: "center" }}
-                          key={1}
-                          text={"English"}
-                          value={"English"}
-                          onClick={async () =>
-                            router.push(router.asPath, undefined, {
-                              locale: "en",
-                            })
-                          }
-                        />
-                        <Dropdown.Item
-                          style={{ textAlign: "center" }}
-                          key={2}
-                          text={"Slovak"}
-                          value={"Slovak"}
-                          onClick={() =>
-                            router.push(router.asPath, undefined, {
-                              locale: "sk",
-                            })
-                          }
-                        />
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  )}
+                  {locales && <LanguageToggler />}
                 </Menu.Menu>
               </Menu>
             </Container>
