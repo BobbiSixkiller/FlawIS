@@ -1,5 +1,6 @@
 import { Formik, FormikConfig, FormikProps, FormikValues } from "formik";
-import { Children, ReactElement, ReactNode, useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
+import { Children, ReactElement, ReactNode, useState } from "react";
 import {
   Button,
   Form,
@@ -47,6 +48,8 @@ export function Wizzard({
     }
   }
 
+  const { t } = useTranslation("common");
+
   return (
     <Formik
       {...props}
@@ -82,12 +85,14 @@ export function Wizzard({
                 <Button
                   type="button"
                   onClick={() => goBack()}
-                  content={step === 0 ? "Zrušiť" : "Back"}
+                  content={step === 0 ? t("actions.cancel") : t("menu.back")}
                 />
                 <Button
                   positive
                   type="submit"
-                  content={isLastStep() ? "Submit" : "Next"}
+                  content={
+                    isLastStep() ? t("actions.submit") : t("actions.next")
+                  }
                   floated="right"
                 />
               </Segment>

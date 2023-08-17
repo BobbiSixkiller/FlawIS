@@ -4,7 +4,9 @@
     "text": "Tento systém je vyvíjaný a udržiavaný Právnickou fakultou, Univerzity Komenského v Bratislave. Ak narazíte na akékoľvek problémy, prosím neváhajte nás kontaktovať!",
     "menu": {
       "contact": "Kontakt",
-      "terms": "Podmienky & Súkromie"
+      "terms": "Podmienky & Súkromie",
+      "socials": "Sociálne siete",
+      "map": "Tu nás nájdete"
     }
   },
   "actions": {
@@ -13,7 +15,11 @@
     "cancel": "Zrušiť",
     "more": "Viac...",
     "previous": "Predchádzajúce...",
-    "confirm": "Potvrdiť"
+    "confirm": "Potvrdiť",
+    "next": "Ďalej",
+    "add": "Pridať",
+    "noResults": "Žiadne výsledky",
+    "submit": "Zaslať"
   },
   "header": {
     "masthead": {
