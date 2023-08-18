@@ -4,7 +4,9 @@
     "text": "This system is being developed and maitained by Faculty of Law, Comenius University in Bratislava. If you encounter any problems, please do not hesitate to contact us!",
     "menu": {
       "contact": "Contact Us",
-      "terms": "Terms & Privacy"
+      "terms": "Terms & Privacy",
+      "socials": "Socials",
+      "map": "Where to find us"
     }
   },
   "actions": {
@@ -13,7 +15,11 @@
     "cancel": "cancel",
     "more": "More...",
     "previous": "Previous...",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "next": "Next",
+    "add": "Add",
+    "noResults": "No results",
+    "submit": "Submit"
   },
   "header": {
     "masthead": {
