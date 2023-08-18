@@ -11,15 +11,33 @@ export default function Footer() {
         <Grid divided inverted stackable>
           <Grid.Row>
             <Grid.Column width={3}>
-              <Header inverted as="h4" content="Socials" />
+              <Header inverted as="h4" content={t("footer.menu.socials")} />
               <List link inverted>
-                <List.Item as="a">Instagram</List.Item>
-                <List.Item as="a">Facebook</List.Item>
-                <List.Item as="a">Web</List.Item>
+                <List.Item
+                  as="a"
+                  href="https://www.instagram.com/praf_uk/"
+                  target="_blank"
+                >
+                  Instagram
+                </List.Item>
+                <List.Item
+                  as="a"
+                  href="https://www.facebook.com/Comenius.University"
+                  target="_blank"
+                >
+                  Facebook
+                </List.Item>
+                <List.Item
+                  as="a"
+                  href="https://www.flaw.uniba.sk/"
+                  target="_blank"
+                >
+                  Web
+                </List.Item>
               </List>
             </Grid.Column>
             <Grid.Column width={3}>
-              <Header inverted as="h4" content="Where to find us" />
+              <Header inverted as="h4" content={t("footer.menu.map")} />
               <List link inverted>
                 <List.Item
                   as="a"
@@ -43,6 +61,7 @@ export default function Footer() {
                 <List.Item
                   as="a"
                   href="https://uniba.sk/ochrana-osobnych-udajov/"
+                  target="_blank"
                 >
                   {t("footer.menu.terms")}
                 </List.Item>
