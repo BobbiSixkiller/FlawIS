@@ -86,7 +86,7 @@ export default function Dashboard({ children }: dashboardProps) {
           <div>{rightPanelItems}</div>
           <List link size="small">
             <List.Item>
-              <LanguageToggler />
+              <LanguageToggler text />
             </List.Item>
             <List.Item as="a" href="#">
               {t("footer.menu.contact")}
