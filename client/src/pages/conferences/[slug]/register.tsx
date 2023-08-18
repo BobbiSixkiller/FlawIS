@@ -146,7 +146,6 @@ export function RegisterSubmission({
 
   const [loadSubmission] = useSubmissionLazyQuery({
     onCompleted: ({ submission }) => {
-      console.log(submission);
       setFieldValue(
         "submission",
         {
@@ -216,6 +215,8 @@ export function RegisterSubmission({
         name="submission.keywords"
         label={t("registration.submission.keywords.label")}
         placeholder={t("registration.submission.keywords.placeholder")}
+        noResultsMessage={t("actions.noResults", { ns: "common" })}
+        additionLabel={t("actions.add", { ns: "common" }) + " "}
         control={Select}
         allowAdditions
         multiple
@@ -271,6 +272,8 @@ export function RegisterSubmission({
         name="submission.authors"
         label={t("registration.submission.authors.label")}
         placeholder={t("registration.submission.authors.placeholder")}
+        noResultsMessage={t("actions.noResults", { ns: "common" })}
+        additionLabel={t("actions.add", { ns: "common" }) + " "}
         control={Select}
         allowAdditions
         multiple

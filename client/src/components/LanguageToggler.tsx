@@ -1,17 +1,16 @@
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { Dropdown } from "semantic-ui-react";
-import useWidth from "../hooks/useWidth";
 
-export default function LanguageToggler() {
+export default function LanguageToggler({ text }: { text?: boolean }) {
   const router = useRouter();
-  const width = useWidth();
-  console.log(width);
+  const { t } = useTranslation("common");
 
   return (
     <Dropdown
       item
-      text={width > 1000 ? undefined : "Jazyk"}
-      icon={width > 1000 ? "world" : undefined}
+      text={!text ? undefined : t("menu.lang")}
+      icon={!text ? "world" : undefined}
       style={{ marginLeft: "auto", marginRight: 0 }}
     >
       <Dropdown.Menu>
