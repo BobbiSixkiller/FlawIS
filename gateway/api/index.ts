@@ -24,13 +24,13 @@ const port = process.env.PORT || 5000;
 const services =
   process.env.NODE_ENV !== "staging"
     ? [
-        { name: "users", url: "http://localhost:5001/graphql" },
-        { name: "files", url: "http://localhost:5002/graphql" },
+        { name: "users", url: "http://users:5001/graphql" },
+        { name: "files", url: "http://files:5002/graphql" },
         {
           name: "conferences",
-          url: "http://localhost:5003/graphql",
+          url: "http://conferences:5003/graphql",
         },
-        { name: "grants", url: "http://localhost:5004/graphql" },
+        { name: "grants", url: "http://grants:5004/graphql" },
       ]
     : [
         { name: "users-staging", url: "http://users-staging:6001/graphql" },
