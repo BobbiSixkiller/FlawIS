@@ -70,9 +70,6 @@ const main = async () => {
 
   const app = Express();
 
-  // Trust the X-Forwarded-For header
-  // app.set("trust proxy", true);
-
   app.use(
     cors({
       credentials: true,
