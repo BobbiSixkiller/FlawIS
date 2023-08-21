@@ -67,7 +67,7 @@ async function main() {
   const server = new ApolloServer({
     schema,
     context: ({ req, res }: Context) => {
-      console.log(req.ip);
+      console.log(req.ip, req.ips);
       return {
         req,
         res,
