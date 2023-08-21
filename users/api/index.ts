@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import Container from "typedi";
-import { ApolloServer } from "apollo-server";
+import { ApolloServer } from "apollo-server-express";
+import Express from "express";
 import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
@@ -18,7 +19,6 @@ import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
 import { initRedis } from "./util/redis";
-import { User } from "./entitites/User";
 
 env.config();
 
@@ -58,22 +58,24 @@ async function main() {
     }
   );
 
+  const app = Express();
+
+  // Trust the X-Forwarded-For header
+  app.set("trust proxy", true);
+
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }: Context) => {
-      console.log(req.ip);
-      return {
-        req,
-        res,
-        user: req.headers.user
-          ? JSON.parse(decodeURIComponent(req.headers.user as string))
-          : null,
-        locale: req.headers.locale
-          ? JSON.parse(decodeURIComponent(req.headers.locale as string))
-          : "sk",
-      };
-    },
+    context: ({ req, res }: Context) => ({
+      req,
+      res,
+      user: req.headers.user
+        ? JSON.parse(decodeURIComponent(req.headers.user as string))
+        : null,
+      locale: req.headers.locale
+        ? JSON.parse(decodeURIComponent(req.headers.locale as string))
+        : "sk",
+    }),
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:
       process.env.NODE_ENV === "production" ||
@@ -86,7 +88,11 @@ async function main() {
   await Messagebroker.init();
   await initRedis();
 
-  await server.listen({ port }, () =>
+  await server.start();
+
+  server.applyMiddleware({ app });
+
+  app.listen({ port }, () =>
     console.log(
       `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
     )

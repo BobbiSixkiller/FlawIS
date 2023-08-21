@@ -7,7 +7,7 @@ const ONE_DAY = 60 * 60 * 24;
 export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
   (limit = 50) =>
   async ({ context: { req }, info }, next) => {
-    const key = `rate-limit:${info.fieldName}:${req.ip}`;
+    const key = `rate-limit:${info.fieldName}:${req.ips[req.ips.length - 1]}`;
 
     const current = await client.incr(key);
     if (current > limit) {
