@@ -11,7 +11,7 @@ export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
 
     const current = await client.incr(key);
     if (current > limit) {
-      throw new Error("you're doing that too much");
+      throw new Error("you're doing that too much, try it again later");
     } else if (current === 1) {
       await client.expire(key, ONE_DAY);
     }
