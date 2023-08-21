@@ -61,16 +61,19 @@ async function main() {
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }: Context) => ({
-      req,
-      res,
-      user: req.headers.user
-        ? JSON.parse(decodeURIComponent(req.headers.user as string))
-        : null,
-      locale: req.headers.locale
-        ? JSON.parse(decodeURIComponent(req.headers.locale as string))
-        : "sk",
-    }),
+    context: ({ req, res }: Context) => {
+      console.log(req.ip);
+      return {
+        req,
+        res,
+        user: req.headers.user
+          ? JSON.parse(decodeURIComponent(req.headers.user as string))
+          : null,
+        locale: req.headers.locale
+          ? JSON.parse(decodeURIComponent(req.headers.locale as string))
+          : "sk",
+      };
+    },
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:
       process.env.NODE_ENV === "production" ||
