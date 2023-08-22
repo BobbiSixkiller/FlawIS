@@ -68,17 +68,19 @@ export default function Dashboard({ children }: dashboardProps) {
       style={{ marginTop: 0, marginBottom: 0, minHeight: "100vh" }}
     >
       <Grid.Column width={3} only="tablet computer">
-        <Menu compact text vertical>
-          <Menu.Item as={Link} href="/">
-            <NextImage
-              alt="flaw-logo-notext"
-              src={logo}
-              height={35}
-              width={35}
-            />
-          </Menu.Item>
-          <MainMenuItems />
-        </Menu>
+        <StickyContainer>
+          <Menu compact text vertical>
+            <Menu.Item as={Link} href="/">
+              <NextImage
+                alt="flaw-logo-notext"
+                src={logo}
+                height={35}
+                width={35}
+              />
+            </Menu.Item>
+            <MainMenuItems />
+          </Menu>
+        </StickyContainer>
       </Grid.Column>
       <Grid.Column width={9}>{children}</Grid.Column>
       <Grid.Column width={4} only="tablet computer">
