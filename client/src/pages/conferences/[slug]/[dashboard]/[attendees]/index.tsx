@@ -94,20 +94,39 @@ const AttendeesPage: NextPageWithLayout = () => {
           <div style={{ alignSelf: "flex-end" }}>
             {exportData && (
               <ExportCSV
-                data={exportData.attendeesToCsvExport.flatMap((attendee) =>
-                  attendee.submissions.map((submission) => ({
-                    name: attendee.user.name,
-                    email: attendee.user.email,
-                    organisation: attendee.user.organisation,
-                    online: attendee.ticket.online.toString(),
-                    variableSymbol: attendee.invoice.issuer.variableSymbol,
-                    price:
-                      attendee.invoice.body.price + attendee.invoice.body.vat,
-                    section: submission.section.name,
-                    submission_name_sk: submission.name,
-                    submission_name_en: submission.translations[0].name,
-                  }))
-                )}
+                data={exportData.attendeesToCsvExport.flatMap((attendee) => {
+                  if (attendee.submissions && attendee.submissions.length > 0) {
+                    return attendee.submissions.map((submission) => ({
+                      name: attendee.user.name,
+                      email: attendee.user.email,
+                      organisation: attendee.user.organisation,
+                      online: attendee.ticket.online.toString(),
+                      variableSymbol: attendee.invoice.issuer.variableSymbol,
+                      price:
+                        attendee.invoice.body.price + attendee.invoice.body.vat,
+                      section: submission.section.name,
+                      submission_name_sk: submission.name,
+                      submission_name_en: submission.translations[0].name,
+                    }));
+                  } else {
+                    // If there are no submissions for the attendee, include them with empty submission data
+                    return [
+                      {
+                        name: attendee.user.name,
+                        email: attendee.user.email,
+                        organisation: attendee.user.organisation,
+                        online: attendee.ticket.online.toString(),
+                        variableSymbol: attendee.invoice.issuer.variableSymbol,
+                        price:
+                          attendee.invoice.body.price +
+                          attendee.invoice.body.vat,
+                        section: "",
+                        submission_name_sk: "",
+                        submission_name_en: "",
+                      },
+                    ];
+                  }
+                })}
               />
             )}
             <Popup

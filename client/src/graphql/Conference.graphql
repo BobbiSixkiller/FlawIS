@@ -125,7 +125,11 @@ fragment AttendeeFragment on Attendee {
   }
 }
 
-query attendeesToCsvExport($conferenceId: ObjectId!) {
+query attendeesToCsvExport(
+  $conferenceId: ObjectId!
+  $sectionIds: [ObjectId!]
+  $passive: Boolean!
+) {
   attendeesToCsvExport(conferenceId: $conferenceId) {
     ...AttendeeFragment
   }
