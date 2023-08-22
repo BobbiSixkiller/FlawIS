@@ -2,7 +2,7 @@ import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
 import { client } from "../util/redis";
 
-const ONE_DAY = 60 * 60 * 24;
+const ONE_HOUR = 60 * 60;
 
 export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
   (limit = 50) =>
@@ -13,7 +13,7 @@ export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
     if (current > limit) {
       throw new Error("you're doing that too much, try it again later");
     } else if (current === 1) {
-      await client.expire(key, ONE_DAY);
+      await client.expire(key, ONE_HOUR);
     }
 
     return next();
