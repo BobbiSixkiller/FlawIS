@@ -112,7 +112,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  @UseMiddleware([RateLimit(300)])
+  @UseMiddleware([RateLimit(50)])
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
