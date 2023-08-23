@@ -140,6 +140,7 @@ const AttendeesPage: NextPageWithLayout = () => {
               }
               on="click"
               position="bottom right"
+              style={{ overflow: "auto", maxHeight: 500 }}
             >
               <Form>
                 <Form.Field>
@@ -162,6 +163,102 @@ const AttendeesPage: NextPageWithLayout = () => {
                     }}
                   />
                 </Form.Field>
+                {data?.conference.sections.map((s) => (
+                  <Form.Field key={s.id}>
+                    <Radio
+                      label={s.name}
+                      toggle
+                      checked={sectionIds.some((f) => f === s.id)}
+                      onChange={(e, data) => {
+                        const filterSet = new Set(sectionIds);
+                        if (data.checked) {
+                          filterSet.add(s.id);
+                        } else {
+                          filterSet.delete(s.id);
+                        }
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: {
+                            passive: router.query.passive,
+                            sectionId: Array.from(filterSet),
+                          },
+                        });
+                      }}
+                    />
+                  </Form.Field>
+                ))}
+                {data?.conference.sections.map((s) => (
+                  <Form.Field key={s.id}>
+                    <Radio
+                      label={s.name}
+                      toggle
+                      checked={sectionIds.some((f) => f === s.id)}
+                      onChange={(e, data) => {
+                        const filterSet = new Set(sectionIds);
+                        if (data.checked) {
+                          filterSet.add(s.id);
+                        } else {
+                          filterSet.delete(s.id);
+                        }
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: {
+                            passive: router.query.passive,
+                            sectionId: Array.from(filterSet),
+                          },
+                        });
+                      }}
+                    />
+                  </Form.Field>
+                ))}
+                {data?.conference.sections.map((s) => (
+                  <Form.Field key={s.id}>
+                    <Radio
+                      label={s.name}
+                      toggle
+                      checked={sectionIds.some((f) => f === s.id)}
+                      onChange={(e, data) => {
+                        const filterSet = new Set(sectionIds);
+                        if (data.checked) {
+                          filterSet.add(s.id);
+                        } else {
+                          filterSet.delete(s.id);
+                        }
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: {
+                            passive: router.query.passive,
+                            sectionId: Array.from(filterSet),
+                          },
+                        });
+                      }}
+                    />
+                  </Form.Field>
+                ))}
+                {data?.conference.sections.map((s) => (
+                  <Form.Field key={s.id}>
+                    <Radio
+                      label={s.name}
+                      toggle
+                      checked={sectionIds.some((f) => f === s.id)}
+                      onChange={(e, data) => {
+                        const filterSet = new Set(sectionIds);
+                        if (data.checked) {
+                          filterSet.add(s.id);
+                        } else {
+                          filterSet.delete(s.id);
+                        }
+                        router.push({
+                          pathname: router.asPath.split("?")[0],
+                          query: {
+                            passive: router.query.passive,
+                            sectionId: Array.from(filterSet),
+                          },
+                        });
+                      }}
+                    />
+                  </Form.Field>
+                ))}
                 {data?.conference.sections.map((s) => (
                   <Form.Field key={s.id}>
                     <Radio
