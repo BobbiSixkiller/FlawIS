@@ -97,7 +97,9 @@ const AttendeesPage: NextPageWithLayout = () => {
                 data={exportData.attendeesToCsvExport.flatMap((attendee) => {
                   if (attendee.submissions && attendee.submissions.length > 0) {
                     return attendee.submissions.map((submission) => ({
+                      titleBefore: attendee.user.titlesBefore,
                       name: attendee.user.name,
+                      titleAfter: attendee.user.titlesAfter,
                       email: attendee.user.email,
                       organisation: attendee.user.organisation,
                       online: attendee.ticket.online.toString(),
@@ -112,7 +114,9 @@ const AttendeesPage: NextPageWithLayout = () => {
                     // If there are no submissions for the attendee, include them with empty submission data
                     return [
                       {
+                        titleBefore: attendee.user.titlesBefore,
                         name: attendee.user.name,
+                        titleAfter: attendee.user.titlesAfter,
                         email: attendee.user.email,
                         organisation: attendee.user.organisation,
                         online: attendee.ticket.online.toString(),

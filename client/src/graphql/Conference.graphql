@@ -42,6 +42,8 @@ fragment AttendeeFragment on Attendee {
     name
     email
     organisation
+    titlesAfter
+    titlesBefore
   }
   ticket {
     withSubmission
@@ -125,11 +127,7 @@ fragment AttendeeFragment on Attendee {
   }
 }
 
-query attendeesToCsvExport(
-  $conferenceId: ObjectId!
-  $sectionIds: [ObjectId!]
-  $passive: Boolean!
-) {
+query attendeesToCsvExport($conferenceId: ObjectId!) {
   attendeesToCsvExport(conferenceId: $conferenceId) {
     ...AttendeeFragment
   }
