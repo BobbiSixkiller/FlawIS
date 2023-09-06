@@ -174,7 +174,7 @@ const DashboardPage: NextPageWithLayout = () => {
                   size="tiny"
                   floated="right"
                   fileUrls={section.submissions.map(
-                    (s) => s.file?.clientSideUrl || ""
+                    (s) => s.file?.serverSideUrl || ""
                   )}
                 />
               </Card.Content>

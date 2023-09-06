@@ -12,7 +12,6 @@ import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Section } from "./Section";
 import { User } from "./User";
-import Messagebroker from "../util/rmq";
 import File from "./File";
 
 @ObjectType({ isAbstract: true })
