@@ -44,8 +44,6 @@ const DashboardPage: NextPageWithLayout = () => {
     variables: { slug: router.query.slug as string },
   });
 
-  console.log(data?.conference.sections);
-
   const [removeTicket] = useRemoveTicketMutation();
   const [deleteSection] = useDeleteSectionMutation();
 
@@ -174,7 +172,7 @@ const DashboardPage: NextPageWithLayout = () => {
                   size="tiny"
                   floated="right"
                   fileUrls={section.submissions.map(
-                    (s) => s.file?.serverSideUrl || ""
+                    (s) => s.file?.clientSideUrl || ""
                   )}
                 />
               </Card.Content>
