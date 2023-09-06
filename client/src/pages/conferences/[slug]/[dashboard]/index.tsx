@@ -7,7 +7,6 @@ import AddTicketDialog from "../../../../components/AddTicketDialog";
 import Attendee from "../../../../components/AttendeeComponent";
 import Dashboard from "../../../../components/Dashboard";
 import DeleteDialog from "../../../../components/DeleteDialog";
-import ExportCSV from "../../../../components/ExportCSV";
 import SectionDialog from "../../../../components/SectionDialog";
 import {
   ConferenceDocument,
@@ -24,6 +23,7 @@ import {
   ControlsContext,
 } from "../../../../providers/ControlsProvider";
 import { NextPageWithLayout } from "../../../_app";
+import FileDownloader from "../../../../components/DownloadFiles";
 
 const DashboardPage: NextPageWithLayout = () => {
   const { user } = useContext(AuthContext);
@@ -167,6 +167,14 @@ const DashboardPage: NextPageWithLayout = () => {
                   confirmText="Potvrdiť"
                 />
                 <SectionDialog id={section.id} data={section} />
+                <FileDownloader
+                  disabled={section.submissions.every((s) => !s.file)}
+                  size="tiny"
+                  floated="right"
+                  fileUrls={section.submissions.map(
+                    (s) => s.file?.clientSideUrl || ""
+                  )}
+                />
               </Card.Content>
             </Card>
           ))}
