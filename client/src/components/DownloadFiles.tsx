@@ -17,7 +17,7 @@ const FileDownloader: React.FC<FileDownloaderProps> = ({
     for (const url of fileUrls) {
       try {
         // Fetch the file data
-        const response = await fetch(url);
+        const response = await fetch(url, { credentials: "include" });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch file: ${url}`);
