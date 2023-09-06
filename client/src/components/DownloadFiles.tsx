@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import JSZip from "jszip";
 import { Button, ButtonProps } from "semantic-ui-react";
 
@@ -10,7 +10,10 @@ const FileDownloader: React.FC<FileDownloaderProps> = ({
   fileUrls,
   ...props
 }) => {
+  const [loading, setLoading] = useState(false);
+
   const downloadFilesAsZip = async () => {
+    setLoading(true);
     const zip = new JSZip();
 
     // Loop through each URL in the array
@@ -50,10 +53,17 @@ const FileDownloader: React.FC<FileDownloaderProps> = ({
       // Clean up the download link
       document.body.removeChild(a);
     });
+
+    setLoading(false);
   };
 
   return (
-    <Button {...props} onClick={downloadFilesAsZip} icon="download">
+    <Button
+      loading={loading}
+      {...props}
+      onClick={downloadFilesAsZip}
+      icon="download"
+    >
       Prispevky.zip
     </Button>
   );
