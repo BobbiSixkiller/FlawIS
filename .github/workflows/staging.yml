@@ -52,3 +52,13 @@ jobs:
           RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
         run: |
           docker-compose -f docker-compose.staging.yml up -d --build
+
+      - name: Remove old Docker images
+        run: |
+          # Remove old Docker images (adjust criteria as needed)
+          docker image prune -f --filter "until=24h" # Remove images older than 24 hours
+
+      - name: Remove unused Docker volumes
+        run: |
+          # Remove unused Docker volumes
+          docker volume prune -f

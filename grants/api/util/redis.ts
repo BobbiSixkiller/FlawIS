@@ -18,7 +18,5 @@ export const initRedis = async () => {
   } catch (error) {
     console.log("Redis init failed, retrying in 15sec...");
     setTimeout(() => initRedis(), 1000 * 15);
-    // Return a promise that resolves to undefined in case of an error
-    return Promise.resolve(undefined);
   }
 };
