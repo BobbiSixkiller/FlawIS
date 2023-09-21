@@ -25,7 +25,7 @@ import { EmailService } from './email.service';
         return {
           transport: config.get<any>('transport'),
           defaults: {
-            from: `"No Reply" <${config.get<string>('MAIL_FROM')}>`,
+            from: config.get<string>('MAIL_FROM'),
           },
           template: {
             dir: join(__dirname, '/templates/'),
