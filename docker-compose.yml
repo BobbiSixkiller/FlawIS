@@ -126,6 +126,20 @@ services:
     ports:
       - "3000:3000"
 
+  client13:
+    build:
+      context: ./client13
+      dockerfile: Dockerfile
+    command: npm run dev
+    depends_on:
+      - gateway
+    volumes:
+      - ./client13/:/usr/app
+      - /usr/app/node_modules
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+
   mail:
     build:
       context: ./mail
