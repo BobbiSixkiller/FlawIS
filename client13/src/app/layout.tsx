@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import DrawerProvider from "./providers/DrawerProvider";
+import Nav from "@/components/Nav";
 
 const UKsans = localFont({
   src: [
@@ -51,7 +53,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${UKsans.className}`}>{children}</body>
+      <body className={`${UKsans.className}`}>
+        <DrawerProvider>
+          <Nav>{children}</Nav>
+        </DrawerProvider>
+      </body>
     </html>
   );
 }

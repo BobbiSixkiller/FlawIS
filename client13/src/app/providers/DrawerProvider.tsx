@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Dispatch, ReactNode, createContext, useReducer } from "react";
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -58,14 +59,7 @@ export default function DrawerProvider({ children }: { children: ReactNode }) {
 
   return (
     <DrawerContext.Provider value={{ ...state, dispatch }}>
-      <div className="flex relative min-h-screen">
-        <div className="w-64 bg-primary-500">
-          <h1>HEADER</h1>
-          <nav>{state.drawerItems}</nav>
-        </div>
-        {/* content container */}
-        <div className="p-10 flex-1">{children}</div>
-      </div>
+      {children}
     </DrawerContext.Provider>
   );
 }
