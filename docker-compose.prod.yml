@@ -168,7 +168,7 @@ services:
       - mongo_config:/data/configdb
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3
