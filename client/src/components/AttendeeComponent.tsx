@@ -2,7 +2,6 @@ import { Button, Card, Grid, Header, List, Popup } from "semantic-ui-react";
 import { useTranslation } from "next-i18next";
 import {
   AttendeeFragmentFragment,
-  FileInput,
   Invoice,
   Role,
   useDeleteSubmissionFileMutation,
@@ -113,12 +112,12 @@ export default function AttendeeComponent({
                   <UpdateSubmissionDialog
                     id={submission.id}
                     input={{
-                      conferenceId: data.conference.id,
+                      conference: data.conference.id,
                       authors: [],
                       abstract: submission.abstract,
                       keywords: submission.keywords,
                       name: submission.name,
-                      sectionId: submission.section.id,
+                      section: submission.section.id,
                       translations: submission.translations.map((t) => ({
                         language: t.language,
                         name: t.name,

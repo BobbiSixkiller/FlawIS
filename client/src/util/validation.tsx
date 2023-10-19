@@ -138,8 +138,8 @@ export default function Validation() {
 
   const submissionInputSchema = object({
     submission: object({
-      conferenceId: string().required(),
-      sectionId: string().required(),
+      conference: string().required(),
+      section: string().required(),
       userId: string(),
       name: string().trim().required(),
       abstract: string().trim().required(),

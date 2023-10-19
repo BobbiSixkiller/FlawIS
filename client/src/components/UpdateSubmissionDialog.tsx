@@ -62,8 +62,8 @@ export default function UpdateSubmissionDialog({
                   initialValues={{
                     submission: {
                       userId: undefined,
-                      conferenceId: data?.conference.id,
-                      sectionId: input.sectionId,
+                      conference: data?.conference.id,
+                      section: input.section,
                       name: input.name,
                       abstract: input.abstract,
                       keywords: input.keywords,

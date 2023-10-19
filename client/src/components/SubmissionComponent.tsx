@@ -1,14 +1,5 @@
-import { Formik, FormikProps } from "formik";
 import { useState } from "react";
-import { Button, Form, Segment } from "semantic-ui-react";
-import { RegisterSubmission } from "../pages/conferences/[slug]/register";
-import parseErrors from "../util/parseErrors";
-import {
-  Section,
-  Submission,
-  SubmissionInput,
-  useConferenceQuery,
-} from "../graphql/generated/schema";
+import { Submission, useConferenceQuery } from "../graphql/generated/schema";
 import Validation from "../util/validation";
 import { useRouter } from "next/router";
 import { InferType } from "yup";

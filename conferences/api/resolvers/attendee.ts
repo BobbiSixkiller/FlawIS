@@ -126,8 +126,8 @@ export class AttendeeResolver {
         const registeredSubmission = await this.submissionService.create({
           ...localizeInput(submission, submission.translations, locale),
           authors: [user?.id],
-          conference: submission.conferenceId,
-          section: submission.sectionId,
+          conference: submission.conference,
+          section: submission.section,
         });
         const localizedSubmission = convertDocument(
           registeredSubmission,

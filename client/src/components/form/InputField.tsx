@@ -86,7 +86,6 @@ export const LocalizedInputField: FC<InputFieldProps> = (props) => {
           onChange={(e: ChangeEvent, { value }: SelectProps) => {
             //Form field is a react semantic UI Select Component
             if (props.multiple && value) {
-              console.log(field.value);
               helpers.setValue(value);
             } else {
               field.onChange(e);
