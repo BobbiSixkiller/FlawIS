@@ -28,16 +28,6 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/users_copy?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6001
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
     restart: unless-stopped
     ports:
       - "6001:6001"
@@ -52,16 +42,6 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/files_copy?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6002
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
     volumes:
       - /home/weby/Desktop/FlawIS-staging-files:/usr/app/public
     restart: unless-stopped
@@ -79,16 +59,6 @@ services:
       MONGODB_URI: mongodb://mongo:27017/conferences_copy?replicaSet=rs0
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6003
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
     restart: unless-stopped
     ports:
       - "6003:6003"
@@ -103,16 +73,6 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/grants_copy?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       PORT: 6004
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
     restart: unless-stopped
     ports:
       - "6004:6004"
@@ -145,9 +105,6 @@ services:
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     restart: unless-stopped
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
 
 networks:
   flawis_default:
