@@ -883,10 +883,10 @@ export type Submission = {
 export type SubmissionInput = {
   abstract: Scalars['String'];
   authors: Array<InputMaybe<Scalars['String']>>;
-  conferenceId: Scalars['ObjectId'];
+  conference: Scalars['ObjectId'];
   keywords: Array<Scalars['String']>;
   name: Scalars['String'];
-  sectionId: Scalars['ObjectId'];
+  section: Scalars['ObjectId'];
   submissionUrl?: InputMaybe<Scalars['String']>;
   translations: Array<SubmissionInputTranslation>;
   /** field for admin to create a submission for a given user */

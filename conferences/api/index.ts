@@ -21,10 +21,6 @@ import { SubmissionResolver } from "./resolvers/submission";
 import { resolveUserReference } from "./resolvers/resolveUserReference";
 
 import env from "dotenv";
-import { User } from "./entities/User";
-import File from "./entities/File";
-import { Conference } from "./entities/Conference";
-import { Submission } from "./entities/Submission";
 
 env.config();
 

@@ -2,21 +2,22 @@ import { createClient } from "redis";
 
 export const client = createClient({ url: "redis://redis:6379" });
 
-export const initRedis = async () => {
-  try {
-    await client.connect();
+client.on("error", (err: any) => {
+  console.log("Redis Client Error", err);
+});
 
-    client.on("connect", () => console.log("Redis client connected!"));
-
-    client.on("error", (err: any) => {
-      console.log("Redis Client Error", err);
+export const initRedis = () => {
+  const connectToRedis = async () => {
+    try {
+      await client.connect();
+      console.log("Redis client connected!");
+    } catch (error) {
+      console.error("Error connecting to Redis:", error);
       // Retry after an error occurs
-      setTimeout(() => initRedis(), 1000 * 15);
-    });
+      setTimeout(connectToRedis, 1000 * 15);
+    }
+  };
 
-    return client; // Return the Redis client upon successful connection
-  } catch (error) {
-    console.log("Redis init failed, retrying in 15sec...");
-    setTimeout(() => initRedis(), 1000 * 15);
-  }
+  // Start the initial connection attempt
+  connectToRedis();
 };

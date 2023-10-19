@@ -7267,7 +7267,7 @@
             "deprecationReason": null
           },
           {
-            "name": "conferenceId",
+            "name": "conference",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -7323,7 +7323,7 @@
             "deprecationReason": null
           },
           {
-            "name": "sectionId",
+            "name": "section",
             "description": null,
             "type": {
               "kind": "NON_NULL",

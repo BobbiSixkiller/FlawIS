@@ -38,10 +38,10 @@ export class SubmissionInput {
   keywords: string[];
 
   @Field()
-  conferenceId: ObjectId;
+  conference: ObjectId;
 
   @Field()
-  sectionId: ObjectId;
+  section: ObjectId;
 
   @Authorized(["ADMIN"])
   @Field({
