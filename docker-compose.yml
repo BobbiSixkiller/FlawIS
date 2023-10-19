@@ -33,9 +33,15 @@ services:
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./users:/usr/app
       - /usr/app/node_modules
@@ -56,8 +62,15 @@ services:
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      - rabbitmq
-      - mongo
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./files:/usr/app
       - /usr/app/node_modules
@@ -78,9 +91,15 @@ services:
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./conferences:/usr/app
       - /usr/app/node_modules
@@ -101,9 +120,15 @@ services:
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      - rabbitmq
-      - mongo
-      - redis
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./grants:/usr/app
       - /usr/app/node_modules
@@ -157,7 +182,8 @@ services:
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     command: npm run start:dev
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     volumes:
       - ./mail:/usr/app
       - /usr/app/node_modules
@@ -168,11 +194,23 @@ services:
     restart: unless-stopped
     ports:
       - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping && rabbitmq-diagnostics -q status
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
   redis:
     image: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'PING' | redis-cli -h redis -x"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
   mongo:
     image: mongo
     restart: unless-stopped
@@ -182,6 +220,12 @@ services:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
   mongo_data: {}

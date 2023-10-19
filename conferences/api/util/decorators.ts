@@ -73,10 +73,10 @@ export function CheckConferenceSection(): ParameterDecorator {
   return createParamDecorator(async ({ args }) => {
     const [conference, section] = await Promise.all([
       getModelForClass(Conference).findOne({
-        _id: args.data.conferenceId,
+        _id: args.data.conference,
       }),
       getModelForClass(Section).findOne({
-        _id: args.data.sectionId,
+        _id: args.data.section,
       }),
     ]);
     if (!conference) throw new UserInputError("Conference not found!");

@@ -86,7 +86,7 @@ async function main() {
 
   await mongoDbConnect();
   await Messagebroker.init();
-  await initRedis();
+  initRedis();
 
   await server.start();
 
