@@ -37,7 +37,7 @@ jobs:
 
       - name: Copy files to staging
         run: |
-          sudo cp -arf /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
+          cp -arf /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
 
       - name: Build and Deploy
         env:
