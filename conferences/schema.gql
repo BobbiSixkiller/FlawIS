@@ -172,7 +172,7 @@ input ConferenceUserInput {
   organisation: String!
   telephone: String!
   titlesAfter: String
-  titlesBefore: String
+  titlesBefore: String!
 }
 
 """Conference contact information"""
@@ -330,10 +330,10 @@ type Submission {
 input SubmissionInput {
   abstract: String!
   authors: [String]!
-  conferenceId: ObjectId!
+  conference: ObjectId!
   keywords: [String!]!
   name: String!
-  sectionId: ObjectId!
+  section: ObjectId!
   submissionUrl: String
   translations: [SubmissionInputTranslation!]!
 

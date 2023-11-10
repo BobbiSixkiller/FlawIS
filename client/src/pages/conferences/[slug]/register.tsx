@@ -80,8 +80,8 @@ function SelectTicket({
             onChange={() => {
               if (ticket.withSubmission) {
                 setFieldValue("submission", {
-                  conferenceId: data.conference.id,
-                  sectionId: "",
+                  conference: data.conference.id,
+                  section: "",
                   name: "",
                   abstract: "",
                   keywords: [],
@@ -149,8 +149,8 @@ export function RegisterSubmission({
       setFieldValue(
         "submission",
         {
-          conferenceId: submission.conference.id,
-          sectionId: submission.section.id,
+          conference: submission.conference.id,
+          section: submission.section.id,
           name: submission.name,
           abstract: submission.abstract,
           keywords: submission.keywords,
@@ -179,12 +179,12 @@ export function RegisterSubmission({
     <>
       <InputField
         disabled={router.query.submission !== undefined}
-        name="submission.sectionId"
+        name="submission.section"
         label="Section"
         placeholder="Choose a section"
         search
         searchInput={{
-          name: "submission.sectionId",
+          name: "submission.section",
           id: "form-control-section",
         }}
         control={Select}
@@ -362,7 +362,7 @@ const RegisterAttendee: NextPageWithLayout = () => {
               DIC: "",
               ICDPH: "",
             },
-            conferenceId: "",
+            conferenceId: data?.conference.id,
             ticketId: "",
             submissionId: router.query.submission as string,
           }}
