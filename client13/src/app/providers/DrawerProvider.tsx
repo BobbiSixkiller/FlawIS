@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Dispatch, ReactNode, createContext, useReducer } from "react";
 
 type ActionMap<M extends { [index: string]: any }> = {
@@ -15,36 +14,37 @@ type ActionMap<M extends { [index: string]: any }> = {
 };
 
 export enum ActionTypes {
-  CleanAll = "CLEAN_ALL",
-  SetItems = "SET_ITEMS",
-  Toggle = "TOGGLE",
+  SetMenuItems = "SET_MENU_ITEMS",
+  SetDrawerItems = "SET_DRAWER_ITEMS",
+  SetVisible = "SET_VISIBLE",
 }
 
 type ActionPayload = {
-  [ActionTypes.SetItems]: { drawerItems: ReactNode };
-  [ActionTypes.CleanAll]: undefined;
-  [ActionTypes.Toggle]: undefined;
+  [ActionTypes.SetDrawerItems]: { drawerItems: ReactNode };
+  [ActionTypes.SetMenuItems]: { menuItems: ReactNode };
+  [ActionTypes.SetVisible]: { visible: boolean };
 };
 
 type DrawerActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
 type DrawerState = {
+  menuItems: ReactNode;
   drawerItems: ReactNode;
   visible: boolean;
 };
 
 export const DrawerContext = createContext<
   DrawerState & { dispatch: Dispatch<DrawerActions> }
->({ drawerItems: null, visible: false, dispatch: () => null });
+>({ drawerItems: null, menuItems: null, visible: false, dispatch: () => null });
 
 function drawerReducer(state: DrawerState, action: DrawerActions): DrawerState {
   switch (action.type) {
-    case ActionTypes.CleanAll:
-      return { ...state, drawerItems: null };
-    case ActionTypes.SetItems:
+    case ActionTypes.SetDrawerItems:
       return { ...state, drawerItems: action.payload.drawerItems };
-    case ActionTypes.Toggle:
-      return { ...state, visible: !state.visible };
+    case ActionTypes.SetMenuItems:
+      return { ...state, menuItems: action.payload.menuItems };
+    case ActionTypes.SetVisible:
+      return { ...state, visible: action.payload.visible };
 
     default:
       throw new Error("Unhandled action type!");
@@ -55,6 +55,7 @@ export default function DrawerProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(drawerReducer, {
     visible: false,
     drawerItems: null,
+    menuItems: null,
   });
 
   return (
