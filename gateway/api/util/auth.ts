@@ -45,7 +45,7 @@ export function createContext({ req, res }: ExpressContext): Context {
   };
 
   if (req.cookies.accessToken) {
-    const token = req.cookies.accessToken.split("Bearer%20")[1];
+    const token = req.cookies.accessToken.split("Bearer ")[1];
     if (token) {
       appContext.user = verifyJwt(token);
     } else

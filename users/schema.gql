@@ -19,13 +19,13 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Mutation {
-  activateUser(token: String!): Boolean!
+  activateUser: String!
   deleteUser(id: ObjectId!): Boolean!
-  login(email: String!, password: String!): User!
+  login(email: String!, password: String!): String!
   logout: Boolean!
-  passwordReset(data: PasswordInput!): User!
-  register(data: RegisterInput!): User!
-  resendActivationLink: Boolean!
+  passwordReset(data: PasswordInput!): String!
+  register(data: RegisterInput!): String!
+  resendActivationLink: String!
   updateUser(data: UserInput!, id: ObjectId!): User!
 }
 

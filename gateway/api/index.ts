@@ -48,12 +48,13 @@ const origins =
         `https://conferences.flaw.uniba.sk`,
         `http://client:3000`,
         `http://localhost:3000`,
+        `http://client13:3000`,
       ]
     : [
         `https://flawis-staging.flaw.uniba.sk`,
         `https://conferences-staging.flaw.uniba.sk`,
-        `http://client-staging:4000`,
-        `http://localhost-staging:4000`,
+        // `http://client-staging:4000`,
+        // `http://localhost-staging:4000`,
       ];
 
 const main = async () => {

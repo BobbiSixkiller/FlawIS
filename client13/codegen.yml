@@ -1,0 +1,11 @@
+overwrite: true
+schema: "http://localhost:5000/graphql"
+documents: "**/*.{gql,graphql}"
+generates:
+  src/lib/graphql/generated/:
+    preset: "client"
+    presetConfig:
+      fragmentMasking: false
+    config:
+      documentMode: "string"
+    plugins: []

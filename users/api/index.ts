@@ -19,6 +19,7 @@ import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
 import { initRedis } from "./util/redis";
+import { I18nMiddleware } from "./middlewares/i18n-middleware";
 
 env.config();
 
@@ -44,7 +45,7 @@ async function main() {
       // orphanedTypes: [User],
       resolvers: [UserResolver],
       // use document converting middleware
-      globalMiddlewares: [TypegooseMiddleware],
+      globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
       // use ObjectId scalar mapping
       scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
       emitSchemaFile: true,

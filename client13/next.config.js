@@ -1,4 +1,11 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  logging: { fetches: { fullUrl: true } },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["http://localhost"],
+    },
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

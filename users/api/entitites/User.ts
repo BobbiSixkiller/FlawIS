@@ -16,6 +16,8 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { hash } from "bcrypt";
 import { signJwt } from "../util/auth";
 import { ModelType } from "@typegoose/typegoose/lib/types";
+import Container from "typedi";
+import { I18nService } from "../services/i18nService";
 
 export enum Role {
   Basic = "BASIC",
@@ -43,7 +45,7 @@ registerEnumType(Role, {
           value: this.email, // Value that haven't pass a validation.
           constraints: {
             // Constraints that failed validation with error messages.
-            EmailExists: "Submitted email address is already in use!",
+            emailExists: Container.get(I18nService).translate("emailExists"),
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },
@@ -92,7 +94,7 @@ export class User extends TimeStamps {
           name: this.name,
           role: this.role,
         },
-        { expiresIn: "7d" }
+        { expiresIn: "1h" }
       )
     );
   }

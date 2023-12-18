@@ -1,5 +1,5 @@
 # Developemnt Stage
-FROM node:18-alpine AS development
+FROM node:21-alpine AS development
 
 # Create app directory
 WORKDIR /usr/app

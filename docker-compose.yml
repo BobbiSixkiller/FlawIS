@@ -136,20 +136,20 @@ services:
     ports:
       - "5004:5004"
 
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    depends_on:
-      - gateway
-    volumes:
-      - ./client/:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: npm run dev
+  #   depends_on:
+  #     - gateway
+  #   volumes:
+  #     - ./client/:/usr/app
+  #     - /usr/app/node_modules
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3000:3000"
 
   client13:
     build:
@@ -163,7 +163,7 @@ services:
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3000:3000"
 
   mail:
     build:

@@ -1,0 +1,7 @@
+{
+  "required": "This is a required field!",
+  "email": "Invalid email address!",
+  "password": "Password must have minimum eight characters, at least one letter and one number!",
+  "confirmPass": "Passwords do not match!",
+  "terms": "You have to agree with privacy policy!"
+}

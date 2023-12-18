@@ -19,12 +19,16 @@ import { Authorized } from "type-graphql";
 import { ResetToken } from "../util/types";
 import messageBroker from "../util/rmq";
 import { RateLimit } from "../middlewares/ratelimit-middleware";
+import { I18nService } from "../services/i18nService";
 
 @Service()
 @Resolver()
 export class UserResolver {
   //using mongodb change steams to handle user integrity accross federated subgraphs
-  constructor(private readonly userService = new CRUDservice(User)) {
+  constructor(
+    private readonly userService = new CRUDservice(User),
+    private readonly i18nService: I18nService
+  ) {
     userService.dataModel
       .watch([])
       .on("change", (data: ChangeStreamDocument<User>) => {
@@ -75,9 +79,9 @@ export class UserResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => User)
-  async user(@Arg("id") id: ObjectId) {
+  async user(@Arg("id") id: ObjectId, @Ctx() { locale }: Context) {
     const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new Error("User not found!");
+    if (!user) throw new Error(this.i18nService.translate("notFound"));
 
     return user;
   }
@@ -122,7 +126,7 @@ export class UserResolver {
     return loggedInUser;
   }
 
-  @Mutation(() => User)
+  @Mutation(() => String)
   @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
@@ -153,13 +157,13 @@ export class UserResolver {
       "mail.registration"
     );
 
-    return user;
+    return user.token;
   }
 
   @Authorized()
   @UseMiddleware([RateLimit(50)])
-  @Mutation(() => Boolean)
-  resendActivationLink(@Ctx() { req, locale, user }: Context) {
+  @Mutation(() => String)
+  async resendActivationLink(@Ctx() { req, locale, user }: Context) {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
@@ -171,26 +175,31 @@ export class UserResolver {
       "mail.registration"
     );
 
-    return true;
+    return this.i18nService.translate("activation");
   }
 
-  @Mutation(() => Boolean)
+  @Authorized()
+  @Mutation(() => String)
   @UseMiddleware([RateLimit(50)])
-  async activateUser(@Arg("token") token: string) {
-    const user: Partial<User> | null = verifyJwt(token);
-    if (user) {
-      const { modifiedCount } = await this.userService.update(
-        { _id: user.id, verified: false },
-        { verified: true }
-      );
-
-      return modifiedCount > 0;
+  async activateUser(@Ctx() { req, locale }: Context) {
+    const user: Partial<User> | null = verifyJwt(
+      req.headers.activation as string
+    );
+    if (!user) {
+      throw new Error(this.i18nService.translate("invalidActivationToken"));
     }
-
-    return false;
+    const { modifiedCount } = await this.userService.update(
+      { _id: user.id, verified: false },
+      { verified: true }
+    );
+    if (modifiedCount > 0) {
+      return this.i18nService.translate("activated");
+    } else {
+      throw new Error(this.i18nService.translate("notFound"));
+    }
   }
 
-  @Mutation(() => User)
+  @Mutation(() => String)
   @UseMiddleware([RateLimit(50)])
   async login(
     @Arg("email") email: string,
@@ -198,10 +207,12 @@ export class UserResolver {
     @Ctx() { res }: Context
   ) {
     const user = await this.userService.findOne({ email });
-    if (!user) throw new AuthenticationError("Invalid credentials!");
+    if (!user)
+      throw new AuthenticationError(this.i18nService.translate("credentials"));
 
     const match = await compare(password, user.password);
-    if (!match) throw new AuthenticationError("Invalid credentials!");
+    if (!match)
+      throw new AuthenticationError(this.i18nService.translate("credentials"));
 
     res.cookie("accessToken", user.token, {
       httpOnly: true,
@@ -215,7 +226,7 @@ export class UserResolver {
           : "localhost",
     });
 
-    return user;
+    return user.token;
   }
 
   @Authorized()
@@ -243,7 +254,7 @@ export class UserResolver {
     @Ctx() { locale, req }: Context
   ) {
     const user = await this.userService.findOne({ email });
-    if (!user) throw new Error("No user with provided email address found!");
+    if (!user) throw new Error(this.i18nService.translate("notRegistered"));
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
@@ -258,22 +269,22 @@ export class UserResolver {
       "mail.reset"
     );
 
-    return "Password reset link has been sent to your email!";
+    return this.i18nService.translate("resetLinkSent");
   }
 
-  @Mutation(() => User)
+  @Mutation(() => String)
   @UseMiddleware([RateLimit(50)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
-    @Ctx() { req, res }: Context
+    @Ctx() { req, res, locale }: Context
   ) {
     const token = req.headers.resettoken;
 
     const userId: ResetToken = verifyJwt(token as string);
-    if (!userId) throw new Error("Reset token expired!");
+    if (!userId) throw new Error(this.i18nService.translate("invalidToken"));
 
     const user = await this.userService.findOne({ _id: userId.id });
-    if (!user) throw new Error("User not found!");
+    if (!user) throw new Error(this.i18nService.translate("notFound"));
 
     user.password = password;
 
@@ -284,15 +295,21 @@ export class UserResolver {
       secure: process.env.NODE_ENV === "production",
     });
 
-    return await user.save();
+    await user.save();
+
+    return user.token;
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
   @UseMiddleware([RateLimit(50)])
   @Mutation(() => User)
-  async updateUser(@Arg("id") id: ObjectId, @Arg("data") userInput: UserInput) {
+  async updateUser(
+    @Arg("id") id: ObjectId,
+    @Arg("data") userInput: UserInput,
+    @Ctx() { locale }: Context
+  ) {
     const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new UserInputError("User not found!");
+    if (!user) throw new UserInputError(this.i18nService.translate("notFound"));
 
     for (const [key, value] of Object.entries(userInput)) {
       user[key as keyof UserInput] = value;
