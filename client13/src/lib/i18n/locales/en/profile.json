@@ -1,0 +1,9 @@
+{
+  "heading": "Profile",
+  "submit": "Update",
+  "submitting": "Updating...",
+  "name": "First and last name",
+  "email": "Email address",
+  "phone": "Phone number",
+  "org": "Organization"
+}

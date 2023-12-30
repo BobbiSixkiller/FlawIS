@@ -18,6 +18,7 @@ import { signJwt } from "../util/auth";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
+import { Billing } from "./Billing";
 
 export enum Role {
   Basic = "BASIC",
@@ -52,6 +53,23 @@ registerEnumType(Role, {
       ]);
     }
   }
+  if (this.email.split("@")[1].includes("uniba")) {
+    this.organisation = "Univerzita Komenského v Bratislave, Právnická fakulta";
+  }
+  if (this.isNew && this.email.split("@")[1].includes("uniba")) {
+    this.billings.push({
+      name: "Univerzita Komenského v Bratislave, Právnická fakulta",
+      address: {
+        street: "Šafárikovo nám. č. 6",
+        city: "Bratislava",
+        postal: "810 00",
+        country: "Slovensko",
+      },
+      ICO: "00397865",
+      DIC: "2020845332",
+      ICDPH: "SK2020845332 ",
+    });
+  }
 })
 @Index({ name: "text", email: "text" })
 @Directive('@key(fields: "id")')
@@ -70,6 +88,18 @@ export class User extends TimeStamps {
   @Field()
   @Property()
   name: string;
+
+  @Field()
+  @Property({ default: "N/A" })
+  telephone: string;
+
+  @Field()
+  @Property({ default: "N/A" })
+  organisation: string;
+
+  @Field(() => [Billing], { nullable: "items" })
+  @Property({ type: () => [Billing], _id: false })
+  billings: Billing[];
 
   @Field(() => Role)
   @Property({ default: "BASIC", enum: ["BASIC", "ADMIN"] })

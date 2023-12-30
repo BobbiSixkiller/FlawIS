@@ -3,10 +3,11 @@
   "notRegistered": "No user with provided email address found!",
   "resetLinkSent": "Password reset link has been sent to your email.",
   "invalidResetToken": "Reset password link has expired!",
-  "notFound": "User not found!",
   "activation": "Activation link has been sent to your email address.",
   "activated": "User account has been activated.",
   "invalidActivationToken": "Activation link has expired!",
   "rateLimit": "You repeat the action too often, do it again later.",
-  "emailExists": "Email address is already in use!"
+  "emailExists": "Email address is already in use!",
+  "notFound": "Resource has not been found!",
+  "userUpdate": "User {{name}} has been updated."
 }

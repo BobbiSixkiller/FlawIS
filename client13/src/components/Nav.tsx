@@ -10,7 +10,7 @@ import {
 import LngSwitcher from "./LngSwitcher";
 import { Role, User } from "@/lib/graphql/generated/graphql";
 import Logo from "./Logo";
-import { MobileNav, NavItem } from "./MobileNav";
+import { MobileNav, NavItem, ProfileMenuItem } from "./MobileNav";
 import { useTranslation } from "@/lib/i18n";
 
 export async function Nav({
@@ -36,33 +36,30 @@ export async function Nav({
             {user ? (
               <>
                 {user.role === Role.Admin && (
-                  <NavItem route="users">
+                  <NavItem lng={lng} route="users">
                     <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                     {t("users")}
                   </NavItem>
                 )}
-                <NavItem route="conferences">
+                <NavItem lng={lng} route="conferences">
                   <AcademicCapIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   {t("conferences")}
                 </NavItem>
-                <NavItem route="profile">
-                  <UserCircleIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                  {t("profile")}
-                </NavItem>
+                <ProfileMenuItem lng={lng} user={user} />
               </>
             ) : (
               <>
-                <NavItem route="login">
+                <NavItem lng={lng} route="login">
                   <ArrowRightCircleIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   {t("login")}
                 </NavItem>
-                <NavItem route="register">
+                <NavItem lng={lng} route="register">
                   <UserPlusIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   {t("register")}
                 </NavItem>
@@ -78,7 +75,9 @@ export async function Nav({
         logo={<Logo lng={lng} width={36} height={36} notext />}
         drawerTitle={<Logo inverted lng={lng} height={60} width={60} />}
       />
-      <div className="container m-auto min-h-screen px-4 py-6">{children}</div>
+      <div className="container mx-auto min-h-screen px-4 lg:px-6 py-6">
+        {children}
+      </div>
     </div>
   );
 }

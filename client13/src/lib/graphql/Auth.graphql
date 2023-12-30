@@ -1,17 +1,11 @@
 fragment User on User {
   id
-  titlesBefore
   name
-  titlesAfter
   email
   role
   verified
   createdAt
   updatedAt
-}
-
-mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password)
 }
 
 query me {
@@ -32,6 +26,10 @@ query me {
       ICDPH
     }
   }
+}
+
+mutation login($email: String!, $password: String!) {
+  login(email: $email, password: $password)
 }
 
 query forgotPassword($email: String!) {

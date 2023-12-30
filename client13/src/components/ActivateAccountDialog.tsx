@@ -20,7 +20,7 @@ export default function ActivateAccountDialog({
     success: false,
     message: "",
   });
-  const [open, setOpen] = useState(!user?.verified);
+  const [open, setOpen] = useState(user && !user?.verified);
   const [activationState, setActivationState] = useState({
     success: false,
     message: "",

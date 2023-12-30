@@ -12,6 +12,7 @@ import {
   PasswordResetDocument,
   RegisterDocument,
   ResendActivationLinkDocument,
+  UpdateUserDocument,
 } from "@/lib/graphql/generated/graphql";
 import parseErrors, { ErrorException } from "@/utils/parseErrors";
 import { executeGqlFetch, validation } from "@/utils/actions";
@@ -35,6 +36,8 @@ export async function register(prevState: any, formData: FormData) {
         email: input.email,
         name: input.name,
         password: input.password,
+        telephone: input.telephone,
+        organisation: input.organization,
       },
     });
 
@@ -52,7 +55,7 @@ export async function register(prevState: any, formData: FormData) {
     if (res.data.register) {
       cookies().set("accessToken", res.data.register as string, {
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+        expires: new Date(Date.now() + 60 * 60 * 1000 * 24),
       });
     }
   } catch (error: any) {
@@ -89,7 +92,7 @@ export async function login(prevState: any, formData: FormData) {
     if (res.data.login) {
       cookies().set("accessToken", res.data.login as string, {
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+        expires: new Date(Date.now() + 60 * 60 * 1000 * 24),
       });
     }
   } catch (error: any) {
@@ -120,7 +123,6 @@ export async function getMe() {
   return res.data?.me;
 }
 
-//test if it redirect based on the dashboard page logic
 export async function logout() {
   cookies().delete("accessToken");
   revalidateTag("user");
@@ -156,7 +158,6 @@ export async function sendResetLink(prevState: any, formData: FormData) {
   }
 }
 
-//doplnit hlavicky
 export async function resetPassword(prevState: any, formData: FormData) {
   const { resetPasswordValidationSchema } = await validation();
   try {
@@ -225,15 +226,11 @@ export async function activate() {
 }
 
 export async function resendActivationLink() {
-  const token = cookies().get("accessToken")?.value;
-
   try {
     const res = await executeGqlFetch(
       ResendActivationLinkDocument,
       {},
-      {
-        Cookie: `accessToken=${token}`,
-      },
+      {},
       { revalidate: 60 * 15 }
     );
     if (res.errors) {
@@ -245,6 +242,45 @@ export async function resendActivationLink() {
       };
     }
     return { success: true, message: res.data.resendActivationLink };
+  } catch (error: any) {
+    console.log(error);
+    return { success: false, message: error.message };
+  }
+}
+export async function updateProfile(prevState: any, formData: FormData) {
+  const { updateProfileInputSchema } = await validation();
+
+  try {
+    const input = await updateProfileInputSchema.validate({
+      id: formData.get("id")?.toString(),
+      name: formData.get("name")?.toString(),
+      email: formData.get("email")?.toString(),
+      organization: formData.get("organization")?.toString(),
+      telephone: formData.get("telephone")?.toString(),
+    });
+
+    const res = await executeGqlFetch(UpdateUserDocument, {
+      id: input.id,
+      data: {
+        name: input.name,
+        email: input.email,
+        organisation: input.organization,
+        telephone: input.telephone,
+      },
+    });
+    if (res.errors) {
+      const { message, validationErrors } = res.errors[0].extensions
+        .exception as ErrorException;
+
+      return {
+        success: false,
+        message: validationErrors
+          ? Object.values(parseErrors(validationErrors)).join(" ")
+          : message,
+      };
+    }
+    revalidateTag("user");
+    return { success: true, message: res.data.updateUser.message };
   } catch (error: any) {
     console.log(error);
     return { success: false, message: error.message };

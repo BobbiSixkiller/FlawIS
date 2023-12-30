@@ -83,7 +83,9 @@ export default function ResetPasswordForm({
         </div>
       </div>
 
-      <Button type="submit">{t("submit")}</Button>
+      <Button type="submit" loadingText={t("submitting")}>
+        {t("submit")}
+      </Button>
     </form>
   );
 }

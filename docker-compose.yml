@@ -1,26 +1,26 @@
 services:
-  gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-    depends_on:
-      - users
-      - conferences
-      - files
-      - grants
-    volumes:
-      - ./gateway:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
+  # gateway:
+  #   build:
+  #     context: ./gateway
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: npm run dev
+  #   environment:
+  #     NODE_ENV: development
+  #     SECRET: ${SECRET}
+  #   depends_on:
+  #     - users
+  #     - conferences
+  #     - files
+  #     - grants
+  #   volumes:
+  #     - ./gateway:/usr/app
+  #     - /usr/app/node_modules
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
 
-  users:
+  core:
     build:
       context: ./users
       dockerfile: Dockerfile
@@ -47,94 +47,94 @@ services:
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
-      - "5001:5001"
+      - "5000:5000"
 
-  files:
-    build:
-      context: ./files
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${FILES_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./files:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5002:5002"
+  # files:
+  #   build:
+  #     context: ./files
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: npm run dev
+  #   environment:
+  #     NODE_ENV: development
+  #     SECRET: ${SECRET}
+  #     MONGODB_URI: ${FILES_MONGODB_URI}
+  #     RMQ_URI: ${RMQ_URI}
+  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #       restart: true
+  #     redis:
+  #       condition: service_healthy
+  #       restart: true
+  #     mongo:
+  #       condition: service_healthy
+  #       restart: true
+  #   volumes:
+  #     - ./files:/usr/app
+  #     - /usr/app/node_modules
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5002:5002"
 
-  conferences:
-    build:
-      context: ./conferences
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${CONFERENCES_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./conferences:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5003:5003"
+  # conferences:
+  #   build:
+  #     context: ./conferences
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: npm run dev
+  #   environment:
+  #     NODE_ENV: development
+  #     SECRET: ${SECRET}
+  #     MONGODB_URI: ${CONFERENCES_MONGODB_URI}
+  #     RMQ_URI: ${RMQ_URI}
+  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #       restart: true
+  #     redis:
+  #       condition: service_healthy
+  #       restart: true
+  #     mongo:
+  #       condition: service_healthy
+  #       restart: true
+  #   volumes:
+  #     - ./conferences:/usr/app
+  #     - /usr/app/node_modules
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5003:5003"
 
-  grants:
-    build:
-      context: ./grants
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${GRANTS_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./grants:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5004:5004"
+  # grants:
+  #   build:
+  #     context: ./grants
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   command: npm run dev
+  #   environment:
+  #     NODE_ENV: development
+  #     SECRET: ${SECRET}
+  #     MONGODB_URI: ${GRANTS_MONGODB_URI}
+  #     RMQ_URI: ${RMQ_URI}
+  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #       restart: true
+  #     redis:
+  #       condition: service_healthy
+  #       restart: true
+  #     mongo:
+  #       condition: service_healthy
+  #       restart: true
+  #   volumes:
+  #     - ./grants:/usr/app
+  #     - /usr/app/node_modules
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5004:5004"
 
   # client:
   #   build:
@@ -157,7 +157,7 @@ services:
       dockerfile: Dockerfile
     command: npm run dev
     depends_on:
-      - gateway
+      - core
     volumes:
       - ./client13/:/usr/app
       - /usr/app/node_modules

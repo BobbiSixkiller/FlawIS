@@ -10,8 +10,9 @@ import {
   UserArgs,
   UserConnection,
   UserInput,
+  UserMutationResponse,
 } from "./types/user";
-import { AuthenticationError, UserInputError } from "apollo-server-core";
+import { AuthenticationError } from "apollo-server-core";
 
 import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
@@ -20,53 +21,54 @@ import { ResetToken } from "../util/types";
 import messageBroker from "../util/rmq";
 import { RateLimit } from "../middlewares/ratelimit-middleware";
 import { I18nService } from "../services/i18nService";
+import { LoadResource } from "../util/decorators";
+import { DocumentType } from "@typegoose/typegoose";
 
 @Service()
 @Resolver()
 export class UserResolver {
-  //using mongodb change steams to handle user integrity accross federated subgraphs
+  //using mongodb change streams to handle user integrity accross federated subgraphs
   constructor(
     private readonly userService = new CRUDservice(User),
     private readonly i18nService: I18nService
   ) {
-    userService.dataModel
-      .watch([])
-      .on("change", (data: ChangeStreamDocument<User>) => {
-        switch (data.operationType) {
-          case "insert":
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-                email: data.fullDocument?.email,
-                name: data.fullDocument?.name,
-              }),
-              "user.new"
-            );
-          case "update":
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-                email: data.updateDescription?.updatedFields?.email,
-                name: data.updateDescription?.updatedFields?.name,
-              }),
-              "user.update.personal"
-            );
-          case "delete":
-            return messageBroker.produceMessage(
-              JSON.stringify({
-                id: data.documentKey?._id,
-              }),
-              "user.delete"
-            );
-          case "invalidate":
-            console.log("invalidate");
-            console.log(data);
-
-          default:
-            console.log("Unhandled operation type: ", data.operationType);
-            return;
-        }
-      });
+    // userService.dataModel
+    //   .watch([])
+    //   .on("change", (data: ChangeStreamDocument<User>) => {
+    //     switch (data.operationType) {
+    //       case "insert":
+    //         return messageBroker.produceMessage(
+    //           JSON.stringify({
+    //             id: data.documentKey?._id,
+    //             email: data.fullDocument?.email,
+    //             name: data.fullDocument?.name,
+    //           }),
+    //           "user.new"
+    //         );
+    //       case "update":
+    //         return messageBroker.produceMessage(
+    //           JSON.stringify({
+    //             id: data.documentKey?._id,
+    //             email: data.updateDescription?.updatedFields?.email,
+    //             name: data.updateDescription?.updatedFields?.name,
+    //           }),
+    //           "user.update.personal"
+    //         );
+    //       case "delete":
+    //         return messageBroker.produceMessage(
+    //           JSON.stringify({
+    //             id: data.documentKey?._id,
+    //           }),
+    //           "user.delete"
+    //         );
+    //       case "invalidate":
+    //         console.log("invalidate");
+    //         console.log(data);
+    //       default:
+    //         console.log("Unhandled operation type: ", data.operationType);
+    //         return;
+    //     }
+    //   });
   }
 
   @Authorized(["ADMIN"])
@@ -79,10 +81,10 @@ export class UserResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => User)
-  async user(@Arg("id") id: ObjectId, @Ctx() { locale }: Context) {
-    const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new Error(this.i18nService.translate("notFound"));
-
+  async user(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(User) user: DocumentType<User>
+  ) {
     return user;
   }
 
@@ -130,7 +132,7 @@ export class UserResolver {
   @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { req, res, locale }: Context //produceMessage for email service and define coresponding routing keys
+    @Ctx() { req, res, locale }: Context
   ) {
     const user = await this.userService.create(registerInput);
 
@@ -181,7 +183,7 @@ export class UserResolver {
   @Authorized()
   @Mutation(() => String)
   @UseMiddleware([RateLimit(50)])
-  async activateUser(@Ctx() { req, locale }: Context) {
+  async activateUser(@Ctx() { req }: Context) {
     const user: Partial<User> | null = verifyJwt(
       req.headers.activation as string
     );
@@ -276,7 +278,7 @@ export class UserResolver {
   @UseMiddleware([RateLimit(50)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
-    @Ctx() { req, res, locale }: Context
+    @Ctx() { req, res }: Context
   ) {
     const token = req.headers.resettoken;
 
@@ -302,20 +304,22 @@ export class UserResolver {
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
   @UseMiddleware([RateLimit(50)])
-  @Mutation(() => User)
+  @Mutation(() => UserMutationResponse)
   async updateUser(
-    @Arg("id") id: ObjectId,
+    @Arg("id") _id: ObjectId,
     @Arg("data") userInput: UserInput,
-    @Ctx() { locale }: Context
-  ) {
-    const user = await this.userService.findOne({ _id: id });
-    if (!user) throw new UserInputError(this.i18nService.translate("notFound"));
-
+    @LoadResource(User) user: DocumentType<User>
+  ): Promise<UserMutationResponse> {
     for (const [key, value] of Object.entries(userInput)) {
       user[key as keyof UserInput] = value;
     }
 
-    return await user.save();
+    const data = await user.save();
+
+    return {
+      data,
+      message: this.i18nService.translate("userUpdate", { name: data.name }),
+    };
   }
 
   @Authorized(["ADMIN"])

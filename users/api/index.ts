@@ -10,20 +10,37 @@ import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
 
 import { UserResolver } from "./resolvers/user";
 
-import { resolveUserReference } from "./resolvers/resolveUserReference";
-import { buildFederatedSchema } from "./util/buildFederatedSchema";
-
-import { Context } from "./util/auth";
+import { Context, createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
 import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
 import { initRedis } from "./util/redis";
 import { I18nMiddleware } from "./middlewares/i18n-middleware";
+import { buildSchema } from "type-graphql";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 
 env.config();
 
-const port = process.env.PORT || 5001;
+const origins =
+  process.env.NODE_ENV !== "staging"
+    ? [
+        `https://flawis.flaw.uniba.sk`,
+        `https://conferences.flaw.uniba.sk`,
+        `http://client:3000`,
+        `http://localhost:3000`,
+        `http://client13:3000`,
+      ]
+    : [
+        `https://flawis-staging.flaw.uniba.sk`,
+        `https://conferences-staging.flaw.uniba.sk`,
+        // `http://client-staging:4000`,
+        // `http://localhost-staging:4000`,
+      ];
+const port = process.env.PORT || 5000;
 const mongooseUri =
   process.env.MONGODB_URI || "mongodb://localhost:27017/users";
 
@@ -40,7 +57,7 @@ async function mongoDbConnect() {
 
 async function main() {
   //Build schema
-  const schema = await buildFederatedSchema(
+  const schema = await buildSchema(
     {
       // orphanedTypes: [User],
       resolvers: [UserResolver],
@@ -50,13 +67,12 @@ async function main() {
       scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
       emitSchemaFile: true,
       container: Container,
-      //disabled validation for dev purposes
-      //validate: false,
+      validate: true,
       authChecker,
-    },
-    {
-      User: { __resolveReference: resolveUserReference },
     }
+    // {
+    //   User: { __resolveReference: resolveUserReference },
+    // }
   );
 
   const app = Express();
@@ -64,19 +80,25 @@ async function main() {
   // Trust the X-Forwarded-For header
   app.set("trust proxy", true);
 
+  app.use(
+    cors({
+      credentials: true,
+      origin: origins,
+    })
+  );
+  app.use(cookieParser());
+
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }: Context) => ({
-      req,
-      res,
-      user: req.headers.user
-        ? JSON.parse(decodeURIComponent(req.headers.user as string))
-        : null,
-      locale: req.headers.locale
-        ? JSON.parse(decodeURIComponent(req.headers.locale as string))
-        : "sk",
-    }),
+    context: (ctx) => createContext(ctx),
+    plugins:
+      process.env.NODE_ENV === "development"
+        ? [
+            ApolloServerPluginLandingPageGraphQLPlayground(),
+            new ApolloComplexityPlugin(200),
+          ]
+        : [new ApolloComplexityPlugin(200)],
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:
       process.env.NODE_ENV === "production" ||
@@ -91,7 +113,7 @@ async function main() {
 
   await server.start();
 
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app, cors: false });
 
   app.listen({ port }, () =>
     console.log(

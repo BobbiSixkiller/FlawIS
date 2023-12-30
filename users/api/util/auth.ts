@@ -5,6 +5,7 @@ import { AuthChecker } from "type-graphql";
 import { User } from "./types";
 
 import env from "dotenv";
+import { ExpressContext } from "apollo-server-express";
 
 env.config();
 
@@ -13,6 +14,27 @@ export interface Context {
   res: Response;
   user: User | null;
   locale: string;
+}
+
+export function createContext({ req, res }: ExpressContext): Context {
+  const appContext: Context = {
+    req: req as Request,
+    res: res as Response,
+    locale: req.cookies.NEXT_locale,
+    user: null,
+  };
+
+  if (req.cookies.accessToken) {
+    const token = req.cookies.accessToken.split("Bearer ")[1];
+    if (token) {
+      appContext.user = verifyJwt(token);
+    } else
+      throw new Error(
+        "Authentication header format must be: 'Bearer [token]'."
+      );
+  }
+
+  return appContext;
 }
 
 export function signJwt(object: Object, options?: SignOptions | undefined) {

@@ -3,7 +3,7 @@
   "email": "Email address",
   "password": "Password",
   "submit": "Sign in",
-  "loading": "Signing in...",
+  "submitting": "Signing in...",
   "forgot": "<0>Forgot password?</0>",
   "register": "Are you new here? <reg>Create an account!</reg>"
 }

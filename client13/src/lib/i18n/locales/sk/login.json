@@ -3,7 +3,7 @@
   "email": "Email adresa",
   "password": "Heslo",
   "submit": "Prihlásiť",
-  "loading": "Prihlasujem...",
+  "submitting": "Prihlasujem...",
   "forgot": "<0>Zabudli ste heslo?</0>",
   "register": "Ste tu prvýkrát? <reg>Vytvorte si účet!</reg>"
 }

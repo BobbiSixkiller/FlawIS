@@ -1,6 +1,6 @@
 import { Max, Min } from "class-validator";
 import { ObjectId } from "mongodb";
-import { Args, ArgsType, ClassType, Field, Int, ObjectType } from "type-graphql";
+import { ArgsType, ClassType, Field, Int, ObjectType } from "type-graphql";
 import { RefDocExists } from "../../util/validation";
 
 //generic function for creating corresponding Connection Type enabling relay style pagination
@@ -36,7 +36,6 @@ export function CreateConnection<TNode>(TNodeClass: ClassType<TNode>) {
   return Connection;
 }
 
-
 export function CreateArgs<TNode>(TNodeClass: ClassType<TNode>) {
   @ArgsType()
   class ConnectionArgs {
@@ -52,5 +51,5 @@ export function CreateArgs<TNode>(TNodeClass: ClassType<TNode>) {
     first: number = 20;
   }
 
-  return ConnectionArgs
+  return ConnectionArgs;
 }

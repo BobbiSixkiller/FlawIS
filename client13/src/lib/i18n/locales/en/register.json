@@ -8,7 +8,7 @@
   "repeatPass": "Repeat password",
   "privacy": "I agree with the <privacy>privacy policy</privacy>",
   "submit": "Register",
-  "loading": "Registering...",
+  "submitting": "Registering...",
   "login": "Already have an account? <login>Log in!</login>",
   "flaw": "Comenius University in Bratislava, Faculty of Law"
 }

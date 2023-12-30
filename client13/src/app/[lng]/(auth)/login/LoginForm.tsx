@@ -71,7 +71,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           />
         </div>
       </div>
-      <Button type="submit" loadingText={t("loading")}>
+      <Button type="submit" loadingText={t("submitting")}>
         {t("submit")}
       </Button>
     </form>

@@ -3,10 +3,11 @@
   "notRegistered": "Nebol nájdený žiadny používateľ so zadanou email adresou!",
   "resetLinkSent": "Link na obnovu hesla bol zaslaný na zadanú email adresu.",
   "invalidToken": "Link na obnovu hesla expiroval!",
-  "notFound": "Používateľ nebol nájdený!",
+  "notFound": "Zdroj nebol nájdený!",
   "activation": "Aktivačný link bol zaslaný na Vašu email adresu.",
   "activated": "Používateľský účet bol aktivovaný.",
   "invalidActivationToken": "Link na aktiváciu účtu expiroval!",
   "rateLimit": "Akciu opakujete príliš často, znova to znova neskôr.",
-  "emailExists": "Email adresa je obsadená!"
+  "emailExists": "Email adresa je obsadená!",
+  "userUpdate": "Používateľ {{name}} bol aktualizovaný."
 }

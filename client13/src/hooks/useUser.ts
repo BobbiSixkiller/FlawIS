@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { User } from "@/lib/graphql/generated/graphql";
-import { getMe } from "@/app/[lng]/(auth)/actions";
+import { getMe, logout } from "@/app/[lng]/(auth)/actions";
 
 export default function useUser() {
   const [user, setUser] = useState<Omit<User, "grants"> | null>(null);
@@ -11,6 +11,8 @@ export default function useUser() {
 
       if (user) {
         setUser(user);
+      } else {
+        await logout();
       }
     }
 

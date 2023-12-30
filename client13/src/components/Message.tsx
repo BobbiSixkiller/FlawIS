@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export default function Message({
@@ -16,7 +17,7 @@ export default function Message({
 
   return (
     <div
-      className={`text-center p-2 rounded-md border ${
+      className={`relative text-center p-2 rounded-md border ${
         success
           ? "border-green-500 text-green-500 bg-green-200"
           : "border-red-500 text-red-500 bg-red-200"

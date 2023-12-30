@@ -36,7 +36,6 @@ export function transformIds(doc: object) {
       Array.isArray(value) &&
       !value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
     ) {
-      console.log(value);
       value = value.map((v) => transformIds(v));
     }
 
@@ -46,7 +45,7 @@ export function transformIds(doc: object) {
   return Object.fromEntries(transformed);
 }
 
-function convertDocument(doc: Document, locale: string) {
+export function convertDocument(doc: Document, locale: string) {
   const convertedDocument = transformIds(doc.toObject());
   const DocumentClass = getClass(doc)!;
   Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);

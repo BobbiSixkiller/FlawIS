@@ -20,7 +20,7 @@ export async function executeGqlFetch<Data, Variables>(
   next?: NextFetchRequestConfig,
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
-  const res = await fetch("http://gateway:5000/graphql", {
+  const res = await fetch("http://core:5000/graphql", {
     cache: nextCache,
     next,
     method: "POST",
@@ -74,6 +74,14 @@ export async function validation() {
     url: string(),
   });
 
+  const updateProfileInputSchema = object({
+    id: string().required(),
+    name: string().trim().required(),
+    email: string().required().email(),
+    organization: string().trim().required(),
+    telephone: string().trim().required(),
+  });
+
   const loginValidationSchema = object({
     email: string().required().email(),
     password: string().trim().required(),
@@ -101,5 +109,6 @@ export async function validation() {
     loginValidationSchema,
     forgotPasswordValidationSchema,
     resetPasswordValidationSchema,
+    updateProfileInputSchema,
   };
 }

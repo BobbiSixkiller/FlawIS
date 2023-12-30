@@ -1,0 +1,12 @@
+mutation updateUser($id: ObjectId!, $data: UserInput!) {
+  updateUser(id: $id, data: $data) {
+    message
+    data {
+      id
+      email
+      name
+      telephone
+      organisation
+    }
+  }
+}

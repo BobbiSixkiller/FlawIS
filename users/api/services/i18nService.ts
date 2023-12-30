@@ -1,5 +1,8 @@
 import i18next, { i18n } from "i18next";
 import ResourcesBackend from "i18next-resources-to-backend";
+import { $Dictionary } from "i18next/typescript/helpers";
+import { TOptionsBase } from "i18next/typescript/options";
+import { InterpolationMap } from "i18next/typescript/t.v4";
 import { Service } from "typedi";
 
 @Service()
@@ -22,9 +25,10 @@ export class I18nService {
         {
           debug: false,
           lng: "en",
+          fallbackLng: "en",
           supportedLngs: ["en", "sk"],
           defaultNS: "translations",
-          ns: "translations",
+          ns: ["translations", "validation"],
         },
         async (err, t) => {
           if (err) {
@@ -40,7 +44,10 @@ export class I18nService {
     await this.i18nInstance.changeLanguage(lang);
   }
 
-  translate(key: string): string {
-    return this.i18nInstance.t(key);
+  translate(
+    key: string,
+    options?: TOptionsBase & $Dictionary & InterpolationMap<string>
+  ): string {
+    return this.i18nInstance.t(key, options);
   }
 }
