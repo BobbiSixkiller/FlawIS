@@ -6,7 +6,8 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import Message from "@/components/Message";
 import { Trans } from "react-i18next";
-import Link from "next/link";
+import { useContext, useEffect } from "react";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 
 export default function ResetPasswordForm({
   lng,
@@ -22,28 +23,24 @@ export default function ResetPasswordForm({
 
   const { t } = useTranslation(lng, "resetPassword");
 
+  const { dispatch } = useContext(MessageContext);
+
+  useEffect(() => {
+    if (state.message) {
+      dispatch({
+        type: ActionTypes.SetMsg,
+        payload: {
+          content: state.message,
+          positive: state.success,
+        },
+      });
+    }
+  }, [state]);
+
   return (
     <form className="space-y-6" action={formAction}>
-      {state.message && (
-        <Message
-          success={state.success}
-          message={
-            <Trans
-              i18nKey={"forgotLink"}
-              t={t}
-              values={{ message: state.message }}
-              components={{
-                forgot: (
-                  <Link
-                    href="/forgotPassword"
-                    className="font-semibold hover:text-red-700 hover:underline"
-                  />
-                ),
-              }}
-            />
-          }
-        />
-      )}
+      <Message lng={lng} />
+
       <input type="hidden" name="token" value={token} />
       <div>
         <label
@@ -83,7 +80,7 @@ export default function ResetPasswordForm({
         </div>
       </div>
 
-      <Button type="submit" loadingText={t("submitting")}>
+      <Button color="primary" type="submit" fluid loadingText={t("submitting")}>
         {t("submit")}
       </Button>
     </form>

@@ -2,7 +2,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chainMiddleware";
 import { cookies } from "next/headers";
 
-const protectedPaths = [
+export const protectedPaths = [
   "/profile",
   "/activate",
   "/users",

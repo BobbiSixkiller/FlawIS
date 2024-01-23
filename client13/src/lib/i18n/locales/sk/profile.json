@@ -1,9 +1,12 @@
 {
   "heading": "Profil",
+  "subheading": "Osobné údaje Vášho používateľského účtu",
   "submit": "Aktualizovať",
   "submitting": "Aktualizujem...",
   "name": "Meno a priezvisko",
   "email": "Email adresa",
   "phone": "Telefónne číslo",
-  "org": "Organizácia"
+  "org": "Organizácia",
+  "status": "Stav účtu",
+  "role": "Rola"
 }

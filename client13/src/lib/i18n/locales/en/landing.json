@@ -5,12 +5,13 @@
   "sk": "Slovak",
   "en": "English",
   "terms": "Terms of use",
-  "privacy": "Privacy policy",
   "home": "Home",
   "login": "Log in",
   "register": "Create account",
   "profile": "Profile",
   "logout": "Log out",
   "users": "Users",
-  "conferences": "Conferences"
+  "conferences": "Conferences",
+  "contact": "Contact",
+  "privacy": "Terms & Privacy"
 }

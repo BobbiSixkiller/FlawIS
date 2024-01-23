@@ -31,11 +31,11 @@ interface IMutationResponse {
 type Mutation {
   activateUser: String!
   deleteUser(id: ObjectId!): Boolean!
-  login(email: String!, password: String!): String!
-  logout: Boolean!
-  passwordReset(data: PasswordInput!): String!
-  register(data: RegisterInput!): String!
+  login(email: String!, password: String!): User!
+  passwordReset(data: PasswordInput!): UserMutationResponse!
+  register(data: RegisterInput!): UserMutationResponse!
   resendActivationLink: String!
+  toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }
 
@@ -54,8 +54,8 @@ input PasswordInput {
 type Query {
   forgotPassword(email: String!): String!
   me: User!
+  textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  userTextSearch(domain: String, text: String!): [User!]!
   users(after: ObjectId, first: Int = 20): UserConnection!
 }
 
@@ -63,7 +63,7 @@ type Query {
 input RegisterInput {
   email: String!
   name: String!
-  organisation: String!
+  organization: String!
   password: String!
   telephone: String!
 }
@@ -81,9 +81,10 @@ type User {
   email: String!
   id: ObjectId!
   name: String!
-  organisation: String!
+  organization: String!
   role: Role!
   telephone: String!
+  token: String!
   updatedAt: DateTime!
   verified: Boolean!
 }
@@ -103,8 +104,9 @@ type UserEdge {
 input UserInput {
   email: String!
   name: String!
-  organisation: String!
-  role: String
+  organization: String!
+  password: String
+  role: Role
   telephone: String!
 }
 

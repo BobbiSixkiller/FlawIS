@@ -3,7 +3,10 @@ export const languages = [fallbackLng, "en"];
 export const defaultNS = "translation";
 export const cookieName = "NEXT_locale";
 
-export function getOptions(lng = fallbackLng, ns = defaultNS) {
+export function getOptions(
+  lng = fallbackLng,
+  ns: string | string[] = [defaultNS]
+) {
   return {
     // debug: true,
     supportedLngs: languages,

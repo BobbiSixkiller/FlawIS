@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 
 import {
-  UserCircleIcon,
   ArrowRightCircleIcon,
   UserPlusIcon,
   UsersIcon,
@@ -27,7 +26,7 @@ export async function Nav({
   return (
     <div className="lg:flex">
       {/* Desktop nav */}
-      <div className="hidden relative lg:flex flex-col gap-6 h-screen w-screen max-w-xs bg-primary-500 text-white px-4 py-6 inset-0 overflow-auto">
+      <div className="hidden sticky top-0 lg:flex flex-col gap-6 h-screen w-screen max-w-xs bg-primary-500 text-white px-4 py-6 inset-0 overflow-auto">
         <div>
           <Logo lng={lng} height={60} width={60} inverted />
         </div>
@@ -75,9 +74,7 @@ export async function Nav({
         logo={<Logo lng={lng} width={36} height={36} notext />}
         drawerTitle={<Logo inverted lng={lng} height={60} width={60} />}
       />
-      <div className="container mx-auto min-h-screen px-4 lg:px-6 py-6">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

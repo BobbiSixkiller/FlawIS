@@ -1,6 +1,8 @@
 import { useTranslation } from "@/lib/i18n";
 import { getMe } from "../../(auth)/actions";
-import ProfileForm from "./ProfileForm";
+import { redirect } from "next/navigation";
+import UpdatePersonalDialog from "./UpdatePersonalDialog";
+import Heading from "@/components/Heading";
 
 export default async function Profile({
   params: { lng },
@@ -11,12 +13,48 @@ export default async function Profile({
   const user = await getMe();
 
   return (
-    <div className="flex justify-center">
-      <div className="w-full md:max-w-md flex flex-col gap-4">
-        <h1 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
-          {t("heading")}
-        </h1>
-        <ProfileForm lng={lng} user={user} />
+    <div className="flex flex-col gap-6">
+      <Heading
+        heading={t("heading")}
+        subHeading={t("subheading")}
+        actions={<UpdatePersonalDialog user={user} lng={lng} />}
+      />
+
+      <div className="border-t border-gray-100">
+        <dl className="divide-y divide-gray-100">
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("name")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.name}
+            </dd>
+          </div>
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("email")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.email}
+            </dd>
+          </div>
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("org")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.organization}
+            </dd>
+          </div>
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("phone")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.telephone}
+            </dd>
+          </div>
+        </dl>
       </div>
     </div>
   );

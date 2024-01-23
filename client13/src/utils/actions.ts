@@ -74,13 +74,20 @@ export async function validation() {
     url: string(),
   });
 
-  const updateProfileInputSchema = object({
+  const profileInputSchema = object({
     id: string().required(),
     name: string().trim().required(),
     email: string().required().email(),
     organization: string().trim().required(),
     telephone: string().trim().required(),
   });
+
+  const userInputSchema = profileInputSchema.concat(
+    object({
+      role: string().oneOf(["Basic", "Admin"], t("role")),
+      verified: boolean(),
+    })
+  );
 
   const loginValidationSchema = object({
     email: string().required().email(),
@@ -109,6 +116,7 @@ export async function validation() {
     loginValidationSchema,
     forgotPasswordValidationSchema,
     resetPasswordValidationSchema,
-    updateProfileInputSchema,
+    profileInputSchema,
+    userInputSchema,
   };
 }

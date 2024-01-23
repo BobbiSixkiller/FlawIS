@@ -18,16 +18,16 @@ export default function LngSwitcher({
   const router = useRouter();
   const path = usePathname();
 
-  const { t } = useTranslation(lng, "landing", {});
+  const { t } = useTranslation(lng, "landing");
 
   return (
     <Menu as="div" className="relative">
       <Menu.Button
         className={`h-full w-full ${
           mobile
-            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10"
-            : "py-3 px-4 rounded-lg hover:bg-primary-700"
-        } flex items-center  `}
+            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
+        } flex items-center`}
       >
         <GlobeAltIcon className="h-5 w-5 lg:mr-2" />
         <span className="hidden lg:block">{t(lng)}</span>

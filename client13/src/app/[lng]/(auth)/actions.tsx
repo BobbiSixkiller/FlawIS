@@ -37,25 +37,25 @@ export async function register(prevState: any, formData: FormData) {
         name: input.name,
         password: input.password,
         telephone: input.telephone,
-        organisation: input.organization,
+        organization: input.organization,
       },
     });
 
     if (res.errors) {
-      const { message, validationErrors } = res.errors[0].extensions
+      const { validationErrors } = res.errors[0].extensions
         .exception as ErrorException;
 
       return {
         success: false,
         message: validationErrors
           ? Object.values(parseErrors(validationErrors)).join(" ")
-          : message,
+          : res.errors[0].message,
       };
     }
     if (res.data.register) {
-      cookies().set("accessToken", res.data.register as string, {
+      cookies().set("accessToken", res.data.register.data.token, {
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000 * 24),
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
       });
     }
   } catch (error: any) {
@@ -63,8 +63,8 @@ export async function register(prevState: any, formData: FormData) {
     return { success: false, message: error.message };
   }
 
-  revalidateTag("user");
-  redirect(formData.get("url")?.toString() || "/");
+  revalidateTag("me");
+  redirect(formData.get("url")?.toString() || "/conferences");
 }
 
 export async function login(prevState: any, formData: FormData) {
@@ -79,20 +79,20 @@ export async function login(prevState: any, formData: FormData) {
     const res = await executeGqlFetch(LoginDocument, input);
 
     if (res.errors) {
-      const { message, validationErrors } = res.errors[0].extensions
+      const { validationErrors } = res.errors[0].extensions
         .exception as ErrorException;
 
       return {
         success: false,
         message: validationErrors
           ? Object.values(parseErrors(validationErrors)).join(" ")
-          : message,
+          : res.errors[0].message,
       };
     }
     if (res.data.login) {
-      cookies().set("accessToken", res.data.login as string, {
+      cookies().set("accessToken", res.data.login.token, {
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000 * 24),
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
       });
     }
   } catch (error: any) {
@@ -100,8 +100,8 @@ export async function login(prevState: any, formData: FormData) {
     return { success: false, message: error.message };
   }
 
-  revalidateTag("user");
-  redirect(formData.get("url")?.toString() || "/");
+  revalidateTag("me");
+  redirect(formData.get("url")?.toString() || "/conferences");
 }
 
 export async function getMe() {
@@ -112,12 +112,11 @@ export async function getMe() {
     MeDocument,
     undefined,
     {},
-    { revalidate: 60 * 60 * 24, tags: ["user"] } //keep logged in user cached for 24hours
+    { revalidate: 60 * 60, tags: ["me"] } //keep logged in user cached for an hour
   );
 
   if (res.errors) {
-    const { message } = res.errors[0].extensions.exception as ErrorException;
-    console.log(message);
+    console.log(res.errors[0]);
   }
 
   return res.data?.me;
@@ -125,8 +124,7 @@ export async function getMe() {
 
 export async function logout() {
   cookies().delete("accessToken");
-  revalidateTag("user");
-  redirect("/");
+  revalidateTag("me");
 }
 
 export async function sendResetLink(prevState: any, formData: FormData) {
@@ -144,11 +142,14 @@ export async function sendResetLink(prevState: any, formData: FormData) {
     );
 
     if (res.errors) {
-      const { message } = res.errors[0].extensions.exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions
+        .exception as ErrorException;
 
       return {
         success: false,
-        message: message || res.errors[0].extensions.code,
+        message: validationErrors
+          ? Object.values(parseErrors(validationErrors)).join(" ")
+          : res.errors[0].message,
       };
     } else {
       return { success: true, message: res.data.forgotPassword };
@@ -174,26 +175,27 @@ export async function resetPassword(prevState: any, formData: FormData) {
       { revalidate: 60 * 60 }
     );
 
-    //pohrat sa s tym
     if (res.errors) {
-      const { message } = res.errors[0].extensions.exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions
+        .exception as ErrorException;
 
       return {
         success: false,
-        message: message || res.errors[0].originalError?.message,
+        message: validationErrors
+          ? Object.values(parseErrors(validationErrors)).join(" ")
+          : res.errors[0].message,
       };
     } else {
-      cookies().set("accessToken", res.data.passwordReset as string, {
+      cookies().set("accessToken", res.data.passwordReset.data.token, {
         httpOnly: true,
-        expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
       });
     }
   } catch (error: any) {
     return { success: false, message: error.message as string };
   }
-
-  revalidateTag("user");
-  return { success: true, message: "SUCCESS" };
+  revalidateTag("me");
+  redirect("/conferences");
 }
 
 export async function activate() {
@@ -212,46 +214,50 @@ export async function activate() {
   );
 
   if (res.errors) {
-    const { message } = res.errors[0].extensions.exception as ErrorException;
+    const { validationErrors } = res.errors[0].extensions
+      .exception as ErrorException;
+
+    console.log(res.errors);
 
     return {
       success: false,
-      message: message || (res.errors[0].originalError?.message as string),
+      message: validationErrors
+        ? Object.values(parseErrors(validationErrors)).join(" ")
+        : res.errors[0].message,
     };
   }
 
   cookies().delete("activationToken");
-  revalidateTag("user");
+  revalidateTag("me");
   return { success: true, message: res.data.activateUser };
 }
 
 export async function resendActivationLink() {
-  try {
-    const res = await executeGqlFetch(
-      ResendActivationLinkDocument,
-      {},
-      {},
-      { revalidate: 60 * 15 }
-    );
-    if (res.errors) {
-      const { message } = res.errors[0].extensions.exception as ErrorException;
+  const res = await executeGqlFetch(
+    ResendActivationLinkDocument,
+    {},
+    {},
+    { revalidate: 60 * 15 }
+  );
+  if (res.errors) {
+    const { validationErrors } = res.errors[0].extensions
+      .exception as ErrorException;
 
-      return {
-        success: false,
-        message: message || res.errors[0].extensions.code,
-      };
-    }
-    return { success: true, message: res.data.resendActivationLink };
-  } catch (error: any) {
-    console.log(error);
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: validationErrors
+        ? Object.values(parseErrors(validationErrors)).join(" ")
+        : res.errors[0].message,
+    };
   }
+  return { success: true, message: res.data.resendActivationLink };
 }
+
 export async function updateProfile(prevState: any, formData: FormData) {
-  const { updateProfileInputSchema } = await validation();
+  const { profileInputSchema } = await validation();
 
   try {
-    const input = await updateProfileInputSchema.validate({
+    const input = await profileInputSchema.validate({
       id: formData.get("id")?.toString(),
       name: formData.get("name")?.toString(),
       email: formData.get("email")?.toString(),
@@ -264,22 +270,22 @@ export async function updateProfile(prevState: any, formData: FormData) {
       data: {
         name: input.name,
         email: input.email,
-        organisation: input.organization,
+        organization: input.organization,
         telephone: input.telephone,
       },
     });
     if (res.errors) {
-      const { message, validationErrors } = res.errors[0].extensions
+      const { validationErrors } = res.errors[0].extensions
         .exception as ErrorException;
 
       return {
         success: false,
         message: validationErrors
           ? Object.values(parseErrors(validationErrors)).join(" ")
-          : message,
+          : res.errors[0].message,
       };
     }
-    revalidateTag("user");
+    revalidateTag("me");
     return { success: true, message: res.data.updateUser.message };
   } catch (error: any) {
     console.log(error);

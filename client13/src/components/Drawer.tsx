@@ -114,7 +114,7 @@ export default function Drawer({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-black/25 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-hidden">
@@ -140,7 +140,7 @@ export default function Drawer({
                       <div className="flex h-7 items-center">
                         <button
                           type="button"
-                          className="relative -m-2 p-2 hover:text-primary-700"
+                          className="relative -m-2 p-2 hover:text-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white rounded-md"
                           onClick={() => setVisible(false)}
                         >
                           <span className="absolute -inset-0.5" />

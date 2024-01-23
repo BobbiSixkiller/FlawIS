@@ -2,34 +2,36 @@ fragment User on User {
   id
   name
   email
+  organization
+  telephone
   role
   verified
   createdAt
   updatedAt
+  billings {
+    name
+    address {
+      street
+      city
+      postal
+      country
+    }
+    ICO
+    DIC
+    ICDPH
+  }
 }
 
 query me {
   me {
     ...User
-    organisation
-    telephone
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-    }
   }
 }
 
 mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password)
+  login(email: $email, password: $password) {
+    token
+  }
 }
 
 query forgotPassword($email: String!) {
@@ -37,11 +39,21 @@ query forgotPassword($email: String!) {
 }
 
 mutation passwordReset($data: PasswordInput!) {
-  passwordReset(data: $data)
+  passwordReset(data: $data) {
+    message
+    data {
+      token
+    }
+  }
 }
 
 mutation register($data: RegisterInput!) {
-  register(data: $data)
+  register(data: $data) {
+    message
+    data {
+      token
+    }
+  }
 }
 
 mutation resendActivationLink {
@@ -50,8 +62,4 @@ mutation resendActivationLink {
 
 mutation activateUser {
   activateUser
-}
-
-mutation logout {
-  logout
 }

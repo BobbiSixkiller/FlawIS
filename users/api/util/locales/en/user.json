@@ -9,5 +9,6 @@
   "rateLimit": "You repeat the action too often, do it again later.",
   "emailExists": "Email address is already in use!",
   "notFound": "Resource has not been found!",
-  "userUpdate": "User {{name}} has been updated."
+  "update": "User {{name}} has been updated.",
+  "new": "User {{name}} has been created."
 }

@@ -12,9 +12,6 @@ export async function GET(req: NextRequest) {
       expires: new Date(Date.now() + 60 * 60 * 1000),
     });
     await activate();
-    // if (res && res.success) {
-    //   cookies().delete("activationToken");
-    // }
   }
 
   return NextResponse.redirect(new URL("/", req.url));

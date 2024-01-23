@@ -18,7 +18,11 @@ export default async function Logo({
   const { t } = await useTranslation(lng, "landing");
 
   return (
-    <div className="flex gap-4 font-normal m-auto">
+    <div
+      className={`flex gap-4 font-normal m-auto ${
+        inverted ? "text-white" : "text-gray-900"
+      }`}
+    >
       <Image
         src={
           inverted

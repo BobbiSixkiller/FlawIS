@@ -5,12 +5,13 @@
   "sk": "Slovenčina",
   "en": "Angličtina",
   "terms": "Podmienky používania",
-  "privacy": "Ochrana osobných údajov",
   "home": "Domov",
   "login": "Prihlásiť sa",
   "register": "Vytvoriť účet",
   "profile": "Profil",
   "logout": "Odhlásiť sa",
   "users": "Používatelia",
-  "conferences": "Konferencie"
+  "conferences": "Konferencie",
+  "contact": "Kontakt",
+  "privacy": "Podmienky & súkromie"
 }

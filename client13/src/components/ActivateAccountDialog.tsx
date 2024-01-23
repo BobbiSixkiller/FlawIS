@@ -1,30 +1,29 @@
 "use client";
 
 import Modal from "./Modal";
-import { useEffect, useState } from "react";
-import { User } from "@/lib/graphql/generated/graphql";
+import { useContext, useEffect, useState } from "react";
+import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "./Button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
 import { useFormState } from "react-dom";
-import Message from "./Message";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { Message } from "./Message";
 
 export default function ActivateAccountDialog({
   lng,
   user,
 }: {
   lng: string;
-  user?: Omit<User, "grants">;
+  user?: UserFragment;
 }) {
   const [state, action] = useFormState(resendActivationLink, {
     success: false,
     message: "",
   });
+
   const [open, setOpen] = useState(user && !user?.verified);
-  const [activationState, setActivationState] = useState({
-    success: false,
-    message: "",
-  });
+  const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "activateAccount");
 
@@ -32,12 +31,32 @@ export default function ActivateAccountDialog({
     async function activateCb() {
       const res = await activate();
       if (res) {
-        setActivationState(res);
+        dispatch({
+          type: ActionTypes.SetMsg,
+          payload: {
+            positive: res.success,
+            content: res.message,
+            dialogOpen: true,
+          },
+        });
       }
     }
 
     activateCb();
   }, []);
+
+  useEffect(() => {
+    if (state.message) {
+      dispatch({
+        type: ActionTypes.SetMsg,
+        payload: {
+          positive: state.success,
+          content: state.message,
+          dialogOpen: true,
+        },
+      });
+    }
+  }, [state]);
 
   return (
     <Modal
@@ -47,13 +66,10 @@ export default function ActivateAccountDialog({
     >
       <form action={action} className="flex flex-col gap-4">
         {t("body")}
-        <Button type="submit">{t("button")}</Button>
-        {(state.message || activationState.message) && (
-          <Message
-            success={state.success || activationState.success}
-            message={state.message || activationState.message}
-          />
-        )}
+        <Button color="primary" type="submit">
+          {t("button")}
+        </Button>
+        <Message lng={lng} />
       </form>
     </Modal>
   );

@@ -11,6 +11,7 @@ import {
   Matches,
   IsString,
   IsPhoneNumber,
+  IsBoolean,
 } from "class-validator";
 
 import { Role, User } from "../../entitites/User";
@@ -54,7 +55,7 @@ export class RegisterInput extends PasswordInput implements Partial<User> {
 
   @Field()
   @IsString()
-  organisation: string;
+  organization: string;
 
   @Field()
   @IsPhoneNumber()
@@ -73,7 +74,7 @@ export class UserInput implements Partial<User> {
 
   @Field()
   @IsString()
-  organisation: string;
+  organization: string;
 
   @Field()
   @IsPhoneNumber(undefined, {
@@ -86,6 +87,13 @@ export class UserInput implements Partial<User> {
   telephone: string;
 
   @Authorized(["ADMIN"])
-  @Field({ nullable: true })
+  @Field(() => Role, { nullable: true })
   role?: Role;
+
+  @Authorized(["ADMIN"])
+  @Field({ nullable: true })
+  @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
+    message: "Minimum 8 characters, at least 1 letter and 1 number!",
+  })
+  password?: string;
 }

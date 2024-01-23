@@ -3,5 +3,6 @@
   "email": "Nesprávny formát email adresy!",
   "password": "Heslo musí mať minimálne osem znakov, aspoň jedno písmeno a jedno číslo!",
   "confirmPass": "Heslá sa nezhodujú!",
-  "privacy": "Musíte súhlasiť s pravidlami zachovania súkromia!"
+  "privacy": "Musíte súhlasiť s pravidlami zachovania súkromia!",
+  "role": "Neznama rola!"
 }

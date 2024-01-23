@@ -5,6 +5,8 @@ import { sendResetLink } from "../actions";
 import Message from "@/components/Message";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
+import { useContext, useEffect } from "react";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 
 export default function ForgotPasswordForm({ lng }: { lng: string }) {
   const [state, formAction] = useFormState(sendResetLink, {
@@ -14,11 +16,21 @@ export default function ForgotPasswordForm({ lng }: { lng: string }) {
 
   const { t } = useTranslation(lng, "forgotPassword");
 
+  const { dispatch } = useContext(MessageContext);
+
+  useEffect(() => {
+    if (state.message) {
+      dispatch({
+        type: ActionTypes.SetMsg,
+        payload: { content: state.message, positive: state.success },
+      });
+    }
+  }, [state]);
+
   return (
     <form className="space-y-6" action={formAction}>
-      {state.message && (
-        <Message success={state.success} message={state.message} />
-      )}
+      <Message lng={lng} />
+
       <div>
         <label
           htmlFor="email"
@@ -38,7 +50,9 @@ export default function ForgotPasswordForm({ lng }: { lng: string }) {
         </div>
       </div>
 
-      <Button type="submit">{t("submit")}</Button>
+      <Button color="primary" type="submit" fluid>
+        {t("submit")}
+      </Button>
     </form>
   );
 }

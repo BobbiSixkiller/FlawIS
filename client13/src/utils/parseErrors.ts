@@ -1,7 +1,6 @@
 //validation error exception interface of validation errors returned by the GraphQL API
 export interface ErrorException {
   validationErrors?: ValidationErrors[];
-  message: string;
 }
 
 interface ValidationErrors {

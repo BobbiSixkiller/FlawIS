@@ -17,9 +17,8 @@ import {
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import LngSwitcher from "./LngSwitcher";
-import Dropdown, { DropdownItem } from "./Dropdown";
 import Drawer from "./Drawer";
-import { Role, User } from "@/lib/graphql/generated/graphql";
+import { Role, UserFragment } from "@/lib/graphql/generated/graphql";
 import { logout } from "@/app/[lng]/(auth)/actions";
 import { useTranslation } from "@/lib/i18n/client";
 import { Menu, Transition } from "@headlessui/react";
@@ -41,7 +40,7 @@ export function NavItem({
   return (
     <Link
       href={`/${lng}/${route}`}
-      className="flex items-center py-3 px-4 rounded-lg hover:bg-primary-700"
+      className="flex items-center py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
       onClick={onClick}
     >
       {children}
@@ -57,7 +56,7 @@ export function ProfileMenuItem({
 }: {
   lng: string;
   mobile?: boolean;
-  user?: Omit<User, "grants">;
+  user?: UserFragment;
 }) {
   const router = useRouter();
   const path = usePathname();
@@ -69,12 +68,12 @@ export function ProfileMenuItem({
       <Menu.Button
         className={`h-full w-full ${
           mobile
-            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10"
-            : "py-3 px-4 rounded-lg hover:bg-primary-700"
+            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
         } flex items-center`}
       >
         <UserCircleIcon className="h-5 w-5 lg:mr-2" />
-        <span className="hidden lg:block">{user?.name}</span>{" "}
+        <span className="hidden lg:block">{user?.name}</span>
         {path.includes("/profile") && (
           <span className="hidden lg:block ml-auto self-start">•</span>
         )}
@@ -141,7 +140,7 @@ export function MobileNav({
   drawerTitle,
 }: {
   lng: string;
-  user?: Omit<User, "grants">;
+  user?: UserFragment;
   logo: ReactNode;
   drawerTitle: ReactNode;
 }) {
@@ -157,7 +156,7 @@ export function MobileNav({
           <div className="hidden sm:flex">{logo}</div>
 
           <button
-            className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 z-10"
+            className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 z-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
             onClick={() => setMenuShown(true)}
           >
             <Bars3Icon className="h-5 w-5" />

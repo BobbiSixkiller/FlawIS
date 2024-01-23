@@ -46,11 +46,11 @@ export type Mutation = {
   __typename?: 'Mutation';
   activateUser: Scalars['String']['output'];
   deleteUser: Scalars['Boolean']['output'];
-  login: Scalars['String']['output'];
-  logout: Scalars['Boolean']['output'];
-  passwordReset: Scalars['String']['output'];
-  register: Scalars['String']['output'];
+  login: User;
+  passwordReset: UserMutationResponse;
+  register: UserMutationResponse;
   resendActivationLink: Scalars['String']['output'];
+  toggleVerifiedUser: UserMutationResponse;
   updateUser: UserMutationResponse;
 };
 
@@ -76,6 +76,11 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationToggleVerifiedUserArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   data: UserInput;
   id: Scalars['ObjectId']['input'];
@@ -95,8 +100,8 @@ export type Query = {
   __typename?: 'Query';
   forgotPassword: Scalars['String']['output'];
   me: User;
+  textSearchUser: Array<User>;
   user: User;
-  userTextSearch: Array<User>;
   users: UserConnection;
 };
 
@@ -106,14 +111,13 @@ export type QueryForgotPasswordArgs = {
 };
 
 
-export type QueryUserArgs = {
-  id: Scalars['ObjectId']['input'];
+export type QueryTextSearchUserArgs = {
+  text: Scalars['String']['input'];
 };
 
 
-export type QueryUserTextSearchArgs = {
-  domain?: InputMaybe<Scalars['String']['input']>;
-  text: Scalars['String']['input'];
+export type QueryUserArgs = {
+  id: Scalars['ObjectId']['input'];
 };
 
 
@@ -126,7 +130,7 @@ export type QueryUsersArgs = {
 export type RegisterInput = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  organisation: Scalars['String']['input'];
+  organization: Scalars['String']['input'];
   password: Scalars['String']['input'];
   telephone: Scalars['String']['input'];
 };
@@ -145,9 +149,10 @@ export type User = {
   email: Scalars['String']['output'];
   id: Scalars['ObjectId']['output'];
   name: Scalars['String']['output'];
-  organisation: Scalars['String']['output'];
+  organization: Scalars['String']['output'];
   role: Role;
   telephone: Scalars['String']['output'];
+  token: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   verified: Scalars['Boolean']['output'];
 };
@@ -169,8 +174,9 @@ export type UserEdge = {
 export type UserInput = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  organisation: Scalars['String']['input'];
-  role?: InputMaybe<Scalars['String']['input']>;
+  organization: Scalars['String']['input'];
+  password?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<Role>;
   telephone: Scalars['String']['input'];
 };
 
@@ -180,12 +186,12 @@ export type UserMutationResponse = IMutationResponse & {
   message: Scalars['String']['output'];
 };
 
-export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, role: Role, verified: boolean, createdAt: any, updatedAt: any };
+export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', organisation: string, telephone: string, id: any, name: string, email: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -193,7 +199,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: string };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', token: string } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -207,14 +213,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: string };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string } } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: string };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string } } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -226,10 +232,27 @@ export type ActivateUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: string };
 
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+export type UsersQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', id: any, name: string, email: string, organization: string, verified: boolean, role: Role, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'PageInfo', endCursor: any, hasNextPage: boolean } } };
+
+export type UserQueryVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, DIC: string, ICDPH: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+
+export type TextSearchUserQueryVariables = Exact<{
+  text: Scalars['String']['input'];
+}>;
+
+
+export type TextSearchUserQuery = { __typename?: 'Query', textSearchUser: Array<{ __typename?: 'User', id: any, name: string, email: string }> };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -237,7 +260,14 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, email: string, name: string, telephone: string, organisation: string } } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string } };
+
+export type ToggleVerifiedUserMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -258,44 +288,60 @@ export const UserFragmentDoc = new TypedDocumentString(`
   id
   name
   email
+  organization
+  telephone
   role
   verified
   createdAt
   updatedAt
+  billings {
+    name
+    address {
+      street
+      city
+      postal
+      country
+    }
+    ICO
+    DIC
+    ICDPH
+  }
 }
     `, {"fragmentName":"User"}) as unknown as TypedDocumentString<UserFragment, unknown>;
 export const MeDocument = new TypedDocumentString(`
     query me {
   me {
     ...User
-    organisation
-    telephone
-    billings {
-      name
-      address {
-        street
-        city
-        postal
-        country
-      }
-      ICO
-      DIC
-      ICDPH
-    }
   }
 }
     fragment User on User {
   id
   name
   email
+  organization
+  telephone
   role
   verified
   createdAt
   updatedAt
+  billings {
+    name
+    address {
+      street
+      city
+      postal
+      country
+    }
+    ICO
+    DIC
+    ICDPH
+  }
 }`) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
 export const LoginDocument = new TypedDocumentString(`
     mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password)
+  login(email: $email, password: $password) {
+    token
+  }
 }
     `) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
 export const ForgotPasswordDocument = new TypedDocumentString(`
@@ -305,12 +351,22 @@ export const ForgotPasswordDocument = new TypedDocumentString(`
     `) as unknown as TypedDocumentString<ForgotPasswordQuery, ForgotPasswordQueryVariables>;
 export const PasswordResetDocument = new TypedDocumentString(`
     mutation passwordReset($data: PasswordInput!) {
-  passwordReset(data: $data)
+  passwordReset(data: $data) {
+    message
+    data {
+      token
+    }
+  }
 }
     `) as unknown as TypedDocumentString<PasswordResetMutation, PasswordResetMutationVariables>;
 export const RegisterDocument = new TypedDocumentString(`
     mutation register($data: RegisterInput!) {
-  register(data: $data)
+  register(data: $data) {
+    message
+    data {
+      token
+    }
+  }
 }
     `) as unknown as TypedDocumentString<RegisterMutation, RegisterMutationVariables>;
 export const ResendActivationLinkDocument = new TypedDocumentString(`
@@ -323,22 +379,78 @@ export const ActivateUserDocument = new TypedDocumentString(`
   activateUser
 }
     `) as unknown as TypedDocumentString<ActivateUserMutation, ActivateUserMutationVariables>;
-export const LogoutDocument = new TypedDocumentString(`
-    mutation logout {
-  logout
+export const UsersDocument = new TypedDocumentString(`
+    query users($after: ObjectId, $first: Int) {
+  users(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        id
+        name
+        email
+        organization
+        verified
+        role
+        createdAt
+        updatedAt
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
 }
-    `) as unknown as TypedDocumentString<LogoutMutation, LogoutMutationVariables>;
+    `) as unknown as TypedDocumentString<UsersQuery, UsersQueryVariables>;
+export const UserDocument = new TypedDocumentString(`
+    query user($id: ObjectId!) {
+  user(id: $id) {
+    ...User
+  }
+}
+    fragment User on User {
+  id
+  name
+  email
+  organization
+  telephone
+  role
+  verified
+  createdAt
+  updatedAt
+  billings {
+    name
+    address {
+      street
+      city
+      postal
+      country
+    }
+    ICO
+    DIC
+    ICDPH
+  }
+}`) as unknown as TypedDocumentString<UserQuery, UserQueryVariables>;
+export const TextSearchUserDocument = new TypedDocumentString(`
+    query textSearchUser($text: String!) {
+  textSearchUser(text: $text) {
+    id
+    name
+    email
+  }
+}
+    `) as unknown as TypedDocumentString<TextSearchUserQuery, TextSearchUserQueryVariables>;
 export const UpdateUserDocument = new TypedDocumentString(`
     mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
     message
-    data {
-      id
-      email
-      name
-      telephone
-      organisation
-    }
   }
 }
     `) as unknown as TypedDocumentString<UpdateUserMutation, UpdateUserMutationVariables>;
+export const ToggleVerifiedUserDocument = new TypedDocumentString(`
+    mutation toggleVerifiedUser($id: ObjectId!) {
+  toggleVerifiedUser(id: $id) {
+    message
+  }
+}
+    `) as unknown as TypedDocumentString<ToggleVerifiedUserMutation, ToggleVerifiedUserMutationVariables>;

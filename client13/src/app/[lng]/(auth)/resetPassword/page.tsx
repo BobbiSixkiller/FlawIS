@@ -1,6 +1,7 @@
 import Logo from "@/components/Logo";
 import ResetPasswordForm from "./ResetPasswordForm";
 import { useTranslation } from "@/lib/i18n";
+import { Trans } from "react-i18next/TransWithoutContext";
 
 export default async function ResetPassword({
   params: { lng },
@@ -21,7 +22,23 @@ export default async function ResetPassword({
         </h2>
       </div>
 
-      <ResetPasswordForm lng={lng} token={token} />
+      <div>
+        <ResetPasswordForm lng={lng} token={token} />
+        <p className="mt-10 text-center text-sm text-gray-500">
+          <Trans
+            i18nKey={"link"}
+            t={t}
+            components={{
+              forgotLink: (
+                <a
+                  href="/forgotPassword"
+                  className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+                />
+              ),
+            }}
+          />
+        </p>
+      </div>
     </div>
   );
 }

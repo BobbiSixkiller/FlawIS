@@ -88,32 +88,14 @@ export class UserResolver {
     return user;
   }
 
-  @Authorized(["ADMIN"])
+  // @Authorized(["ADMIN"])
   @Query(() => [User])
-  async userTextSearch(
-    @Arg("text") text: string,
-    @Arg("domain", { nullable: true }) domain?: string
-  ) {
+  async textSearchUser(@Arg("text") text: string) {
     return await this.userService.aggregate([
       { $match: { $text: { $search: text } } },
       { $sort: { score: { $meta: "textScore" } } },
-      {
-        $match: {
-          $expr: {
-            $cond: [
-              { $ne: [domain, null] },
-              {
-                $eq: [
-                  { $arrayElemAt: [{ $split: ["$email", "@"] }, 1] },
-                  domain,
-                ],
-              },
-              { $ne: ["$_id", null] },
-            ],
-          },
-        },
-      },
       { $addFields: { id: "$_id" } },
+      { $limit: 10 },
     ]);
   }
 
@@ -128,38 +110,34 @@ export class UserResolver {
     return loggedInUser;
   }
 
-  @Mutation(() => String)
+  @Mutation(() => UserMutationResponse)
   @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { req, res, locale }: Context
-  ) {
+    @Ctx() { req, locale, user: loggedInUser }: Context
+  ): Promise<UserMutationResponse> {
     const user = await this.userService.create(registerInput);
 
-    res.cookie("accessToken", user.token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      domain:
-        process.env.NODE_ENV === "production" ||
-        process.env.NODE_ENV === "staging"
-          ? "flaw.uniba.sk"
-          : "localhost",
-    });
+    if (!loggedInUser) {
+      messageBroker.produceMessage(
+        JSON.stringify({
+          locale,
+          clientUrl: req.headers.origin,
+          name: user.name,
+          email: user.email,
+          token: signJwt({ id: user.id }, { expiresIn: 3600 }),
+        }),
+        "mail.registration"
+      );
+    } else {
+      user.verified = true;
+      await user.save();
+    }
 
-    messageBroker.produceMessage(
-      JSON.stringify({
-        locale,
-        clientUrl: req.headers.origin,
-        name: user.name,
-        email: user.email,
-        token: signJwt({ id: user.id }, { expiresIn: 3600 }),
-      }),
-      "mail.registration"
-    );
-
-    return user.token;
+    return {
+      data: user,
+      message: this.i18nService.translate("new", { name: user.name }),
+    };
   }
 
   @Authorized()
@@ -201,13 +179,9 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => String)
+  @Mutation(() => User)
   @UseMiddleware([RateLimit(50)])
-  async login(
-    @Arg("email") email: string,
-    @Arg("password") password: string,
-    @Ctx() { res }: Context
-  ) {
+  async login(@Arg("email") email: string, @Arg("password") password: string) {
     const user = await this.userService.findOne({ email });
     if (!user)
       throw new AuthenticationError(this.i18nService.translate("credentials"));
@@ -216,37 +190,7 @@ export class UserResolver {
     if (!match)
       throw new AuthenticationError(this.i18nService.translate("credentials"));
 
-    res.cookie("accessToken", user.token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      domain:
-        process.env.NODE_ENV === "production" ||
-        process.env.NODE_ENV === "staging"
-          ? "flaw.uniba.sk"
-          : "localhost",
-    });
-
-    return user.token;
-  }
-
-  @Authorized()
-  @Mutation(() => Boolean)
-  logout(@Ctx() { res }: Context) {
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      domain:
-        process.env.NODE_ENV === "production" ||
-        process.env.NODE_ENV === "staging"
-          ? "flaw.uniba.sk"
-          : "localhost",
-    });
-
-    return true;
+    return user;
   }
 
   @Query(() => String)
@@ -274,12 +218,12 @@ export class UserResolver {
     return this.i18nService.translate("resetLinkSent");
   }
 
-  @Mutation(() => String)
+  @Mutation(() => UserMutationResponse)
   @UseMiddleware([RateLimit(50)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
-    @Ctx() { req, res }: Context
-  ) {
+    @Ctx() { req }: Context
+  ): Promise<UserMutationResponse> {
     const token = req.headers.resettoken;
 
     const userId: ResetToken = verifyJwt(token as string);
@@ -290,16 +234,12 @@ export class UserResolver {
 
     user.password = password;
 
-    res.cookie("accessToken", user.token, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 60 * 60 * 1000 * 24 * 7),
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
-
     await user.save();
 
-    return user.token;
+    return {
+      data: user,
+      message: this.i18nService.translate("update", { name: user.name }),
+    };
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
@@ -311,14 +251,30 @@ export class UserResolver {
     @LoadResource(User) user: DocumentType<User>
   ): Promise<UserMutationResponse> {
     for (const [key, value] of Object.entries(userInput)) {
-      user[key as keyof UserInput] = value;
+      (user as any)[key] = value;
     }
 
     const data = await user.save();
 
     return {
       data,
-      message: this.i18nService.translate("userUpdate", { name: data.name }),
+      message: this.i18nService.translate("update", { name: data.name }),
+    };
+  }
+
+  @Authorized(["ADMIN"])
+  @Mutation(() => UserMutationResponse)
+  async toggleVerifiedUser(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(User) user: DocumentType<User>
+  ): Promise<UserMutationResponse> {
+    user.verified = !user.verified;
+
+    const data = await user.save();
+
+    return {
+      data,
+      message: this.i18nService.translate("update", { name: data.name }),
     };
   }
 

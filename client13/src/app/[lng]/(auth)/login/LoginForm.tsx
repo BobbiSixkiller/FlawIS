@@ -1,12 +1,14 @@
 "use client";
 
-import Message from "@/components/Message";
 import { useTranslation } from "@/lib/i18n/client";
 import { useFormState } from "react-dom";
 import { login } from "../actions";
 import { Trans } from "react-i18next";
 import Link from "next/link";
 import Button from "@/components/Button";
+import { useContext, useEffect } from "react";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { Message } from "@/components/Message";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const [state, formAction] = useFormState(login, {
@@ -16,11 +18,21 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
 
   const { t } = useTranslation(lng, "login");
 
+  const { dispatch } = useContext(MessageContext);
+
+  useEffect(() => {
+    if (state.message) {
+      dispatch({
+        type: ActionTypes.SetMsg,
+        payload: { content: state.message, positive: state.success },
+      });
+    }
+  }, [state]);
+
   return (
     <form className="space-y-6" action={formAction}>
-      {state?.message && (
-        <Message success={state.success} message={state.message} />
-      )}
+      <Message lng={lng} />
+
       <input type="hidden" name="url" value={url} />
       <div>
         <label
@@ -71,7 +83,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           />
         </div>
       </div>
-      <Button type="submit" loadingText={t("submitting")}>
+      <Button color="primary" type="submit" fluid loadingText={t("submitting")}>
         {t("submit")}
       </Button>
     </form>

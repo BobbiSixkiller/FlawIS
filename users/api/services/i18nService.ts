@@ -27,8 +27,8 @@ export class I18nService {
           lng: "en",
           fallbackLng: "en",
           supportedLngs: ["en", "sk"],
-          defaultNS: "translations",
-          ns: ["translations", "validation"],
+          defaultNS: "user",
+          ns: ["user", "validation"],
         },
         async (err, t) => {
           if (err) {

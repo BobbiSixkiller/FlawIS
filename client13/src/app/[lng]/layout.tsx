@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { dir } from "i18next";
 import { languages } from "@/lib/i18n/settings";
+import MessageProvider from "@/providers/MessageProvider";
 
 const UKsans = localFont({
   src: [
@@ -69,7 +70,9 @@ export default async function RootLayout({
 }) {
   return (
     <html lang={lng} dir={dir(lng)}>
-      <body className={`${UKsans.className}`}>{children}</body>
+      <body className={`${UKsans.className}`}>
+        <MessageProvider>{children}</MessageProvider>
+      </body>
     </html>
   );
 }

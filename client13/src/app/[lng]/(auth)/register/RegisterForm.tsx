@@ -3,11 +3,12 @@
 import { useTranslation } from "@/lib/i18n/client";
 import { useFormState } from "react-dom";
 import { register } from "../actions";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
 import Button from "@/components/Button";
 import Message from "@/components/Message";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 
 export default function RegisterForm({
   lng,
@@ -32,11 +33,21 @@ export default function RegisterForm({
     }
   }, [email, lng]);
 
+  const { dispatch } = useContext(MessageContext);
+
+  useEffect(() => {
+    if (state.message) {
+      dispatch({
+        type: ActionTypes.SetMsg,
+        payload: { content: state.message, positive: state.success },
+      });
+    }
+  }, [state]);
+
   return (
     <form className="space-y-6" action={formAction}>
-      {state.message && (
-        <Message success={state.success} message={state.message} />
-      )}
+      <Message lng={lng} />
+
       <input type="hidden" name="url" value={url} />
       <div>
         <label
@@ -78,7 +89,7 @@ export default function RegisterForm({
       </div>
       <div>
         <label
-          htmlFor="phone"
+          htmlFor="telephone"
           className="block text-sm font-medium leading-6 text-gray-900"
         >
           {t("phone")}
@@ -176,7 +187,7 @@ export default function RegisterForm({
           />
         </label>
       </div>
-      <Button type="submit" loadingText={t("submitting")}>
+      <Button color="primary" type="submit" fluid loadingText={t("submitting")}>
         {t("submit")}
       </Button>
     </form>

@@ -1,6 +1,5 @@
 import {
   ArgumentValidationError,
-  Directive,
   Field,
   ObjectType,
   registerEnumType,
@@ -54,7 +53,7 @@ registerEnumType(Role, {
     }
   }
   if (this.email.split("@")[1].includes("uniba")) {
-    this.organisation = "Univerzita Komenského v Bratislave, Právnická fakulta";
+    this.organization = "Univerzita Komenského v Bratislave, Právnická fakulta";
   }
   if (this.isNew && this.email.split("@")[1].includes("uniba")) {
     this.billings.push({
@@ -72,7 +71,6 @@ registerEnumType(Role, {
   }
 })
 @Index({ name: "text", email: "text" })
-@Directive('@key(fields: "id")')
 @ObjectType({ description: "The user model entity" })
 export class User extends TimeStamps {
   @Field(() => ObjectId)
@@ -95,7 +93,7 @@ export class User extends TimeStamps {
 
   @Field()
   @Property({ default: "N/A" })
-  organisation: string;
+  organization: string;
 
   @Field(() => [Billing], { nullable: "items" })
   @Property({ type: () => [Billing], _id: false })
@@ -114,6 +112,7 @@ export class User extends TimeStamps {
   @Field()
   updatedAt: Date;
 
+  @Field()
   get token(): string {
     return (
       "Bearer " +
@@ -124,7 +123,7 @@ export class User extends TimeStamps {
           name: this.name,
           role: this.role,
         },
-        { expiresIn: "1h" }
+        { expiresIn: "24h" }
       )
     );
   }
