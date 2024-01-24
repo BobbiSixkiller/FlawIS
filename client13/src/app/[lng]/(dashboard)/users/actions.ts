@@ -19,7 +19,7 @@ export async function getUsers(after?: string, first?: number) {
     UsersDocument,
     { after, first },
     {},
-    { tags: ["users"], revalidate: 3600 }
+    { tags: ["users"] }
   );
 
   if (res.errors) {
@@ -34,7 +34,7 @@ export async function getUser(id: string) {
     UserDocument,
     { id },
     {},
-    { tags: [`user:${id}`], revalidate: 3600 }
+    { tags: [`user:${id}`] }
   );
   if (res.errors) {
     console.log(res.errors[0]);

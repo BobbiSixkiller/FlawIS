@@ -3,5 +3,6 @@
   "new": "New",
   "delete": "Delete",
   "error": "Error",
-  "success": "Success"
+  "success": "Success",
+  "notFoundMsg": "Could not find requested resource"
 }

@@ -2,7 +2,7 @@
 
 import Modal from "@/components/Modal";
 import { useContext, useEffect, useState } from "react";
-import { User } from "@/lib/graphql/generated/graphql";
+import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { PencilIcon } from "@heroicons/react/24/outline";
@@ -15,7 +15,7 @@ export default function UpdatePersonalDialog({
   user,
   lng,
 }: {
-  user?: User;
+  user?: UserFragment;
   lng: string;
 }) {
   const [open, setOpen] = useState(false);

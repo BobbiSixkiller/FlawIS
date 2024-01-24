@@ -7,8 +7,8 @@ import { useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
 import Button from "@/components/Button";
-import Message from "@/components/Message";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { Message } from "@/components/Message";
 
 export default function RegisterForm({
   lng,

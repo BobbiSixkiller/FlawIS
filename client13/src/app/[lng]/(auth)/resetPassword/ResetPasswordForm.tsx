@@ -4,10 +4,9 @@ import { useFormState } from "react-dom";
 import { resetPassword } from "../actions";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import Message from "@/components/Message";
-import { Trans } from "react-i18next";
 import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { Message } from "@/components/Message";
 
 export default function ResetPasswordForm({
   lng,

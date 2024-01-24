@@ -80,7 +80,6 @@ export default async function DashboardLayout({
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <DashboardMessage lng={lng} />
-
           {children}
         </div>
         <div className="lg:hidden col-span-3 p-6 bg-gray-900">

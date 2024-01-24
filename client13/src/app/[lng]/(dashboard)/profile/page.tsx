@@ -1,6 +1,5 @@
 import { useTranslation } from "@/lib/i18n";
 import { getMe } from "../../(auth)/actions";
-import { redirect } from "next/navigation";
 import UpdatePersonalDialog from "./UpdatePersonalDialog";
 import Heading from "@/components/Heading";
 
