@@ -46,8 +46,6 @@ export default function RegisterForm({
 
   return (
     <form className="space-y-6" action={formAction}>
-      <Message lng={lng} />
-
       <input type="hidden" name="url" value={url} />
       <div>
         <label

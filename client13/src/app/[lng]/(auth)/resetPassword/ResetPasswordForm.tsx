@@ -38,8 +38,6 @@ export default function ResetPasswordForm({
 
   return (
     <form className="space-y-6" action={formAction}>
-      <Message lng={lng} />
-
       <input type="hidden" name="token" value={token} />
       <div>
         <label

@@ -2,6 +2,7 @@ import Logo from "@/components/Logo";
 import ResetPasswordForm from "./ResetPasswordForm";
 import { useTranslation } from "@/lib/i18n";
 import { Trans } from "react-i18next/TransWithoutContext";
+import { Message } from "@/components/Message";
 
 export default async function ResetPassword({
   params: { lng },
@@ -21,6 +22,8 @@ export default async function ResetPassword({
           {t("heading")}
         </h2>
       </div>
+
+      <Message lng={lng} />
 
       <div>
         <ResetPasswordForm lng={lng} token={token} />

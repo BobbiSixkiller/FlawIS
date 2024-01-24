@@ -1,8 +1,9 @@
 "use client";
 
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -19,8 +20,19 @@ const Modal: React.FC<ModalProps> = ({
   children,
   togglerHidden = true,
 }) => {
+  const { dispatch, dialogOpen } = useContext(MessageContext);
+
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition
+      appear
+      show={isOpen}
+      as={Fragment}
+      afterLeave={() => {
+        if (dialogOpen) {
+          dispatch({ type: ActionTypes.ClearMsg });
+        }
+      }}
+    >
       <Dialog as="div" className="relative z-10" onClose={onClose}>
         <Transition.Child
           as={Fragment}
