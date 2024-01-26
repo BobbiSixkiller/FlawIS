@@ -4,7 +4,8 @@ import Heading from "@/components/Heading";
 import { Back } from "@/components/Button";
 import UserUpdateDialog from "./UserUpdateDialog";
 import Toggle from "@/components/Toggle";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import UserDeleteDialog from "./UserDeleteDialog";
 
 export default async function User({
   params: { id, lng },
@@ -17,16 +18,7 @@ export default async function User({
   const { t } = await useTranslation(lng, ["profile", "common"]);
 
   if (!user) {
-    return notFound();
-
-    // return (
-    //   <div className="container mx-auto flex flex-col gap-6">
-    //     <Back />
-    //     <h1 className="text-xl font-semibold leading-7 text-gray-900">
-    //       User not found!
-    //     </h1>
-    //   </div>
-    // );
+    redirect("/users");
   }
 
   return (
@@ -35,7 +27,10 @@ export default async function User({
         <Back />
         <Heading
           heading={user.name}
-          actions={<UserUpdateDialog lng={lng} user={user} />}
+          actions={[
+            <UserUpdateDialog key={1} lng={lng} user={user} />,
+            <UserDeleteDialog key={2} lng={lng} user={user} />,
+          ]}
         />
       </div>
 

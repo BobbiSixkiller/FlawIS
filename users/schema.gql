@@ -30,7 +30,7 @@ interface IMutationResponse {
 
 type Mutation {
   activateUser: String!
-  deleteUser(id: ObjectId!): Boolean!
+  deleteUser(id: ObjectId!): String!
   login(email: String!, password: String!): User!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!

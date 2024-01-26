@@ -10,5 +10,6 @@
   "rateLimit": "Akciu opakujete príliš často, znova to znova neskôr.",
   "emailExists": "Email adresa je obsadená!",
   "update": "Používateľ {{name}} bol aktualizovaný.",
-  "new": "Používateľ {{name}} bol vytvorený."
+  "new": "Používateľ {{name}} bol vytvorený.",
+  "delete": "Používateľ {{name}} bol vymazaný."
 }

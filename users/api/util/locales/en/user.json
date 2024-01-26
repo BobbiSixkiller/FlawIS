@@ -10,5 +10,6 @@
   "emailExists": "Email address is already in use!",
   "notFound": "Resource has not been found!",
   "update": "User {{name}} has been updated.",
-  "new": "User {{name}} has been created."
+  "new": "User {{name}} has been created.",
+  "delete": "User {{name}} has been deleted."
 }

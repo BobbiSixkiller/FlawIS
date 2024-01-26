@@ -21,7 +21,7 @@ export default function Heading({
           </p>
         )}
       </div>
-      <div>{actions}</div>
+      <div className="flex gap-1">{actions}</div>
     </div>
   );
 }

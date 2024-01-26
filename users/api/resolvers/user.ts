@@ -279,9 +279,13 @@ export class UserResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Mutation(() => Boolean)
-  async deleteUser(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.userService.delete({ _id: id });
-    return deletedCount > 0;
+  @Mutation(() => String)
+  async deleteUser(
+    @Arg("id") _id: ObjectId,
+    @LoadResource(User) user: DocumentType<User>
+  ): Promise<string> {
+    await user.remove();
+
+    return this.i18nService.translate("delete", { name: user.name });
   }
 }

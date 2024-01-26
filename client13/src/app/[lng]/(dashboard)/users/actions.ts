@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  DeleteUserDocument,
   RegisterDocument,
   Role,
   TextSearchUserDocument,
@@ -26,7 +27,7 @@ export async function getUsers(after?: string, first?: number) {
     console.log(res.errors[0]);
   }
 
-  return res.data.users;
+  return res.data;
 }
 
 export async function getUser(id: string) {
@@ -151,4 +152,16 @@ export async function searchUser(text: string) {
   }
 
   return { success: true, data: res.data.textSearchUser };
+}
+
+export async function deleteUser(prevState: any, formData: FormData) {
+  const res = await executeGqlFetch(DeleteUserDocument, {
+    id: formData.get("id")?.toString(),
+  });
+  if (res.errors) {
+    return { success: false, message: res.errors[0].message };
+  }
+
+  revalidateTag("users");
+  return { success: true, message: res.data.deleteUser };
 }

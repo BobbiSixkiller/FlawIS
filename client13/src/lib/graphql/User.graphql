@@ -45,3 +45,7 @@ mutation toggleVerifiedUser($id: ObjectId!) {
     message
   }
 }
+
+mutation deleteUser($id: ObjectId!) {
+  deleteUser(id: $id)
+}

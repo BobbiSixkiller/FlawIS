@@ -45,7 +45,7 @@ export type IMutationResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   activateUser: Scalars['String']['output'];
-  deleteUser: Scalars['Boolean']['output'];
+  deleteUser: Scalars['String']['output'];
   login: User;
   passwordReset: UserMutationResponse;
   register: UserMutationResponse;
@@ -269,6 +269,13 @@ export type ToggleVerifiedUserMutationVariables = Exact<{
 
 export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string } };
 
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: string };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -454,3 +461,8 @@ export const ToggleVerifiedUserDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ToggleVerifiedUserMutation, ToggleVerifiedUserMutationVariables>;
+export const DeleteUserDocument = new TypedDocumentString(`
+    mutation deleteUser($id: ObjectId!) {
+  deleteUser(id: $id)
+}
+    `) as unknown as TypedDocumentString<DeleteUserMutation, DeleteUserMutationVariables>;

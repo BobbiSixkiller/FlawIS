@@ -1,13 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import {
-  Dispatch,
-  ReactNode,
-  createContext,
-  useEffect,
-  useReducer,
-} from "react";
+import { Dispatch, ReactNode, createContext, useReducer } from "react";
 
 type ActionMap<M extends { [index: string]: any }> = {
   [Key in keyof M]: M[Key] extends undefined
@@ -75,12 +68,6 @@ export default function MessageProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(messageReducer, {
     visible: false,
   });
-
-  const path = usePathname();
-
-  useEffect(() => {
-    dispatch({ type: ActionTypes.ClearMsg });
-  }, [path]);
 
   return (
     <MessageContext.Provider value={{ ...state, dispatch }}>
