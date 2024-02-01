@@ -13,14 +13,10 @@ export default async function Register({
   const { t } = await useTranslation(lng, "register");
 
   return (
-    <div className="sm:mx-auto sm:w-full sm:max-w-sm flex min-h-full flex-1 gap-4 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="flex flex-col gap-10">
-        <Logo lng={lng} width={60} height={60} notext />
-
-        <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
-          {t("heading")}
-        </h2>
-      </div>
+    <div className="mt-6 flex flex-col gap-4">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
+        {t("heading")}
+      </h2>
 
       <div>
         <RegisterForm lng={lng} url={url} />

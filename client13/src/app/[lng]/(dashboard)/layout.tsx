@@ -114,7 +114,7 @@ export default async function DashboardLayout({
         <div className="hidden px-4 py-6 lg:col-span-1 lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-between">
           {sidebar}
           <div className="hidden lg:block mt-auto">
-            <ul className="text-xs text-gray-900">
+            <ul className="text-xs text-gray-500">
               <li className="hover:underline hover:text-primary-500 cursor-pointer">
                 <a
                   href="mailto:matus.muransky@flaw.uniba.sk"

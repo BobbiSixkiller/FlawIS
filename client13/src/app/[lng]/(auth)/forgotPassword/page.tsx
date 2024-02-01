@@ -3,6 +3,7 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import Link from "next/link";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import { useTranslation } from "@/lib/i18n";
+import { Message } from "@/components/Message";
 
 export default async function ForgotPassword({
   params: { lng },
@@ -12,14 +13,12 @@ export default async function ForgotPassword({
   const { t } = await useTranslation(lng, "forgotPassword");
 
   return (
-    <div className="sm:mx-auto sm:w-full sm:max-w-sm flex min-h-full flex-1 gap-4 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="flex flex-col gap-10">
-        <Logo lng={lng} width={60} height={60} notext />
+    <div className="mt-6 flex flex-col gap-4">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
+        {t("heading")}
+      </h2>
 
-        <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
-          {t("heading")}
-        </h2>
-      </div>
+      <Message lng={lng} />
 
       <div>
         <ForgotPasswordForm lng={lng} />

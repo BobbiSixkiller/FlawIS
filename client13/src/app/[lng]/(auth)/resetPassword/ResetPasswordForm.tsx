@@ -37,9 +37,9 @@ export default function ResetPasswordForm({
   }, [state]);
 
   return (
-    <form className="space-y-6" action={formAction}>
-      <input type="hidden" name="token" value={token} />
+    <form className="space-y-6 mt-4" action={formAction}>
       <div>
+        <input type="hidden" name="token" value={token} />
         <label
           htmlFor="password"
           className="block text-sm font-medium leading-6 text-gray-900"

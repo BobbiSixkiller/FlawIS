@@ -8,7 +8,6 @@ import Link from "next/link";
 import Button from "@/components/Button";
 import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { Message } from "@/components/Message";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const [state, formAction] = useFormState(login, {
@@ -30,9 +29,9 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   }, [state]);
 
   return (
-    <form className="space-y-6" action={formAction}>
-      <input type="hidden" name="url" value={url} />
+    <form className="space-y-6 mt-4" action={formAction}>
       <div>
+        <input type="hidden" name="url" value={url} />
         <label
           htmlFor="email"
           className="block text-sm font-medium leading-6 text-gray-900"

@@ -28,7 +28,7 @@ export default function ForgotPasswordForm({ lng }: { lng: string }) {
   }, [state]);
 
   return (
-    <form className="space-y-6" action={formAction}>
+    <form className="space-y-6 mt-4" action={formAction}>
       <div>
         <label
           htmlFor="email"

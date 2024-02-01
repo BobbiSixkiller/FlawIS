@@ -45,9 +45,9 @@ export default function RegisterForm({
   }, [state]);
 
   return (
-    <form className="space-y-6" action={formAction}>
-      <input type="hidden" name="url" value={url} />
+    <form className="space-y-6 mt-4" action={formAction}>
       <div>
+        <input type="hidden" name="url" value={url} />
         <label
           htmlFor="name"
           className="block text-sm font-medium leading-6 text-gray-900"
