@@ -42,9 +42,9 @@ export default function Validation() {
   });
 
   const conferencesRegisterInputSchema = object({
-    titlesBefore: string().trim().required(),
+    // titlesBefore: string().trim().required(),
     name: string().trim().required(),
-    titlesAfter: string().trim().nullable(),
+    // titlesAfter: string().trim().nullable(),
     email: string().required().email(),
     password: string()
       .trim()

@@ -81,7 +81,7 @@ const RegisterPage: NextPage = () => {
   return (
     <Grid container centered>
       <Grid.Row>
-        <Grid.Column computer={10} tablet={14} mobile={16}>
+        <Grid.Column computer={8} tablet={14} mobile={16}>
           <div
             style={{
               width: "100%",
@@ -108,9 +108,9 @@ const RegisterPage: NextPage = () => {
           </Header>
           <Formik
             initialValues={{
-              titlesBefore: "",
+              // titlesBefore: "",
               name: "",
-              titlesAfter: "" as string | null | undefined,
+              // titlesAfter: "" as string | null | undefined,
               email: "",
               organisation: "",
               telephone: "",
@@ -137,8 +137,8 @@ const RegisterPage: NextPage = () => {
                     data: {
                       organisation: values.organisation,
                       telephone: values.telephone,
-                      titlesAfter: values.titlesAfter,
-                      titlesBefore: values.titlesBefore,
+                      // titlesAfter: values.titlesAfter,
+                      // titlesBefore: values.titlesBefore,
                     },
                   },
                 });
@@ -152,9 +152,16 @@ const RegisterPage: NextPage = () => {
             }}
           >
             {({ handleSubmit, isSubmitting }: FormikProps<Values>) => (
-              <Form size="large" autoComplete="off" onSubmit={handleSubmit}>
+              <Form autoComplete="off" onSubmit={handleSubmit}>
                 <Segment>
-                  <Form.Group>
+                  <InputField
+                    fluid
+                    placeholder={t("name.placeholder")}
+                    label={t("name.label")}
+                    name="name"
+                    control={Input}
+                  />
+                  {/* <Form.Group>
                     <InputField
                       placeholder="JUDr."
                       label={t("titles.label")}
@@ -176,7 +183,7 @@ const RegisterPage: NextPage = () => {
                       control={Input}
                       width={3}
                     />
-                  </Form.Group>
+                  </Form.Group> */}
 
                   <EmailField
                     fluid
