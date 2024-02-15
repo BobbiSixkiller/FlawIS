@@ -259,14 +259,10 @@ const AttendeesPage: NextPageWithLayout = () => {
                   <Card.Meta>{edge?.node.user.email}</Card.Meta>
                   <Card.Description>
                     <p>Organizacia: {edge?.node.user.organisation}</p>
-
-                    {edge?.node.submissions.some((s) => s.file === null) ? (
-                      <p style={{ color: "red" }}>
-                        Nenahral subor registrovaneho prispevku!
-                      </p>
-                    ) : (
-                      <p>Subor prispevku nahraty</p>
-                    )}
+                    <p style={{ color: "red" }}>
+                      {edge?.node.submissions.some((s) => s.file === null) &&
+                        "Nenahral subor registrovaneho prispevku!"}
+                    </p>
                   </Card.Description>
                 </Card.Content>
                 <Card.Content extra>
