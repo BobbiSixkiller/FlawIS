@@ -201,36 +201,6 @@ services:
       MINIO_ROOT_PASSWORD: Strong#Pass#2024
     command: server --console-address ":9001" /data
 
-  mariadb:
-    image: mariadb:10.6
-    restart: always
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
-    volumes:
-      - mariadb:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=test
-      - MYSQL_PASSWORD=pass
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-
-  nextcloud:
-    image: nextcloud
-    restart: always
-    ports:
-      - 8080:80
-    links:
-      - mariadb
-    volumes:
-      - nextcloud:/var/www/html
-    environment:
-      - MYSQL_PASSWORD=pass
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_HOST=mariadb
-      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud
-      - NEXTCLOUD_ADMIN_USER=root
-      - NEXTCLOUD_ADMIN_PASSWORD=pass
-
   rabbitmq:
     image: rabbitmq
     restart: unless-stopped
