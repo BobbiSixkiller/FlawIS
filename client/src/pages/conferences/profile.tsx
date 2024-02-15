@@ -69,7 +69,7 @@ const ProfilePage: NextPageWithLayout = () => {
     <Grid padded={width < 400 ? "vertically" : true}>
       <Grid.Row>
         <Grid.Column>
-          <Header>{`${data?.me.titlesBefore} ${data?.me.name}${
+          <Header>{`${data?.me.titlesBefore || ""} ${data?.me.name}${
             data?.me.titlesAfter ? `, ${data.me.titlesAfter}` : ""
           }`}</Header>
         </Grid.Column>
