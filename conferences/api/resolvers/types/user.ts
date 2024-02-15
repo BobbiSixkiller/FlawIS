@@ -13,10 +13,10 @@ export class ConferenceUserInput {
   @IsPhoneNumber()
   telephone: string;
 
-  @Field()
-  @IsString()
-  titlesBefore: string;
+  // @Field()
+  // @IsString()
+  // titlesBefore: string;
 
-  @Field({ nullable: true })
-  titlesAfter?: string;
+  // @Field({ nullable: true })
+  // titlesAfter?: string;
 }
