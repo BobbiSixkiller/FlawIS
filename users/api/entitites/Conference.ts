@@ -14,9 +14,9 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { Section } from "./Section";
+// import { Section } from "./Section";
 import { Address, Billing } from "./Billing";
-import File from "./File";
+// import File from "./File";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -220,9 +220,9 @@ export class Conference extends TimeStamps {
   @Property({ type: () => Ticket, default: [] })
   tickets: Ticket[];
 
-  @Field(() => [Section])
-  @Property({ ref: () => Section })
-  sections: Ref<Section>[];
+  // @Field(() => [Section])
+  // @Property({ ref: () => Section })
+  // sections: Ref<Section>[];
 
   @Field(() => [ConferenceTranslation])
   @Property({ type: () => ConferenceTranslation, default: [], _id: false })

@@ -3,5 +3,5 @@ export default async function Sidebar({
 }: {
   params: { lng: string };
 }) {
-  return <div>Conferences</div>;
+  return <div>Search conference</div>;
 }

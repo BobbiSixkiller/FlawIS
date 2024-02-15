@@ -5,7 +5,7 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
-import { Submission } from "./Submission";
+// import { Submission } from "./Submission";
 
 @ObjectType({ isAbstract: true })
 class Translation {
@@ -50,8 +50,8 @@ export class Section extends TimeStamps {
   @Property({ type: () => String })
   languages: string[];
 
-  @Field(() => [Submission])
-  submissions: Submission[];
+  // @Field(() => [Submission])
+  // submissions: Submission[];
 
   @Field()
   createdAt: Date;

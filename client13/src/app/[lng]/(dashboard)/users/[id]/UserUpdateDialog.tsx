@@ -65,7 +65,7 @@ export default function UserUpdateDialog({
       <Modal
         isOpen={open || false}
         onClose={() => setOpen(false)}
-        title={t("heading", { ns: "profile" })}
+        title="Aktualizovat pouzivatela"
         togglerHidden={false}
       >
         <form className="space-y-6" action={formAction}>
