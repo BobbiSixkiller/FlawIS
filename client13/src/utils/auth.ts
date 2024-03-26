@@ -7,7 +7,6 @@ export const protectedPaths = [
   "/activate",
   "/users",
   "/conferences",
-  "/grants",
 ];
 
 const publicPaths = [
@@ -28,7 +27,7 @@ export function withAuth(middleware: CustomMiddleware) {
       return NextResponse.redirect(url);
     }
 
-    if (token && publicPaths.some((path) => url.pathname.includes(path))) {
+    if (token && publicPaths.some((path) => path === url.pathname)) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }

@@ -1,21 +1,19 @@
-import { getClass } from "@typegoose/typegoose";
 import { Model, Document, Types } from "mongoose";
+import { getClass } from "@typegoose/typegoose";
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
 
-export const TypegooseMiddleware: MiddlewareFn = async ({ context }, next) => {
+export const TypegooseMiddleware: MiddlewareFn<Context> = async ({}, next) => {
   const result = await next();
-
-  const { locale } = context as Context;
 
   if (Array.isArray(result)) {
     return result.map((item) =>
-      item instanceof Model ? convertDocument(item, locale) : item
+      item instanceof Model ? convertDocument(item) : item
     );
   }
 
   if (result instanceof Model) {
-    return convertDocument(result, locale);
+    return convertDocument(result);
   }
 
   return result;
@@ -45,9 +43,9 @@ export function transformIds(doc: object) {
   return Object.fromEntries(transformed);
 }
 
-export function convertDocument(doc: Document, locale: string) {
+export function convertDocument(doc: Document) {
   const convertedDocument = transformIds(doc.toObject());
-  const DocumentClass = getClass(doc)!;
-  Object.setPrototypeOf(convertedDocument, DocumentClass.prototype);
+  const DocumentClass = getClass(doc);
+  Object.setPrototypeOf(convertedDocument, DocumentClass!.prototype);
   return convertedDocument;
 }

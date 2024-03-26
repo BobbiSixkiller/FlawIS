@@ -1,3 +1,24 @@
+fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+
+fragment Billing on Billing {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  stampUrl
+  variableSymbol
+  IBAN
+  SWIFT
+}
+
 fragment User on User {
   id
   name
@@ -9,16 +30,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    name
-    address {
-      street
-      city
-      postal
-      country
-    }
-    ICO
-    DIC
-    ICDPH
+    ...Billing
   }
 }
 

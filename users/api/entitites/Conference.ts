@@ -7,6 +7,7 @@ import {
 } from "type-graphql";
 import {
   getModelForClass,
+  Index,
   pre,
   prop as Property,
   Ref,
@@ -14,19 +15,36 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-// import { Section } from "./Section";
-import { Address, Billing } from "./Billing";
-// import File from "./File";
+import { Section } from "./Section";
+import { Billing } from "./Billing";
+import { ModelType } from "@typegoose/typegoose/lib/types";
+import Container from "typedi";
+import { I18nService } from "../services/i18nService";
 
-@ObjectType({ isAbstract: true })
-class Translation {
+@ObjectType()
+export class ConferenceTranslationContent {
   @Field()
   @Property()
-  language: string;
+  name: string;
+
+  @Field()
+  @Property()
+  logoUrl: string;
 }
 
 @ObjectType()
-class TicketTranslation extends Translation implements Partial<Ticket> {
+export class ConferenceTranslation {
+  @Field(() => ConferenceTranslationContent)
+  @Property({ _id: false })
+  sk: ConferenceTranslationContent;
+
+  @Field(() => ConferenceTranslationContent)
+  @Property({ _id: false })
+  en: ConferenceTranslationContent;
+}
+
+@ObjectType()
+export class TicketTranslationContent {
   @Field()
   @Property()
   name: string;
@@ -37,37 +55,14 @@ class TicketTranslation extends Translation implements Partial<Ticket> {
 }
 
 @ObjectType()
-class ConferenceTranslation extends Translation {
-  @Field()
-  @Property()
-  name: string;
+export class TicketTranslation {
+  @Field(() => TicketTranslationContent)
+  @Property({ _id: false })
+  sk: TicketTranslationContent;
 
-  @Field()
-  @Property()
-  description: string;
-
-  @Field()
-  @Property({ type: () => File, _id: false })
-  logo: File;
-}
-
-@ObjectType({ description: "Conference billing organization" })
-export class ConferenceBilling extends Billing {
-  @Field()
-  @Property()
-  variableSymbol: string;
-
-  @Field()
-  @Property()
-  IBAN: string;
-
-  @Field()
-  @Property()
-  SWIFT: string;
-
-  @Field()
-  @Property({ type: () => File, _id: false })
-  stamp: File;
+  @Field(() => TicketTranslationContent)
+  @Property({ _id: false })
+  en: TicketTranslationContent;
 }
 
 @ObjectType({ description: "Important dates regarding conference" })
@@ -89,41 +84,14 @@ export class ImportantDates {
   submissionDeadline?: Date;
 }
 
-@ObjectType({ description: "Conference contact information" })
-export class Contact {
-  @Field()
-  @Property()
-  name: string;
-
-  @Field()
-  @Property({ _id: false })
-  address: Address;
-
-  @Field(() => [String])
-  @Property({ type: () => [String] })
-  conferenceTeam: string[];
-
-  @Field(() => [String])
-  @Property({ type: () => [String] })
-  scientificTeam: string[];
-
-  @Field()
-  @Property()
-  email: string;
-}
-
 @ObjectType({ description: "Conference ticket" })
 export class Ticket {
   @Field(() => ID)
   id: ObjectId;
 
-  @Field()
-  @Property()
-  name: string;
-
-  @Field()
-  @Property()
-  description: string;
+  @Field(() => TicketTranslation)
+  @Property({ _id: false })
+  translations: TicketTranslation;
 
   @Field(() => Int)
   @Property()
@@ -136,26 +104,34 @@ export class Ticket {
   @Field()
   @Property()
   online: boolean;
-
-  @Field(() => [TicketTranslation])
-  @Property({ type: () => TicketTranslation, default: [], _id: false })
-  translations: TicketTranslation[];
 }
 
 @pre<Conference>("save", async function () {
-  if (this.isNew || this.isModified("name")) {
+  if (
+    this.isNew ||
+    this.isModified("translations.sk.name") ||
+    this.isModified("translations.en.name")
+  ) {
     const conferenceExists = await getModelForClass(Conference)
-      .findOne({ name: this.name })
+      .findOne({
+        $or: [
+          { "translations.sk.name": this.translations.sk.name },
+          { "translations.en.name": this.translations.en.name },
+        ],
+      })
       .exec();
     if (conferenceExists && conferenceExists.id !== this.id) {
       throw new ArgumentValidationError([
         {
           target: Conference, // Object that was validated.
           property: "name", // Object's property that haven't pass validation.
-          value: this.name, // Value that haven't pass a validation.
+          value: conferenceExists.translations.sk.name, // Value that haven't pass a validation
           constraints: {
             // Constraints that failed validation with error messages.
-            name: "Conference with provided name already exists!",
+            name: Container.get(I18nService).translate("nameExists", {
+              ns: "conference",
+              name: conferenceExists.translations.sk.name,
+            }),
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },
@@ -175,7 +151,10 @@ export class Ticket {
           value: this.slug, // Value that haven't pass a validation.
           constraints: {
             // Constraints that failed validation with error messages.
-            slug: "Conference with provided slug already exists!",
+            slug: Container.get(I18nService).translate("slugExists", {
+              ns: "conference",
+              slug: this.slug,
+            }),
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },
@@ -183,50 +162,39 @@ export class Ticket {
     }
   }
 })
+@Index({
+  slug: "text",
+  "translations.sk.name": "text",
+  "translations.en.name": "text",
+})
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
   @Field()
-  @Property()
-  name: string;
-
-  @Field()
   @Property({ unique: true })
   slug: string;
 
-  @Field()
-  @Property({ type: () => File, _id: false })
-  logo: File;
+  @Field(() => ConferenceTranslation)
+  @Property({ _id: false })
+  translations: ConferenceTranslation;
 
-  @Field()
-  @Property()
-  description: string;
-
-  @Field(() => ConferenceBilling)
-  @Property({ type: () => ConferenceBilling, _id: false })
-  billing: ConferenceBilling;
+  @Field(() => Billing)
+  @Property({ type: () => Billing, _id: false })
+  billing: Billing;
 
   @Field(() => ImportantDates)
   @Property({ type: () => ImportantDates, _id: false })
   dates: ImportantDates;
 
-  @Field(() => Contact, { nullable: true })
-  @Property({ _id: false })
-  contact?: Contact;
-
   @Field(() => [Ticket])
   @Property({ type: () => Ticket, default: [] })
   tickets: Ticket[];
 
-  // @Field(() => [Section])
-  // @Property({ ref: () => Section })
-  // sections: Ref<Section>[];
-
-  @Field(() => [ConferenceTranslation])
-  @Property({ type: () => ConferenceTranslation, default: [], _id: false })
-  translations: ConferenceTranslation[];
+  @Field(() => [Section])
+  @Property({ ref: () => Section })
+  sections: Ref<Section>[];
 
   @Field(() => Int)
   @Property({ default: 0 })
@@ -236,4 +204,67 @@ export class Conference extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
+
+  public static async paginatedConferences(
+    this: ModelType<Conference>,
+    first: number,
+    after?: ObjectId
+  ) {
+    return await this.aggregate([
+      { $sort: { _id: -1 } },
+      {
+        $facet: {
+          data: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $limit: first || 20 },
+            {
+              $addFields: {
+                id: "$_id", //transform _id to id property as defined in GraphQL object types
+              },
+            },
+          ],
+          hasNextPage: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $skip: first || 20 }, // skip paginated data
+            { $limit: 1 }, // just to check if there's any element
+          ],
+        },
+      },
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          pageInfo: {
+            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
+            endCursor: { $last: "$data.id" },
+          },
+        },
+      },
+    ]);
+  }
 }

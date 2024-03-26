@@ -65,7 +65,6 @@ export default function UpdatePersonalDialog({
         isOpen={open || false}
         onClose={() => setOpen(false)}
         title={t("heading", { ns: "profile" })}
-        togglerHidden={false}
       >
         <form className="space-y-6" action={formAction}>
           {dialogOpen && <Message lng={lng} />}

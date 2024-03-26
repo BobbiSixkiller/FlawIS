@@ -1,11 +1,10 @@
 import { useTranslation } from "@/lib/i18n";
 import { getUser, toggleVerified } from "../actions";
 import Heading from "@/components/Heading";
-import { Back } from "@/components/Button";
-import UserUpdateDialog from "./UserUpdateDialog";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
-import UserDeleteDialog from "./UserDeleteDialog";
+import Link from "next/link";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default async function User({
   params: { id, lng },
@@ -22,18 +21,28 @@ export default async function User({
   }
 
   return (
-    <div className="container mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <Back />
-        <Heading
-          heading={user.name}
-          actions={[
-            <UserUpdateDialog key={1} lng={lng} user={user} />,
-            <UserDeleteDialog key={2} lng={lng} user={user} />,
-          ]}
-        />
-      </div>
-
+    <div>
+      <Heading
+        heading={user.name}
+        links={[
+          <Link
+            key={0}
+            href={`/users/${id}/update`}
+            scroll={false}
+            className="flex gap-2"
+          >
+            <PencilIcon className="h-5 w-5" /> Update
+          </Link>,
+          <Link
+            key={1}
+            href={`/users/${id}/delete`}
+            scroll={false}
+            className="flex gap-2"
+          >
+            <TrashIcon className="h-5 w-5" /> Delete
+          </Link>,
+        ]}
+      />
       <div className="mt-6 border-t border-gray-100">
         <dl className="divide-y divide-gray-100">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

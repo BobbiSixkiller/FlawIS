@@ -32,13 +32,29 @@ export class Billing {
 
   @Field()
   @Property()
-  ICO: string;
+  ICO?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  DIC: string;
+  DIC?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  ICDPH: string;
+  ICDPH?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  variableSymbol?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  IBAN?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  SWIFT?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  stampUrl?: string;
 }

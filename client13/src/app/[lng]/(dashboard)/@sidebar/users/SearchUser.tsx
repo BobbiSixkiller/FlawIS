@@ -5,9 +5,9 @@ import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { searchUser } from "@/app/[lng]/(dashboard)/users/actions";
 import { useRouter } from "next/navigation";
-import Spinner from "./Spinner";
+import Spinner from "../../../../../components/Spinner";
 
-export default function Search() {
+export default function SearchUser() {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);

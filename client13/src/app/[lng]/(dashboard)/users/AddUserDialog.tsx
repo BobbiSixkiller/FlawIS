@@ -4,7 +4,7 @@ import Modal from "@/components/Modal";
 import { useContext, useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { useFormState } from "react-dom";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { addUser } from "./actions";
@@ -51,14 +51,13 @@ export default function AddUserDialog({ lng }: { lng: string }) {
   return (
     <>
       <Button color="primary" type="button" onClick={() => setOpen(true)}>
-        <PencilIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+        <PlusIcon className="mr-2 h-4 w-4" aria-hidden="true" />
         {t("new", { ns: "common" })}
       </Button>
       <Modal
         isOpen={open || false}
         onClose={() => setOpen(false)}
         title={t("heading", { ns: "register" })}
-        togglerHidden={false}
       >
         <form className="space-y-6" action={formAction}>
           {dialogOpen && <Message lng={lng} />}

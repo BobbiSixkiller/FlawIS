@@ -16,19 +16,18 @@ export default async function Users({
 
   const user = await getMe();
   if (user?.role !== Role.Admin) {
-    redirect("/conferences");
+    redirect("/");
   }
 
-  const initialData = await getUsers(undefined, 5);
+  const initialData = await getUsers();
 
   return (
     <div className="flex flex-col gap-6">
       <Heading
-        heading={t("heading")}
-        subHeading={t("subheading")}
-        actions={<AddUserDialog lng={lng} />}
+        heading="Users"
+        subHeading="Pouzivatelia registrovani v systeme"
       />
-      <ListUsers initialData={initialData} />
+      {initialData && <ListUsers initialData={initialData} lng={lng} />}
     </div>
   );
 }

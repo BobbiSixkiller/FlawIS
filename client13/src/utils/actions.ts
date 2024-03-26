@@ -6,7 +6,6 @@ import { cookieName, fallbackLng } from "@/lib/i18n/settings";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { cookies, headers } from "next/headers";
-import { AuthType, BufferLike, createClient } from "webdav";
 import { boolean, object, ref, setLocale, string } from "yup";
 
 type GraphQLResponse<GraphQLData> = {

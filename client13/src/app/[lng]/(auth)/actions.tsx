@@ -42,8 +42,7 @@ export async function register(prevState: any, formData: FormData) {
     });
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -79,8 +78,7 @@ export async function login(prevState: any, formData: FormData) {
     const res = await executeGqlFetch(LoginDocument, input);
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -142,8 +140,7 @@ export async function sendResetLink(prevState: any, formData: FormData) {
     );
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -176,8 +173,7 @@ export async function resetPassword(prevState: any, formData: FormData) {
     );
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -275,8 +271,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
       },
     });
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,

@@ -169,25 +169,6 @@ export class ConferenceInput {
   @Field(() => DatesInput)
   dates: DatesInput;
 
-  // @Field()
-  // @IsString()
-  // variableSymbol: string;
-
-  // @Field({ nullable: true })
-  // @IsDate()
-  // regStart?: Date;
-
-  // @Field({ nullable: true })
-  // @IsDate()
-  // start?: Date;
-
-  // @Field({ nullable: true })
-  // @IsDate()
-  // end?: Date;
-
-  // @Field(() => [TicketInput], { nullable: true })
-  // tickets?: TicketInput[];
-
   @Field(() => [ConferenceInputTranslation])
   translations: ConferenceInputTranslation[];
 }

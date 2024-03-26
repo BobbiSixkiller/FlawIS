@@ -26,7 +26,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
         payload: { content: state.message, positive: state.success },
       });
     }
-  }, [state]);
+  }, [state, dispatch]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

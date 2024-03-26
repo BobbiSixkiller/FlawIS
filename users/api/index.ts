@@ -1,7 +1,10 @@
 import "reflect-metadata";
 import Container from "typedi";
-import { ApolloServer } from "apollo-server-express";
+import http from "http";
 import Express from "express";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
@@ -9,8 +12,9 @@ import { ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
 
 import { UserResolver } from "./resolvers/user";
+import { ConferencerResolver } from "./resolvers/conference";
 
-import { Context, createContext } from "./util/auth";
+import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
 import Messagebroker from "./util/rmq";
 
@@ -20,8 +24,6 @@ import { I18nMiddleware } from "./middlewares/i18n-middleware";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-import { ApolloComplexityPlugin } from "./util/ApolloComplexityPlugin";
 
 env.config();
 
@@ -59,8 +61,7 @@ async function main() {
   //Build schema
   const schema = await buildSchema(
     {
-      // orphanedTypes: [User],
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, ConferencerResolver],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
       // use ObjectId scalar mapping
@@ -76,29 +77,12 @@ async function main() {
   );
 
   const app = Express();
-
-  // Trust the X-Forwarded-For header
-  app.set("trust proxy", true);
-
-  app.use(
-    cors({
-      credentials: true,
-      origin: origins,
-    })
-  );
-  app.use(cookieParser());
+  const httpServer = http.createServer(app);
 
   //Create Apollo server
   const server = new ApolloServer({
     schema,
-    context: (ctx) => createContext(ctx),
-    plugins:
-      process.env.NODE_ENV === "development"
-        ? [
-            ApolloServerPluginLandingPageGraphQLPlayground(),
-            new ApolloComplexityPlugin(200),
-          ]
-        : [new ApolloComplexityPlugin(200)],
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     csrfPrevention: process.env.NODE_ENV === "production" ? true : false,
     persistedQueries:
       process.env.NODE_ENV === "production" ||
@@ -106,18 +90,30 @@ async function main() {
         ? false
         : undefined,
   });
+  await server.start();
+
+  // Trust the X-Forwarded-For header
+  app.set("trust proxy", true);
+  app.use(
+    cors({
+      credentials: true,
+      origin: origins,
+    })
+  );
+  app.use(cookieParser());
+  app.use(
+    "/graphql",
+    Express.json(),
+    expressMiddleware(server, { context: async (ctx) => createContext(ctx) })
+  );
 
   await mongoDbConnect();
   await Messagebroker.init();
   initRedis();
 
-  await server.start();
-
-  server.applyMiddleware({ app, cors: false });
-
-  app.listen({ port }, () =>
+  httpServer.listen({ port }, () =>
     console.log(
-      `🚀 Server ready and listening at ==> http://localhost:${port}${server.graphqlPath}`
+      `🚀 Server ready and listening at ==> http://localhost:${port}/graphql`
     )
   );
 }

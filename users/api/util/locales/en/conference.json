@@ -1,0 +1,9 @@
+{
+  "notFound": "Conference has not been found!",
+  "update": "Conference {{name}} has been updated.",
+  "new": "Conference {{name}} has been created.",
+  "delete": "Conference {{name}} has been deleted.",
+  "nameExists": "Conference name {{name}} is already taken!",
+  "slugExists": "Conference slug {{slug}} is already taken!",
+  "alreadyRegistered": "User {{name}} has been already registered to {{conference}}!"
+}

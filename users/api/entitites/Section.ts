@@ -5,24 +5,24 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
-// import { Submission } from "./Submission";
-
-@ObjectType({ isAbstract: true })
-class Translation {
-  @Field()
-  @Property()
-  language: string;
-}
+import { Submission } from "./Submission";
 
 @ObjectType()
-class SectionTranslation extends Translation {
+export class SectionTranslationContent {
   @Field()
   @Property()
   name: string;
+}
 
-  @Field()
-  @Property()
-  description: string;
+@ObjectType()
+export class SectionTranslation {
+  @Field(() => SectionTranslationContent)
+  @Property({ _id: false })
+  sk: SectionTranslationContent;
+
+  @Field(() => SectionTranslationContent)
+  @Property({ _id: false })
+  en: SectionTranslationContent;
 }
 
 @ObjectType({ description: "Conference's section entity model type" })
@@ -34,24 +34,16 @@ export class Section extends TimeStamps {
   @Property({ ref: () => Conference })
   conference: Ref<Conference>;
 
-  @Field()
-  @Property()
-  name: string;
-
-  @Field()
-  @Property()
-  description: string;
-
-  @Field(() => [SectionTranslation])
+  @Field(() => SectionTranslation)
   @Property({ type: () => SectionTranslation, _id: false })
-  translations: SectionTranslation[];
+  translations: SectionTranslation;
 
   @Field(() => [String])
   @Property({ type: () => String })
   languages: string[];
 
-  // @Field(() => [Submission])
-  // submissions: Submission[];
+  @Field(() => [Submission])
+  submissions: Submission[];
 
   @Field()
   createdAt: Date;

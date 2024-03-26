@@ -13,11 +13,7 @@ export default async function Profile({
 
   return (
     <div className="flex flex-col gap-6">
-      <Heading
-        heading={t("heading")}
-        subHeading={t("subheading")}
-        actions={<UpdatePersonalDialog user={user} lng={lng} />}
-      />
+      <Heading heading={t("heading")} subHeading={t("subheading")} />
 
       <div className="border-t border-gray-100">
         <dl className="divide-y divide-gray-100">

@@ -6,12 +6,15 @@ import {
   ValidatorConstraintInterface,
 } from "class-validator";
 import { getModelForClass } from "@typegoose/typegoose";
-import { ClassType, createParamDecorator } from "type-graphql";
+import {
+  ClassType,
+  createParamDecorator,
+  ParameterDecorator,
+} from "type-graphql";
 // import { Conference } from "../entities/Conference";
 // import { Attendee } from "../entities/Attendee";
 import { Context } from "./auth";
 // import { Section } from "../entities/Section";
-import { UserInputError } from "apollo-server-core";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 
@@ -87,17 +90,15 @@ export function RefDocExists(
 //   });
 // }
 
-export function LoadResource<TNode>(
-  TNodeClass: ClassType<TNode>
+export function LoadResource<Type extends object>(
+  TypeClass: ClassType<Type>
 ): ParameterDecorator {
-  return createParamDecorator<Context>(async ({ args, context: {} }) => {
-    const resource = await getModelForClass(TNodeClass).findOne({
-      _id: args.id,
+  return createParamDecorator<Context>(async ({ args }) => {
+    const resource = await getModelForClass(TypeClass).findOne({
+      $or: [{ _id: args.id }, { slug: args.slug }],
     });
     if (!resource)
-      throw new UserInputError(
-        Container.get(I18nService).translate("notFound")
-      );
+      throw new Error(Container.get(I18nService).translate("notFound"));
 
     return resource;
   });

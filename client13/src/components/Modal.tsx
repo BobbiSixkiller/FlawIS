@@ -18,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
-  togglerHidden = true,
+  togglerHidden = false,
 }) => {
   const { dispatch, dialogOpen } = useContext(MessageContext);
 

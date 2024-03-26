@@ -1,1 +1,6 @@
-{ "phone": "Telephone must be a valid phone number!" }
+{
+  "password": "Password must be at least 8 characters long and contain at least one number and one character!",
+  "maxLength": "Maximum allowed length is {{length}}!",
+  "email": "Invalid email address {{value}}",
+  "phone": "Invalid phone number {{value}}"
+}

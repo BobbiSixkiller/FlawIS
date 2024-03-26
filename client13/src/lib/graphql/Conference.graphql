@@ -1,0 +1,128 @@
+fragment Invoice on Invoice {
+  body {
+    body
+    comment
+    dueDate
+    issueDate
+    price
+    type
+    vat
+    vatDate
+  }
+  issuer {
+    ...Billing
+  }
+  payer {
+    ...Billing
+  }
+}
+
+query conferences($after: ObjectId, $first: Int) {
+  conferences(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        id
+        slug
+        translations {
+          sk {
+            name
+            logoUrl
+          }
+          en {
+            name
+            logoUrl
+          }
+        }
+        dates {
+          start
+          end
+        }
+        createdAt
+        updatedAt
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query conference($slug: String!) {
+  conference(slug: $slug) {
+    id
+    slug
+    translations {
+      sk {
+        name
+        logoUrl
+      }
+      en {
+        name
+        logoUrl
+      }
+    }
+    attending {
+      invoice {
+        ...Invoice
+      }
+      ticket {
+        online
+        withSubmission
+      }
+      submissions {
+        id
+        authors {
+          id
+          name
+        }
+        section {
+          id
+          name
+        }
+        translations {
+          sk {
+            name
+            keywords
+            abstract
+          }
+          en {
+            name
+            keywords
+            abstract
+          }
+        }
+        updatedAt
+      }
+    }
+  }
+}
+
+query textSearchConference($text: String!) {
+  textSearchConference(text: $text) {
+    id
+    slug
+    translations {
+      sk {
+        name
+      }
+      en {
+        name
+      }
+    }
+  }
+}
+
+mutation createConference($data: ConferenceInput!) {
+  createConference(data: $data) {
+    message
+    data {
+      slug
+    }
+  }
+}
+
+mutation deleteConference($id: ObjectId!) {
+  deleteConference(id: $id)
+}

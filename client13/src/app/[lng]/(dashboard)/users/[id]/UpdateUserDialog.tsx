@@ -12,7 +12,7 @@ import { updateUser } from "../actions";
 import Select from "@/components/Select";
 import { Message } from "@/components/Message";
 
-export default function UserUpdateDialog({
+export default function UpdateUserDialog({
   user,
   lng,
 }: {

@@ -1,1 +1,6 @@
-{ "phone": "Telefón musí byť platné telefónne čislo vrátane predvoľby!" }
+{
+  "password": "Heslo musí mať aspoň 8 znakov a pozostávať z aspoň jedného čísla a jedného písmena!",
+  "maxLength": "Maximálna povolená dĺžka je {{length}} znakov!",
+  "email": "Nesprávny formát email adresy {{value}}",
+  "phone": "Telefónne číslo {{value}} musí byť platné telefónne čislo vrátane predvoľby!"
+}

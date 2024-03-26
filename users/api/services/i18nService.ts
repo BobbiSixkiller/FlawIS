@@ -28,7 +28,7 @@ export class I18nService {
           fallbackLng: "en",
           supportedLngs: ["en", "sk"],
           defaultNS: "user",
-          ns: ["user", "validation"],
+          ns: ["user", "conference", "validation"],
         },
         async (err, t) => {
           if (err) {
@@ -49,5 +49,9 @@ export class I18nService {
     options?: TOptionsBase & $Dictionary & InterpolationMap<string>
   ): string {
     return this.i18nInstance.t(key, options);
+  }
+
+  language() {
+    return i18next.language;
   }
 }

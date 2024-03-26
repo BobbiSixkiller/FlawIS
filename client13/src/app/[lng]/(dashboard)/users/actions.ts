@@ -27,7 +27,7 @@ export async function getUsers(after?: string, first?: number) {
     console.log(res.errors[0]);
   }
 
-  return res.data;
+  return res.data.users;
 }
 
 export async function getUser(id: string) {
@@ -68,8 +68,7 @@ export async function addUser(prevState: any, formData: FormData) {
     });
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -110,8 +109,7 @@ export async function updateUser(prevState: any, formData: FormData) {
     });
 
     if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions
-        .exception as ErrorException;
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {
         success: false,
@@ -155,13 +153,17 @@ export async function searchUser(text: string) {
 }
 
 export async function deleteUser(prevState: any, formData: FormData) {
-  const res = await executeGqlFetch(DeleteUserDocument, {
-    id: formData.get("id")?.toString(),
-  });
-  if (res.errors) {
-    return { success: false, message: res.errors[0].message };
-  }
+  try {
+    const res = await executeGqlFetch(DeleteUserDocument, {
+      id: formData.get("id")?.toString(),
+    });
+    if (res.errors) {
+      throw new Error(res.errors[0].message);
+    }
 
-  revalidateTag("users");
-  return { success: true, message: res.data.deleteUser };
+    revalidateTag("users");
+    return { success: true, message: res.data.deleteUser };
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
 }

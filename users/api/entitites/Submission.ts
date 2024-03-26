@@ -1,11 +1,6 @@
-import {
-  getModelForClass,
-  index,
-  pre,
-  prop as Property,
-} from "@typegoose/typegoose";
+import { index, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { ArgumentValidationError, Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Ref } from "../util/types";
@@ -13,15 +8,8 @@ import { Conference } from "./Conference";
 import { Section } from "./Section";
 import { User } from "./User";
 
-@ObjectType({ isAbstract: true })
-class Translation {
-  @Field()
-  @Property()
-  language: string;
-}
-
 @ObjectType()
-class SubmissionTranslation extends Translation implements Partial<Submission> {
+export class SubmissionTranslationContent {
   @Field()
   @Property()
   name: string;
@@ -35,49 +23,34 @@ class SubmissionTranslation extends Translation implements Partial<Submission> {
   keywords: string[];
 }
 
-@pre<Submission>("save", async function () {
-  if (this.isNew) {
-    const submissionExists = await getModelForClass(Submission)
-      .findOne({
-        name: this.name,
-      })
-      .exec();
-    if (submissionExists)
-      throw new ArgumentValidationError([
-        {
-          target: Submission, // Object that was validated.
-          property: "submission.name", // Object's property that haven't pass validation.
-          value: this.name, // Value that haven't pass a validation.
-          constraints: {
-            // Constraints that failed validation with error messages.
-            nameExists: "Submission with provided name already exists!",
-          },
-          //children?: ValidationError[], // Contains all nested validation errors of the property
-        },
-      ]);
-  }
-})
+@ObjectType()
+export class SubmissionTranslation {
+  @Field(() => SubmissionTranslationContent)
+  @Property({ _id: false })
+  sk: SubmissionTranslationContent;
+
+  @Field(() => SubmissionTranslationContent)
+  @Property({ _id: false })
+  en: SubmissionTranslationContent;
+}
+
 @index({ conference: 1, section: 1, authors: 1 })
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
   @Field(() => ID)
   id: ObjectId;
 
-  @Field()
-  @Property()
-  name: string;
-
-  @Field()
-  @Property()
-  abstract: string;
-
-  @Field(() => [String])
-  @Property({ type: () => String })
-  keywords: string[];
+  @Field(() => SubmissionTranslation)
+  @Property({ type: () => SubmissionTranslation, _id: false })
+  translations: SubmissionTranslation;
 
   @Field({ nullable: true })
-  @Property({ type: () => File, _id: false })
-  file?: File;
+  @Property()
+  file?: string;
+
+  @Field(() => [User])
+  @Property({ ref: () => User })
+  authors: Ref<User>[];
 
   @Field(() => Conference)
   @Property({ ref: () => Conference })
@@ -86,14 +59,6 @@ export class Submission extends TimeStamps {
   @Field(() => Section)
   @Property({ ref: () => Section })
   section: Ref<Section>;
-
-  @Field(() => [User])
-  @Property({ ref: () => User })
-  authors: Ref<User>[];
-
-  @Field(() => [SubmissionTranslation])
-  @Property({ type: () => SubmissionTranslation, _id: false })
-  translations: SubmissionTranslation[];
 
   @Field()
   createdAt: Date;

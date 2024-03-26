@@ -8,7 +8,6 @@ import { Trans } from "react-i18next";
 
 import Button from "@/components/Button";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { Message } from "@/components/Message";
 
 export default function RegisterForm({
   lng,
@@ -31,7 +30,7 @@ export default function RegisterForm({
     if (email.includes("uniba")) {
       setOrg(t("flaw"));
     }
-  }, [email, lng]);
+  }, [email, lng, t]);
 
   const { dispatch } = useContext(MessageContext);
 
@@ -42,7 +41,7 @@ export default function RegisterForm({
         payload: { content: state.message, positive: state.success },
       });
     }
-  }, [state]);
+  }, [state, dispatch]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

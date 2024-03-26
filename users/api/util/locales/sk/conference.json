@@ -1,0 +1,9 @@
+{
+  "notFound": "Konferencia nebola nájdená!",
+  "update": "Konferencia {{name}} bola aktualizovaná.",
+  "new": "Konferencia {{name}} bola vytvorená.",
+  "delete": "Konferencia {{name}} bola vymazaná.",
+  "nameExists": "Konferencia s názvom {{name}} už existuje!",
+  "slugExists": "Konferencia s url slugom {{slug}} už existuje!",
+  "alreadyRegistered": "Používateľ {{name}} je už zaregistrovaný na {{conference}}!"
+}

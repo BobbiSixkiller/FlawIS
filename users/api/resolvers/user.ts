@@ -12,7 +12,6 @@ import {
   UserInput,
   UserMutationResponse,
 } from "./types/user";
-import { AuthenticationError } from "apollo-server-core";
 
 import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
@@ -27,7 +26,6 @@ import { DocumentType } from "@typegoose/typegoose";
 @Service()
 @Resolver()
 export class UserResolver {
-  //using mongodb change streams to handle user integrity accross federated subgraphs
   constructor(
     private readonly userService = new CRUDservice(User),
     private readonly i18nService: I18nService
@@ -88,7 +86,7 @@ export class UserResolver {
     return user;
   }
 
-  // @Authorized(["ADMIN"])
+  @Authorized(["ADMIN"])
   @Query(() => [User])
   async textSearchUser(@Arg("text") text: string) {
     return await this.userService.aggregate([
@@ -104,8 +102,7 @@ export class UserResolver {
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
-    if (!loggedInUser)
-      throw new AuthenticationError("User account has been deleted!");
+    if (!loggedInUser) throw new Error("User account has been deleted!");
 
     return loggedInUser;
   }
@@ -183,12 +180,10 @@ export class UserResolver {
   @UseMiddleware([RateLimit(50)])
   async login(@Arg("email") email: string, @Arg("password") password: string) {
     const user = await this.userService.findOne({ email });
-    if (!user)
-      throw new AuthenticationError(this.i18nService.translate("credentials"));
+    if (!user) throw new Error(this.i18nService.translate("credentials"));
 
     const match = await compare(password, user.password);
-    if (!match)
-      throw new AuthenticationError(this.i18nService.translate("credentials"));
+    if (!match) throw new Error(this.i18nService.translate("credentials"));
 
     return user;
   }
@@ -284,7 +279,7 @@ export class UserResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(User) user: DocumentType<User>
   ): Promise<string> {
-    await user.remove();
+    await this.userService.delete({ _id: user.id });
 
     return this.i18nService.translate("delete", { name: user.name });
   }

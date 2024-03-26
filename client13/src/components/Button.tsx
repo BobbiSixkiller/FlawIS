@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 import Spinner from "./Spinner";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 
 export function Back() {
@@ -10,12 +10,10 @@ export function Back() {
 
   return (
     <button
-      className="rounded-md focus:outline-primary-500"
-      onClick={() => {
-        router.back();
-      }}
+      onClick={() => router.back()}
+      className="hover:bg-gray-700 hover:bg-opacity-10 outline-non p-2 rounded-md"
     >
-      <ChevronLeftIcon className="h-5 w-5" />
+      <XMarkIcon className="w-5 h-5" />
     </button>
   );
 }
@@ -28,6 +26,7 @@ export default function Button({
   onClick,
   fluid = false,
   color,
+  disabled = false,
 }: {
   children: React.ReactNode;
   loadingText?: string;
@@ -35,7 +34,8 @@ export default function Button({
   type?: "submit" | "button";
   onClick?: () => void;
   fluid?: boolean;
-  color: "primary" | "red" | "green" | "basic";
+  color: "primary" | "secondary" | "red" | "green" | "basic";
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
@@ -48,6 +48,12 @@ export default function Button({
           pending || loading
             ? "bg-primary-400 hover:bg-primary-400"
             : "bg-primary-500 hover:bg-primary-700"
+        } focus-visible:outline-primary-500 text-white shadow-sm`;
+      case "secondary":
+        return `${
+          pending || loading || disabled
+            ? "bg-gray-400 hover:bg-gray-400"
+            : "bg-gray-900 hover:bg-gray-500"
         } focus-visible:outline-primary-500 text-white shadow-sm`;
       case "red":
         return `${
@@ -71,7 +77,8 @@ export default function Button({
     <button
       onClick={onClick}
       type={type}
-      aria-disabled={pending || loading}
+      aria-disabled={pending || loading || disabled}
+      disabled={pending || loading || disabled}
       className={`h-9 flex ${
         fluid ? "w-full" : ""
       } justify-center items-center rounded-md ${btnColor(

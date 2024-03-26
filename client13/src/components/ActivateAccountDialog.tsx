@@ -63,6 +63,7 @@ export default function ActivateAccountDialog({
       isOpen={open || false}
       onClose={() => setOpen(!user?.verified)}
       title={t("heading")}
+      togglerHidden={true}
     >
       <form action={action} className="flex flex-col gap-4">
         {t("body")}

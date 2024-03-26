@@ -1,7 +1,3 @@
-export default async function Sidebar({
-  params: { lng },
-}: {
-  params: { lng: string };
-}) {
+export default function Sidebar() {
   return null;
 }

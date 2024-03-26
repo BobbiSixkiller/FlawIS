@@ -6,12 +6,12 @@ import {
   ObjectType,
 } from "type-graphql";
 import {
-  Length,
   IsEmail,
   Matches,
   IsString,
   IsPhoneNumber,
-  IsBoolean,
+  MaxLength,
+  ValidationArguments,
 } from "class-validator";
 
 import { Role, User } from "../../entitites/User";
@@ -38,7 +38,10 @@ export class UserMutationResponse extends IMutationResponse {
 export class PasswordInput implements Partial<User> {
   @Field()
   @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
-    message: "Minimum 8 characters, at least 1 letter and 1 number!",
+    message: () =>
+      Container.get(I18nService).translate("password", {
+        ns: "validation",
+      }),
   })
   password: string;
 }
@@ -46,30 +49,23 @@ export class PasswordInput implements Partial<User> {
 @InputType({ description: "New user input data" })
 export class RegisterInput extends PasswordInput implements Partial<User> {
   @Field()
-  @Length(1, 100, { message: "Name must be 1-100 characters long!" })
+  @MaxLength(100, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("maxLength", {
+        ns: "validation",
+        length: args.constraints[0],
+      }),
+  })
   name: string;
 
   @Field()
-  @IsEmail()
-  email: string;
-
-  @Field()
-  @IsString()
-  organization: string;
-
-  @Field()
-  @IsPhoneNumber()
-  telephone: string;
-}
-
-@InputType({ description: "User update input data" })
-export class UserInput implements Partial<User> {
-  @Field()
-  @Length(1, 100, { message: "Name must be 1-100 characters long!" })
-  name: string;
-
-  @Field()
-  @IsEmail()
+  @IsEmail(undefined, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("email", {
+        ns: "validation",
+        value: args.value,
+      }),
+  })
   email: string;
 
   @Field()
@@ -78,10 +74,47 @@ export class UserInput implements Partial<User> {
 
   @Field()
   @IsPhoneNumber(undefined, {
-    message: () =>
+    message: (args: ValidationArguments) =>
       Container.get(I18nService).translate("phone", {
-        lng: "sk",
         ns: "validation",
+        value: args.value,
+      }),
+  })
+  telephone: string;
+}
+
+@InputType({ description: "User update input data" })
+export class UserInput implements Partial<User> {
+  @Field()
+  @MaxLength(100, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("maxLength", {
+        ns: "validation",
+        length: args.constraints[0],
+      }),
+  })
+  name: string;
+
+  @Field()
+  @IsEmail(undefined, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("email", {
+        ns: "validation",
+        value: args.value,
+      }),
+  })
+  email: string;
+
+  @Field()
+  @IsString()
+  organization: string;
+
+  @Field()
+  @IsPhoneNumber(undefined, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("phone", {
+        ns: "validation",
+        value: args.value,
       }),
   })
   telephone: string;
@@ -93,7 +126,10 @@ export class UserInput implements Partial<User> {
   @Authorized(["ADMIN"])
   @Field({ nullable: true })
   @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
-    message: "Minimum 8 characters, at least 1 letter and 1 number!",
+    message: () =>
+      Container.get(I18nService).translate("password", {
+        ns: "validation",
+      }),
   })
   password?: string;
 }

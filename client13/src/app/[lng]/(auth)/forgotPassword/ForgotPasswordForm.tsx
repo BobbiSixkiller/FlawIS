@@ -6,7 +6,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { Message } from "@/components/Message";
 
 export default function ForgotPasswordForm({ lng }: { lng: string }) {
   const [state, formAction] = useFormState(sendResetLink, {
@@ -25,7 +24,7 @@ export default function ForgotPasswordForm({ lng }: { lng: string }) {
         payload: { content: state.message, positive: state.success },
       });
     }
-  }, [state]);
+  }, [state, dispatch]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

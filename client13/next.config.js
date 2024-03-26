@@ -6,6 +6,15 @@ const nextConfig = {
       allowedOrigins: ["http://localhost"],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "minio",
+        port: "9000",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

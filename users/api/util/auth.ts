@@ -5,7 +5,7 @@ import { AuthChecker } from "type-graphql";
 import { User } from "./types";
 
 import env from "dotenv";
-import { ExpressContext } from "apollo-server-express";
+import { ExpressContextFunctionArgument } from "@apollo/server/dist/esm/express4";
 
 env.config();
 
@@ -16,7 +16,10 @@ export interface Context {
   locale: string;
 }
 
-export function createContext({ req, res }: ExpressContext): Context {
+export function createContext({
+  req,
+  res,
+}: ExpressContextFunctionArgument): Context {
   const appContext: Context = {
     req: req as Request,
     res: res as Response,

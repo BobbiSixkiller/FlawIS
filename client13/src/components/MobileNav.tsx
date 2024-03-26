@@ -39,7 +39,7 @@ export function NavItem({
 
   return (
     <Link
-      href={`/${lng}/${route}`}
+      href={`/${route}`}
       className="flex items-center py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
       onClick={onClick}
     >
@@ -103,7 +103,7 @@ export function ProfileMenuItem({
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm ${
                     path.includes("/profile") ? "font-bold" : ""
                   }`}
-                  onClick={() => router.push(`/${lng}/profile`)}
+                  onClick={() => router.push(`/profile`)}
                 >
                   <UserCircleIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   {t("profile")}
@@ -116,7 +116,10 @@ export function ProfileMenuItem({
                   className={`${
                     active ? "bg-primary-500 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  onClick={async () => logout()}
+                  onClick={() => {
+                    logout();
+                    location.reload();
+                  }}
                 >
                   <ArrowLeftCircleIcon
                     className="mr-2 h-5 w-5"
@@ -145,7 +148,6 @@ export function MobileNav({
   drawerTitle: ReactNode;
 }) {
   const [menuShown, setMenuShown] = useState(false);
-  const router = useRouter();
 
   const { t } = useTranslation(lng, "landing");
 

@@ -6,7 +6,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { Message } from "@/components/Message";
 
 export default function ResetPasswordForm({
   lng,
@@ -34,7 +33,7 @@ export default function ResetPasswordForm({
         },
       });
     }
-  }, [state]);
+  }, [state, dispatch]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

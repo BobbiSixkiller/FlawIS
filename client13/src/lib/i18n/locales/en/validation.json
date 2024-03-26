@@ -4,5 +4,7 @@
   "password": "Password must have minimum eight characters, at least one letter and one number!",
   "confirmPass": "Passwords do not match!",
   "terms": "You have to agree with privacy policy!",
-  "role": "Unknown role!"
+  "role": "Unknown role!",
+  "date": "You have to set Date!",
+  "endDateInvalid": "End date can't be before start date!"
 }
