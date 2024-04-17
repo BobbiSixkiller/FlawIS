@@ -14,49 +14,64 @@ type ActionMap<M extends { [index: string]: any }> = {
 };
 
 export enum ActionTypes {
-  SetMsg = "SET_MSG",
-  ClearMsg = "CLEAR_MSG",
+  SetAppMsg = "SET_APP_MSG",
+  ClearAppMsg = "CLEAR_APP_MSG",
+  SetFormMsg = "SET_FORM_MSG",
+  ClearFormMsg = "CLEAR_FORM_MSG",
 }
 
 type ActionPayload = {
-  [ActionTypes.SetMsg]: {
-    content: string;
-    positive?: boolean;
-    dialogOpen?: boolean;
-  };
-  [ActionTypes.ClearMsg]: undefined;
+  [ActionTypes.SetAppMsg]: { message: string; success: boolean };
+  [ActionTypes.ClearAppMsg]: undefined;
+  [ActionTypes.SetFormMsg]: { message: string; success: boolean };
+  [ActionTypes.ClearFormMsg]: undefined;
 };
 
 type MessageActions = ActionMap<ActionPayload>[keyof ActionMap<ActionPayload>];
 
 type MessageState = {
-  visible: boolean;
-  positive?: boolean;
-  content?: string;
-  dialogOpen?: boolean;
+  appMessage: { visible: boolean; content: string; success: boolean };
+  formMessage: { visible: boolean; content: string; success: boolean };
 };
 
 export const MessageContext = createContext<
   MessageState & { dispatch: Dispatch<MessageActions> }
 >({
-  visible: false,
+  appMessage: { visible: false, content: "", success: false },
+  formMessage: { visible: false, content: "", success: false },
   dispatch: () => null,
 });
 
 function messageReducer(state: MessageState, action: MessageActions) {
   switch (action.type) {
-    case ActionTypes.SetMsg:
+    case ActionTypes.SetAppMsg:
       return {
         ...state,
-        visible: true,
-        content: action.payload.content,
-        positive: action.payload.positive,
-        dialogOpen: action.payload.dialogOpen,
+        appMessage: {
+          visible: true,
+          content: action.payload.message,
+          success: action.payload.success,
+        },
       };
-    case ActionTypes.ClearMsg:
+    case ActionTypes.ClearAppMsg:
       return {
         ...state,
-        visible: false,
+        appMessage: { ...state.appMessage, visible: false },
+      };
+
+    case ActionTypes.SetFormMsg:
+      return {
+        ...state,
+        formMessage: {
+          visible: true,
+          content: action.payload.message,
+          success: action.payload.success,
+        },
+      };
+    case ActionTypes.ClearFormMsg:
+      return {
+        ...state,
+        formMessage: { ...state.formMessage, visible: false },
       };
 
     default:
@@ -66,7 +81,8 @@ function messageReducer(state: MessageState, action: MessageActions) {
 
 export default function MessageProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(messageReducer, {
-    visible: false,
+    appMessage: { visible: false, content: "", success: false },
+    formMessage: { visible: false, content: "", success: false },
   });
 
   return (

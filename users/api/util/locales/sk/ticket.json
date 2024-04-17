@@ -1,0 +1,6 @@
+{
+  "notFound": "Forma účasti nebola nájdená!",
+  "update": "Forma účasti {{name}} bola aktualizovaná.",
+  "new": "Forma účasti {{name}} bola vytvorená.",
+  "delete": "Forma účasti {{name}} bola vymazaná."
+}

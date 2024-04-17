@@ -24,16 +24,19 @@ export default function ResetPasswordForm({
   const { dispatch } = useContext(MessageContext);
 
   useEffect(() => {
-    if (state.message) {
+    if (state?.message && !state.success) {
       dispatch({
-        type: ActionTypes.SetMsg,
-        payload: {
-          content: state.message,
-          positive: state.success,
-        },
+        type: ActionTypes.SetFormMsg,
+        payload: state,
       });
     }
-  }, [state, dispatch]);
+    if (state?.message && state.success) {
+      dispatch({
+        type: ActionTypes.SetAppMsg,
+        payload: state,
+      });
+    }
+  }, [state]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

@@ -3,7 +3,7 @@
   "notRegistered": "Nebol nájdený žiadny používateľ so zadanou email adresou!",
   "resetLinkSent": "Link na obnovu hesla bol zaslaný na zadanú email adresu.",
   "invalidToken": "Link na obnovu hesla expiroval!",
-  "notFound": "Zdroj nebol nájdený!",
+  "notFound": "Používateľ nebol nájdený!",
   "activation": "Aktivačný link bol zaslaný na Vašu email adresu.",
   "activated": "Používateľský účet bol aktivovaný.",
   "invalidActivationToken": "Link na aktiváciu účtu expiroval!",

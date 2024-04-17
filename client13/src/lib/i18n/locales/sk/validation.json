@@ -6,5 +6,6 @@
   "privacy": "Musíte súhlasiť s pravidlami zachovania súkromia!",
   "role": "Neznama rola!",
   "date": "Nastavte datum!",
-  "endDateInvalid": "Koncový dátum nemôže byť skôr ako začiatok!"
+  "endDateInvalid": "Koncový dátum nemôže byť skôr ako začiatok!",
+  "min": "Minimálna hodnota je {{value}}"
 }

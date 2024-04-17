@@ -1,8 +1,7 @@
-import Logo from "@/components/Logo";
 import LoginForm from "./LoginForm";
 import { useTranslation } from "@/lib/i18n";
 import { Trans } from "react-i18next/TransWithoutContext";
-import { Message } from "@/components/Message";
+import { FormMessage } from "@/components/Message";
 
 export default async function Login({
   params: { lng },
@@ -19,7 +18,7 @@ export default async function Login({
         {t("heading")}
       </h2>
 
-      <Message lng={lng} />
+      <FormMessage lng={lng} />
 
       <div>
         <LoginForm lng={lng} url={url} />

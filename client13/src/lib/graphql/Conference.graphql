@@ -17,29 +17,67 @@ fragment Invoice on Invoice {
   }
 }
 
+fragment Section on Section {
+  id
+  conference
+  translations {
+    sk {
+      name
+      topic
+    }
+    en {
+      name
+      topic
+    }
+  }
+}
+
+fragment Ticket on Ticket {
+  id
+  online
+  price
+  withSubmission
+  translations {
+    en {
+      name
+      description
+    }
+    sk {
+      name
+      description
+    }
+  }
+}
+
+fragment Conference on Conference {
+  id
+  slug
+  translations {
+    sk {
+      name
+      logoUrl
+    }
+    en {
+      name
+      logoUrl
+    }
+  }
+  dates {
+    start
+    end
+    regEnd
+    submissionDeadline
+  }
+  createdAt
+  updatedAt
+}
+
 query conferences($after: ObjectId, $first: Int) {
   conferences(after: $after, first: $first) {
     edges {
       cursor
       node {
-        id
-        slug
-        translations {
-          sk {
-            name
-            logoUrl
-          }
-          en {
-            name
-            logoUrl
-          }
-        }
-        dates {
-          start
-          end
-        }
-        createdAt
-        updatedAt
+        ...Conference
       }
     }
     pageInfo {
@@ -51,25 +89,19 @@ query conferences($after: ObjectId, $first: Int) {
 
 query conference($slug: String!) {
   conference(slug: $slug) {
-    id
-    slug
-    translations {
-      sk {
-        name
-        logoUrl
-      }
-      en {
-        name
-        logoUrl
-      }
+    ...Conference
+    sections {
+      ...Section
+    }
+    tickets {
+      ...Ticket
     }
     attending {
       invoice {
         ...Invoice
       }
       ticket {
-        online
-        withSubmission
+        ...Ticket
       }
       submissions {
         id
@@ -78,8 +110,7 @@ query conference($slug: String!) {
           name
         }
         section {
-          id
-          name
+          ...Section
         }
         translations {
           sk {
@@ -101,28 +132,85 @@ query conference($slug: String!) {
 
 query textSearchConference($text: String!) {
   textSearchConference(text: $text) {
-    id
-    slug
-    translations {
-      sk {
-        name
-      }
-      en {
-        name
-      }
-    }
+    ...Conference
   }
 }
 
 mutation createConference($data: ConferenceInput!) {
   createConference(data: $data) {
     message
-    data {
-      slug
-    }
   }
 }
 
 mutation deleteConference($id: ObjectId!) {
-  deleteConference(id: $id)
+  deleteConference(id: $id) {
+    message
+    data {
+      slug
+      translations {
+        sk {
+          logoUrl
+        }
+        en {
+          logoUrl
+        }
+      }
+      billing {
+        stampUrl
+      }
+    }
+  }
+}
+
+mutation updateConferenceDates($slug: String!, $data: DatesInput!) {
+  updateConferenceDates(slug: $slug, data: $data) {
+    message
+    data {
+      slug
+      translations {
+        sk {
+          name
+        }
+        en {
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation createSection($data: SectionInput!) {
+  createSection(data: $data) {
+    message
+  }
+}
+
+mutation updateSection($id: ObjectId!, $data: SectionInput!) {
+  updateSection(id: $id, data: $data) {
+    message
+  }
+}
+
+mutation deleteSection($id: ObjectId!) {
+  deleteSection(id: $id)
+}
+
+mutation createTicket($slug: String!, $data: TicketInput!) {
+  createTicket(slug: $slug, data: $data) {
+    message
+  }
+}
+
+mutation updateTicket(
+  $slug: String!
+  $ticketId: ObjectId!
+  $data: TicketInput!
+) {
+  updateTicket(slug: $slug, ticketId: $ticketId, data: $data) {
+    message
+  }
+}
+
+mutation deleteTicket($slug: String!, $ticketId: ObjectId!) {
+  deleteTicket(slug: $slug, ticketId: $ticketId)
 }

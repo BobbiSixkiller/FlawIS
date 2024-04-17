@@ -4,5 +4,6 @@
   "delete": "Delete",
   "error": "Error",
   "success": "Success",
-  "notFoundMsg": "Could not find requested resource"
+  "notFoundMsg": "Could not find requested resource",
+  "more": "More"
 }

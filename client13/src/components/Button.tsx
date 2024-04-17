@@ -2,21 +2,6 @@
 
 import { useFormStatus } from "react-dom";
 import Spinner from "./Spinner";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
-
-export function Back() {
-  const router = useRouter();
-
-  return (
-    <button
-      onClick={() => router.back()}
-      className="hover:bg-gray-700 hover:bg-opacity-10 outline-non p-2 rounded-md"
-    >
-      <XMarkIcon className="w-5 h-5" />
-    </button>
-  );
-}
 
 export default function Button({
   children,
@@ -80,7 +65,7 @@ export default function Button({
       aria-disabled={pending || loading || disabled}
       disabled={pending || loading || disabled}
       className={`h-9 flex ${
-        fluid ? "w-full" : ""
+        fluid ? "w-full" : "max-w-fit"
       } justify-center items-center rounded-md ${btnColor(
         color
       )} px-3 py-1.5 text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 `}

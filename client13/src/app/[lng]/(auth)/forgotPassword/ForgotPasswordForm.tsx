@@ -18,13 +18,13 @@ export default function ForgotPasswordForm({ lng }: { lng: string }) {
   const { dispatch } = useContext(MessageContext);
 
   useEffect(() => {
-    if (state.message) {
+    if (state?.message) {
       dispatch({
-        type: ActionTypes.SetMsg,
-        payload: { content: state.message, positive: state.success },
+        type: ActionTypes.SetFormMsg,
+        payload: state,
       });
     }
-  }, [state, dispatch]);
+  }, [state]);
 
   return (
     <form className="space-y-6 mt-4" action={formAction}>

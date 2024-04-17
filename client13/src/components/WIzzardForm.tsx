@@ -77,21 +77,21 @@ export function WizzardForm<T>({
 
   return (
     <FormProvider {...methods}>
-      <form
-        className="space-y-6 mt-4"
-        onSubmit={methods.handleSubmit(onSubmit)}
-      >
+      <form className="space-y-6" onSubmit={methods.handleSubmit(onSubmit)}>
         {steps[step]}
         <div className="flex justify-between">
+          {steps.length > 1 && (
+            <Button
+              color="secondary"
+              type="button"
+              onClick={back}
+              disabled={step === 0}
+            >
+              <ChevronLeftIcon className="h-4 w-4" />
+            </Button>
+          )}
           <Button
-            color="secondary"
-            type="button"
-            onClick={back}
-            disabled={step === 0}
-          >
-            <ChevronLeftIcon className="h-4 w-4" />
-          </Button>
-          <Button
+            fluid={steps.length === 1}
             color="primary"
             type="submit"
             loading={methods.formState.isSubmitting}
@@ -106,6 +106,30 @@ export function WizzardForm<T>({
         </div>
       </form>
     </FormProvider>
+  );
+}
+
+export function CheckBox({ name, label }: { name: string; label: string }) {
+  const { register, getFieldState } = useFormContext();
+  const { error } = getFieldState(name);
+
+  return (
+    <div>
+      <div className="flex items-center gap-x-3">
+        <input
+          {...register(name)}
+          type="checkbox"
+          className="h-4 w-4 border-gray-300 text-primary-500 focus:ring-primary-500 rounded-md"
+        />
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium leading-6 text-gray-900"
+        >
+          {label}
+        </label>
+      </div>
+      {error && <p className="text-sm text-red-500">{error.message}</p>}
+    </div>
   );
 }
 
@@ -224,7 +248,9 @@ export function Textarea({
   useOnClickOutside(ref, () => setVisible(false));
 
   const { error } = getFieldState(name);
-  const { error: localizedErr } = getFieldState(`translations[0].${name}`);
+  const { error: localizedErr } = getFieldState(
+    name.replace(lng || "en", lng === "sk" ? "en" : "sk")
+  );
 
   return (
     <div ref={ref}>
@@ -243,7 +269,9 @@ export function Textarea({
           }}
           {...register(name)}
           placeholder={props.placeholder}
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+          className={
+            "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+          }
         />
         {error && <p className="text-sm text-red-500">{error.message}</p>}
       </div>
@@ -260,16 +288,21 @@ export function Textarea({
         >
           <div className="mt-2">
             <label
-              htmlFor={`translations[0].${name}`}
+              htmlFor={name.replace(lng || "en", lng === "sk" ? "en" : "sk")}
               className="block text-sm font-medium leading-6 text-gray-900"
             >
               {label} {lng === "sk" ? "anglicky" : "in Slovak"}
             </label>
             <div className="mt-2">
               <textarea
-                {...register(`translations[0].${name}`)}
+                onFocus={() => setVisible(true)}
+                {...register(
+                  name.replace(lng || "en", lng === "sk" ? "en" : "sk")
+                )}
                 placeholder={props.placeholder}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                className={
+                  "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                }
               />
               {localizedErr && (
                 <p className="text-sm text-red-500">{localizedErr.message}</p>

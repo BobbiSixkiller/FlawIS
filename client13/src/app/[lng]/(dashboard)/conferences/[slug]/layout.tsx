@@ -1,16 +1,14 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { Role } from "@/lib/graphql/generated/graphql";
-import Link from "next/link";
 import { ReactNode } from "react";
 import { getConference } from "../actions";
-import { redirect } from "next/navigation";
 import {
   FolderOpenIcon,
   InformationCircleIcon,
   TicketIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import Heading from "@/components/Heading";
+import TabMenu from "@/components/TabMenu";
 
 export default async function TabsLayout({
   attendee,
@@ -22,45 +20,39 @@ export default async function TabsLayout({
   params: { slug: string; lng: string };
 }) {
   const user = await getMe();
-  const conference = await getConference(slug);
 
-  if (user?.role !== Role.Admin && conference.attending) {
-    return <>{attendee}</>;
+  if (user?.role !== Role.Admin) {
+    return <div className="h-full">{attendee}</div>;
   }
 
   return (
-    <div className="w-full h-full flex flex-col gap-2">
-      <nav className="flex gap-3 overflow-x-auto border-b">
-        <Link
-          href={`/conferences/${slug}`}
-          className="px-4 py-1 mb-2 rounded-md hover:bg-gray-700 hover:bg-opacity-10 flex items-center gap-2"
-        >
-          <InformationCircleIcon className="h-5 w-5" />
-          Info
-        </Link>
-        <Link
-          href={`/conferences/${slug}/attendees`}
-          className="px-4 py-1 mb-2 rounded-md hover:bg-gray-700 hover:bg-opacity-10 flex items-center gap-2"
-        >
-          <UserGroupIcon className="h-5 w-5" />
-          Ucastnici
-        </Link>
-        <Link
-          href={`/conferences/${slug}/sections`}
-          className="px-4 py-1 mb-2 rounded-md hover:bg-gray-700 hover:bg-opacity-10 flex items-center gap-2"
-        >
-          <FolderOpenIcon className="h-5 w-5" />
-          Sekcie
-        </Link>
-        <Link
-          href={`/conferences/${slug}/tickets`}
-          className="px-4 py-1 mb-2 rounded-md hover:bg-gray-700 hover:bg-opacity-10 flex items-center gap-2"
-        >
-          <TicketIcon className="h-5 w-5" />
-          Listky
-        </Link>
-      </nav>
-      <div className="pt-3 h-full">{children}</div>
+    <div className="h-full">
+      <TabMenu
+        tabs={[
+          {
+            href: `/conferences/${slug}`,
+            name: "Info",
+            icon: <InformationCircleIcon className="h-5 w-5" />,
+          },
+          {
+            href: `/conferences/${slug}/attendees`,
+            name: "Ucastnici",
+            icon: <UserGroupIcon className="h-5 w-5" />,
+          },
+          {
+            href: `/conferences/${slug}/sections`,
+            name: "Sekcie",
+            icon: <FolderOpenIcon className="h-5 w-5" />,
+          },
+          {
+            href: `/conferences/${slug}/tickets`,
+            name: "Listky",
+            icon: <TicketIcon className="h-5 w-5" />,
+          },
+        ]}
+      />
+
+      {children}
     </div>
   );
 }

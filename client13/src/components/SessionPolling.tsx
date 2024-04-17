@@ -3,16 +3,9 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { usePageVisibility } from "@/hooks/usePageVisibility";
 import { useEffect, useState, useRef } from "react";
-import { User } from "@/lib/graphql/generated/graphql";
 
 //implement nextjs intercepting route with modal and move this logic to main page of the dashboard group
-export default function LoginDialog({
-  lng,
-  user,
-}: {
-  lng: string;
-  user?: User;
-}) {
+export default function SessionPolling() {
   const isPageVisible = usePageVisibility();
   const timerIdRef = useRef<any>(null);
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);

@@ -3,7 +3,7 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import Link from "next/link";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import { useTranslation } from "@/lib/i18n";
-import { Message } from "@/components/Message";
+import { FormMessage } from "@/components/Message";
 
 export default async function ForgotPassword({
   params: { lng },
@@ -18,7 +18,7 @@ export default async function ForgotPassword({
         {t("heading")}
       </h2>
 
-      <Message lng={lng} />
+      <FormMessage lng={lng} />
 
       <div>
         <ForgotPasswordForm lng={lng} />

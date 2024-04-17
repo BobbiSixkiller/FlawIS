@@ -99,23 +99,18 @@ type ConferencePageInfo {
 }
 
 type ConferenceTranslation {
-  en: ConferenceTranslationContent!
-  sk: ConferenceTranslationContent!
-}
-
-type ConferenceTranslationContent {
-  logoUrl: String!
-  name: String!
-}
-
-input ConferenceTranslationContentInput {
-  logoUrl: String!
-  name: String!
+  en: ConferenceTranslations!
+  sk: ConferenceTranslations!
 }
 
 input ConferenceTranslationInput {
-  en: ConferenceTranslationContentInput!
-  sk: ConferenceTranslationContentInput!
+  en: LocalizedConferenceInputs!
+  sk: LocalizedConferenceInputs!
+}
+
+type ConferenceTranslations {
+  logoUrl: String!
+  name: String!
 }
 
 """
@@ -161,16 +156,38 @@ type InvoiceData {
   vatDate: DateTimeISO!
 }
 
+input LocalizedConferenceInputs {
+  logoUrl: String!
+  name: String!
+}
+
+input LocalizedSectionInputs {
+  name: String!
+  topic: String!
+}
+
+input LocalizedTicketInputs {
+  description: String!
+  name: String!
+}
+
 type Mutation {
   activateUser: String!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
-  deleteConference(id: ObjectId!): String!
+  createSection(data: SectionInput!): SectionMutationResponse!
+  createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
+  deleteConference(id: ObjectId!): ConferenceMutationResponse!
+  deleteSection(id: ObjectId!): String!
+  deleteTicket(slug: String!, ticketId: ObjectId!): String!
   deleteUser(id: ObjectId!): String!
   login(email: String!, password: String!): User!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
+  updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
+  updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }
 
@@ -212,19 +229,35 @@ type Section {
   conference: String!
   createdAt: DateTimeISO!
   id: ID!
-  languages: [String!]!
   submissions: [Submission!]!
   translations: SectionTranslation!
   updatedAt: DateTimeISO!
 }
 
-type SectionTranslation {
-  en: SectionTranslationContent!
-  sk: SectionTranslationContent!
+"""Section input type"""
+input SectionInput {
+  conference: ObjectId!
+  translations: SectionTranslationInput!
 }
 
-type SectionTranslationContent {
+type SectionMutationResponse implements IMutationResponse {
+  data: Section!
+  message: String!
+}
+
+type SectionTranslation {
+  en: SectionTranslations!
+  sk: SectionTranslations!
+}
+
+input SectionTranslationInput {
+  en: LocalizedSectionInputs!
+  sk: LocalizedSectionInputs!
+}
+
+type SectionTranslations {
   name: String!
+  topic: String!
 }
 
 """Submission entity model type"""
@@ -252,19 +285,31 @@ type SubmissionTranslationContent {
 
 """Conference ticket"""
 type Ticket {
-  id: ID!
+  id: ObjectId!
   online: Boolean!
   price: Int!
   translations: TicketTranslation!
   withSubmission: Boolean!
 }
 
-type TicketTranslation {
-  en: TicketTranslationContent!
-  sk: TicketTranslationContent!
+input TicketInput {
+  online: Boolean!
+  price: Int!
+  translations: TicketTranslationInput!
+  withSubmission: Boolean!
 }
 
-type TicketTranslationContent {
+type TicketTranslation {
+  en: TicketTranslations!
+  sk: TicketTranslations!
+}
+
+input TicketTranslationInput {
+  en: LocalizedTicketInputs!
+  sk: LocalizedTicketInputs!
+}
+
+type TicketTranslations {
   description: String!
   name: String!
 }

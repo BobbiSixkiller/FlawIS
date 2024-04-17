@@ -3,9 +3,9 @@ import { getMe } from "../../(auth)/actions";
 import { redirect } from "next/navigation";
 import Heading from "@/components/Heading";
 import { useTranslation } from "@/lib/i18n";
-import AddUserDialog from "./AddUserDialog";
 import { getUsers } from "./actions";
 import ListUsers from "./ListUsers";
+import { NewUserLink } from "./new/NewUserForm";
 
 export default async function Users({
   params: { lng },
@@ -24,8 +24,10 @@ export default async function Users({
   return (
     <div className="flex flex-col gap-6">
       <Heading
+        lng={lng}
         heading="Users"
         subHeading="Pouzivatelia registrovani v systeme"
+        links={[<NewUserLink key={0} />]}
       />
       {initialData && <ListUsers initialData={initialData} lng={lng} />}
     </div>

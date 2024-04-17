@@ -6,24 +6,21 @@ import { Field, ID, ObjectType } from "type-graphql";
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Submission } from "./Submission";
+import { LocalesType } from "../resolvers/types/translation";
 
 @ObjectType()
-export class SectionTranslationContent {
+export class SectionTranslations {
   @Field()
   @Property()
   name: string;
+
+  @Field()
+  @Property()
+  topic: string;
 }
 
 @ObjectType()
-export class SectionTranslation {
-  @Field(() => SectionTranslationContent)
-  @Property({ _id: false })
-  sk: SectionTranslationContent;
-
-  @Field(() => SectionTranslationContent)
-  @Property({ _id: false })
-  en: SectionTranslationContent;
-}
+export class SectionTranslation extends LocalesType(SectionTranslations) {}
 
 @ObjectType({ description: "Conference's section entity model type" })
 export class Section extends TimeStamps {
@@ -37,10 +34,6 @@ export class Section extends TimeStamps {
   @Field(() => SectionTranslation)
   @Property({ type: () => SectionTranslation, _id: false })
   translations: SectionTranslation;
-
-  @Field(() => [String])
-  @Property({ type: () => String })
-  languages: string[];
 
   @Field(() => [Submission])
   submissions: Submission[];

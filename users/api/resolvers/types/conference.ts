@@ -4,6 +4,9 @@ import { IMutationResponse } from "./interface";
 import { Conference, ImportantDates, Ticket } from "../../entitites/Conference";
 import { IsBoolean, IsDate, IsString, Min } from "class-validator";
 import { Address, Billing } from "../../entitites/Billing";
+import { Section } from "../../entitites/Section";
+import { ObjectId } from "mongodb";
+import { LocalesInput } from "./translation";
 
 @ObjectType({
   description: "ConferenceConnection type enabling cursor based pagination",
@@ -17,6 +20,12 @@ export class ConferenceArgs extends CreateArgs(Conference) {}
 export class ConferenceMutationResponse extends IMutationResponse {
   @Field(() => Conference)
   data: Conference;
+}
+
+@ObjectType({ implements: IMutationResponse })
+export class SectionMutationResponse extends IMutationResponse {
+  @Field(() => Section)
+  data: Section;
 }
 
 @InputType()
@@ -77,7 +86,7 @@ export class BillingInput implements Billing {
 }
 
 @InputType()
-export class ConferenceTranslationContentInput {
+export class LocalizedConferenceInputs {
   @Field()
   @IsString()
   name: string;
@@ -87,16 +96,12 @@ export class ConferenceTranslationContentInput {
 }
 
 @InputType()
-export class ConferenceTranslationInput {
-  @Field(() => ConferenceTranslationContentInput)
-  sk: ConferenceTranslationContentInput;
-
-  @Field(() => ConferenceTranslationContentInput)
-  en: ConferenceTranslationContentInput;
-}
+export class ConferenceTranslationInput extends LocalesInput(
+  LocalizedConferenceInputs
+) {}
 
 @InputType()
-export class TicketTranslationContentInput {
+export class LocalizedTicketInputs {
   @Field()
   name: string;
 
@@ -105,13 +110,9 @@ export class TicketTranslationContentInput {
 }
 
 @InputType()
-export class TicketTranslationInput {
-  @Field(() => TicketTranslationContentInput)
-  sk: TicketTranslationContentInput;
-
-  @Field(() => TicketTranslationContentInput)
-  en: TicketTranslationContentInput;
-}
+export class TicketTranslationInput extends LocalesInput(
+  LocalizedTicketInputs
+) {}
 
 @InputType()
 export class TicketInput implements Partial<Ticket> {
@@ -164,4 +165,27 @@ export class ConferenceInput implements Partial<Conference> {
 
   @Field(() => ConferenceTranslationInput)
   translations: ConferenceTranslationInput;
+}
+
+@InputType()
+export class LocalizedSectionInputs {
+  @Field()
+  name: string;
+
+  @Field()
+  topic: string;
+}
+
+@InputType()
+export class SectionTranslationInput extends LocalesInput(
+  LocalizedSectionInputs
+) {}
+
+@InputType({ description: "Section input type" })
+export class SectionInput implements Partial<Section> {
+  @Field()
+  conference: ObjectId;
+
+  @Field(() => SectionTranslationInput)
+  translations: SectionTranslationInput;
 }

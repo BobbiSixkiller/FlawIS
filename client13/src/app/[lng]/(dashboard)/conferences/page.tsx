@@ -1,11 +1,10 @@
 import Heading from "@/components/Heading";
 import { useTranslation } from "@/lib/i18n";
 import { downloadFile } from "@/lib/minio";
-import AddConference from "./AddConference";
 import { getConferences } from "./actions";
 import ListConferences from "./ListConferences";
 import { getMe } from "../../(auth)/actions";
-import { Role } from "@/lib/graphql/generated/graphql";
+import { NewConferenceLink } from "./new/NewConferenceForm";
 
 export default async function Conferences({
   params: { lng },
@@ -31,7 +30,12 @@ export default async function Conferences({
 
   return (
     <div className="flex flex-col gap-6">
-      <Heading heading={t("heading")} subHeading={t("subheading")} />
+      <Heading
+        heading={t("heading")}
+        subHeading={t("subheading")}
+        lng={lng}
+        links={[<NewConferenceLink key={0} />]}
+      />
       {initialData && <ListConferences initialData={initialData} lng={lng} />}
     </div>
   );

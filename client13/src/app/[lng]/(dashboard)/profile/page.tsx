@@ -1,7 +1,7 @@
 import { useTranslation } from "@/lib/i18n";
 import { getMe } from "../../(auth)/actions";
-import UpdatePersonalDialog from "./UpdatePersonalDialog";
 import Heading from "@/components/Heading";
+import { UpdateProfileLink } from "./update/UpdateProfileForm";
 
 export default async function Profile({
   params: { lng },
@@ -13,7 +13,12 @@ export default async function Profile({
 
   return (
     <div className="flex flex-col gap-6">
-      <Heading heading={t("heading")} subHeading={t("subheading")} />
+      <Heading
+        heading={t("heading")}
+        subHeading={t("subheading")}
+        lng={lng}
+        links={[<UpdateProfileLink key={0} lng={lng} />]}
+      />
 
       <div className="border-t border-gray-100">
         <dl className="divide-y divide-gray-100">

@@ -1,5 +1,6 @@
+import { FormMessage } from "@/components/Message";
 import { getUser } from "../../actions";
-import DeleteUserForm from "../DeleteUserForm";
+import DeleteUserForm from "./DeleteUserForm";
 
 export default async function DeleteUserPage({
   params: { id, lng },
@@ -8,5 +9,10 @@ export default async function DeleteUserPage({
 }) {
   const user = await getUser(id);
 
-  return <DeleteUserForm lng={lng} user={user} />;
+  return (
+    <div className="flex flex-col gap-6 justify-center">
+      <FormMessage lng={lng} />
+      <DeleteUserForm lng={lng} user={user} />
+    </div>
+  );
 }

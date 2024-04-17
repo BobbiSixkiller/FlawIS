@@ -5,8 +5,10 @@ import {
   ConferenceDocument,
   ConferencesDocument,
   CreateConferenceDocument,
+  DatesInput,
   DeleteConferenceDocument,
   TextSearchConferenceDocument,
+  UpdateConferenceDatesDocument,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
@@ -58,7 +60,6 @@ export async function searchConference(text: string) {
 }
 
 export async function createConference(data: FormData) {
-  console.log(data);
   try {
     const logo: File | null = data.get("translations.sk.logo.0") as File;
     const logoLocalized: File | null = data.get(
@@ -154,8 +155,47 @@ export async function deleteConference(prevState: any, data: FormData) {
       throw new Error(res.errors[0].message);
     }
 
-    revalidateTag(`conferences`);
-    return { success: true, message: res.data.deleteConference };
+    await deleteFiles("images", [
+      res.data.deleteConference.data.translations.sk.logoUrl.replace(
+        "http://minio:9000/images/",
+        ""
+      ),
+      res.data.deleteConference.data.translations.sk.logoUrl.replace(
+        "http://minio:9000/images/",
+        ""
+      ),
+      res.data.deleteConference.data.billing.stampUrl!.replace(
+        "http://minio:9000/images/",
+        ""
+      ),
+    ]);
+
+    revalidateTag("conferences");
+    revalidateTag(`conference:${res.data.deleteConference.data.slug}`);
+    return { success: true, message: res.data.deleteConference.message };
+  } catch (error: any) {
+    return { success: false, message: error.message };
+  }
+}
+
+export async function updateConferenceDates(slug: string, data: DatesInput) {
+  try {
+    const res = await executeGqlFetch(UpdateConferenceDatesDocument, {
+      slug,
+      data,
+    });
+    if (res.errors) {
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
+
+      throw new Error(
+        validationErrors
+          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
+          : res.errors[0].message
+      );
+    }
+
+    revalidateTag(`conference:${res.data.updateConferenceDates.data.slug}`);
+    return { success: true, message: res.data.updateConferenceDates.message };
   } catch (error: any) {
     return { success: false, message: error.message };
   }

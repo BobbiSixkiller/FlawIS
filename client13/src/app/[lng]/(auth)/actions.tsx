@@ -213,8 +213,6 @@ export async function activate() {
     const { validationErrors } = res.errors[0].extensions
       .exception as ErrorException;
 
-    console.log(res.errors);
-
     return {
       success: false,
       message: validationErrors

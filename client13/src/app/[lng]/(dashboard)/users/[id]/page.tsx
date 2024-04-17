@@ -3,8 +3,8 @@ import { getUser, toggleVerified } from "../actions";
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { DeleteUserLink } from "./delete/DeleteUserForm";
+import { UpdateUserLink } from "./update/UpdateUserForm";
 
 export default async function User({
   params: { id, lng },
@@ -23,24 +23,11 @@ export default async function User({
   return (
     <div>
       <Heading
+        lng={lng}
         heading={user.name}
         links={[
-          <Link
-            key={0}
-            href={`/users/${id}/update`}
-            scroll={false}
-            className="flex gap-2"
-          >
-            <PencilIcon className="h-5 w-5" /> Update
-          </Link>,
-          <Link
-            key={1}
-            href={`/users/${id}/delete`}
-            scroll={false}
-            className="flex gap-2"
-          >
-            <TrashIcon className="h-5 w-5" /> Delete
-          </Link>,
+          <UpdateUserLink key={0} id={id} />,
+          <DeleteUserLink key={1} id={id} />,
         ]}
       />
       <div className="mt-6 border-t border-gray-100">

@@ -1,7 +1,8 @@
-import DeleteUserForm from "@/app/[lng]/(dashboard)/users/[id]/DeleteUserForm";
+import UpdateUserForm from "@/app/[lng]/(dashboard)/users/[id]/update/UpdateUserForm";
 import { getUser } from "@/app/[lng]/(dashboard)/users/actions";
-import { Message } from "@/components/Message";
-import Modal2 from "@/components/Modal2";
+import { FormMessage } from "@/components/Message";
+import Modal from "@/components/Modal";
+import { useTranslation } from "@/lib/i18n";
 
 export default async function UpdateUserPage({
   params: { id, lng },
@@ -10,5 +11,12 @@ export default async function UpdateUserPage({
 }) {
   const user = await getUser(id);
 
-  return <Modal2 title="Aktualizovat">update</Modal2>;
+  const { t } = await useTranslation(lng, "common");
+
+  return (
+    <Modal title={t("update")}>
+      <FormMessage lng={lng} />
+      <UpdateUserForm lng={lng} user={user} />
+    </Modal>
+  );
 }

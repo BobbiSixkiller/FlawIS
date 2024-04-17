@@ -4,5 +4,6 @@
   "delete": "Zmazať",
   "error": "Chyba",
   "success": "Úspech",
-  "notFoundMsg": "Nenašli sme zadaný zdroj"
+  "notFoundMsg": "Nenašli sme zadaný zdroj",
+  "more": "Viac"
 }

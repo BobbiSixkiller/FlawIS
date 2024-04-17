@@ -102,7 +102,7 @@ export default function Drawer({
     <Transition.Root show={visible} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-10"
+        className="relative z-20"
         onClose={() => setVisible(false)}
       >
         <Transition.Child

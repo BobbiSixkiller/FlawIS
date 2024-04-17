@@ -1,7 +1,8 @@
-import DeleteUserForm from "@/app/[lng]/(dashboard)/users/[id]/DeleteUserForm";
+import DeleteUserForm from "@/app/[lng]/(dashboard)/users/[id]/delete/DeleteUserForm";
 import { getUser } from "@/app/[lng]/(dashboard)/users/actions";
-import { Message } from "@/components/Message";
-import Modal2 from "@/components/Modal2";
+import { FormMessage } from "@/components/Message";
+import Modal from "@/components/Modal";
+import { useTranslation } from "@/lib/i18n";
 
 export default async function DeleteUserPage({
   params: { id, lng },
@@ -10,9 +11,12 @@ export default async function DeleteUserPage({
 }) {
   const user = await getUser(id);
 
+  const { t } = await useTranslation(lng, "common");
+
   return (
-    <Modal2 title="delete">
+    <Modal title={t("delete")}>
+      <FormMessage lng={lng} />
       <DeleteUserForm user={user} lng={lng} />
-    </Modal2>
+    </Modal>
   );
 }

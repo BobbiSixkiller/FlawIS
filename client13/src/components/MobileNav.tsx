@@ -152,7 +152,7 @@ export function MobileNav({
   const { t } = useTranslation(lng, "landing");
 
   return (
-    <div className="lg:hidden sticky top-0 border-b bg-white">
+    <div className="lg:hidden sticky top-0 border-b bg-white z-20">
       <div className="container h-[60px] mx-auto px-4 py-3 flex justify-between align-middle">
         <div className="flex gap-4">
           <div className="hidden sm:flex">{logo}</div>

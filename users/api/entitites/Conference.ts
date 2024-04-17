@@ -15,14 +15,14 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { Section } from "./Section";
 import { Billing } from "./Billing";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
+import { LocalesType } from "../resolvers/types/translation";
 
 @ObjectType()
-export class ConferenceTranslationContent {
+export class ConferenceTranslations {
   @Field()
   @Property()
   name: string;
@@ -33,18 +33,12 @@ export class ConferenceTranslationContent {
 }
 
 @ObjectType()
-export class ConferenceTranslation {
-  @Field(() => ConferenceTranslationContent)
-  @Property({ _id: false })
-  sk: ConferenceTranslationContent;
-
-  @Field(() => ConferenceTranslationContent)
-  @Property({ _id: false })
-  en: ConferenceTranslationContent;
-}
+export class ConferenceTranslation extends LocalesType(
+  ConferenceTranslations
+) {}
 
 @ObjectType()
-export class TicketTranslationContent {
+export class TicketTranslations {
   @Field()
   @Property()
   name: string;
@@ -55,15 +49,7 @@ export class TicketTranslationContent {
 }
 
 @ObjectType()
-export class TicketTranslation {
-  @Field(() => TicketTranslationContent)
-  @Property({ _id: false })
-  sk: TicketTranslationContent;
-
-  @Field(() => TicketTranslationContent)
-  @Property({ _id: false })
-  en: TicketTranslationContent;
-}
+export class TicketTranslation extends LocalesType(TicketTranslations) {}
 
 @ObjectType({ description: "Important dates regarding conference" })
 export class ImportantDates {
@@ -86,7 +72,7 @@ export class ImportantDates {
 
 @ObjectType({ description: "Conference ticket" })
 export class Ticket {
-  @Field(() => ID)
+  @Field()
   id: ObjectId;
 
   @Field(() => TicketTranslation)
@@ -191,10 +177,6 @@ export class Conference extends TimeStamps {
   @Field(() => [Ticket])
   @Property({ type: () => Ticket, default: [] })
   tickets: Ticket[];
-
-  @Field(() => [Section])
-  @Property({ ref: () => Section })
-  sections: Ref<Section>[];
 
   @Field(() => Int)
   @Property({ default: 0 })

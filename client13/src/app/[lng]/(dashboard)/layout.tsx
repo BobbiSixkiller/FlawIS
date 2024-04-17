@@ -1,6 +1,6 @@
-import ActivateAccountDialog from "@/components/ActivateAccountDialog";
+import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
 import { getMe } from "../(auth)/actions";
-import LoginDialog from "@/components/LoginDialog";
+import SessionPolling from "@/components/SessionPolling";
 import { useTranslation } from "@/lib/i18n";
 import Logo from "@/components/Logo";
 import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
@@ -77,18 +77,15 @@ export default async function DashboardLayout({
           <LngSwitcher lng={lng} />
         </div>
       </div>
-
       <MobileNav
         lng={lng}
         user={user}
         logo={<Logo lng={lng} width={36} height={36} notext />}
         drawerTitle={<Logo inverted lng={lng} height={60} width={60} />}
       />
-
       {/* Dashboard content with sidebar */}
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
-          <DashboardMessage lng={lng} />
           <Breadcrumbs
             homeElement={<HomeIcon className="h-5 w-5" />}
             separator={<ChevronRightIcon className="h-3 w-3" />}
@@ -128,7 +125,6 @@ export default async function DashboardLayout({
           </div>
         </div>
       </div>
-
       {/* Mobile footer */}
       <div className="lg:hidden col-span-3 bg-gray-900">
         <div className="container mx-auto p-6">
@@ -161,8 +157,10 @@ export default async function DashboardLayout({
       </div>
 
       {modal}
+
+      <DashboardMessage lng={lng} />
       <ActivateAccountDialog lng={lng} user={user} />
-      <LoginDialog lng={lng} />
+      <SessionPolling />
     </div>
   );
 }

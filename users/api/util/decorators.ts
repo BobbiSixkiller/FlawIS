@@ -17,6 +17,8 @@ import { Context } from "./auth";
 // import { Section } from "../entities/Section";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
+import { Conference } from "../entitites/Conference";
+import { Attendee } from "../entitites/Attendee";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
 class RefDocValidator implements ValidatorConstraintInterface {
@@ -46,59 +48,60 @@ export function RefDocExists(
   };
 }
 
-// export function CheckTicket(): ParameterDecorator {
-//   return createParamDecorator(async ({ args, context }) => {
-//     const conference = await getModelForClass(Conference).findOne({
-//       _id: args.data.conferenceId,
-//     });
-//     if (!conference) throw new UserInputError("Conference not found!");
+export function CheckTicket(): ParameterDecorator {
+  return createParamDecorator<Context>(async ({ args, context }) => {
+    const conference = await getModelForClass(Conference).findOne({
+      slug: args.data.slug,
+    });
+    if (!conference)
+      throw new Error(
+        Container.get(I18nService).translate("notFound", {
+          ns: "conference",
+        })
+      );
 
-//     const ticket = conference.tickets.find(
-//       (t) => t.id.toString() === args.data.ticketId.toString()
-//     );
-//     if (!ticket) throw new UserInputError("Invalid ticket!");
+    const ticket = conference.tickets.find(
+      (t) => t.id.toString() === args.data.ticketId.toString()
+    );
+    if (!ticket)
+      throw new Error(
+        Container.get(I18nService).translate("notFound", {
+          ns: "ticket",
+        })
+      );
 
-//     const { user, locale } = context as Context;
-//     const attendeeExists = await getModelForClass(Attendee).findOne({
-//       conference: conference.id,
-//       user: user?.id,
-//     });
-//     if (attendeeExists)
-//       throw new UserInputError("You are already signed up for the conference!");
+    const { user } = context;
+    const attendeeExists = await getModelForClass(Attendee).findOne({
+      conference: conference.id,
+      user: user?.id,
+    });
+    if (attendeeExists)
+      throw new Error(
+        Container.get(I18nService).translate("alreadyRegistered", {
+          ns: "conference",
+        })
+      );
 
-//     return {
-//       ticket,
-//       conference: convertDocument(conference, locale),
-//     };
-//   });
-// }
-
-// export function CheckConferenceSection(): ParameterDecorator {
-//   return createParamDecorator(async ({ args }) => {
-//     const [conference, section] = await Promise.all([
-//       getModelForClass(Conference).findOne({
-//         _id: args.data.conference,
-//       }),
-//       getModelForClass(Section).findOne({
-//         _id: args.data.section,
-//       }),
-//     ]);
-//     if (!conference) throw new UserInputError("Conference not found!");
-//     if (!section) throw new UserInputError("Section not found!");
-
-//     return { conference, section };
-//   });
-// }
+    return {
+      ticket,
+      conference,
+    };
+  });
+}
 
 export function LoadResource<Type extends object>(
   TypeClass: ClassType<Type>
 ): ParameterDecorator {
   return createParamDecorator<Context>(async ({ args }) => {
-    const resource = await getModelForClass(TypeClass).findOne({
-      $or: [{ _id: args.id }, { slug: args.slug }],
-    });
+    const filter = args.id ? { _id: args.id } : { slug: args.slug };
+
+    const resource = await getModelForClass(TypeClass).findOne(filter);
     if (!resource)
-      throw new Error(Container.get(I18nService).translate("notFound"));
+      throw new Error(
+        Container.get(I18nService).translate("notFound", {
+          ns: TypeClass.name.toLowerCase(),
+        })
+      );
 
     return resource;
   });

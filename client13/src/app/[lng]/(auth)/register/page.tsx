@@ -2,6 +2,7 @@ import { useTranslation } from "@/lib/i18n";
 import { Trans } from "react-i18next/TransWithoutContext";
 import Logo from "@/components/Logo";
 import RegisterForm from "./RegisterForm";
+import { FormMessage } from "@/components/Message";
 
 export default async function Register({
   params: { lng },
@@ -17,6 +18,8 @@ export default async function Register({
       <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
         {t("heading")}
       </h2>
+
+      <FormMessage lng={lng} />
 
       <div>
         <RegisterForm lng={lng} url={url} />

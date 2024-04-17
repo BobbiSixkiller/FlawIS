@@ -61,8 +61,8 @@ export function withInfiniteScroll<T>({
 
     return (
       <Container>
-        {data.edges.map((edge) => (
-          <ListItem key={edge?.cursor} data={edge?.node} lng={lng} />
+        {data.edges.map((edge, i) => (
+          <ListItem key={i} data={edge?.node} lng={lng} />
         ))}
         {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
       </Container>
