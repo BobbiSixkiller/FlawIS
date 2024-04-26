@@ -1,31 +1,17 @@
 "use client";
 
 import {
-  Input,
   WizzardForm,
   WizzardStep,
   objectToFormData,
 } from "@/components/WIzzardForm";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { Input, LocalizedInput } from "@/components/Input";
 import { useRouter } from "next/navigation";
 import { createConference } from "../actions";
 import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-
-export function NewConferenceLink() {
-  const router = useRouter();
-
-  return (
-    <button
-      className="w-full flex gap-2"
-      onClick={() => router.push(`/conferences/new`, { scroll: false })}
-    >
-      <PlusIcon className="w-5 h-5" /> Nova
-    </button>
-  );
-}
 
 export interface ConferenceInputType {
   slug: string;
@@ -146,8 +132,12 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
           }),
         })}
       >
-        <Input lng={lng} label="Meno" name={`translations.${lng}.name`} />
-        <Input
+        <LocalizedInput
+          lng={lng}
+          label="Meno"
+          name={`translations.${lng}.name`}
+        />
+        <LocalizedInput
           lng={lng}
           label="Logo"
           name={`translations.${lng}.logo`}

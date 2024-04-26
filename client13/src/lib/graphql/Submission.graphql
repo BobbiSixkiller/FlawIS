@@ -1,0 +1,42 @@
+fragment Submission on Submission {
+  id
+  translations {
+    sk {
+      name
+      abstract
+      keywords
+    }
+    en {
+      name
+      abstract
+      keywords
+    }
+  }
+  authors {
+    id
+    name
+    email
+  }
+  fileUrl
+  conference {
+    id
+    slug
+  }
+  section {
+    ...Section
+  }
+  createdAt
+  updatedAt
+}
+
+query submission($id: ObjectId!) {
+  submission(id: $id) {
+    ...Submission
+  }
+}
+
+mutation createSubmission($data: SubmissionInput!) {
+  createSubmission(data: $data) {
+    message
+  }
+}

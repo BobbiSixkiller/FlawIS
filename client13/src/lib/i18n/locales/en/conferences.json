@@ -1,4 +1,15 @@
 {
   "heading": "Conferences",
-  "subheading": "Conferences organized by Faculty of Law, Comenius University"
+  "subheading": "Conferences organized by Faculty of Law, Comenius University",
+  "registreation": {
+    "ticket": "Form of attendance",
+    "billing": {
+      "meno": "Name",
+      "street": "Street",
+      "city": "City",
+      "postal": "Postal code",
+      "country": "Country"
+    },
+    "submission": {}
+  }
 }

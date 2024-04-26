@@ -25,6 +25,7 @@ import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { SectionResolver } from "./resolvers/section";
+import { SubmissionResolver } from "./resolvers/submission";
 
 env.config();
 
@@ -62,7 +63,12 @@ async function main() {
   //Build schema
   const schema = await buildSchema(
     {
-      resolvers: [UserResolver, ConferencerResolver, SectionResolver],
+      resolvers: [
+        UserResolver,
+        ConferencerResolver,
+        SectionResolver,
+        SubmissionResolver,
+      ],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
       // use ObjectId scalar mapping

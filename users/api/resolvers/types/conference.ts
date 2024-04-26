@@ -48,7 +48,7 @@ export class AddressInput implements Address {
 }
 
 @InputType()
-export class BillingInput implements Billing {
+export class ConferenceBillingInput implements Billing {
   @Field()
   @IsString()
   name: string;
@@ -81,7 +81,7 @@ export class BillingInput implements Billing {
   variableSymbol: string;
 
   @Field()
-  @Field()
+  @IsString()
   stampUrl: string;
 }
 
@@ -157,8 +157,8 @@ export class ConferenceInput implements Partial<Conference> {
   @IsString()
   slug: string;
 
-  @Field(() => BillingInput)
-  billing: BillingInput;
+  @Field(() => ConferenceBillingInput)
+  billing: ConferenceBillingInput;
 
   @Field(() => DatesInput)
   dates: DatesInput;

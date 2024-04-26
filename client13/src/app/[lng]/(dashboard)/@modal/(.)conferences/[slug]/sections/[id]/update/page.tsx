@@ -1,4 +1,4 @@
-import UpdateSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/sections/[id]/update/UpdateSectionForm";
+import UpdateSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@admin/sections/[id]/update/UpdateSectionForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import Modal from "@/components/Modal";
 import { redirect } from "next/navigation";

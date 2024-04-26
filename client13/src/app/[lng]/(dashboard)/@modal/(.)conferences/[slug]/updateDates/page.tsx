@@ -1,4 +1,4 @@
-import UpdateDatesForm from "@/app/[lng]/(dashboard)/conferences/[slug]/updateDates/UpdateDatesForm";
+import UpdateDatesForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@admin/updateDates/UpdateDatesForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";

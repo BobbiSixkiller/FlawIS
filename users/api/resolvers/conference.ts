@@ -14,6 +14,7 @@ import { CRUDservice } from "../services/CRUDservice";
 import {
   Conference,
   ConferenceTranslation,
+  ConferenceTranslations,
   Ticket,
   TicketTranslation,
 } from "../entitites/Conference";
@@ -27,13 +28,18 @@ import {
   TicketInput,
 } from "./types/conference";
 import { ObjectId } from "mongodb";
-import { LoadResource } from "../util/decorators";
+import { CheckTicket, LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 
 import { Context } from "../util/auth";
 import { Attendee } from "../entitites/Attendee";
 import { Section } from "../entitites/Section";
 import { transformIds } from "../middlewares/typegoose-middleware";
+import Messagebroker from "../util/rmq";
+import { AttendeeInput } from "./types/attendee";
+import { VerifiedTicket } from "../util/types";
+import { User } from "../entitites/User";
+import { Submission } from "../entitites/Submission";
 
 @Service()
 @Resolver(() => Conference)
@@ -42,6 +48,8 @@ export class ConferencerResolver {
     private readonly conferenceService = new CRUDservice(Conference),
     private readonly sectionService = new CRUDservice(Section),
     private readonly attendeeService = new CRUDservice(Attendee),
+    private readonly userService = new CRUDservice(User),
+    private readonly submissionService = new CRUDservice(Submission),
     private readonly i18nService: I18nService
   ) {}
 
@@ -241,5 +249,87 @@ export class ConferencerResolver {
         this.i18nService.language() as keyof TicketTranslation
       ].name,
     });
+  }
+
+  @Authorized()
+  @Mutation(() => ConferenceMutationResponse)
+  async addAttendee(
+    @Arg("data")
+    { conferenceId, submissionId, billing }: AttendeeInput,
+    @CheckTicket() { ticket, conference }: VerifiedTicket,
+    @Ctx() { user, locale, req }: Context
+  ): Promise<ConferenceMutationResponse> {
+    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
+    const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
+
+    await this.userService.update(
+      { _id: user?.id },
+      {
+        $addToSet: { billings: billing },
+      },
+      { upsert: true }
+    );
+
+    if (submissionId) {
+      await this.submissionService.update(
+        { _id: submissionId },
+        { $addToSet: { authors: user?.id } }
+      );
+    }
+
+    const attendee = await this.attendeeService.create({
+      conference: conferenceId,
+      user: user?.id,
+      ticket,
+      invoice: {
+        issuer: {
+          ...conference.billing,
+          variableSymbol:
+            conference.billing.variableSymbol +
+            String(conference.attendeesCount + 1).padStart(4, "0"),
+        },
+        payer: {
+          ...billing,
+          name: isFlaw ? `${user.name}, ${billing.name}` : billing.name,
+        },
+        body: {
+          price: Math.round((priceWithouTax / 100) * 100) / 100,
+          vat: isFlaw
+            ? 0
+            : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
+          body: this.i18nService.translate("invoiceBody", { ns: "conference" }),
+          comment: this.i18nService.translate("invoiceComment", {
+            ns: "conference",
+          }),
+        },
+      },
+    });
+
+    Messagebroker.produceMessage(
+      JSON.stringify({
+        locale,
+        clientUrl: req.hostname,
+        name: user?.name,
+        email: user?.email,
+        conferenceName:
+          conference.translations[this.i18nService.language() as "sk" | "en"]
+            .name,
+        conferenceLogo:
+          conference.translations[this.i18nService.language() as "sk" | "en"]
+            .logoUrl,
+        invoice: attendee.invoice,
+      }),
+      "mail.conference.invoice"
+    );
+
+    return {
+      message: this.i18nService.translate("newAttendee", {
+        ns: "conference",
+        name: conference.translations[
+          this.i18nService.language() as keyof ConferenceTranslation
+        ].name,
+      }),
+      data: { ...conference, attending: attendee },
+    };
   }
 }

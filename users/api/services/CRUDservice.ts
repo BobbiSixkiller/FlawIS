@@ -42,6 +42,22 @@ export class CRUDservice<U extends types.AnyParamConstructor<any>> {
     return await this.dataModel.findOne(filter, projection, options).exec();
   }
 
+  async findOneAndUpdate(
+    filter: mongoose.FilterQuery<
+      types.DocumentType<InstanceType<U>, types.BeAnObject>
+    >,
+    update:
+      | mongoose.UpdateWithAggregationPipeline
+      | mongoose.UpdateQuery<
+          types.DocumentType<InstanceType<U>, types.BeAnObject>
+        >,
+    options?: mongoose.QueryOptions | null
+  ) {
+    return await this.dataModel
+      .findOneAndUpdate(filter, update, options)
+      .exec();
+  }
+
   async update(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<U>, types.BeAnObject>

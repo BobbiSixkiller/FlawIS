@@ -7,5 +7,7 @@
   "role": "Neznama rola!",
   "date": "Nastavte datum!",
   "endDateInvalid": "Koncový dátum nemôže byť skôr ako začiatok!",
-  "min": "Minimálna hodnota je {{value}}"
+  "min": "Minimálna hodnota je {{value}}!",
+  "ticket": "Vyberte formu účasti!",
+  "keywords": "Pridajte aspoň {{value}} kľúčové slovo!"
 }

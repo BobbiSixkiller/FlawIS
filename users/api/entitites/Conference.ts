@@ -1,16 +1,9 @@
-import {
-  ArgumentValidationError,
-  Field,
-  ID,
-  Int,
-  ObjectType,
-} from "type-graphql";
+import { ArgumentValidationError, Field, Int, ObjectType } from "type-graphql";
 import {
   getModelForClass,
   Index,
   pre,
   prop as Property,
-  Ref,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
@@ -20,6 +13,7 @@ import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 import { LocalesType } from "../resolvers/types/translation";
+import { Attendee } from "./Attendee";
 
 @ObjectType()
 export class ConferenceTranslations {
@@ -93,25 +87,38 @@ export class Ticket {
 }
 
 @pre<Conference>("save", async function () {
-  if (
-    this.isNew ||
-    this.isModified("translations.sk.name") ||
-    this.isModified("translations.en.name")
-  ) {
+  if (this.isNew || this.isModified("translations.sk.name")) {
     const conferenceExists = await getModelForClass(Conference)
-      .findOne({
-        $or: [
-          { "translations.sk.name": this.translations.sk.name },
-          { "translations.en.name": this.translations.en.name },
-        ],
-      })
+      .findOne({ "translations.sk.name": this.translations.sk.name })
       .exec();
     if (conferenceExists && conferenceExists.id !== this.id) {
       throw new ArgumentValidationError([
         {
           target: Conference, // Object that was validated.
-          property: "name", // Object's property that haven't pass validation.
+          property: "translations.sk.name", // Object's property that haven't pass validation.
           value: conferenceExists.translations.sk.name, // Value that haven't pass a validation
+          constraints: {
+            // Constraints that failed validation with error messages.
+            name: Container.get(I18nService).translate("nameExists", {
+              ns: "conference",
+              name: conferenceExists.translations.sk.name,
+            }),
+          },
+          //children?: ValidationError[], // Contains all nested validation errors of the property
+        },
+      ]);
+    }
+  }
+  if (this.isNew || this.isModified("translations.en.name")) {
+    const conferenceExists = await getModelForClass(Conference)
+      .findOne({ "translations.en.name": this.translations.en.name })
+      .exec();
+    if (conferenceExists && conferenceExists.id !== this.id) {
+      throw new ArgumentValidationError([
+        {
+          target: Conference, // Object that was validated.
+          property: "translations.en.name", // Object's property that haven't pass validation.
+          value: conferenceExists.translations.en.name, // Value that haven't pass a validation
           constraints: {
             // Constraints that failed validation with error messages.
             name: Container.get(I18nService).translate("nameExists", {
@@ -181,6 +188,9 @@ export class Conference extends TimeStamps {
   @Field(() => Int)
   @Property({ default: 0 })
   attendeesCount: number;
+
+  @Field(() => Attendee, { nullable: true })
+  attending?: Attendee;
 
   @Field()
   createdAt: Date;

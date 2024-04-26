@@ -1,9 +1,8 @@
 "use client";
 
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { useRouter } from "next/navigation";
 
 interface ModalProps {
@@ -21,8 +20,6 @@ export default function Modal({
 }: ModalProps) {
   const [show, setShow] = useState(true);
   const router = useRouter();
-
-  const { dispatch } = useContext(MessageContext);
 
   return (
     <Transition.Root

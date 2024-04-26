@@ -7,5 +7,7 @@
   "role": "Unknown role!",
   "date": "You have to set Date!",
   "endDateInvalid": "End date can't be before start date!",
-  "min": "Minimum value is {{value}}"
+  "min": "Minimum value is {{value}}!",
+  "ticket": "Choose a form of attendance!",
+  "keywords": "Add at least {{value}} keyword!"
 }

@@ -17,18 +17,20 @@ export interface Msg {
 }
 interface AuthMsg extends Msg {
   token: string;
-  clientUrl: string;
 }
 
-interface Grant {
-  name: string;
-  id: string;
-}
+function getClientUrl() {
+  switch (process.env.NODE_ENV) {
+    case 'development':
+      return 'http://localhost:3000';
+    case 'staging':
+      return 'http://flawis-staging.flaw.uniba.sk';
+    case 'production':
+      return 'http://flawis.flaw.uniba.sk';
 
-interface GrantAnnouncementMsg extends Msg {
-  announcement: string;
-  grants: Grant[];
-  clientUrl: string;
+    default:
+      throw new Error('Invalid environment!');
+  }
 }
 
 @Injectable()
@@ -80,7 +82,7 @@ export class EmailService {
   })
   async sendActivationLink(msg: AuthMsg) {
     try {
-      const url = `${msg.clientUrl}/${msg.locale}/activate?token=${msg.token}`;
+      const url = `${getClientUrl()}/${msg.locale}/activate?token=${msg.token}`;
 
       await this.mailerService.sendMail({
         to: msg.email,
@@ -104,7 +106,9 @@ export class EmailService {
     routingKey: 'mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
-    const url = `${msg.clientUrl}/${msg.locale}/resetPassword?token=${msg.token}`;
+    const url = `${getClientUrl()}/${msg.locale}/resetPassword?token=${
+      msg.token
+    }`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -115,31 +119,6 @@ export class EmailService {
         // ✏️ filling curly brackets with content
         name: msg.name,
         url,
-        i18nLang: msg.locale,
-      },
-    });
-  }
-
-  @RabbitSubscribe({
-    exchange: process.env.RMQ_EXCHANGE,
-    routingKey: 'mail.grantAnnouncemenet',
-  })
-  async sendGrantAnnouncement(msg: GrantAnnouncementMsg) {
-    const urls = msg.grants.map((grant) => ({
-      text: grant.name,
-      url: `${msg.clientUrl}/${msg.locale}/${grant.id}`,
-    }));
-
-    await this.mailerService.sendMail({
-      to: msg.email,
-      // from: '"Support Team" <support@example.com>', // override default from
-      subject: this.i18n.t('grantAnnouncement.subject', { lang: msg.locale }),
-      template: 'grantAnnouncement',
-      context: {
-        // ✏️ filling curly brackets with content
-        name: msg.name,
-        announcement: msg.announcement,
-        urls,
         i18nLang: msg.locale,
       },
     });

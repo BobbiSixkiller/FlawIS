@@ -11,10 +11,7 @@ import {
   createParamDecorator,
   ParameterDecorator,
 } from "type-graphql";
-// import { Conference } from "../entities/Conference";
-// import { Attendee } from "../entities/Attendee";
 import { Context } from "./auth";
-// import { Section } from "../entities/Section";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 import { Conference } from "../entitites/Conference";

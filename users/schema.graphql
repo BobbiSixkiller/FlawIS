@@ -29,6 +29,23 @@ type Attendee {
   user: User!
 }
 
+input AttendeeBillingInput {
+  DIC: String
+  ICDPH: String
+  ICO: String
+  address: AddressInput!
+  name: String!
+}
+
+"""Conference registration input type"""
+input AttendeeInput {
+  billing: AttendeeBillingInput!
+  conferenceId: ObjectId!
+  submission: SubmissionInput!
+  submissionId: ObjectId
+  ticketId: ObjectId!
+}
+
 """Billing information"""
 type Billing {
   DIC: String
@@ -40,18 +57,6 @@ type Billing {
   name: String!
   stampUrl: String
   variableSymbol: String
-}
-
-input BillingInput {
-  DIC: String!
-  IBAN: String!
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String!
-  address: AddressInput!
-  name: String!
-  stampUrl: String!
-  variableSymbol: String!
 }
 
 """Conference model type"""
@@ -69,6 +74,18 @@ type Conference {
   updatedAt: DateTimeISO!
 }
 
+input ConferenceBillingInput {
+  DIC: String!
+  IBAN: String!
+  ICDPH: String!
+  ICO: String!
+  SWIFT: String!
+  address: AddressInput!
+  name: String!
+  stampUrl: String!
+  variableSymbol: String!
+}
+
 """ConferenceConnection type enabling cursor based pagination"""
 type ConferenceConnection {
   edges: [ConferenceEdge]!
@@ -82,7 +99,7 @@ type ConferenceEdge {
 
 """Conference input type"""
 input ConferenceInput {
-  billing: BillingInput!
+  billing: ConferenceBillingInput!
   dates: DatesInput!
   slug: String!
   translations: ConferenceTranslationInput!
@@ -166,6 +183,12 @@ input LocalizedSectionInputs {
   topic: String!
 }
 
+input LocalizedSubmissionInputs {
+  abstract: String!
+  keywords: [String!]!
+  name: String!
+}
+
 input LocalizedTicketInputs {
   description: String!
   name: String!
@@ -173,11 +196,14 @@ input LocalizedTicketInputs {
 
 type Mutation {
   activateUser: String!
+  addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
+  createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
   deleteSection(id: ObjectId!): String!
+  deleteSubmission(id: ObjectId!): Submission!
   deleteTicket(slug: String!, ticketId: ObjectId!): String!
   deleteUser(id: ObjectId!): String!
   login(email: String!, password: String!): User!
@@ -187,6 +213,7 @@ type Mutation {
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
+  updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
   updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }
@@ -203,6 +230,7 @@ type Query {
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
   me: User!
+  submission(id: ObjectId!): Submission!
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
@@ -265,11 +293,24 @@ type Submission {
   authors: [User!]!
   conference: Conference!
   createdAt: DateTimeISO!
-  file: String
+  fileUrl: String
   id: ID!
   section: Section!
   translations: SubmissionTranslation!
   updatedAt: DateTimeISO!
+}
+
+input SubmissionInput {
+  authors: [String]!
+  conference: ObjectId!
+  fileUrl: String
+  section: ObjectId!
+  translations: SubmissionTranslationInput!
+}
+
+type SubmissionMutationResponse implements IMutationResponse {
+  data: Submission!
+  message: String!
 }
 
 type SubmissionTranslation {
@@ -281,6 +322,11 @@ type SubmissionTranslationContent {
   abstract: String!
   keywords: [String!]!
   name: String!
+}
+
+input SubmissionTranslationInput {
+  en: LocalizedSubmissionInputs!
+  sk: LocalizedSubmissionInputs!
 }
 
 """Conference ticket"""

@@ -72,6 +72,16 @@ fragment Conference on Conference {
   updatedAt
 }
 
+fragment ConferenceRegistration on Conference {
+  ...Conference
+  sections {
+    ...Section
+  }
+  tickets {
+    ...Ticket
+  }
+}
+
 query conferences($after: ObjectId, $first: Int) {
   conferences(after: $after, first: $first) {
     edges {
@@ -213,4 +223,10 @@ mutation updateTicket(
 
 mutation deleteTicket($slug: String!, $ticketId: ObjectId!) {
   deleteTicket(slug: $slug, ticketId: $ticketId)
+}
+
+mutation addAttendee($data: AttendeeInput!) {
+  addAttendee(data: $data) {
+    message
+  }
 }

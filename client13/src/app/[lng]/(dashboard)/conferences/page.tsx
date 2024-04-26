@@ -4,7 +4,8 @@ import { downloadFile } from "@/lib/minio";
 import { getConferences } from "./actions";
 import ListConferences from "./ListConferences";
 import { getMe } from "../../(auth)/actions";
-import { NewConferenceLink } from "./new/NewConferenceForm";
+import Link from "next/link";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default async function Conferences({
   params: { lng },
@@ -34,7 +35,16 @@ export default async function Conferences({
         heading={t("heading")}
         subHeading={t("subheading")}
         lng={lng}
-        links={[<NewConferenceLink key={0} />]}
+        links={[
+          <Link
+            key={0}
+            href="/conferences/new"
+            className="w-full flex gap-2"
+            scroll={false}
+          >
+            <PlusIcon className="w-5 h-5" /> Nova
+          </Link>,
+        ]}
       />
       {initialData && <ListConferences initialData={initialData} lng={lng} />}
     </div>

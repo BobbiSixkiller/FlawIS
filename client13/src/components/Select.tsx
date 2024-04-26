@@ -13,7 +13,7 @@ export default function Select({
   label?: string;
   name: string;
   options: { name: string; value: any }[];
-  defaultSelected: string;
+  defaultSelected?: string;
 }) {
   const [selected, setSelected] = useState(
     options.find((o) => o.value === defaultSelected) || options[0]

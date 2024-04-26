@@ -1,4 +1,4 @@
-import DeleteSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/sections/[id]/delete/DeleteSectionForm";
+import DeleteSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@admin/sections/[id]/delete/DeleteSectionForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";

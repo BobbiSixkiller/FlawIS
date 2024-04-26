@@ -1,4 +1,4 @@
-import UpdateTicketForm from "@/app/[lng]/(dashboard)/conferences/[slug]/tickets/[id]/update/UpdateTicketForm";
+import UpdateTicketForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@admin/tickets/[id]/update/UpdateTicketForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";

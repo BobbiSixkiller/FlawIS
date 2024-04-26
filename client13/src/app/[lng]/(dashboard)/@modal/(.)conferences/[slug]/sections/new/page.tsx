@@ -1,4 +1,4 @@
-import NewSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/sections/new/NewSectionForm";
+import NewSectionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@admin/sections/new/NewSectionForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import Modal from "@/components/Modal";
 

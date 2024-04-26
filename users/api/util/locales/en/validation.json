@@ -2,5 +2,6 @@
   "password": "Password must be at least 8 characters long and contain at least one number and one character!",
   "maxLength": "Maximum allowed length is {{length}}!",
   "email": "Invalid email address {{value}}",
-  "phone": "Invalid phone number {{value}}"
+  "phone": "Invalid phone number {{value}}",
+  "keywords": "You must include at least {{value}} keywords!"
 }
