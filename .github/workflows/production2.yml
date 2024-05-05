@@ -2,10 +2,10 @@ name: Build and Deploy to production
 on:
   push:
     branches:
-      - master
+      - dev
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: [HyperV]
     environment: production
     steps:
       - name: Checkout code
