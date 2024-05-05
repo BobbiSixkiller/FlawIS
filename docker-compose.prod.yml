@@ -111,3 +111,4 @@ services:
 volumes:
   mongo_data: {}
   mongo_config: {}
+  minio_storage: {}
