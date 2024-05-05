@@ -1,22 +1,6 @@
 version: "3.4"
 
 services:
-  # gateway:
-  #   build:
-  #     context: ./gateway
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     NODE_ENV: production
-  #     SECRET: ${SECRET}
-  #   depends_on:
-  #     - users
-  #     - conferences
-  #     - files
-  #     - grants
-  #   restart: unless-stopped
-  #   ports:
-  #     - "5000:5000"
-
   core:
     build:
       context: ./users
@@ -27,6 +11,9 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
+      minio:
+        condition: service_healthy
+        restart: true
       rabbitmq:
         condition: service_healthy
         restart: true
@@ -38,71 +25,7 @@ services:
         restart: true
     restart: unless-stopped
     ports:
-      - "5001:5001"
-
-  # files:
-  #   build:
-  #     context: ./files
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     NODE_ENV: production
-  #     SECRET: ${SECRET}
-  #     MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
-  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-  #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
-  #       restart: true
-  #     redis:
-  #       condition: service_healthy
-  #       restart: true
-  #     mongo:
-  #       condition: service_healthy
-  #       restart: true
-  #   volumes:
-  #     - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
-  #   restart: unless-stopped
-  #   ports:
-  #     - "5002:5002"
-
-  # conferences:
-  #   build:
-  #     context: ./conferences
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     NODE_ENV: production
-  #     SECRET: ${SECRET}
-  #     MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
-  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-  #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
-  #       restart: true
-  #     redis:
-  #       condition: service_healthy
-  #       restart: true
-  #     mongo:
-  #       condition: service_healthy
-  #       restart: true
-  #   restart: unless-stopped
-  #   ports:
-  #     - "5003:5003"
-
-  # grants:
-  #   build:
-  #     context: ./grants
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     NODE_ENV: production
-  #     SECRET: ${SECRET}
-  #     MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
-  #     RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-  #   depends_on:
-  #     - rabbitmq
-  #     - mongo
-  #   restart: unless-stopped
-  #   ports:
-  # - "5004:5004"
+      - "5000:5000"
 
   client13:
     build:
@@ -112,7 +35,7 @@ services:
         - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-prod
     depends_on:
-      - gateway
+      - core
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -144,8 +67,8 @@ services:
     volumes:
       - minio_storage:/data
     environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: Strong#Pass#2024
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     command: server --console-address ":9001" /data
   rabbitmq:
     image: rabbitmq
