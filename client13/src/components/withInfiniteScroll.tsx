@@ -24,10 +24,17 @@ export interface Connection<T> {
   pageInfo: PageInfo;
 }
 
+export interface GetDataFilter {
+  after?: string;
+  first?: number;
+  [key: string]: any; // This allows for any other properties with any type.
+}
+
 interface ScrollProps<T> {
   lng: string;
   initialData: Connection<T>;
-  getData: (after?: string, first?: number) => Promise<Connection<T>>;
+  filter: GetDataFilter;
+  getData: (filter: GetDataFilter) => Promise<Connection<T>>;
   ListItem: ComponentType<{ data?: T; lng: string }>;
   Placeholder: ComponentType<{ cardRef?: LegacyRef<HTMLDivElement> }>;
   Container: ComponentType<{ children: ReactNode }>;
@@ -37,6 +44,7 @@ export function withInfiniteScroll<T>({
   lng,
   Container,
   ListItem,
+  filter,
   getData,
   Placeholder,
   initialData,
@@ -47,7 +55,10 @@ export function withInfiniteScroll<T>({
 
     useEffect(() => {
       async function getMore() {
-        const newData = await getData(data.pageInfo.endCursor);
+        const newData = await getData({
+          ...filter,
+          after: data.pageInfo.endCursor,
+        });
         setData((prevData) => ({
           edges: [...prevData.edges, ...newData.edges],
           pageInfo: newData.pageInfo,
@@ -57,7 +68,7 @@ export function withInfiniteScroll<T>({
       if (inView && data.pageInfo.hasNextPage) {
         getMore();
       }
-    }, [inView, data]);
+    }, [inView, data, filter]);
 
     return (
       <Container>

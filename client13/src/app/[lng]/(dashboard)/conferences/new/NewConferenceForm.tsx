@@ -41,6 +41,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
 
   return (
     <WizzardForm<ConferenceInputType>
+      lng={lng}
       values={{
         slug: "",
         dates: { start: "", end: "" },
@@ -86,6 +87,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
       }}
     >
       <WizzardStep
+        name="O konferencii"
         validationSchema={object({
           translations: object({
             sk: object({
@@ -156,6 +158,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
         />
       </WizzardStep>
       <WizzardStep
+        name="Fakturacne udaje"
         validationSchema={object({
           billing: object({
             name: string().trim().required(t("required")),

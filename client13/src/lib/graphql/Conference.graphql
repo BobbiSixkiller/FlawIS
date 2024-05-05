@@ -10,7 +10,17 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    ...Billing
+    name
+    address {
+      ...Address
+    }
+    ICO
+    ICDPH
+    DIC
+    stampUrl
+    variableSymbol
+    IBAN
+    SWIFT
   }
   payer {
     ...Billing
@@ -107,35 +117,7 @@ query conference($slug: String!) {
       ...Ticket
     }
     attending {
-      invoice {
-        ...Invoice
-      }
-      ticket {
-        ...Ticket
-      }
-      submissions {
-        id
-        authors {
-          id
-          name
-        }
-        section {
-          ...Section
-        }
-        translations {
-          sk {
-            name
-            keywords
-            abstract
-          }
-          en {
-            name
-            keywords
-            abstract
-          }
-        }
-        updatedAt
-      }
+      ...Attendee
     }
   }
 }

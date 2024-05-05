@@ -1,6 +1,6 @@
 "use client";
 
-import { getMe } from "@/app/[lng]/(auth)/actions";
+import { getMe, logout } from "@/app/[lng]/(auth)/actions";
 import { usePageVisibility } from "@/hooks/usePageVisibility";
 import { useEffect, useState, useRef } from "react";
 
@@ -20,6 +20,7 @@ export default function SessionPolling() {
       if (!user) {
         setIsPollingEnabled(false);
         console.log("Polling failed. Stopped polling. Refresh page.");
+        await logout();
         location.reload();
       }
     };

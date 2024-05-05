@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import { Input } from "@/components/WIzzardForm";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,26 +10,27 @@ import { date, object, ref } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/Input";
 
 export default function UpdateDatesForm({
   lng,
   conference,
 }: {
   lng: string;
-  conference: ConferenceFragment;
+  conference?: ConferenceFragment;
 }) {
   const router = useRouter();
   const { t } = useTranslation(lng, "validation");
 
   const methods = useForm({
     values: {
-      start: conference.dates.start.toString().split(".")[0],
-      end: conference.dates.end.toString().split(".")[0],
-      regEnd: conference.dates.regEnd
-        ? conference.dates.regEnd.toString().split(".")[0]
+      start: conference?.dates.start.toString().split(".")[0],
+      end: conference?.dates.end.toString().split(".")[0],
+      regEnd: conference?.dates.regEnd
+        ? conference?.dates.regEnd.toString().split(".")[0]
         : null,
-      submissionDeadline: conference.dates.submissionDeadline
-        ? conference.dates.submissionDeadline.toString().split(".")[0]
+      submissionDeadline: conference?.dates.submissionDeadline
+        ? conference?.dates.submissionDeadline.toString().split(".")[0]
         : null,
     },
     resolver: yupResolver(
@@ -56,7 +56,7 @@ export default function UpdateDatesForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateConferenceDates(conference.slug, data);
+          const state = await updateConferenceDates(conference!.slug, data);
 
           if (state.message && !state.success) {
             dispatch({

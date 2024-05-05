@@ -8,5 +8,7 @@
   "alreadyRegistered": "Používateľ {{name}} je už zaregistrovaný na {{conference}}!",
   "invoiceBody": "Faktúra vystavená na úhradu konferenčného poplatku pre účastníka {{name}}.",
   "invoiceComment": "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača.",
-  "newAttendee": "Úspešne ste sa zaregistrovali na {{name}}! Faktúra by mala čoskoro prísť na vašu e-mailovú adresu."
+  "newAttendee": "Úspešne ste sa zaregistrovali na {{name}}! Faktúra by mala čoskoro prísť na vašu e-mailovú adresu.",
+  "updateInvoice": "Faktúra bola aktualizovaná!",
+  "deleteAttendee": "Účastník bol zmazaný!"
 }

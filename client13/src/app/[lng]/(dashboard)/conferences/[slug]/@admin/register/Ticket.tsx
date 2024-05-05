@@ -1,12 +1,16 @@
 "use client";
 
+import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { RadioGroup } from "@headlessui/react";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
 export default function Ticket({
   tickets,
   setSubmission,
+  submission,
 }: {
+  submission?: SubmissionFragment;
   tickets: {
     id: string;
     name: string;
@@ -19,12 +23,21 @@ export default function Ticket({
   const { watch, setValue, getFieldState } = useFormContext();
   const { error } = getFieldState("ticketId");
 
+  useEffect(() => {
+    if (submission) {
+      const ticket = tickets.find((t) => t.withSubmission === true);
+      setValue("ticketId", ticket?.id);
+      setSubmission(true);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col gap-2">
       <label className="block text-sm font-medium leading-6 text-gray-900">
         Forma ucasti
       </label>
       <RadioGroup
+        disabled={submission !== undefined}
         value={watch("ticketId")}
         onChange={(value) => setValue("ticketId", value)}
       >
@@ -51,7 +64,7 @@ export default function Ticket({
                     relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none border`
               }
             >
-              {({ active, checked }) => (
+              {({ checked }) => (
                 <>
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">

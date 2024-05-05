@@ -92,6 +92,7 @@ export default function ListConferences({
 }) {
   const InfiniteScrollListUsers = withInfiniteScroll<ConferenceData>({
     lng,
+    filter: { after: undefined, first: undefined },
     getData: getConferences,
     initialData,
     Container,

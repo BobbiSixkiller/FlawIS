@@ -2,6 +2,7 @@
 const nextConfig = {
   logging: { fetches: { fullUrl: true } },
   experimental: {
+    serverComponentsExternalPackages: ["@react-pdf/renderer"],
     serverActions: {
       allowedOrigins: ["http://localhost"],
     },

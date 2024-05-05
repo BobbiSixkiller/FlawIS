@@ -1,4 +1,38 @@
 {
   "heading": "Konferencie",
-  "subheading": "Konferencie organizované Právnickou fakultou Univerzity Komenského"
+  "subheading": "Konferencie organizované Právnickou fakultou Univerzity Komenského",
+  "registration": {
+    "ticket": "Forma účasti",
+    "billing": {
+      "info": "Fakturačné údaje",
+      "meno": "Meno",
+      "street": "Ulica",
+      "city": "Mesto",
+      "postal": "PSČ",
+      "country": "Krajina",
+      "ICO": "IČO",
+      "DIC": "DIČ",
+      "ICDPH": "IČDPH"
+    },
+    "submission": {
+      "info": "Príspevok",
+      "section": "Sekcia",
+      "name": "Názov príspevku",
+      "abstract": "Abstrakt",
+      "keywords": "Kľúčové slová",
+      "authors": "Email adresy spoluautorov"
+    }
+  },
+  "submission": {
+    "new": "Nový príspevok",
+    "update": "Aktualizovať príspevok",
+    "delete": "Zmazať príspevok",
+    "submissions": "Príspevky"
+  },
+  "conference": {
+    "start": "Začiatok",
+    "end": "Koniec",
+    "regEnd": "Koniec registrácie",
+    "submissionDeadline": "Deadline zaslania prispevkov"
+  }
 }

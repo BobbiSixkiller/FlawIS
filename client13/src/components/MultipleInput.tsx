@@ -9,15 +9,16 @@ export function MultipleInput({
   label,
   name,
   onFocus,
+  disabled,
 }: {
   label: string;
   name: string;
 } & InputHTMLAttributes<HTMLInputElement>) {
-  const { watch, setValue, getFieldState } = useFormContext();
+  const { watch, setValue, getFieldState, register } = useFormContext();
+  const strings: string[] = watch(name, []);
   const { error } = getFieldState(name);
 
-  const [strings, setStrings] = useState(watch(name) as string[]);
-  const [val, setVal] = useState("");
+  const [input, setInput] = useState("");
   const [focus, setFocus] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
@@ -27,20 +28,22 @@ export function MultipleInput({
     }
   }, [focus]);
 
-  useEffect(() => {
-    setValue(name, strings);
-  }, [strings]);
-
   // Handle key down event on input field
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Backspace" && val === "") {
+    if (event.key === "Backspace" && input === "") {
       // Prevent the default backspace behavior
       event.preventDefault();
-      setStrings((prev) => prev.slice(0, -1));
-    } else if (event.key === "Enter" && val.trim() !== "") {
+      setValue(name, strings.slice(0, -1), {
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    } else if (event.key === "Enter" && input.trim() !== "") {
       event.preventDefault(); // Prevent form submission
-      setStrings((prev) => Array.from(new Set(prev).add(val)));
-      setVal("");
+      setValue(name, Array.from(new Set(strings).add(input)), {
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+      setInput("");
     }
   };
 
@@ -53,10 +56,16 @@ export function MultipleInput({
         {label}
       </label>
       <div
-        className={`py-1.5 pl-2.5 flex flex-wrap gap-1  w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-gray-300 ${
+        className={`py-1.5 pl-2.5 flex flex-wrap gap-1  w-full rounded-md border-0 ${
+          disabled ? "text-slate-500 bg-slate-100" : "text-gray-900"
+        } shadow-sm ring-1 ring-gray-300 ${
           focus ? "ring-primary-500 ring-2" : ""
         } shadow-sm sm:text-sm sm:leading-6 relative`}
-        onClick={() => setFocus(true)}
+        onClick={() => {
+          if (!disabled) {
+            setFocus(true);
+          }
+        }}
       >
         {strings.length !== 0 &&
           strings.map((p, i) => (
@@ -66,39 +75,63 @@ export function MultipleInput({
             >
               {p}
               <button
+                type="button"
                 className="hover:text-gray-500 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
-                onClick={() =>
-                  setStrings((prev) => prev.filter((i) => i !== p))
-                }
+                onClick={() => {
+                  if (!disabled) {
+                    setValue(
+                      name,
+                      strings.filter((i) => i !== p),
+                      {
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      }
+                    );
+                  }
+                }}
               >
                 <XMarkIcon className="h-3 w-3" />
               </button>
             </div>
           ))}
-        <input
-          className="flex-1 sm:text-sm sm:leading-6 border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 focus:ring-transparent"
-          onFocus={(e) => {
-            setFocus(true);
-            if (onFocus) {
-              onFocus(e);
-            }
-          }}
-          onBlur={() => setFocus(false)}
-          ref={ref}
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button
-          className="p-2 hover:text-primary-500 text-gray-400 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
-          onClick={() => {
-            setStrings((prev) => Array.from(new Set(prev).add(val)));
-            setVal("");
-            setFocus(true);
-          }}
-        >
-          <PlusIcon className="h-3 w-3" />
-        </button>
+        <div className="flex-1 flex gap-1">
+          <input
+            disabled={disabled}
+            {...register(name)}
+            className={`w-full sm:text-sm sm:leading-6 ${
+              disabled ? "text-slate-500 bg-slate-100" : "text-gray-900"
+            } border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 focus:ring-transparent`}
+            onFocus={(e) => {
+              if (!disabled) {
+                setFocus(true);
+                if (onFocus) {
+                  onFocus(e);
+                }
+              }
+            }}
+            onBlur={() => setFocus(false)}
+            ref={ref}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            type="button"
+            className="p-2 hover:text-primary-500 text-gray-400 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
+            onClick={() => {
+              if (input !== "") {
+                setValue(name, Array.from(new Set(strings).add(input)), {
+                  shouldTouch: true,
+                  shouldValidate: true,
+                });
+                setInput("");
+                setFocus(true);
+              }
+            }}
+          >
+            <PlusIcon className="h-3 w-3" />
+          </button>
+        </div>
       </div>
       {error && <p className="text-sm text-red-500">{error.message}</p>}
     </div>

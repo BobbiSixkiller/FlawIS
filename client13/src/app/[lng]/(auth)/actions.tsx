@@ -52,17 +52,21 @@ export async function register(prevState: any, formData: FormData) {
       };
     }
     if (res.data.register) {
+      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      cookies().set("user", res.data.register.data.id, {
+        httpOnly: true,
+        expires,
+      });
       cookies().set("accessToken", res.data.register.data.token, {
         httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
+        expires, //accesstoken expires in 24 hours
       });
+      revalidateTag(res.data.register.data.id);
     }
   } catch (error: any) {
-    console.log(error);
     return { success: false, message: error.message };
   }
 
-  revalidateTag("me");
   redirect(formData.get("url")?.toString() || "/conferences");
 }
 
@@ -88,29 +92,33 @@ export async function login(prevState: any, formData: FormData) {
       };
     }
     if (res.data.login) {
-      cookies().set("accessToken", res.data.login.token, {
+      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      cookies().set("user", res.data.login.data.id, {
         httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       });
+      cookies().set("accessToken", res.data.login.data.token, {
+        httpOnly: true,
+        expires, //accesstoken expires in 24 hours
+      });
+      revalidateTag(res.data.login.data.id);
     }
   } catch (error: any) {
-    console.log(error);
     return { success: false, message: error.message };
   }
 
-  revalidateTag("me");
   redirect(formData.get("url")?.toString() || "/conferences");
 }
 
 export async function getMe() {
-  const token = cookies().get("accessToken")?.value;
-  if (!token) return;
+  const user = cookies().get("user")?.value;
+  if (!user) return;
 
   const res = await executeGqlFetch(
     MeDocument,
     undefined,
     {},
-    { revalidate: 60 * 60, tags: ["me"] } //keep logged in user cached for an hour
+    { revalidate: 60 * 60, tags: [user] } //keep logged in user cached for an hour
   );
 
   if (res.errors) {
@@ -121,8 +129,8 @@ export async function getMe() {
 }
 
 export async function logout() {
+  cookies().delete("user");
   cookies().delete("accessToken");
-  revalidateTag("me");
 }
 
 export async function sendResetLink(prevState: any, formData: FormData) {
@@ -175,55 +183,66 @@ export async function resetPassword(prevState: any, formData: FormData) {
     if (res.errors) {
       const { validationErrors } = res.errors[0].extensions as ErrorException;
 
-      return {
-        success: false,
-        message: validationErrors
+      throw new Error(
+        validationErrors
           ? Object.values(parseErrors(validationErrors)).join(" ")
-          : res.errors[0].message,
-      };
+          : res.errors[0].message
+      );
     } else {
+      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      cookies().set("user", res.data.passwordReset.data.id, {
+        httpOnly: true,
+        expires,
+      });
       cookies().set("accessToken", res.data.passwordReset.data.token, {
         httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //accesstoken expires in 24 hours
+        expires, //accesstoken expires in 24 hours
       });
+      revalidateTag(res.data.passwordReset.data.id);
     }
   } catch (error: any) {
     return { success: false, message: error.message as string };
   }
-  revalidateTag("me");
+
   redirect("/conferences");
 }
 
 export async function activate() {
-  const token = cookies().get("activationToken")?.value;
-  if (!token) {
-    return;
-  }
+  try {
+    const token = cookies().get("activationToken")?.value;
+    if (!token) {
+      return;
+    }
 
-  const res = await executeGqlFetch(
-    ActivateUserDocument,
-    undefined,
-    {
-      activation: token,
-    },
-    { revalidate: 60 * 60 }
-  );
+    const res = await executeGqlFetch(
+      ActivateUserDocument,
+      undefined,
+      {
+        activation: token,
+      },
+      { revalidate: 60 * 60 }
+    );
 
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions
-      .exception as ErrorException;
+    if (res.errors) {
+      const { validationErrors } = res.errors[0].extensions
+        .exception as ErrorException;
 
+      throw new Error(
+        validationErrors
+          ? Object.values(parseErrors(validationErrors)).join(" ")
+          : res.errors[0].message
+      );
+    }
+
+    cookies().delete("activationToken");
+    revalidateTag(res.data.activateUser.data.id);
+    return { success: true, message: res.data.activateUser };
+  } catch (error: any) {
     return {
       success: false,
-      message: validationErrors
-        ? Object.values(parseErrors(validationErrors)).join(" ")
-        : res.errors[0].message,
+      message: error.message,
     };
   }
-
-  cookies().delete("activationToken");
-  revalidateTag("me");
-  return { success: true, message: res.data.activateUser };
 }
 
 export async function resendActivationLink() {
@@ -278,7 +297,7 @@ export async function updateProfile(prevState: any, formData: FormData) {
           : res.errors[0].message,
       };
     }
-    revalidateTag("me");
+    revalidateTag(res.data.updateUser.data.id);
     return { success: true, message: res.data.updateUser.message };
   } catch (error: any) {
     console.log(error);

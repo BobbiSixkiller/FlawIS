@@ -5,18 +5,18 @@ import {
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
+import { Field, Float, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import { Field, Float, ID, ObjectType } from "type-graphql";
 
-import { Ref } from "../util/types";
-import { Billing } from "./Billing";
+import { Billing, ConferenceBilling } from "./Billing";
 
 import { Conference, Ticket } from "./Conference";
 import { Submission } from "./Submission";
+import { ModelType } from "@typegoose/typegoose/lib/types";
 import { User } from "./User";
 
 @ObjectType({ description: "The body of an invoice" })
-class InvoiceData {
+export class InvoiceData {
   @Field()
   @Property({ default: "Faktúra" })
   type?: String;
@@ -56,9 +56,9 @@ export class Invoice {
   @Property({ type: () => Billing, _id: false })
   payer: Billing;
 
-  @Field(() => Billing)
-  @Property({ type: () => Billing, _id: false })
-  issuer: Billing;
+  @Field(() => ConferenceBilling)
+  @Property({ type: () => ConferenceBilling, _id: false })
+  issuer: ConferenceBilling;
 
   @Field(() => InvoiceData)
   @Property({ type: () => InvoiceData, _id: false })
@@ -68,6 +68,9 @@ export class Invoice {
 @ObjectType()
 export class AttendeeUser {
   @Field()
+  id: ObjectId;
+
+  @Field()
   @Property()
   name: string;
 
@@ -76,35 +79,39 @@ export class AttendeeUser {
   email: string;
 }
 
+@ObjectType()
+export class AttendeeConference {
+  @Field()
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  slug: string;
+}
+
 @pre<Attendee>("save", async function () {
   if (this.isNew) {
     await getModelForClass(Conference).updateOne(
-      { _id: this.conference },
+      { slug: this.conference.slug },
       { $inc: { attendeesCount: 1 } }
     );
   }
 })
-@post<Attendee>("deleteOne", async function (attendee) {
-  await getModelForClass(Conference).updateOne(
-    { _id: attendee.conference },
-    { $inc: { attendeesCount: -1 } }
-  );
-})
 @ObjectType({ description: "Attendee model type" })
 export class Attendee extends TimeStamps {
-  @Field(() => ID)
+  @Field(() => ObjectId)
   id: ObjectId;
 
   @Field(() => Conference)
-  @Property({ ref: () => Conference })
-  conference: Ref<Conference>;
+  @Property({ type: () => AttendeeConference })
+  conference: AttendeeConference;
 
   @Field(() => User)
-  @Property({ ref: () => User })
-  user: Ref<User>;
+  @Property({ type: () => AttendeeUser })
+  user: AttendeeUser;
 
   @Field(() => Ticket)
-  @Property({ type: () => Ticket, _id: false })
+  @Property({ type: () => Ticket })
   ticket: Ticket;
 
   //invoice subdoc added so individual invoice customization is possible
@@ -119,4 +126,69 @@ export class Attendee extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
+
+  public static async paginatedAttendees(
+    this: ModelType<Attendee>,
+    conferenceSlug: string,
+    first: number,
+    after?: ObjectId
+  ) {
+    return await this.aggregate([
+      { $sort: { _id: -1 } },
+      {
+        $facet: {
+          data: [
+            { $match: { "conference.slug": conferenceSlug } },
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $limit: first || 20 },
+            {
+              $addFields: {
+                id: "$_id", //transform _id to id property as defined in GraphQL object types
+              },
+            },
+          ],
+          hasNextPage: [
+            {
+              $match: {
+                $expr: {
+                  $cond: [
+                    { $eq: [after, null] },
+                    { $ne: ["$_id", null] },
+                    { $lt: ["$_id", after] },
+                  ],
+                },
+              },
+            },
+            { $skip: first || 20 }, // skip paginated data
+            { $limit: 1 }, // just to check if there's any element
+          ],
+        },
+      },
+      {
+        $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          pageInfo: {
+            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
+            endCursor: { $last: "$data.id" },
+          },
+        },
+      },
+    ]);
+  }
 }

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ConferenceFragment,
-  SectionFragment,
-} from "@/lib/graphql/generated/graphql";
+import { SectionFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -11,9 +8,9 @@ import { useParams, useRouter } from "next/navigation";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
-import { Textarea } from "@/components/WIzzardForm";
 import Button from "@/components/Button";
 import { updateSection } from "../../actions";
+import { LocalizedTextarea } from "@/components/Textarea";
 
 export default function UpdateTicketForm({
   section,
@@ -74,12 +71,12 @@ export default function UpdateTicketForm({
           }
         })}
       >
-        <Textarea
+        <LocalizedTextarea
           lng={lng}
           label="Nazov sekcie"
           name={`translations.${lng}.name`}
         />
-        <Textarea
+        <LocalizedTextarea
           lng={lng}
           label="Tema sekcie"
           name={`translations.${lng}.topic`}

@@ -8,13 +8,11 @@ import { useParams, useRouter } from "next/navigation";
 import { deleteTicket } from "../../actions";
 
 export default function DeleteTicketForm({
-  dialogOpen = false,
   ticket,
   lng,
 }: {
   ticket?: TicketFragment;
   lng: string;
-  dialogOpen?: boolean;
 }) {
   const router = useRouter();
   const { slug } = useParams();

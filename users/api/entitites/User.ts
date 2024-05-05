@@ -96,7 +96,7 @@ export class User extends TimeStamps {
   organization: string;
 
   @Field(() => [Billing], { nullable: "items" })
-  @Property({ type: () => [Billing], _id: false })
+  @Property({ type: () => [Billing], _id: false, default: [] })
   billings: Billing[];
 
   @Field(() => Role)

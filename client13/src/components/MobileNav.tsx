@@ -118,7 +118,7 @@ export function ProfileMenuItem({
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   onClick={() => {
                     logout();
-                    location.reload();
+                    router.refresh();
                   }}
                 >
                   <ArrowLeftCircleIcon

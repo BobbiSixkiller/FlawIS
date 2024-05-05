@@ -21,7 +21,7 @@ export default async function SectionsPage({
         Nova
       </Link>
       <div className="-mx-6 sm:mx-0 divide-y">
-        {conference.sections.map((s, i) => (
+        {conference?.sections.map((s, i) => (
           <div className="p-6 sm:p-4 flex justify-between gap-4" key={i}>
             <div className="flex flex-col">
               <span className="text-lg text-gray-900">

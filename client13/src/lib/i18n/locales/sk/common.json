@@ -1,10 +1,13 @@
 {
   "update": "Aktualizovať",
   "new": "Nový",
+  "create": "Vytvoriť",
   "delete": "Zmazať",
   "error": "Chyba",
   "success": "Úspech",
   "notFoundMsg": "Nenašli sme zadaný zdroj",
   "more": "Viac",
-  "step": "Krok"
+  "step": "Krok",
+  "confirm": "Potvrdiť",
+  "deleteConfirm": "Naozaj si prajete zmazať {{name}}?"
 }

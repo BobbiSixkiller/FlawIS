@@ -9,7 +9,7 @@ export default async function DeleteSectionPage({
   params: { slug: string; id: string; lng: string };
 }) {
   const conference = await getConference(slug);
-  const section = conference.sections.find((s) => s.id === id);
+  const section = conference?.sections.find((s) => s.id === id);
 
   if (!section) {
     redirect(`/conference/${slug}/sections`);

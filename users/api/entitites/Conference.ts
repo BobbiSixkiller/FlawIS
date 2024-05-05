@@ -8,7 +8,7 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { Billing } from "./Billing";
+import { ConferenceBilling } from "./Billing";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
@@ -173,9 +173,9 @@ export class Conference extends TimeStamps {
   @Property({ _id: false })
   translations: ConferenceTranslation;
 
-  @Field(() => Billing)
-  @Property({ type: () => Billing, _id: false })
-  billing: Billing;
+  @Field(() => ConferenceBilling)
+  @Property({ type: () => ConferenceBilling, _id: false })
+  billing: ConferenceBilling;
 
   @Field(() => ImportantDates)
   @Property({ type: () => ImportantDates, _id: false })

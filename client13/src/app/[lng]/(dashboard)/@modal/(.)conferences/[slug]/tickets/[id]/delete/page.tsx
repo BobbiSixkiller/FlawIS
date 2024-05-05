@@ -16,9 +16,8 @@ export default async function DeleteTicketPage({
       <div className="w-96 flex flex-col gap-6">
         <FormMessage lng={lng} />
         <DeleteTicketForm
-          dialogOpen={true}
           lng={lng}
-          ticket={conference.tickets.find((t) => t.id === id)}
+          ticket={conference?.tickets.find((t) => t.id === id)}
         />
       </div>
     </Modal>

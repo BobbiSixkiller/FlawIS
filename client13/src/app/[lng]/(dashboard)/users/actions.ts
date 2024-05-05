@@ -1,5 +1,6 @@
 "use server";
 
+import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
   DeleteUserDocument,
   RegisterDocument,
@@ -13,12 +14,13 @@ import {
 import { executeGqlFetch, validation } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
+import { notFound } from "next/navigation";
 
-export async function getUsers(after?: string, first?: number) {
+export async function getUsers(filter: GetDataFilter) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
   const res = await executeGqlFetch(
     UsersDocument,
-    { after, first },
+    { ...filter },
     {},
     { tags: ["users"] }
   );
@@ -36,6 +38,7 @@ export async function getUser(id: string) {
   });
   if (res.errors) {
     console.log(res.errors[0]);
+    return notFound();
   }
 
   return res.data?.user;
@@ -77,7 +80,6 @@ export async function addUser(prevState: any, formData: FormData) {
     revalidateTag("users");
     return { success: true, message: res.data.register.message };
   } catch (error: any) {
-    console.log(error);
     return { success: false, message: error.message };
   }
 }

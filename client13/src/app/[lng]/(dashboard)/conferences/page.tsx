@@ -27,7 +27,7 @@ export default async function Conferences({
     return stream;
   }
 
-  const initialData = await getConferences();
+  const initialData = await getConferences({});
 
   return (
     <div className="flex flex-col gap-6">

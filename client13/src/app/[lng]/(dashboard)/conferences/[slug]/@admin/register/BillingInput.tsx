@@ -8,7 +8,7 @@ import {
   ChevronUpIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 export default function BillingInput({
@@ -36,6 +36,13 @@ export default function BillingInput({
     return a.name.toLowerCase() === b.name.toLowerCase();
   }
 
+  const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+    if (filteredBillings && filteredBillings.length === 0) {
+      setValue("billing.name", event.target.value);
+    }
+  };
+
   return (
     <div>
       <label
@@ -59,7 +66,7 @@ export default function BillingInput({
             <Combobox.Input
               className="w-full border-none rounded-r-none rounded-l-md py-1.5 placeholder:text-gray-400 focus:ring-transparent sm:text-sm sm:leading-6"
               displayValue={(billing: Billing) => billing?.name}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={handleInput}
               onFocus={() => setFocus(true)}
               onBlur={() => setFocus(false)}
               id="billing.name"
@@ -99,7 +106,6 @@ export default function BillingInput({
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
-            afterLeave={() => setQuery("")}
           >
             <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
               {filteredBillings?.length === 0 && query !== "" ? (

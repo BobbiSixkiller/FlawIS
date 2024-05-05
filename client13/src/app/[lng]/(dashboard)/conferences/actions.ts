@@ -13,11 +13,14 @@ import {
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
+import { GetDataFilter } from "@/components/withInfiniteScroll";
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 
-export async function getConferences(after?: string, first?: number) {
+export async function getConferences(filter: GetDataFilter) {
   const res = await executeGqlFetch(
     ConferencesDocument,
-    { after, first },
+    { ...filter },
     {},
     { tags: ["conferences"], revalidate: 3600 }
   );
@@ -31,15 +34,18 @@ export async function getConferences(after?: string, first?: number) {
 
 export async function getConference(slug: string) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
+  const user = cookies().get("user")?.value;
+
   const res = await executeGqlFetch(
     ConferenceDocument,
     { slug },
     {},
-    { tags: [`conference:${slug}`], revalidate: 3600 }
+    { tags: [`conference:${slug}`, `conference:${user}`] }
   );
 
   if (res.errors) {
     console.log(res.errors[0]);
+    return notFound();
   }
 
   return res.data?.conference;
@@ -194,6 +200,7 @@ export async function updateConferenceDates(slug: string, data: DatesInput) {
       );
     }
 
+    revalidateTag("conferences");
     revalidateTag(`conference:${res.data.updateConferenceDates.data.slug}`);
     return { success: true, message: res.data.updateConferenceDates.message };
   } catch (error: any) {

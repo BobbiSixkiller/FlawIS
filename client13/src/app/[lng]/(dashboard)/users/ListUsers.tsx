@@ -67,6 +67,7 @@ export default function ListUsers({
 }) {
   const InfiniteScrollListUsers = withInfiniteScroll<UserData>({
     lng,
+    filter: { after: undefined, first: undefined },
     getData: getUsers,
     initialData,
     ListItem,

@@ -13,10 +13,6 @@ fragment Billing on Billing {
   ICO
   ICDPH
   DIC
-  stampUrl
-  variableSymbol
-  IBAN
-  SWIFT
 }
 
 fragment User on User {
@@ -42,7 +38,11 @@ query me {
 
 mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
-    token
+    message
+    data {
+      ...User
+      token
+    }
   }
 }
 
@@ -54,6 +54,7 @@ mutation passwordReset($data: PasswordInput!) {
   passwordReset(data: $data) {
     message
     data {
+      ...User
       token
     }
   }
@@ -63,6 +64,7 @@ mutation register($data: RegisterInput!) {
   register(data: $data) {
     message
     data {
+      ...User
       token
     }
   }
@@ -73,5 +75,11 @@ mutation resendActivationLink {
 }
 
 mutation activateUser {
-  activateUser
+  activateUser {
+    message
+    data {
+      ...User
+      token
+    }
+  }
 }

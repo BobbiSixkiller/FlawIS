@@ -15,13 +15,11 @@ import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
 
 export default function NewTicketForm({
-  dialogOpen = false,
   conference,
   lng,
 }: {
-  dialogOpen?: boolean;
   lng: string;
-  conference: ConferenceFragment;
+  conference?: ConferenceFragment;
 }) {
   const router = useRouter();
 
@@ -65,7 +63,7 @@ export default function NewTicketForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await createTicket(data, conference.slug);
+          const state = await createTicket(data, conference!.slug);
 
           if (state.message && !state.success) {
             dispatch({

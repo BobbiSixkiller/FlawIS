@@ -47,8 +47,9 @@ export function RefDocExists(
 
 export function CheckTicket(): ParameterDecorator {
   return createParamDecorator<Context>(async ({ args, context }) => {
+    console.log("IDE");
     const conference = await getModelForClass(Conference).findOne({
-      slug: args.data.slug,
+      _id: args.data.conferenceId,
     });
     if (!conference)
       throw new Error(
@@ -69,13 +70,16 @@ export function CheckTicket(): ParameterDecorator {
 
     const { user } = context;
     const attendeeExists = await getModelForClass(Attendee).findOne({
-      conference: conference.id,
-      user: user?.id,
+      "conference._id": conference.id,
+      "user._id": user?.id,
     });
     if (attendeeExists)
       throw new Error(
         Container.get(I18nService).translate("alreadyRegistered", {
           ns: "conference",
+          name: user?.name,
+          conference:
+            conference.translations[context.locale as "sk" | "en"].name,
         })
       );
 

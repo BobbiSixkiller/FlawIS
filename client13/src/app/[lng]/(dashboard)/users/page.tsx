@@ -19,7 +19,7 @@ export default async function Users({
     redirect("/");
   }
 
-  const initialData = await getUsers();
+  const initialData = await getUsers({});
 
   return (
     <div className="flex flex-col gap-6">

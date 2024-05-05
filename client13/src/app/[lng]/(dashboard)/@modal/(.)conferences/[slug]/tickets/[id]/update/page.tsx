@@ -16,9 +16,10 @@ export default async function UpdateSection({
       <div className="w-96 flex flex-col gap-6">
         <FormMessage lng={lng} />
         <UpdateTicketForm
-          dialogOpen={true}
           lng={lng}
-          ticket={conference.tickets.find((t) => t.id === id) as TicketFragment}
+          ticket={
+            conference?.tickets.find((t) => t.id === id) as TicketFragment
+          }
         />
       </div>
     </Modal>

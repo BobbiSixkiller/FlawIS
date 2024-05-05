@@ -1,0 +1,67 @@
+fragment Attendee on Attendee {
+  id
+  user {
+    ...User
+  }
+  invoice {
+    ...Invoice
+  }
+  ticket {
+    ...Ticket
+  }
+  submissions {
+    ...Submission
+  }
+  conference {
+    slug
+    translations {
+      sk {
+        logoUrl
+      }
+      en {
+        logoUrl
+      }
+    }
+  }
+  createdAt
+  updatedAt
+}
+
+query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!) {
+  attendees(after: $after, first: $first, conferenceSlug: $conferenceSlug) {
+    edges {
+      cursor
+      node {
+        ...Attendee
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query attendee($id: ObjectId!) {
+  attendee(id: $id) {
+    ...Attendee
+  }
+}
+
+mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {
+  updateInvoice(id: $id, data: $data) {
+    message
+    data {
+      ...Attendee
+    }
+  }
+}
+
+mutation deleteAttendee($id: ObjectId!) {
+  deleteAttendee(id: $id) {
+    message
+    data {
+      ...Attendee
+    }
+  }
+}

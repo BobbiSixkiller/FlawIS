@@ -37,15 +37,26 @@ query textSearchUser($text: String!) {
 mutation updateUser($id: ObjectId!, $data: UserInput!) {
   updateUser(id: $id, data: $data) {
     message
+    data {
+      ...User
+    }
   }
 }
 
 mutation toggleVerifiedUser($id: ObjectId!) {
   toggleVerifiedUser(id: $id) {
     message
+    data {
+      ...User
+    }
   }
 }
 
 mutation deleteUser($id: ObjectId!) {
-  deleteUser(id: $id)
+  deleteUser(id: $id) {
+    message
+    data {
+      ...User
+    }
+  }
 }

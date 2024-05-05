@@ -1,6 +1,5 @@
 "use client";
 
-import { CheckBox, Input, Textarea } from "@/components/WIzzardForm";
 import { useParams, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { useContext } from "react";
@@ -11,13 +10,14 @@ import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
 import { updateTicket } from "../../actions";
+import { Input, LocalizedInput } from "@/components/Input";
+import { LocalizedTextarea } from "@/components/Textarea";
+import CheckBox from "@/components/Checkbox";
 
 export default function UpdateTicketForm({
-  dialogOpen = false,
   ticket,
   lng,
 }: {
-  dialogOpen?: boolean;
   lng: string;
   ticket: TicketFragment;
 }) {
@@ -79,12 +79,12 @@ export default function UpdateTicketForm({
           }
         })}
       >
-        <Input
+        <LocalizedInput
           lng={lng}
           label="Nazov listku"
           name={`translations.${lng}.name`}
         />
-        <Textarea
+        <LocalizedTextarea
           lng={lng}
           label="Popis listku"
           name={`translations.${lng}.description`}

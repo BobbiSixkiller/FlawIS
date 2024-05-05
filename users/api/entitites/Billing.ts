@@ -41,20 +41,43 @@ export class Billing {
   @Field({ nullable: true })
   @Property()
   ICDPH?: string;
+}
 
-  @Field({ nullable: true })
+@ObjectType({ description: "Conference billing information" })
+export class ConferenceBilling implements Billing {
+  @Field()
   @Property()
-  variableSymbol?: string;
+  name: string;
 
-  @Field({ nullable: true })
-  @Property()
-  IBAN?: string;
+  @Field(() => Address)
+  @Property({ _id: false })
+  address: Address;
 
-  @Field({ nullable: true })
+  @Field()
   @Property()
-  SWIFT?: string;
+  variableSymbol: string;
 
-  @Field({ nullable: true })
+  @Field()
   @Property()
-  stampUrl?: string;
+  ICO: string;
+
+  @Field()
+  @Property()
+  DIC: string;
+
+  @Field()
+  @Property()
+  ICDPH: string;
+
+  @Field()
+  @Property()
+  IBAN: string;
+
+  @Field()
+  @Property()
+  SWIFT: string;
+
+  @Field()
+  @Property()
+  stampUrl: string;
 }

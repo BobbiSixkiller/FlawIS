@@ -14,7 +14,6 @@ import { CRUDservice } from "../services/CRUDservice";
 import {
   Conference,
   ConferenceTranslation,
-  ConferenceTranslations,
   Ticket,
   TicketTranslation,
 } from "../entitites/Conference";
@@ -39,7 +38,6 @@ import Messagebroker from "../util/rmq";
 import { AttendeeInput } from "./types/attendee";
 import { VerifiedTicket } from "../util/types";
 import { User } from "../entitites/User";
-import { Submission } from "../entitites/Submission";
 
 @Service()
 @Resolver(() => Conference)
@@ -49,7 +47,6 @@ export class ConferencerResolver {
     private readonly sectionService = new CRUDservice(Section),
     private readonly attendeeService = new CRUDservice(Attendee),
     private readonly userService = new CRUDservice(User),
-    private readonly submissionService = new CRUDservice(Submission),
     private readonly i18nService: I18nService
   ) {}
 
@@ -64,7 +61,6 @@ export class ConferencerResolver {
     );
 
     const connection: ConferenceConnection = data[0];
-    console.log(connection.edges);
 
     return {
       pageInfo: connection.pageInfo,
@@ -143,8 +139,6 @@ export class ConferencerResolver {
 
     await conference.save();
 
-    console.log(conference.dates);
-
     return {
       data: conference,
       message: this.i18nService.translate("update", {
@@ -157,11 +151,11 @@ export class ConferencerResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => Attendee, { nullable: true })
+  @FieldResolver(() => Attendee)
   async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
     return await this.attendeeService.findOne({
-      conference: id,
-      user: user?.id,
+      "conference._id": id,
+      "user._id": user?.id,
     });
   }
 
@@ -255,9 +249,9 @@ export class ConferencerResolver {
   @Mutation(() => ConferenceMutationResponse)
   async addAttendee(
     @Arg("data")
-    { conferenceId, submissionId, billing }: AttendeeInput,
+    { billing }: AttendeeInput,
     @CheckTicket() { ticket, conference }: VerifiedTicket,
-    @Ctx() { user, locale, req }: Context
+    @Ctx() { user, locale }: Context
   ): Promise<ConferenceMutationResponse> {
     const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
@@ -270,16 +264,9 @@ export class ConferencerResolver {
       { upsert: true }
     );
 
-    if (submissionId) {
-      await this.submissionService.update(
-        { _id: submissionId },
-        { $addToSet: { authors: user?.id } }
-      );
-    }
-
     const attendee = await this.attendeeService.create({
-      conference: conferenceId,
-      user: user?.id,
+      conference: { _id: conference.id, slug: conference.slug },
+      user: { _id: user?.id, name: user?.name, email: user?.email },
       ticket,
       invoice: {
         issuer: {
@@ -297,7 +284,10 @@ export class ConferencerResolver {
           vat: isFlaw
             ? 0
             : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
-          body: this.i18nService.translate("invoiceBody", { ns: "conference" }),
+          body: this.i18nService.translate("invoiceBody", {
+            ns: "conference",
+            name: user?.name,
+          }),
           comment: this.i18nService.translate("invoiceComment", {
             ns: "conference",
           }),
@@ -308,7 +298,6 @@ export class ConferencerResolver {
     Messagebroker.produceMessage(
       JSON.stringify({
         locale,
-        clientUrl: req.hostname,
         name: user?.name,
         email: user?.email,
         conferenceName:

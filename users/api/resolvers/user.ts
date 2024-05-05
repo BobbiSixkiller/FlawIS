@@ -154,36 +154,46 @@ export class UserResolver {
   }
 
   @Authorized()
-  @Mutation(() => String)
+  @Mutation(() => UserMutationResponse)
   @UseMiddleware([RateLimit(50)])
-  async activateUser(@Ctx() { req }: Context) {
+  async activateUser(@Ctx() { req }: Context): Promise<UserMutationResponse> {
     const user: Partial<User> | null = verifyJwt(
       req.headers.activation as string
     );
     if (!user) {
       throw new Error(this.i18nService.translate("invalidActivationToken"));
     }
-    const { modifiedCount } = await this.userService.update(
+
+    const data = await this.userService.findOneAndUpdate(
       { _id: user.id, verified: false },
       { verified: true }
     );
-    if (modifiedCount > 0) {
-      return this.i18nService.translate("activated");
-    } else {
+    if (!data) {
       throw new Error(this.i18nService.translate("notFound"));
     }
+
+    return { message: this.i18nService.translate("activated"), data };
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserMutationResponse)
   @UseMiddleware([RateLimit(50)])
-  async login(@Arg("email") email: string, @Arg("password") password: string) {
+  async login(
+    @Arg("email") email: string,
+    @Arg("password") password: string
+  ): Promise<UserMutationResponse> {
     const user = await this.userService.findOne({ email });
     if (!user) throw new Error(this.i18nService.translate("credentials"));
 
     const match = await compare(password, user.password);
     if (!match) throw new Error(this.i18nService.translate("credentials"));
 
-    return user;
+    return {
+      data: user,
+      message: this.i18nService.translate("welcome", {
+        ns: "user",
+        name: user.name,
+      }),
+    };
   }
 
   @Query(() => String)
@@ -271,13 +281,16 @@ export class UserResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Mutation(() => String)
+  @Mutation(() => UserMutationResponse)
   async deleteUser(
     @Arg("id") _id: ObjectId,
     @LoadResource(User) user: DocumentType<User>
-  ): Promise<string> {
+  ): Promise<UserMutationResponse> {
     await this.userService.delete({ _id: user.id });
 
-    return this.i18nService.translate("delete", { name: user.name });
+    return {
+      message: this.i18nService.translate("delete", { name: user.name }),
+      data: user,
+    };
   }
 }

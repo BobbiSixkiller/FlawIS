@@ -1,6 +1,6 @@
 import { ArrayMinSize, IsEmail, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
-import { Authorized, Field, InputType, ObjectType } from "type-graphql";
+import { Field, InputType, ObjectType } from "type-graphql";
 import { LocalesInput } from "./translation";
 import Container from "typedi";
 import { I18nService } from "../../services/i18nService";

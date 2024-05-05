@@ -1,15 +1,38 @@
 {
   "heading": "Conferences",
   "subheading": "Conferences organized by Faculty of Law, Comenius University",
-  "registreation": {
+  "registration": {
     "ticket": "Form of attendance",
     "billing": {
+      "info": "Billing information",
       "meno": "Name",
       "street": "Street",
       "city": "City",
       "postal": "Postal code",
-      "country": "Country"
+      "country": "Country",
+      "ICO": "Business ID",
+      "DIC": "TAX ID",
+      "ICDPH": "VAT reg. no."
     },
-    "submission": {}
+    "submission": {
+      "info": "Submission",
+      "section": "Section",
+      "name": "Submission name",
+      "abstract": "Abstract",
+      "keywords": "Keywords",
+      "authors": "Co-authors email addresses"
+    }
+  },
+  "submission": {
+    "new": "New submission",
+    "update": "Update submission",
+    "delete": "Delete submission",
+    "submissions": "Submissions"
+  },
+  "conference": {
+    "start": "Start",
+    "end": "End",
+    "regEnd": "Registration end",
+    "submissionDeadline": "Submission file upload deadline"
   }
 }

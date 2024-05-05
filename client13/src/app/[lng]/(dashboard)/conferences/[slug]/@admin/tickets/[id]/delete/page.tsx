@@ -13,7 +13,7 @@ export default async function DeleteTicketPage({
     <div className="flex justify-center">
       <DeleteTicketForm
         lng={lng}
-        ticket={conference.tickets.find((t) => t.id === id)}
+        ticket={conference?.tickets.find((t) => t.id === id)}
       />
     </div>
   );

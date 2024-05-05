@@ -95,7 +95,7 @@ export class SubmissionResolver {
     return {
       data: submission,
       message: this.i18nService.translate("new", {
-        ns: "section",
+        ns: "submission",
         name: submission.translations[
           this.i18nService.language() as keyof SubmissionTranslation
         ].name,
@@ -110,12 +110,17 @@ export class SubmissionResolver {
     @Arg("data") data: SubmissionInput,
     @LoadResource(Submission) submission: DocumentType<Submission>,
     @Ctx() { user }: Context
-  ) {
+  ): Promise<SubmissionMutationResponse> {
     for (const [key, value] of Object.entries(data)) {
       if (key !== "authors") {
         submission[key as keyof Submission] = value;
       }
     }
+
+    await this.submissionService.update(
+      { _id: submission.id },
+      { $addToSet: { authors: user?.id } }
+    );
 
     if (data.authors.length !== 0) {
       const conference = await this.conferenceService.findOne({
@@ -152,23 +157,36 @@ export class SubmissionResolver {
       );
     }
 
-    return await submission.save();
+    await submission.save();
+
+    return {
+      message: this.i18nService.translate("update", {
+        ns: "submission",
+        name: submission.translations[
+          this.i18nService.language() as keyof SubmissionTranslation
+        ].name,
+      }),
+      data: submission,
+    };
   }
 
   @Authorized()
-  @Mutation(() => Submission)
+  @Mutation(() => SubmissionMutationResponse)
   async deleteSubmission(
     @Arg("id") _id: ObjectId,
     @LoadResource(Submission) submission: DocumentType<Submission>
-  ) {
+  ): Promise<SubmissionMutationResponse> {
     await this.submissionService.delete({ _id: submission.id });
 
-    return this.i18nService.translate("delete", {
-      ns: "section",
-      name: submission.translations[
-        this.i18nService.language() as keyof SubmissionTranslation
-      ].name,
-    });
+    return {
+      message: this.i18nService.translate("delete", {
+        ns: "submission",
+        name: submission.translations[
+          this.i18nService.language() as keyof SubmissionTranslation
+        ].name,
+      }),
+      data: submission,
+    };
   }
 
   @Authorized()

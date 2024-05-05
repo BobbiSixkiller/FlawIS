@@ -10,7 +10,7 @@ export default async function UpdateSection({
   params: { lng: string; slug: string; id: string };
 }) {
   const conference = await getConference(slug);
-  const section = conference.sections.find((s) => s.id === id);
+  const section = conference?.sections.find((s) => s.id === id);
 
   if (!section) {
     redirect(`/conference/${slug}/sections`);

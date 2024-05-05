@@ -1,15 +1,18 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { useFormContext } from "react-hook-form";
 
 export default function Select({
   label,
   name,
   options,
   defaultSelected,
+  disabled = false,
 }: {
+  disabled?: boolean;
   label?: string;
   name: string;
   options: { name: string; value: any }[];
@@ -19,15 +22,30 @@ export default function Select({
     options.find((o) => o.value === defaultSelected) || options[0]
   );
 
+  const { setValue } = useFormContext();
+  useEffect(() => {
+    setValue(name, selected.value);
+  }, [selected]);
+
   return (
-    <Listbox as="div" name={name} value={selected} onChange={setSelected}>
+    <Listbox
+      disabled={disabled}
+      as="div"
+      name={name}
+      value={selected}
+      onChange={setSelected}
+    >
       {label && (
         <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900 mb-2">
           {label}
         </Listbox.Label>
       )}
       <div className="relative">
-        <Listbox.Button className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 shadow-sm focus:outline-primary-500 sm:text-sm sm:leading-6">
+        <Listbox.Button
+          className={`block w-full rounded-md border-0 py-1.5 ${
+            disabled ? "text-slate-500 bg-slate-100" : "text-gray-900"
+          } ring-1 ring-inset ring-gray-300 shadow-sm focus:outline-primary-500 sm:text-sm sm:leading-6`}
+        >
           <span className="block truncate">{selected.name}</span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <ChevronUpDownIcon

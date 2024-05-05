@@ -13,7 +13,7 @@ export default async function UpdateTicketPage({
     <div className="flex justify-center">
       <UpdateTicketForm
         lng={lng}
-        ticket={conference.tickets.find((t) => t.id === id) as TicketFragment}
+        ticket={conference?.tickets.find((t) => t.id === id) as TicketFragment}
       />
     </div>
   );

@@ -17,7 +17,7 @@ export default function NewSectionForm({
   lng,
 }: {
   lng: string;
-  conference: ConferenceFragment;
+  conference?: ConferenceFragment;
 }) {
   const router = useRouter();
   const { slug } = useParams<{ slug: string }>();
@@ -43,7 +43,7 @@ export default function NewSectionForm({
       }).required(t("required"))
     ),
     values: {
-      conference: conference.id,
+      conference: conference?.id,
       translations: {
         sk: { name: "", topic: "" },
         en: { name: "", topic: "" },

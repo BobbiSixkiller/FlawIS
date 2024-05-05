@@ -1,14 +1,27 @@
 import Heading from "@/components/Heading";
 import { getConference } from "../../../../actions";
+import ConferenceRegistrationForm from "../../../@admin/register/ConferenceRegistrationForm";
+import { getSubmission } from "../../../@admin/register/actions";
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import { redirect } from "next/navigation";
+import { Conference } from "@/lib/graphql/generated/graphql";
 
 export default async function RegisterPage({
   params: { lng, slug },
+  searchParams,
 }: {
   params: { slug: string; lng: string };
+  searchParams?: {
+    submission?: string;
+  };
 }) {
-  const conference = await getConference(slug);
-  if (conference.attending) {
+  const user = await getMe();
+
+  const [conference, submission] = await Promise.all([
+    getConference(slug),
+    getSubmission(searchParams?.submission),
+  ]);
+  if (conference && conference.attending) {
     redirect(`/conferences/${slug}`);
   }
 
@@ -17,9 +30,14 @@ export default async function RegisterPage({
       <Heading
         lng={lng}
         heading="Registracia"
-        subHeading={conference.translations[lng as "sk" | "en"].name}
+        subHeading={conference!.translations[lng as "sk" | "en"].name}
       />
-      <div>forn</div>
+      <ConferenceRegistrationForm
+        lng={lng}
+        conference={conference as Conference}
+        submission={submission}
+        billings={user!.billings}
+      />
     </div>
   );
 }

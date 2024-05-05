@@ -6,7 +6,7 @@ import { dir } from "i18next";
 import { languages } from "@/lib/i18n/settings";
 import MessageProvider from "@/providers/MessageProvider";
 
-const UKsans = localFont({
+export const UKsans = localFont({
   src: [
     {
       path: "../../../public/UKsans/UKSans-Thin.otf",

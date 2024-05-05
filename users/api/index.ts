@@ -26,6 +26,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { SectionResolver } from "./resolvers/section";
 import { SubmissionResolver } from "./resolvers/submission";
+import { AttendeeResolver } from "./resolvers/attendee";
 
 env.config();
 
@@ -68,6 +69,7 @@ async function main() {
         ConferencerResolver,
         SectionResolver,
         SubmissionResolver,
+        AttendeeResolver,
       ],
       // use document converting middleware
       globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],

@@ -11,5 +11,6 @@
   "emailExists": "Email adresa je obsadená!",
   "update": "Používateľ {{name}} bol aktualizovaný.",
   "new": "Používateľ {{name}} bol vytvorený.",
-  "delete": "Používateľ {{name}} bol vymazaný."
+  "delete": "Používateľ {{name}} bol vymazaný.",
+  "welcome": "Vitajte {{name}}!"
 }

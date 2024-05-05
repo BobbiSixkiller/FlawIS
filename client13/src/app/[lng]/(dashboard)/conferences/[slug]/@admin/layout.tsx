@@ -41,7 +41,7 @@ export default async function TabsLayout({
     },
   ];
 
-  if (!conference.attending) {
+  if (conference && !conference.attending) {
     tabs.push({
       href: `/conferences/${slug}/register`,
       name: "Registrovat",

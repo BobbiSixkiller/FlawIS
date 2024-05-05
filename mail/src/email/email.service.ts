@@ -136,10 +136,6 @@ export class EmailService {
         conferenceLogo: msg.conferenceLogo,
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
-        stamp:
-          process.env.NODE_ENV === 'staging'
-            ? 'http://gateway-staging:6000' + msg.invoice.issuer.stamp.path
-            : 'http://gateway:5000' + msg.invoice.issuer.stamp.path,
       },
       'invoice.hbs',
     );
@@ -169,7 +165,9 @@ export class EmailService {
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    const url = `${msg.clientUrl}/${msg.locale}/${msg.conferenceSlug}/register?submission=${msg.submissionId}`;
+    const url = `${getClientUrl()}/${msg.locale}/conferences/${
+      msg.conferenceSlug
+    }/register?submission=${msg.submissionId}`;
 
     await this.mailerService.sendMail({
       to: msg.email,

@@ -22,7 +22,8 @@ export function withAuth(middleware: CustomMiddleware) {
     const token = cookies().get("accessToken")?.value;
 
     if (!token && protectedPaths.some((path) => url.pathname.includes(path))) {
-      url.searchParams.append("url", url.pathname);
+      const fullUrl = `${url.pathname}${url.search}`;
+      url.searchParams.append("url", fullUrl);
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }

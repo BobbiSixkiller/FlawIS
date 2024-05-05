@@ -12,7 +12,7 @@ export default function DeleteConferenceForm({
   conference,
 }: {
   lng: string;
-  conference: ConferenceFragment;
+  conference?: ConferenceFragment;
 }) {
   const router = useRouter();
   const { dispatch } = useContext(MessageContext);
@@ -39,7 +39,7 @@ export default function DeleteConferenceForm({
         }
       }}
     >
-      <input type="hidden" name="id" value={conference.id} />
+      <input type="hidden" name="id" value={conference?.id} />
 
       <h1>
         Naozaj chcete zmazat konferenciu{" "}
