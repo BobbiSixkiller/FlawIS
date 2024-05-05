@@ -8,10 +8,12 @@ jobs:
     runs-on: [HyperV]
     environment: production
     steps:
-      - name: Checkout code
+      - name: Setting up node version
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
+
+      - name: Checkout code
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
