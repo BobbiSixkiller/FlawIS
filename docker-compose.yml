@@ -13,6 +13,8 @@ services:
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       minio:
+        condition: service_healthy
+        restart: true
       rabbitmq:
         condition: service_healthy
         restart: true
@@ -79,11 +81,7 @@ services:
       MINIO_ROOT_PASSWORD: Strong#Pass#2024
     command: server --console-address ":9001" /data
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -I --fail http://minio:9000/minio/health/live || exit 1",
-        ]
+      test: ["CMD-SHELL", "mc ready local"]
       interval: 30s
       timeout: 10s
       retries: 3
