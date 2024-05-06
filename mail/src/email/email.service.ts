@@ -24,9 +24,9 @@ function getClientUrl() {
     case 'development':
       return 'http://localhost:3000';
     case 'staging':
-      return 'http://flawis-staging.flaw.uniba.sk';
+      return 'http://conf-staging.flaw.uniba.sk';
     case 'production':
-      return 'http://flawis.flaw.uniba.sk';
+      return 'http://conf.flaw.uniba.sk';
 
     default:
       throw new Error('Invalid environment!');

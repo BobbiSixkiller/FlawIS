@@ -4,6 +4,7 @@ import { $Dictionary } from "i18next/typescript/helpers";
 import { TOptionsBase } from "i18next/typescript/options";
 import { InterpolationMap } from "i18next/typescript/t.v4";
 import { Service } from "typedi";
+import path from "path"; // Import the path module
 
 @Service()
 export class I18nService {
@@ -18,7 +19,13 @@ export class I18nService {
       .use(
         ResourcesBackend(
           (language: string, namespace: string) =>
-            import(`../util/locales/${language}/${namespace}.json`)
+            // Construct the absolute file path using the path module
+            import(
+              path.resolve(
+                __dirname,
+                `../util/locales/${language}/${namespace}.json`
+              )
+            )
         )
       )
       .init(
