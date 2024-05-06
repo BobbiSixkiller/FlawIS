@@ -11,9 +11,7 @@ services:
       MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      minio:
-        condition: service_healthy
-        restart: true
+      - minio
       rabbitmq:
         condition: service_healthy
         restart: true
