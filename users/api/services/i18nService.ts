@@ -19,11 +19,9 @@ export class I18nService {
       .use(
         ResourcesBackend(
           (language: string, namespace: string) =>
-            // Construct the absolute file path using the path module
             import(
               path.resolve(
-                __dirname,
-                `../util/locales/${language}/${namespace}.json`
+                `/usr/app/api/util/locales/${language}/${namespace}.json`
               )
             )
         )
