@@ -20,6 +20,7 @@ export function UpdateUserLink({ id }: { id: string }) {
 
   return (
     <button
+      type="button"
       className="w-full flex gap-2"
       onClick={() => router.push(`/users/${id}/update`, { scroll: false })}
     >

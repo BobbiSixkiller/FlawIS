@@ -1,19 +1,20 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { deleteUser } from "../../actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { deleteUser } from "./actions";
 
 export function DeleteUserLink({ id }: { id: string }) {
   const router = useRouter();
 
   return (
     <button
+      type="button"
       className="px-4 py-2 sm:p-0 w-full flex gap-2"
       onClick={() => router.push(`/users/${id}/delete`, { scroll: false })}
     >
@@ -30,39 +31,48 @@ export default function DeleteUserForm({
   lng: string;
 }) {
   const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  function handleClick() {
+    startTransition(async () => {
+      const state = await deleteUser(user.id);
+
+      if (state.message && !state.success) {
+        dispatch({
+          type: ActionTypes.SetFormMsg,
+          payload: state,
+        });
+      }
+
+      if (state.success) {
+        dispatch({
+          type: ActionTypes.SetAppMsg,
+          payload: state,
+        });
+        router.back();
+      }
+    });
+  }
 
   const { t } = useTranslation(lng, ["profile", "common"]);
 
   const { dispatch } = useContext(MessageContext);
 
   return (
-    <form
-      className="space-y-6 w-full sm:w-96"
-      action={async (data) => {
-        const state = await deleteUser(null, data);
-
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
-
-        if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
-          router.back();
-        }
-      }}
-    >
+    <div className="space-y-6 w-full sm:w-96">
       <input type="hidden" name="id" value={user.id} />
       <h1>Naozaj chcete zmazat pouzivatela {user.name} ?</h1>
 
-      <Button color="primary" type="submit" fluid>
+      <Button
+        color="primary"
+        type="submit"
+        fluid
+        onClick={handleClick}
+        loading={pending}
+        disabled={pending}
+      >
         Potvrdit
       </Button>
-    </form>
+    </div>
   );
 }

@@ -2,20 +2,15 @@
 
 import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
-  DeleteUserDocument,
   RegisterDocument,
-  Role,
   TextSearchUserDocument,
   ToggleVerifiedUserDocument,
-  UpdateUserDocument,
   UserDocument,
-  UserInput,
   UsersDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, validation } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
-import { notFound } from "next/navigation";
 
 export async function getUsers(filter: GetDataFilter) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -39,7 +34,6 @@ export async function getUser(id: string) {
   });
   if (res.errors) {
     console.log(res.errors[0]);
-    return notFound();
   }
 
   return res.data?.user;
@@ -108,20 +102,4 @@ export async function searchUser(text: string) {
   }
 
   return { success: true, data: res.data.textSearchUser };
-}
-
-export async function deleteUser(prevState: any, formData: FormData) {
-  try {
-    const res = await executeGqlFetch(DeleteUserDocument, {
-      id: formData.get("id")?.toString(),
-    });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
-    }
-
-    revalidateTag("users");
-    return { success: true, message: res.data.deleteUser };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
 }
