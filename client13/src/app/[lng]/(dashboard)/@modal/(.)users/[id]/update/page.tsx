@@ -20,5 +20,3 @@ export default async function UpdateUserPage({
     </Modal>
   );
 }
-
-export const dynamic = "force-dynamic";

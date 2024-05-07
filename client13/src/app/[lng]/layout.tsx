@@ -3,7 +3,6 @@ import "../globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { dir } from "i18next";
-import { languages } from "@/lib/i18n/settings";
 import MessageProvider from "@/providers/MessageProvider";
 
 export const UKsans = localFont({
@@ -42,10 +41,6 @@ export const UKsans = localFont({
   display: "swap",
   variable: "--font-UKsans",
 });
-
-export async function generateStaticParams() {
-  return languages.map((lng) => ({ lng }));
-}
 
 export async function generateMetadata({
   params: { lng },
