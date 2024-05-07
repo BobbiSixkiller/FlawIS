@@ -16,3 +16,5 @@ export default async function DeleteUserPage({
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";

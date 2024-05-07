@@ -11,8 +11,10 @@ export default async function UpdateUserPage({
 
   return (
     <div className="flex flex-col gap-6 justify-center">
-      <FormMessage lng={lng} /> 
+      <FormMessage lng={lng} />
       <UpdateUserForm lng={lng} user={user} />
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
