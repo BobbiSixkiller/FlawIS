@@ -18,8 +18,6 @@ export default async function ConferencePage({
           style={{
             width: "auto",
             height: "auto",
-            maxWidth: "300px",
-            maxHeight: "200px",
           }}
           alt="conference-logo"
           src={conference!.translations[lng as "sk" | "en"].logoUrl as string}
