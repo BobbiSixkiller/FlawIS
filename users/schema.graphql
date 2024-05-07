@@ -275,6 +275,7 @@ input PasswordInput {
 type Query {
   attendee(id: ObjectId!): Attendee!
   attendees(after: ObjectId, conferenceSlug: String!, first: Int! = 20): AttendeeConnection!
+  attendeesCsvExport(slug: String!): [Attendee!]!
   conference(slug: String!): Conference!
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!

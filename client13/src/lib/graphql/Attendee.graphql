@@ -48,6 +48,12 @@ query attendee($id: ObjectId!) {
   }
 }
 
+query attendeesCsvExport($slug: String!) {
+  attendeesCsvExport(slug: $slug) {
+    ...Attendee
+  }
+}
+
 mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {
   updateInvoice(id: $id, data: $data) {
     message

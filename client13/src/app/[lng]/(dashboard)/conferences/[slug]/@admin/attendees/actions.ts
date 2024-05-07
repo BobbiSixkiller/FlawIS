@@ -1,7 +1,10 @@
 "use server";
 
 import { GetDataFilter } from "@/components/withInfiniteScroll";
-import { AttendeesDocument } from "@/lib/graphql/generated/graphql";
+import {
+  AttendeesCsvExportDocument,
+  AttendeesDocument,
+} from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 
 export async function getAttendees(filter: GetDataFilter) {
@@ -20,4 +23,19 @@ export async function getAttendees(filter: GetDataFilter) {
   }
 
   return res.data?.attendees;
+}
+
+export async function getAllAttendees(slug: string) {
+  const res = await executeGqlFetch(
+    AttendeesCsvExportDocument,
+    { slug },
+    {},
+    { tags: ["attendees"], revalidate: 3600 }
+  );
+
+  if (res.errors) {
+    console.log(res.errors[0]);
+  }
+
+  return res.data?.attendeesCsvExport;
 }

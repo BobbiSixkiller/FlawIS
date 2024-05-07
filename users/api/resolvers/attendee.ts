@@ -60,6 +60,12 @@ export class AttendeeResolver {
   }
 
   @Authorized(["ADMIN"])
+  @Query(() => [Attendee])
+  async attendeesCsvExport(@Arg("slug") slug: string) {
+    return await this.attendeeService.findAll({ "conference.slug": slug });
+  }
+
+  @Authorized(["ADMIN"])
   @Query(() => Attendee)
   async attendee(
     @Arg("id") _id: ObjectId,

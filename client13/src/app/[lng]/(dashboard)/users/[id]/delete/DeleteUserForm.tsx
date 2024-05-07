@@ -1,7 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useContext } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { deleteUser } from "../../actions";
@@ -9,7 +8,6 @@ import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { FormMessage } from "@/components/Message";
 
 export function DeleteUserLink({ id }: { id: string }) {
   const router = useRouter();
