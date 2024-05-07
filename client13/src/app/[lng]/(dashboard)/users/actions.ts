@@ -9,6 +9,7 @@ import {
   ToggleVerifiedUserDocument,
   UpdateUserDocument,
   UserDocument,
+  UserInput,
   UsersDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, validation } from "@/utils/actions";
@@ -80,48 +81,6 @@ export async function addUser(prevState: any, formData: FormData) {
     revalidateTag("users");
     return { success: true, message: res.data.register.message };
   } catch (error: any) {
-    return { success: false, message: error.message };
-  }
-}
-
-export async function updateUser(prevState: any, formData: FormData) {
-  const { userInputSchema } = await validation();
-  try {
-    const input = await userInputSchema.validate({
-      id: formData.get("id")?.toString(),
-      name: formData.get("name")?.toString(),
-      email: formData.get("email")?.toString(),
-      organization: formData.get("organization")?.toString(),
-      telephone: formData.get("telephone")?.toString(),
-      role: formData.get("role[value]")?.toString(),
-    });
-
-    const res = await executeGqlFetch(UpdateUserDocument, {
-      id: input.id,
-      data: {
-        email: input.email,
-        name: input.name,
-        telephone: input.telephone,
-        organization: input.organization,
-        role: input.role as Role,
-      },
-    });
-
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      return {
-        success: false,
-        message: validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message,
-      };
-    }
-    revalidateTag("users");
-    revalidateTag(`user:${input.id}`);
-    return { success: true, message: res.data.updateUser.message };
-  } catch (error: any) {
-    console.log(error);
     return { success: false, message: error.message };
   }
 }

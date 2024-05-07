@@ -2,13 +2,18 @@
 
 import { Role, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { updateUser } from "../../actions";
 import { useRouter } from "next/navigation";
 import Select from "@/components/Select";
 import Button from "@/components/Button";
 import { PencilIcon } from "@heroicons/react/24/outline";
+import { FormProvider, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { object, string } from "yup";
+import { Input } from "@/components/Input";
+import { Textarea } from "@/components/Textarea";
+import { updateUser } from "./actions";
 
 export function UpdateUserLink({ id }: { id: string }) {
   const router = useRouter();
@@ -33,130 +38,85 @@ export default function UpdateUserForm({
   const router = useRouter();
   const { t } = useTranslation(lng, ["profile", "common"]);
 
-  const [email, setEmail] = useState(user.email);
-  const [org, setOrg] = useState(user.organization);
+  const { dispatch } = useContext(MessageContext);
 
+  const methods = useForm({
+    resolver: yupResolver(
+      object({
+        name: string().required(t("required")),
+        email: string().email().required(t("required")),
+        organization: string().required(t("required")),
+        telephone: string().required(t("required")),
+        role: string<Role>(),
+      }).required(t("required"))
+    ),
+    values: {
+      email: user.email,
+      name: user.name,
+      organization: user.organization,
+      role: user.role,
+      telephone: user.telephone,
+    },
+  });
+
+  const email = methods.watch("email");
   useEffect(() => {
     if (email.includes("uniba")) {
-      setOrg("Univerzita Komenského v Bratislave, Právnická fakulta");
+      methods.setValue(
+        "organization",
+        "Univerzita Komenského v Bratislave, Právnická fakulta"
+      );
     }
   }, [email, lng]);
 
-  const { dispatch } = useContext(MessageContext);
-
   return (
-    <form
-      className="space-y-6 w-full sm:w-96"
-      action={async (data) => {
-        const state = await updateUser(null, data);
+    <FormProvider {...methods}>
+      <form
+        className="space-y-6 w-full sm:w-96"
+        onSubmit={methods.handleSubmit(async (data) => {
+          const state = await updateUser(user.id, data);
 
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
+          if (state.message && !state.success) {
+            dispatch({
+              type: ActionTypes.SetFormMsg,
+              payload: state,
+            });
+          }
 
-        if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
-          router.back();
-        }
-      }}
-    >
-      <input type="hidden" name="id" value={user.id} />
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium leading-6 text-gray-900"
+          if (state.success) {
+            dispatch({
+              type: ActionTypes.SetAppMsg,
+              payload: state,
+            });
+            router.back();
+          }
+        })}
+      >
+        <Input label="Meno" name="name" />
+        <Input label="Email" name="email" />
+        <Textarea label="Organizacia" name="organization" />
+        <Input label="Telefon" name="telephone" />
+        <Select
+          label={t("role")}
+          name="role"
+          defaultSelected={user.role}
+          options={[
+            { name: "Admin", value: Role.Admin },
+            { name: "Basic", value: Role.Basic },
+          ]}
+        />
+
+        <Button
+          color="primary"
+          type="submit"
+          fluid
+          loadingText={t("submitting")}
+          loading={methods.formState.isSubmitting}
+          disabled={methods.formState.isSubmitting}
         >
-          {t("name")}
-        </label>
-        <div className="mt-2">
-          <input
-            id="name"
-            name="name"
-            defaultValue={user.name}
-            type="text"
-            autoComplete="name"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
-      <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {t("email")}
-        </label>
-        <div className="mt-2">
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-            defaultValue={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-      </div>
-      <div>
-        <label
-          htmlFor="telephone"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {t("phone")}
-        </label>
-        <div className="mt-2">
-          <input
-            id="telephone"
-            name="telephone"
-            defaultValue={user.telephone}
-            type="tel"
-            autoComplete="tel"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
-      <div>
-        <label
-          htmlFor="organization"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {t("org")}
-        </label>
-        <div className="mt-2">
-          <input
-            onChange={(e) => setOrg(e.target.value)}
-            value={org}
-            id="organization"
-            name="organization"
-            type="text"
-            autoComplete="organization"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
-      <Select
-        label={t("role")}
-        name="role"
-        defaultSelected={user.role}
-        options={[
-          { name: "Admin", value: Role.Admin },
-          { name: "Basic", value: Role.Basic },
-        ]}
-      />
-      <Button color="primary" type="submit" fluid loadingText={t("submitting")}>
-        {t("submit")}
-      </Button>
-    </form>
+          {t("submit")}
+        </Button>
+      </form>
+    </FormProvider>
   );
 }
