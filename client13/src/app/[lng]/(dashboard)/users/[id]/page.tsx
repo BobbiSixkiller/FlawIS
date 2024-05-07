@@ -10,7 +10,6 @@ export default async function User({
   params: { id, lng },
 }: {
   params: { lng: string; id: string };
-  searchParams: {};
 }) {
   const user = await getUser(id);
 

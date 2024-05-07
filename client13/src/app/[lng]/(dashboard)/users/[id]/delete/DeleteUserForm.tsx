@@ -60,7 +60,6 @@ export default function DeleteUserForm({
 
   return (
     <div className="space-y-6 w-full sm:w-96">
-      <input type="hidden" name="id" value={user.id} />
       <h1>Naozaj chcete zmazat pouzivatela {user.name} ?</h1>
 
       <Button
