@@ -4,8 +4,8 @@ FROM node:21-alpine AS development
 # Create app directory
 WORKDIR /usr/app
 
-ARG NEXT_PUBLIC_BACKEND_URL
-ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+# ARG NEXT_PUBLIC_BACKEND_URL
+# ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 # Install app dependencies
 COPY package*.json ./

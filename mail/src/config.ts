@@ -11,8 +11,5 @@ export default () => ({
             pass: process.env.MAIL_PASSWORD,
           }
         : undefined,
-    // tls: {
-    //   ciphers: 'SSLv3',
-    // },
   },
 });
