@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from "@/utils/helpers";
 import ExportCSV from "./ExportCSV";
 import ListAttendees from "./ListAttendees";
 import { getAllAttendees, getAttendees } from "./actions";
@@ -25,8 +26,12 @@ export default async function AttendeesPage({
               variableSymbol: attendee.invoice.issuer.variableSymbol,
               price: attendee.invoice.body.price + attendee.invoice.body.vat,
               section: submission.section.translations[lng as "sk" | "en"].name,
-              submission_name_sk: submission.translations.sk.name,
-              submission_name_en: submission.translations.en.name,
+              submission_name_sk: capitalizeFirstLetter(
+                submission.translations.sk.name
+              ),
+              submission_name_en: capitalizeFirstLetter(
+                submission.translations.en.name
+              ),
             }));
           } else {
             // If there are no submissions for the attendee, include them with empty submission data

@@ -6,6 +6,7 @@ import ListConferences from "./ListConferences";
 import { getMe } from "../../(auth)/actions";
 import Link from "next/link";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { Role } from "@/lib/graphql/generated/graphql";
 
 export default async function Conferences({
   params: { lng },
@@ -35,16 +36,20 @@ export default async function Conferences({
         heading={t("heading")}
         subHeading={t("subheading")}
         lng={lng}
-        links={[
-          <Link
-            key={0}
-            href="/conferences/new"
-            className="w-full flex gap-2"
-            scroll={false}
-          >
-            <PlusIcon className="w-5 h-5" /> Nova
-          </Link>,
-        ]}
+        links={
+          user?.role === Role.Admin
+            ? [
+                <Link
+                  key={0}
+                  href="/conferences/new"
+                  className="w-full flex gap-2"
+                  scroll={false}
+                >
+                  <PlusIcon className="w-5 h-5" /> Nova
+                </Link>,
+              ]
+            : []
+        }
       />
       {initialData && <ListConferences initialData={initialData} lng={lng} />}
     </div>

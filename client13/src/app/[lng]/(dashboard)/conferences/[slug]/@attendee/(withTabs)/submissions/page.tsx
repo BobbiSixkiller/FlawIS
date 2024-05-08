@@ -3,6 +3,7 @@ import { getConference } from "../../../../actions";
 import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { capitalizeFirstLetter } from "@/utils/helpers";
 
 export default async function Submissions({
   params: { slug, lng },
@@ -32,7 +33,7 @@ export default async function Submissions({
           className="rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500"
         >
           <h2 className="font-medium leading-6">
-            {s.translations[lng as "sk" | "en"].name}
+            {capitalizeFirstLetter(s.translations[lng as "sk" | "en"].name)}
           </h2>
           <p className="leading-none text-gray-500">
             {s.section.translations[lng as "sk" | "en"].name}
