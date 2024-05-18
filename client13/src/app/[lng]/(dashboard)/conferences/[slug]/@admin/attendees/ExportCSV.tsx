@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { stringify } from "csv-stringify";
 import { useState } from "react";
 
@@ -46,7 +47,9 @@ export default function ExportCSV({ data }: { data: any[] }) {
         }
       }}
     >
-      CSV export
+      <div className="flex items-center gap-2">
+        .csv <TableCellsIcon className="size-5" />
+      </div>
     </Button>
   );
 }

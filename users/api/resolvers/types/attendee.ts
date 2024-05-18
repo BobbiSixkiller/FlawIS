@@ -17,6 +17,12 @@ export class AttendeeConnection extends CreateConnection(Attendee) {}
 export class AttendeeArgs extends CreateArgs(Attendee) {
   @Field()
   conferenceSlug: string;
+
+  @Field(() => [ObjectId], { nullable: "items", defaultValue: [] })
+  sectionIds: ObjectId[];
+
+  @Field(() => Boolean, { nullable: true })
+  passive?: boolean;
 }
 
 @ObjectType({ implements: IMutationResponse })

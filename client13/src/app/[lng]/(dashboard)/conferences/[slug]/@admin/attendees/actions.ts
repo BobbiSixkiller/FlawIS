@@ -13,9 +13,13 @@ export async function getAttendees(filter: GetDataFilter) {
     {
       ...filter,
       conferenceSlug: filter.conferenceSlug,
+      passive: filter.passive,
+      sectionIds: filter.sectionIds,
     },
     {},
-    { tags: ["attendees", `attendees:${filter}`], revalidate: 3600 }
+    // { tags: ["attendees", `attendees:${filter}`], revalidate: 3600 }
+    {},
+    "no-store"
   );
 
   if (res.errors) {

@@ -27,8 +27,20 @@ fragment Attendee on Attendee {
   updatedAt
 }
 
-query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!) {
-  attendees(after: $after, first: $first, conferenceSlug: $conferenceSlug) {
+query attendees(
+  $after: ObjectId
+  $first: Int
+  $conferenceSlug: String!
+  $passive: Boolean
+  $sectionIds: [ObjectId!]
+) {
+  attendees(
+    after: $after
+    first: $first
+    conferenceSlug: $conferenceSlug
+    passive: $passive
+    sectionIds: $sectionIds
+  ) {
     edges {
       cursor
       node {

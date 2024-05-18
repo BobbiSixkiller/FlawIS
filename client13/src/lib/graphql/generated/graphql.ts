@@ -441,6 +441,8 @@ export type QueryAttendeesArgs = {
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   conferenceSlug: Scalars['String']['input'];
   first?: Scalars['Int']['input'];
+  passive?: InputMaybe<Scalars['Boolean']['input']>;
+  sectionIds?: Array<InputMaybe<Scalars['ObjectId']['input']>>;
 };
 
 
@@ -681,6 +683,8 @@ export type AttendeesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   conferenceSlug: Scalars['String']['input'];
+  passive?: InputMaybe<Scalars['Boolean']['input']>;
+  sectionIds?: InputMaybe<Array<Scalars['ObjectId']['input']> | Scalars['ObjectId']['input']>;
 }>;
 
 
@@ -1372,8 +1376,14 @@ fragment Conference on Conference {
   updatedAt
 }`, {"fragmentName":"ConferenceRegistration"}) as unknown as TypedDocumentString<ConferenceRegistrationFragment, unknown>;
 export const AttendeesDocument = new TypedDocumentString(`
-    query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!) {
-  attendees(after: $after, first: $first, conferenceSlug: $conferenceSlug) {
+    query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!, $passive: Boolean, $sectionIds: [ObjectId!]) {
+  attendees(
+    after: $after
+    first: $first
+    conferenceSlug: $conferenceSlug
+    passive: $passive
+    sectionIds: $sectionIds
+  ) {
     edges {
       cursor
       node {

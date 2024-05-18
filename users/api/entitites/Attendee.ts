@@ -14,6 +14,7 @@ import { Conference, Ticket } from "./Conference";
 import { Submission } from "./Submission";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { User } from "./User";
+import { AttendeeArgs } from "../resolvers/types/attendee";
 
 @ObjectType({ description: "The body of an invoice" })
 export class InvoiceData {
@@ -129,9 +130,7 @@ export class Attendee extends TimeStamps {
 
   public static async paginatedAttendees(
     this: ModelType<Attendee>,
-    conferenceSlug: string,
-    first: number,
-    after?: ObjectId
+    { conferenceSlug, sectionIds, first, after, passive }: AttendeeArgs
   ) {
     return await this.aggregate([
       { $sort: { _id: -1 } },
@@ -139,6 +138,69 @@ export class Attendee extends TimeStamps {
         $facet: {
           data: [
             { $match: { "conference.slug": conferenceSlug } },
+            {
+              $lookup: {
+                from: "submissions",
+                let: {
+                  conference: "$conference",
+                  user: "$user",
+                },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $in: ["$$user._id", "$authors"] },
+                          { $eq: ["$conference", "$$conference._id"] },
+                        ],
+                      },
+                    },
+                  },
+                ],
+                as: "submissions",
+              },
+            },
+            {
+              $match: {
+                $expr: {
+                  $cond: {
+                    if: {
+                      $or: [
+                        { $ne: [{ $size: [sectionIds] }, 0] },
+                        { $eq: [passive, true] },
+                      ],
+                    },
+                    then: {
+                      $or: [
+                        {
+                          $and: [
+                            { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
+                            {
+                              $anyElementTrue: {
+                                $map: {
+                                  input: "$submissions",
+                                  as: "nested",
+                                  in: {
+                                    $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                                  },
+                                },
+                              },
+                            },
+                          ],
+                        },
+                        {
+                          $and: [
+                            { $eq: [passive, true] }, // Include documents with empty submissions
+                            { $eq: [{ $size: "$submissions" }, 0] },
+                          ],
+                        },
+                      ],
+                    },
+                    else: {},
+                  },
+                },
+              },
+            },
             {
               $match: {
                 $expr: {

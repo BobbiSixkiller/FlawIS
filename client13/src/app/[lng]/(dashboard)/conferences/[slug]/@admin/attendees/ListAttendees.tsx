@@ -8,7 +8,7 @@ import {
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 function ListItem({ data }: { data?: AttendeeFragment }) {
   return (
@@ -55,10 +55,17 @@ export default function ListAttendees({
   lng: string;
 }) {
   const { slug } = useParams();
+  const searchParams = useSearchParams();
 
   const InfiniteScrollListAttendees = withInfiniteScroll<AttendeeFragment>({
     lng,
-    filter: { after: undefined, first: undefined, conferenceSlug: slug },
+    filter: {
+      after: undefined,
+      first: undefined,
+      conferenceSlug: slug,
+      sectionIds: searchParams.getAll("sectionId"),
+      passive: searchParams.get("passive") === "true" ? true : null,
+    },
     getData: getAttendees,
     initialData,
     ListItem,

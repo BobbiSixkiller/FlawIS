@@ -39,16 +39,11 @@ export class AttendeeResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => AttendeeConnection)
-  async attendees(
-    @Args() { first, after, conferenceSlug }: AttendeeArgs
-  ): Promise<AttendeeConnection> {
-    const data = await this.attendeeService.dataModel.paginatedAttendees(
-      conferenceSlug,
-      first,
-      after
-    );
+  async attendees(@Args() args: AttendeeArgs): Promise<AttendeeConnection> {
+    const data = await this.attendeeService.dataModel.paginatedAttendees(args);
 
     const connection: AttendeeConnection = data[0];
+    console.log(connection.edges, args);
 
     return {
       pageInfo: connection.pageInfo,
