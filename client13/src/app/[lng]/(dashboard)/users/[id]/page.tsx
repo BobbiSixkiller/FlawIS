@@ -3,8 +3,11 @@ import { getUser, toggleVerified } from "../actions";
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
-import { DeleteUserLink } from "./delete/DeleteUserForm";
-import { UpdateUserLink } from "./update/UpdateUserForm";
+import {
+  ArrowsRightLeftIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 
 export default async function User({
   params: { id, lng },
@@ -25,8 +28,21 @@ export default async function User({
         lng={lng}
         heading={user.name}
         links={[
-          <UpdateUserLink key={0} id={id} />,
-          <DeleteUserLink key={1} id={id} />,
+          {
+            href: `/users/${user.id}/impersonate`,
+            text: "Impersonovat",
+            icon: <ArrowsRightLeftIcon className="size-5" />,
+          },
+          {
+            href: `/users/${user.id}/update`,
+            text: "Aktualizovat",
+            icon: <PencilIcon className="size-5" />,
+          },
+          {
+            href: `/users/${user.id}/delete`,
+            text: "Zmazat",
+            icon: <TrashIcon className="size-5" />,
+          },
         ]}
       />
       <div className="mt-6 border-t border-gray-100">

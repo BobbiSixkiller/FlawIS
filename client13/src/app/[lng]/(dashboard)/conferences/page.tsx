@@ -39,14 +39,11 @@ export default async function Conferences({
         links={
           user?.role === Role.Admin
             ? [
-                <Link
-                  key={0}
-                  href="/conferences/new"
-                  className="w-full flex gap-2"
-                  scroll={false}
-                >
-                  <PlusIcon className="w-5 h-5" /> Nova
-                </Link>,
+                {
+                  href: "/conferences/new",
+                  text: "Nova",
+                  icon: <PlusIcon className="size-5" />,
+                },
               ]
             : []
         }

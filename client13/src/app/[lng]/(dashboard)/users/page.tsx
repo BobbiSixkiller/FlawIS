@@ -5,7 +5,7 @@ import Heading from "@/components/Heading";
 import { useTranslation } from "@/lib/i18n";
 import { getUsers } from "./actions";
 import ListUsers from "./ListUsers";
-import { NewUserLink } from "./new/NewUserForm";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default async function Users({
   params: { lng },
@@ -27,7 +27,13 @@ export default async function Users({
         lng={lng}
         heading="Users"
         subHeading="Pouzivatelia registrovani v systeme"
-        links={[<NewUserLink key={0} />]}
+        links={[
+          {
+            href: "/users/new",
+            text: "Novy",
+            icon: <PlusIcon className="size-5" />,
+          },
+        ]}
       />
       {initialData && <ListUsers initialData={initialData} lng={lng} />}
     </div>

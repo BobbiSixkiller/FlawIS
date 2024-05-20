@@ -1,6 +1,5 @@
+import { getSubmission } from "@/app/[lng]/(dashboard)/conferences/[slug]/@attendee/(withTabs)/submissions/[id]/actions";
 import DeleteSubmissionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@attendee/(withTabs)/submissions/[id]/delete/DeleteSubmissionForm";
-import UpdateSubmissionForm from "@/app/[lng]/(dashboard)/conferences/[slug]/@attendee/(withTabs)/submissions/[id]/update/UpdateSubmissionForm";
-import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";
 import { useTranslation } from "@/lib/i18n";
@@ -12,8 +11,7 @@ export default async function DeleteSubmissionPage({
   params: { slug: string; lng: string; id: string };
 }) {
   const { t } = await useTranslation(lng, "conferences");
-  const conference = await getConference(slug);
-  const submission = conference.attending?.submissions.find((s) => s.id === id);
+  const submission = await getSubmission(id);
   if (!submission) {
     redirect(`/conferences/${slug}/submissions`);
   }

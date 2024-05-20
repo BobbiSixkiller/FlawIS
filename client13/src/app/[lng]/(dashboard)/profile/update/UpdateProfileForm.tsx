@@ -5,24 +5,8 @@ import Button from "@/components/Button";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { PencilIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-
-export function UpdateProfileLink({ lng }: { lng: string }) {
-  const router = useRouter();
-
-  const { t } = useTranslation(lng, "common");
-
-  return (
-    <button
-      className="w-full flex gap-2"
-      onClick={() => router.push(`/profile/update`, { scroll: false })}
-    >
-      <PencilIcon className="w-5 h-5" /> {t("update")}
-    </button>
-  );
-}
 
 export default function UpdateProfileForm({
   lng,

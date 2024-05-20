@@ -12,15 +12,6 @@ export default async function AttendeesPage({
   params: { lng: string; slug: string };
   searchParams?: { passive?: string; sectionId?: string[] };
 }) {
-  console.log(searchParams);
-  console.log(
-    searchParams?.sectionId
-      ? Array.isArray(searchParams?.sectionId)
-        ? searchParams.sectionId
-        : [searchParams.sectionId]
-      : []
-  );
-
   const [initialData, exportData, conference] = await Promise.all([
     getAttendees({
       passive: searchParams?.passive ? searchParams.passive === "true" : null,

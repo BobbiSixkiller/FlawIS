@@ -56,7 +56,7 @@ export class SubmissionTranslation {
           constraints: {
             // Constraints that failed validation with error messages.
             name: Container.get(I18nService).translate("nameExists", {
-              ns: "conference",
+              ns: "submission",
               name: submissionExists.translations.sk.name,
             }),
           },
@@ -78,7 +78,7 @@ export class SubmissionTranslation {
           constraints: {
             // Constraints that failed validation with error messages.
             name: Container.get(I18nService).translate("nameExists", {
-              ns: "conference",
+              ns: "submission",
               name: submissionExists.translations.sk.name,
             }),
           },

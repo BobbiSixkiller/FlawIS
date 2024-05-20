@@ -2,6 +2,7 @@
 
 import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
+  ImpersonateDocument,
   RegisterDocument,
   TextSearchUserDocument,
   ToggleVerifiedUserDocument,
@@ -11,6 +12,8 @@ import {
 import { executeGqlFetch, validation } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function getUsers(filter: GetDataFilter) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));

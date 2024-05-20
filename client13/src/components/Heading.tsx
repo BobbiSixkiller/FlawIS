@@ -1,9 +1,10 @@
 "use client";
 
-import { Children, Fragment, ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Menu, Transition } from "@headlessui/react";
 import { useTranslation } from "@/lib/i18n/client";
+import Link from "next/link";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -17,11 +18,11 @@ export default function Heading({
 }: {
   heading: string;
   subHeading?: ReactNode;
-  links?: ReactNode;
+  links?: { text: string; href: string; icon?: ReactNode }[];
   lng: string;
 }) {
-  const children = Children.toArray(links);
-  const first = children.shift();
+  const first = links?.[0];
+  const restLinks = links?.slice(1);
 
   const { t } = useTranslation(lng, "common");
 
@@ -38,24 +39,30 @@ export default function Heading({
         )}
       </div>
       <div className="mt-5 flex gap-3 lg:ml-4 lg:mt-0">
-        {children.map((child, i) => (
+        {restLinks?.map((l, i) => (
           <span className="hidden sm:block" key={i}>
-            <div className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-              {child}
-            </div>
+            <Link
+              scroll={false}
+              href={l.href}
+              className="inline-flex gap-2 items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              {l.icon} {l.text}
+            </Link>
           </span>
         ))}
 
         {first && (
-          <span className="">
-            <div className="inline-flex items-center rounded-md bg-primary-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500">
-              {first}
-            </div>
-          </span>
+          <Link
+            scroll={false}
+            href={first.href}
+            className="inline-flex items-center gap-2 rounded-md bg-primary-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
+            {first.icon} {first.text}
+          </Link>
         )}
 
         {/* Dropdown */}
-        {children.length > 0 && (
+        {restLinks && restLinks.length > 0 && (
           <Menu as="div" className="relative sm:hidden">
             <Menu.Button className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400">
               {t("more")}
@@ -75,17 +82,20 @@ export default function Heading({
               leaveTo="transform opacity-0 scale-95"
             >
               <Menu.Items className="absolute right-0 z-10 -mr-1 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                {children.map((action, i) => (
+                {restLinks.map((link, i) => (
                   <Menu.Item key={i}>
-                    {({ active }) => (
-                      <div
+                    {({ active, close }) => (
+                      <Link
+                        scroll={false}
+                        href={link.href}
                         className={classNames(
                           active ? "bg-gray-100" : "",
-                          "text-sm text-gray-700"
+                          "text-sm text-gray-700 flex items-center gap-2 p-2"
                         )}
+                        onClick={close}
                       >
-                        {action}
-                      </div>
+                        {link.icon} {link.text}
+                      </Link>
                     )}
                   </Menu.Item>
                 ))}

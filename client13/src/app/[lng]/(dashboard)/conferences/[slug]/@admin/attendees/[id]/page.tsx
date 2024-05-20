@@ -1,9 +1,15 @@
 import Heading from "@/components/Heading";
 import { getAttendee } from "./actions";
 import DownloadPDFButton from "./DownloadPDFButton";
-import { PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowsRightLeftIcon,
+  PencilIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { capitalizeFirstLetter } from "@/utils/helpers";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
@@ -29,15 +35,16 @@ export default async function AttendeePage({
         heading={attendee.user.name}
         subHeading={attendee.user.organization}
         links={[
-          <Link
-            key={1}
-            href={`/conferences/${slug}/attendees/${id}/delete`}
-            className="flex gap-2 p-2 sm:p-0"
-            scroll={false}
-          >
-            <TrashIcon className="w-5 h-5" />
-            Zmazat
-          </Link>,
+          {
+            href: `/users/${attendee.user.id}/impersonate`,
+            text: "Impersonovat",
+            icon: <ArrowsRightLeftIcon className="size-5" />,
+          },
+          {
+            href: `/conferences/${slug}/attendees/${id}/delete`,
+            text: "Zmazat",
+            icon: <TrashIcon className="size-5" />,
+          },
         ]}
       />
       <div className="flex gap-2">
@@ -50,7 +57,32 @@ export default async function AttendeePage({
           <PencilIcon className="w-5 h-5" />
         </Link>
       </div>
-      {attendee.submissions.length > 0 && <div>Prispevky</div>}
+      {attendee.submissions.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          {attendee.submissions.map((s) => (
+            <div
+              key={s.id}
+              className="rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1"
+            >
+              <h2 className="font-medium leading-6">
+                {capitalizeFirstLetter(s.translations[lng as "sk" | "en"].name)}
+              </h2>
+              <p className="leading-none text-gray-500">
+                {s.section.translations[lng as "sk" | "en"].name}
+                <br />
+                {s.id}
+              </p>
+              <ul className="mt-2 flex gap-1">
+                {s.authors.map((a) => (
+                  <li key={a.id}>{a.name}</li>
+                ))}
+              </ul>
+              <p>{s.translations[lng as "sk" | "en"].abstract}</p>
+              <p>{s.translations[lng as "sk" | "en"].keywords.join(" • ")}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

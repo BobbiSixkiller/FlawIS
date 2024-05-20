@@ -15,20 +15,6 @@ import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import { updateUser } from "./actions";
 
-export function UpdateUserLink({ id }: { id: string }) {
-  const router = useRouter();
-
-  return (
-    <button
-      type="button"
-      className="w-full flex gap-2"
-      onClick={() => router.push(`/users/${id}/update`, { scroll: false })}
-    >
-      <PencilIcon className="w-5 h-5" /> Aktualizovat
-    </button>
-  );
-}
-
 export default function UpdateUserForm({
   lng,
   user,

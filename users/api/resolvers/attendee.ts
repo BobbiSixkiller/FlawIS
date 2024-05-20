@@ -43,7 +43,6 @@ export class AttendeeResolver {
     const data = await this.attendeeService.dataModel.paginatedAttendees(args);
 
     const connection: AttendeeConnection = data[0];
-    console.log(connection.edges, args);
 
     return {
       pageInfo: connection.pageInfo,

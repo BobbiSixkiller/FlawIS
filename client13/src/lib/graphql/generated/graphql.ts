@@ -769,6 +769,13 @@ export type ActivateUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
+export type ImpersonateQueryVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type ImpersonateQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, token: string } };
+
 export type InvoiceFragment = { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type SectionFragment = { __typename?: 'Section', id: string, conference: string, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } };
@@ -2352,6 +2359,14 @@ fragment User on User {
     ...Billing
   }
 }`) as unknown as TypedDocumentString<ActivateUserMutation, ActivateUserMutationVariables>;
+export const ImpersonateDocument = new TypedDocumentString(`
+    query impersonate($id: ObjectId!) {
+  user(id: $id) {
+    id
+    token
+  }
+}
+    `) as unknown as TypedDocumentString<ImpersonateQuery, ImpersonateQueryVariables>;
 export const ConferencesDocument = new TypedDocumentString(`
     query conferences($after: ObjectId, $first: Int) {
   conferences(after: $after, first: $first) {

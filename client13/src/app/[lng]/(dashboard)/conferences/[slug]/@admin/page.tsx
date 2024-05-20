@@ -31,25 +31,16 @@ export default async function ConferencePage({
           heading={conference!.slug}
           subHeading={conference!.translations[lng as "sk" | "en"].name}
           links={[
-            <Link
-              key={0}
-              href={`/conferences/${slug}/updateDates`}
-              className="flex gap-2"
-              scroll={false}
-            >
-              <PencilIcon className="w-5 h-5" />
-              Aktualizovat
-            </Link>,
-            ,
-            <Link
-              key={1}
-              href={`/conferences/${slug}/delete`}
-              className="flex gap-2 p-2 sm:p-0"
-              scroll={false}
-            >
-              <TrashIcon className="w-5 h-5" />
-              Zmazat
-            </Link>,
+            {
+              href: `/conferences/${slug}/updateDates`,
+              text: "Aktualizovat",
+              icon: <PencilIcon className="size-5" />,
+            },
+            {
+              href: `/conferences/${slug}/delete`,
+              text: "Zmazat",
+              icon: <TrashIcon className="size-5" />,
+            },
           ]}
         />
       </div>

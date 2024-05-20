@@ -1,7 +1,7 @@
 import { useTranslation } from "@/lib/i18n";
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
-import { UpdateProfileLink } from "./update/UpdateProfileForm";
+import { PencilIcon } from "@heroicons/react/24/outline";
 
 export default async function Profile({
   params: { lng },
@@ -17,7 +17,13 @@ export default async function Profile({
         heading={t("heading")}
         subHeading={t("subheading")}
         lng={lng}
-        links={[<UpdateProfileLink key={0} lng={lng} />]}
+        links={[
+          {
+            href: "/profile/update",
+            text: t("update"),
+            icon: <PencilIcon className="size-5" />,
+          },
+        ]}
       />
 
       <div className="border-t border-gray-100">

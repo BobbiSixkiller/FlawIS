@@ -131,6 +131,7 @@ export async function getMe() {
 export async function logout() {
   cookies().delete("user");
   cookies().delete("accessToken");
+  redirect("/");
 }
 
 export async function sendResetLink(prevState: any, formData: FormData) {

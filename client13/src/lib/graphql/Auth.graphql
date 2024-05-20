@@ -83,3 +83,10 @@ mutation activateUser {
     }
   }
 }
+
+query impersonate($id: ObjectId!) {
+  user(id: $id) {
+    id
+    token
+  }
+}

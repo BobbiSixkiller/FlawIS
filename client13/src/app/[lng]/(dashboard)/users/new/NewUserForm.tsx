@@ -6,20 +6,6 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { addUser } from "../actions";
 import { useTranslation } from "@/lib/i18n/client";
-import { PlusIcon } from "@heroicons/react/24/outline";
-
-export function NewUserLink() {
-  const router = useRouter();
-
-  return (
-    <button
-      className="w-full flex gap-2"
-      onClick={() => router.push(`/users/new`, { scroll: false })}
-    >
-      <PlusIcon className="w-5 h-5" /> Novy
-    </button>
-  );
-}
 
 export default function NewUserForm({ lng }: { lng: string }) {
   const router = useRouter();
