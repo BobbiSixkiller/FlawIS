@@ -16,6 +16,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import parseErrors, { ErrorException } from "@/utils/parseErrors";
 import { executeGqlFetch, validation } from "@/utils/actions";
+import { OAuth2Client } from "google-auth-library";
 
 export async function register(prevState: any, formData: FormData) {
   const { registerInputSchema } = await validation();
@@ -108,6 +109,24 @@ export async function login(prevState: any, formData: FormData) {
   }
 
   redirect(formData.get("url")?.toString() || "/conferences");
+}
+
+const client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+export async function getGoogleAuthLink() {
+  const authUrl = client.generateAuthUrl({
+    access_type: "offline",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ],
+  });
+
+  redirect(authUrl);
 }
 
 export async function getMe() {

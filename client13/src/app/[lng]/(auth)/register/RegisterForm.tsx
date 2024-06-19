@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/lib/i18n/client";
 import { useFormState } from "react-dom";
-import { register } from "../actions";
+import { getGoogleAuthLink, register } from "../actions";
 import { useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
@@ -203,8 +203,8 @@ export default function RegisterForm({
         <div className="flex-grow border-t border-gray-300"></div>
       </div>
       <div className="flex justify-center gap-3">
-        <Link
-          href={"/google"}
+        <button
+          onClick={() => getGoogleAuthLink()}
           className="text-sm rounded-md border border-gray-300 hover:border-primary-500  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
         >
           <svg
@@ -233,7 +233,7 @@ export default function RegisterForm({
             ></path>
           </svg>
           Google
-        </Link>
+        </button>
         {/* <button className="text-sm rounded-md border border-gray-300 hover:border-primary-500 px-3.5 py-2 w-32 flex gap-2 justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"

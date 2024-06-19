@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/lib/i18n/client";
 import { useFormState } from "react-dom";
-import { login } from "../actions";
+import { getGoogleAuthLink, login } from "../actions";
 import { Trans } from "react-i18next";
 import Link from "next/link";
 import Button from "@/components/Button";
@@ -97,8 +97,9 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
         <div className="flex-grow border-t border-gray-300"></div>
       </div>
       <div className="flex justify-center gap-3">
-        <Link
-          href={"/google"}
+        <button
+          type="button"
+          onClick={() => getGoogleAuthLink()}
           className="text-sm rounded-md border border-gray-300 hover:border-primary-500  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
         >
           <svg
@@ -127,7 +128,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             ></path>
           </svg>
           Google
-        </Link>
+        </button>
         {/* <button className="text-sm rounded-md border border-gray-300 hover:border-primary-500 px-3.5 py-2 w-32 flex gap-2 justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
