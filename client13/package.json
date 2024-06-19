@@ -17,6 +17,7 @@
     "@react-pdf/renderer": "^3.4.4",
     "accept-language": "^3.0.18",
     "csv-stringify": "^6.4.6",
+    "google-auth-library": "^9.11.0",
     "graphql": "^16.8.1",
     "i18next": "^23.7.7",
     "i18next-browser-languagedetector": "^7.2.0",

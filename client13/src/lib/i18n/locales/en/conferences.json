@@ -5,7 +5,7 @@
     "ticket": "Form of attendance",
     "billing": {
       "info": "Billing information",
-      "meno": "Name",
+      "name": "Name",
       "street": "Street",
       "city": "City",
       "postal": "Postal code",

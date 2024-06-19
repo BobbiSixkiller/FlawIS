@@ -9,5 +9,6 @@
   "more": "More",
   "step": "Step",
   "confirm": "Confirm",
-  "deleteConfirm": "Do you really wish to delete {{name}}?"
+  "deleteConfirm": "Do you really wish to delete {{name}}?",
+  "notFound": "Nothing found."
 }

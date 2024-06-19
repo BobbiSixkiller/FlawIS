@@ -9,5 +9,6 @@
   "more": "Viac",
   "step": "Krok",
   "confirm": "Potvrdiť",
-  "deleteConfirm": "Naozaj si prajete zmazať {{name}}?"
+  "deleteConfirm": "Naozaj si prajete zmazať {{name}}?",
+  "notFound": "Nič sa nenašlo."
 }

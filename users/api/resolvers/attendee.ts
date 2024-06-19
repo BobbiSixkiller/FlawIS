@@ -98,6 +98,10 @@ export class AttendeeResolver {
       { slug: attendee.conference.slug },
       { $inc: { attendeesCount: -1 } }
     );
+    await this.submissionService.update(
+      { authors: attendee.user.id },
+      { $pull: { authors: attendee.user.id } }
+    );
 
     return {
       data: attendee,

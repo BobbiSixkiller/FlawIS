@@ -10,5 +10,6 @@
   "submit": "Register",
   "submitting": "Registering...",
   "login": "Already have an account? <login>Log in!</login>",
-  "flaw": "Comenius University in Bratislava, Faculty of Law"
+  "flaw": "Comenius University in Bratislava, Faculty of Law",
+  "continue": "Or continue"
 }

@@ -5,7 +5,7 @@
     "ticket": "Forma účasti",
     "billing": {
       "info": "Fakturačné údaje",
-      "meno": "Meno",
+      "name": "Meno",
       "street": "Ulica",
       "city": "Mesto",
       "postal": "PSČ",

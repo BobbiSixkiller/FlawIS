@@ -30,7 +30,7 @@ registerEnumType(Role, {
 });
 
 @pre<User>("save", async function () {
-  if (this.isNew || this.isModified("password")) {
+  if ((this.isNew && this.password) || this.isModified("password")) {
     this.password = await hash(this.password, 12);
   }
   if (this.isNew || this.isModified("email")) {

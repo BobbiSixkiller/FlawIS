@@ -32,16 +32,8 @@ env.config();
 
 const origins =
   process.env.NODE_ENV !== "staging"
-    ? [
-        `https://flawis.flaw.uniba.sk`,
-        `https://conferences.flaw.uniba.sk`,
-        `http://client:3000`,
-        `http://localhost:3000`,
-        `http://client13:3000`,
-      ]
+    ? [`http://client:3000`, `http://localhost:3000`]
     : [
-        `https://flawis-staging.flaw.uniba.sk`,
-        `https://conferences-staging.flaw.uniba.sk`,
         // `http://client-staging:4000`,
         // `http://localhost-staging:4000`,
       ];
@@ -62,28 +54,23 @@ async function mongoDbConnect() {
 
 async function main() {
   //Build schema
-  const schema = await buildSchema(
-    {
-      resolvers: [
-        UserResolver,
-        ConferencerResolver,
-        SectionResolver,
-        SubmissionResolver,
-        AttendeeResolver,
-      ],
-      // use document converting middleware
-      globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
-      // use ObjectId scalar mapping
-      scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
-      emitSchemaFile: true,
-      container: Container,
-      validate: true,
-      authChecker,
-    }
-    // {
-    //   User: { __resolveReference: resolveUserReference },
-    // }
-  );
+  const schema = await buildSchema({
+    resolvers: [
+      UserResolver,
+      ConferencerResolver,
+      SectionResolver,
+      SubmissionResolver,
+      AttendeeResolver,
+    ],
+    // use document converting middleware
+    globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
+    // use ObjectId scalar mapping
+    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+    emitSchemaFile: true,
+    container: Container,
+    validate: true,
+    authChecker,
+  });
 
   const app = Express();
   const httpServer = http.createServer(app);

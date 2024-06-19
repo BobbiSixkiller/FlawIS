@@ -252,6 +252,7 @@ type Mutation {
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
   deleteTicket(slug: String!, ticketId: ObjectId!): String!
   deleteUser(id: ObjectId!): UserMutationResponse!
+  googleSignIn(authCode: String!): UserMutationResponse!
   login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!

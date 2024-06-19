@@ -10,6 +10,9 @@ services:
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     depends_on:
       minio:
         condition: service_healthy
@@ -27,13 +30,17 @@ services:
     ports:
       - "5000:5000"
 
-  client13:
+  client:
     build:
       context: ./client13
       dockerfile: Dockerfile
       # args:
       #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-prod
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     depends_on:
       - core
     restart: unless-stopped

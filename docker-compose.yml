@@ -8,9 +8,12 @@ services:
     environment:
       NODE_ENV: development
       SECRET: ${SECRET}
-      MONGODB_URI: ${USERS_MONGODB_URI}
+      MONGODB_URI: ${MONGODB_URI}
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     depends_on:
       minio:
         condition: service_healthy
@@ -31,11 +34,15 @@ services:
     ports:
       - "5000:5000"
 
-  client13:
+  client:
     build:
       context: ./client13
       dockerfile: Dockerfile
     command: npm run dev
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     depends_on:
       - core
     volumes:

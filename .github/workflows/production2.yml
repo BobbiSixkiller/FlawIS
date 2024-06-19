@@ -28,8 +28,10 @@ jobs:
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ vars.MAIL_FROM }}
-          BACKEND_URL: ${{ vars.BACKEND_URL }}
           RMQ_URI: ${{ vars.RMQ_URI }}
           RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
           docker-compose -f docker-compose.prod.yml up -d --build

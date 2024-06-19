@@ -45,7 +45,7 @@ export default function DeleteSubmissionForm({
   }
 
   return (
-    <div className="space-y-6 text-center">
+    <div className="space-y-6 text-center max-w-96">
       <h1>
         {t("deleteConfirm", {
           name: submission.translations[lng as "sk" | "en"]?.name,

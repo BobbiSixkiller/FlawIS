@@ -22,13 +22,19 @@ import { RateLimit } from "../middlewares/ratelimit-middleware";
 import { I18nService } from "../services/i18nService";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
+import { OAuth2Client } from "google-auth-library";
 
 @Service()
 @Resolver()
 export class UserResolver {
   constructor(
     private readonly userService = new CRUDservice(User),
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
+    private readonly googleOAuthClient = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+    )
   ) {
     // userService.dataModel
     //   .watch([])
@@ -182,7 +188,8 @@ export class UserResolver {
     @Arg("password") password: string
   ): Promise<UserMutationResponse> {
     const user = await this.userService.findOne({ email });
-    if (!user) throw new Error(this.i18nService.translate("credentials"));
+    if (!user || !user?.password)
+      throw new Error(this.i18nService.translate("credentials"));
 
     const match = await compare(password, user.password);
     if (!match) throw new Error(this.i18nService.translate("credentials"));
@@ -194,6 +201,46 @@ export class UserResolver {
         name: user.name,
       }),
     };
+  }
+
+  @Mutation(() => UserMutationResponse)
+  @UseMiddleware([RateLimit(50)])
+  async googleSignIn(
+    @Arg("authCode") authCode: string
+  ): Promise<UserMutationResponse> {
+    try {
+      const { tokens } = await this.googleOAuthClient.getToken(authCode);
+      this.googleOAuthClient.setCredentials(tokens);
+
+      const ticket = await this.googleOAuthClient.verifyIdToken({
+        idToken: tokens.id_token!,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (payload) {
+        // Here you can create a session or JWT for the user
+        // For simplicity, we're returning the user payload directly
+        let user = await this.userService.findOne({ email: payload.email });
+        if (!user) {
+          user = await this.userService.create({
+            name: payload.name,
+            email: payload.email,
+            verified: payload.email_verified,
+          });
+        }
+
+        return {
+          data: user,
+          message: this.i18nService.translate("welcome", {
+            ns: "user",
+            name: user.name,
+          }),
+        };
+      } else throw new Error("Invalid token payload");
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
   }
 
   @Query(() => String)

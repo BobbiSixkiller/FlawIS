@@ -46,6 +46,16 @@ mutation login($email: String!, $password: String!) {
   }
 }
 
+mutation googleSignIn($authCode: String!) {
+  googleSignIn(authCode: $authCode) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
 query forgotPassword($email: String!) {
   forgotPassword(email: $email)
 }

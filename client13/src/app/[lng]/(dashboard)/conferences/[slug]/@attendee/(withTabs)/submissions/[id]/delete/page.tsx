@@ -19,7 +19,7 @@ export default async function DeleteSubmissionPage({
       >
         <XMarkIcon className="w-5 h-5" />
       </Link>
-      <div className="mx-auto w-full sm:mx-auto sm:max-w-96 flex flex-col gap-4">
+      <div className="mx-auto flex flex-col gap-4">
         <FormMessage lng={lng} />
         <DeleteSubmissionForm lng={lng} submission={submission} />
       </div>

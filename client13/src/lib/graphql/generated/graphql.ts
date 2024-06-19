@@ -283,6 +283,7 @@ export type Mutation = {
   deleteSubmission: SubmissionMutationResponse;
   deleteTicket: Scalars['String']['output'];
   deleteUser: UserMutationResponse;
+  googleSignIn: UserMutationResponse;
   login: UserMutationResponse;
   passwordReset: UserMutationResponse;
   register: UserMutationResponse;
@@ -351,6 +352,11 @@ export type MutationDeleteTicketArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationGoogleSignInArgs = {
+  authCode: Scalars['String']['input'];
 };
 
 
@@ -737,6 +743,13 @@ export type LoginMutationVariables = Exact<{
 
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+
+export type GoogleSignInMutationVariables = Exact<{
+  authCode: Scalars['String']['input'];
+}>;
+
+
+export type GoogleSignInMutation = { __typename?: 'Mutation', googleSignIn: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -2232,6 +2245,45 @@ fragment User on User {
     ...Billing
   }
 }`) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
+export const GoogleSignInDocument = new TypedDocumentString(`
+    mutation googleSignIn($authCode: String!) {
+  googleSignIn(authCode: $authCode) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment Billing on Billing {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+}
+fragment User on User {
+  id
+  name
+  email
+  organization
+  telephone
+  role
+  verified
+  createdAt
+  updatedAt
+  billings {
+    ...Billing
+  }
+}`) as unknown as TypedDocumentString<GoogleSignInMutation, GoogleSignInMutationVariables>;
 export const ForgotPasswordDocument = new TypedDocumentString(`
     query forgotPassword($email: String!) {
   forgotPassword(email: $email)

@@ -12,7 +12,6 @@ import {
   SectionFragment,
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
-import { LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import { updateSubmission } from "./actions";
 import Select from "@/components/Select";
@@ -115,7 +114,7 @@ export default function UpdateSubmissionForm({
             value: s.id,
           }))}
         />
-        <LocalizedInput
+        <LocalizedTextarea
           lng={lng}
           label={t("registration.submission.name", { ns: "conferences" })}
           name={`translations.${lng}.name`}
