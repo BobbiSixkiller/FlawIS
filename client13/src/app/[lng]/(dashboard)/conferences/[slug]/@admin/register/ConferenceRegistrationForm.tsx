@@ -225,12 +225,22 @@ export default function ConferenceRegistrationForm({
           <LocalizedMultipleInput
             disabled={submission !== undefined}
             lng={lng}
-            label={t("registration.submission.keywords", { ns: "conferences" })}
+            label={t("registration.submission.keywords.label", {
+              ns: "conferences",
+            })}
+            placeholder={t("registration.submission.keywords.placeholder", {
+              ns: "conferences",
+            })}
             name={`submission.translations.${lng}.keywords`}
           />
           <MultipleInput
             disabled={submission !== undefined}
-            label={t("registration.submission.authors", { ns: "conferences" })}
+            label={t("registration.submission.authors.label", {
+              ns: "conferences",
+            })}
+            placeholder={t("registration.submission.authors.placeholder", {
+              ns: "conferences",
+            })}
             name="submission.authors"
           />
         </WizzardStep>

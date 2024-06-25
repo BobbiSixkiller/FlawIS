@@ -8,7 +8,6 @@ import { Trans } from "react-i18next";
 
 import Button from "@/components/Button";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import Link from "next/link";
 
 export default function RegisterForm({
   lng,

@@ -9,7 +9,7 @@ export function MultipleInput({
   label,
   name,
   onFocus,
-  disabled,
+  ...props
 }: {
   label: string;
   name: string;
@@ -56,13 +56,12 @@ export function MultipleInput({
         {label}
       </label>
       <div
-        className={`py-1.5 pl-2.5 flex flex-wrap gap-1  w-full rounded-md border-0 ${
-          disabled ? "text-slate-500 bg-slate-100" : "text-gray-900"
-        } shadow-sm ring-1 ring-gray-300 ${
-          focus ? "ring-primary-500 ring-2" : ""
-        } shadow-sm sm:text-sm sm:leading-6 relative`}
+        className={`py-1 pl-2.5 flex flex-wrap gap-1  w-full rounded-md border-0 
+            disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 shadow-sm ring-1 ring-gray-300 ${
+              focus ? "ring-primary-500 ring-2" : ""
+            } shadow-sm sm:text-sm sm:leading-6 relative`}
         onClick={() => {
-          if (!disabled) {
+          if (!props.disabled) {
             setFocus(true);
           }
         }}
@@ -78,7 +77,7 @@ export function MultipleInput({
                 type="button"
                 className="hover:text-gray-500 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
                 onClick={() => {
-                  if (!disabled) {
+                  if (!props.disabled) {
                     setValue(
                       name,
                       strings.filter((i) => i !== p),
@@ -96,13 +95,11 @@ export function MultipleInput({
           ))}
         <div className="flex-1 flex gap-1">
           <input
-            disabled={disabled}
+            {...props}
             {...register(name)}
-            className={`w-full sm:text-sm sm:leading-6 ${
-              disabled ? "text-slate-500 bg-slate-100" : "text-gray-900"
-            } border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 focus:ring-transparent`}
+            className="w-full sm:text-sm sm:leading-6 disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 placeholder:truncate focus:ring-transparent"
             onFocus={(e) => {
-              if (!disabled) {
+              if (!props.disabled) {
                 setFocus(true);
                 if (onFocus) {
                   onFocus(e);
@@ -129,7 +126,7 @@ export function MultipleInput({
               }
             }}
           >
-            <PlusIcon className="h-3 w-3" />
+            <PlusIcon className="size-3 stroke-2" />
           </button>
         </div>
       </div>

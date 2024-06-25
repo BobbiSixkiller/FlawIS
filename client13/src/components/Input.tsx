@@ -23,11 +23,10 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
         {label}
       </label>
       <input
-        {...register(name)}
         {...props}
+        {...register(name)}
         onFocus={onFocus}
         id={name}
-        placeholder={props.placeholder}
         className={
           props.type === "file"
             ? `block w-full text-sm text-slate-500

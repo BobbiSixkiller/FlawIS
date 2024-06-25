@@ -19,8 +19,14 @@
       "section": "Sekcia",
       "name": "Názov príspevku",
       "abstract": "Abstrakt",
-      "keywords": "Kľúčové slová",
-      "authors": "Email adresy spoluautorov"
+      "keywords": {
+        "label": "Kľúčové slová",
+        "placeholder": "Pre pridanie slova stlačte enter"
+      },
+      "authors": {
+        "label": "Email adresy spoluautorov",
+        "placeholder": "Pre pridanie adresy stlačte enter"
+      }
     }
   },
   "submission": {

@@ -19,8 +19,14 @@
       "section": "Section",
       "name": "Submission name",
       "abstract": "Abstract",
-      "keywords": "Keywords",
-      "authors": "Co-authors email addresses"
+      "keywords": {
+        "label": "Keywords",
+        "placeholder": "To add a keyword press enter"
+      },
+      "authors": {
+        "label": "Co-authors email addresses",
+        "placeholder": "To add an adress press enter"
+      }
     }
   },
   "submission": {
