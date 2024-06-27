@@ -126,11 +126,21 @@ export default function UpdateSubmissionForm({
         />
         <LocalizedMultipleInput
           lng={lng}
-          label={t("registration.submission.keywords", { ns: "conferences" })}
+          label={t("registration.submission.keywords.label", {
+            ns: "conferences",
+          })}
+          placeholder={t("registration.submission.keywords.placeholder", {
+            ns: "conferences",
+          })}
           name={`translations.${lng}.keywords`}
         />
         <MultipleInput
-          label={t("registration.submission.authors", { ns: "conferences" })}
+          label={t("registration.submission.authors.label", {
+            ns: "conferences",
+          })}
+          placeholder={t("registration.submission.authors.placeholder", {
+            ns: "conferences",
+          })}
           name="authors"
         />
 

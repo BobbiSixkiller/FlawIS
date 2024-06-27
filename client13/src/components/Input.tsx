@@ -1,8 +1,8 @@
 "use client";
 
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, useEffect } from "react";
 import { withLocalizedInput } from "./withLocalizedInput";
-import { useFormContext } from "react-hook-form";
+import { useController, useFormContext } from "react-hook-form";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -10,9 +10,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Input({ name, label, onFocus, ...props }: InputProps) {
-  const { register, getFieldState } = useFormContext();
-
-  const { error } = getFieldState(name);
+  const { field, fieldState } = useController({ name });
 
   return (
     <div>
@@ -24,7 +22,7 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
       </label>
       <input
         {...props}
-        {...register(name)}
+        {...field}
         onFocus={onFocus}
         id={name}
         className={
@@ -37,7 +35,9 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
             : "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
         }
       />
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {fieldState.error && (
+        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      )}
     </div>
   );
 }

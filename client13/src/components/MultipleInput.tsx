@@ -1,8 +1,8 @@
 "use client";
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { InputHTMLAttributes, useEffect, useRef, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { InputHTMLAttributes, useState } from "react";
+import { useController } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 
 export function MultipleInput({
@@ -14,35 +14,23 @@ export function MultipleInput({
   label: string;
   name: string;
 } & InputHTMLAttributes<HTMLInputElement>) {
-  const { watch, setValue, getFieldState, register } = useFormContext();
-  const strings: string[] = watch(name, []);
-  const { error } = getFieldState(name);
+  const { field, fieldState } = useController({ name });
+
+  const strings: string[] = field.value || [];
 
   const [input, setInput] = useState("");
   const [focus, setFocus] = useState(false);
-  const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (focus) {
-      ref.current?.focus();
-    }
-  }, [focus]);
 
   // Handle key down event on input field
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Backspace" && input === "") {
       // Prevent the default backspace behavior
       event.preventDefault();
-      setValue(name, strings.slice(0, -1), {
-        shouldTouch: true,
-        shouldValidate: true,
-      });
+      field.onChange(strings.slice(0, -1));
     } else if (event.key === "Enter" && input.trim() !== "") {
-      event.preventDefault(); // Prevent form submission
-      setValue(name, Array.from(new Set(strings).add(input)), {
-        shouldTouch: true,
-        shouldValidate: true,
-      });
+      // Prevent form submission
+      event.preventDefault();
+      field.onChange(Array.from(new Set(strings).add(input)));
       setInput("");
     }
   };
@@ -78,14 +66,7 @@ export function MultipleInput({
                 className="hover:text-gray-500 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
                 onClick={() => {
                   if (!props.disabled) {
-                    setValue(
-                      name,
-                      strings.filter((i) => i !== p),
-                      {
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      }
-                    );
+                    field.onChange(strings.filter((i) => i !== p));
                   }
                 }}
               >
@@ -96,7 +77,8 @@ export function MultipleInput({
         <div className="flex-1 flex gap-1">
           <input
             {...props}
-            {...register(name)}
+            {...field}
+            id={name}
             className="w-full sm:text-sm sm:leading-6 disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 placeholder:truncate focus:ring-transparent"
             onFocus={(e) => {
               if (!props.disabled) {
@@ -107,7 +89,6 @@ export function MultipleInput({
               }
             }}
             onBlur={() => setFocus(false)}
-            ref={ref}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -117,10 +98,7 @@ export function MultipleInput({
             className="p-2 hover:text-primary-500 text-gray-400 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
             onClick={() => {
               if (input !== "") {
-                setValue(name, Array.from(new Set(strings).add(input)), {
-                  shouldTouch: true,
-                  shouldValidate: true,
-                });
+                field.onChange(Array.from(new Set(strings).add(input)));
                 setInput("");
                 setFocus(true);
               }
@@ -130,7 +108,9 @@ export function MultipleInput({
           </button>
         </div>
       </div>
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {fieldState.error && (
+        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      )}
     </div>
   );
 }

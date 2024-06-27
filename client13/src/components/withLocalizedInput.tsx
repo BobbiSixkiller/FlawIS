@@ -6,9 +6,11 @@ import {
   ComponentType,
   Fragment,
   InputHTMLAttributes,
+  useEffect,
   useRef,
   useState,
 } from "react";
+import { useController } from "react-hook-form";
 
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
@@ -22,9 +24,23 @@ export function withLocalizedInput(
 ) {
   return function WithLocalizedInputComponent() {
     const [visible, setVisible] = useState(false);
+    //if there is an error in the localized field make it visible
+    const { fieldState } = useController({
+      name: props.name.replace(lng, lng === "sk" ? "en" : "sk"),
+    });
+
+    useEffect(() => {
+      if (fieldState.error) {
+        setVisible(true);
+      }
+    }, [fieldState.error]);
 
     const ref = useRef<HTMLDivElement>(null);
-    useOnClickOutside(ref, () => setVisible(false));
+    useOnClickOutside(ref, () => {
+      if (!fieldState.error) {
+        setVisible(false);
+      }
+    });
 
     return (
       <div ref={ref}>
