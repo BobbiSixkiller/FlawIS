@@ -12,14 +12,14 @@ export default async function Users({
 }: {
   params: { lng: string };
 }) {
-  const { t } = await useTranslation(lng, "users");
-
   const user = await getMe();
   if (user?.role !== Role.Admin) {
     redirect("/");
   }
 
   const initialData = await getUsers({});
+
+  const { t } = await useTranslation(lng, "users");
 
   return (
     <div className="flex flex-col gap-6">

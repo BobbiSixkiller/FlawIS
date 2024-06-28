@@ -5,6 +5,7 @@ import { getAllAttendees, getAttendees } from "./actions";
 import AttendeeFilter from "./AttendeeFilter";
 import { getConference } from "../../../actions";
 import { redirect } from "next/navigation";
+import { getMe } from "@/app/[lng]/(auth)/actions";
 
 export default async function AttendeesPage({
   params: { lng, slug },
@@ -26,10 +27,6 @@ export default async function AttendeesPage({
     getAllAttendees(slug),
     getConference(slug),
   ]);
-
-  if (!initialData || !exportData) {
-    redirect(`/conferences/${slug}`);
-  }
 
   return (
     <div className="flex flex-col gap-4">

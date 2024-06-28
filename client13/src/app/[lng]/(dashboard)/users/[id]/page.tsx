@@ -15,7 +15,6 @@ export default async function User({
   params: { lng: string; id: string };
 }) {
   const user = await getUser(id);
-
   if (!user) {
     redirect("/users");
   }

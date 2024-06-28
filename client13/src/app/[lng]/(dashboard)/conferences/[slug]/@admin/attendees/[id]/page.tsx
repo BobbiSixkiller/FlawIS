@@ -10,12 +10,18 @@ import {
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter } from "@/utils/helpers";
+import { getMe } from "@/app/[lng]/(auth)/actions";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
 }: {
   params: { slug: string; id: string; lng: string };
 }) {
+  const user = await getMe();
+  if (!user) {
+    redirect(`/conferences/${slug}`);
+  }
+
   const attendee = await getAttendee(id);
   if (!attendee) {
     redirect(`/conferences/${slug}/attendees`);
