@@ -15,7 +15,6 @@ export default function ImpersonateForm({
   user: UserFragment;
   lng: string;
 }) {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   function handleClick() {
@@ -34,7 +33,7 @@ export default function ImpersonateForm({
           type: ActionTypes.SetAppMsg,
           payload: state,
         });
-        router.replace("/conferences");
+        location.reload();
       }
     });
   }
