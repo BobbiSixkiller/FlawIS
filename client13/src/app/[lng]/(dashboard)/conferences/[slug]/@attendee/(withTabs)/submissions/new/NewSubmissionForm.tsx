@@ -8,7 +8,6 @@ import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { array, object, string } from "yup";
 import { createSubmission } from "./actions";
-import { LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Button from "@/components/Button";
 import { SectionFragment } from "@/lib/graphql/generated/graphql";
@@ -112,7 +111,7 @@ export default function NewSubmissionForm({
             value: s.id,
           }))}
         />
-        <LocalizedInput
+        <LocalizedTextarea
           lng={lng}
           label={t("registration.submission.name", { ns: "conferences" })}
           name={`translations.${lng}.name`}

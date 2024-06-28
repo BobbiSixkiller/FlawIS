@@ -47,7 +47,6 @@ export function RefDocExists(
 
 export function CheckTicket(): ParameterDecorator {
   return createParamDecorator<Context>(async ({ args, context }) => {
-    console.log("IDE");
     const conference = await getModelForClass(Conference).findOne({
       _id: args.data.conferenceId,
     });

@@ -18,7 +18,7 @@ import Ticket from "./Ticket";
 
 import BillingInput from "./BillingInput";
 import { LocalizedTextarea } from "@/components/Textarea";
-import { Input, LocalizedInput } from "@/components/Input";
+import { Input } from "@/components/Input";
 import {
   LocalizedMultipleInput,
   MultipleInput,
@@ -210,7 +210,7 @@ export default function ConferenceRegistrationForm({
             }))}
             defaultSelected={submission?.section.id}
           />
-          <LocalizedInput
+          <LocalizedTextarea
             disabled={submission !== undefined}
             lng={lng}
             label={t("registration.submission.name", { ns: "conferences" })}
