@@ -1,9 +1,4 @@
-import {
-  getModelForClass,
-  post,
-  pre,
-  prop as Property,
-} from "@typegoose/typegoose";
+import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Field, Float, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";

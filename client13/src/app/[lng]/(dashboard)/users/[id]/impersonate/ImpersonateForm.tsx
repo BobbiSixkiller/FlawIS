@@ -34,7 +34,7 @@ export default function ImpersonateForm({
           type: ActionTypes.SetAppMsg,
           payload: state,
         });
-        router.replace("/");
+        router.replace("/conferences");
       }
     });
   }

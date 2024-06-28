@@ -2,6 +2,7 @@
 
 import { ImpersonateDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
+import { redirect } from "next/dist/server/api-utils";
 import { cookies } from "next/headers";
 
 export async function impersonate(id: string) {
@@ -15,7 +16,7 @@ export async function impersonate(id: string) {
     );
     if (res.errors) {
       console.log(res.errors[0]);
-      throw new Error();
+      throw new Error(res.errors[0].message);
     }
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     cookies().set("user", res.data.user.id, {
