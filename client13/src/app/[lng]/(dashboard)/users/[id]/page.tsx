@@ -16,11 +16,11 @@ export default async function User({
 }) {
   const user = await getUser(id);
 
-  const { t } = await useTranslation(lng, ["profile", "common"]);
-
   if (!user) {
     redirect("/users");
   }
+
+  const { t } = await useTranslation(lng, ["profile", "common"]);
 
   return (
     <div>

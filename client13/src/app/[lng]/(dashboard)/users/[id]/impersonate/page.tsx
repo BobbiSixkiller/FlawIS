@@ -3,7 +3,7 @@ import { getUser } from "../../actions";
 import ImpersonateForm from "./ImpersonateForm";
 import { redirect } from "next/navigation";
 
-export default async function DeleteUserPage({
+export default async function ImpersonateUserPage({
   params: { id, lng },
 }: {
   params: { lng: string; id: string };
@@ -20,5 +20,3 @@ export default async function DeleteUserPage({
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";
