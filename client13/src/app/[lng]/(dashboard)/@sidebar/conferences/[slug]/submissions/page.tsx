@@ -9,5 +9,5 @@ export default async function Sidebar({
 }) {
   const user = await getMe();
 
-  return user?.role === Role.Admin ? <SearchConference lng={lng} /> : null;
+  return user?.role === Role.Admin ? <SearchConference /> : null;
 }

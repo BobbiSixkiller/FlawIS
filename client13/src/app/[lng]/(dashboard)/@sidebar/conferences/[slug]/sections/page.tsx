@@ -5,5 +5,5 @@ export default async function Sidebar({
 }: {
   params: { lng: string };
 }) {
-  return <SearchConference lng={lng} />;
+  return <SearchConference />;
 }
