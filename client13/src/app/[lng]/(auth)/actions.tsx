@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import {
   ActivateUserDocument,
@@ -148,8 +148,15 @@ export async function getMe() {
 }
 
 export async function logout() {
+  const user = cookies().get("user")?.value;
+  if (!user) return;
+  revalidateTag(user);
+
   cookies().delete("user");
   cookies().delete("accessToken");
+
+  revalidatePath("/[lng]/(dashboard)", "page");
+
   redirect("/");
 }
 

@@ -61,7 +61,7 @@ type AttendeeMutationResponse implements IMutationResponse {
 }
 
 type AttendeePageInfo {
-  endCursor: ObjectId!
+  endCursor: ObjectId
   hasNextPage: Boolean!
 }
 
@@ -139,7 +139,7 @@ type ConferenceMutationResponse implements IMutationResponse {
 }
 
 type ConferencePageInfo {
-  endCursor: ObjectId!
+  endCursor: ObjectId
   hasNextPage: Boolean!
 }
 
@@ -282,6 +282,7 @@ type Query {
   forgotPassword(email: String!): String!
   me: User!
   submission(id: ObjectId!): Submission!
+  textSearchAttendee(text: String!): [Attendee!]!
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
@@ -453,6 +454,6 @@ type UserMutationResponse implements IMutationResponse {
 }
 
 type UserPageInfo {
-  endCursor: ObjectId!
+  endCursor: ObjectId
   hasNextPage: Boolean!
 }

@@ -66,6 +66,17 @@ query attendeesCsvExport($slug: String!) {
   }
 }
 
+query textSearchAttendee($text: String!) {
+  textSearchAttendee(text: $text) {
+    id
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+
 mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {
   updateInvoice(id: $id, data: $data) {
     message

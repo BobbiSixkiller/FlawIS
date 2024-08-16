@@ -14,13 +14,13 @@ interface PageInfo {
   endCursor: string;
 }
 
-export interface Edge<T> {
+export interface Edge<EdgeT> {
   cursor: string;
-  node: T;
+  node: EdgeT;
 }
 
-export interface Connection<T> {
-  edges: (Edge<T> | null)[];
+export interface Connection<EdgeT> {
+  edges: (Edge<EdgeT> | null)[];
   pageInfo: PageInfo;
 }
 
@@ -30,17 +30,17 @@ export interface GetDataFilter {
   [key: string]: any; // This allows for any other properties with any type.
 }
 
-interface ScrollProps<T> {
+interface ScrollProps<EdgeT> {
   lng: string;
-  initialData: Connection<T>;
+  initialData: Connection<EdgeT>;
   filter: GetDataFilter;
-  getData: (filter: GetDataFilter) => Promise<Connection<T>>;
-  ListItem: ComponentType<{ data?: T; lng: string }>;
+  getData: (filter: GetDataFilter) => Promise<Connection<EdgeT>>;
+  ListItem: ComponentType<{ data?: EdgeT; lng: string }>;
   Placeholder: ComponentType<{ cardRef?: LegacyRef<HTMLDivElement> }>;
   Container: ComponentType<{ children: ReactNode }>;
 }
 
-export function withInfiniteScroll<T>({
+export function withInfiniteScroll<EdgeT>({
   lng,
   Container,
   ListItem,
@@ -48,7 +48,7 @@ export function withInfiniteScroll<T>({
   getData,
   Placeholder,
   initialData,
-}: ScrollProps<T>) {
+}: ScrollProps<EdgeT>) {
   return function WithInfiniteScrollComponent() {
     const [data, setData] = useState(initialData);
     const { ref, inView } = useInView();

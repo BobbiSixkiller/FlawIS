@@ -21,8 +21,8 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
         {label}
       </label>
       <input
-        {...props}
         {...field}
+        {...props}
         onFocus={onFocus}
         id={name}
         className={

@@ -26,7 +26,12 @@ export async function getAttendees(filter: GetDataFilter) {
     console.log(res.errors[0]);
   }
 
-  return res.data?.attendees;
+  return (
+    res.data?.attendees || {
+      edges: [],
+      pageInfo: { hasNextPage: false, endCursor: null },
+    }
+  );
 }
 
 export async function getAllAttendees(slug: string) {

@@ -42,9 +42,14 @@ export function withLocalizedInput(
       }
     });
 
+    console.log(visible);
     return (
       <div ref={ref}>
-        <InputComponent {...props} onFocus={() => setVisible(true)} />
+        <InputComponent
+          {...props}
+          onFocus={() => setVisible(true)}
+          onClick={() => setVisible(true)}
+        />
         <Transition
           as={Fragment}
           show={visible}

@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation";
 import { createConference } from "../actions";
 import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import FileInput, { LocalizedFileInput } from "@/components/FileInput";
 
 export interface ConferenceInputType {
   slug: string;
@@ -92,36 +93,22 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
           translations: object({
             sk: object({
               name: string().trim().required(t("required")),
-              logo: mixed<FileList>() // Pass in the type of `fileUpload`
-                .test(
-                  "required",
-                  t("required"),
-                  (files) => files && files.length !== 0
-                )
+              logo: mixed<File>() // Pass in the type of `fileUpload`
+                .test("required", t("required"), (file) => file !== undefined)
                 .test(
                   "fileSize",
                   "Only documents up to 2MB are permitted.",
-                  (files) =>
-                    files &&
-                    files.length !== 0 && // Check if `files` is not an empty list
-                    files[0].size < 2_000_000
+                  (file) => file && file.size < 2_000_000
                 ),
             }),
             en: object({
               name: string().trim().required(t("required")),
-              logo: mixed<FileList>() // Pass in the type of `fileUpload`
-                .test(
-                  "required",
-                  t("required"),
-                  (files) => files && files.length !== 0
-                )
+              logo: mixed<File>() // Pass in the type of `fileUpload`
+                .test("required", t("required"), (file) => file !== undefined)
                 .test(
                   "fileSize",
                   "Only documents up to 2MB are permitted.",
-                  (files) =>
-                    files &&
-                    files.length !== 0 && // Check if `files` is not an empty list
-                    files[0].size < 2_000_000
+                  (file) => file && file.size < 2_000_000
                 ),
             }),
           }),
@@ -139,11 +126,10 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
           label="Meno"
           name={`translations.${lng}.name`}
         />
-        <LocalizedInput
+        <LocalizedFileInput
           lng={lng}
           label="Logo"
           name={`translations.${lng}.logo`}
-          type="file"
         />
         <Input label="Slug" name="slug" />
         <Input
@@ -174,19 +160,12 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
             ICO: string().trim().required(t("required")),
             DIC: string().trim().required(t("required")),
             ICDPH: string().trim().required(t("required")),
-            stamp: mixed<FileList>() // Pass in the type of `fileUpload`
-              .test(
-                "required",
-                t("required"),
-                (files) => files && files.length !== 0
-              )
+            stamp: mixed<File>() // Pass in the type of `fileUpload`
+              .test("required", t("required"), (file) => file !== undefined)
               .test(
                 "fileSize",
                 "Only documents up to 2MB are permitted.",
-                (files) =>
-                  files &&
-                  files.length !== 0 && // Check if `files` is not an empty list
-                  files[0].size < 2_000_000
+                (file) => file && file.size < 2_000_000
               ),
           }),
         })}
@@ -202,7 +181,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
         <Input label="ICO" name="billing.ICO" />
         <Input label="DIC" name="billing.DIC" />
         <Input label="ICDPH" name="billing.ICDPH" />
-        <Input label="Peciatka" name="billing.stamp" type="file" />
+        <FileInput label="Peciatka" name="billing.stamp" />
       </WizzardStep>
     </WizzardForm>
   );

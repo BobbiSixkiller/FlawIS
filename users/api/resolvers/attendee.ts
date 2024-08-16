@@ -69,6 +69,19 @@ export class AttendeeResolver {
   }
 
   @Authorized(["ADMIN"])
+  @Query(() => [Attendee])
+  async textSearchAttendee(@Arg("text") text: string) {
+    await this.attendeeService.dataModel.syncIndexes();
+
+    return await this.attendeeService.aggregate([
+      { $match: { $text: { $search: text } } },
+      { $sort: { score: { $meta: "textScore" } } },
+      { $addFields: { id: "$_id", "user.id": "$user._id" } },
+      { $limit: 10 },
+    ]);
+  }
+
+  @Authorized(["ADMIN"])
   @Mutation(() => AttendeeMutationResponse)
   async updateInvoice(
     @Arg("id") _id: ObjectId,

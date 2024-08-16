@@ -18,8 +18,8 @@ export function CreateConnection<TNode extends object>(
 
   @ObjectType(`${TNodeClass.name}PageInfo`)
   abstract class PageInfo {
-    @Field()
-    endCursor: ObjectId;
+    @Field({ nullable: true })
+    endCursor?: ObjectId;
 
     @Field()
     hasNextPage: boolean;

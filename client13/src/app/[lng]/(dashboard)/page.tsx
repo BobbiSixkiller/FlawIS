@@ -4,7 +4,7 @@ import { getMe } from "../(auth)/actions";
 export default async function Dashboard() {
   const user = await getMe();
   if (user) {
-    redirect("/conferences");
+    return redirect("/conferences");
   }
-  redirect("/login");
+  return redirect("/login");
 }

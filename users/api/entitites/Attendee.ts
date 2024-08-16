@@ -1,4 +1,9 @@
-import { getModelForClass, pre, prop as Property } from "@typegoose/typegoose";
+import {
+  getModelForClass,
+  Index,
+  pre,
+  prop as Property,
+} from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Field, Float, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
@@ -94,6 +99,7 @@ export class AttendeeConference {
   }
 })
 @ObjectType({ description: "Attendee model type" })
+@Index({ "user.name": "text", "user.email": "text" })
 export class Attendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;

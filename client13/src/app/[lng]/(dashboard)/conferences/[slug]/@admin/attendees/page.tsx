@@ -28,6 +28,8 @@ export default async function AttendeesPage({
     getConference(slug),
   ]);
 
+  console.log(initialData);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2">
@@ -72,7 +74,7 @@ export default async function AttendeesPage({
         <AttendeeFilter sections={conference.sections} lng={lng} />
       </div>
 
-      {initialData ? (
+      {initialData.pageInfo.endCursor ? (
         <ListAttendees lng={lng} initialData={initialData} />
       ) : (
         "Ziadny"

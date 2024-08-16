@@ -58,20 +58,15 @@ export async function searchConference(text: string) {
     {},
     { revalidate: 3600 }
   );
-  if (res.errors) {
-    return { success: false, message: res.errors[0].message };
-  }
 
-  return { success: true, data: res.data.textSearchConference };
+  return res.data.textSearchConference || [];
 }
 
 export async function createConference(data: FormData) {
   try {
-    const logo: File | null = data.get("translations.sk.logo.0") as File;
-    const logoLocalized: File | null = data.get(
-      "translations.en.logo.0"
-    ) as File;
-    const stamp: File | null = data.get("billing.stamp.0") as File;
+    const logo: File | null = data.get("translations.sk.logo") as File;
+    const logoLocalized: File | null = data.get("translations.en.logo") as File;
+    const stamp: File | null = data.get("billing.stamp") as File;
 
     if (!logo || !logoLocalized || !stamp)
       throw new Error("Files not provided!");
@@ -129,6 +124,7 @@ export async function createConference(data: FormData) {
         },
       },
     });
+    console.log("IDE");
     if (res.errors) {
       const { validationErrors } = res.errors[0].extensions as ErrorException;
 
