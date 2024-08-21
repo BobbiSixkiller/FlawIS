@@ -104,7 +104,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
@@ -114,7 +114,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
     @Ctx() { req, locale, user: loggedInUser }: Context
@@ -143,7 +143,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   @Mutation(() => String)
   async resendActivationLink(@Ctx() { req, locale, user }: Context) {
     messageBroker.produceMessage(
@@ -161,7 +161,7 @@ export class UserResolver {
 
   @Authorized()
   @Mutation(() => UserMutationResponse)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async activateUser(@Ctx() { req }: Context): Promise<UserMutationResponse> {
     const user: Partial<User> | null = verifyJwt(
       req.headers.activation as string
@@ -182,7 +182,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string
@@ -204,7 +204,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async googleSignIn(
     @Arg("authCode") authCode: string
   ): Promise<UserMutationResponse> {
@@ -244,7 +244,7 @@ export class UserResolver {
   }
 
   @Query(() => String)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async forgotPassword(
     @Arg("email") email: string,
     @Ctx() { locale, req }: Context
@@ -268,7 +268,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
     @Ctx() { req }: Context
@@ -292,7 +292,7 @@ export class UserResolver {
   }
 
   @Authorized(["ADMIN", "IS_OWN_USER"])
-  @UseMiddleware([RateLimit(50)])
+  // @UseMiddleware([RateLimit(50)])
   @Mutation(() => UserMutationResponse)
   async updateUser(
     @Arg("id") _id: ObjectId,
