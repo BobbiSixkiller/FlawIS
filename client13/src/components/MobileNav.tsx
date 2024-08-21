@@ -19,7 +19,6 @@ import {
 import LngSwitcher from "./LngSwitcher";
 import Drawer from "./Drawer";
 import { Role, UserFragment } from "@/lib/graphql/generated/graphql";
-import { logout } from "@/app/[lng]/(auth)/actions";
 import { useTranslation } from "@/lib/i18n/client";
 import { Menu, Transition } from "@headlessui/react";
 
