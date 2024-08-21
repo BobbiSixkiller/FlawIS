@@ -65,7 +65,7 @@ export default function ActivateAccountDialog({
     <Transition.Root appear show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 overflow-y-auto z-20"
+        className="fixed inset-0 overflow-y-auto z-10"
         onClose={() => setOpen(!user?.verified)}
       >
         <Transition.Child
@@ -89,7 +89,7 @@ export default function ActivateAccountDialog({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="w-full max-w-lg mx-auto overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
+            <Dialog.Panel className="z-20 w-full max-w-lg mx-auto overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between">
                 <Dialog.Title
                   as="h3"

@@ -6,7 +6,7 @@ import {
   useRouter,
   useSelectedLayoutSegment,
 } from "next/navigation";
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode, useState, useTransition } from "react";
 import {
   AcademicCapIcon,
   ArrowLeftCircleIcon,
@@ -116,10 +116,7 @@ export function ProfileMenuItem({
                   className={`${
                     active ? "bg-primary-500 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  onClick={() => {
-                    logout();
-                    router.refresh();
-                  }}
+                  onClick={() => router.push("/logout")}
                 >
                   <ArrowLeftCircleIcon
                     className="mr-2 h-5 w-5"

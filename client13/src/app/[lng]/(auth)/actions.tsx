@@ -147,19 +147,6 @@ export async function getMe() {
   return res.data?.me;
 }
 
-export async function logout() {
-  const user = cookies().get("user")?.value;
-  if (!user) return;
-  revalidateTag(user);
-
-  cookies().delete("user");
-  cookies().delete("accessToken");
-
-  revalidatePath("/[lng]/(dashboard)", "page");
-
-  redirect("/");
-}
-
 export async function sendResetLink(prevState: any, formData: FormData) {
   const { forgotPasswordValidationSchema } = await validation();
   try {
