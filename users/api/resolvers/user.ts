@@ -109,6 +109,7 @@ export class UserResolver {
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
     if (!loggedInUser) throw new Error("User account has been deleted!");
+    console.log(loggedInUser);
 
     return loggedInUser;
   }
