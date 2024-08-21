@@ -1,7 +1,8 @@
 "use client";
 
-import { getMe, logout } from "@/app/[lng]/(auth)/actions";
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import { usePageVisibility } from "@/hooks/usePageVisibility";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
 //implement nextjs intercepting route with modal and move this logic to main page of the dashboard group
@@ -9,6 +10,8 @@ export default function SessionPolling() {
   const isPageVisible = usePageVisibility();
   const timerIdRef = useRef<any>(null);
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+  const router = useRouter();
+  const path = usePathname();
 
   useEffect(() => {
     const pollingCallback = async () => {
@@ -19,9 +22,8 @@ export default function SessionPolling() {
 
       if (!user) {
         setIsPollingEnabled(false);
-        console.log("Polling failed. Stopped polling. Refresh page.");
-        await logout();
-        location.reload();
+        console.log("Polling failed. Stopped polling. Logging out.");
+        router.replace(`/logout?url=${encodeURIComponent(path)}`);
       }
     };
 

@@ -137,7 +137,7 @@ export async function getMe() {
     MeDocument,
     undefined,
     {},
-    { revalidate: 60 * 60, tags: [user] } //keep logged in user cached for an hour
+    { revalidate: 60 * 60, tags: [user] }
   );
 
   if (res.errors) {

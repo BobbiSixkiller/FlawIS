@@ -29,6 +29,7 @@ export default async function DashboardLayout({
   params: { lng: string };
 }) {
   const user = await getMe();
+  console.log(user);
 
   const { t, i18n } = await useTranslation(lng, "landing");
 
