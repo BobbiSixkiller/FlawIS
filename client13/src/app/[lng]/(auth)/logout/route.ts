@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { redirect } from "next/navigation";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -14,5 +15,5 @@ export async function GET(req: NextRequest) {
     revalidateTag(user);
   }
 
-  return NextResponse.redirect(new URL(redirectUrl, req.url));
+  redirect(redirectUrl);
 }
