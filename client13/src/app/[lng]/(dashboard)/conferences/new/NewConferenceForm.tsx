@@ -5,14 +5,15 @@ import {
   WizzardStep,
   objectToFormData,
 } from "@/components/WIzzardForm";
-import { Input, LocalizedInput } from "@/components/Input";
+import { Input } from "@/components/Input";
 import { useRouter } from "next/navigation";
 import { createConference } from "../actions";
 import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import FileInput, { LocalizedFileInput } from "@/components/FileInput";
+import { LocalizedTextarea } from "@/components/Textarea";
 
 export interface ConferenceInputType {
   slug: string;
@@ -121,7 +122,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
           }),
         })}
       >
-        <LocalizedInput
+        <LocalizedTextarea
           lng={lng}
           label="Meno"
           name={`translations.${lng}.name`}

@@ -42,7 +42,6 @@ export function withLocalizedInput(
       }
     });
 
-    console.log(visible);
     return (
       <div ref={ref}>
         <InputComponent

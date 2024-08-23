@@ -46,5 +46,5 @@ export async function getAllAttendees(slug: string) {
     console.log(res.errors[0]);
   }
 
-  return res.data?.attendeesCsvExport;
+  return res.data?.attendeesCsvExport || [];
 }

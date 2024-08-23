@@ -40,16 +40,18 @@ function ListItem({ data, lng }: { data?: ConferenceData; lng: string }) {
       className="rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
       href={`/conferences/${data.slug}`}
     >
-      <Image
-        style={{ width: "auto", height: "auto" }}
-        alt="conference-logo"
-        src={
-          data.translations[lng as keyof ConferenceData["translations"]]
-            .logoUrl as string
-        }
-        width={300}
-        height={200}
-      />
+      <div className="relative h-[200px]">
+        <Image
+          alt="conference-logo"
+          src={
+            data.translations[lng as keyof ConferenceData["translations"]]
+              .logoUrl as string
+          }
+          fill
+          objectFit="contain"
+        />
+      </div>
+
       <h2 className="font-medium leading-6">
         {
           data.translations[lng as keyof ConferenceData["translations"]]
