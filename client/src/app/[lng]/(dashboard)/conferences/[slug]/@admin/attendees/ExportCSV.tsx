@@ -39,6 +39,7 @@ export default function ExportCSV({ data }: { data: any[] }) {
       onClick={async () => {
         try {
           setLoading(true);
+          console.log(data);
           const csvString = await convertToCSV(data);
           downloadCSV(csvString);
           setLoading(false);
