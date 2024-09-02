@@ -57,10 +57,7 @@ export class AttendeeResolver {
   @Authorized(["ADMIN"])
   @Query(() => [Attendee])
   async attendeesCsvExport(@Arg("slug") slug: string): Promise<Attendee[]> {
-    const res = await this.attendeeService.findAll({ "conference.slug": slug });
-    console.log(res);
-
-    return res;
+    return await this.attendeeService.findAll({ "conference.slug": slug });
   }
 
   @Authorized(["ADMIN"])
@@ -129,7 +126,7 @@ export class AttendeeResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => User)
+  @FieldResolver(() => User, { nullable: true })
   async user(@Root() { user: { id } }: Attendee) {
     return this.userService.findOne({ _id: id });
   }
