@@ -1,7 +1,7 @@
 services:
   core:
     build:
-      context: ./users
+      context: ./core
       dockerfile: Dockerfile
       target: development
     command: npm run dev
@@ -28,7 +28,7 @@ services:
         condition: service_healthy
         restart: true
     volumes:
-      - ./users:/usr/app
+      - ./core:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
@@ -36,7 +36,7 @@ services:
 
   client:
     build:
-      context: ./client13
+      context: ./client
       dockerfile: Dockerfile
     command: npm run dev
     environment:
@@ -46,7 +46,7 @@ services:
     depends_on:
       - core
     volumes:
-      - ./client13/:/usr/app
+      - ./client/:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
