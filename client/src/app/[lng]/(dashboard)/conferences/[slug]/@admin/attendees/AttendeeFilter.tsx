@@ -60,7 +60,7 @@ export default function AttendeeFilter({
       {({ open }) => (
         <>
           <Popover.Button
-            className={` group flex items-center rounded-md bg-primary-500 focus:outline-primary-500 p-2 text-base font-medium text-white`}
+            className={`group flex items-center rounded-md bg-primary-500 focus:outline-primary-500 p-2 text-base font-medium text-white`}
           >
             {open ? (
               <XMarkIcon className="size-5" aria-hidden="true" />
