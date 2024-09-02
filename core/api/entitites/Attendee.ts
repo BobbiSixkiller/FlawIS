@@ -5,7 +5,7 @@ import {
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, Float, ObjectType } from "type-graphql";
+import { Field, Float, ObjectType, createUnionType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Billing, ConferenceBilling } from "./Billing";
@@ -15,6 +15,19 @@ import { Submission } from "./Submission";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { User } from "./User";
 import { AttendeeArgs } from "../resolvers/types/attendee";
+
+export const AttendeeUserUnion = createUnionType({
+  name: "AttendeeUserUnion", // Name of the GraphQL union
+  types: () => [User, AttendeeUser] as const, // function that returns tuple of object types classes
+  // Implementation of detecting returned object type
+  resolveType: (value) => {
+    if ("organization" in value) {
+      return User; // Return object type class (the one with `@ObjectType()`)
+    } else {
+      return AttendeeUser;
+    }
+  },
+});
 
 @ObjectType({ description: "The body of an invoice" })
 export class InvoiceData {
@@ -108,7 +121,7 @@ export class Attendee extends TimeStamps {
   @Property({ type: () => AttendeeConference })
   conference: AttendeeConference;
 
-  @Field(() => User)
+  @Field(() => AttendeeUserUnion)
   @Property({ type: () => AttendeeUser })
   user: AttendeeUser;
 

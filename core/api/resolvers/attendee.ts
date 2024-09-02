@@ -9,7 +9,7 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Attendee } from "../entitites/Attendee";
+import { Attendee, AttendeeUserUnion } from "../entitites/Attendee";
 import { CRUDservice } from "../services/CRUDservice";
 import { I18nService } from "../services/i18nService";
 import {
@@ -126,9 +126,16 @@ export class AttendeeResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => User, { nullable: true })
-  async user(@Root() { user: { id } }: Attendee) {
-    return this.userService.findOne({ _id: id });
+  @FieldResolver(() => AttendeeUserUnion)
+  async user(
+    @Root() { user: attendeeUser }: Attendee
+  ): Promise<typeof AttendeeUserUnion> {
+    const user = await this.userService.findOne({ _id: attendeeUser.id });
+    if (user) {
+      return user;
+    } else {
+      return attendeeUser;
+    }
   }
 
   @Authorized()

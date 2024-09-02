@@ -39,7 +39,11 @@ export default async function AttendeePage({
       <Heading
         lng={lng}
         heading={attendee.user.name}
-        subHeading={attendee.user.organization}
+        subHeading={
+          attendee.user.__typename === "User"
+            ? attendee.user.organization
+            : "N/A"
+        }
         links={[
           {
             href: `/users/${attendee.user.id}/impersonate`,

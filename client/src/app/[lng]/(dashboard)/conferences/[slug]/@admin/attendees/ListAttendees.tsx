@@ -17,7 +17,9 @@ function ListItem({ data }: { data?: AttendeeFragment }) {
       href={`/conferences/${data?.conference.slug}/attendees/${data?.id}`}
     >
       <h2 className="font-medium leading-6">{data?.user.name}</h2>
-      <p className="leading-none text-gray-500">{data?.user.organization}</p>
+      <p className="leading-none text-gray-500">
+        {data?.user.__typename === "User" ? data.user.organization : "N/A"}
+      </p>
       <p className="mt-2">Email: {data?.user.email}</p>
     </Link>
   );

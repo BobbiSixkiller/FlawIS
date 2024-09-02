@@ -1,7 +1,14 @@
 fragment Attendee on Attendee {
   id
   user {
-    ...User
+    ... on User {
+      ...User
+    }
+    ... on AttendeeUser {
+      id
+      name
+      email
+    }
   }
   invoice {
     ...Invoice
@@ -71,9 +78,16 @@ query textSearchAttendee($text: String!) {
   textSearchAttendee(text: $text) {
     id
     user {
-      id
-      name
-      email
+      ... on AttendeeUser {
+        id
+        name
+        email
+      }
+      ... on User {
+        id
+        name
+        email
+      }
     }
   }
 }

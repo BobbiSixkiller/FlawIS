@@ -8,6 +8,7 @@ import { ObjectId } from "mongodb";
 import {
   getModelForClass,
   Index,
+  post,
   pre,
   prop as Property,
 } from "@typegoose/typegoose";

@@ -1,7 +1,8 @@
 import { stringify } from "csv-stringify";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getAllAttendees } from "../actions";
 import { capitalizeFirstLetter } from "@/utils/helpers";
+import { AttendeeUser, User } from "@/lib/graphql/generated/graphql";
 
 export async function GET(
   req: NextRequest,
@@ -14,7 +15,8 @@ export async function GET(
       return attendee.submissions.map((submission) => ({
         name: attendee.user.name,
         email: attendee.user.email,
-        organization: attendee.user.organization,
+        organization:
+          attendee.user.__typename === "User" ? attendee.user.organization : "",
         online: attendee.ticket.online.toString(),
         variableSymbol: attendee.invoice.issuer.variableSymbol,
         price: attendee.invoice.body.price + attendee.invoice.body.vat,
@@ -32,7 +34,10 @@ export async function GET(
         {
           name: attendee.user.name,
           email: attendee.user.email,
-          organization: attendee.user.organization,
+          organization:
+            attendee.user.__typename === "User"
+              ? attendee.user.organization
+              : "",
           online: attendee.ticket.online.toString(),
           variableSymbol: attendee.invoice.issuer.variableSymbol,
           price: attendee.invoice.body.price + attendee.invoice.body.vat,
