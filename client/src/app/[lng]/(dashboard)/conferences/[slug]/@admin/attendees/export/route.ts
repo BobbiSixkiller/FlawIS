@@ -8,6 +8,7 @@ export async function GET(
   { params: { lng, slug } }: { params: { lng: string; slug: string } }
 ) {
   const data = await getAllAttendees(slug);
+  console.log(data);
   const exportData = data.flatMap((attendee) => {
     if (attendee.submissions && attendee.submissions.length > 0) {
       return attendee.submissions.map((submission) => ({
@@ -43,7 +44,11 @@ export async function GET(
     }
   });
 
+  console.log(exportData);
+
   const csvString = await convertToCSV(exportData);
+
+  console.log(csvString);
 
   const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
   const arrayBuffer = await blob.arrayBuffer();
@@ -52,7 +57,7 @@ export async function GET(
   return new Response(buffer, {
     status: 200,
     headers: {
-      "Content-Disposition": `attachment; filename="export.csv"`,
+      "Content-Disposition": `attachment; filename="${slug}-export.csv"`,
       "Content-Type": "text/csv",
     },
   });
