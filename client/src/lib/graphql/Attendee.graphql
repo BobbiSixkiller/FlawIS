@@ -5,6 +5,7 @@ fragment Attendee on Attendee {
       ...User
     }
     ... on AttendeeUser {
+      __typename
       id
       name
       email
