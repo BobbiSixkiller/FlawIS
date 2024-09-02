@@ -8,7 +8,7 @@ export const TypegooseMiddleware: MiddlewareFn<Context> = async ({}, next) => {
 
   if (Array.isArray(result)) {
     return result.map((item) =>
-      item instanceof Model ? convertDocument(item) : transformIds(item)
+      item instanceof Model ? convertDocument(item) : item
     );
   }
 

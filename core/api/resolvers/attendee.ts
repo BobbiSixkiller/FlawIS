@@ -56,8 +56,11 @@ export class AttendeeResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => [Attendee])
-  async attendeesCsvExport(@Arg("slug") slug: string) {
-    return await this.attendeeService.findAll({ "conference.slug": slug });
+  async attendeesCsvExport(@Arg("slug") slug: string): Promise<Attendee[]> {
+    const res = await this.attendeeService.findAll({ "conference.slug": slug });
+    console.log(res);
+
+    return res;
   }
 
   @Authorized(["ADMIN"])
