@@ -14,7 +14,7 @@ export default async function Users({
 }) {
   const user = await getMe();
   if (user?.role !== Role.Admin) {
-    redirect("/");
+    redirect("/conferences");
   }
 
   const initialData = await getUsers({});

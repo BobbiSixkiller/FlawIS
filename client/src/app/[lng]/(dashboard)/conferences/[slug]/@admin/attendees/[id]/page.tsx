@@ -11,6 +11,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import { getMe } from "@/app/[lng]/(auth)/actions";
+import { Role } from "@/lib/graphql/generated/graphql";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
@@ -18,7 +19,7 @@ export default async function AttendeePage({
   params: { slug: string; id: string; lng: string };
 }) {
   const user = await getMe();
-  if (!user) {
+  if (user?.role !== Role.Admin) {
     redirect(`/conferences/${slug}`);
   }
 

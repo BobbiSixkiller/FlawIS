@@ -4,7 +4,6 @@ import { downloadFile } from "@/lib/minio";
 import { getConferences } from "./actions";
 import ListConferences from "./ListConferences";
 import { getMe } from "../../(auth)/actions";
-import Link from "next/link";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Role } from "@/lib/graphql/generated/graphql";
 

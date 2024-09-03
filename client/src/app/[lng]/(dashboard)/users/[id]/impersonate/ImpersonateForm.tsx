@@ -20,7 +20,7 @@ export default function ImpersonateForm({
     startTransition(async () => {
       const state = await impersonate(user.id);
 
-      if (state.message && !state.success) {
+      if (state && !state.success) {
         dispatch({
           type: ActionTypes.SetFormMsg,
           payload: state,
@@ -32,7 +32,7 @@ export default function ImpersonateForm({
           type: ActionTypes.SetAppMsg,
           payload: state,
         });
-        location.reload();
+        window.location.replace("/conferences");
       }
     });
   }

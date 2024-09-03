@@ -1,11 +1,18 @@
 "use server";
 
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import { ImpersonateDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
-import { redirect } from "next/dist/server/api-utils";
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function impersonate(id: string) {
+  const user = await getMe();
+  if (!user) {
+    redirect("/login");
+  }
+
   try {
     const res = await executeGqlFetch(
       ImpersonateDocument,
@@ -27,7 +34,8 @@ export async function impersonate(id: string) {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
     });
-    return { success: true, message: "Welcome!" };
+    revalidateTag(user.id);
+    return { success: true, message: "Vitajte!" };
   } catch (error: any) {
     return { success: false, message: error.message };
   }

@@ -4,6 +4,9 @@ import AttendeeFilter from "./AttendeeFilter";
 import { getConference } from "../../../actions";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { getMe } from "@/app/[lng]/(auth)/actions";
+import { redirect } from "next/navigation";
+import { Role } from "@/lib/graphql/generated/graphql";
 
 export default async function AttendeesPage({
   params: { slug },
@@ -12,6 +15,11 @@ export default async function AttendeesPage({
   params: { lng: string; slug: string };
   searchParams?: { passive?: string; sectionId?: string[] };
 }) {
+  const user = await getMe();
+  if (user?.role !== Role.Admin) {
+    redirect(`/conferences/${slug}`);
+  }
+
   const [initialData, conference] = await Promise.all([
     getAttendees({
       passive: searchParams?.passive ? searchParams.passive === "true" : null,

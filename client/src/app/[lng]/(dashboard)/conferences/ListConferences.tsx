@@ -38,7 +38,8 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
           alt="conference-logo"
           src={data.translations[lng as "sk" | "en"].logoUrl}
           fill
-          objectFit="contain"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: "cover" }}
         />
       </div>
 

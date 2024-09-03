@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { getConference } from "../../actions";
 import Heading from "@/components/Heading";
-import Link from "next/link";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default async function ConferencePage({
