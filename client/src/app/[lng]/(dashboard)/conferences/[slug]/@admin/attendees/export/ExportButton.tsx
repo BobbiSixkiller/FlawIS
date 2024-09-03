@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import Spinner from "@/components/Spinner";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { useState } from "react";

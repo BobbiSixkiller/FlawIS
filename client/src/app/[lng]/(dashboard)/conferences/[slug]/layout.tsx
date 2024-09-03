@@ -12,7 +12,6 @@ export default async function TabsLayout({
   params: { slug: string; lng: string };
 }) {
   const user = await getMe();
-  console.log(user);
 
   return (
     <div className="h-full">{user?.role !== Role.Admin ? attendee : admin}</div>
