@@ -4,7 +4,6 @@ import ConferenceRegistrationForm from "../../../@admin/register/ConferenceRegis
 import { getSubmission } from "../../../@admin/register/actions";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { redirect } from "next/navigation";
-import { Conference } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n";
 
 export default async function RegisterPage({
@@ -37,7 +36,7 @@ export default async function RegisterPage({
       />
       <ConferenceRegistrationForm
         lng={lng}
-        conference={conference as Conference}
+        conference={conference}
         submission={submission}
         billings={user!.billings}
       />

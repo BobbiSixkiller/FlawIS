@@ -3,7 +3,6 @@ import { getConference } from "../../../actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { getSubmission } from "./actions";
 import { redirect } from "next/navigation";
-import { Conference } from "@/lib/graphql/generated/graphql";
 
 export default async function RegisterPage({
   params: { lng, slug },
@@ -24,13 +23,11 @@ export default async function RegisterPage({
     redirect(`/conferences/${slug}`);
   }
 
-  console.log(submission);
-
   return (
     <div className="flex justify-center">
       <ConferenceRegistrationForm
         lng={lng}
-        conference={conference as Conference}
+        conference={conference}
         submission={submission}
         billings={user!.billings}
       />

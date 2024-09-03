@@ -8,4 +8,5 @@ generates:
       fragmentMasking: false
     config:
       documentMode: "string"
+      addTypename: true
     plugins: []

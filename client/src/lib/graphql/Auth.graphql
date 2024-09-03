@@ -16,7 +16,6 @@ fragment Billing on Billing {
 }
 
 fragment User on User {
-  __typename
   id
   name
   email

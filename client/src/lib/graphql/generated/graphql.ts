@@ -754,12 +754,12 @@ export type AddressFragment = { __typename?: 'Address', street: string, city: st
 
 export type BillingFragment = { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } };
 
-export type UserFragment = { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
+export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -767,14 +767,14 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type GoogleSignInMutationVariables = Exact<{
   authCode: Scalars['String']['input'];
 }>;
 
 
-export type GoogleSignInMutation = { __typename?: 'Mutation', googleSignIn: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type GoogleSignInMutation = { __typename?: 'Mutation', googleSignIn: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -788,14 +788,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -805,7 +805,7 @@ export type ResendActivationLinkMutation = { __typename?: 'Mutation', resendActi
 export type ActivateUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ImpersonateQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -966,7 +966,7 @@ export type UserQueryVariables = Exact<{
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user: { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type TextSearchUserQueryVariables = Exact<{
   text: Scalars['String']['input'];
@@ -981,21 +981,21 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ToggleVerifiedUserMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -1037,7 +1037,6 @@ export const BillingFragmentDoc = new TypedDocumentString(`
 }`, {"fragmentName":"Billing"}) as unknown as TypedDocumentString<BillingFragment, unknown>;
 export const UserFragmentDoc = new TypedDocumentString(`
     fragment User on User {
-  __typename
   id
   name
   email
@@ -1194,6 +1193,7 @@ export const AttendeeFragmentDoc = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -1242,7 +1242,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -1456,6 +1455,7 @@ export const AttendeesDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -1504,7 +1504,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -1616,6 +1615,7 @@ export const AttendeeDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -1664,7 +1664,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -1776,6 +1775,7 @@ export const AttendeesCsvExportDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -1824,7 +1824,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -1958,6 +1957,7 @@ export const UpdateInvoiceDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -2006,7 +2006,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2121,6 +2120,7 @@ export const DeleteAttendeeDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -2169,7 +2169,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2293,7 +2292,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2333,7 +2331,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2373,7 +2370,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2418,7 +2414,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2458,7 +2453,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2503,7 +2497,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -2582,6 +2575,7 @@ export const ConferenceDocument = new TypedDocumentString(`
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
@@ -2630,7 +2624,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -3128,7 +3121,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -3176,7 +3168,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -3215,7 +3206,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email
@@ -3254,7 +3244,6 @@ fragment Billing on Billing {
   DIC
 }
 fragment User on User {
-  __typename
   id
   name
   email

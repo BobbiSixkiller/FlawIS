@@ -6,7 +6,7 @@ import { TableCellsIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 export default async function AttendeesPage({
-  params: { lng, slug },
+  params: { slug },
   searchParams,
 }: {
   params: { lng: string; slug: string };

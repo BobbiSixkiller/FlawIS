@@ -2,6 +2,7 @@ fragment Attendee on Attendee {
   id
   user {
     ... on User {
+      __typename
       ...User
     }
     ... on AttendeeUser {
