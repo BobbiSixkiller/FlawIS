@@ -68,7 +68,7 @@ export default async function AttendeePage({
         </Link>
       </div>
       {attendee.submissions.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           {attendee.submissions.map((s) => (
             <div
               key={s.id}

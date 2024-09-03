@@ -18,7 +18,7 @@ import { I18nService } from "../services/i18nService";
 @ObjectType()
 export class SubmissionTranslationContent {
   @Field()
-  @Property({ lowercase: true })
+  @Property()
   name: string;
 
   @Field()
@@ -26,7 +26,7 @@ export class SubmissionTranslationContent {
   abstract: string;
 
   @Field(() => [String])
-  @Property({ type: () => String, lowercase: true })
+  @Property({ type: () => String })
   keywords: string[];
 }
 
