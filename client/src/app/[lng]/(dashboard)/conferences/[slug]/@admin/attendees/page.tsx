@@ -2,11 +2,10 @@ import ListAttendees from "./ListAttendees";
 import { getAttendees } from "./actions";
 import AttendeeFilter from "./AttendeeFilter";
 import { getConference } from "../../../actions";
-import { TableCellsIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { redirect } from "next/navigation";
 import { Role } from "@/lib/graphql/generated/graphql";
+import ExportButton from "./export/ExportButton";
 
 export default async function AttendeesPage({
   params: { slug },
@@ -36,12 +35,7 @@ export default async function AttendeesPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">
-        <Link
-          href={`/conferences/${slug}/attendees/export`}
-          className="flex items-center gap-2 p-2 rounded-md bg-green-500 hover:bg-green-700 text-white text-sm"
-        >
-          .csv <TableCellsIcon className="size-5" />
-        </Link>
+        <ExportButton />
         <AttendeeFilter sections={conference.sections} />
         <div className="ml-auto text-xl font-bold">
           {initialData.totalCount}

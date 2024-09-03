@@ -7,8 +7,8 @@ export async function GET(
   req: NextRequest,
   { params: { lng, slug } }: { params: { lng: string; slug: string } }
 ) {
+  await new Promise((res) => setTimeout(() => res("success"), 4000));
   const data = await getAllAttendees(slug);
-  console.log(data);
   const exportData = data.flatMap((attendee) => {
     if (attendee.submissions && attendee.submissions.length > 0) {
       return attendee.submissions.map((submission) => ({
@@ -49,8 +49,6 @@ export async function GET(
       ];
     }
   });
-
-  console.log(exportData);
 
   const csvString = await convertToCSV(exportData);
 
