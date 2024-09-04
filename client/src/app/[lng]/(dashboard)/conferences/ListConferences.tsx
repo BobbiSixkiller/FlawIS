@@ -30,7 +30,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
 
   return (
     <Link
-      className="h-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
+      className="h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
       href={`/conferences/${data.slug}`}
     >
       <div className="relative h-24 w-full max-w-72">
