@@ -10,7 +10,7 @@ import Button from "@/components/Button";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { object, string } from "yup";
+import { object, ref, string } from "yup";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import { updateUser } from "./actions";
@@ -35,6 +35,24 @@ export default function UpdateUserForm({
         organization: string().required(t("required")),
         telephone: string().required(t("required")),
         role: string<Role>(),
+        password: string()
+          .trim()
+          .transform((value) => (!value ? null : value))
+          .nullable()
+          .matches(
+            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\s]{6,}$/,
+            t("password", { ns: "validation" })
+          ),
+        confirmPass: string()
+          .trim()
+          .when("password", (password, schema) =>
+            password[0]
+              ? schema.oneOf(
+                  [ref("password")],
+                  t("confirmPass", { ns: "validation" })
+                )
+              : schema.transform((value) => (!value ? null : value)).nullable()
+          ),
       }).required(t("required"))
     ),
     values: {
@@ -43,6 +61,8 @@ export default function UpdateUserForm({
       organization: user.organization,
       role: user.role,
       telephone: user.telephone,
+      password: "",
+      confirmPass: "",
     },
   });
 
@@ -60,24 +80,34 @@ export default function UpdateUserForm({
     <FormProvider {...methods}>
       <form
         className="space-y-6 w-full sm:w-96"
-        onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateUser(user.id, data);
-
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
+        onSubmit={methods.handleSubmit(
+          async ({ email, name, organization, telephone, password, role }) => {
+            console.log(password);
+            const state = await updateUser(user.id, {
+              email,
+              name,
+              organization,
+              telephone,
+              role,
+              password: password !== null ? password : undefined,
             });
-          }
 
-          if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
-            router.back();
+            if (state.message && !state.success) {
+              dispatch({
+                type: ActionTypes.SetFormMsg,
+                payload: state,
+              });
+            }
+
+            if (state.success) {
+              dispatch({
+                type: ActionTypes.SetAppMsg,
+                payload: state,
+              });
+              router.back();
+            }
           }
-        })}
+        )}
       >
         <Input label="Meno" name="name" />
         <Input label="Email" name="email" />
@@ -92,6 +122,8 @@ export default function UpdateUserForm({
             { name: "Basic", value: Role.Basic },
           ]}
         />
+        <Input label="Heslo" name="password" />
+        <Input label="Potvrdit heslo" name="confirmPass" />
 
         <Button
           color="primary"

@@ -248,7 +248,7 @@ export class UserResolver {
   // @UseMiddleware([RateLimit(50)])
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { locale, req }: Context
+    @Ctx() { locale }: Context
   ) {
     const user = await this.userService.findOne({ email });
     if (!user) throw new Error(this.i18nService.translate("notRegistered"));
