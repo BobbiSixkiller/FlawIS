@@ -108,7 +108,7 @@ export default function UpdateSubmissionForm({
         <Select
           name="section"
           label={t("registration.submission.section", { ns: "conferences" })}
-          defaultSelected={sections[0].id}
+          defaultSelected={submission.section.id}
           options={sections.map((s) => ({
             name: s.translations[lng as "sk" | "en"].name,
             value: s.id,

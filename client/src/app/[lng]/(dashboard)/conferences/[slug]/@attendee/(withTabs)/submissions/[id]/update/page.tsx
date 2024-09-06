@@ -1,6 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { getSubmission } from "../actions";
 import UpdateSubmissionForm from "./UpdateSubmissionForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { redirect } from "next/navigation";
