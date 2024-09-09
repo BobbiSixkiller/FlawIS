@@ -5,13 +5,7 @@ import { executeGqlFetch } from "@/utils/actions";
 import { notFound } from "next/navigation";
 
 export async function getSubmission(id: string) {
-  const res = await executeGqlFetch(
-    SubmissionDocument,
-    { id },
-    {},
-    {},
-    "no-store"
-  );
+  const res = await executeGqlFetch(SubmissionDocument, { id });
 
   if (res.errors) {
     console.log(res.errors[0]);

@@ -189,6 +189,30 @@ export class SubmissionResolver {
     };
   }
 
+  @Authorized(["ADMIN"])
+  @Mutation(() => SubmissionMutationResponse)
+  async removeAuthor(
+    @Arg("id") _id: ObjectId,
+    @Arg("authorId") authorId: ObjectId,
+    @LoadResource(Submission) submission: DocumentType<Submission>
+  ): Promise<SubmissionMutationResponse> {
+    submission.authors = submission.authors.filter(
+      (a) => a.toString() !== authorId.toString()
+    );
+
+    await submission.save();
+
+    return {
+      message: this.i18nService.translate("authorRemoved", {
+        ns: "submission",
+        name: submission.translations[
+          this.i18nService.language() as keyof SubmissionTranslation
+        ].name,
+      }),
+      data: submission,
+    };
+  }
+
   @Authorized()
   @FieldResolver(() => Conference, { nullable: true })
   async conference(@Root() { conference }: Submission) {

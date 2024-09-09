@@ -11,8 +11,6 @@ interface ModalProps {
   togglerHidden?: boolean;
 }
 
-//implement withModal HOC ktory passne show a setShow do child componentu
-
 export default function Modal({
   children,
   title,

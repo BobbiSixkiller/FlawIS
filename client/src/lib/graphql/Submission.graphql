@@ -61,3 +61,12 @@ mutation deleteSubmission($id: ObjectId!) {
     }
   }
 }
+
+mutation removeAuthor($id: ObjectId!, $authorId: ObjectId!) {
+  removeAuthor(id: $id, authorId: $authorId) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}

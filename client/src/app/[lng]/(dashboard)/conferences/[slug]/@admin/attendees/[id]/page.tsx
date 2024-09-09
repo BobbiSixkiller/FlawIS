@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { Role } from "@/lib/graphql/generated/graphql";
+import RemoveAuthor from "./RemoveAuthor";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
@@ -85,7 +86,10 @@ export default async function AttendeePage({
               </p>
               <ul className="mt-2 flex gap-1">
                 {s.authors.map((a) => (
-                  <li key={a.id}>{a.name}</li>
+                  <li key={a.id} className="flex gap-1">
+                    {a.name}
+                    <RemoveAuthor author={a} submission={s} />
+                  </li>
                 ))}
               </ul>
               <p>{s.translations[lng as "sk" | "en"].abstract}</p>

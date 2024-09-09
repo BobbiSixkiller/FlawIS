@@ -266,6 +266,7 @@ type Mutation {
   login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!
+  removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!

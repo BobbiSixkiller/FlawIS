@@ -3,5 +3,6 @@
   "update": "Príspevok {{name}} bol aktualizovaný.",
   "new": "Príspevok {{name}} bol vytvorený.",
   "delete": "Príspevok {{name}} bola vymazaný.",
-  "nameExists": "Príspevok s názvom {{name}} už existuje!"
+  "nameExists": "Príspevok s názvom {{name}} už existuje!",
+  "authorRemoved": "Autor bol vymazaný."
 }
