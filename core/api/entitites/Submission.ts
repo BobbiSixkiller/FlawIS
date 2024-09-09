@@ -79,7 +79,7 @@ export class SubmissionTranslation {
             // Constraints that failed validation with error messages.
             name: Container.get(I18nService).translate("nameExists", {
               ns: "submission",
-              name: submissionExists.translations.sk.name,
+              name: submissionExists.translations.en.name,
             }),
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property
