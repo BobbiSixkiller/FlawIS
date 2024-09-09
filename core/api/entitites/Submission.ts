@@ -1,6 +1,6 @@
 import {
   getModelForClass,
-  index,
+  Index,
   pre,
   prop as Property,
 } from "@typegoose/typegoose";
@@ -41,7 +41,7 @@ export class SubmissionTranslation {
   en: SubmissionTranslationContent;
 }
 
-@index({ conference: 1, section: 1, authors: 1 })
+@Index({ conference: 1, section: 1, authors: 1 })
 @pre<Submission>("save", async function () {
   if (this.isNew || this.isModified("translations.sk.name")) {
     const submissionExists = await getModelForClass(Submission)
