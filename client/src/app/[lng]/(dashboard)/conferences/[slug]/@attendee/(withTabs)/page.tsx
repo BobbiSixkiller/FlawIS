@@ -15,7 +15,6 @@ export default async function ConferencePage({
   if (conference && !conference.attending) {
     redirect(`/conferences/${slug}/register`);
   }
-  console.log("SLAPE");
   return (
     <div className="text-gray-900 flex flex-col gap-6">
       <div className="flex flex-col gap-4">

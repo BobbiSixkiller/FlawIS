@@ -1,7 +1,7 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { getConference } from "../../../actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
-import { getSubmission } from "./actions";
+import { getSubmission, updateSubmission } from "./actions";
 import { redirect } from "next/navigation";
 
 export default async function RegisterPage({
@@ -19,7 +19,22 @@ export default async function RegisterPage({
     getConference(slug),
     getSubmission(searchParams?.submission),
   ]);
-  if (conference && conference.attending) {
+
+  if (conference && conference.attending && !submission) {
+    redirect(`/conferences/${slug}`);
+  }
+  if (
+    conference &&
+    conference.attending &&
+    submission &&
+    conference.attending.ticket.withSubmission
+  ) {
+    await updateSubmission(submission.id, {
+      conference: submission.conference.id,
+      authors: [],
+      section: submission.section.id,
+      translations: submission.translations,
+    });
     redirect(`/conferences/${slug}`);
   }
 

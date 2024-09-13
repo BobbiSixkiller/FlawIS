@@ -1,7 +1,10 @@
 import Heading from "@/components/Heading";
 import { getConference } from "../../../../actions";
 import ConferenceRegistrationForm from "../../../@admin/register/ConferenceRegistrationForm";
-import { getSubmission } from "../../../@admin/register/actions";
+import {
+  getSubmission,
+  updateSubmission,
+} from "../../../@admin/register/actions";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { redirect } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
@@ -21,7 +24,22 @@ export default async function RegisterPage({
     getConference(slug),
     getSubmission(searchParams?.submission),
   ]);
-  if (conference && conference.attending) {
+
+  if (conference && conference.attending && !submission) {
+    redirect(`/conferences/${slug}`);
+  }
+  if (
+    conference &&
+    conference.attending &&
+    submission &&
+    conference.attending.ticket.withSubmission
+  ) {
+    await updateSubmission(submission.id, {
+      conference: submission.conference.id,
+      authors: [],
+      section: submission.section.id,
+      translations: submission.translations,
+    });
     redirect(`/conferences/${slug}`);
   }
 
