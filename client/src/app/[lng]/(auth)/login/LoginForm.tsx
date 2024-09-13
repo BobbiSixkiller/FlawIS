@@ -99,7 +99,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
       <div className="flex justify-center gap-3">
         <button
           type="button"
-          onClick={() => getGoogleAuthLink()}
+          onClick={() => getGoogleAuthLink(url)}
           className="text-sm rounded-md border border-gray-300 hover:border-primary-500  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
         >
           <svg

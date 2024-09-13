@@ -8,6 +8,9 @@ import { redirect } from "next/navigation";
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+
+  const redirectUrl = state ? JSON.parse(state).redirectUrl : "/";
 
   if (!code) {
     return NextResponse.json({ error: "No code provided" }, { status: 400 });
@@ -27,5 +30,6 @@ export async function GET(req: NextRequest) {
     expires, //accesstoken expires in 24 hours
   });
   revalidateTag(res.data.googleSignIn.data.id);
-  return redirect("/");
+
+  return redirect(redirectUrl);
 }

@@ -34,12 +34,13 @@ export default async function RegisterPage({
     submission &&
     conference.attending.ticket.withSubmission
   ) {
-    await updateSubmission(submission.id, {
+    const res = await updateSubmission(submission.id, {
       conference: submission.conference.id,
       authors: [],
       section: submission.section.id,
       translations: submission.translations,
     });
+    console.log(res);
     redirect(`/conferences/${slug}`);
   }
 

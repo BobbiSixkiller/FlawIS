@@ -117,13 +117,14 @@ const client = new OAuth2Client(
   process.env.GOOGLE_REDIRECT_URI
 );
 
-export async function getGoogleAuthLink() {
+export async function getGoogleAuthLink(url?: string) {
   const authUrl = client.generateAuthUrl({
     access_type: "offline",
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
     ],
+    state: JSON.stringify({ redirectUrl: url }),
   });
 
   redirect(authUrl);
