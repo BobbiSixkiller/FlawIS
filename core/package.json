@@ -1,7 +1,7 @@
 {
-  "name": "flawis-users",
+  "name": "flawis-core",
   "version": "1.0.0",
-  "description": "Microservice handling users of FlawIS implemented as a GraphhQL API with mongoDB as data layer.",
+  "description": "Core backend service implemented as a GraphhQL API with mongoDB as data layer.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
