@@ -28,6 +28,8 @@ export async function GET(
         submission_name_en: capitalizeFirstLetter(
           submission.translations.en.name
         ),
+        abstract_sk: submission.translations.sk.abstract,
+        abstract_en: submission.translations.en.abstract,
       }));
     } else {
       // If there are no submissions for the attendee, include them with empty submission data
@@ -45,6 +47,8 @@ export async function GET(
           section: "",
           submission_name_sk: "",
           submission_name_en: "",
+          abstract_sk: "",
+          abstract_en: "",
         },
       ];
     }
