@@ -129,25 +129,83 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           </svg>
           Google
         </button>
-        {/* <button className="text-sm rounded-md border border-gray-300 hover:border-primary-500 px-3.5 py-2 w-32 flex gap-2 justify-center items-center">
+        {/* <button
+          type="button"
+          onClick={() => getMsalAuthLink(url)}
+          className="text-sm rounded-md border border-gray-300 hover:border-primary-500 px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
+        >
           <svg
+            viewBox="0 0 512 512"
             xmlns="http://www.w3.org/2000/svg"
-            x="0px"
-            y="0px"
-            width="30"
-            height="30"
-            viewBox="0 0 48 48"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            strokeLinejoin="round"
+            strokeMiterlimit="2"
           >
-            <path
-              fill="#039be5"
-              d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"
-            ></path>
-            <path
-              fill="#fff"
-              d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"
-            ></path>
+            <g fillRule="nonzero">
+              <path
+                d="M52.091 10.225h40.684L50.541 135.361a6.5 6.5 0 01-6.146 4.412H12.732c-3.553 0-6.477-2.923-6.477-6.476 0-.704.115-1.403.34-2.07L45.944 14.638a6.501 6.501 0 016.147-4.415v.002z"
+                fill="url(#prefix___Linear1)"
+                transform="translate(2.076 1.626) scale(3.37462)"
+              />
+              <path
+                d="M377.371 319.374H159.644c-5.527 0-10.076 4.549-10.076 10.077 0 2.794 1.164 5.466 3.206 7.37l139.901 130.577a21.986 21.986 0 0015.004 5.91H430.96l-53.589-153.934z"
+                fill="#0078d4"
+              />
+              <path
+                d="M52.091 10.225a6.447 6.447 0 00-6.161 4.498L6.644 131.12a6.457 6.457 0 00-.38 2.185c0 3.548 2.92 6.468 6.469 6.468H45.23a6.95 6.95 0 005.328-4.531l7.834-23.089 27.985 26.102a6.622 6.622 0 004.165 1.518h36.395l-15.962-45.615-46.533.011 28.48-83.944H52.091z"
+                fill="url(#prefix___Linear2)"
+                transform="translate(2.076 1.626) scale(3.37462)"
+              />
+              <path
+                d="M104.055 14.631a6.492 6.492 0 00-6.138-4.406H52.575a6.493 6.493 0 016.138 4.406l39.35 116.594c.225.668.34 1.367.34 2.072 0 3.554-2.924 6.478-6.478 6.478h45.344c3.553-.001 6.476-2.925 6.476-6.478 0-.705-.115-1.404-.34-2.072l-39.35-116.594z"
+                fill="url(#prefix___Linear3)"
+                transform="translate(2.076 1.626) scale(3.37462)"
+              />
+            </g>
+            <defs>
+              <linearGradient
+                id="prefix___Linear1"
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="0"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="rotate(108.701 26.35 33.911) scale(131.7791)"
+              >
+                <stop offset="0" stopColor="#114a8b" />
+                <stop offset="1" stopColor="#0669bc" />
+              </linearGradient>
+              <linearGradient
+                id="prefix___Linear2"
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="0"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="rotate(161.318 33.644 45.587) scale(10.31703)"
+              >
+                <stop offset="0" stopOpacity=".3" />
+                <stop offset=".07" stopOpacity=".2" />
+                <stop offset=".32" stopOpacity=".1" />
+                <stop offset=".62" stopOpacity=".05" />
+                <stop offset="1" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient
+                id="prefix___Linear3"
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="0"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform="rotate(69.426 25.69 62.036) scale(131.9816)"
+              >
+                <stop offset="0" stopColor="#3ccbf4" />
+                <stop offset="1" stopColor="#2892df" />
+              </linearGradient>
+            </defs>
           </svg>
-          Facebook
+          Microsoft
         </button> */}
       </div>
     </form>

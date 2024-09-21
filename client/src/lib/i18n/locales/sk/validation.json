@@ -9,5 +9,6 @@
   "endDateInvalid": "Koncový dátum nemôže byť skôr ako začiatok!",
   "min": "Minimálna hodnota je {{value}}!",
   "ticket": "Vyberte formu účasti!",
-  "keywords": "Pridajte aspoň {{value}} kľúčové slovo!"
+  "keywords": "Pridajte aspoň {{value}} kľúčové slovo!",
+  "maxFiles": "Maximálny počet súborov je {{value}}!"
 }

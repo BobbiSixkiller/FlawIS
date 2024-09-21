@@ -264,11 +264,13 @@ type Mutation {
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
   login(email: String!, password: String!): UserMutationResponse!
+  msalSignIn(authCode: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
+  unsetSubmissionFile(id: ObjectId!): SubmissionMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!

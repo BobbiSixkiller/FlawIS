@@ -115,21 +115,41 @@ export function objectToFormData(
   parentKey: string = ""
 ): FormData {
   for (let key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      let propName = parentKey ? `${parentKey}.${key}` : key;
+    if (
+      obj.hasOwnProperty(key) &&
+      obj[key] !== null &&
+      obj[key] !== undefined
+    ) {
+      const propName = parentKey ? `${parentKey}.${key}` : key;
+
       if (Array.isArray(obj[key])) {
-        obj[key].forEach((item: any, index: number) => {
-          if (typeof item === "object" && !(item instanceof File)) {
-            objectToFormData(item, formData, `${propName}[${index}]`);
-          } else {
-            formData.append(`${propName}.${index}`, item);
+        obj[key].forEach((item: any) => {
+          if (item !== null && item !== undefined) {
+            if (item instanceof File) {
+              // Append each file under the same key
+              formData.append(propName, item);
+              console.log(`Appending file under key: ${propName}`);
+            } else if (typeof item === "object") {
+              // Recursive call for objects that are not Files
+              objectToFormData(item, formData, propName);
+            } else {
+              // Append non-object items
+              formData.append(propName, item);
+            }
           }
         });
-      } else if (typeof obj[key] === "object" && !(obj[key] instanceof File)) {
+      } else if (obj[key] instanceof File) {
+        // Directly append File objects
+        formData.append(propName, obj[key]);
+        console.log(`Appending file under key: ${propName}`);
+      } else if (typeof obj[key] === "object") {
+        // Recursive call for nested objects
         objectToFormData(obj[key], formData, propName);
       } else {
+        // Append primitive values
         formData.append(propName, obj[key]);
       }
+      console.log(`Appending key: ${propName}, value: ${obj[key]}`);
     }
   }
   return formData;

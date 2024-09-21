@@ -49,7 +49,7 @@ export class SubmissionInput {
 
   @Field({ nullable: true })
   @IsString()
-  fileUrl?: string;
+  fileUrl: string;
 
   @Field(() => [String], { nullable: "items" })
   @IsEmail({}, { each: true })

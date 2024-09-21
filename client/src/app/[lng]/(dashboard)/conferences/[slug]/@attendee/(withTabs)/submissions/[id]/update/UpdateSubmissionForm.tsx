@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { array, object, string } from "yup";
+import { array, mixed, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,12 +13,19 @@ import {
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { LocalizedTextarea } from "@/components/Textarea";
-import { updateSubmission } from "./actions";
+import {
+  deleteSubmissionFile,
+  updateSubmission,
+  uploadSubmissionFile,
+} from "./actions";
 import Select from "@/components/Select";
 import {
   LocalizedMultipleInput,
   MultipleInput,
 } from "@/components/MultipleInput";
+import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import { objectToFormData } from "@/components/WIzzardForm";
+import { deleteFiles } from "@/lib/minio";
 
 export default function UpdateSubmissionForm({
   sections,
@@ -35,6 +42,23 @@ export default function UpdateSubmissionForm({
 
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
+  useEffect(() => {
+    const fetchFiles = async () => {
+      const response = await fetch(
+        `/conferences/${submission.conference.slug}/submissions/${submission.id}/download`
+      );
+      const blob = await response.blob();
+      const fileName = submission.fileUrl?.split("/").pop() || "file";
+      const file = new File([blob], fileName);
+
+      methods.setValue("files", [file]);
+    };
+
+    if (submission.fileUrl) {
+      fetchFiles();
+    }
+  }, [submission]);
+
   const methods = useForm({
     resolver: yupResolver(
       object({
@@ -43,6 +67,9 @@ export default function UpdateSubmissionForm({
         authors: array()
           .of(string().email().required(t("required")))
           .default([]),
+        files: array()
+          .of(mixed<File>())
+          .max(1, (val) => t("maxFiles", { value: val.max })),
         translations: object({
           sk: object({
             name: string().trim().required(t("required")),
@@ -77,6 +104,7 @@ export default function UpdateSubmissionForm({
         },
       },
       authors: [],
+      files: [],
       conference: submission.conference.id,
       section: submission.section.id,
     },
@@ -86,24 +114,65 @@ export default function UpdateSubmissionForm({
     <FormProvider {...methods}>
       <form
         className="space-y-6 w-full sm:w-96"
-        onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateSubmission(submission.id, data);
+        onSubmit={methods.handleSubmit(
+          async ({ authors, conference, section, translations, files }) => {
+            let fileUrl: string | null = null;
+            const slug = submission.conference.slug;
 
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+            if (files && submission.fileUrl) {
+              await deleteSubmissionFile(
+                submission.fileUrl,
+                slug,
+                submission.id
+              );
 
-          if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
+              const formData = objectToFormData({
+                files,
+                section: submission.section.translations.sk.name,
+                conferenceSlug: submission.conference.slug,
+              });
+              const res = await uploadSubmissionFile(formData);
+              fileUrl = res[0];
+            } else if (files && !submission.fileUrl) {
+              const formData = objectToFormData({
+                files,
+                section: submission.section.translations.sk.name,
+                conferenceSlug: submission.conference.slug,
+              });
+              const res = await uploadSubmissionFile(formData);
+              fileUrl = res[0];
+            } else if ((files?.length === 0 || !files) && submission.fileUrl) {
+              await deleteSubmissionFile(
+                submission.fileUrl,
+                slug,
+                submission.id
+              );
+            }
+
+            const state = await updateSubmission(submission.id, {
+              authors,
+              conference,
+              section,
+              translations,
+              fileUrl,
             });
-            router.back();
+
+            if (state.message && !state.success) {
+              dispatch({
+                type: ActionTypes.SetFormMsg,
+                payload: state,
+              });
+            }
+
+            if (state.success) {
+              dispatch({
+                type: ActionTypes.SetAppMsg,
+                payload: state,
+              });
+              router.back();
+            }
           }
-        })}
+        )}
       >
         <Select
           name="section"
@@ -142,6 +211,19 @@ export default function UpdateSubmissionForm({
             ns: "conferences",
           })}
           name="authors"
+        />
+        <MultipleFileUploadField
+          label={t("registration.submission.file", {
+            ns: "conferences",
+          })}
+          name="files"
+          maxFiles={1}
+          accept={{
+            "application/pdf": [".pdf"],
+            "application/msword": [".doc"],
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+              [".docx"],
+          }}
         />
 
         <Button

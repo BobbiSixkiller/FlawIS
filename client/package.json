@@ -1,5 +1,5 @@
 {
-  "name": "client13",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@azure/msal-node": "^2.13.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
@@ -27,6 +28,7 @@
     "react": "^18.3.1",
     "react-cookie": "^6.1.1",
     "react-dom": "^18.3.1",
+    "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.48.2",
     "react-i18next": "^14.1.0",
     "react-intersection-observer": "^9.5.3",

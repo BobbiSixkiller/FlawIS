@@ -2,10 +2,13 @@
 
 import {
   SubmissionInput,
+  UnsetSubmissionFileDocument,
   UpdateSubmissionDocument,
 } from "@/lib/graphql/generated/graphql";
+import { deleteFiles, uploadFile } from "@/lib/minio";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
+import { exec } from "child_process";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -32,4 +35,32 @@ export async function updateSubmission(id: string, data: SubmissionInput) {
   } catch (error: any) {
     return { success: false, message: error.message };
   }
+}
+
+export async function uploadSubmissionFile(data: FormData): Promise<string[]> {
+  const files = data.getAll("files") as File[];
+  const conference = data.get("conferenceSlug") as string;
+  const section = data.get("section") as string;
+
+  const res = await Promise.all(
+    files.map((f) => uploadFile(conference, `${section}/${f.name}`, f))
+  );
+
+  return res;
+}
+
+export async function deleteSubmissionFile(
+  fileUrl: string,
+  conferenceSlug: string,
+  submissionId: string
+) {
+  const apiRes = await executeGqlFetch(UnsetSubmissionFileDocument, {
+    id: submissionId,
+  });
+
+  const minioRes = await deleteFiles(conferenceSlug, [
+    fileUrl.replace(`http://minio:9000/${conferenceSlug}/`, ""),
+  ]);
+
+  return minioRes && !apiRes.errors;
 }

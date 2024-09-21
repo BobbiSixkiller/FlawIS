@@ -24,6 +24,7 @@
         "label": "Keywords",
         "placeholder": "To add a keyword press enter"
       },
+      "file": "Submission file",
       "authors": {
         "label": "Co-authors email addresses",
         "placeholder": "To add an adress press enter"

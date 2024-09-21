@@ -5,15 +5,20 @@ services:
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    env_file:
+      - ./.env
+    # environment:
+    #   NODE_ENV: development
+    #   SECRET: ${SECRET}
+    #   MONGODB_URI: ${MONGODB_URI}
+    #   RMQ_URI: ${RMQ_URI}
+    #   RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    #   GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    #   GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    #   GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    #   AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+    #   AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+    #   AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
       minio:
         condition: service_healthy
@@ -39,10 +44,15 @@ services:
       context: ./client
       dockerfile: Dockerfile
     command: npm run dev
-    environment:
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    env_file:
+      - ./.env
+    # environment:
+    #   GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    #   GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    #   GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    #   AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+    #   AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+    #   AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
       - core
     volumes:
@@ -57,16 +67,18 @@ services:
       context: ./mail
       dockerfile: Dockerfile
       target: development
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MAIL_HOST: ${MAIL_HOST}
-      MAIL_PORT: ${MAIL_PORT}
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      MAIL_FROM: ${MAIL_FROM}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    env_file:
+      - ./.env
+    # environment:
+    #   NODE_ENV: development
+    #   SECRET: ${SECRET}
+    #   MAIL_HOST: ${MAIL_HOST}
+    #   MAIL_PORT: ${MAIL_PORT}
+    #   MAIL_USER: ${MAIL_USER}
+    #   MAIL_PASSWORD: ${MAIL_PASSWORD}
+    #   MAIL_FROM: ${MAIL_FROM}
+    #   RMQ_URI: ${RMQ_URI}
+    #   RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     command: npm run start:dev
     depends_on:
       rabbitmq:

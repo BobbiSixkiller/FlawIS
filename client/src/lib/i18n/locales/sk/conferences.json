@@ -24,6 +24,7 @@
         "label": "Kľúčové slová",
         "placeholder": "Pre pridanie slova stlačte enter"
       },
+      "file": "Súbor príspevku",
       "authors": {
         "label": "Email adresy spoluautorov",
         "placeholder": "Pre pridanie adresy stlačte enter"

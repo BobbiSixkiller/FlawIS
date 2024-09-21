@@ -16,7 +16,9 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import parseErrors, { ErrorException } from "@/utils/parseErrors";
 import { executeGqlFetch, validation } from "@/utils/actions";
+
 import { OAuth2Client } from "google-auth-library";
+import { ConfidentialClientApplication } from "@azure/msal-node";
 
 export async function register(prevState: any, formData: FormData) {
   const { registerInputSchema } = await validation();
@@ -111,14 +113,14 @@ export async function login(prevState: any, formData: FormData) {
   redirect(formData.get("url")?.toString() || "/conferences");
 }
 
-const client = new OAuth2Client(
+const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
 
 export async function getGoogleAuthLink(url?: string) {
-  const authUrl = client.generateAuthUrl({
+  const authUrl = googleClient.generateAuthUrl({
     access_type: "offline",
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
@@ -129,6 +131,24 @@ export async function getGoogleAuthLink(url?: string) {
 
   redirect(authUrl);
 }
+
+// const msalClient = new ConfidentialClientApplication({
+//   auth: {
+//     clientId: process.env.AZURE_CLIENT_ID || "",
+//     authority: process.env.AZURE_AUTHORITY || "",
+//     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
+//   },
+// });
+
+// export async function getMsalAuthLink(url?: string) {
+//   const authUrl = await msalClient.getAuthCodeUrl({
+//     scopes: ["user.read"],
+//     redirectUri: "http://localhost:3000/microsoft/callback",
+//     state: JSON.stringify({ redirectUrl: url }),
+//   });
+
+//   redirect(authUrl);
+// }
 
 export async function getMe() {
   const user = cookies().get("user")?.value;

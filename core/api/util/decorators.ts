@@ -5,16 +5,16 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
-import { getModelForClass } from "@typegoose/typegoose";
+import { DocumentType, getModelForClass } from "@typegoose/typegoose";
 import {
   ClassType,
-  createParamDecorator,
+  createParameterDecorator,
   ParameterDecorator,
 } from "type-graphql";
 import { Context } from "./auth";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
-import { Conference } from "../entitites/Conference";
+import { Conference, Ticket } from "../entitites/Conference";
 import { Attendee } from "../entitites/Attendee";
 
 @ValidatorConstraint({ name: "RefDoc", async: true })
@@ -46,7 +46,7 @@ export function RefDocExists(
 }
 
 export function CheckTicket(): ParameterDecorator {
-  return createParamDecorator<Context>(async ({ args, context }) => {
+  return createParameterDecorator<Context>(async ({ args, context }) => {
     const conference = await getModelForClass(Conference).findOne({
       _id: args.data.conferenceId,
     });
@@ -58,7 +58,7 @@ export function CheckTicket(): ParameterDecorator {
       );
 
     const ticket = conference.tickets.find(
-      (t) => t.id.toString() === args.data.ticketId.toString()
+      (t: Ticket) => t.id.toString() === args.data.ticketId.toString()
     );
     if (!ticket)
       throw new Error(
@@ -92,7 +92,7 @@ export function CheckTicket(): ParameterDecorator {
 export function LoadResource<Type extends object>(
   TypeClass: ClassType<Type>
 ): ParameterDecorator {
-  return createParamDecorator<Context>(async ({ args }) => {
+  return createParameterDecorator<Context>(async ({ args }) => {
     const filter = args.id ? { _id: args.id } : { slug: args.slug };
 
     const resource = await getModelForClass(TypeClass).findOne(filter);

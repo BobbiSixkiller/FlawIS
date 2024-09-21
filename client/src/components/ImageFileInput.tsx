@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useController, useFormContext } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 
-export default function FileInput({
+export default function ImageFileInput({
   avatarUrl,
   label,
   name,
@@ -15,9 +15,6 @@ export default function FileInput({
   label: string;
   name: string;
 } & InputProps) {
-  //   const { setValue, watch } = useFormContext();
-  //   const value = watch(name);
-
   const { field, fieldState } = useController({ name });
 
   useEffect(() => {
@@ -42,7 +39,6 @@ export default function FileInput({
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      //   setValue(name, file);
       field.onChange(file);
     }
   };
@@ -77,11 +73,14 @@ export default function FileInput({
   );
 }
 
-export function LocalizedFileInput({
+export function LocalizedImageFileInput({
   lng,
   ...props
 }: { lng: string } & InputProps) {
-  const LocalizedFileInput = withLocalizedInput({ lng, ...props }, FileInput);
+  const LocalizedImageFileInput = withLocalizedInput(
+    { lng, ...props },
+    ImageFileInput
+  );
 
-  return <LocalizedFileInput />;
+  return <LocalizedImageFileInput />;
 }

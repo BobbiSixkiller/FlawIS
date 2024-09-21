@@ -1,5 +1,5 @@
 import * as Minio from "minio";
-import { Stream } from "stream";
+import { Readable } from "stream";
 import { v4 as uuid } from "uuid";
 
 const minioClient = new Minio.Client({
@@ -10,6 +10,28 @@ const minioClient = new Minio.Client({
   secretKey: process.env.MINIO_SECRET_KEY || "",
 });
 
+async function ensureBucketExists(bucketName: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    minioClient.bucketExists(bucketName, (err, exists) => {
+      if (err) {
+        return reject(err);
+      }
+      if (exists) {
+        return resolve();
+      } else {
+        // Create the bucket if it does not exist
+        minioClient.makeBucket(bucketName, "", (err) => {
+          if (err) {
+            return reject(err);
+          }
+          console.log(`Bucket '${bucketName}' created successfully.`);
+          return resolve();
+        });
+      }
+    });
+  });
+}
+
 export async function uploadFile(
   bucketName: string,
   path: string,
@@ -18,36 +40,42 @@ export async function uploadFile(
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  return new Promise<string>((resolve, reject) => {
-    const paths = path.split("/");
-    paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-    const objectName = paths.join("/");
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      // Ensure the bucket exists, or create it
+      await ensureBucketExists(bucketName);
 
-    minioClient.putObject(bucketName, objectName, buffer, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.log(
-          `File '${
-            paths[paths.length]
-          }' uploaded to bucket '${bucketName}' successfully.`
-        );
-        resolve(`http://minio:9000/${bucketName}/${objectName}`);
-      }
-    });
+      // const paths = path.split("/");
+      // paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
+      // const objectName = paths.join("/");
+
+      // Upload the object
+      minioClient.putObject(bucketName, path, buffer, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log(
+            `File '${path}' uploaded to bucket '${bucketName}' successfully.`
+          );
+          resolve(`http://minio:9000/${bucketName}/${path}`);
+        }
+      });
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 
 export async function downloadFile(
   bucketName: string,
   objectName: string
-): Promise<Stream> {
-  return new Promise<Stream>((resolve, reject) => {
+): Promise<Readable> {
+  return new Promise<Readable>((resolve, reject) => {
     minioClient.getObject(bucketName, objectName, (err, stream) => {
       if (err) {
         reject(err);
       } else {
-        resolve(stream);
+        resolve(stream as Readable);
       }
     });
   });

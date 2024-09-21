@@ -12,8 +12,10 @@ import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import FileInput, { LocalizedFileInput } from "@/components/FileInput";
 import { LocalizedTextarea } from "@/components/Textarea";
+import ImageFileInput, {
+  LocalizedImageFileInput,
+} from "@/components/ImageFileInput";
 
 export interface ConferenceInputType {
   slug: string;
@@ -127,7 +129,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
           label="Meno"
           name={`translations.${lng}.name`}
         />
-        <LocalizedFileInput
+        <LocalizedImageFileInput
           lng={lng}
           label="Logo"
           name={`translations.${lng}.logo`}
@@ -182,7 +184,7 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
         <Input label="ICO" name="billing.ICO" />
         <Input label="DIC" name="billing.DIC" />
         <Input label="ICDPH" name="billing.ICDPH" />
-        <FileInput label="Peciatka" name="billing.stamp" />
+        <ImageFileInput label="Peciatka" name="billing.stamp" />
       </WizzardStep>
     </WizzardForm>
   );

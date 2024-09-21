@@ -70,3 +70,12 @@ mutation removeAuthor($id: ObjectId!, $authorId: ObjectId!) {
     }
   }
 }
+
+mutation unsetSubmissionFile($id: ObjectId!) {
+  unsetSubmissionFile(id: $id) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}

@@ -24,7 +24,7 @@ export default async function Submissions({
         scroll={false}
         className="p-2 rounded-md bg-green-500 hover:bg-green-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
       >
-        <PlusIcon className="w-5 h-5" />
+        <PlusIcon className="w-5 h-5 stroke-2" />
         {t("new")}
       </Link>
       {conference?.attending?.submissions.map((s) => (
@@ -51,14 +51,14 @@ export default async function Submissions({
               scroll={false}
               className="p-2 rounded-md bg-primary-500 hover:bg-primary-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
             >
-              <PencilIcon className="w-4 h-4" />
+              <PencilIcon className="w-4 h-4 stroke-2" />
             </Link>
             <Link
               href={`/conferences/${slug}/submissions/${s.id}/delete`}
               scroll={false}
               className="p-2 rounded-md bg-red-500 hover:bg-red-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
             >
-              <TrashIcon className="w-4 h-4" />
+              <TrashIcon className="w-4 h-4 stroke-2" />
             </Link>
           </div>
         </div>

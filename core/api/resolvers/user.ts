@@ -1,5 +1,5 @@
-import { Arg, Args, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
-import { ObjectId, ChangeStreamDocument } from "mongodb";
+import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
+import { ObjectId } from "mongodb";
 import { Service } from "typedi";
 import { User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
@@ -23,6 +23,9 @@ import { I18nService } from "../services/i18nService";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
+import { ConfidentialClientApplication } from "@azure/msal-node";
+import "isomorphic-fetch";
+import { Client } from "@microsoft/microsoft-graph-client";
 
 @Service()
 @Resolver()
@@ -34,45 +37,22 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    )
-  ) {
-    // userService.dataModel
-    //   .watch([])
-    //   .on("change", (data: ChangeStreamDocument<User>) => {
-    //     switch (data.operationType) {
-    //       case "insert":
-    //         return messageBroker.produceMessage(
-    //           JSON.stringify({
-    //             id: data.documentKey?._id,
-    //             email: data.fullDocument?.email,
-    //             name: data.fullDocument?.name,
-    //           }),
-    //           "user.new"
-    //         );
-    //       case "update":
-    //         return messageBroker.produceMessage(
-    //           JSON.stringify({
-    //             id: data.documentKey?._id,
-    //             email: data.updateDescription?.updatedFields?.email,
-    //             name: data.updateDescription?.updatedFields?.name,
-    //           }),
-    //           "user.update.personal"
-    //         );
-    //       case "delete":
-    //         return messageBroker.produceMessage(
-    //           JSON.stringify({
-    //             id: data.documentKey?._id,
-    //           }),
-    //           "user.delete"
-    //         );
-    //       case "invalidate":
-    //         console.log("invalidate");
-    //         console.log(data);
-    //       default:
-    //         console.log("Unhandled operation type: ", data.operationType);
-    //         return;
-    //     }
-    //   });
+    ),
+    private readonly msalClient = new ConfidentialClientApplication({
+      auth: {
+        clientId: process.env.AZURE_CLIENT_ID || "",
+        authority: process.env.AZURE_AUTHORITY || "",
+        clientSecret: process.env.AZURE_CLIENT_SECRET || "",
+      },
+    })
+  ) {}
+
+  private getAuthenticatedClient(accessToken: string): Client {
+    return Client.init({
+      authProvider: (done: any) => {
+        done(null, accessToken);
+      },
+    });
   }
 
   @Authorized(["ADMIN"])
@@ -240,6 +220,59 @@ export class UserResolver {
         };
       } else throw new Error("Invalid token payload");
     } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  @Mutation(() => UserMutationResponse)
+  async msalSignIn(
+    @Arg("authCode") authCode: string
+  ): Promise<UserMutationResponse> {
+    try {
+      // Acquire token using MSAL
+      const tokenResponse = await this.msalClient.acquireTokenByCode({
+        code: authCode,
+        scopes: ["user.read"],
+        redirectUri: "http://localhost:3000/microsoft/callback",
+      });
+
+      if (!tokenResponse || !tokenResponse.accessToken) {
+        throw new Error("Invalid token payload");
+      }
+
+      // Initialize Microsoft Graph client with access token
+      const graphClient = this.getAuthenticatedClient(
+        tokenResponse.accessToken
+      );
+
+      // Fetch user information from Microsoft Graph API
+      const azureUser = await graphClient
+        .api("/me")
+        .select(["mail", "displayName", "otherMails"])
+        .get();
+
+      console.log(azureUser);
+
+      let user = await this.userService.findOne({
+        email: azureUser.otherMails,
+      });
+      if (!user) {
+        user = await this.userService.create({
+          name: azureUser.displayName,
+          email: azureUser.mail,
+          verified: true,
+        });
+      }
+
+      return {
+        data: user,
+        message: this.i18nService.translate("welcome", {
+          ns: "user",
+          name: user.name,
+        }),
+      };
+    } catch (error: any) {
+      console.error("Error in msalSignIn:", error);
       throw new Error(error.message);
     }
   }
