@@ -20,6 +20,8 @@ jobs:
 
       - name: Build and Deploy
         env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           MINIO_USER: ${{ secrets.MINIO_USER }}
           MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
           SECRET: ${{ secrets.SECRET }}
