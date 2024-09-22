@@ -12,7 +12,7 @@ const minioClient = new Minio.Client({
 
 async function ensureBucketExists(bucketName: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    minioClient.bucketExists(bucketName.toLocaleLowerCase(), (err, exists) => {
+    minioClient.bucketExists(bucketName.toLowerCase(), (err, exists) => {
       if (err) {
         return reject(err);
       }
@@ -20,12 +20,12 @@ async function ensureBucketExists(bucketName: string): Promise<void> {
         return resolve();
       } else {
         // Create the bucket if it does not exist
-        minioClient.makeBucket(bucketName.toLocaleLowerCase(), "", (err) => {
+        minioClient.makeBucket(bucketName.toLowerCase(), "", (err) => {
           if (err) {
             return reject(err);
           }
           console.log(
-            `Bucket '${bucketName.toLocaleLowerCase()}' created successfully.`
+            `Bucket '${bucketName.toLowerCase()}' created successfully.`
           );
           return resolve();
         });
@@ -41,32 +41,28 @@ export async function uploadFile(
 ): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+  const bucket = bucketName.toLowerCase();
 
   return new Promise<string>(async (resolve, reject) => {
     try {
       // Ensure the bucket exists, or create it
-      await ensureBucketExists(bucketName.toLocaleLowerCase());
+      await ensureBucketExists(bucket);
 
-      // const paths = path.split("/");
-      // paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-      // const objectName = paths.join("/");
+      const paths = path.split("/");
+      paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
+      const objectName = paths.join("/").toLowerCase();
 
       // Upload the object
-      minioClient.putObject(
-        bucketName.toLocaleLowerCase(),
-        path,
-        buffer,
-        (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log(
-              `File '${path}' uploaded to bucket '${bucketName}' successfully.`
-            );
-            resolve(`http://minio:9000/${bucketName}/${path}`);
-          }
+      minioClient.putObject(bucket, objectName, buffer, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log(
+            `File '${objectName}' uploaded to bucket '${bucket}' successfully.`
+          );
+          resolve(`http://minio:9000/${bucket}/${objectName}`);
         }
-      );
+      });
     } catch (error) {
       reject(error);
     }
@@ -79,7 +75,7 @@ export async function downloadFile(
 ): Promise<Readable> {
   return new Promise<Readable>((resolve, reject) => {
     minioClient.getObject(
-      bucketName.toLocaleLowerCase(),
+      bucketName.toLowerCase(),
       objectName,
       (err, stream) => {
         if (err) {
@@ -97,21 +93,18 @@ export async function deleteFiles(
   objectList: string[]
 ): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
-    minioClient.bucketExists(bucket.toLocaleLowerCase(), (err, res) => {
+    const bucketName = bucket.toLowerCase();
+    minioClient.bucketExists(bucketName, (err, res) => {
       if (err) {
         reject(err);
       }
       if (res) {
-        minioClient.removeObjects(
-          bucket.toLocaleLowerCase(),
-          objectList,
-          (err) => {
-            if (err) {
-              reject(err);
-            }
-            resolve(true);
+        minioClient.removeObjects(bucketName, objectList, (err) => {
+          if (err) {
+            reject(err);
           }
-        );
+          resolve(true);
+        });
       }
     });
   });

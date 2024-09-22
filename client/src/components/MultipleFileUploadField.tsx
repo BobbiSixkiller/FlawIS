@@ -155,7 +155,6 @@ function SingleUploadProgress({
   onUpload,
 }: SingleUploadProgressProps) {
   const [progress, setProgress] = useState(0);
-  console.log(errors);
 
   useEffect(() => {
     // async function upload() {

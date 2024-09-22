@@ -25,7 +25,6 @@ import {
 } from "@/components/MultipleInput";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import { objectToFormData } from "@/components/WIzzardForm";
-import { deleteFiles } from "@/lib/minio";
 
 export default function UpdateSubmissionForm({
   sections,
@@ -49,7 +48,9 @@ export default function UpdateSubmissionForm({
       );
       const blob = await response.blob();
       const fileName = submission.fileUrl?.split("/").pop() || "file";
-      const file = new File([blob], fileName);
+      const fileNameArr = fileName.split("-");
+
+      const file = new File([blob], fileNameArr[fileNameArr.length - 1]);
 
       methods.setValue("files", [file]);
     };
@@ -119,6 +120,8 @@ export default function UpdateSubmissionForm({
             let fileUrl: string | null = null;
             const slug = submission.conference.slug;
 
+            console.log(files);
+
             if (files && submission.fileUrl) {
               await deleteSubmissionFile(
                 submission.fileUrl,
@@ -142,11 +145,12 @@ export default function UpdateSubmissionForm({
               const res = await uploadSubmissionFile(formData);
               fileUrl = res[0];
             } else if ((files?.length === 0 || !files) && submission.fileUrl) {
-              await deleteSubmissionFile(
+              const resik = await deleteSubmissionFile(
                 submission.fileUrl,
                 slug,
                 submission.id
               );
+              console.log(resik);
             }
 
             const state = await updateSubmission(submission.id, {

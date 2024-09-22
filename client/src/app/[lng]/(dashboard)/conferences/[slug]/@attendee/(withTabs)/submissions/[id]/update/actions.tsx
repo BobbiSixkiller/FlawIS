@@ -59,8 +59,10 @@ export async function deleteSubmissionFile(
   });
 
   const minioRes = await deleteFiles(conferenceSlug, [
-    fileUrl.replace(`http://minio:9000/${conferenceSlug}/`, ""),
+    fileUrl.replace(`http://minio:9000/${conferenceSlug.toLowerCase()}/`, ""),
   ]);
+
+  console.log(apiRes, minioRes);
 
   return minioRes && !apiRes.errors;
 }
