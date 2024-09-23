@@ -113,8 +113,8 @@ export class AttendeeConference {
 })
 @ObjectType({ description: "Attendee model type" })
 @Index({ "user.name": "text", "user.email": "text" })
-@Index({ "conference.slug": 1 })
-@Index({ "conference.slug": 1, _id: -1 })
+@Index({ "conference.slug": 1, _id: -1 }) //attendees query
+@Index({ "user._id": 1, "conference.slug": 1 }) //attendee query
 export class Attendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;

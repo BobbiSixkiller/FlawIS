@@ -322,7 +322,7 @@ type Section {
   conference: String!
   createdAt: DateTimeISO!
   id: ID!
-  submissions: [Submission!]!
+  submissions(after: ObjectId, conferenceId: ObjectId, first: Int! = 20, sectionIds: [ObjectId!]): SubmissionConnection!
   translations: SectionTranslation!
   updatedAt: DateTimeISO!
 }
@@ -365,6 +365,17 @@ type Submission {
   updatedAt: DateTimeISO!
 }
 
+type SubmissionConnection {
+  edges: [SubmissionEdge]!
+  pageInfo: SubmissionPageInfo!
+  totalCount: Float!
+}
+
+type SubmissionEdge {
+  cursor: ObjectId!
+  node: Submission!
+}
+
 input SubmissionInput {
   authors: [String]!
   conference: ObjectId!
@@ -376,6 +387,11 @@ input SubmissionInput {
 type SubmissionMutationResponse implements IMutationResponse {
   data: Submission!
   message: String!
+}
+
+type SubmissionPageInfo {
+  endCursor: ObjectId
+  hasNextPage: Boolean!
 }
 
 type SubmissionTranslation {

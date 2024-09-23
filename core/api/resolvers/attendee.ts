@@ -45,12 +45,13 @@ export class AttendeeResolver {
     const connection: AttendeeConnection = data[0];
 
     return {
-      totalCount: connection.totalCount,
-      pageInfo: connection.pageInfo,
-      edges: connection.edges.map((e) => ({
-        cursor: e.cursor,
-        node: transformIds(e.node),
-      })),
+      totalCount: connection.totalCount || 0,
+      pageInfo: connection.pageInfo || { hasNextPage: false },
+      edges:
+        connection.edges.map((e) => ({
+          cursor: e.cursor,
+          node: transformIds(e.node),
+        })) || [],
     };
   }
 

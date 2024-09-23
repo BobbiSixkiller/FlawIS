@@ -26,6 +26,7 @@ import { Section } from "../entitites/Section";
 import { User } from "../entitites/User";
 import { I18nService } from "../services/i18nService";
 
+//refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
 @Resolver(() => Submission)
 export class SubmissionResolver {

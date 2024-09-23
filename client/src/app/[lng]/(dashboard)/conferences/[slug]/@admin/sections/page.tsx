@@ -1,14 +1,14 @@
 import Dropdown from "@/components/Dropdown";
-import { getConference } from "../../../actions";
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { conferenceSections } from "./actions";
 
 export default async function SectionsPage({
   params: { lng, slug },
 }: {
   params: { lng: string; slug: string };
 }) {
-  const conference = await getConference(slug);
+  const conference = await conferenceSections({ slug });
 
   return (
     <div className="flex flex-col gap-2">
@@ -22,7 +22,10 @@ export default async function SectionsPage({
       </Link>
       <div className="-mx-6 sm:mx-0 divide-y">
         {conference?.sections.map((s, i) => (
-          <div className="p-6 sm:p-4 flex justify-between gap-4" key={i}>
+          <div
+            className="p-6 sm:p-4 flex justify-between items-center gap-4"
+            key={i}
+          >
             <div className="flex flex-col">
               <span className="text-lg text-gray-900">
                 {s.translations[lng as "sk" | "en"].name}
@@ -31,6 +34,16 @@ export default async function SectionsPage({
                 {s.translations[lng as "sk" | "en"].topic}
               </span>
             </div>
+
+            <span>
+              {s.submissions.edges.reduce((acc, edge) => {
+                if (edge?.node.fileUrl) {
+                  return acc + 1;
+                } else return acc;
+              }, 0)}{" "}
+              / {s.submissions.totalCount}
+            </span>
+
             <Dropdown
               trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
               items={[

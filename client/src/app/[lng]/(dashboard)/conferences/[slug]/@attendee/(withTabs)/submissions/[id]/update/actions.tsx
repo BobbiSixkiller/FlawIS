@@ -8,7 +8,6 @@ import {
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { exec } from "child_process";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -61,8 +60,6 @@ export async function deleteSubmissionFile(
   const minioRes = await deleteFiles(conferenceSlug, [
     fileUrl.replace(`http://minio:9000/${conferenceSlug.toLowerCase()}/`, ""),
   ]);
-
-  console.log(apiRes, minioRes);
 
   return minioRes && !apiRes.errors;
 }

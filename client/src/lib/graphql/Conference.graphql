@@ -123,6 +123,25 @@ query conference($slug: String!) {
   }
 }
 
+query conferenceSections($slug: String!, $after: ObjectId, $first: Int) {
+  conference(slug: $slug) {
+    id
+    sections {
+      ...Section
+      submissions(first: $first, after: $after) {
+        totalCount
+        edges {
+          cursor
+          node {
+            id
+            fileUrl
+          }
+        }
+      }
+    }
+  }
+}
+
 query textSearchConference($text: String!) {
   textSearchConference(text: $text) {
     ...Conference

@@ -35,9 +35,6 @@ export class Section extends TimeStamps {
   @Property({ type: () => SectionTranslation, _id: false })
   translations: SectionTranslation;
 
-  @Field(() => [Submission])
-  submissions: Submission[];
-
   @Field()
   createdAt: Date;
   @Field()

@@ -555,9 +555,18 @@ export type Section = {
   conference: Scalars['String']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['ID']['output'];
-  submissions: Array<Submission>;
+  submissions: SubmissionConnection;
   translations: SectionTranslation;
   updatedAt: Scalars['DateTimeISO']['output'];
+};
+
+
+/** Conference's section entity model type */
+export type SectionSubmissionsArgs = {
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  conferenceId?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: Scalars['Int']['input'];
+  sectionIds?: InputMaybe<Array<Scalars['ObjectId']['input']>>;
 };
 
 /** Section input type */
@@ -602,6 +611,19 @@ export type Submission = {
   updatedAt: Scalars['DateTimeISO']['output'];
 };
 
+export type SubmissionConnection = {
+  __typename?: 'SubmissionConnection';
+  edges: Array<Maybe<SubmissionEdge>>;
+  pageInfo: SubmissionPageInfo;
+  totalCount: Scalars['Float']['output'];
+};
+
+export type SubmissionEdge = {
+  __typename?: 'SubmissionEdge';
+  cursor: Scalars['ObjectId']['output'];
+  node: Submission;
+};
+
 export type SubmissionInput = {
   authors: Array<InputMaybe<Scalars['String']['input']>>;
   conference: Scalars['ObjectId']['input'];
@@ -614,6 +636,12 @@ export type SubmissionMutationResponse = IMutationResponse & {
   __typename?: 'SubmissionMutationResponse';
   data: Submission;
   message: Scalars['String']['output'];
+};
+
+export type SubmissionPageInfo = {
+  __typename?: 'SubmissionPageInfo';
+  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
 };
 
 export type SubmissionTranslation = {
@@ -864,6 +892,15 @@ export type ConferenceQueryVariables = Exact<{
 
 
 export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference: string, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, attending?: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: string, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference: string, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } | null, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } };
+
+export type ConferenceSectionsQueryVariables = Exact<{
+  slug: Scalars['String']['input'];
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type ConferenceSectionsQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, sections: Array<{ __typename?: 'Section', id: string, conference: string, submissions: { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: any, node: { __typename?: 'Submission', id: string, fileUrl?: string | null } } | null> }, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }> } };
 
 export type TextSearchConferenceQueryVariables = Exact<{
   text: Scalars['String']['input'];
@@ -2827,6 +2864,39 @@ fragment Submission on Submission {
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<ConferenceQuery, ConferenceQueryVariables>;
+export const ConferenceSectionsDocument = new TypedDocumentString(`
+    query conferenceSections($slug: String!, $after: ObjectId, $first: Int) {
+  conference(slug: $slug) {
+    id
+    sections {
+      ...Section
+      submissions(first: $first, after: $after) {
+        totalCount
+        edges {
+          cursor
+          node {
+            id
+            fileUrl
+          }
+        }
+      }
+    }
+  }
+}
+    fragment Section on Section {
+  id
+  conference
+  translations {
+    sk {
+      name
+      topic
+    }
+    en {
+      name
+      topic
+    }
+  }
+}`) as unknown as TypedDocumentString<ConferenceSectionsQuery, ConferenceSectionsQueryVariables>;
 export const TextSearchConferenceDocument = new TypedDocumentString(`
     query textSearchConference($text: String!) {
   textSearchConference(text: $text) {

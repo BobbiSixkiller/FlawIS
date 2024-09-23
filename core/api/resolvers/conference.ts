@@ -63,12 +63,13 @@ export class ConferencerResolver {
     const connection: ConferenceConnection = data[0];
 
     return {
-      totalCount: connection.totalCount,
-      pageInfo: connection.pageInfo,
-      edges: connection.edges.map((e) => ({
-        cursor: e.cursor,
-        node: transformIds(e.node),
-      })),
+      totalCount: connection.totalCount || 0,
+      pageInfo: connection.pageInfo || { hasNextPage: false },
+      edges:
+        connection.edges.map((e) => ({
+          cursor: e.cursor,
+          node: transformIds(e.node),
+        })) || [],
     };
   }
 
@@ -153,9 +154,9 @@ export class ConferencerResolver {
 
   @Authorized()
   @FieldResolver(() => Attendee)
-  async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
+  async attending(@Ctx() { user }: Context, @Root() { slug }: Conference) {
     return await this.attendeeService.findOne({
-      "conference._id": id,
+      "conference.slug": slug,
       "user._id": user?.id,
     });
   }

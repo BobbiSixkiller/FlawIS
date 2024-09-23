@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  ConferenceSectionsDocument,
   CreateSectionDocument,
   DeleteSectionDocument,
   SectionInput,
@@ -9,6 +10,19 @@ import {
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
+
+export async function conferenceSections(params: {
+  slug: string;
+  first?: number;
+  after?: string;
+}) {
+  const res = await executeGqlFetch(ConferenceSectionsDocument, params);
+  if (res.errors) {
+    console.log(res.errors[0]);
+  }
+
+  return res.data.conference;
+}
 
 export async function createSection(
   data: SectionInput,

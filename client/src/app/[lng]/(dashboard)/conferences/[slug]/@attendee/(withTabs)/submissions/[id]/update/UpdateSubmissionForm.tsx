@@ -120,8 +120,6 @@ export default function UpdateSubmissionForm({
             let fileUrl: string | null = null;
             const slug = submission.conference.slug;
 
-            console.log(files);
-
             if (files && submission.fileUrl) {
               await deleteSubmissionFile(
                 submission.fileUrl,
@@ -145,12 +143,11 @@ export default function UpdateSubmissionForm({
               const res = await uploadSubmissionFile(formData);
               fileUrl = res[0];
             } else if ((files?.length === 0 || !files) && submission.fileUrl) {
-              const resik = await deleteSubmissionFile(
+              await deleteSubmissionFile(
                 submission.fileUrl,
                 slug,
                 submission.id
               );
-              console.log(resik);
             }
 
             const state = await updateSubmission(submission.id, {
