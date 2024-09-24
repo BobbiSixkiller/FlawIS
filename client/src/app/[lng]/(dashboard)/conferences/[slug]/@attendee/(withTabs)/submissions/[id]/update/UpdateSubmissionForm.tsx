@@ -47,10 +47,14 @@ export default function UpdateSubmissionForm({
         `/conferences/${submission.conference.slug}/submissions/${submission.id}/download`
       );
       const blob = await response.blob();
+      const fileType = blob.type || "application/octet-stream";
+
       const fileName = submission.fileUrl?.split("/").pop() || "file";
       const fileNameArr = fileName.split("-");
 
-      const file = new File([blob], fileNameArr[fileNameArr.length - 1]);
+      const file = new File([blob], fileNameArr[fileNameArr.length - 1], {
+        type: fileType,
+      });
 
       methods.setValue("files", [file]);
     };
@@ -114,7 +118,7 @@ export default function UpdateSubmissionForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 w-full sm:w-96"
+        className="space-y-6 min-w-80"
         onSubmit={methods.handleSubmit(
           async ({ authors, conference, section, translations, files }) => {
             let fileUrl: string | null = null;

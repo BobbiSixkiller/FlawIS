@@ -7,23 +7,18 @@ import { useTranslation } from "@/lib/i18n/client";
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
 
 interface DownloadPDFButtonProps {
-  id: string;
   lng: string;
   data: AttendeeFragment;
 }
 
-const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({
-  id,
-  lng,
-  data,
-}) => {
+const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({ lng, data }) => {
   const { t } = useTranslation(lng, "invoice");
 
   const [isPending, startTransition] = useTransition();
 
   const handleDownload = () => {
     startTransition(async () => {
-      const response = await fetch(`/${lng}/invoice/${id}`, {
+      const response = await fetch(`/${lng}/invoice`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -16,7 +16,6 @@ export default function DeleteSectionForm({
   lng: string;
 }) {
   const router = useRouter();
-  const { slug } = useParams();
 
   const { t } = useTranslation(lng, ["profile", "common"]);
 
@@ -24,28 +23,27 @@ export default function DeleteSectionForm({
 
   return (
     <form
-      className="space-y-6 w-full sm:w-96"
+      className="space-y-6 min-w-80"
       action={async (data) => {
         const state = await deleteSection(null, data);
 
         if (state.message && !state.success) {
           dispatch({
             type: ActionTypes.SetFormMsg,
-            payload: state,
+            payload: state.message,
           });
         }
 
         if (state.success) {
           dispatch({
             type: ActionTypes.SetAppMsg,
-            payload: state,
+            payload: state.message,
           });
           router.back();
         }
       }}
     >
       <input type="hidden" name="id" value={section.id} />
-      <input type="hidden" name="slug" value={slug} />
 
       <h1>
         Naozaj chcete zmazat sekciu{" "}

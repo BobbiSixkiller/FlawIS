@@ -35,11 +35,7 @@ export default async function ConferencePage({
           heading={conference!.slug}
           subHeading={conference!.translations[lng as "sk" | "en"].name}
         />
-        <DownloadPDFButton
-          id={conference?.attending?.id}
-          lng={lng}
-          data={conference?.attending!}
-        />
+        <DownloadPDFButton lng={lng} data={conference?.attending!} />
       </div>
       <div className="border-t border-gray-100">
         <dl className="divide-y divide-gray-100">

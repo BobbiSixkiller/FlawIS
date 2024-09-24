@@ -22,13 +22,15 @@ export async function GET(
   }
 
   try {
+    const objectName = submission.fileUrl.replace(
+      `http://minio:9000/${submission.conference.slug.toLowerCase()}/`,
+      ""
+    );
+
     // Download the file
     const fileStream = await downloadFile(
       submission.conference.slug,
-      submission.fileUrl.replace(
-        `http://minio:9000/${submission.conference.slug}/`,
-        ""
-      )
+      objectName
     );
 
     // Convert Node.js stream to web ReadableStream
@@ -43,7 +45,8 @@ export async function GET(
           .pop()}"`, // Set the filename for download
       },
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error);
     return NextResponse.json({
       status: 500,
       message: "Error downloading the file.",

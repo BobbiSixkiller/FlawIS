@@ -4,9 +4,9 @@ import { InvoiceDoc } from "./InvoiceDoc";
 export async function POST(
   request: Request,
   {
-    params: { lng, attendee },
+    params: { lng },
   }: {
-    params: { lng: string; attendee: string };
+    params: { lng: string };
   }
 ) {
   const data = await request.json();

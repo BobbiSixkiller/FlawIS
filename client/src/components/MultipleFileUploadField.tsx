@@ -48,10 +48,8 @@ export default function MultipleFileUploadField({
 }) {
   const { field, fieldState } = useController({ name });
 
-  const { setValue, watch } = useFormContext();
+  const { setValue } = useFormContext();
   const [files, setFiles] = useState<UploadableFile[]>([]);
-
-  console.log(watch("files"));
 
   useEffect(() => {
     setFiles(field.value.map((file: File) => ({ file, errors: [] })));
@@ -217,10 +215,18 @@ function SingleUploadProgress({
     });
   }
 
+  console.log(file);
+
   return (
     <div className="flex flex-col p-2 gap-1">
       <div className="flex flex-row justify-between items-end">
-        {file?.name}
+        <a
+          href={URL.createObjectURL(file)}
+          download={file.name}
+          className="text-primary-500 hover:underline"
+        >
+          {file?.name}
+        </a>
         <button
           onClick={async (e) => {
             e.preventDefault();

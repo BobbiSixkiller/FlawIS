@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 
-export default async function Submissions({
+export default async function AttendeeSubmissionsPage({
   params: { slug, lng },
 }: {
   params: { slug: string; lng: string };

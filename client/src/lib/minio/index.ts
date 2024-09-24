@@ -76,7 +76,7 @@ export async function downloadFile(
   return new Promise<Readable>((resolve, reject) => {
     minioClient.getObject(
       bucketName.toLowerCase(),
-      objectName,
+      objectName.toLowerCase(),
       (err, stream) => {
         if (err) {
           reject(err);

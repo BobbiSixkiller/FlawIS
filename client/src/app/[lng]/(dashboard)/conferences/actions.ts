@@ -40,7 +40,7 @@ export async function getConference(slug: string) {
     ConferenceDocument,
     { slug },
     {},
-    { tags: [`conference:${slug}`, `conference:${user}`] }
+    { tags: [`conference:${slug}`, `conference:${user}`], revalidate: 3600 }
   );
 
   if (res.errors) {

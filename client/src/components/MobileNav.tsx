@@ -6,7 +6,7 @@ import {
   useRouter,
   useSelectedLayoutSegment,
 } from "next/navigation";
-import { Fragment, ReactNode, useState, useTransition } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import {
   AcademicCapIcon,
   ArrowLeftCircleIcon,
@@ -144,15 +144,36 @@ export function MobileNav({
   drawerTitle: ReactNode;
 }) {
   const [menuShown, setMenuShown] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Add scroll event listener
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const { t } = useTranslation(lng, "landing");
 
   return (
-    <div className="lg:hidden sticky top-0 border-b bg-white z-20">
+    <div
+      className={`lg:hidden sticky top-0 border-b bg-white z-10 ${
+        scrolled ? "shadow" : ""
+      }`}
+    >
       <div className="container h-[60px] mx-auto px-4 py-3 flex justify-between align-middle">
         <div className="flex gap-4">
           <div className="hidden sm:flex">{logo}</div>
-
           <button
             className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 z-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
             onClick={() => setMenuShown(true)}

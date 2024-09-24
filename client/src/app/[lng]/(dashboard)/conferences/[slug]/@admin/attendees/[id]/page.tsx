@@ -60,7 +60,7 @@ export default async function AttendeePage({
         ]}
       />
       <div className="flex gap-2">
-        <DownloadPDFButton id={attendee.id} lng={lng} data={attendee} />
+        <DownloadPDFButton lng={lng} data={attendee} />
         <Link
           scroll={false}
           href={`/conferences/${slug}/attendees/${id}/updateInvoice`}

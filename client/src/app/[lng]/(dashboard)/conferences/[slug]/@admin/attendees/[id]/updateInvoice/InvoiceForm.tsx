@@ -85,7 +85,7 @@ export default function UpdateInvoiceForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 w-full sm:w-96"
+        className="space-y-6"
         onSubmit={methods.handleSubmit(async (data) => {
           const state = await updateInvoice(id, data);
 

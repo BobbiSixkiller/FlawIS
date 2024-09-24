@@ -43,7 +43,7 @@ export default function UpdateTicketForm({
       }).required(t("required"))
     ),
     values: {
-      conference: section.conference,
+      conference: section.conference?.id,
       translations: section.translations,
     },
   });
@@ -51,9 +51,9 @@ export default function UpdateTicketForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 w-full sm:w-96"
+        className="space-y-6 min-w-80"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateSection(data, slug, section?.id);
+          const state = await updateSection(data, section?.id);
 
           if (state.message && !state.success) {
             dispatch({

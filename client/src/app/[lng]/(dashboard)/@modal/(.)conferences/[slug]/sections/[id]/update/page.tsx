@@ -16,7 +16,7 @@ export default async function UpdateSection({
   }
 
   return (
-    <Modal title="Nova sekcia">
+    <Modal title="Aktualizovat sekciu">
       <FormMessage lng={lng} />
       <UpdateSectionForm lng={lng} section={section} />
     </Modal>
