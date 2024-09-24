@@ -247,7 +247,7 @@ export class UserResolver {
       // Fetch user information from Microsoft Graph API
       const azureUser = await graphClient
         .api("/me")
-        .select(["mail", "displayName", "otherMails"])
+        .select(["mail", "displayName", "otherMails", "proxyAddresses"])
         .get();
 
       console.log(azureUser);

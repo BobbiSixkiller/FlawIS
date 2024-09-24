@@ -21,21 +21,33 @@ export default async function SectionsPage({
         Nova
       </Link>
       <div className="-mx-6 sm:mx-0 divide-y">
+        <div className="flex flex-col sm:flex-row gap-2 p-6 sm:p-4 sm:items-center">
+          <div className="w-3/4">Nazov</div>
+          <div>Nahrate prispevky</div>
+        </div>
         {conference?.sections.map((s, i) => (
           <div
-            className="p-6 sm:p-4 flex justify-between items-center gap-4"
+            className="p-6 sm:p-4 flex justify-between sm:items-center gap-4"
             key={i}
           >
-            <div className="flex flex-col">
+            <div className="flex flex-col w-3/4">
               <span className="text-lg text-gray-900">
                 {s.translations[lng as "sk" | "en"].name}
               </span>
               <span className="text-sm text-gray-400">
                 {s.translations[lng as "sk" | "en"].topic}
               </span>
+              <span className="whitespace-nowrap sm:hidden text-sm">
+                {s.submissions.edges.reduce((acc, edge) => {
+                  if (edge?.node.fileUrl) {
+                    return acc + 1;
+                  } else return acc;
+                }, 0)}{" "}
+                / {s.submissions.totalCount}
+              </span>
             </div>
 
-            <span>
+            <span className="whitespace-nowrap hidden sm:block">
               {s.submissions.edges.reduce((acc, edge) => {
                 if (edge?.node.fileUrl) {
                   return acc + 1;
