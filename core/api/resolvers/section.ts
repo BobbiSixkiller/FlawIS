@@ -18,11 +18,13 @@ import { DocumentType } from "@typegoose/typegoose";
 import { SubmissionArgs, SubmissionConnection } from "./types/submission";
 import { Submission } from "../entitites/Submission";
 import { transformIds } from "../middlewares/typegoose-middleware";
+import { Conference } from "../entitites/Conference";
 
 @Service()
 @Resolver(() => Section)
 export class SectionResolver {
   constructor(
+    private readonly conferenceService = new CRUDservice(Conference),
     private readonly sectionService = new CRUDservice(Section),
     private readonly submissionService = new CRUDservice(Submission),
     private readonly i18nService: I18nService
@@ -71,19 +73,30 @@ export class SectionResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Mutation(() => String)
+  @Mutation(() => SectionMutationResponse)
   async deleteSection(
     @Arg("id") _id: ObjectId,
     @LoadResource(Section) section: DocumentType<Section>
-  ): Promise<string> {
+  ): Promise<SectionMutationResponse> {
     await this.sectionService.delete({ _id: section.id });
 
-    return this.i18nService.translate("delete", {
-      ns: "section",
-      name: section.translations[
-        this.i18nService.language() as keyof SectionTranslation
-      ].name,
-    });
+    return {
+      data: section,
+      message: this.i18nService.translate("delete", {
+        ns: "section",
+        name: section.translations[
+          this.i18nService.language() as keyof SectionTranslation
+        ].name,
+      }),
+    };
+  }
+
+  @Authorized()
+  @FieldResolver(() => Conference, { nullable: true })
+  async conference(
+    @Root() { conference }: Section
+  ): Promise<Conference | null> {
+    return this.conferenceService.findOne({ _id: conference });
   }
 
   @Authorized(["ADMIN"])

@@ -258,7 +258,7 @@ type Mutation {
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
-  deleteSection(id: ObjectId!): String!
+  deleteSection(id: ObjectId!): SectionMutationResponse!
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
   deleteTicket(slug: String!, ticketId: ObjectId!): String!
   deleteUser(id: ObjectId!): UserMutationResponse!
@@ -319,7 +319,7 @@ enum Role {
 
 """Conference's section entity model type"""
 type Section {
-  conference: String!
+  conference: Conference
   createdAt: DateTimeISO!
   id: ID!
   submissions(after: ObjectId, conferenceId: ObjectId, first: Int! = 20, sectionIds: [ObjectId!]): SubmissionConnection!

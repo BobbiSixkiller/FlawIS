@@ -27,9 +27,9 @@ export class Section extends TimeStamps {
   @Field(() => ID)
   id: ObjectId;
 
-  @Field(() => String)
+  @Field(() => Conference, { nullable: true })
   @Property({ ref: () => Conference })
-  conference: Ref<Conference>;
+  conference?: Ref<Conference>;
 
   @Field(() => SectionTranslation)
   @Property({ type: () => SectionTranslation, _id: false })
