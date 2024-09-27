@@ -118,7 +118,7 @@ export default function UpdateSubmissionForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 min-w-80"
+        className="space-y-6 w-80 sm:w-96"
         onSubmit={methods.handleSubmit(
           async ({ authors, conference, section, translations, files }) => {
             let fileUrl: string | null = null;
