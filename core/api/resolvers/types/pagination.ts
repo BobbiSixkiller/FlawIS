@@ -51,7 +51,6 @@ export function CreateArgs<TNode extends object>(TNodeClass: ClassType<TNode>) {
 
     @Field(() => Int, { defaultValue: 20 })
     @Min(1)
-    @Max(50)
     first: number = 20;
   }
 

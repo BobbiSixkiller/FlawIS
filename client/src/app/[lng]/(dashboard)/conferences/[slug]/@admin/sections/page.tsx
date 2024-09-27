@@ -8,7 +8,10 @@ export default async function SectionsPage({
 }: {
   params: { lng: string; slug: string };
 }) {
-  const conference = await conferenceSections({ slug });
+  const conference = await conferenceSections({
+    slug,
+    first: 1000,
+  });
 
   return (
     <div className="flex flex-col gap-2">
