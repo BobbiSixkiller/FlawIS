@@ -31,12 +31,7 @@ export async function GET(
   const { t } = await useTranslation(lng, "minio");
   const { bucketName, objectName }: Download = await request.json();
   if (!bucketName || !objectName) {
-    return NextResponse.json(
-      {
-        error: t("400"),
-      },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: t("400") }, { status: 400 });
   }
 
   try {
@@ -56,12 +51,7 @@ export async function GET(
       },
     });
   } catch (error: any) {
-    return NextResponse.json(
-      {
-        error: t("500"),
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: t("500") }, { status: 500 });
   }
 }
 

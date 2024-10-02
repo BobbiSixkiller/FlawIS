@@ -1,6 +1,7 @@
 import { chain } from "./middlewares/chainMiddleware";
 import { withAuth } from "./middlewares/authMiddleware";
 import { withLocalization } from "./middlewares/i18nMiddleware";
+import { withTenant } from "./middlewares/tenantMiddleware";
 
 export const config = {
   // do not localize next.js paths and public folder
@@ -9,4 +10,4 @@ export const config = {
   ],
 };
 
-export default chain([withAuth, withLocalization]);
+export default chain([withAuth, withLocalization, withTenant]);

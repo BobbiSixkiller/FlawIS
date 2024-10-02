@@ -29,7 +29,8 @@ export function withLocalization(middleware: CustomMiddleware) {
 
       // Rewrite for default locale that is removed from URL
       if (lng === fallbackLng) {
-        return NextResponse.rewrite(url);
+        return middleware(req, event, NextResponse.rewrite(url));
+        // return NextResponse.rewrite(url);
       }
       return NextResponse.redirect(url);
     }
@@ -39,10 +40,12 @@ export function withLocalization(middleware: CustomMiddleware) {
       const lngInReferer = languages.find((l) =>
         refererUrl.pathname.startsWith(`/${l}`)
       );
+
       const response = NextResponse.next();
       if (lngInReferer) {
         response.cookies.set(cookieName, lngInReferer);
       }
+
       return response;
     }
 

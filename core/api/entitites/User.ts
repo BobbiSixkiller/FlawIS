@@ -23,6 +23,8 @@ import { Billing } from "./Billing";
 export enum Role {
   Basic = "BASIC",
   Admin = "ADMIN",
+  Student = "STUDENT",
+  Organization = "ORGANIZATION",
 }
 
 registerEnumType(Role, {
@@ -101,8 +103,15 @@ export class User extends TimeStamps {
   billings: Billing[];
 
   @Field(() => Role)
-  @Property({ default: "BASIC", enum: ["BASIC", "ADMIN"] })
+  @Property({
+    default: "BASIC",
+    enum: ["BASIC", "ADMIN", "STUDENT", "ORGANIZATION"],
+  })
   role: Role;
+
+  @Field({ nullable: true })
+  @Property()
+  cvUrl?: string;
 
   @Field()
   @Property({ default: false })

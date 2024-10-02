@@ -315,6 +315,8 @@ input RegisterInput {
 enum Role {
   Admin
   Basic
+  Organization
+  Student
 }
 
 """Conference's section entity model type"""
@@ -445,6 +447,7 @@ type TicketTranslations {
 type User {
   billings: [Billing]!
   createdAt: DateTimeISO!
+  cvUrl: String
   email: String!
   id: ObjectId!
   name: String!

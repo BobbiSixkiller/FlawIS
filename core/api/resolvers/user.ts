@@ -247,10 +247,15 @@ export class UserResolver {
       // Fetch user information from Microsoft Graph API
       const azureUser = await graphClient
         .api("/me")
-        .select(["mail", "displayName", "otherMails", "proxyAddresses"])
+        .select([
+          "mail",
+          "displayName",
+          "otherMails",
+          "proxyAddresses",
+          "department",
+          "jobTitle",
+        ])
         .get();
-
-      console.log(azureUser);
 
       let user = await this.userService.findOne({
         email: azureUser.otherMails,

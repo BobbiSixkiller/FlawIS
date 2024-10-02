@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/lib/i18n/client";
 import { useFormState } from "react-dom";
-import { getGoogleAuthLink, login } from "../actions";
+import { getGoogleAuthLink, getMsalAuthLink, login } from "../actions";
 import { Trans } from "../../../../../node_modules/react-i18next";
 import Link from "next/link";
 import Button from "@/components/Button";
@@ -129,7 +129,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           </svg>
           Google
         </button>
-        {/* <button
+        <button
           type="button"
           onClick={() => getMsalAuthLink(url)}
           className="text-sm rounded-md border border-gray-300 hover:border-primary-500 px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
@@ -206,7 +206,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             </defs>
           </svg>
           Microsoft
-        </button> */}
+        </button>
       </div>
     </form>
   );

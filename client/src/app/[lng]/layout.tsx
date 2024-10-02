@@ -5,7 +5,7 @@ import localFont from "next/font/local";
 import { dir } from "i18next";
 import MessageProvider from "@/providers/MessageProvider";
 
-export const UKsans = localFont({
+const UKsans = localFont({
   src: [
     {
       path: "../../../public/UKsans/UKSans-Thin.otf",
