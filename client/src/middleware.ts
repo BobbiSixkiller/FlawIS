@@ -1,45 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { chain } from "./middlewares/chainMiddleware";
+import { withAuth } from "./middlewares/authMiddleware";
+import { withLocalization } from "./middlewares/i18nMiddleware";
+import { withTenant } from "./middlewares/tenantMiddleware";
 
 export const config = {
-  matcher: ["/((?!api|_next|images|locales|[\\w-]+\\.\\w+).*)*"],
+  // do not localize next.js paths and public folder
+  matcher: [
+    "/((?!api|_next/static|_next/image|images|UKsans|site.webmanifest|browserconfig.xml|sw.js|.pdf).*)",
+  ],
 };
 
-export default function middleware(req: NextRequest) {
-  const url = req.nextUrl.clone();
-  const hostname = req.headers.get("host");
-
-  if (
-    ["/login", "/forgotPassword", "/resetPassword", "/activate"].includes(
-      url.pathname
-    )
-  ) {
-    url.pathname = `/auth${url.pathname}`;
-    return NextResponse.rewrite(url);
-  }
-
-  switch (hostname) {
-    case "conferences.flaw.uniba.sk":
-      url.pathname = `/conferences${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    case "flawis.flaw.uniba.sk":
-      url.pathname = `/flawis${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    case "conferences-staging.flaw.uniba.sk":
-      url.pathname = `/conferences${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    case "flawis-staging.flaw.uniba.sk":
-      url.pathname = `/flawis${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    case "localhost:3000":
-      url.pathname = `/conferences${url.pathname}`;
-      return NextResponse.rewrite(url);
-
-    default:
-      url.pathname = "/404";
-      return NextResponse.rewrite(url);
-  }
-}
+export default chain([withAuth, withLocalization, withTenant]);

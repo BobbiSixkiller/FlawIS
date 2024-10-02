@@ -1,9 +1,5 @@
 import { Msg } from '../email.service';
 
-interface File {
-  path: string;
-}
-
 interface Address {
   street: string;
   city: string;
@@ -20,7 +16,7 @@ interface Billing {
   variableSymbol?: string;
   IBAN?: string;
   SWIFT?: string;
-  stamp?: File;
+  stampUrl?: string;
 }
 
 interface InvoiceBody {

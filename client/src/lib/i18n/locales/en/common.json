@@ -1,0 +1,14 @@
+{
+  "update": "Update",
+  "new": "New",
+  "create": "Create",
+  "delete": "Delete",
+  "error": "Error",
+  "success": "Success",
+  "notFoundMsg": "Could not find requested resource",
+  "more": "More",
+  "step": "Step",
+  "confirm": "Confirm",
+  "deleteConfirm": "Do you really wish to delete {{name}}?",
+  "notFound": "Nothing found."
+}

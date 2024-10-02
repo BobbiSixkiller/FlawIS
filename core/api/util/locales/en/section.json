@@ -1,0 +1,6 @@
+{
+  "notFound": "Section has not been found!",
+  "update": "Section {{name}} has been updated.",
+  "new": "Section {{name}} has been created.",
+  "delete": "Section {{name}} has been deleted."
+}

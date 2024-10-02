@@ -1,149 +1,60 @@
 services:
-  gateway:
+  core:
     build:
-      context: ./gateway
+      context: ./core
       dockerfile: Dockerfile
       target: development
     command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
+    env_file:
+      - ./.env
+    # environment:
+    #   NODE_ENV: development
+    #   SECRET: ${SECRET}
+    #   MONGODB_URI: ${MONGODB_URI}
+    #   RMQ_URI: ${RMQ_URI}
+    #   RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    #   GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    #   GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    #   GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    #   AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+    #   AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+    #   AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
-      - users
-      - conferences
-      - files
-      - grants
+      minio:
+        condition: service_healthy
+        restart: true
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     volumes:
-      - ./gateway:/usr/app
+      - ./core:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
     ports:
       - "5000:5000"
 
-  users:
-    build:
-      context: ./users
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${USERS_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./users:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5001:5001"
-
-  files:
-    build:
-      context: ./files
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${FILES_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./files:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5002:5002"
-
-  conferences:
-    build:
-      context: ./conferences
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${CONFERENCES_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./conferences:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5003:5003"
-
-  grants:
-    build:
-      context: ./grants
-      dockerfile: Dockerfile
-      target: development
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MONGODB_URI: ${GRANTS_MONGODB_URI}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - ./grants:/usr/app
-      - /usr/app/node_modules
-    restart: unless-stopped
-    ports:
-      - "5004:5004"
-
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-      target: development
     command: npm run dev
+    env_file:
+      - ./.env
+    # environment:
+    #   GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    #   GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    #   GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+    #   AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+    #   AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+    #   AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
-      - gateway
+      - core
     volumes:
       - ./client/:/usr/app
       - /usr/app/node_modules
@@ -156,16 +67,18 @@ services:
       context: ./mail
       dockerfile: Dockerfile
       target: development
-    environment:
-      NODE_ENV: development
-      SECRET: ${SECRET}
-      MAIL_HOST: ${MAIL_HOST}
-      MAIL_PORT: ${MAIL_PORT}
-      MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      MAIL_FROM: ${MAIL_FROM}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    env_file:
+      - ./.env
+    # environment:
+    #   NODE_ENV: development
+    #   SECRET: ${SECRET}
+    #   MAIL_HOST: ${MAIL_HOST}
+    #   MAIL_PORT: ${MAIL_PORT}
+    #   MAIL_USER: ${MAIL_USER}
+    #   MAIL_PASSWORD: ${MAIL_PASSWORD}
+    #   MAIL_FROM: ${MAIL_FROM}
+    #   RMQ_URI: ${RMQ_URI}
+    #   RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     command: npm run start:dev
     depends_on:
       rabbitmq:
@@ -175,6 +88,24 @@ services:
       - /usr/app/node_modules
     restart: unless-stopped
 
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: Strong#Pass#2024
+    command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
   rabbitmq:
     image: rabbitmq
     restart: unless-stopped
@@ -216,3 +147,4 @@ services:
 volumes:
   mongo_data: {}
   mongo_config: {}
+  minio_storage: {}

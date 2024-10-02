@@ -1,0 +1,14 @@
+{
+  "notFound": "Konferencia nebola nájdená!",
+  "update": "Konferencia {{name}} bola aktualizovaná.",
+  "new": "Konferencia {{name}} bola vytvorená.",
+  "delete": "Konferencia {{name}} bola vymazaná.",
+  "nameExists": "Konferencia s názvom {{name}} už existuje!",
+  "slugExists": "Konferencia s url slugom {{slug}} už existuje!",
+  "alreadyRegistered": "Používateľ {{name}} je už zaregistrovaný na {{conference}}!",
+  "invoiceBody": "Faktúra vystavená na úhradu konferenčného poplatku pre účastníka {{name}}.",
+  "invoiceComment": "V prípade neuhradenia konferenčného poplatku do stanoveného termínu si hostiteľská organizácia vyhradzuje právo na zrušenie účasti uchádzača.",
+  "newAttendee": "Úspešne ste sa zaregistrovali na {{name}}! Faktúra by mala čoskoro prísť na vašu e-mailovú adresu.",
+  "updateInvoice": "Faktúra bola aktualizovaná!",
+  "deleteAttendee": "Účastník bol zmazaný!"
+}

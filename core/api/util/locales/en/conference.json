@@ -1,0 +1,14 @@
+{
+  "notFound": "Conference has not been found!",
+  "update": "Conference {{name}} has been updated.",
+  "new": "Conference {{name}} has been created.",
+  "delete": "Conference {{name}} has been deleted.",
+  "nameExists": "Conference name {{name}} is already taken!",
+  "slugExists": "Conference slug {{slug}} is already taken!",
+  "alreadyRegistered": "User {{name}} has been already registered to {{conference}}!",
+  "invoiceBody": "This invoice has been issued in order for {{name}} to pay the conference fee.",
+  "invoiceComment": "In case of not due payment the host organisation is reserving the right to cancel attendee.",
+  "newAttendee": "You have successfully registered for {{name}}! The invoice should arrive to your email address shortly.",
+  "updateInvoice": "Invoice has been updated!",
+  "deleteAttendee": "Attendee has been deleted!"
+}

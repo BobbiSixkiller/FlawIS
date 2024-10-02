@@ -1,0 +1,12 @@
+{
+  "heading": "Profile",
+  "subheading": "Personal details of your user account",
+  "submit": "Update",
+  "submitting": "Updating...",
+  "name": "First and last name",
+  "email": "Email address",
+  "phone": "Phone number",
+  "org": "Organization",
+  "status": "Account status",
+  "role": "Role"
+}

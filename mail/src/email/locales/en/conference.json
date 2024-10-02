@@ -10,9 +10,9 @@
       "postal": "Postal",
       "country": "Country"
     },
-    "ICO": "IČO",
-    "DIC": "DIČ",
-    "ICDPH": "IČDPH",
+    "ICO": "Business ID",
+    "DIC": "TAX ID",
+    "ICDPH": "VAT reg. no.",
     "variableSymbol": "Variable symbol",
     "IBAN": "IBAN",
     "SWIFT": "SWIFT",

@@ -1,0 +1,113 @@
+fragment Attendee on Attendee {
+  id
+  user {
+    ... on User {
+      __typename
+      ...User
+    }
+    ... on AttendeeUser {
+      __typename
+      id
+      name
+      email
+    }
+  }
+  invoice {
+    ...Invoice
+  }
+  ticket {
+    ...Ticket
+  }
+  submissions {
+    ...Submission
+  }
+  conference {
+    slug
+    translations {
+      sk {
+        logoUrl
+      }
+      en {
+        logoUrl
+      }
+    }
+  }
+  createdAt
+  updatedAt
+}
+
+query attendees(
+  $after: ObjectId
+  $first: Int
+  $conferenceSlug: String!
+  $passive: Boolean
+  $sectionIds: [ObjectId!]
+) {
+  attendees(
+    after: $after
+    first: $first
+    conferenceSlug: $conferenceSlug
+    passive: $passive
+    sectionIds: $sectionIds
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Attendee
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query attendee($id: ObjectId!) {
+  attendee(id: $id) {
+    ...Attendee
+  }
+}
+
+query attendeesCsvExport($slug: String!) {
+  attendeesCsvExport(slug: $slug) {
+    ...Attendee
+  }
+}
+
+query textSearchAttendee($text: String!) {
+  textSearchAttendee(text: $text) {
+    id
+    user {
+      ... on AttendeeUser {
+        id
+        name
+        email
+      }
+      ... on User {
+        id
+        name
+        email
+      }
+    }
+  }
+}
+
+mutation updateInvoice($id: ObjectId!, $data: InvoiceInput!) {
+  updateInvoice(id: $id, data: $data) {
+    message
+    data {
+      ...Attendee
+    }
+  }
+}
+
+mutation deleteAttendee($id: ObjectId!) {
+  deleteAttendee(id: $id) {
+    message
+    data {
+      ...Attendee
+    }
+  }
+}

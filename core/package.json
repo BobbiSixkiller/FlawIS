@@ -1,0 +1,64 @@
+{
+  "name": "flawis-core",
+  "version": "1.0.0",
+  "description": "Core backend service implemented as a GraphhQL API with mongoDB as data layer.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "serve": "node dist/api/index.js",
+    "dev": "nodemon --config nodemon.json api/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BobbiSixkiller/FlawIS-users.git"
+  },
+  "keywords": [
+    "GraphQL"
+  ],
+  "author": "Matúš Muránsky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BobbiSixkiller/FlawIS-users/issues"
+  },
+  "homepage": "https://github.com/BobbiSixkiller/FlawIS-users#readme",
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "@azure/msal-node": "^2.13.1",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@typegoose/typegoose": "^12.2.0",
+    "@types/jsonwebtoken": "^9.0.5",
+    "amqplib": "^0.10.3",
+    "bcrypt": "^5.0.1",
+    "class-validator": "^0.14.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "google-auth-library": "^9.11.0",
+    "graphql": "^16.8.1",
+    "graphql-query-complexity": "^0.11.0",
+    "i18next": "^23.7.8",
+    "i18next-http-middleware": "^3.5.0",
+    "i18next-resources-to-backend": "^1.2.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.2.0",
+    "redis": "^4.6.5",
+    "reflect-metadata": "^0.1.13",
+    "type-graphql": "^2.0.0-beta.6",
+    "typedi": "^0.10.0"
+  },
+  "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^2.40.0",
+    "@types/amqplib": "^0.10.1",
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "nodemon": "^2.0.16",
+    "ts-node": "^10.7.0",
+    "typescript": "^5.6.2"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "400": "Muíte poskytnúť bucket name a object name pre stiahnutie súboru!",
+  "500": "Sťahovanie súboru zlyhalo."
+}

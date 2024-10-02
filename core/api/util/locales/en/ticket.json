@@ -1,0 +1,6 @@
+{
+  "notFound": "Ticket has not been found!",
+  "update": "Ticket {{name}} has been updated.",
+  "new": "Ticket {{name}} has been created.",
+  "delete": "Ticket {{name}} has been deleted."
+}
