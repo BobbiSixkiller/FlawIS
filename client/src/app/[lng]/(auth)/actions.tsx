@@ -132,23 +132,23 @@ export async function getGoogleAuthLink(url?: string) {
   redirect(authUrl);
 }
 
-const msalClient = new ConfidentialClientApplication({
-  auth: {
-    clientId: process.env.AZURE_CLIENT_ID || "",
-    authority: process.env.AZURE_AUTHORITY || "",
-    clientSecret: process.env.AZURE_CLIENT_SECRET || "",
-  },
-});
+// const msalClient = new ConfidentialClientApplication({
+//   auth: {
+//     clientId: process.env.AZURE_CLIENT_ID || "",
+//     authority: process.env.AZURE_AUTHORITY || "",
+//     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
+//   },
+// });
 
-export async function getMsalAuthLink(url?: string) {
-  const authUrl = await msalClient.getAuthCodeUrl({
-    scopes: ["user.read"],
-    redirectUri: "http://localhost:3000/microsoft/callback",
-    state: JSON.stringify({ redirectUrl: url }),
-  });
+// export async function getMsalAuthLink(url?: string) {
+//   const authUrl = await msalClient.getAuthCodeUrl({
+//     scopes: ["user.read"],
+//     redirectUri: "http://localhost:3000/microsoft/callback",
+//     state: JSON.stringify({ redirectUrl: url }),
+//   });
 
-  redirect(authUrl);
-}
+//   redirect(authUrl);
+// }
 
 export async function getMe() {
   const user = cookies().get("user")?.value;
