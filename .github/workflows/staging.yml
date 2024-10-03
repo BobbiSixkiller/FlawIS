@@ -1,64 +1,54 @@
-name: Build and Deploy to staging
+name: Build and Deploy to Staging
 on:
   push:
     branches:
       - staging
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     environment: staging
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Delete Staging Databases
-        env:
-          MONGO_CONTAINER_NAME: "flawis-mongo-1"
+      - name: Setting up node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Copy MongoDB data from production
         run: |
-          docker exec $MONGO_CONTAINER_NAME mongo --eval 'db.getMongo().getDBNames().forEach(function(name) { if (name.endsWith("_copy")) { db.getSiblingDB(name).dropDatabase(); } });'
+          mongodump --uri="mongodb://mongo:27017" --out=/path/to/backup
+          mongorestore --uri="mongodb://mongo:27018" /path/to/backup
 
-      - name: Create staging Databases
+      - name: Configure MinIO client and Mirror data from Production to Staging
         env:
-          MONGO_CONTAINER_NAME: "flawis-mongo-1"
+          MINIO_ROOT_USER: ${MINIO_USER}
+          MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
         run: |
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --db=users
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --nsFrom='users.*' --nsTo='users_copy.*'
+          mc alias set production http://production_minio_host:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc alias set staging http://staging_minio_host:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc mirror production/data staging/data
 
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --db=conferences
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --nsFrom='conferences.*' --nsTo='conferences_copy.*'
-
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --db=grants
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --nsFrom='grants.*' --nsTo='grants_copy.*'
-
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --db=files
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --nsFrom='files.*' --nsTo='files_copy.*'
-
-      - name: Copy files to staging
-        run: |
-          cp -arf /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
-
-      - name: Build and Deploy
+      - name: Build and Deploy Staging
         env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_AUTHORITY: ${{ secrets.AZURE_AUTHORITY }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           SECRET: ${{ secrets.SECRET }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ vars.MAIL_FROM }}
-          BACKEND_URL: ${{ vars.BACKEND_URL }}
           RMQ_URI: ${{ vars.RMQ_URI }}
           RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
-          docker-compose -f docker-compose.staging.yml up -d --build
-
-      - name: Remove old Docker images
-        run: |
-          # Remove old Docker images (adjust criteria as needed)
-          docker image prune -f --filter "until=24h" # Remove images older than 24 hours
-
-      - name: Remove unused Docker volumes
-        run: |
-          # Remove unused Docker volumes
-          docker volume prune -f
+          docker-compose -f docker-compose.staging.yml up -d --build --remove-orphans

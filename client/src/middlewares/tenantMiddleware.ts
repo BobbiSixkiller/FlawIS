@@ -14,7 +14,10 @@ export function withTenant(middleware: CustomMiddleware) {
     // console.log(`/${locale?.value}/${"zebracik"}${url.pathname}`);
 
     // If the subdomain is "conferences", perform the rewrite
-    if (subdomain === "localhost:3000" || "internships.flaw.uniba.sk") {
+    if (
+      subdomain === "localhost:3000" ||
+      subdomain === "internships.flaw.uniba.sk"
+    ) {
       const newUrl = new URL(`/${locale}/zebracik${url.pathname}`, req.url); // Rewrite the path with the subdomain
       return NextResponse.rewrite(newUrl); // Rewrite the response to include the subdomain in the path
     }
