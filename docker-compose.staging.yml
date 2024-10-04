@@ -1,80 +1,56 @@
 version: "3.4"
 
 services:
-  core:
+  core-staging:
     build:
       context: ./core
       dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
-      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
-      AZURE_AUTHORITY: ${AZURE_AUTHORITY}
-      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+    env_file:
+      - ./core/.env
     depends_on:
-      minio:
+      minio-staging:
         condition: service_healthy
         restart: true
-      rabbitmq:
+      rabbitmq-staging:
         condition: service_healthy
         restart: true
-      redis:
+      redis-staging:
         condition: service_healthy
         restart: true
-      mongo:
+      mongo-staging:
         condition: service_healthy
         restart: true
     restart: unless-stopped
     ports:
       - "5001:5000"
 
-  client:
+  client-staging:
     build:
       context: ./client
       dockerfile: Dockerfile
       # args:
       #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+    env_file:
+      - ./client/.env
     command: npm run start-prod
-    environment:
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
-      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
-      AZURE_AUTHORITY: ${AZURE_AUTHORITY}
-      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
-      - core
+      - core-staging
     restart: unless-stopped
     ports:
       - "3001:3000"
 
-  mail:
+  mail-staging:
     build:
       context: ./mail
       dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MAIL_HOST: ${MAIL_HOST}
-      MAIL_PORT: ${MAIL_PORT}
-      # MAIL_USER: ${MAIL_USER}
-      # MAIL_PASSWORD: ${MAIL_PASSWORD}
-      MAIL_FROM: ${MAIL_FROM}
-      RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+    env_file:
+      - ./client/.env
     depends_on:
-      rabbitmq:
+      rabbitmq-staging:
         condition: service_healthy
     restart: unless-stopped
 
-  minio:
+  minio-staging:
     image: minio/minio:latest
     restart: unless-stopped
     ports:
@@ -92,7 +68,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-  rabbitmq:
+  rabbitmq-staging:
     image: rabbitmq
     restart: unless-stopped
     ports:
@@ -103,7 +79,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-  redis:
+  redis-staging:
     image: redis
     restart: unless-stopped
     ports:
@@ -114,7 +90,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-  mongo:
+  mongo-staging:
     image: mongo:4.4.1
     restart: unless-stopped
     ports:
@@ -124,7 +100,7 @@ services:
       - mongo_config_staging:/data/configdb
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo mongo-staging:27017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3

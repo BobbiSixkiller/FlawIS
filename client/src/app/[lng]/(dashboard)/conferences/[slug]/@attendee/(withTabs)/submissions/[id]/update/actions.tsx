@@ -41,11 +41,16 @@ export async function uploadSubmissionFile(data: FormData): Promise<string[]> {
   const conference = data.get("conferenceSlug") as string;
   const section = data.get("section") as string;
 
-  const res = await Promise.all(
-    files.map((f) => uploadFile(conference, `${section}/${f.name}`, f))
-  );
+  try {
+    const res = await Promise.all(
+      files.map((f) => uploadFile(conference, `${section}/${f.name}`, f))
+    );
 
-  return res;
+    return res;
+  } catch (error: any) {
+    console.log(error.message);
+    return [];
+  }
 }
 
 export async function deleteSubmissionFile(
