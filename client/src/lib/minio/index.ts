@@ -54,6 +54,8 @@ export async function uploadFile(
   return new Promise<string>((resolve, reject) => {
     minioClient.putObject(bucket, objectName, buffer, (err) => {
       if (err) {
+        console.log("bucket name is: ", bucket);
+        console.log("object name is: ", objectName);
         console.error(`Error uploading file: ${err.message}`);
         return reject(err);
       }
