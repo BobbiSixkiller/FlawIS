@@ -215,15 +215,13 @@ function SingleUploadProgress({
     });
   }
 
-  console.log(file);
-
   return (
     <div className="flex flex-col p-2 gap-1">
-      <div className="flex flex-row justify-between items-end">
+      <div className="flex flex-row justify-between items-center w-full gap-2">
         <a
           href={URL.createObjectURL(file)}
           download={file.name}
-          className="text-primary-500 hover:underline"
+          className="text-primary-500 hover:underline whitespace-normal overflow-hidden truncate"
         >
           {file?.name}
         </a>
