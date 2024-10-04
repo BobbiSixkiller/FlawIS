@@ -50,13 +50,12 @@ export async function uploadFile(
   paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
   const objectName = paths.join("/").toLowerCase();
 
+  console.log(objectName.length);
+
   // Upload the object
   return new Promise<string>((resolve, reject) => {
     minioClient.putObject(bucket, objectName, buffer, (err) => {
       if (err) {
-        console.log("bucket name is: ", bucket);
-        console.log("object name is: ", objectName);
-        console.log(err);
         console.error(`Error uploading file: ${err.message}`);
         return reject(err);
       }
