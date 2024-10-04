@@ -77,5 +77,8 @@ jobs:
           echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_PASSWORD }}" >> ./minio/.env
 
       - name: Build and Deploy Staging
+        env:
+          MINIO_USER: ${{ secrets.MINIO_USER }}
+          MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
         run: |
           docker-compose -f docker-compose.staging.yml up -d --build --remove-orphans

@@ -58,9 +58,9 @@ services:
       - "9101:9001"
     volumes:
       - minio_storage_staging:/data
-    # environment:
-    #   MINIO_ROOT_USER: ${MINIO_USER}
-    #   MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
     command: server --console-address ":9001" /data
     healthcheck:
       test: ["CMD-SHELL", "mc ready local"]
