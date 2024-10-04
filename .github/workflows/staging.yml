@@ -76,4 +76,4 @@ jobs:
           MINIO_USER: ${{ secrets.MINIO_USER }}
           MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
         run: |
-          docker compose -p staging -f docker-compose.staging.yml up -d --build --remove-orphans
+          docker compose -p flawis-staging -f docker-compose.staging.yml up -d --build --remove-orphans
