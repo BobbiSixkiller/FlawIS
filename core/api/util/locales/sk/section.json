@@ -1,0 +1,6 @@
+{
+  "notFound": "Sekcia nebola nájdená!",
+  "update": "Sekcia {{name}} bola aktualizovaná.",
+  "new": "Sekcia {{name}} bola vytvorená.",
+  "delete": "Sekcia {{name}} bola vymazaná."
+}

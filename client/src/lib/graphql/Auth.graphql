@@ -1,0 +1,111 @@
+fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+
+fragment Billing on Billing {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+}
+
+fragment User on User {
+  id
+  name
+  email
+  organization
+  telephone
+  role
+  verified
+  createdAt
+  updatedAt
+  billings {
+    ...Billing
+  }
+}
+
+query me {
+  me {
+    ...User
+  }
+}
+
+mutation login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
+mutation googleSignIn($authCode: String!) {
+  googleSignIn(authCode: $authCode) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
+mutation msalSignIn($authCode: String!) {
+  msalSignIn(authCode: $authCode) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+query forgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}
+
+mutation passwordReset($data: PasswordInput!) {
+  passwordReset(data: $data) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
+mutation register($data: RegisterInput!) {
+  register(data: $data) {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
+mutation resendActivationLink {
+  resendActivationLink
+}
+
+mutation activateUser {
+  activateUser {
+    message
+    data {
+      ...User
+      token
+    }
+  }
+}
+
+query impersonate($id: ObjectId!) {
+  user(id: $id) {
+    id
+    token
+  }
+}

@@ -1,118 +1,56 @@
 version: "3.4"
 
 services:
-  gateway:
+  core:
     build:
-      context: ./gateway
+      context: ./core
       dockerfile: Dockerfile
     environment:
       NODE_ENV: production
       SECRET: ${SECRET}
+      MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
-      - users
-      - conferences
-      - files
-      - grants
+      minio:
+        condition: service_healthy
+        restart: true
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+      redis:
+        condition: service_healthy
+        restart: true
+      mongo:
+        condition: service_healthy
+        restart: true
     restart: unless-stopped
     ports:
       - "5000:5000"
-
-  users:
-    build:
-      context: ./users
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo:27017/users?replicaSet=rs0"
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    restart: unless-stopped
-    ports:
-      - "5001:5001"
-
-  files:
-    build:
-      context: ./files
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo:27017/files?replicaSet=rs0"
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - /home/weby/Desktop/FlawIS/files/public:/usr/app/public
-    restart: unless-stopped
-    ports:
-      - "5002:5002"
-
-  conferences:
-    build:
-      context: ./conferences
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MONGODB_URI: mongodb://mongo:27017/conferences?replicaSet=rs0
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-        restart: true
-      redis:
-        condition: service_healthy
-        restart: true
-      mongo:
-        condition: service_healthy
-        restart: true
-    restart: unless-stopped
-    ports:
-      - "5003:5003"
-
-  grants:
-    build:
-      context: ./grants
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-      SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo:27017/grants?replicaSet=rs0"
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
-    depends_on:
-      - rabbitmq
-      - mongo
-    restart: unless-stopped
-    ports:
-      - "5004:5004"
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+      # args:
+      #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start-prod
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
-      - gateway
+      - core
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -136,6 +74,24 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
   rabbitmq:
     image: rabbitmq
     restart: unless-stopped
@@ -159,7 +115,7 @@ services:
       retries: 3
       start_period: 30s
   mongo:
-    image: mongo
+    image: mongo:4.4.1
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -177,3 +133,4 @@ services:
 volumes:
   mongo_data: {}
   mongo_config: {}
+  minio_storage: {}

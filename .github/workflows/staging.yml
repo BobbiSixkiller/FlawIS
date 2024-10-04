@@ -1,64 +1,72 @@
-name: Build and Deploy to staging
+name: Build and Deploy to Staging
 on:
   push:
     branches:
       - staging
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     environment: staging
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Delete Staging Databases
+      - name: Setting up node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Copy MongoDB data from production
+        run: |
+          mongodump --uri="mongodb://mongo:27017" --out=/backup
+          mongorestore --uri="mongodb://mongo:27018" /backup
+
+      - name: Configure MinIO client and Mirror data from Production to Staging
         env:
-          MONGO_CONTAINER_NAME: "flawis-mongo-1"
+          MINIO_ROOT_USER: ${{ secrets.MINIO_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
         run: |
-          docker exec $MONGO_CONTAINER_NAME mongo --eval 'db.getMongo().getDBNames().forEach(function(name) { if (name.endsWith("_copy")) { db.getSiblingDB(name).dropDatabase(); } });'
+          mc alias set production http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc alias set staging http://minio:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc mirror production/data staging/data
 
-      - name: Create staging Databases
-        env:
-          MONGO_CONTAINER_NAME: "flawis-mongo-1"
+        # Step 2: Create .env file with GitHub secrets
+      - name: Create .env file for core service
         run: |
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --db=users
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/users_dump.archive --gzip --nsFrom='users.*' --nsTo='users_copy.*'
+          echo "NODE_ENV=production" > ./core/.env
+          echo "SECRET=${{ secrets.SECRET }}" >> ./core/.env
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> ./core/.env
+          echo "RMQ_URI=${{ secrets.RMQ_URI }}" >> ./core/.env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./core/.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./core/.env
+          echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./core/.env
+          # Add more environment variables as needed
 
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --db=conferences
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/conferences_dump.archive --gzip --nsFrom='conferences.*' --nsTo='conferences_copy.*'
-
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --db=grants
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/grants_dump.archive --gzip --nsFrom='grants.*' --nsTo='grants_copy.*'
-
-          docker exec $MONGO_CONTAINER_NAME mongodump --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --db=files
-          docker exec $MONGO_CONTAINER_NAME mongorestore --uri "mongodb://mongo:27017" --archive=/data/files_dump.archive --gzip --nsFrom='files.*' --nsTo='files_copy.*'
-
-      - name: Copy files to staging
+      - name: Create .env file for client service
         run: |
-          cp -arf /home/weby/Desktop/FlawIS/files/public/* /home/weby/Desktop/FlawIS-staging-files
+          echo "NODE_ENV=production" > ./client/.env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./client/.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./client/.env
+          echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./client/.env
+          # Add more environment variables as needed
 
-      - name: Build and Deploy
-        env:
-          SECRET: ${{ secrets.SECRET }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_USER: ${{ secrets.MAIL_USER }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ vars.MAIL_FROM }}
-          BACKEND_URL: ${{ vars.BACKEND_URL }}
-          RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+      - name: Create .env file for mail service
         run: |
-          docker-compose -f docker-compose.staging.yml up -d --build
+          echo "NODE_ENV=production" > ./mail/.env
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> ./mail/.env
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> ./mail/.env
+          echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> ./mail/.env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> ./mail/.env
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> ./mail/.env
+          # Add more environment variables as needed
 
-      - name: Remove old Docker images
+      - name: Create .env file for MinIO
         run: |
-          # Remove old Docker images (adjust criteria as needed)
-          docker image prune -f --filter "until=24h" # Remove images older than 24 hours
+          echo "MINIO_ROOT_USER=${{ secrets.MINIO_USER }}" > ./minio/.env
+          echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_PASSWORD }}" >> ./minio/.env
 
-      - name: Remove unused Docker volumes
+      - name: Build and Deploy Staging
         run: |
-          # Remove unused Docker volumes
-          docker volume prune -f
+          docker-compose -f docker-compose.staging.yml up -d --build --remove-orphans

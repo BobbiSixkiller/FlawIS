@@ -1,0 +1,81 @@
+fragment Submission on Submission {
+  id
+  translations {
+    sk {
+      name
+      abstract
+      keywords
+    }
+    en {
+      name
+      abstract
+      keywords
+    }
+  }
+  authors {
+    id
+    name
+    email
+  }
+  fileUrl
+  conference {
+    id
+    slug
+  }
+  section {
+    ...Section
+  }
+  createdAt
+  updatedAt
+}
+
+query submission($id: ObjectId!) {
+  submission(id: $id) {
+    ...Submission
+  }
+}
+
+mutation createSubmission($data: SubmissionInput!) {
+  createSubmission(data: $data) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}
+
+mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
+  updateSubmission(id: $id, data: $data) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}
+
+mutation deleteSubmission($id: ObjectId!) {
+  deleteSubmission(id: $id) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}
+
+mutation removeAuthor($id: ObjectId!, $authorId: ObjectId!) {
+  removeAuthor(id: $id, authorId: $authorId) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}
+
+mutation unsetSubmissionFile($id: ObjectId!) {
+  unsetSubmissionFile(id: $id) {
+    message
+    data {
+      ...Submission
+    }
+  }
+}

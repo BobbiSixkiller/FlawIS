@@ -2,8 +2,11 @@ overwrite: true
 schema: "http://localhost:5000/graphql"
 documents: "**/*.{gql,graphql}"
 generates:
-  src/graphql/generated/schema.ts:
-    plugins: ["typescript", "typescript-operations", "typescript-react-apollo"]
-  ./graphql.schema.json:
-    plugins:
-      - "introspection"
+  src/lib/graphql/generated/:
+    preset: "client"
+    presetConfig:
+      fragmentMasking: false
+    config:
+      documentMode: "string"
+      addTypename: true
+    plugins: []
