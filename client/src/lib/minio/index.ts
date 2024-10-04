@@ -56,6 +56,7 @@ export async function uploadFile(
       if (err) {
         console.log("bucket name is: ", bucket);
         console.log("object name is: ", objectName);
+        console.log(err);
         console.error(`Error uploading file: ${err.message}`);
         return reject(err);
       }
