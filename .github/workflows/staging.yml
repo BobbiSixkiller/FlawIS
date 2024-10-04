@@ -20,35 +20,53 @@ jobs:
 
       - name: Copy MongoDB data from production
         run: |
-          mongodump --uri="mongodb://mongo:27017" --out=/path/to/backup
-          mongorestore --uri="mongodb://mongo:27018" /path/to/backup
+          mongodump --uri="mongodb://mongo:27017" --out=/backup
+          mongorestore --uri="mongodb://mongo:27018" /backup
 
       - name: Configure MinIO client and Mirror data from Production to Staging
         env:
-          MINIO_ROOT_USER: ${MINIO_USER}
-          MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
         run: |
-          mc alias set production http://production_minio_host:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-          mc alias set staging http://staging_minio_host:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc alias set production http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc alias set staging http://minio:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
           mc mirror production/data staging/data
 
+        # Step 2: Create .env file with GitHub secrets
+      - name: Create .env file for core service
+        run: |
+          echo "NODE_ENV=production" > ./core/.env
+          echo "SECRET=${{ secrets.SECRET }}" >> ./core/.env
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> ./core/.env
+          echo "RMQ_URI=${{ secrets.RMQ_URI }}" >> ./core/.env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./core/.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./core/.env
+          echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./core/.env
+          # Add more environment variables as needed
+
+      - name: Create .env file for client service
+        run: |
+          echo "NODE_ENV=production" > ./client/.env
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./client/.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./client/.env
+          echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./client/.env
+          # Add more environment variables as needed
+
+      - name: Create .env file for mail service
+        run: |
+          echo "NODE_ENV=production" > ./mail/.env
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> ./mail/.env
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> ./mail/.env
+          echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> ./mail/.env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> ./mail/.env
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> ./mail/.env
+          # Add more environment variables as needed
+
+      - name: Create .env file for MinIO
+        run: |
+          echo "MINIO_ROOT_USER=${{ secrets.MINIO_USER }}" > ./minio/.env
+          echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_PASSWORD }}" >> ./minio/.env
+
       - name: Build and Deploy Staging
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_AUTHORITY: ${{ secrets.AZURE_AUTHORITY }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          SECRET: ${{ secrets.SECRET }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_USER: ${{ secrets.MAIL_USER }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ vars.MAIL_FROM }}
-          RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
           docker-compose -f docker-compose.staging.yml up -d --build --remove-orphans
