@@ -44,7 +44,7 @@ export function MultipleInput({
         {label}
       </label>
       <div
-        className={`py-1 pl-2.5 flex flex-wrap gap-1  w-full rounded-md border-0 
+        className={`py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 
             disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 shadow-sm ring-1 ring-gray-300 ${
               focus ? "ring-primary-500 ring-2" : ""
             } shadow-sm sm:text-sm sm:leading-6 relative`}
@@ -57,7 +57,7 @@ export function MultipleInput({
         {strings.length !== 0 &&
           strings.map((p, i) => (
             <div
-              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 px-1 items-center"
+              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 px-1 h-7 items-center"
               key={i}
             >
               {p}
