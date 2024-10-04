@@ -48,9 +48,13 @@ export async function uploadFile(
 
   const paths = path.split("/");
   paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-  const objectName = paths.join("/").toLowerCase();
+  const objectName = paths
+    .join("/")
+    .replace(/\s+/g, "_") // Replace spaces with underscores
+    .replace(/[^\w\-_.]/g, "") // Remove any character that is not a word character, hyphen, underscore, or period
+    .toLowerCase();
 
-  console.log(objectName.length);
+  console.log("Sanitized object name is: ", objectName);
 
   // Upload the object
   return new Promise<string>((resolve, reject) => {
