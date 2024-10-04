@@ -4,8 +4,7 @@ import { v4 as uuid } from "uuid";
 
 const minioClient = new Minio.Client({
   useSSL: false,
-  // endPoint: "minio",
-  endPoint: "172.18.0.5",
+  endPoint: "minio",
   port: 9000,
   accessKey: process.env.MINIO_ACCESS_KEY || "",
   secretKey: process.env.MINIO_SECRET_KEY || "",
