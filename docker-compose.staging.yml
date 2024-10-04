@@ -1,7 +1,7 @@
 version: "3.4"
 
 services:
-  core:
+  core-staging:
     build:
       context: ./core
       dockerfile: Dockerfile
@@ -24,7 +24,7 @@ services:
     ports:
       - "5001:5000"
 
-  client:
+  client-staging:
     build:
       context: ./client
       dockerfile: Dockerfile
@@ -39,7 +39,7 @@ services:
     ports:
       - "3001:3000"
 
-  mail:
+  mail-staging:
     build:
       context: ./mail
       dockerfile: Dockerfile
@@ -50,7 +50,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  minio:
+  minio-staging:
     image: minio/minio:latest
     restart: unless-stopped
     ports:
@@ -68,7 +68,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-  rabbitmq:
+  rabbitmq-staging:
     image: rabbitmq
     restart: unless-stopped
     ports:
@@ -79,7 +79,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-  redis:
+  redis-staging:
     image: redis
     restart: unless-stopped
     ports:
@@ -90,7 +90,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-  mongo:
+  mongo-staging:
     image: mongo:4.4.1
     restart: unless-stopped
     ports:
