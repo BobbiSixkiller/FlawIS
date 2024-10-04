@@ -8,16 +8,16 @@ services:
     env_file:
       - ./core/.env
     depends_on:
-      minio:
+      minio-staging:
         condition: service_healthy
         restart: true
-      rabbitmq:
+      rabbitmq-staging:
         condition: service_healthy
         restart: true
-      redis:
+      redis-staging:
         condition: service_healthy
         restart: true
-      mongo:
+      mongo-staging:
         condition: service_healthy
         restart: true
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       - ./client/.env
     command: npm run start-prod
     depends_on:
-      - core
+      - core-staging
     restart: unless-stopped
     ports:
       - "3001:3000"
@@ -46,7 +46,7 @@ services:
     env_file:
       - ./client/.env
     depends_on:
-      rabbitmq:
+      rabbitmq-staging:
         condition: service_healthy
     restart: unless-stopped
 
@@ -100,7 +100,7 @@ services:
       - mongo_config_staging:/data/configdb
     entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo mongo-staging:27017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3
