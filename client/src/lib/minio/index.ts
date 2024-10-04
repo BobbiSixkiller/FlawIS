@@ -47,12 +47,13 @@ export async function uploadFile(
   await ensureBucketExists(bucket);
 
   const paths = path.split("/");
-  paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-  const objectName = paths
-    .join("/")
-    .replace(/\s+/g, "_") // Replace spaces with underscores
-    .replace(/[^\w\-_.]/g, "") // Remove any character that is not a word character, hyphen, underscore, or period
-    .toLowerCase();
+  paths[paths.length - 1] =
+    uuid() +
+    "-" +
+    paths[paths.length - 1]
+      .replace(/\s+/g, "_") // Replace spaces with underscores
+      .replace(/[^\w\-_.]/g, ""); // Remove any character that is not a word character, hyphen, underscore, or period;
+  const objectName = paths.join("/").toLowerCase();
 
   console.log("Sanitized object name is: ", objectName);
 
