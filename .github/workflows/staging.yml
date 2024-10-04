@@ -71,11 +71,6 @@ jobs:
           echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> ./mail/.env
           # Add more environment variables as needed
 
-      - name: Create .env file for MinIO
-        run: |
-          echo "MINIO_ROOT_USER=${{ secrets.MINIO_USER }}" > ./minio/.env
-          echo "MINIO_ROOT_PASSWORD=${{ secrets.MINIO_PASSWORD }}" >> ./minio/.env
-
       - name: Build and Deploy Staging
         env:
           MINIO_USER: ${{ secrets.MINIO_USER }}
