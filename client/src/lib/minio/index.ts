@@ -43,29 +43,25 @@ export async function uploadFile(
   const buffer = Buffer.from(bytes);
   const bucket = bucketName.toLowerCase();
 
-  return new Promise<string>(async (resolve, reject) => {
-    try {
-      // Ensure the bucket exists, or create it
-      await ensureBucketExists(bucket);
+  // Ensure the bucket exists
+  await ensureBucketExists(bucket);
 
-      const paths = path.split("/");
-      paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-      const objectName = paths.join("/").toLowerCase();
+  const paths = path.split("/");
+  paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
+  const objectName = paths.join("/").toLowerCase();
 
-      // Upload the object
-      minioClient.putObject(bucket, objectName, buffer, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log(
-            `File '${objectName}' uploaded to bucket '${bucket}' successfully.`
-          );
-          resolve(`http://minio:9000/${bucket}/${objectName}`);
-        }
-      });
-    } catch (error) {
-      reject(error);
-    }
+  // Upload the object
+  return new Promise<string>((resolve, reject) => {
+    minioClient.putObject(bucket, objectName, buffer, (err) => {
+      if (err) {
+        console.error(`Error uploading file: ${err.message}`);
+        return reject(err);
+      }
+      console.log(
+        `File '${objectName}' uploaded to bucket '${bucket}' successfully.`
+      );
+      resolve(`http://minio:9000/${bucket}/${objectName}`);
+    });
   });
 }
 
@@ -96,15 +92,20 @@ export async function deleteFiles(
     const bucketName = bucket.toLowerCase();
     minioClient.bucketExists(bucketName, (err, res) => {
       if (err) {
-        reject(err);
+        console.error(`Error checking bucket existence: ${err.message}`);
+        return reject(err);
       }
       if (res) {
-        minioClient.removeObjects(bucketName, objectList, (err) => {
+        minioClient.removeObjects(bucketName, objectList, (err: any) => {
           if (err) {
-            reject(err);
+            console.error(`Error deleting objects: ${err.message}`);
+            return reject(err);
           }
           resolve(true);
         });
+      } else {
+        console.error(`Bucket '${bucketName}' does not exist.`);
+        reject(new Error(`Bucket '${bucketName}' does not exist.`));
       }
     });
   });
