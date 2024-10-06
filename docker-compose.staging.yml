@@ -14,36 +14,27 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
-      # AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
-      # AZURE_AUTHORITY: ${AZURE_AUTHORITY}
-      # AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
       minio-staging:
         condition: service_healthy
-        restart: true
       rabbitmq-staging:
         condition: service_healthy
-        restart: true
       redis-staging:
         condition: service_healthy
-        restart: true
       mongo-staging:
         condition: service_healthy
-        restart: true
     restart: unless-stopped
     ports:
       - "5001:5000"
+    networks:
+      - staging-network
 
   client-staging:
     build:
       context: ./client
       dockerfile: Dockerfile
-      # args:
-      #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
-    # env_file:
-    #   - ./client/.env
     environment:
-      API_URI: http://core:5000/graphql
+      API_URI: http://core-staging:5000/graphql
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
@@ -55,20 +46,18 @@ services:
     restart: unless-stopped
     ports:
       - "3001:3000"
+    networks:
+      - staging-network
 
   mail-staging:
     build:
       context: ./mail
       dockerfile: Dockerfile
-    # env_file:
-    #   - ./mail/.env
     environment:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
-      # MAIL_USER: ${MAIL_USER}
-      # MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
       RMQ_URI: amqp://rabbitmq-staging:5672
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
@@ -76,6 +65,8 @@ services:
       rabbitmq-staging:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - staging-network
 
   minio-staging:
     image: minio/minio:latest
@@ -95,6 +86,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - staging-network
+
   rabbitmq-staging:
     image: rabbitmq
     restart: unless-stopped
@@ -106,6 +100,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - staging-network
+
   redis-staging:
     image: redis
     restart: unless-stopped
@@ -117,6 +114,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - staging-network
+
   mongo-staging:
     image: mongo:4.4.1
     restart: unless-stopped
@@ -132,8 +132,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - staging-network
 
 volumes:
   mongo_data_staging: {}
   mongo_config_staging: {}
   minio_storage_staging: {}
+
+networks:
+  staging-network:
+    driver: bridge

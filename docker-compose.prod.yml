@@ -20,26 +20,22 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-        restart: true
       rabbitmq:
         condition: service_healthy
-        restart: true
       redis:
         condition: service_healthy
-        restart: true
       mongo:
         condition: service_healthy
-        restart: true
     restart: unless-stopped
     ports:
       - "5000:5000"
+    networks:
+      - production-network
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-      # args:
-      #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
     command: npm run start
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
@@ -52,6 +48,8 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    networks:
+      - production-network
 
   mail:
     build:
@@ -62,8 +60,6 @@ services:
       SECRET: ${SECRET}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
-      # MAIL_USER: ${MAIL_USER}
-      # MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
@@ -71,6 +67,8 @@ services:
       rabbitmq:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - production-network
 
   minio:
     image: minio/minio:latest
@@ -90,6 +88,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    networks:
+      - production-network
+
   rabbitmq:
     image: rabbitmq
     restart: unless-stopped
@@ -101,6 +102,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - production-network
+
   redis:
     image: redis
     restart: unless-stopped
@@ -112,6 +116,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - production-network
+
   mongo:
     image: mongo:4.4.1
     restart: unless-stopped
@@ -127,8 +134,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - production-network
 
 volumes:
   mongo_data: {}
   mongo_config: {}
   minio_storage: {}
+
+networks:
+  production-network:
+    driver: bridge
