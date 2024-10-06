@@ -20,7 +20,7 @@ export async function executeGqlFetch<Data, Variables>(
   next?: NextFetchRequestConfig,
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
-  const res = await fetch("http://core:5000/graphql", {
+  const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
     cache: nextCache,
     next,
     method: "POST",
@@ -31,7 +31,7 @@ export async function executeGqlFetch<Data, Variables>(
       origin:
         process.env.NODE_ENV === "development"
           ? "http://localhost:3000"
-          : "https://flawis.flaw.uniba.sk",
+          : "https://flawis.flaw.uniba.sk", //fix this bs
       Cookie: cookies()
         .getAll()
         .map((c) => `${c.name}=${c.value}`)

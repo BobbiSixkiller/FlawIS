@@ -33,13 +33,9 @@ env.config();
 const origins =
   process.env.NODE_ENV !== "staging"
     ? [`http://client:3000`, `http://localhost:3000`]
-    : [
-        // `http://client-staging:4000`,
-        // `http://localhost-staging:4000`,
-      ];
+    : [`http://client-staging:3001`];
 const port = process.env.PORT || 5000;
-const mongooseUri =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/users";
+const mongooseUri = process.env.MONGODB_URI || "mongodb://localhost:27017/test";
 
 async function mongoDbConnect() {
   try {
