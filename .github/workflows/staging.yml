@@ -89,4 +89,4 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
-          docker-compose -p staging -f docker-compose.staging.yml up -d --build
+          docker-compose -f docker-compose.staging.yml up -d --build
