@@ -41,10 +41,9 @@ export async function uploadFile(
 ): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  const bucket = bucketName.toLowerCase();
 
   // Ensure the bucket exists
-  await ensureBucketExists(bucket);
+  await ensureBucketExists(bucketName);
 
   const paths = path.split("/").map(
     (p) =>
@@ -56,19 +55,17 @@ export async function uploadFile(
 
   const objectName = paths.join("/").toLowerCase();
 
-  console.log("Sanitized object name is: ", objectName);
-
   // Upload the object
   return new Promise<string>((resolve, reject) => {
-    minioClient.putObject(bucket, objectName, buffer, (err) => {
+    minioClient.putObject(bucketName, objectName, buffer, (err) => {
       if (err) {
         console.error(`Error uploading file: ${err.message}`);
         return reject(err);
       }
       console.log(
-        `File '${objectName}' uploaded to bucket '${bucket}' successfully.`
+        `File '${objectName}' uploaded to bucket '${bucketName}' successfully.`
       );
-      resolve(`http://minio:9000/${bucket}/${objectName}`);
+      resolve(`http://minio:9000/${bucketName}/${objectName}`);
     });
   });
 }
@@ -78,26 +75,21 @@ export async function downloadFile(
   objectName: string
 ): Promise<Readable> {
   return new Promise<Readable>((resolve, reject) => {
-    minioClient.getObject(
-      bucketName.toLowerCase(),
-      objectName.toLowerCase(),
-      (err, stream) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(stream as Readable);
-        }
+    minioClient.getObject(bucketName, objectName, (err, stream) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(stream as Readable);
       }
-    );
+    });
   });
 }
 
 export async function deleteFiles(
-  bucket: string,
+  bucketName: string,
   objectList: string[]
 ): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
-    const bucketName = bucket.toLowerCase();
     minioClient.bucketExists(bucketName, (err, res) => {
       if (err) {
         console.error(`Error checking bucket existence: ${err.message}`);

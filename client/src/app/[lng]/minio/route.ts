@@ -2,6 +2,7 @@ import { useTranslation } from "@/lib/i18n";
 import { downloadFile } from "@/lib/minio";
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
+import { getMe } from "../(auth)/actions";
 
 function nodeStreamToWebReadable(stream: Readable): ReadableStream {
   return new ReadableStream({
@@ -19,24 +20,35 @@ function nodeStreamToWebReadable(stream: Readable): ReadableStream {
   });
 }
 
-interface Download {
-  bucketName?: string;
-  objectName?: string;
-}
-
 export async function GET(
   request: NextRequest,
-  { params: { lng } }: { params: { lng: string } }
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+  }
 ) {
   const { t } = await useTranslation(lng, "minio");
-  const { bucketName, objectName }: Download = await request.json();
+
+  const user = await getMe();
+  if (!user) {
+    return NextResponse.json({ message: t("401") }, { status: 401 });
+  }
+
+  const searchParams = request.nextUrl.searchParams;
+  const bucketName = searchParams.get("bucketName")?.valueOf().toLowerCase();
+  const objectName = searchParams.get("objectName")?.valueOf().toLowerCase();
+
   if (!bucketName || !objectName) {
-    return NextResponse.json({ error: t("400") }, { status: 400 });
+    return NextResponse.json({ message: t("400") }, { status: 400 });
   }
 
   try {
     // Download the file
-    const fileStream = await downloadFile(bucketName, objectName);
+    const fileStream = await downloadFile(
+      bucketName,
+      objectName.split(`http://minio:9000/${bucketName}`)[1]
+    );
 
     // Convert Node.js stream to web ReadableStream
     const webReadableStream = nodeStreamToWebReadable(fileStream);
@@ -46,15 +58,16 @@ export async function GET(
       headers: {
         "Content-Type": "application/octet-stream", // Set the appropriate MIME type
         "Content-Disposition": `attachment; filename="${objectName
-          .split("/")
+          .split("-")
           .pop()}"`, // Set the filename for download
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: t("500") }, { status: 500 });
+    console.log(error);
+    return NextResponse.json({ message: t("500") }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
-  const data = await request.json();
-}
+// export async function POST(request: NextRequest) {
+//   const data = await request.json();
+// }

@@ -1,4 +1,5 @@
 {
   "400": "You have to provide a bucket and an object name in order to download a file!",
+  "401": "Access not allowed!",
   "500": "Error downloading the file."
 }

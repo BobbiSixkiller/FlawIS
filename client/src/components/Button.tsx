@@ -30,7 +30,7 @@ export default function Button({
         return `focus-visible:outline-primary-500 text-gray-900 hover:text-gray-500`;
       case "primary":
         return `${
-          pending || loading
+          pending || loading || disabled
             ? "bg-primary-400 hover:bg-primary-400"
             : "bg-primary-500 hover:bg-primary-700"
         } focus-visible:outline-primary-500 text-white shadow-sm`;
@@ -42,13 +42,13 @@ export default function Button({
         } focus-visible:outline-primary-500 text-white shadow-sm`;
       case "red":
         return `${
-          pending || loading
+          pending || loading || disabled
             ? "bg-red-400 hover:bg-red-400"
             : "bg-red-500 hover:bg-red-700"
         } focus-visible:outline-primary-500 text-white shadow-sm`;
       case "green":
         return `${
-          pending || loading
+          pending || loading || disabled
             ? "bg-green-400 hover:bg-green-400"
             : "bg-green-500 hover:bg-green-700"
         } focus-visible:outline-primary-500 text-white shadow-sm`;

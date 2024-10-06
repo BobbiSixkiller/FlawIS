@@ -42,7 +42,9 @@ export async function uploadSubmissionFile(data: FormData): Promise<string[]> {
   const section = data.get("section") as string;
 
   const res = await Promise.all(
-    files.map((f) => uploadFile(conference, `${section}/${f.name}`, f))
+    files.map((f) =>
+      uploadFile(conference.toLowerCase(), `${section}/${f.name}`, f)
+    )
   );
 
   return res;
@@ -53,12 +55,13 @@ export async function deleteSubmissionFile(
   conferenceSlug: string,
   submissionId: string
 ) {
+  const bucketName = conferenceSlug.toLowerCase();
   const apiRes = await executeGqlFetch(UnsetSubmissionFileDocument, {
     id: submissionId,
   });
 
-  const minioRes = await deleteFiles(conferenceSlug, [
-    fileUrl.replace(`http://minio:9000/${conferenceSlug.toLowerCase()}/`, ""),
+  const minioRes = await deleteFiles(bucketName, [
+    fileUrl.replace(`http://minio:9000/${bucketName}/`, ""),
   ]);
 
   return minioRes && !apiRes.errors;

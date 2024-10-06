@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { array, mixed, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
@@ -41,27 +41,42 @@ export default function UpdateSubmissionForm({
 
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
+  const [loadingFile, setLoadingFile] = useState(true);
+
   useEffect(() => {
     const fetchFiles = async () => {
-      const response = await fetch(
-        `/conferences/${submission.conference.slug}/submissions/${submission.id}/download`
-      );
-      const blob = await response.blob();
-      const fileType = blob.type || "application/octet-stream";
+      try {
+        const response = await fetch(
+          `/minio?bucketName=${submission.conference.slug}&objectName=${submission.fileUrl}`
+        );
+        // Check if the response is OK (status code 200-299)
+        if (!response.ok) {
+          const errorMessage = await response.json(); // Parse the JSON body
+          throw new Error(errorMessage.message || "Unknown error occurred");
+        }
 
-      const fileName = submission.fileUrl?.split("/").pop() || "file";
-      const fileNameArr = fileName.split("-");
+        const blob = await response.blob();
+        const fileType = blob.type || "application/octet-stream";
 
-      const file = new File([blob], fileNameArr[fileNameArr.length - 1], {
-        type: fileType,
-      });
+        const fileName = submission.fileUrl?.split("/").pop() || "file";
+        const fileNameArr = fileName.split("-");
 
-      methods.setValue("files", [file]);
+        const file = new File([blob], fileNameArr[fileNameArr.length - 1], {
+          type: fileType,
+        });
+
+        methods.setValue("files", [file]);
+      } catch (error: any) {
+        console.log(error.message);
+        methods.setError("files", { message: error.message });
+      }
+
+      setLoadingFile(false);
     };
 
     if (submission.fileUrl) {
       fetchFiles();
-    }
+    } else setLoadingFile(false);
   }, [submission]);
 
   const methods = useForm({
@@ -121,10 +136,14 @@ export default function UpdateSubmissionForm({
         className="space-y-6 w-80 sm:w-96"
         onSubmit={methods.handleSubmit(
           async ({ authors, conference, section, translations, files }) => {
-            let fileUrl: string | null = null;
+            let fileUrl: string | undefined | null;
             const slug = submission.conference.slug;
 
-            if (files && submission.fileUrl) {
+            if (
+              files &&
+              submission.fileUrl &&
+              submission.fileUrl.split("-").pop() !== files[0]?.name
+            ) {
               await deleteSubmissionFile(
                 submission.fileUrl,
                 slug,
@@ -137,6 +156,7 @@ export default function UpdateSubmissionForm({
                 conferenceSlug: submission.conference.slug,
               });
               const res = await uploadSubmissionFile(formData);
+
               fileUrl = res[0];
             } else if (files && !submission.fileUrl) {
               const formData = objectToFormData({
@@ -146,7 +166,7 @@ export default function UpdateSubmissionForm({
               });
               const res = await uploadSubmissionFile(formData);
               fileUrl = res[0];
-            } else if ((files?.length === 0 || !files) && submission.fileUrl) {
+            } else if (!files && submission.fileUrl) {
               await deleteSubmissionFile(
                 submission.fileUrl,
                 slug,
@@ -236,7 +256,7 @@ export default function UpdateSubmissionForm({
           type="submit"
           fluid
           loading={methods.formState.isSubmitting}
-          disabled={methods.formState.isSubmitting}
+          disabled={methods.formState.isSubmitting || loadingFile}
         >
           {t("update", { ns: "common" })}
         </Button>

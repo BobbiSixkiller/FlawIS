@@ -1,4 +1,5 @@
 {
-  "400": "Muíte poskytnúť bucket name a object name pre stiahnutie súboru!",
+  "400": "Musíte poskytnúť bucket name a object name pre stiahnutie súboru!",
+  "401": "Prístup zakázaný!",
   "500": "Sťahovanie súboru zlyhalo."
 }
