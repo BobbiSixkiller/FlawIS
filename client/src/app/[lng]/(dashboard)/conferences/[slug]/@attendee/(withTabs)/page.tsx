@@ -4,7 +4,7 @@ import Image from "next/image";
 import Heading from "@/components/Heading";
 import DownloadPDFButton from "../../@admin/attendees/[id]/DownloadPDFButton";
 import { useTranslation } from "@/lib/i18n";
-import { displayDate } from "../../@admin/page";
+import { displayDate } from "@/utils/helpers";
 
 export default async function ConferencePage({
   params: { lng, slug },
