@@ -30,10 +30,6 @@ import { AttendeeResolver } from "./resolvers/attendee";
 
 env.config();
 
-const origins =
-  process.env.NODE_ENV !== "staging"
-    ? [`http://client:3000`, `http://localhost:3000`]
-    : [`http://client-staging:3001`];
 const port = process.env.PORT || 5000;
 const mongooseUri = process.env.MONGODB_URI || "mongodb://localhost:27017/test";
 
@@ -89,7 +85,12 @@ async function main() {
   app.use(
     cors({
       credentials: true,
-      origin: origins,
+      origin: [
+        `http://client:3000`,
+        `http://client-staging:3000`,
+        `http://localhost:3000`,
+        `http://localhost:3001`,
+      ],
     })
   );
   app.use(cookieParser());

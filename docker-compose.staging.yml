@@ -63,7 +63,7 @@ services:
     # env_file:
     #   - ./mail/.env
     environment:
-      NODE_ENV: production
+      NODE_ENV: staging
       SECRET: ${SECRET}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
