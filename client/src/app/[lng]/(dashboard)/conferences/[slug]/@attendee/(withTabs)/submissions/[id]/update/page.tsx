@@ -4,7 +4,6 @@ import UpdateSubmissionForm from "./UpdateSubmissionForm";
 import { getConference } from "@/app/[lng]/(dashboard)/conferences/actions";
 import { redirect } from "next/navigation";
 import { FormMessage } from "@/components/Message";
-import { downloadFile } from "@/lib/minio";
 
 export default async function UpdateSubmissionPage({
   params: { lng, slug, id },

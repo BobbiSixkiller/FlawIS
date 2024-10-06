@@ -4,6 +4,7 @@ import Image from "next/image";
 import Heading from "@/components/Heading";
 import DownloadPDFButton from "../../@admin/attendees/[id]/DownloadPDFButton";
 import { useTranslation } from "@/lib/i18n";
+import { displayDate } from "../../@admin/page";
 
 export default async function ConferencePage({
   params: { lng, slug },
@@ -41,38 +42,34 @@ export default async function ConferencePage({
         <dl className="divide-y divide-gray-100">
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              {t("conference.start")}
+              Zaciatok
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {new Date(conference!.dates.start).toString()}
+              {displayDate(conference.dates.start)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              {t("conference.end")}
+              Koniec
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {new Date(conference!.dates.end).toString()}
+              {displayDate(conference.dates.end)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              {t("conference.regEnd")}
+              Koniec registracie
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {conference!.dates.regEnd
-                ? new Date(conference!.dates.regEnd).toString()
-                : "N/A"}
+              {displayDate(conference.dates.regEnd)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              {t("conference.submissionDeadline")}
+              Deadline zaslania prispevkov
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {conference!.dates.submissionDeadline
-                ? new Date(conference!.dates.submissionDeadline).toString()
-                : "N/A"}
+              {displayDate(conference.dates.submissionDeadline)}
             </dd>
           </div>
         </dl>

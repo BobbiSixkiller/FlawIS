@@ -3,6 +3,25 @@ import { getConference } from "../../actions";
 import Heading from "@/components/Heading";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
+export function displayDate(utc?: string) {
+  if (!utc) return "N/A";
+
+  const date = new Date(utc);
+
+  return date.toLocaleString("sk-SK", {
+    weekday: "long", // Display the full name of the day
+    year: "numeric",
+    month: "long", // Full month name
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false, // Use 24-hour format
+    timeZoneName: "short", // Include time zone abbreviation (e.g., CET or CEST)
+    timeZone: "Europe/Bratislava", // Explicit time zone for Slovakia
+  });
+}
+
 export default async function ConferencePage({
   params: { lng, slug },
 }: {
@@ -51,7 +70,7 @@ export default async function ConferencePage({
               Zaciatok
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {new Date(conference!.dates.start).toString()}
+              {displayDate(conference.dates.start)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
@@ -59,7 +78,7 @@ export default async function ConferencePage({
               Koniec
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {new Date(conference!.dates.end).toString()}
+              {displayDate(conference.dates.end)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
@@ -67,9 +86,7 @@ export default async function ConferencePage({
               Koniec registracie
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {conference!.dates.regEnd
-                ? new Date(conference!.dates.regEnd).toString()
-                : ""}
+              {displayDate(conference.dates.regEnd)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
@@ -77,9 +94,7 @@ export default async function ConferencePage({
               Deadline zaslania prispevkov
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {conference!.dates.submissionDeadline
-                ? new Date(conference!.dates.submissionDeadline).toString()
-                : ""}
+              {displayDate(conference.dates.submissionDeadline)}
             </dd>
           </div>
         </dl>

@@ -16,7 +16,7 @@ export default async function AttendeeSubmissionsPage({
   if (conference && !conference.attending?.ticket.withSubmission) {
     redirect(`/conferences/${slug}`);
   }
-
+  console.log(new Date(), new Date(conference.dates.submissionDeadline));
   return (
     <div className="flex flex-col gap-4">
       <Link
@@ -46,13 +46,16 @@ export default async function AttendeeSubmissionsPage({
           <p>{s.translations[lng as "sk" | "en"].abstract}</p>
           <p>{s.translations[lng as "sk" | "en"].keywords.join(" • ")}</p>
           <div className="mt-4 flex gap-2">
-            <Link
-              href={`/conferences/${slug}/submissions/${s.id}/update`}
-              scroll={false}
-              className="p-2 rounded-md bg-primary-500 hover:bg-primary-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
-            >
-              <PencilIcon className="w-4 h-4 stroke-2" />
-            </Link>
+            {conference.dates.submissionDeadline &&
+              new Date(conference.dates.submissionDeadline) > new Date() && (
+                <Link
+                  href={`/conferences/${slug}/submissions/${s.id}/update`}
+                  scroll={false}
+                  className="p-2 rounded-md bg-primary-500 hover:bg-primary-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
+                >
+                  <PencilIcon className="w-4 h-4 stroke-2" />
+                </Link>
+              )}
             <Link
               href={`/conferences/${slug}/submissions/${s.id}/delete`}
               scroll={false}

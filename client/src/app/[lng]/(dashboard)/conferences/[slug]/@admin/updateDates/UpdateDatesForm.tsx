@@ -4,13 +4,13 @@ import Button from "@/components/Button";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { updateConferenceDates } from "../../../actions";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { date, object, ref } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/Input";
+import { updateConferenceDates } from "./actions";
 
 export default function UpdateDatesForm({
   lng,
@@ -22,15 +22,24 @@ export default function UpdateDatesForm({
   const router = useRouter();
   const { t } = useTranslation(lng, "validation");
 
+  function setDefaultVal(utc: string) {
+    const date = new Date(utc);
+    date.setHours(date.getHours() + 2);
+
+    return date.toISOString().slice(0, 16);
+  }
+
   const methods = useForm({
-    values: {
-      start: conference?.dates.start.toString().split(".")[0],
-      end: conference?.dates.end.toString().split(".")[0],
+    defaultValues: {
+      start: setDefaultVal(conference?.dates.start) as unknown as Date,
+      end: setDefaultVal(conference?.dates.end) as unknown as Date,
       regEnd: conference?.dates.regEnd
-        ? conference?.dates.regEnd.toString().split(".")[0]
+        ? (setDefaultVal(conference?.dates.regEnd) as unknown as Date)
         : null,
       submissionDeadline: conference?.dates.submissionDeadline
-        ? conference?.dates.submissionDeadline.toString().split(".")[0]
+        ? (setDefaultVal(
+            conference?.dates.submissionDeadline
+          ) as unknown as Date)
         : null,
     },
     resolver: yupResolver(
@@ -56,6 +65,7 @@ export default function UpdateDatesForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
+          console.log(data.submissionDeadline);
           const state = await updateConferenceDates(conference!.slug, data);
 
           if (state.message && !state.success) {

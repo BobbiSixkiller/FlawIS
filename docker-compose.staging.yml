@@ -5,8 +5,17 @@ services:
     build:
       context: ./core
       dockerfile: Dockerfile
-    env_file:
-      - ./core/.env
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      # AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      # AZURE_AUTHORITY: ${AZURE_AUTHORITY}
+      # AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
     depends_on:
       minio-staging:
         condition: service_healthy
@@ -30,8 +39,14 @@ services:
       dockerfile: Dockerfile
       # args:
       #   - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
-    env_file:
-      - ./client/.env
+    # env_file:
+    #   - ./client/.env
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     command: npm run start-prod
     depends_on:
       - core-staging
@@ -43,8 +58,18 @@ services:
     build:
       context: ./mail
       dockerfile: Dockerfile
-    env_file:
-      - ./client/.env
+    # env_file:
+    #   - ./mail/.env
+    environment:
+      NODE_ENV: production
+      SECRET: ${SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      # MAIL_USER: ${MAIL_USER}
+      # MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      RMQ_URI: ${RMQ_URI}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
       rabbitmq-staging:
         condition: service_healthy
