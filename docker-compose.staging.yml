@@ -47,7 +47,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
-    command: npm run start-prod
+    command: npm run start-staging
     depends_on:
       - core-staging
     restart: unless-stopped
