@@ -34,8 +34,14 @@ jobs:
 
       - name: Copy Data from Production MinIO to Staging MinIO
         run: |
-          # Step 1: Copy data directly from the production MinIO container to the staging MinIO container
-          docker cp flawis-minio-1:/data flawis-minio-staging-1:/data
+          # Step 1: Copy data from the production MinIO container to a temporary directory on the host
+          docker cp flawis-minio-1:/data ./minio-data-backup
+
+          # Step 2: Copy the data from the host to the staging MinIO container
+          docker cp ./minio-data-backup flawis-minio-staging-1:/data
+
+          # Step 3: Clean up the temporary directory
+          rm -rf ./minio-data-backup
 
       # Step 2: Create .env file with GitHub secrets
       # - name: Create .env file for core service
