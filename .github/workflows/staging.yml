@@ -32,21 +32,10 @@ jobs:
           # Step 4: Run mongorestore inside the staging MongoDB container
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
 
-      - name: Configure MinIO client and Mirror data from Production to Staging
-        env:
-          MINIO_ROOT_USER: ${{ secrets.MINIO_USER }}
-          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+      - name: Copy Data from Production MinIO to Staging MinIO
         run: |
-          # Step 1: Download and install MinIO Client (mc)
-          wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /usr/local/bin/mc
-          chmod +x /usr/local/bin/mc
-
-          # Step 2: Set up MinIO aliases for production and staging
-          mc alias set production http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-          mc alias set staging http://minio-staging:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-
-          # Step 3: Mirror data from production to staging
-          mc mirror production/data staging/data
+          # Step 1: Copy data directly from the production MinIO container to the staging MinIO container
+          docker cp flawis-minio-1:/data flawis-minio-staging-1:/data
 
       # Step 2: Create .env file with GitHub secrets
       # - name: Create .env file for core service
