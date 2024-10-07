@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 
 export const client = createClient({
-  url: process.env.RMQ_URI || "redis://redis:6379",
+  url: process.env.REDIS_URI || "redis://redis:6379",
 });
 
 client.on("error", (err: any) => {
