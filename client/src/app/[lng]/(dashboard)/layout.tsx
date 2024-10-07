@@ -89,7 +89,7 @@ export default async function DashboardLayout({
           <Breadcrumbs
             homeElement={<HomeIcon className="h-5 w-5" />}
             separator={<ChevronRightIcon className="h-3 w-3" />}
-            activeClasses="text-primary-500"
+            activeClasses="text-primary-500 hover:underline"
             containerClasses="flex flex-wrap text-sm gap-2 items-center"
             capitalizeLinks
           />
