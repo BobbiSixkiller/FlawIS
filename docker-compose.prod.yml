@@ -96,6 +96,8 @@ services:
     restart: unless-stopped
     ports:
       - "5672:5672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q ping && rabbitmq-diagnostics -q status
       interval: 30s
@@ -141,6 +143,7 @@ volumes:
   mongo_data: {}
   mongo_config: {}
   minio_storage: {}
+  rabbitmq_data: {}
 
 networks:
   production-network:
