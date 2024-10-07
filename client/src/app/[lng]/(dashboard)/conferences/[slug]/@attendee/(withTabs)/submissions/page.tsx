@@ -16,7 +16,7 @@ export default async function AttendeeSubmissionsPage({
   if (conference && !conference.attending?.ticket.withSubmission) {
     redirect(`/conferences/${slug}`);
   }
-  console.log(new Date(), new Date(conference.dates.submissionDeadline));
+
   return (
     <div className="flex flex-col gap-4">
       <Link
@@ -45,9 +45,9 @@ export default async function AttendeeSubmissionsPage({
           </ul>
           <p>{s.translations[lng as "sk" | "en"].abstract}</p>
           <p>{s.translations[lng as "sk" | "en"].keywords.join(" • ")}</p>
-          <div className="mt-4 flex gap-2">
-            {conference.dates.submissionDeadline &&
-              new Date(conference.dates.submissionDeadline) > new Date() && (
+          {conference.dates.submissionDeadline &&
+            new Date(conference.dates.submissionDeadline) > new Date() && (
+              <div className="mt-4 flex gap-2">
                 <Link
                   href={`/conferences/${slug}/submissions/${s.id}/update`}
                   scroll={false}
@@ -55,15 +55,15 @@ export default async function AttendeeSubmissionsPage({
                 >
                   <PencilIcon className="w-4 h-4 stroke-2" />
                 </Link>
-              )}
-            <Link
-              href={`/conferences/${slug}/submissions/${s.id}/delete`}
-              scroll={false}
-              className="p-2 rounded-md bg-red-500 hover:bg-red-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
-            >
-              <TrashIcon className="w-4 h-4 stroke-2" />
-            </Link>
-          </div>
+                <Link
+                  href={`/conferences/${slug}/submissions/${s.id}/delete`}
+                  scroll={false}
+                  className="p-2 rounded-md bg-red-500 hover:bg-red-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
+                >
+                  <TrashIcon className="w-4 h-4 stroke-2" />
+                </Link>
+              </div>
+            )}
         </div>
       ))}
     </div>
