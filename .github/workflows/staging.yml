@@ -37,8 +37,15 @@ jobs:
           MINIO_ROOT_USER: ${{ secrets.MINIO_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
         run: |
+          # Step 1: Download and install MinIO Client (mc)
+          wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /usr/local/bin/mc
+          chmod +x /usr/local/bin/mc
+
+          # Step 2: Set up MinIO aliases for production and staging
           mc alias set production http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
-          mc alias set staging http://minio:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+          mc alias set staging http://minio-staging:9100 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+
+          # Step 3: Mirror data from production to staging
           mc mirror production/data staging/data
 
       # Step 2: Create .env file with GitHub secrets
