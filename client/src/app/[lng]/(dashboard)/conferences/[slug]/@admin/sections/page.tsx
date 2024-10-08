@@ -67,6 +67,16 @@ export default async function SectionsPage({
                   label: "Aktualizovat",
                 },
                 {
+                  href: `/minio?bucketName=${
+                    s.conference?.slug
+                  }${s.submissions.edges.map((sub) => {
+                    if (sub?.node.fileUrl) {
+                      return `&objectName=${sub.node.fileUrl}`;
+                    }
+                  })}`,
+                  label: "Prispevky.zip",
+                },
+                {
                   href: `/conferences/${slug}/sections/${s.id}/delete`,
                   label: "Zmazat",
                 },
