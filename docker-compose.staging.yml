@@ -11,6 +11,7 @@ services:
       MONGODB_URI: "mongodb://mongo-staging:27017/flawis?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       RMQ_URI: ${RMQ_URI}
+      REDIS_URI: ${REDIS_URI}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
