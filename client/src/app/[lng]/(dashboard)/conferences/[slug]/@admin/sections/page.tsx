@@ -69,11 +69,13 @@ export default async function SectionsPage({
                 {
                   href: `/minio?bucketName=${
                     s.conference?.slug
-                  }${s.submissions.edges.map((sub) => {
-                    if (sub?.node.fileUrl) {
-                      return `&url=${sub.node.fileUrl}`;
-                    }
-                  })}`,
+                  }${s.submissions.edges
+                    .map((sub) => {
+                      if (sub?.node.fileUrl) {
+                        return `&url=${sub.node.fileUrl}`;
+                      }
+                    })
+                    .join()}`,
                   label: "Prispevky.zip",
                 },
                 {
