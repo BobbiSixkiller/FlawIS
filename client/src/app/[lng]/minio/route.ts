@@ -44,6 +44,8 @@ export async function GET(
       name.split(`http://minio:9000/${bucketName}`).pop()!.trim().toLowerCase()
     );
 
+  console.log(bucketName);
+
   if (!bucketName || objectNames.length === 0) {
     return NextResponse.json({ message: t("400") }, { status: 400 });
   }
