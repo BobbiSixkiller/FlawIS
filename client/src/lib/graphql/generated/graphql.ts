@@ -546,7 +546,9 @@ export type RegisterInput = {
 /** User role inside the FLAWIS system */
 export enum Role {
   Admin = 'Admin',
-  Basic = 'Basic'
+  Basic = 'Basic',
+  Organization = 'Organization',
+  Student = 'Student'
 }
 
 /** Conference's section entity model type */
@@ -701,6 +703,7 @@ export type User = {
   __typename?: 'User';
   billings: Array<Maybe<Billing>>;
   createdAt: Scalars['DateTimeISO']['output'];
+  cvUrl?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   id: Scalars['ObjectId']['output'];
   name: Scalars['String']['output'];
@@ -892,6 +895,8 @@ export type ConferenceQueryVariables = Exact<{
 
 
 export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, attending?: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization: string, telephone: string, role: Role, verified: boolean, createdAt: any, updatedAt: any, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: string, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } | null, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } };
+
+export type SubmissionFilesFragment = { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: any, node: { __typename?: 'Submission', id: string, fileUrl?: string | null } } | null> };
 
 export type ConferenceSectionsQueryVariables = Exact<{
   slug: Scalars['String']['input'];
@@ -1519,6 +1524,18 @@ fragment Conference on Conference {
   createdAt
   updatedAt
 }`, {"fragmentName":"ConferenceRegistration"}) as unknown as TypedDocumentString<ConferenceRegistrationFragment, unknown>;
+export const SubmissionFilesFragmentDoc = new TypedDocumentString(`
+    fragment SubmissionFiles on SubmissionConnection {
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      fileUrl
+    }
+  }
+}
+    `, {"fragmentName":"SubmissionFiles"}) as unknown as TypedDocumentString<SubmissionFilesFragment, unknown>;
 export const AttendeesDocument = new TypedDocumentString(`
     query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!, $passive: Boolean, $sectionIds: [ObjectId!]) {
   attendees(
@@ -2901,14 +2918,7 @@ export const ConferenceSectionsDocument = new TypedDocumentString(`
     sections {
       ...Section
       submissions(first: $first, after: $after) {
-        totalCount
-        edges {
-          cursor
-          node {
-            id
-            fileUrl
-          }
-        }
+        ...SubmissionFiles
       }
     }
   }
@@ -2927,6 +2937,16 @@ export const ConferenceSectionsDocument = new TypedDocumentString(`
     en {
       name
       topic
+    }
+  }
+}
+fragment SubmissionFiles on SubmissionConnection {
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      fileUrl
     }
   }
 }`) as unknown as TypedDocumentString<ConferenceSectionsQuery, ConferenceSectionsQueryVariables>;
