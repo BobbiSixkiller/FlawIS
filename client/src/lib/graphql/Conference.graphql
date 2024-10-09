@@ -126,20 +126,24 @@ query conference($slug: String!) {
   }
 }
 
+fragment SubmissionFiles on SubmissionConnection {
+  totalCount
+  edges {
+    cursor
+    node {
+      id
+      fileUrl
+    }
+  }
+}
+
 query conferenceSections($slug: String!, $after: ObjectId, $first: Int) {
   conference(slug: $slug) {
     id
     sections {
       ...Section
       submissions(first: $first, after: $after) {
-        totalCount
-        edges {
-          cursor
-          node {
-            id
-            fileUrl
-          }
-        }
+        ...SubmissionFiles
       }
     }
   }
