@@ -67,15 +67,14 @@ export default async function SectionsPage({
                   label: "Aktualizovat",
                 },
                 {
-                  href: `/minio?bucketName=${
-                    s.conference?.slug
-                  }${s.submissions.edges
-                    .map((sub) => {
-                      if (sub?.node.fileUrl) {
-                        return `&url=${sub.node.fileUrl}`;
-                      }
-                    })
-                    .join()}`,
+                  href: `/minio?bucketName=${s.conference?.slug}${
+                    s.submissions.edges
+                      .map((sub) =>
+                        sub?.node.fileUrl ? `&url=${sub.node.fileUrl}` : null
+                      ) // Return null for invalid entries
+                      .filter(Boolean) // Filter out null values
+                      .join("") // Join without adding commas
+                  }`,
                   label: "Prispevky.zip",
                 },
                 {
