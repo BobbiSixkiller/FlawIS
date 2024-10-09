@@ -44,8 +44,6 @@ export async function GET(
       name.split(`http://minio:9000/${bucketName}`).pop()!.trim().toLowerCase()
     );
 
-  console.log(bucketName);
-
   if (!bucketName || objectNames.length === 0) {
     return NextResponse.json({ message: t("400") }, { status: 400 });
   }
@@ -77,10 +75,17 @@ export async function GET(
       // Stream the zip file back to the client
       const webReadableStream = nodeStreamToWebReadable(zipStream);
 
+      // Download all files concurrently
+      const fileStreams = await Promise.all(
+        objectNames.map(async (objectName) => {
+          const fileStream = await downloadFile(bucketName, objectName);
+          return { fileStream, objectName };
+        })
+      );
+
       // Add each file to the zip archive
-      for (const objectName of objectNames) {
-        const fileStream = await downloadFile(bucketName, objectName);
-        archive.append(fileStream, { name: objectName.split("-").pop()! }); // Add file with appropriate name
+      for (const { fileStream, objectName } of fileStreams) {
+        archive.append(fileStream, { name: objectName.split("-").pop()! });
       }
 
       // Finalize the archive
