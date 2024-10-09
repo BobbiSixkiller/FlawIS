@@ -71,7 +71,7 @@ export default async function SectionsPage({
                     s.conference?.slug
                   }${s.submissions.edges.map((sub) => {
                     if (sub?.node.fileUrl) {
-                      return `&objectName=${sub.node.fileUrl}`;
+                      return `&url=${sub.node.fileUrl}`;
                     }
                   })}`,
                   label: "Prispevky.zip",

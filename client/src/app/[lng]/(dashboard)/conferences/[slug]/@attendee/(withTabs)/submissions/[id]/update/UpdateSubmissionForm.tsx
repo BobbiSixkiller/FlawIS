@@ -47,7 +47,7 @@ export default function UpdateSubmissionForm({
     const fetchFiles = async () => {
       try {
         const response = await fetch(
-          `/minio?bucketName=${submission.conference.slug}&objectName=${submission.fileUrl}`
+          `/minio?bucketName=${submission.conference.slug}&url=${submission.fileUrl}`
         );
         // Check if the response is OK (status code 200-299)
         if (!response.ok) {

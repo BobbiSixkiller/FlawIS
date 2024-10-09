@@ -38,9 +38,13 @@ export async function GET(
 
   const searchParams = request.nextUrl.searchParams;
   const bucketName = searchParams.get("bucketName")?.valueOf().toLowerCase();
+  console.log("BUCKET ", bucketName);
   const objectNames = searchParams
-    .getAll("objectName")
-    .map((name) => name.valueOf().toLowerCase()); // Fetch all object names
+    .getAll("url")
+    .map(
+      (name) =>
+        name.valueOf().toLowerCase().split(`http://minio:9000/${bucketName}`)[1]
+    ); // Fetch all object names
 
   if (!bucketName || objectNames.length === 0) {
     return NextResponse.json({ message: t("400") }, { status: 400 });
@@ -49,10 +53,7 @@ export async function GET(
   try {
     // Download the file
     if (objectNames.length === 1) {
-      const fileStream = await downloadFile(
-        bucketName,
-        objectNames[0].split(`http://minio:9000/${bucketName}`)[1]
-      );
+      const fileStream = await downloadFile(bucketName, objectNames[0]);
 
       // Convert Node.js stream to web ReadableStream
       const webReadableStream = nodeStreamToWebReadable(fileStream);
