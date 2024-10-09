@@ -43,6 +43,11 @@ jobs:
           # Step 3: Clean up the temporary directory
           rm -rf ./minio-data-backup
 
+      - name: Clean up unused Docker resources
+        run: |
+          docker system prune --all --force
+        continue-on-error: true # Ensures that failure here doesn't block other steps
+
       # Step 2: Create .env file with GitHub secrets
       # - name: Create .env file for core service
       #   run: |
