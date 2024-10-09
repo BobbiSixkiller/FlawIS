@@ -37,14 +37,12 @@ export async function GET(
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const bucketName = searchParams.get("bucketName")?.valueOf().toLowerCase();
-  console.log("BUCKET ", bucketName);
+  const bucketName = searchParams.get("bucketName")?.trim().toLowerCase();
   const objectNames = searchParams
     .getAll("url")
-    .map(
-      (name) =>
-        name.valueOf().toLowerCase().split(`http://minio:9000/${bucketName}`)[1]
-    ); // Fetch all object names
+    .map((name) =>
+      name.split(`http://minio:9000/${bucketName}`).pop()!.trim().toLowerCase()
+    );
 
   if (!bucketName || objectNames.length === 0) {
     return NextResponse.json({ message: t("400") }, { status: 400 });
