@@ -44,6 +44,11 @@ export async function GET(
       name.split(`http://minio:9000/${bucketName}`).pop()!.trim().toLowerCase()
     );
 
+<<<<<<< HEAD
+=======
+  console.log("BUCKET: ", bucketName);
+
+>>>>>>> staging
   if (!bucketName || objectNames.length === 0) {
     return NextResponse.json({ message: t("400") }, { status: 400 });
   }
@@ -84,8 +89,16 @@ export async function GET(
       );
 
       // Add each file to the zip archive
+<<<<<<< HEAD
       for (const { fileStream, objectName } of fileStreams) {
         archive.append(fileStream, { name: objectName.split("-").pop()! });
+=======
+      for (const objectName of objectNames) {
+        console.log("BUCKET IN LOOP: ", bucketName);
+
+        const fileStream = await downloadFile(bucketName, objectName);
+        archive.append(fileStream, { name: objectName.split("-").pop()! }); // Add file with appropriate name
+>>>>>>> staging
       }
 
       // Finalize the archive
