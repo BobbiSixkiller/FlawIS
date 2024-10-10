@@ -30,6 +30,7 @@ export async function GET(
         ),
         abstract_sk: submission.translations.sk.abstract,
         abstract_en: submission.translations.en.abstract,
+        file: submission.fileUrl ? "true" : "false",
       }));
     } else {
       // If there are no submissions for the attendee, include them with empty submission data
@@ -49,6 +50,7 @@ export async function GET(
           submission_name_en: "",
           abstract_sk: "",
           abstract_en: "",
+          file: "false",
         },
       ];
     }
