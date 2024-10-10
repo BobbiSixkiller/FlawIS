@@ -92,6 +92,7 @@ jobs:
           MAIL_FROM: ${{ vars.MAIL_FROM }}
           RMQ_URI: ${{ vars.RMQ_URI }}
           RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+          REDIS_URI: ${{ vars.REDIS_URI }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
