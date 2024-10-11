@@ -38,7 +38,9 @@ jobs:
           then
             wget https://dl.min.io/client/mc/release/linux-amd64/mc
             chmod +x mc
-            sudo mv mc /usr/local/bin/
+            mkdir -p $HOME/bin
+            mv mc $HOME/bin/
+            echo "$HOME/bin" >> $GITHUB_PATH
           else
             echo "MinIO client is already installed."
           fi
