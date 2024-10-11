@@ -37,9 +37,8 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ) // private readonly msalClient = new ConfidentialClientApplication({
-  ) //   auth: {
-  //     clientId: process.env.AZURE_CLIENT_ID || "",
+    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: {
+  ) //     clientId: process.env.AZURE_CLIENT_ID || "",
   //     authority: process.env.AZURE_AUTHORITY || "",
   //     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
   //   },
