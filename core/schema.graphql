@@ -264,7 +264,6 @@ type Mutation {
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
   login(email: String!, password: String!): UserMutationResponse!
-  msalSignIn(authCode: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!

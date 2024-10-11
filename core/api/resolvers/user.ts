@@ -37,15 +37,14 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ),
-    private readonly msalClient = new ConfidentialClientApplication({
-      auth: {
-        clientId: process.env.AZURE_CLIENT_ID || "",
-        authority: process.env.AZURE_AUTHORITY || "",
-        clientSecret: process.env.AZURE_CLIENT_SECRET || "",
-      },
-    })
-  ) {}
+    ) // private readonly msalClient = new ConfidentialClientApplication({
+  ) //   auth: {
+  //     clientId: process.env.AZURE_CLIENT_ID || "",
+  //     authority: process.env.AZURE_AUTHORITY || "",
+  //     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
+  //   },
+  // })
+  {}
 
   private getAuthenticatedClient(accessToken: string): Client {
     return Client.init({
@@ -223,63 +222,63 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => UserMutationResponse)
-  async msalSignIn(
-    @Arg("authCode") authCode: string
-  ): Promise<UserMutationResponse> {
-    try {
-      // Acquire token using MSAL
-      const tokenResponse = await this.msalClient.acquireTokenByCode({
-        code: authCode,
-        scopes: ["user.read"],
-        redirectUri: "http://localhost:3000/microsoft/callback",
-      });
+  // @Mutation(() => UserMutationResponse)
+  // async msalSignIn(
+  //   @Arg("authCode") authCode: string
+  // ): Promise<UserMutationResponse> {
+  //   try {
+  //     // Acquire token using MSAL
+  //     const tokenResponse = await this.msalClient.acquireTokenByCode({
+  //       code: authCode,
+  //       scopes: ["user.read"],
+  //       redirectUri: "http://localhost:3000/microsoft/callback",
+  //     });
 
-      if (!tokenResponse || !tokenResponse.accessToken) {
-        throw new Error("Invalid token payload");
-      }
+  //     if (!tokenResponse || !tokenResponse.accessToken) {
+  //       throw new Error("Invalid token payload");
+  //     }
 
-      // Initialize Microsoft Graph client with access token
-      const graphClient = this.getAuthenticatedClient(
-        tokenResponse.accessToken
-      );
+  //     // Initialize Microsoft Graph client with access token
+  //     const graphClient = this.getAuthenticatedClient(
+  //       tokenResponse.accessToken
+  //     );
 
-      // Fetch user information from Microsoft Graph API
-      const azureUser = await graphClient
-        .api("/me")
-        .select([
-          "mail",
-          "displayName",
-          "otherMails",
-          "proxyAddresses",
-          "department",
-          "jobTitle",
-        ])
-        .get();
+  //     // Fetch user information from Microsoft Graph API
+  //     const azureUser = await graphClient
+  //       .api("/me")
+  //       .select([
+  //         "mail",
+  //         "displayName",
+  //         "otherMails",
+  //         "proxyAddresses",
+  //         "department",
+  //         "jobTitle",
+  //       ])
+  //       .get();
 
-      let user = await this.userService.findOne({
-        email: azureUser.otherMails,
-      });
-      if (!user) {
-        user = await this.userService.create({
-          name: azureUser.displayName,
-          email: azureUser.mail,
-          verified: true,
-        });
-      }
+  //     let user = await this.userService.findOne({
+  //       email: azureUser.otherMails,
+  //     });
+  //     if (!user) {
+  //       user = await this.userService.create({
+  //         name: azureUser.displayName,
+  //         email: azureUser.mail,
+  //         verified: true,
+  //       });
+  //     }
 
-      return {
-        data: user,
-        message: this.i18nService.translate("welcome", {
-          ns: "user",
-          name: user.name,
-        }),
-      };
-    } catch (error: any) {
-      console.error("Error in msalSignIn:", error);
-      throw new Error(error.message);
-    }
-  }
+  //     return {
+  //       data: user,
+  //       message: this.i18nService.translate("welcome", {
+  //         ns: "user",
+  //         name: user.name,
+  //       }),
+  //     };
+  //   } catch (error: any) {
+  //     console.error("Error in msalSignIn:", error);
+  //     throw new Error(error.message);
+  //   }
+  // }
 
   @Query(() => String)
   // @UseMiddleware([RateLimit(50)])
