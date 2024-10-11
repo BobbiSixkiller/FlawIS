@@ -32,16 +32,25 @@ jobs:
           # Step 4: Run mongorestore inside the staging MongoDB container
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
 
-      - name: Copy Data from Production MinIO to Staging MinIO
+      - name: Install MinIO client (if not already installed)
         run: |
-          # Step 1: Copy data from the production MinIO container to a temporary directory on the host
-          docker cp flawis-minio-1:/data ./minio-data-backup
+          if ! command -v mc &> /dev/null
+          then
+            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x mc
+            sudo mv mc /usr/local/bin/
+          else
+            echo "MinIO client is already installed."
+          fi
 
-          # Step 2: Copy the data from the host to the staging MinIO container
-          docker cp ./minio-data-backup flawis-minio-staging-1:/data
+      # - name: Copy Data from Production MinIO to Staging MinIO
+      #   run: |
+      #     # Step 2: Configure mc to connect to production and staging MinIO
+      #     mc alias set production http://minio:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+      #     mc alias set staging http://minio-staging:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
 
-          # Step 3: Clean up the temporary directory
-          rm -rf ./minio-data-backup
+      #     # Step 3: Copy data from production to staging
+      #     mc mirror production/data staging/data
 
       - name: Clean up unused Docker resources
         run: |
