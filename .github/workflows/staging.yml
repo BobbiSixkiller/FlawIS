@@ -38,7 +38,7 @@ jobs:
           docker cp flawis-minio-1:/data ./minio-data-backup
 
           # Step 2: Copy the data from the host to the staging MinIO container
-          docker cp ./minio-data-backup/. flawis-minio-staging-1:/data
+          docker cp ./minio-data-backup flawis-minio-staging-1:/data
 
           # Step 3: Clean up the temporary directory
           rm -rf ./minio-data-backup
