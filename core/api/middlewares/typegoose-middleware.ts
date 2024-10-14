@@ -25,15 +25,15 @@ export function transformIds(doc: object) {
   for (let [key, value] of Object.entries(doc)) {
     if (key === "_id") key = "id";
 
-    if (
-      key.includes("Url") &&
-      typeof value === "string" &&
-      process.env.NODE_ENV === "staging"
-    ) {
-      value = value.replace("minio:9000", "minio-staging:9100");
-    }
+    // if (
+    //   key.includes("Url") &&
+    //   typeof value === "string" &&
+    //   process.env.NODE_ENV === "staging"
+    // ) {
+    //   value = value.replace("minio:9000", "minio-staging:9100");
+    // }
 
-    if (typeof value === "object") {
+    if (typeof value === "object" && value?.hasOwnProperty("_id")) {
       value = transformIds(value);
     }
 
