@@ -2,6 +2,9 @@ import { useTranslation } from "@/lib/i18n";
 import Image from "next/image";
 import { Trans } from "react-i18next/TransWithoutContext";
 
+import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
+import logo from "../../public/images/Flaw-logo-notext.png";
+
 export default async function Logo({
   lng,
   notext = false,
@@ -24,11 +27,7 @@ export default async function Logo({
       }`}
     >
       <Image
-        src={
-          inverted
-            ? "/images/Flaw-logo-notext-inverted.png"
-            : "/images/Flaw-logo-notext.png"
-        }
+        src={inverted ? logoInverted : logo}
         width={width}
         height={height}
         alt="Flaw-logo"

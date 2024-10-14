@@ -26,12 +26,10 @@ export function NavItem({
   children,
   route,
   onClick,
-  lng,
 }: {
   children: ReactNode;
   route: string;
   onClick?: () => void;
-  lng: string;
 }) {
   const segment = useSelectedLayoutSegment();
   const active = route === segment;
@@ -199,17 +197,12 @@ export function MobileNav({
             {user ? (
               <>
                 {user.role === Role.Admin && (
-                  <NavItem
-                    lng={lng}
-                    route="users"
-                    onClick={() => setMenuShown(false)}
-                  >
+                  <NavItem route="users" onClick={() => setMenuShown(false)}>
                     <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                     {t("users")}
                   </NavItem>
                 )}
                 <NavItem
-                  lng={lng}
                   route="conferences"
                   onClick={() => setMenuShown(false)}
                 >
@@ -222,22 +215,14 @@ export function MobileNav({
               </>
             ) : (
               <>
-                <NavItem
-                  lng={lng}
-                  route="login"
-                  onClick={() => setMenuShown(false)}
-                >
+                <NavItem route="login" onClick={() => setMenuShown(false)}>
                   <ArrowRightCircleIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   {t("login")}
                 </NavItem>
-                <NavItem
-                  lng={lng}
-                  route="register"
-                  onClick={() => setMenuShown(false)}
-                >
+                <NavItem route="register" onClick={() => setMenuShown(false)}>
                   <UserPlusIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   {t("register")}
                 </NavItem>
