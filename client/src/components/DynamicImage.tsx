@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getPlaiceholder } from "plaiceholder";
 import { cn } from "@/utils/helpers";
 
-async function getImage(src: string) {
+export async function getImage(src: string) {
   const buffer = await fetch(src).then(async (res) =>
     Buffer.from(await res.arrayBuffer())
   );

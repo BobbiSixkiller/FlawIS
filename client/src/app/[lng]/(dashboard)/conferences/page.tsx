@@ -1,6 +1,5 @@
 import Heading from "@/components/Heading";
 import { useTranslation } from "@/lib/i18n";
-import { downloadFile } from "@/lib/minio";
 import { getConferences } from "./actions";
 import ListConferences from "./ListConferences";
 import { getMe } from "../../(auth)/actions";

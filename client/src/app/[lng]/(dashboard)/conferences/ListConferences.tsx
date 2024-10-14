@@ -7,18 +7,24 @@ import {
 } from "@/components/withInfiniteScroll";
 import { getConferences } from "./actions";
 import Image from "next/image";
-import { LegacyRef, ReactNode } from "react";
+import { LegacyRef, ReactNode, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
+import { getImage } from "@/components/DynamicImage";
 
 function ListItem({ data }: { data?: ConferenceFragment }) {
   const { lng } = useParams<{ lng: string }>();
-  // Check if data exists before accessing its properties
-  if (!data) return null;
+  const [blurUrl, setBlurUrl] = useState("");
+
+  useEffect(() => {
+    async function getBlurUrl() {
+      await getImage(data!.translations[lng as "sk" | "en"].logoUrl);
+    }
+  }, []);
 
   // Create Date objects for start and end dates
-  const startDate = data.dates.start ? new Date(data.dates.start) : null;
-  const endDate = data.dates.end ? new Date(data.dates.end) : null;
+  const startDate = data?.dates.start ? new Date(data.dates.start) : null;
+  const endDate = data?.dates.end ? new Date(data.dates.end) : null;
 
   // Format start and end dates using toLocaleString method
   const start = startDate
@@ -31,12 +37,12 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
   return (
     <Link
       className="h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
-      href={`/conferences/${data.slug}`}
+      href={`/conferences/${data?.slug}`}
     >
       <div className="relative h-24 w-full max-w-72">
         <Image
           alt="conference-logo"
-          src={data.translations[lng as "sk" | "en"].logoUrl}
+          src={data!.translations[lng as "sk" | "en"].logoUrl}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{ objectFit: "cover" }}
@@ -44,7 +50,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
       </div>
 
       <h2 className="font-medium leading-6">
-        {data.translations[lng as "sk" | "en"].name}
+        {data?.translations[lng as "sk" | "en"].name}
       </h2>
       <p className="leading-none text-gray-500">
         Prebieha od {start} do {end}
@@ -76,7 +82,7 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 export default function ListConferences({
   initialData,
 }: {
-  initialData: Connection<ConferenceFragment>;
+  initialData: Connection<ConferenceFragment & {}>;
 }) {
   const InfiniteScrollListUsers = withInfiniteScroll<ConferenceFragment>({
     filter: { after: undefined, first: undefined },
