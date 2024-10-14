@@ -3,6 +3,7 @@ import { getConference } from "../../actions";
 import Heading from "@/components/Heading";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { displayDate } from "@/utils/helpers";
+import DynamicImage from "@/components/DynamicImage";
 
 export default async function ConferencePage({
   params: { lng, slug },
@@ -14,18 +15,15 @@ export default async function ConferencePage({
   return (
     <div className="text-gray-900 flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        <Image
-          style={{
-            width: "auto",
-            height: "auto",
-            maxWidth: "300px",
-            maxHeight: "200px",
-          }}
+        <DynamicImage
           alt="conference-logo"
           src={conference!.translations[lng as "sk" | "en"].logoUrl as string}
-          width={300}
-          height={200}
+          containerClass="w-[300px] h-[150px]"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: "cover" }}
         />
+
         <Heading
           lng={lng}
           heading={conference!.slug}

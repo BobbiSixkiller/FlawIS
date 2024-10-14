@@ -7,20 +7,13 @@ import {
 } from "@/components/withInfiniteScroll";
 import { getConferences } from "./actions";
 import Image from "next/image";
-import { LegacyRef, ReactNode, useEffect, useState } from "react";
+import { LegacyRef, ReactNode } from "react";
 import { useParams } from "next/navigation";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
-import { getImage } from "@/components/DynamicImage";
+import DynamicImageClient from "@/components/DynamicImageClient";
 
 function ListItem({ data }: { data?: ConferenceFragment }) {
   const { lng } = useParams<{ lng: string }>();
-  const [blurUrl, setBlurUrl] = useState("");
-
-  useEffect(() => {
-    async function getBlurUrl() {
-      await getImage(data!.translations[lng as "sk" | "en"].logoUrl);
-    }
-  }, []);
 
   // Create Date objects for start and end dates
   const startDate = data?.dates.start ? new Date(data.dates.start) : null;
@@ -39,15 +32,14 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
       className="h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
       href={`/conferences/${data?.slug}`}
     >
-      <div className="relative h-24 w-full max-w-72">
-        <Image
-          alt="conference-logo"
-          src={data!.translations[lng as "sk" | "en"].logoUrl}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          style={{ objectFit: "cover" }}
-        />
-      </div>
+      <DynamicImageClient
+        alt="conference-logo"
+        src={data!.translations[lng as "sk" | "en"].logoUrl}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        style={{ objectFit: "cover" }}
+        containerClass="h-24 w-full max-w-72"
+      />
 
       <h2 className="font-medium leading-6">
         {data?.translations[lng as "sk" | "en"].name}

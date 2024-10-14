@@ -2,33 +2,28 @@
 
 import Image, { ImageProps } from "next/image";
 import { cn } from "@/utils/helpers";
-import { getImage } from "./DynamicImage";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function DynamicImageClient({
-  url,
+  src,
   alt,
   containerClass,
   ...props
 }: {
-  url: string;
+  src: string;
   alt?: string;
   containerClass?: string;
 } & ImageProps) {
-  const [blurImg, setBlurImg] = useState("");
-
-  useEffect(() => {
-    async function getBlurImg() {
-      const { base64 } = await getImage(url);
-      setBlurImg(base64);
-    }
-
-    getBlurImg();
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   return (
-    <div className={cn("relative", containerClass)}>
-      <Image alt={alt} {...props} placeholder="blur" blurDataURL={blurImg} />
+    <div
+      className={cn(
+        `relative ${loading ? "bg-slate-200 animate-pulse" : ""}`,
+        containerClass
+      )}
+    >
+      <Image {...props} src={src} alt={alt} onLoad={() => setLoading(false)} />
     </div>
   );
 }
