@@ -44,12 +44,12 @@ export default async function DashboardLayout({
             {user ? (
               <>
                 {user.role === Role.Admin && (
-                  <NavItem lng={lng} route="users">
+                  <NavItem route="users">
                     <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                     {t("users")}
                   </NavItem>
                 )}
-                <NavItem lng={lng} route="conferences">
+                <NavItem route="conferences">
                   <AcademicCapIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
@@ -60,14 +60,14 @@ export default async function DashboardLayout({
               </>
             ) : (
               <>
-                <NavItem lng={lng} route="login">
+                <NavItem route="login">
                   <ArrowRightCircleIcon
                     className="mr-2 h-5 w-5"
                     aria-hidden="true"
                   />
                   {t("login")}
                 </NavItem>
-                <NavItem lng={lng} route="register">
+                <NavItem route="register">
                   <UserPlusIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                   {t("register")}
                 </NavItem>
