@@ -33,7 +33,7 @@ export function transformIds(doc: object) {
       value = value.replace("minio:9000", "minio-staging:9100");
     }
 
-    if (typeof value === "object" && value?.hasOwnProperty("_id")) {
+    if (typeof value === "object") {
       value = transformIds(value);
     }
 
