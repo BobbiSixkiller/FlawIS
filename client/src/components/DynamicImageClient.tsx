@@ -23,7 +23,15 @@ export default function DynamicImageClient({
         containerClass
       )}
     >
-      <Image {...props} src={src} alt={alt} onLoad={() => setLoading(false)} />
+      <Image
+        {...props}
+        src={src}
+        alt={alt}
+        onLoad={() => setLoading(false)}
+        className={`transition-opacity ease-in delay-150 ${
+          loading ? "opacity-0" : "opacity-100"
+        }`}
+      />
     </div>
   );
 }
