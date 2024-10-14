@@ -47,12 +47,10 @@ jobs:
 
       - name: Copy Data from Production MinIO to Staging MinIO
         run: |
-          # Step 2: Configure mc to connect to production and staging MinIO
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
 
-          # Step 3: Copy data from production to staging
-          mc mirror production/data staging/data
+          mc mirror production/ staging/
 
       - name: Clean up unused Docker resources
         run: |
