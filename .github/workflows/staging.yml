@@ -45,14 +45,14 @@ jobs:
             echo "MinIO client is already installed."
           fi
 
-      # - name: Copy Data from Production MinIO to Staging MinIO
-      #   run: |
-      #     # Step 2: Configure mc to connect to production and staging MinIO
-      #     mc alias set production http://minio:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-      #     mc alias set staging http://minio-staging:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+      - name: Copy Data from Production MinIO to Staging MinIO
+        run: |
+          # Step 2: Configure mc to connect to production and staging MinIO
+          mc alias set production http://minio:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          mc alias set staging http://minio-staging:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
 
-      #     # Step 3: Copy data from production to staging
-      #     mc mirror production/data staging/data
+          # Step 3: Copy data from production to staging
+          mc mirror production/data staging/data
 
       - name: Clean up unused Docker resources
         run: |
