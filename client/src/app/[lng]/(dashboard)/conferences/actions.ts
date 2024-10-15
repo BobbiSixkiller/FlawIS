@@ -5,10 +5,8 @@ import {
   ConferenceDocument,
   ConferencesDocument,
   CreateConferenceDocument,
-  DatesInput,
   DeleteConferenceDocument,
   TextSearchConferenceDocument,
-  UpdateConferenceDatesDocument,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";

@@ -28,9 +28,10 @@ export default function DynamicImageClient({
         src={src}
         alt={alt}
         onLoad={() => setLoading(false)}
-        className={`transition-opacity ease-in delay-150 ${
+        className={`transition-opacity ease-in delay-100 ${
           loading ? "opacity-0" : "opacity-100"
         }`}
+        priority
       />
     </div>
   );

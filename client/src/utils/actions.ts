@@ -21,17 +21,13 @@ export async function executeGqlFetch<Data, Variables>(
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
-    cache: nextCache,
-    next,
+    cache: "no-store",
+    next: undefined,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       //this needs staging testing whether it appends actual browser IP or just docker container
       "x-forwarded-for": headers().get("x-forwarded-for")?.toString() as string,
-      origin:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3000"
-          : "https://flawis.flaw.uniba.sk", //fix this bs
       Cookie: cookies()
         .getAll()
         .map((c) => `${c.name}=${c.value}`)
