@@ -86,7 +86,7 @@ export async function login(prevState: any, formData: FormData) {
 
     if (res.errors) {
       const { validationErrors } = res.errors[0].extensions as ErrorException;
-
+      console.log(res.errors[0]);
       return {
         success: false,
         message: validationErrors

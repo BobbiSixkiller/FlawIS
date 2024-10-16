@@ -16,6 +16,11 @@ const nextConfig = {
         hostname: "minio",
         port: "9000",
       },
+      {
+        protocol: "http",
+        hostname: "minio-staging",
+        port: "9000",
+      },
     ],
   },
 };
