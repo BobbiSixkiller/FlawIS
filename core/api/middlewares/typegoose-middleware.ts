@@ -28,7 +28,7 @@ export function transformIds(doc: object) {
     }
 
     if (key.includes("Url") && process.env.NODE_ENV === "staging") {
-      value = value.replace("minio:9000", "minio-staging:9100");
+      value = value.replace("minio", "minio-staging");
     }
 
     if (typeof value === "object" && Object.keys(value).length > 1) {
