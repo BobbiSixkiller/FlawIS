@@ -19,11 +19,7 @@ export const TypegooseMiddleware: MiddlewareFn<Context> = async ({}, next) => {
   return result;
 };
 
-export function transformIds(doc: object | null | undefined) {
-  if (!doc || typeof doc !== "object") {
-    return doc;
-  }
-
+export function transformIds(doc: object) {
   const transformed = [];
 
   for (let [key, value] of Object.entries(doc)) {
@@ -35,7 +31,11 @@ export function transformIds(doc: object | null | undefined) {
       value = value.replace("minio", "minio-staging");
     }
 
-    if (typeof value === "object" && Object.keys(value).length > 1) {
+    if (
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      Object.keys(value).length > 1
+    ) {
       value = transformIds(value);
     }
 
