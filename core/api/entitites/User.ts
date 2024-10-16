@@ -160,11 +160,6 @@ export class User extends TimeStamps {
               },
             },
             { $limit: first || 20 },
-            {
-              $addFields: {
-                id: "$_id", //transform _id to id property as defined in GraphQL object types
-              },
-            },
           ],
           hasNextPage: [
             {
@@ -196,7 +191,7 @@ export class User extends TimeStamps {
           },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data.id" },
+            endCursor: { $last: "$data._id" },
           },
         },
       },

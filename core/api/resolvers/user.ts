@@ -27,6 +27,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import { Client } from "@microsoft/microsoft-graph-client";
+import { transformIds } from "../middlewares/typegoose-middleware";
 
 @Service()
 @Resolver()
@@ -52,9 +53,19 @@ export class UserResolver {
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
   async users(@Args() { first, after }: UserArgs) {
-    const users = await this.userService.dataModel.paginatedUsers(first, after);
+    const data = await this.userService.dataModel.paginatedUsers(first, after);
 
-    return users[0] as UserConnection;
+    const connection: UserConnection = data[0];
+
+    return {
+      totalCount: connection.totalCount || 0,
+      pageInfo: connection.pageInfo || { hasNextPage: false },
+      edges:
+        connection.edges.map((e) => ({
+          cursor: e.cursor,
+          node: transformIds(e.node),
+        })) || [],
+    };
   }
 
   @Authorized(["ADMIN"])
