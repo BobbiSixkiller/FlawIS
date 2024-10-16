@@ -1,3 +1,5 @@
+import "isomorphic-fetch";
+
 import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
@@ -24,7 +26,6 @@ import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
 import { ConfidentialClientApplication } from "@azure/msal-node";
-import "isomorphic-fetch";
 import { Client } from "@microsoft/microsoft-graph-client";
 
 @Service()
@@ -37,9 +38,8 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: { //     clientId: process.env.AZURE_CLIENT_ID || "", //     authority: process.env.AZURE_AUTHORITY || "", //     clientSecret: process.env.AZURE_CLIENT_SECRET || "", //   },
-  ) // })
-  {}
+    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: { //     clientId: process.env.AZURE_CLIENT_ID || "", //     authority: process.env.AZURE_AUTHORITY || "", //     clientSecret: process.env.AZURE_CLIENT_SECRET || "", //   }, // })
+  ) {}
 
   private getAuthenticatedClient(accessToken: string): Client {
     return Client.init({
