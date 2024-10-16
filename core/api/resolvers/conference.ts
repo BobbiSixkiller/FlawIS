@@ -65,11 +65,7 @@ export class ConferencerResolver {
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
+      edges: connection.edges || [],
     };
   }
 

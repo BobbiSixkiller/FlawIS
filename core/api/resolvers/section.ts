@@ -17,7 +17,6 @@ import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 import { SubmissionArgs, SubmissionConnection } from "./types/submission";
 import { Submission } from "../entitites/Submission";
-import { transformIds } from "../middlewares/typegoose-middleware";
 import { Conference } from "../entitites/Conference";
 
 @Service()
@@ -116,11 +115,7 @@ export class SectionResolver {
 
     return {
       totalCount: connection.totalCount || 0,
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
+      edges: connection.edges || [],
       pageInfo: connection.pageInfo || { hasNextPage: false },
     };
   }
