@@ -37,10 +37,8 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: { //     clientId: process.env.AZURE_CLIENT_ID || "", //     authority: process.env.AZURE_AUTHORITY || "",
-  ) //     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
-  //   },
-  // })
+    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: { //     clientId: process.env.AZURE_CLIENT_ID || "", //     authority: process.env.AZURE_AUTHORITY || "", //     clientSecret: process.env.AZURE_CLIENT_SECRET || "", //   },
+  ) // })
   {}
 
   private getAuthenticatedClient(accessToken: string): Client {
@@ -93,7 +91,7 @@ export class UserResolver {
   // @UseMiddleware([RateLimit(50)])
   async register(
     @Arg("data") registerInput: RegisterInput,
-    @Ctx() { req, locale, user: loggedInUser }: Context
+    @Ctx() { locale, user: loggedInUser }: Context
   ): Promise<UserMutationResponse> {
     const user = await this.userService.create(registerInput);
 
@@ -169,8 +167,6 @@ export class UserResolver {
 
     const match = await compare(password, user.password);
     if (!match) throw new Error(this.i18nService.translate("credentials"));
-
-    console.log(user);
 
     return {
       data: user,

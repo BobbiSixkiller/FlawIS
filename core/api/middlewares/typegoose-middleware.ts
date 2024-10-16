@@ -32,6 +32,7 @@ export function transformIds(doc: object) {
     }
 
     if (
+      value &&
       typeof value === "object" &&
       !Array.isArray(value) &&
       Object.keys(value).length > 1
@@ -40,6 +41,7 @@ export function transformIds(doc: object) {
     }
 
     if (
+      value &&
       typeof value === "object" &&
       Array.isArray(value) &&
       !value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
