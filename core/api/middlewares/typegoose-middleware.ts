@@ -19,7 +19,11 @@ export const TypegooseMiddleware: MiddlewareFn<Context> = async ({}, next) => {
   return result;
 };
 
-export function transformIds(doc: object) {
+export function transformIds(doc: object | null | undefined) {
+  if (!doc || typeof doc !== "object") {
+    return doc;
+  }
+
   const transformed = [];
 
   for (let [key, value] of Object.entries(doc)) {
