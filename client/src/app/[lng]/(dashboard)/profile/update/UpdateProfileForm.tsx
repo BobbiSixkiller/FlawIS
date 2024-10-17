@@ -1,12 +1,12 @@
 "use client";
 
-import { updateProfile } from "@/app/[lng]/(auth)/actions";
 import Button from "@/components/Button";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { updateProfile } from "./actions";
 
 export default function UpdateProfileForm({
   lng,

@@ -1,8 +1,8 @@
 "use client";
 
-import { InputHTMLAttributes, useEffect } from "react";
+import { InputHTMLAttributes } from "react";
 import { withLocalizedInput } from "./withLocalizedInput";
-import { useController, useFormContext } from "react-hook-form";
+import { useController } from "react-hook-form";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -21,8 +21,8 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
         {label}
       </label>
       <input
-        {...field}
         {...props}
+        {...field}
         onFocus={onFocus}
         id={name}
         className={
