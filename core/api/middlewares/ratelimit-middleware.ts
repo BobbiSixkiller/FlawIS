@@ -10,7 +10,6 @@ export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
   (limit = 50) =>
   async ({ context: { req }, info }, next) => {
     const key = `rate-limit:${info.fieldName}:${req.ips[req.ips.length - 1]}`;
-    console.log(key);
 
     const current = await client.incr(key);
     if (current > limit) {

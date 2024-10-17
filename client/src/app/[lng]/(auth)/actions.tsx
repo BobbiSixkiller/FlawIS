@@ -12,13 +12,11 @@ import {
   PasswordResetDocument,
   RegisterDocument,
   ResendActivationLinkDocument,
-  UpdateUserDocument,
 } from "@/lib/graphql/generated/graphql";
 import parseErrors, { ErrorException } from "@/utils/parseErrors";
 import { executeGqlFetch, validation } from "@/utils/actions";
 
 import { OAuth2Client } from "google-auth-library";
-import { ConfidentialClientApplication } from "@azure/msal-node";
 
 export async function register(prevState: any, formData: FormData) {
   const { registerInputSchema } = await validation();
@@ -96,15 +94,15 @@ export async function login(prevState: any, formData: FormData) {
     }
     if (res.data.login) {
       const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
       cookies().set("user", res.data.login.data.id, {
         httpOnly: true,
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        expires,
       });
       cookies().set("accessToken", res.data.login.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
       });
-      revalidateTag(res.data.login.data.id);
     }
   } catch (error: any) {
     return { success: false, message: error.message };
@@ -131,24 +129,6 @@ export async function getGoogleAuthLink(url?: string) {
 
   redirect(authUrl);
 }
-
-// const msalClient = new ConfidentialClientApplication({
-//   auth: {
-//     clientId: process.env.AZURE_CLIENT_ID || "",
-//     authority: process.env.AZURE_AUTHORITY || "",
-//     clientSecret: process.env.AZURE_CLIENT_SECRET || "",
-//   },
-// });
-
-// export async function getMsalAuthLink(url?: string) {
-//   const authUrl = await msalClient.getAuthCodeUrl({
-//     scopes: ["user.read"],
-//     redirectUri: "http://localhost:3000/microsoft/callback",
-//     state: JSON.stringify({ redirectUrl: url }),
-//   });
-
-//   redirect(authUrl);
-// }
 
 export async function getMe() {
   const user = cookies().get("user")?.value;

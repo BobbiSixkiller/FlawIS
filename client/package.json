@@ -10,7 +10,6 @@
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
-    "@azure/msal-node": "^2.13.1",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",

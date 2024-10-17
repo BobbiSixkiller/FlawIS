@@ -26,8 +26,8 @@ export async function executeGqlFetch<Data, Variables>(
   const clientIp = forwardedFor?.split(",")[0]?.trim(); // Take the first one which is the actual client IP
 
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
-    cache: "no-store",
-    next: undefined,
+    cache: nextCache,
+    next,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
