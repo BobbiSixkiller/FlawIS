@@ -18,9 +18,15 @@ import {
 } from "@heroicons/react/24/outline";
 import LngSwitcher from "./LngSwitcher";
 import Drawer from "./Drawer";
-import { Role, UserFragment } from "@/lib/graphql/generated/graphql";
+import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { Menu, Transition } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from "@headlessui/react";
 
 export function NavItem({
   children,
@@ -32,7 +38,7 @@ export function NavItem({
   onClick?: () => void;
 }) {
   const segment = useSelectedLayoutSegment();
-  const active = route === segment;
+  const active = route === segment || (segment === null && route === "/");
 
   return (
     <Link
@@ -58,11 +64,11 @@ export function ProfileMenuItem({
   const router = useRouter();
   const path = usePathname();
 
-  const { t } = useTranslation(lng, "landing");
+  const { t } = useTranslation(lng, "dashboard");
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button
+      <MenuButton
         className={`h-full w-full ${
           mobile
             ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
@@ -74,7 +80,7 @@ export function ProfileMenuItem({
         {path.includes("/profile") && (
           <span className="hidden lg:block ml-auto self-start">•</span>
         )}
-      </Menu.Button>
+      </MenuButton>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"
@@ -84,7 +90,7 @@ export function ProfileMenuItem({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items
+        <MenuItems
           className={`absolute ${
             mobile
               ? "right-0 mt-2 min-w-max w-32 origin-top-right"
@@ -92,11 +98,11 @@ export function ProfileMenuItem({
           } rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none`}
         >
           <div className="p-1">
-            <Menu.Item>
-              {({ active }) => (
+            <MenuItem>
+              {({ focus }) => (
                 <button
                   className={`${
-                    active ? "bg-primary-500 text-white" : "text-gray-900"
+                    focus ? "bg-primary-500 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm ${
                     path.includes("/profile") ? "font-bold" : ""
                   }`}
@@ -106,12 +112,12 @@ export function ProfileMenuItem({
                   {t("profile")}
                 </button>
               )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
+            </MenuItem>
+            <MenuItem>
+              {({ focus }) => (
                 <button
                   className={`${
-                    active ? "bg-primary-500 text-white" : "text-gray-900"
+                    focus ? "bg-primary-500 text-white" : "text-gray-900"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   onClick={() => router.push("/logout")}
                 >
@@ -122,9 +128,9 @@ export function ProfileMenuItem({
                   {t("logout")}
                 </button>
               )}
-            </Menu.Item>
+            </MenuItem>
           </div>
-        </Menu.Items>
+        </MenuItems>
       </Transition>
     </Menu>
   );
@@ -196,7 +202,7 @@ export function MobileNav({
           >
             {user ? (
               <>
-                {user.role === Role.Admin && (
+                {user.access.includes(Access.Admin) && (
                   <NavItem route="users" onClick={() => setMenuShown(false)}>
                     <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                     {t("users")}

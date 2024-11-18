@@ -1,19 +1,11 @@
 "use client";
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { InputHTMLAttributes, useState } from "react";
+import { useState } from "react";
 import { useController } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 
-export function MultipleInput({
-  label,
-  name,
-  onFocus,
-  ...props
-}: {
-  label: string;
-  name: string;
-} & InputHTMLAttributes<HTMLInputElement>) {
+export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
   const { field, fieldState } = useController({ name });
 
   const strings: string[] = field.value || [];

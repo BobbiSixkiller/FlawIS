@@ -8,8 +8,7 @@ export type User = {
   id: ObjectId;
   name: string;
   email: string;
-  role: string;
-  permissions: string[];
+  access: string[];
 };
 
 export type ResetToken = {

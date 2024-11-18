@@ -1,11 +1,11 @@
 "use client";
 
 import { useFormState } from "react-dom";
-import { sendResetLink } from "../actions";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { useContext, useEffect } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { sendResetLink } from "./actions";
 
 export default function ForgotPasswordForm({ lng }: { lng: string }) {
   const [state, formAction] = useFormState(sendResetLink, {

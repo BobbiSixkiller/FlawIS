@@ -173,28 +173,6 @@ export class SubmissionResolver {
 
   @Authorized()
   @Mutation(() => SubmissionMutationResponse)
-  async unsetSubmissionFile(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Submission) submission: DocumentType<Submission>
-  ) {
-    await this.submissionService.update(
-      { _id: submission.id },
-      { $unset: { fileUrl: "" } }
-    );
-
-    return {
-      message: this.i18nService.translate("update", {
-        ns: "submission",
-        name: submission.translations[
-          this.i18nService.language() as keyof SubmissionTranslation
-        ].name,
-      }),
-      data: submission,
-    };
-  }
-
-  @Authorized()
-  @Mutation(() => SubmissionMutationResponse)
   async deleteSubmission(
     @Arg("id") _id: ObjectId,
     @LoadResource(Submission) submission: DocumentType<Submission>

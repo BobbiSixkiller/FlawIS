@@ -3,12 +3,12 @@ import "isomorphic-fetch";
 import { Arg, Args, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
-import { User } from "../entitites/User";
+import { Access, User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
   PasswordInput,
-  RegisterInput,
+  RegisterUserInput,
   UserArgs,
   UserConnection,
   UserInput,
@@ -25,8 +25,6 @@ import { I18nService } from "../services/i18nService";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
-import { ConfidentialClientApplication } from "@azure/msal-node";
-import { Client } from "@microsoft/microsoft-graph-client";
 import { transformIds } from "../middlewares/typegoose-middleware";
 
 @Service()
@@ -39,16 +37,8 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ) // private readonly msalClient = new ConfidentialClientApplication({ //   auth: { //     clientId: process.env.AZURE_CLIENT_ID || "", //     authority: process.env.AZURE_AUTHORITY || "", //     clientSecret: process.env.AZURE_CLIENT_SECRET || "", //   }, // })
+    )
   ) {}
-
-  private getAuthenticatedClient(accessToken: string): Client {
-    return Client.init({
-      authProvider: (done: any) => {
-        done(null, accessToken);
-      },
-    });
-  }
 
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
@@ -101,10 +91,25 @@ export class UserResolver {
   @Mutation(() => UserMutationResponse)
   @UseMiddleware(RateLimit())
   async register(
-    @Arg("data") registerInput: RegisterInput,
-    @Ctx() { locale, user: loggedInUser }: Context
+    @Arg("data") registerInput: RegisterUserInput,
+    @Ctx() { locale, user: loggedInUser, req }: Context
   ): Promise<UserMutationResponse> {
-    const user = await this.userService.create(registerInput);
+    const host = req.header("host");
+    const subdomain = host?.split(".")[0];
+
+    const access: Access[] = [];
+
+    if (subdomain === "conferences") {
+      access.push(Access.ConferenceAttendee);
+    }
+    if (subdomain === "internships") {
+      access.push(Access.Student);
+    }
+
+    const user = await this.userService.create({
+      ...registerInput,
+      access: registerInput.access ? registerInput.access : access,
+    });
 
     if (!loggedInUser) {
       messageBroker.produceMessage(
@@ -130,7 +135,7 @@ export class UserResolver {
   @Authorized()
   @UseMiddleware(RateLimit())
   @Mutation(() => String)
-  async resendActivationLink(@Ctx() { req, locale, user }: Context) {
+  async resendActivationLink(@Ctx() { locale, user }: Context) {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
@@ -345,8 +350,6 @@ export class UserResolver {
     for (const [key, value] of Object.entries(userInput)) {
       (user as any)[key] = value;
     }
-
-    console.log("ZEBRACIK");
 
     const data = await user.save();
 

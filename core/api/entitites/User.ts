@@ -8,7 +8,6 @@ import { ObjectId } from "mongodb";
 import {
   getModelForClass,
   Index,
-  post,
   pre,
   prop as Property,
 } from "@typegoose/typegoose";
@@ -20,16 +19,29 @@ import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 import { Billing } from "./Billing";
 
-export enum Role {
-  Basic = "BASIC",
+export enum Access {
   Admin = "ADMIN",
-  Student = "STUDENT",
+  ConferenceAttendee = "CONFERENCE_ATTENDEE",
   Organization = "ORGANIZATION",
+  Student = "STUDENT",
 }
 
-registerEnumType(Role, {
-  name: "Role", // this one is mandatory
-  description: "User role inside the FLAWIS system", // this one is optional
+registerEnumType(Access, {
+  name: "Access", // this one is mandatory
+  description: "User access inside the FLAWIS system", // this one is optional
+});
+
+export enum StudyProgramme {
+  Bachelor1 = 1,
+  Bachelor2 = 2,
+  Bachelor3 = 3,
+  Master1 = 4,
+  Master2 = 5,
+}
+
+registerEnumType(StudyProgramme, {
+  name: "StudyProgramme",
+  description: "Student user account StudyProgramme",
 });
 
 @pre<User>("save", async function () {
@@ -90,28 +102,32 @@ export class User extends TimeStamps {
   @Property()
   name: string;
 
-  @Field()
-  @Property({ default: "N/A" })
-  telephone: string;
+  @Field({ nullable: true })
+  @Property()
+  telephone?: string;
 
-  @Field()
-  @Property({ default: "N/A" })
-  organization: string;
+  @Field({ nullable: true })
+  @Property()
+  organization?: string;
 
   @Field(() => [Billing], { nullable: "items" })
   @Property({ type: () => [Billing], _id: false, default: [] })
   billings: Billing[];
 
-  @Field(() => Role)
+  @Field(() => [Access])
   @Property({
-    default: "BASIC",
-    enum: ["BASIC", "ADMIN", "STUDENT", "ORGANIZATION"],
+    type: String, // Typegoose expects this to be a string type as it stores enums as strings
+    enum: Access, // Make sure to link the Access enum here
   })
-  role: Role;
+  access: Access[];
 
   @Field({ nullable: true })
   @Property()
   cvUrl?: string;
+
+  @Field(() => StudyProgramme, { nullable: true })
+  @Property({ type: Number, enum: StudyProgramme })
+  studyProgramme?: StudyProgramme;
 
   @Field()
   @Property({ default: false })
@@ -131,7 +147,7 @@ export class User extends TimeStamps {
           id: this.id,
           email: this.email,
           name: this.name,
-          role: this.role,
+          access: this.access,
         },
         { expiresIn: "24h" }
       )

@@ -89,7 +89,7 @@ export default function MultipleFileUploadField({
       })
     );
     if (!field.value.some((v: File) => v === file)) {
-      setValue(name, [...field.value, file]);
+      setValue(name, [...field.value, file], { shouldValidate: true });
     }
   }
 
@@ -131,7 +131,7 @@ export default function MultipleFileUploadField({
       ))}
 
       {fieldState.error && (
-        <p className="mt-1 text-xs text-red-500">{fieldState.error.message}</p>
+        <p className="mt-1 text-sm text-red-500">{fieldState.error.message}</p>
       )}
     </div>
   );

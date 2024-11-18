@@ -15,7 +15,7 @@ import { useController } from "react-hook-form";
 export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
   name: string;
-  label: string;
+  label?: string;
 }
 
 export function withLocalizedInput(

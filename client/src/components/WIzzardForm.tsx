@@ -72,7 +72,7 @@ export function WizzardForm<T>({
     <FormProvider {...methods}>
       <div className="w-full flex flex-col gap-6">
         <Stepper activeIndex={step} steps={steps} lng={lng} />
-        <FormMessage lng={lng} />
+        <FormMessage />
         <form
           className="space-y-6 w-full md:max-w-96 mx-auto"
           onSubmit={methods.handleSubmit(onSubmit)}

@@ -1,7 +1,13 @@
 "use client";
 
 import React, { Fragment, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +26,7 @@ export default function Modal({
   const router = useRouter();
 
   return (
-    <Transition.Root
+    <Transition
       appear
       show={show}
       as={Fragment}
@@ -33,7 +39,7 @@ export default function Modal({
         className="fixed z-10 inset-0 overflow-y-auto"
         onClose={() => setShow(false)}
       >
-        <Transition.Child
+        <TransitionChild
           enter="duration-300 ease-out"
           enterFrom="opacity-0"
           enterTo="opacity-100"
@@ -41,11 +47,11 @@ export default function Modal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Dialog.Overlay className="fixed inset-0 bg-black/25" />
-        </Transition.Child>
+          <div className="fixed inset-0 bg-black/25" />
+        </TransitionChild>
 
         <div className="flex min-h-full items-center justify-center p-4">
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
@@ -54,14 +60,14 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="z-20 overflow-hidden w-fit rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
+            <DialogPanel className="z-20 w-full sm:w-fit overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between mb-6">
-                <Dialog.Title
+                <DialogTitle
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
                   {title}
-                </Dialog.Title>
+                </DialogTitle>
                 {!togglerHidden && (
                   <button
                     onClick={() => setShow(false)}
@@ -72,10 +78,10 @@ export default function Modal({
                 )}
               </div>
               {children}
-            </Dialog.Panel>
-          </Transition.Child>
+            </DialogPanel>
+          </TransitionChild>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   );
 }

@@ -1,5 +1,11 @@
 {
-  "400": "You have to provide a bucket name and an url in order to download a file!",
   "401": "Access not allowed!",
-  "500": "Error downloading the file."
+  "GET": {
+    "400": "You have to provide a bucket name and an url in order to download a file!",
+    "500": "Error downloading the file."
+  },
+  "POST": {
+    "400": "You have to provide a file, a bucket name and a path in order to upload a file!",
+    "500": "Error uploading the file."
+  }
 }

@@ -2,18 +2,12 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chainMiddleware";
 import { cookies } from "next/headers";
 
-export const protectedPaths = [
-  "/profile",
-  "/activate",
-  "/users",
-  "/conferences",
-];
-
 const publicPaths = [
   "/login",
   "/register",
   "/forgotPassword",
   "/resetPassword",
+  "/google/callback",
 ];
 
 export function withAuth(middleware: CustomMiddleware) {
@@ -21,9 +15,12 @@ export function withAuth(middleware: CustomMiddleware) {
     const url = req.nextUrl.clone();
     const token = cookies().get("accessToken")?.value;
 
-    if (!token && protectedPaths.some((path) => url.pathname.includes(path))) {
-      const fullUrl = `${url.pathname}${url.search}`;
-      url.searchParams.append("url", fullUrl);
+    if (!token && !publicPaths.some((path) => path === url.pathname)) {
+      if (url.pathname !== "/") {
+        const fullUrl = `${url.pathname}${url.search}`;
+        url.searchParams.append("url", fullUrl);
+      }
+
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }

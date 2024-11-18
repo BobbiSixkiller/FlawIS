@@ -18,7 +18,7 @@ export default async function ResetPassword({
         {t("heading")}
       </h2>
 
-      <FormMessage lng={lng} />
+      <FormMessage />
 
       <div>
         <ResetPasswordForm lng={lng} token={token} />

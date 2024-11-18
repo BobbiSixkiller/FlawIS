@@ -1,5 +1,5 @@
 import { useTranslation } from "@/lib/i18n";
-import { downloadFile } from "@/lib/minio";
+import { downloadFile, uploadFile } from "@/lib/minio";
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
 import { getMe } from "../(auth)/actions";
@@ -32,7 +32,7 @@ export async function GET(
   const { t } = await useTranslation(lng, "minio");
 
   const user = await getMe();
-  if (!user) {
+  if (!user || !user?.verified) {
     return NextResponse.json({ message: t("401") }, { status: 401 });
   }
 
@@ -45,7 +45,7 @@ export async function GET(
     );
 
   if (!bucketName || objectNames.length === 0) {
-    return NextResponse.json({ message: t("400") }, { status: 400 });
+    return NextResponse.json({ message: t("GET.400") }, { status: 400 });
   }
 
   try {
@@ -93,10 +93,39 @@ export async function GET(
     }
   } catch (error: any) {
     console.log(error);
-    return NextResponse.json({ message: t("500") }, { status: 500 });
+    return NextResponse.json({ message: t("GET.500") }, { status: 500 });
   }
 }
 
-// export async function POST(request: NextRequest) {
-//   const data = await request.json();
-// }
+export async function POST(
+  request: NextRequest,
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+  }
+) {
+  const { t } = await useTranslation(lng, "minio");
+
+  const user = await getMe();
+  if (!user || !user?.verified) {
+    return NextResponse.json({ message: t("401") }, { status: 401 });
+  }
+
+  const formData = await request.formData();
+  const file = formData.get("file") as File | null;
+  const bucketName = formData.get("bucketName") as string | null;
+  const path = formData.get("path") as string | null;
+
+  if (!file || !bucketName || !path) {
+    return NextResponse.json({ message: t("POST.400") }, { status: 400 });
+  }
+
+  try {
+    const url = await uploadFile(bucketName, path, file);
+    return Response.json({ url }, { status: 200 });
+  } catch (error: any) {
+    console.log(error);
+    return NextResponse.json({ message: t("POST.500") }, { status: 500 });
+  }
+}

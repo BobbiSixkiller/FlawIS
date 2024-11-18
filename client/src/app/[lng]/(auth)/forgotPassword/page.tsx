@@ -17,7 +17,7 @@ export default async function ForgotPassword({
         {t("heading")}
       </h2>
 
-      <FormMessage lng={lng} />
+      <FormMessage />
 
       <div>
         <ForgotPasswordForm lng={lng} />

@@ -12,8 +12,6 @@ export default function ImageFileInput({
   ...props
 }: {
   avatarUrl?: string;
-  label: string;
-  name: string;
 } & InputProps) {
   const { field, fieldState } = useController({ name });
 

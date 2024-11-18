@@ -13,6 +13,8 @@ export async function GET(req: NextRequest) {
   const redirectUrl =
     state && state !== "{}" ? JSON.parse(state).redirectUrl : "/";
 
+  console.log("REDIRECT TO ", redirectUrl);
+
   if (!code) {
     return NextResponse.json({ error: "No code provided" }, { status: 400 });
   }

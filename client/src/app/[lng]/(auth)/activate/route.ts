@@ -14,5 +14,5 @@ export async function GET(req: NextRequest) {
     await activate();
   }
 
-  return NextResponse.redirect(new URL("/conferences", req.url));
+  return NextResponse.redirect(new URL("/", req.url));
 }

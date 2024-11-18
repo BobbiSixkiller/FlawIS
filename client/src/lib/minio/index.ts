@@ -1,3 +1,5 @@
+"use server";
+
 import * as Minio from "minio";
 import { Readable } from "stream";
 import { v4 as uuid } from "uuid";
@@ -85,28 +87,21 @@ export async function downloadFile(
   });
 }
 
-export async function deleteFiles(
-  bucketName: string,
-  objectList: string[]
-): Promise<boolean> {
-  return new Promise<boolean>((resolve, reject) => {
-    minioClient.bucketExists(bucketName, (err, res) => {
-      if (err) {
-        console.error(`Error checking bucket existence: ${err.message}`);
-        return reject(err);
-      }
-      if (res) {
-        minioClient.removeObjects(bucketName, objectList, (err: any) => {
-          if (err) {
-            console.error(`Error deleting objects: ${err.message}`);
-            return reject(err);
-          }
-          resolve(true);
-        });
-      } else {
-        console.error(`Bucket '${bucketName}' does not exist.`);
-        reject(new Error(`Bucket '${bucketName}' does not exist.`));
-      }
-    });
+export async function deleteFiles(urls: string[]) {
+  const minioObjects = urls.map((url) => {
+    const paths = url.replace("http://minio:9000/", "").split("/");
+    const bucketName = paths.shift() || "";
+
+    return { bucketName, objectName: paths.join("/") };
   });
+
+  try {
+    for (const { bucketName, objectName } of minioObjects) {
+      await ensureBucketExists(bucketName);
+      await minioClient.removeObject(bucketName, objectName);
+    }
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }

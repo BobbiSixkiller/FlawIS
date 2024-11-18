@@ -18,7 +18,7 @@ export default async function Logo({
   notext?: boolean;
   inverted?: boolean;
 }) {
-  const { t } = await useTranslation(lng, "landing");
+  const { t } = await useTranslation(lng, "dashboard");
 
   return (
     <div

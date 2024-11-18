@@ -10,5 +10,6 @@
   "step": "Krok",
   "confirm": "Potvrdiť",
   "deleteConfirm": "Naozaj si prajete zmazať {{name}}?",
-  "notFound": "Nič sa nenašlo."
+  "notFound": "Nič sa nenašlo.",
+  "flaw": "Univerzita Komenského v Bratislave, Právnická fakulta"
 }

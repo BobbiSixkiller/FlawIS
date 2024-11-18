@@ -29,7 +29,7 @@ export default function SessionPolling() {
 
     const startPolling = () => {
       pollingCallback(); // To immediately start fetching data
-      timerIdRef.current = setInterval(pollingCallback, 1000 * 60 * 60 * 24); // Polling every day
+      timerIdRef.current = setInterval(pollingCallback, 1000 * 60 * 60); // Polling every hour
     };
 
     const stopPolling = () => {

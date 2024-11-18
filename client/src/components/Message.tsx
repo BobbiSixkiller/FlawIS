@@ -4,12 +4,13 @@ import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Fragment, useContext, useEffect } from "react";
 import { setTimeout } from "timers";
 
-export function FormMessage({ lng }: { lng: string }) {
+export function FormMessage() {
   const router = useRouter();
+  const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "common");
   const { formMessage, dispatch } = useContext(MessageContext);
 
@@ -63,7 +64,7 @@ export function FormMessage({ lng }: { lng: string }) {
   );
 }
 
-export function DashboardMessage({ lng }: { lng: string }) {
+export function AppMessage({ lng }: { lng: string }) {
   const { t } = useTranslation(lng, "common");
   const { appMessage, dispatch } = useContext(MessageContext);
 
@@ -84,16 +85,22 @@ export function DashboardMessage({ lng }: { lng: string }) {
     >
       <div
         className={`
-           fixed h-fit z-20 inset-x-0 bottom-0 text-center flex flex-col gap-1 p-3 border-t border-green-500 text-green-500 bg-green-200
+           fixed h-fit z-20 inset-x-0 bottom-0 text-center flex flex-col gap-1 p-3 border-t ${
+             appMessage.success
+               ? "border-green-500 text-green-500 bg-green-200"
+               : "border-red-500 text-red-500 bg-red-200"
+           }
            `}
       >
         <div className="relative h-6">
           <h2 className="font-bold absolute mr-auto ml-auto inset-x-0">
-            {t("success")}
+            {appMessage.success ? t("success") : t("error")}
           </h2>
           <button
             type="button"
-            className={`absolute right-0 align-text-bottom hover:text-green-700`}
+            className={`absolute right-0 align-text-bottom  ${
+              appMessage.success ? "hover:text-green-700" : "hover:text-red-700"
+            }`}
             onClick={() => dispatch({ type: ActionTypes.ClearAppMsg })}
           >
             <span className="sr-only">Hide message</span>

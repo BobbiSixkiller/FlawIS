@@ -8,5 +8,15 @@
   "phone": "Phone number",
   "org": "Organization",
   "status": "Account status",
-  "role": "Role"
+  "access": "Access",
+  "studyProgramme": "Study programme",
+  "cv": "CV",
+  "update": "Update",
+  "Bachelor1": "1st Bachelor",
+  "Bachelor2": "2nd Bachelor",
+  "Bachelor3": "3nd Bachelor",
+  "Master1": "1st Master",
+  "Master2": "2nd Master",
+  "password": "Password",
+  "confirmPass": "Confirm password"
 }
