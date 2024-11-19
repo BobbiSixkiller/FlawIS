@@ -35,10 +35,12 @@ export default function UserForm({
   user,
   subdomain,
   namespace,
+  inModal,
 }: {
   user?: UserFragment;
   subdomain?: string;
   namespace: string;
+  inModal?: boolean;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
@@ -184,7 +186,7 @@ export default function UserForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 mt-4 sm:w-96"
+        className={`space-y-6 mt-4 w-full ${inModal && "sm:w-96"}`}
         onSubmit={methods.handleSubmit(
           async (val) => {
             console.log(val);

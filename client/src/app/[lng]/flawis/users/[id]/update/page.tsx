@@ -1,6 +1,5 @@
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import { getUser } from "../../actions";
-import UpdateUserForm from "./UpdateUserForm";
 
 export default async function UpdateUserPage({
   params: { id, lng },

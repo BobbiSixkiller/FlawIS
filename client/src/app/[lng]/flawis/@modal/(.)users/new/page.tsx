@@ -11,9 +11,7 @@ export default async function NewUserPage({
 
   return (
     <Modal title={t("new")}>
-      <div className="sm:w-96">
-        <UserForm namespace="register" />
-      </div>
+      <UserForm namespace="register" inModal />
     </Modal>
   );
 }

@@ -1,5 +1,4 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import UpdateProfileForm from "./UpdateProfileForm";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 
 export default async function UpdateProfilePage({

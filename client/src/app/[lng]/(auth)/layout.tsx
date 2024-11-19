@@ -11,7 +11,7 @@ export default async function AuthLayout({
   const { i18n, t } = await useTranslation(lng, "dashboard");
 
   return (
-    <div className="mx-auto w-full max-w-96 flex flex-col justify-center px-6 py-12 sm:px-0">
+    <div className="mx-auto w-full max-w-96 flex flex-col justify-center px-6 py-12">
       <Logo lng={lng} width={60} height={60} notext />
 
       {children}

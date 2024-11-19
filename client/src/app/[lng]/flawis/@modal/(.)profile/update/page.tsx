@@ -14,7 +14,7 @@ export default async function UpdateProfilePage({
 
   return (
     <Modal title={t("heading")}>
-      <UserForm user={user} namespace="profile" />
+      <UserForm user={user} namespace="profile" inModal />
     </Modal>
   );
 }
