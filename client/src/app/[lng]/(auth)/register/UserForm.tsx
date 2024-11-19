@@ -116,7 +116,9 @@ export default function UserForm({
           .trim()
           .nullable()
           .when([], {
-            is: () => subdomain === "conferences",
+            is: () =>
+              subdomain === "conferences" ||
+              subdomain === "conferences-staging",
             then: (schema) => schema.required(),
           }),
         telephone: yup
@@ -124,7 +126,9 @@ export default function UserForm({
           .trim()
           .nullable()
           .when([], {
-            is: () => subdomain === "conferences",
+            is: () =>
+              subdomain === "conferences" ||
+              subdomain === "conferences-staging",
             then: (schema) =>
               schema
                 .required()
@@ -271,7 +275,9 @@ export default function UserForm({
           />
         )}
 
-        {(subdomain === "conferences" || path.includes("users")) && (
+        {(subdomain === "conferences" ||
+          subdomain === "conferences-staging" ||
+          path.includes("users")) && (
           <>
             <PhoneInput label={t("phone")} name="telephone" />
             <Input label={t("org")} name="organization" />
