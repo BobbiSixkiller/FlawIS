@@ -46,7 +46,7 @@ export async function register({
     return { success: false, message: error.message };
   }
 
-  redirect(url || "/profile");
+  redirect(url || "/");
 }
 
 export async function addUser(data: RegisterUserInput) {

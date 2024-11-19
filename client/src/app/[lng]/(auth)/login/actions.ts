@@ -36,5 +36,5 @@ export async function login(email: string, password: string, url?: string) {
     return { success: false, message: error.message };
   }
 
-  redirect(url || "/profile");
+  redirect(url || "/");
 }

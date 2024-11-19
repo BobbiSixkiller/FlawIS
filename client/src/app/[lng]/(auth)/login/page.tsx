@@ -15,6 +15,7 @@ export default async function Login({
   const { t } = await useTranslation(lng, "login");
 
   const host = headers().get("host") || "localhost:3000";
+  const subdomain = host.split(".")[0];
 
   return (
     <div className="mt-6 flex flex-col gap-4">
@@ -26,7 +27,9 @@ export default async function Login({
 
       <LoginForm lng={lng} url={url} />
 
-      {(host === "conferences.flaw.uniba.sk" || host === "localhost:3000") && (
+      {(subdomain === "conferences" ||
+        subdomain === "conferences-staging" ||
+        subdomain === "localhost:3000") && (
         <div>
           <div className="relative flex py-6 items-center">
             <div className="flex-grow border-t border-gray-300"></div>
