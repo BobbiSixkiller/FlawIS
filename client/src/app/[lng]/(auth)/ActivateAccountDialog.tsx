@@ -19,7 +19,7 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { FormMessage } from "../../../components/Message";
+import { FormMessage } from "@/components/Message";
 
 export default function ActivateAccountDialog({
   lng,
