@@ -1,8 +1,8 @@
 import DeleteSubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/delete/DeleteSubmissionForm";
-import { getSubmission } from "@/app/[lng]/conferences/[slug]/(register)/register/actions";
 import Modal from "@/components/Modal";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
+import { getSubmission } from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/actions";
 
 export default async function DeleteSubmissionPage({
   params: { lng, slug, id },

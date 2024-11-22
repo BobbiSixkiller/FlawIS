@@ -1,8 +1,8 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import DeleteSubmissionForm from "./DeleteSubmissionForm";
-import { getSubmission } from "../actions";
 import { FormMessage } from "@/components/Message";
+import { getSubmission } from "../actions";
 
 export default async function DeleteSubmissionPage({
   params: { lng, slug, id },

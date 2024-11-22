@@ -1,6 +1,5 @@
 "use server";
 
-import { getMe } from "@/app/[lng]/(auth)/actions";
 import {
   AddAttendeeDocument,
   AttendeeInput,

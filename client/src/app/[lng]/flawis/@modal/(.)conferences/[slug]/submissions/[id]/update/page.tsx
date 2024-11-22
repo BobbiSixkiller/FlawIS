@@ -1,9 +1,9 @@
 import UpdateSubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/update/UpdateSubmissionForm";
-import { getSubmission } from "@/app/[lng]/conferences/[slug]/(register)/register/actions";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import Modal from "@/components/Modal";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
+import { getSubmission } from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/actions";
 
 export default async function UpdateSubmissionPage({
   params: { lng, slug, id },
