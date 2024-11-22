@@ -16,6 +16,7 @@
       "ICDPH": "IČDPH"
     },
     "submission": {
+      "lng": "Jazyk, v ktorom bude účastník prezentovať svoj príspevok",
       "info": "Príspevok",
       "section": "Sekcia",
       "name": "Názov príspevku",

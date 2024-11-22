@@ -249,5 +249,8 @@ mutation deleteTicket($slug: String!, $ticketId: ObjectId!) {
 mutation addAttendee($data: AttendeeInput!) {
   addAttendee(data: $data) {
     message
+    data {
+      slug
+    }
   }
 }

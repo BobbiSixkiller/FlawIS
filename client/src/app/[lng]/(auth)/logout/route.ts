@@ -1,4 +1,4 @@
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
@@ -8,12 +8,11 @@ export async function GET(req: NextRequest) {
   const url = searchParams.get("url");
   const redirectUrl = url ? decodeURIComponent(url) : "/login";
 
-  const user = cookies().get("user")?.value;
-  if (user) {
-    cookies().delete("user");
+  const token = cookies().get("accessToken")?.value;
+  if (token) {
     cookies().delete("accessToken");
-    revalidateTag(user);
   }
 
+  revalidatePath("/", "layout");
   redirect(redirectUrl);
 }

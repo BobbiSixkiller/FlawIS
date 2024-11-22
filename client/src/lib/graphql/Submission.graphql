@@ -12,6 +12,7 @@ fragment Submission on Submission {
       keywords
     }
   }
+  presentationLng
   authors {
     id
     name
@@ -64,15 +65,6 @@ mutation deleteSubmission($id: ObjectId!) {
 
 mutation removeAuthor($id: ObjectId!, $authorId: ObjectId!) {
   removeAuthor(id: $id, authorId: $authorId) {
-    message
-    data {
-      ...Submission
-    }
-  }
-}
-
-mutation unsetSubmissionFile($id: ObjectId!) {
-  unsetSubmissionFile(id: $id) {
     message
     data {
       ...Submission

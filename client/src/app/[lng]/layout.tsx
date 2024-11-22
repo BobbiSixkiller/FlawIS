@@ -1,9 +1,10 @@
-import { useTranslation } from "@/lib/i18n";
 import "../globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { dir } from "i18next";
 import MessageProvider from "@/providers/MessageProvider";
+import { AppMessage } from "@/components/Message";
+import { translate } from "@/lib/i18n";
 
 const UKsans = localFont({
   src: [
@@ -48,7 +49,7 @@ export async function generateMetadata({
   params: { lng: string };
 }): Promise<Metadata> {
   // eslint-disable-next-line no-console, react-hooks/rules-of-hooks
-  const { t } = await useTranslation(lng, "landing");
+  const { t } = await translate(lng, "landing");
 
   return {
     title: t("title"),
@@ -66,7 +67,10 @@ export default async function RootLayout({
   return (
     <html lang={lng} dir={dir(lng)}>
       <body className={`${UKsans.className}`}>
-        <MessageProvider>{children}</MessageProvider>
+        <MessageProvider>
+          {children}
+          <AppMessage lng={lng} />
+        </MessageProvider>
       </body>
     </html>
   );

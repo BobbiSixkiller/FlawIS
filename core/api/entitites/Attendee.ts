@@ -21,7 +21,7 @@ export const AttendeeUserUnion = createUnionType({
   types: () => [User, AttendeeUser] as const, // function that returns tuple of object types classes
   // Implementation of detecting returned object type
   resolveType: (value) => {
-    if ("organization" in value) {
+    if ("createdAt" in value) {
       return User; // Return object type class (the one with `@ObjectType()`)
     } else {
       return AttendeeUser;
@@ -229,11 +229,6 @@ export class Attendee extends TimeStamps {
               },
             },
             { $limit: first || 20 },
-            {
-              $addFields: {
-                id: "$_id", //transform _id to id property as defined in GraphQL object types
-              },
-            },
           ],
           hasNextPage: [
             {
@@ -331,7 +326,7 @@ export class Attendee extends TimeStamps {
           },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data.id" },
+            endCursor: { $last: "$data._id" },
           },
         },
       },

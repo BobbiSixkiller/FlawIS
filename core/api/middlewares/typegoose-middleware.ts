@@ -23,13 +23,25 @@ export function transformIds(doc: object) {
   const transformed = [];
 
   for (let [key, value] of Object.entries(doc)) {
-    if (key === "_id") key = "id";
+    if (key === "_id") {
+      key = "id";
+    }
 
-    if (typeof value === "object" && value?.hasOwnProperty("_id")) {
+    if (key.includes("Url") && process.env.NODE_ENV === "staging") {
+      value = value.replace("minio", "minio-staging");
+    }
+
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      Object.keys(value).length > 1
+    ) {
       value = transformIds(value);
     }
 
     if (
+      value &&
       typeof value === "object" &&
       Array.isArray(value) &&
       !value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))

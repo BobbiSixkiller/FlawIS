@@ -21,13 +21,15 @@ fragment User on User {
   email
   organization
   telephone
-  role
+  access
   verified
   createdAt
   updatedAt
   billings {
     ...Billing
   }
+  studyProgramme
+  cvUrl
 }
 
 query me {
@@ -56,15 +58,6 @@ mutation googleSignIn($authCode: String!) {
   }
 }
 
-mutation msalSignIn($authCode: String!) {
-  msalSignIn(authCode: $authCode) {
-    message
-    data {
-      ...User
-      token
-    }
-  }
-}
 query forgotPassword($email: String!) {
   forgotPassword(email: $email)
 }
@@ -79,7 +72,7 @@ mutation passwordReset($data: PasswordInput!) {
   }
 }
 
-mutation register($data: RegisterInput!) {
+mutation register($data: RegisterUserInput!) {
   register(data: $data) {
     message
     data {

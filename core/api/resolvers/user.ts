@@ -1,12 +1,22 @@
-import { Arg, Args, Ctx, Query, Resolver } from "type-graphql";
+import "isomorphic-fetch";
+
+import {
+  Arg,
+  Args,
+  AuthenticationError,
+  Ctx,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
-import { User } from "../entitites/User";
+import { Access, User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
   PasswordInput,
-  RegisterInput,
+  RegisterUserInput,
   UserArgs,
   UserConnection,
   UserInput,
@@ -23,9 +33,7 @@ import { I18nService } from "../services/i18nService";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
-import { ConfidentialClientApplication } from "@azure/msal-node";
-import "isomorphic-fetch";
-import { Client } from "@microsoft/microsoft-graph-client";
+import { transformIds } from "../middlewares/typegoose-middleware";
 
 @Service()
 @Resolver()
@@ -37,30 +45,25 @@ export class UserResolver {
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI
-    ),
-    private readonly msalClient = new ConfidentialClientApplication({
-      auth: {
-        clientId: process.env.AZURE_CLIENT_ID || "",
-        authority: process.env.AZURE_AUTHORITY || "",
-        clientSecret: process.env.AZURE_CLIENT_SECRET || "",
-      },
-    })
+    )
   ) {}
-
-  private getAuthenticatedClient(accessToken: string): Client {
-    return Client.init({
-      authProvider: (done: any) => {
-        done(null, accessToken);
-      },
-    });
-  }
 
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
   async users(@Args() { first, after }: UserArgs) {
-    const users = await this.userService.dataModel.paginatedUsers(first, after);
+    const data = await this.userService.dataModel.paginatedUsers(first, after);
 
-    return users[0] as UserConnection;
+    const connection: UserConnection = data[0];
+
+    return {
+      totalCount: connection.totalCount || 0,
+      pageInfo: connection.pageInfo || { hasNextPage: false },
+      edges:
+        connection.edges.map((e) => ({
+          cursor: e.cursor,
+          node: transformIds(e.node),
+        })) || [],
+    };
   }
 
   @Authorized(["ADMIN"])
@@ -84,7 +87,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     const loggedInUser = await this.userService.findOne({ _id: user?.id });
@@ -94,12 +97,27 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async register(
-    @Arg("data") registerInput: RegisterInput,
-    @Ctx() { req, locale, user: loggedInUser }: Context
+    @Arg("data") registerInput: RegisterUserInput,
+    @Ctx() { locale, user: loggedInUser, req }: Context
   ): Promise<UserMutationResponse> {
-    const user = await this.userService.create(registerInput);
+    const host = req.header("host");
+    const subdomain = host?.split(".")[0];
+
+    const access: Access[] = [];
+
+    if (subdomain === "conferences") {
+      access.push(Access.ConferenceAttendee);
+    }
+    if (subdomain === "internships") {
+      access.push(Access.Student);
+    }
+
+    const user = await this.userService.create({
+      ...registerInput,
+      access: registerInput.access ? registerInput.access : access,
+    });
 
     if (!loggedInUser) {
       messageBroker.produceMessage(
@@ -107,6 +125,7 @@ export class UserResolver {
           locale,
           name: user.name,
           email: user.email,
+          hostname: req.hostname,
           token: signJwt({ id: user.id }, { expiresIn: 3600 }),
         }),
         "mail.registration"
@@ -123,14 +142,15 @@ export class UserResolver {
   }
 
   @Authorized()
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   @Mutation(() => String)
-  async resendActivationLink(@Ctx() { req, locale, user }: Context) {
+  async resendActivationLink(@Ctx() { locale, user, req }: Context) {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
         name: user?.name,
         email: user?.email,
+        hostname: req.hostname,
         token: signJwt({ id: user?.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
@@ -141,7 +161,7 @@ export class UserResolver {
 
   @Authorized()
   @Mutation(() => UserMutationResponse)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async activateUser(@Ctx() { req }: Context): Promise<UserMutationResponse> {
     const user: Partial<User> | null = verifyJwt(
       req.headers.activation as string
@@ -162,7 +182,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async login(
     @Arg("email") email: string,
     @Arg("password") password: string
@@ -184,7 +204,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async googleSignIn(
     @Arg("authCode") authCode: string
   ): Promise<UserMutationResponse> {
@@ -223,69 +243,69 @@ export class UserResolver {
     }
   }
 
-  @Mutation(() => UserMutationResponse)
-  async msalSignIn(
-    @Arg("authCode") authCode: string
-  ): Promise<UserMutationResponse> {
-    try {
-      // Acquire token using MSAL
-      const tokenResponse = await this.msalClient.acquireTokenByCode({
-        code: authCode,
-        scopes: ["user.read"],
-        redirectUri: "http://localhost:3000/microsoft/callback",
-      });
+  // @Mutation(() => UserMutationResponse)
+  // async msalSignIn(
+  //   @Arg("authCode") authCode: string
+  // ): Promise<UserMutationResponse> {
+  //   try {
+  //     // Acquire token using MSAL
+  //     const tokenResponse = await this.msalClient.acquireTokenByCode({
+  //       code: authCode,
+  //       scopes: ["user.read"],
+  //       redirectUri: "http://localhost:3000/microsoft/callback",
+  //     });
 
-      if (!tokenResponse || !tokenResponse.accessToken) {
-        throw new Error("Invalid token payload");
-      }
+  //     if (!tokenResponse || !tokenResponse.accessToken) {
+  //       throw new Error("Invalid token payload");
+  //     }
 
-      // Initialize Microsoft Graph client with access token
-      const graphClient = this.getAuthenticatedClient(
-        tokenResponse.accessToken
-      );
+  //     // Initialize Microsoft Graph client with access token
+  //     const graphClient = this.getAuthenticatedClient(
+  //       tokenResponse.accessToken
+  //     );
 
-      // Fetch user information from Microsoft Graph API
-      const azureUser = await graphClient
-        .api("/me")
-        .select([
-          "mail",
-          "displayName",
-          "otherMails",
-          "proxyAddresses",
-          "department",
-          "jobTitle",
-        ])
-        .get();
+  //     // Fetch user information from Microsoft Graph API
+  //     const azureUser = await graphClient
+  //       .api("/me")
+  //       .select([
+  //         "mail",
+  //         "displayName",
+  //         "otherMails",
+  //         "proxyAddresses",
+  //         "department",
+  //         "jobTitle",
+  //       ])
+  //       .get();
 
-      let user = await this.userService.findOne({
-        email: azureUser.otherMails,
-      });
-      if (!user) {
-        user = await this.userService.create({
-          name: azureUser.displayName,
-          email: azureUser.mail,
-          verified: true,
-        });
-      }
+  //     let user = await this.userService.findOne({
+  //       email: azureUser.otherMails,
+  //     });
+  //     if (!user) {
+  //       user = await this.userService.create({
+  //         name: azureUser.displayName,
+  //         email: azureUser.mail,
+  //         verified: true,
+  //       });
+  //     }
 
-      return {
-        data: user,
-        message: this.i18nService.translate("welcome", {
-          ns: "user",
-          name: user.name,
-        }),
-      };
-    } catch (error: any) {
-      console.error("Error in msalSignIn:", error);
-      throw new Error(error.message);
-    }
-  }
+  //     return {
+  //       data: user,
+  //       message: this.i18nService.translate("welcome", {
+  //         ns: "user",
+  //         name: user.name,
+  //       }),
+  //     };
+  //   } catch (error: any) {
+  //     console.error("Error in msalSignIn:", error);
+  //     throw new Error(error.message);
+  //   }
+  // }
 
   @Query(() => String)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { locale }: Context
+    @Ctx() { locale, req }: Context
   ) {
     const user = await this.userService.findOne({ email });
     if (!user) throw new Error(this.i18nService.translate("notRegistered"));
@@ -297,6 +317,7 @@ export class UserResolver {
         locale,
         email: user.email,
         name: user.name,
+        hostname: req.hostname,
         token,
       }),
       "mail.reset"
@@ -306,7 +327,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserMutationResponse)
-  // @UseMiddleware([RateLimit(50)])
+  @UseMiddleware(RateLimit())
   async passwordReset(
     @Arg("data") { password }: PasswordInput,
     @Ctx() { req }: Context
@@ -329,14 +350,24 @@ export class UserResolver {
     };
   }
 
-  @Authorized(["ADMIN", "IS_OWN_USER"])
-  // @UseMiddleware([RateLimit(50)])
+  @Authorized()
+  @UseMiddleware(RateLimit())
   @Mutation(() => UserMutationResponse)
   async updateUser(
     @Arg("id") _id: ObjectId,
     @Arg("data") userInput: UserInput,
-    @LoadResource(User) user: DocumentType<User>
+    @LoadResource(User) user: DocumentType<User>,
+    @Ctx() context: Context
   ): Promise<UserMutationResponse> {
+    if (
+      !context.user?.access.includes(Access.Admin) &&
+      user.id !== context.user?.id
+    ) {
+      throw new AuthenticationError(
+        this.i18nService.translate("401", { ns: "common" })
+      );
+    }
+
     for (const [key, value] of Object.entries(userInput)) {
       (user as any)[key] = value;
     }

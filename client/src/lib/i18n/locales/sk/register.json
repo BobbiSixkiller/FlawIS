@@ -1,15 +1,14 @@
 {
   "heading": "Vytvoriť nový účet",
-  "name": "Meno a priezvisko",
+  "name": "Meno a priezvisko - bez titulov a s diakritikou",
   "email": "Email adresa",
   "phone": "Telefónne číslo",
   "org": "Organizácia",
   "password": "Heslo",
-  "repeatPass": "Zopakujte heslo",
+  "confirmPass": "Zopakujte heslo",
   "privacy": "Súhlasím s <privacy>podmienkami ochrany súkromia</privacy>",
   "submit": "Registrovať",
   "submitting": "Registrujem...",
   "login": "Máte už účet vytvorený? <login>Prihláste sa!</login>",
-  "flaw": "Univerzita Komenského v Bratislave, Právnická fakulta",
   "continue": "Alebo pokračujte"
 }

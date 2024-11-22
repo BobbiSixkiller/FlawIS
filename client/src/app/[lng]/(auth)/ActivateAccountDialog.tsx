@@ -12,8 +12,14 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "../../../components/Button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { Dialog, Transition } from "@headlessui/react";
-import { FormMessage } from "../../../components/Message";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
+import { FormMessage } from "@/components/Message";
 
 export default function ActivateAccountDialog({
   lng,
@@ -53,22 +59,22 @@ export default function ActivateAccountDialog({
 
   const onClick = () => {
     startTransition(async () => {
-      const { message, success } = await resendActivationLink();
+      const state = await resendActivationLink();
       dispatch({
         type: ActionTypes.SetFormMsg,
-        payload: { message, success },
+        payload: state,
       });
     });
   };
 
   return (
-    <Transition.Root appear show={open} as={Fragment}>
+    <Transition appear show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 overflow-y-auto z-10"
+        className="fixed inset-0 overflow-y-auto z-20"
         onClose={() => setOpen(!user?.verified)}
       >
-        <Transition.Child
+        <TransitionChild
           enter="duration-300 ease-out"
           enterFrom="opacity-0"
           enterTo="opacity-100"
@@ -76,11 +82,11 @@ export default function ActivateAccountDialog({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Dialog.Overlay className="fixed inset-0 bg-black/25" />
-        </Transition.Child>
+          <DialogPanel className="fixed inset-0 bg-black/25" />
+        </TransitionChild>
 
         <div className="flex min-h-full items-center justify-center p-4 text-center">
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
@@ -89,17 +95,18 @@ export default function ActivateAccountDialog({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="z-20 w-full max-w-lg mx-auto overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
+            <DialogPanel className="z-20 w-full max-w-lg mx-auto overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between">
-                <Dialog.Title
+                <DialogTitle
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
                   {t("heading")}
-                </Dialog.Title>
+                </DialogTitle>
               </div>
               <div className="flex flex-col gap-4">
                 {t("body")}
+
                 <Button
                   color="primary"
                   type="button"
@@ -110,12 +117,13 @@ export default function ActivateAccountDialog({
                 >
                   {t("button")}
                 </Button>
-                <FormMessage lng={lng} />
+
+                <FormMessage />
               </div>
-            </Dialog.Panel>
-          </Transition.Child>
+            </DialogPanel>
+          </TransitionChild>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   );
 }

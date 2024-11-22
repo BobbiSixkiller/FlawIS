@@ -68,11 +68,7 @@ export const authChecker: AuthChecker<Context> = (
   if (!user) return false;
 
   //check if user role matches the defined role
-  if (roles.some((role) => user.role === role)) return true;
-
-  //check if user permissions property contains some defined role
-  if (roles.some((role) => role === "IS_OWN_USER"))
-    return args.id.toString() === user.id;
+  if (roles.some((role) => user.access.includes(role))) return true;
 
   //no roles matched
   return false;

@@ -1,20 +1,9 @@
 "use client";
 
-import { InputHTMLAttributes } from "react";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 import { useFormContext } from "react-hook-form";
 
-export function Textarea({
-  name,
-  label,
-  lng,
-  onFocus,
-  ...props
-}: {
-  lng?: string;
-  name: string;
-  label: string;
-} & InputHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({ name, label, onFocus, ...props }: InputProps) {
   const { register, getFieldState } = useFormContext();
 
   const { error } = getFieldState(name);

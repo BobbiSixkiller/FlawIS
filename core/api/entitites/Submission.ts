@@ -5,7 +5,13 @@ import {
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { ArgumentValidationError, Field, ID, ObjectType } from "type-graphql";
+import {
+  ArgumentValidationError,
+  Field,
+  ID,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Ref } from "../util/types";
@@ -16,6 +22,17 @@ import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { SubmissionArgs } from "../resolvers/types/submission";
+
+export enum PresentationLng {
+  SK = "SK",
+  EN = "EN",
+  CZ = "CZ",
+}
+
+registerEnumType(PresentationLng, {
+  name: "PresentationLng",
+  description: "Language the speaker will be presenting his submission in",
+});
 
 @ObjectType()
 export class SubmissionTranslationContent {
@@ -99,6 +116,10 @@ export class Submission extends TimeStamps {
   @Property({ type: () => SubmissionTranslation, _id: false })
   translations: SubmissionTranslation;
 
+  @Field(() => PresentationLng, { nullable: true })
+  @Property({ enum: PresentationLng })
+  presentationLng?: PresentationLng;
+
   @Field({ nullable: true })
   @Property()
   fileUrl?: string;
@@ -167,11 +188,6 @@ export class Submission extends TimeStamps {
               },
             },
             { $limit: first || 20 },
-            {
-              $addFields: {
-                id: "$_id", //transform _id to id property as defined in GraphQL object types
-              },
-            },
           ],
           hasNextPage: [
             {
@@ -203,7 +219,7 @@ export class Submission extends TimeStamps {
           },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data.id" },
+            endCursor: { $last: "$data._id" },
           },
         },
       },

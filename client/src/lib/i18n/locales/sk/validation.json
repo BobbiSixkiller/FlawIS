@@ -10,5 +10,7 @@
   "min": "Minimálna hodnota je {{value}}!",
   "ticket": "Vyberte formu účasti!",
   "keywords": "Pridajte aspoň {{value}} kľúčové slovo!",
-  "maxFiles": "Maximálny počet súborov je {{value}}!"
+  "maxFiles": "Maximálny počet súborov je {{value}}!",
+  "minFiles": "Minimálny počet súborov je {{value}}!",
+  "phone": "Nesprávny formát telefónneho čísla!"
 }

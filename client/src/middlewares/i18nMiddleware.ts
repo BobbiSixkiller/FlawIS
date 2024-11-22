@@ -9,46 +9,57 @@ export function withLocalization(middleware: CustomMiddleware) {
   return (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
 
-    if (
-      url.pathname.indexOf("icon") > -1 ||
-      url.pathname.indexOf("chrome") > -1
-    )
-      return NextResponse.next();
-    let lng;
+    let currentLng;
     if (req.cookies.has(cookieName))
-      lng = acceptLanguage.get(req.cookies.get(cookieName)?.value);
-    if (!lng) lng = acceptLanguage.get(req.headers.get("Accept-Language"));
-    if (!lng) lng = fallbackLng;
+      currentLng = acceptLanguage.get(req.cookies.get(cookieName)?.value);
+    if (!currentLng)
+      currentLng = acceptLanguage.get(req.headers.get("Accept-Language"));
+    if (!currentLng) currentLng = fallbackLng;
 
-    // Redirect if lng in path is not supported
-    if (
-      !languages.some((loc) => url.pathname.startsWith(`/${loc}`)) &&
-      !url.pathname.startsWith("/_next")
-    ) {
-      url.pathname = `/${lng}${url.pathname}`;
+    const paths = url.pathname.split("/");
 
-      // Rewrite for default locale that is removed from URL
-      if (lng === fallbackLng) {
-        return middleware(req, event, NextResponse.rewrite(url));
-        // return NextResponse.rewrite(url);
+    // Rewrite for default lng if no lng is in path
+    if (!languages.some((loc) => url.pathname.startsWith(`/${loc}`))) {
+      // Remove lng from path if it is not supported and redirect with currentLng
+      if (paths[1].length === 2) {
+        url.pathname = `/${currentLng}${url.pathname.slice(3)}`;
+
+        return NextResponse.redirect(url);
+        // Redirect if currentLng si supported but is missing in path
+      } else if (currentLng !== fallbackLng) {
+        url.pathname = `/${currentLng}${url.pathname}`;
+
+        return NextResponse.redirect(url);
+        // Rewrite when currentLng is fallbackLng
+      } else {
+        url.pathname = `/${currentLng}${url.pathname}`;
+
+        return middleware(
+          req,
+          event,
+          NextResponse.rewrite(url, {
+            headers: {
+              "Set-Cookie": `${cookieName}=${fallbackLng}; path=/`,
+            },
+          })
+        );
       }
-      return NextResponse.redirect(url);
     }
 
-    if (req.headers.has("referer")) {
-      const refererUrl = new URL(req.headers.get("referer") as string);
-      const lngInReferer = languages.find((l) =>
-        refererUrl.pathname.startsWith(`/${l}`)
-      );
+    // Remove default locale from path
+    if (url.pathname.startsWith(`/${fallbackLng}`)) {
+      url.pathname = url.pathname.slice(3);
 
-      const response = NextResponse.next();
-      if (lngInReferer) {
-        response.cookies.set(cookieName, lngInReferer);
-      }
-
-      return response;
+      return NextResponse.redirect(url, {
+        headers: {
+          "Set-Cookie": `${cookieName}=${fallbackLng}; path=/`,
+        },
+      });
     }
 
-    return middleware(req, event, res);
+    const response = NextResponse.next();
+    response.cookies.set(cookieName, paths[1]);
+
+    return middleware(req, event, response);
   };
 }

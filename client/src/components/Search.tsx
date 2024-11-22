@@ -1,7 +1,15 @@
 "use client";
 
 import Spinner from "@/components/Spinner";
-import { Combobox, Dialog, Transition } from "@headlessui/react";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Dialog,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ComponentType, Fragment, useEffect, useState } from "react";
 
@@ -56,12 +64,12 @@ export default function SearchComponent<T extends { id: string }>({
         <MagnifyingGlassIcon className="h-6 w-6 mr-2" />
         Search...
       </div>
-      <Transition.Root show={open} as={Fragment}>
+      <Transition show={open} as={Fragment}>
         <Dialog
           onClose={setOpen}
           className="fixed inset-0 p-4 pt-[25vh] overflow-y-auto"
         >
-          <Transition.Child
+          <TransitionChild
             enter="duration-300 ease-out"
             enterFrom="opacity-0"
             enterTo="opacity-100"
@@ -69,9 +77,9 @@ export default function SearchComponent<T extends { id: string }>({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-black/25" />
-          </Transition.Child>
-          <Transition.Child
+            <div className="fixed inset-0 bg-black/25" />
+          </TransitionChild>
+          <TransitionChild
             enter="duration-300 ease-out"
             enterFrom="opacity-0 scale-95"
             enterTo="opacity-100 scale-100"
@@ -90,7 +98,7 @@ export default function SearchComponent<T extends { id: string }>({
             >
               <div className="px-4 flex items-center">
                 <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
-                <Combobox.Input
+                <ComboboxInput
                   autoComplete="off"
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder:text-gray-400 h-12"
@@ -100,24 +108,24 @@ export default function SearchComponent<T extends { id: string }>({
                 {loading && <Spinner />}
               </div>
               {options.length !== 0 && !loading && (
-                <Combobox.Options
+                <ComboboxOptions
                   static
                   className="py-4 text-sm max-h-96 overflow-y-auto"
                 >
                   {options.map((option) => (
-                    <Combobox.Option value={option} key={option.id}>
-                      {({ active }) => <Option data={option} active={active} />}
-                    </Combobox.Option>
+                    <ComboboxOption value={option} key={option.id}>
+                      {({ focus }) => <Option data={option} active={focus} />}
+                    </ComboboxOption>
                   ))}
-                </Combobox.Options>
+                </ComboboxOptions>
               )}
               {search && options.length === 0 && (
                 <p className="p-4 text-sm text-gray-500">No results found.</p>
               )}
             </Combobox>
-          </Transition.Child>
+          </TransitionChild>
         </Dialog>
-      </Transition.Root>
+      </Transition>
     </>
   );
 }

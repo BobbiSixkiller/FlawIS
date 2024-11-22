@@ -1,6 +1,12 @@
 "use client";
 
-import { Menu, Transition } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from "@headlessui/react";
 import { Fragment } from "react";
 import { languages } from "@/lib/i18n/settings";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
@@ -18,11 +24,11 @@ export default function LngSwitcher({
   const router = useRouter();
   const path = usePathname();
 
-  const { t } = useTranslation(lng, "landing");
+  const { t } = useTranslation(lng, "dashboard");
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button
+      <MenuButton
         className={`h-full w-full ${
           mobile
             ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
@@ -31,7 +37,7 @@ export default function LngSwitcher({
       >
         <GlobeAltIcon className="h-5 w-5 lg:mr-2" />
         <span className="hidden lg:block">{t(lng)}</span>
-      </Menu.Button>
+      </MenuButton>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"
@@ -41,7 +47,7 @@ export default function LngSwitcher({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items
+        <MenuItems
           className={`absolute ${
             mobile
               ? "right-0 mt-2 min-w-max w-32 origin-top-right"
@@ -50,19 +56,18 @@ export default function LngSwitcher({
         >
           <div className="p-1">
             {languages.map((l, i) => (
-              <Menu.Item key={i}>
-                {({ active }) => (
+              <MenuItem key={i}>
+                {({ focus }) => (
                   <button
                     className={`${
-                      active ? "bg-primary-500 text-white" : "text-gray-900"
+                      focus ? "bg-primary-500 text-white" : "text-gray-900"
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm ${
                       l === lng ? "font-bold" : ""
                     }`}
-                    onClick={() =>
-                      router.replace(
-                        `/${l}${path.replace("/sk", "").replace("/en", "")}`
-                      )
-                    }
+                    onClick={() => {
+                      console.log(l);
+                      router.replace(`/${l}${path.replace("/en", "")}`);
+                    }}
                   >
                     <Image
                       alt="Locale-flag"
@@ -75,10 +80,10 @@ export default function LngSwitcher({
                     {t(l)}
                   </button>
                 )}
-              </Menu.Item>
+              </MenuItem>
             ))}
           </div>
-        </Menu.Items>
+        </MenuItems>
       </Transition>
     </Menu>
   );

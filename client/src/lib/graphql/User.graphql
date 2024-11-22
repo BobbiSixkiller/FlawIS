@@ -9,7 +9,7 @@ query users($after: ObjectId, $first: Int) {
         email
         organization
         verified
-        role
+        access
         createdAt
         updatedAt
       }

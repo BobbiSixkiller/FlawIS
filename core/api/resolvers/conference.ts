@@ -154,9 +154,9 @@ export class ConferencerResolver {
 
   @Authorized()
   @FieldResolver(() => Attendee)
-  async attending(@Ctx() { user }: Context, @Root() { slug }: Conference) {
+  async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
     return await this.attendeeService.findOne({
-      "conference.slug": slug,
+      "conference._id": id,
       "user._id": user?.id,
     });
   }

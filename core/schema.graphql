@@ -3,6 +3,14 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+"""User access inside the FLAWIS system"""
+enum Access {
+  Admin
+  ConferenceAttendee
+  Organization
+  Student
+}
+
 type Address {
   city: String!
   country: String!
@@ -264,13 +272,11 @@ type Mutation {
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
   login(email: String!, password: String!): UserMutationResponse!
-  msalSignIn(authCode: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
-  register(data: RegisterInput!): UserMutationResponse!
+  register(data: RegisterUserInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
-  unsetSubmissionFile(id: ObjectId!): SubmissionMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
@@ -284,6 +290,13 @@ scalar ObjectId
 
 input PasswordInput {
   password: String!
+}
+
+"""Language the speaker will be presenting his submission in"""
+enum PresentationLng {
+  CZ
+  EN
+  SK
 }
 
 type Query {
@@ -303,20 +316,15 @@ type Query {
 }
 
 """New user input data"""
-input RegisterInput {
+input RegisterUserInput {
+  access: [Access!]
+  cvUrl: String
   email: String!
   name: String!
-  organization: String!
+  organization: String
   password: String!
-  telephone: String!
-}
-
-"""User role inside the FLAWIS system"""
-enum Role {
-  Admin
-  Basic
-  Organization
-  Student
+  studyProgramme: StudyProgramme
+  telephone: String
 }
 
 """Conference's section entity model type"""
@@ -355,6 +363,15 @@ type SectionTranslations {
   topic: String!
 }
 
+"""Student user account StudyProgramme"""
+enum StudyProgramme {
+  Bachelor1
+  Bachelor2
+  Bachelor3
+  Master1
+  Master2
+}
+
 """Submission entity model type"""
 type Submission {
   authors: [User!]!
@@ -362,6 +379,7 @@ type Submission {
   createdAt: DateTimeISO!
   fileUrl: String
   id: ID!
+  presentationLng: PresentationLng
   section: Section!
   translations: SubmissionTranslation!
   updatedAt: DateTimeISO!
@@ -382,6 +400,7 @@ input SubmissionInput {
   authors: [String]!
   conference: ObjectId!
   fileUrl: String
+  presentationLng: PresentationLng!
   section: ObjectId!
   translations: SubmissionTranslationInput!
 }
@@ -445,15 +464,16 @@ type TicketTranslations {
 
 """The user model entity"""
 type User {
+  access: [Access!]!
   billings: [Billing]!
   createdAt: DateTimeISO!
   cvUrl: String
   email: String!
   id: ObjectId!
   name: String!
-  organization: String!
-  role: Role!
-  telephone: String!
+  organization: String
+  studyProgramme: StudyProgramme
+  telephone: String
   token: String!
   updatedAt: DateTimeISO!
   verified: Boolean!
@@ -471,14 +491,16 @@ type UserEdge {
   node: User!
 }
 
-"""User update input data"""
+"""FlawIS user base input"""
 input UserInput {
+  access: [Access!]
+  cvUrl: String
   email: String!
   name: String!
-  organization: String!
+  organization: String
   password: String
-  role: Role
-  telephone: String!
+  studyProgramme: StudyProgramme
+  telephone: String
 }
 
 type UserMutationResponse implements IMutationResponse {

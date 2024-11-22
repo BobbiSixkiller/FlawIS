@@ -1,5 +1,5 @@
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 import {
   Image,
   Page,
@@ -61,7 +61,7 @@ export async function InvoiceDoc({
   data: AttendeeFragment;
   lng: string;
 }) {
-  const { t } = await useTranslation(lng, "invoice");
+  const { t } = await translate(lng, "invoice");
 
   return (
     <Document>

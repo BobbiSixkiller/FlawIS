@@ -1,5 +1,5 @@
 import Logo from "@/components/Logo";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 
 export default async function AuthLayout({
   children,
@@ -8,10 +8,10 @@ export default async function AuthLayout({
   children: React.ReactNode;
   params: { lng: string };
 }) {
-  const { i18n, t } = await useTranslation(lng, "landing");
+  const { i18n, t } = await translate(lng, "dashboard");
 
   return (
-    <div className="sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="mx-auto w-full max-w-96 flex flex-col justify-center px-6 py-12">
       <Logo lng={lng} width={60} height={60} notext />
 
       {children}

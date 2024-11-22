@@ -55,17 +55,14 @@ export default function MultipleFileUploadField({
     setFiles(field.value.map((file: File) => ({ file, errors: [] })));
   }, [field.value]);
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      const mappedAccepted = acceptedFiles.map((file) => ({
-        file,
-        errors: [],
-      }));
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const mappedAccepted = acceptedFiles.map((file) => ({
+      file,
+      errors: [],
+    }));
 
-      setFiles((curr) => [...curr, ...mappedAccepted, ...rejectedFiles]);
-    },
-    []
-  );
+    setFiles((curr) => [...curr, ...mappedAccepted]);
+  }, []);
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({ onDrop, maxFiles, maxSize, accept });
@@ -89,7 +86,7 @@ export default function MultipleFileUploadField({
       })
     );
     if (!field.value.some((v: File) => v === file)) {
-      setValue(name, [...field.value, file]);
+      setValue(name, [...field.value, file], { shouldValidate: true });
     }
   }
 
@@ -131,7 +128,7 @@ export default function MultipleFileUploadField({
       ))}
 
       {fieldState.error && (
-        <p className="mt-1 text-xs text-red-500">{fieldState.error.message}</p>
+        <p className="mt-1 text-sm text-red-500">{fieldState.error.message}</p>
       )}
     </div>
   );

@@ -18,30 +18,39 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Copy MongoDB data from production
+      # - name: Copy MongoDB data from production
+      #   run: |
+      #     # Step 1: Run mongodump inside the production MongoDB container
+      #     docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
+
+      #     # Step 2: Copy the backup from the production MongoDB container to the local runner
+      #     docker cp flawis-mongo-1:/data/backup ./backup
+
+      #     # Step 3: Copy the backup from the runner to the staging MongoDB container
+      #     docker cp ./backup flawis-mongo-staging-1:/data/backup
+
+      #     # Step 4: Run mongorestore inside the staging MongoDB container
+      #     docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
+
+      - name: Install MinIO client (if not already installed)
         run: |
-          # Step 1: Run mongodump inside the production MongoDB container
-          docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
-
-          # Step 2: Copy the backup from the production MongoDB container to the local runner
-          docker cp flawis-mongo-1:/data/backup ./backup
-
-          # Step 3: Copy the backup from the runner to the staging MongoDB container
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
-
-          # Step 4: Run mongorestore inside the staging MongoDB container
-          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
+          if ! command -v mc &> /dev/null
+          then
+            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x mc
+            mkdir -p $HOME/bin
+            mv mc $HOME/bin/
+            echo "$HOME/bin" >> $GITHUB_PATH
+          else
+            echo "MinIO client is already installed."
+          fi
 
       - name: Copy Data from Production MinIO to Staging MinIO
         run: |
-          # Step 1: Copy data from the production MinIO container to a temporary directory on the host
-          docker cp flawis-minio-1:/data ./minio-data-backup
+          mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
 
-          # Step 2: Copy the data from the host to the staging MinIO container
-          docker cp ./minio-data-backup flawis-minio-staging-1:/data
-
-          # Step 3: Clean up the temporary directory
-          rm -rf ./minio-data-backup
+          mc mirror production/ staging/
 
       - name: Clean up unused Docker resources
         run: |

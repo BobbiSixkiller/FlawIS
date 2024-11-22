@@ -1,11 +1,11 @@
 import Logo from "@/components/Logo";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 
 export default async function NotFound() {
   const lng = cookies().get("NEXT_locale")?.value || "sk";
-  const { t } = await useTranslation(lng, ["common", "landing"]);
+  const { t } = await translate(lng, ["common", "landing"]);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-6">

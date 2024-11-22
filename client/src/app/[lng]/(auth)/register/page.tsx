@@ -1,7 +1,8 @@
-import { useTranslation } from "@/lib/i18n";
-import RegisterForm from "./RegisterForm";
-import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
+import { headers } from "next/headers";
+import GoogleSignIn from "../GoogleSignin";
+import UserForm from "./UserForm";
+import { translate } from "@/lib/i18n";
 
 export default async function Register({
   params: { lng },
@@ -10,7 +11,10 @@ export default async function Register({
   params: { lng: string };
   searchParams: { url?: string };
 }) {
-  const { t } = await useTranslation(lng, "register");
+  const { t } = await translate(lng, "register");
+
+  const host = headers().get("host") || ""; // Get the hostname from the request
+  const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
   return (
     <div className="mt-6 flex flex-col gap-4">
@@ -18,26 +22,38 @@ export default async function Register({
         {t("heading")}
       </h2>
 
-      <FormMessage lng={lng} />
+      <UserForm subdomain={subdomain} namespace="register" />
 
-      <div>
-        <RegisterForm lng={lng} url={url} />
+      {(subdomain === "conferences" || subdomain === "conferences-staging") && (
+        <div>
+          <div className="relative flex py-6 items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 font-light text-sm">
+              {t("continue")}
+            </span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
-          <Trans
-            i18nKey={"login"}
-            t={t}
-            components={{
-              login: (
-                <a
-                  href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
-                  className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
-                />
-              ),
-            }}
-          />
-        </p>
-      </div>
+          <div className="flex justify-center pt-4">
+            <GoogleSignIn url={url} />
+          </div>
+        </div>
+      )}
+
+      <p className="mt-10 text-center text-sm text-gray-500">
+        <Trans
+          i18nKey={"login"}
+          t={t}
+          components={{
+            login: (
+              <a
+                href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
+                className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+              />
+            ),
+          }}
+        />
+      </p>
     </div>
   );
 }

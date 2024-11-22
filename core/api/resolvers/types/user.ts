@@ -12,9 +12,10 @@ import {
   IsPhoneNumber,
   MaxLength,
   ValidationArguments,
+  IsNumber,
 } from "class-validator";
 
-import { Role, User } from "../../entitites/User";
+import { Access, StudyProgramme, User } from "../../entitites/User";
 import { CreateArgs, CreateConnection } from "./pagination";
 import { IMutationResponse } from "./interface";
 import { I18nService } from "../../services/i18nService";
@@ -34,6 +35,70 @@ export class UserMutationResponse extends IMutationResponse {
   data: User;
 }
 
+@InputType({ description: "FlawIS user base input" })
+export class UserInput implements Partial<User> {
+  @Field()
+  @IsEmail(undefined, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("email", {
+        ns: "validation",
+        value: args.value,
+      }),
+  })
+  email: string;
+
+  @Field({ nullable: true })
+  @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
+    message: () =>
+      Container.get(I18nService).translate("password", {
+        ns: "validation",
+      }),
+  })
+  password?: string;
+
+  @Authorized(["ADMIN"])
+  @Field(() => [Access], { nullable: true })
+  access?: Access[];
+
+  @Field()
+  @MaxLength(100, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("maxLength", {
+        ns: "validation",
+        length: args.constraints[0],
+      }),
+  })
+  name: string;
+
+  @Field({ nullable: true })
+  @MaxLength(200, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("maxLength", {
+        ns: "validation",
+        length: args.constraints[0],
+      }),
+  })
+  organization?: string;
+
+  @Field({ nullable: true })
+  @IsPhoneNumber(undefined, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("phone", {
+        ns: "validation",
+        value: args.value,
+      }),
+  })
+  telephone?: string;
+
+  @Field(() => StudyProgramme, { nullable: true })
+  @IsNumber()
+  studyProgramme?: StudyProgramme;
+
+  @Field({ nullable: true })
+  @IsString()
+  cvUrl?: string;
+}
+
 @InputType()
 export class PasswordInput implements Partial<User> {
   @Field()
@@ -47,89 +112,13 @@ export class PasswordInput implements Partial<User> {
 }
 
 @InputType({ description: "New user input data" })
-export class RegisterInput extends PasswordInput implements Partial<User> {
+export class RegisterUserInput extends UserInput {
   @Field()
-  @MaxLength(100, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("maxLength", {
-        ns: "validation",
-        length: args.constraints[0],
-      }),
-  })
-  name: string;
-
-  @Field()
-  @IsEmail(undefined, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("email", {
-        ns: "validation",
-        value: args.value,
-      }),
-  })
-  email: string;
-
-  @Field()
-  @IsString()
-  organization: string;
-
-  @Field()
-  @IsPhoneNumber(undefined, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("phone", {
-        ns: "validation",
-        value: args.value,
-      }),
-  })
-  telephone: string;
-}
-
-@InputType({ description: "User update input data" })
-export class UserInput implements Partial<User> {
-  @Field()
-  @MaxLength(100, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("maxLength", {
-        ns: "validation",
-        length: args.constraints[0],
-      }),
-  })
-  name: string;
-
-  @Field()
-  @IsEmail(undefined, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("email", {
-        ns: "validation",
-        value: args.value,
-      }),
-  })
-  email: string;
-
-  @Field()
-  @IsString()
-  organization: string;
-
-  @Field()
-  @IsPhoneNumber(undefined, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("phone", {
-        ns: "validation",
-        value: args.value,
-      }),
-  })
-  telephone: string;
-
-  @Authorized(["ADMIN"])
-  @Field(() => Role, { nullable: true })
-  role?: Role;
-
-  @Authorized(["ADMIN"])
-  @Field({ nullable: true })
   @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
     message: () =>
       Container.get(I18nService).translate("password", {
         ns: "validation",
       }),
   })
-  password?: string;
+  password: string;
 }
