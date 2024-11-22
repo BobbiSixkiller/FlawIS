@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { array, mixed, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
+  PresentationLng,
   SectionFragment,
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
@@ -21,6 +21,7 @@ import {
 } from "@/components/MultipleInput";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
+import useValidation from "@/hooks/useValidation";
 
 export default function UpdateSubmissionForm({
   sections,
@@ -60,37 +61,43 @@ export default function UpdateSubmissionForm({
     fetchFiles();
   }, []);
 
+  const { yup } = useValidation();
+
   const methods = useForm({
     resolver: yupResolver(
-      object({
-        conference: string().required(t("required")),
-        section: string().required(t("required")),
-        authors: array()
-          .of(string().email().required(t("required")))
-          .default([]),
-        files: array()
-          .of(mixed<File>().required())
-          .required()
-          .max(1, (val) => t("maxFiles", { value: val.max })),
-        translations: object({
-          sk: object({
-            name: string().trim().required(t("required")),
-            abstract: string().trim().required(t("required")),
-            keywords: array()
-              .of(string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
+      yup
+        .object({
+          conference: yup.string().required(),
+          section: yup.string().required(),
+          authors: yup.array().of(yup.string().email().required()).default([]),
+          files: yup
+            .array()
+            .of(yup.mixed<File>().required())
+            .required()
+            .max(1, (val) => t("maxFiles", { value: val.max })),
+          presentationLng: yup.string<PresentationLng>().required(),
+          translations: yup.object({
+            sk: yup.object({
+              name: yup.string().trim().required(),
+              abstract: yup.string().trim().required(),
+              keywords: yup
+                .array()
+                .of(yup.string().required().trim())
+                .min(1, (val) => t("keywords", { value: val.min }))
+                .required(),
+            }),
+            en: yup.object({
+              name: yup.string().trim().required(),
+              abstract: yup.string().trim().required(),
+              keywords: yup
+                .array()
+                .of(yup.string().required().trim())
+                .min(1, (val) => t("keywords", { value: val.min }))
+                .required(),
+            }),
           }),
-          en: object({
-            name: string().trim().required(t("required")),
-            abstract: string().trim().required(t("required")),
-            keywords: array()
-              .of(string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
-          }),
-        }),
-      }).required(t("required"))
+        })
+        .required()
     ),
     defaultValues: {
       translations: {
@@ -109,6 +116,7 @@ export default function UpdateSubmissionForm({
       files: [],
       conference: submission.conference.id,
       section: submission.section.id,
+      presentationLng: (submission.presentationLng || "") as PresentationLng,
     },
   });
 
@@ -117,7 +125,14 @@ export default function UpdateSubmissionForm({
       <form
         className="space-y-6 w-80 sm:w-96"
         onSubmit={methods.handleSubmit(
-          async ({ authors, conference, section, translations, files }) => {
+          async ({
+            authors,
+            conference,
+            section,
+            translations,
+            files,
+            presentationLng,
+          }) => {
             const { error, url } = await uploadOrDelete(
               submission.conference.slug,
               submission.fileUrl,
@@ -133,6 +148,7 @@ export default function UpdateSubmissionForm({
               conference,
               section,
               translations,
+              presentationLng,
               fileUrl: url,
             });
 
@@ -180,6 +196,15 @@ export default function UpdateSubmissionForm({
             ns: "conferences",
           })}
           name={`translations.${lng}.keywords`}
+        />
+        <Select
+          name="presentationLng"
+          label={t("registration.submission.lng", { ns: "conferences" })}
+          options={[
+            { name: PresentationLng.Sk, value: PresentationLng.Sk },
+            { name: PresentationLng.Cz, value: PresentationLng.Cz },
+            { name: PresentationLng.En, value: PresentationLng.En },
+          ]}
         />
         <MultipleInput
           label={t("registration.submission.authors.label", {

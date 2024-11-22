@@ -1,14 +1,14 @@
 import NewSubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/new/NewSubmissionForm";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 
 export default async function NewSubmissionPage({
   params: { lng, slug },
 }: {
   params: { slug: string; lng: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
   const conference = await getConference(slug);
 
   return (

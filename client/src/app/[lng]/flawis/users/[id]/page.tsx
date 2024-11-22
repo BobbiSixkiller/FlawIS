@@ -1,4 +1,3 @@
-import { useTranslation } from "@/lib/i18n";
 import { getUser } from "../actions";
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
@@ -10,6 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { toggleVerified } from "./actions";
+import { translate } from "@/lib/i18n";
 
 export default async function User({
   params: { id, lng },
@@ -21,7 +21,7 @@ export default async function User({
     redirect("/users");
   }
 
-  const { t } = await useTranslation(lng, ["profile", "common"]);
+  const { t } = await translate(lng, ["profile", "common"]);
 
   return (
     <div>

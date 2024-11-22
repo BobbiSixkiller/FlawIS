@@ -1,8 +1,8 @@
 import Heading from "@/components/Heading";
-import { useTranslation } from "@/lib/i18n";
 import { getUsers } from "./actions";
 import ListUsers from "./ListUsers";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { translate } from "@/lib/i18n";
 
 export default async function Users({
   params: { lng },
@@ -11,7 +11,7 @@ export default async function Users({
 }) {
   const initialData = await getUsers({});
 
-  const { t } = await useTranslation(lng, "users");
+  const { t } = await translate(lng, "users");
 
   return (
     <div className="flex flex-col gap-6">

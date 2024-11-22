@@ -9,6 +9,7 @@ export async function GET(
 ) {
   await new Promise((res) => setTimeout(() => res("success"), 4000));
   const data = await getAllAttendees(slug);
+
   const exportData = data.flatMap((attendee) => {
     if (attendee.submissions && attendee.submissions.length > 0) {
       return attendee.submissions.map((submission) => ({
@@ -30,6 +31,7 @@ export async function GET(
         ),
         abstract_sk: submission.translations.sk.abstract,
         abstract_en: submission.translations.en.abstract,
+        language: submission.presentationLng || "",
         file: submission.fileUrl ? "true" : "false",
       }));
     } else {
@@ -50,6 +52,7 @@ export async function GET(
           submission_name_en: "",
           abstract_sk: "",
           abstract_en: "",
+          language: "",
           file: "false",
         },
       ];

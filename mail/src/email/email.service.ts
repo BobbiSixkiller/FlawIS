@@ -16,6 +16,7 @@ export interface Msg {
   email: string;
 }
 interface AuthMsg extends Msg {
+  hostname: string;
   token: string;
 }
 
@@ -24,9 +25,9 @@ function getClientUrl() {
     case 'development':
       return 'http://localhost:3000';
     case 'staging':
-      return 'http://conf-staging.flaw.uniba.sk';
+      return 'http://conferences-staging.flaw.uniba.sk';
     case 'production':
-      return 'http://conf.flaw.uniba.sk';
+      return 'http://conferences.flaw.uniba.sk';
 
     default:
       throw new Error('Invalid environment!');
@@ -82,7 +83,11 @@ export class EmailService {
   })
   async sendActivationLink(msg: AuthMsg) {
     try {
-      const url = `${getClientUrl()}/${msg.locale}/activate?token=${msg.token}`;
+      const url = `${
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:3000'
+          : `https://${msg.hostname}`
+      }/${msg.locale}/activate?token=${msg.token}`;
 
       await this.mailerService.sendMail({
         to: msg.email,
@@ -106,9 +111,11 @@ export class EmailService {
     routingKey: 'mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
-    const url = `${getClientUrl()}/${msg.locale}/resetPassword?token=${
-      msg.token
-    }`;
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/resetPassword?token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -165,7 +172,7 @@ export class EmailService {
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    const url = `${getClientUrl()}/${msg.locale}/conferences/${
+    const url = `${getClientUrl()}/${msg.locale}/${
       msg.conferenceSlug
     }/register?submission=${msg.submissionId}`;
 

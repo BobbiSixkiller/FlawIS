@@ -14,7 +14,7 @@ export async function getUsers(filter: GetDataFilter) {
     UsersDocument,
     { ...filter },
     {},
-    { tags: ["users"] }
+    { tags: ["users"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -31,9 +31,15 @@ export async function getUsers(filter: GetDataFilter) {
 }
 
 export async function getUser(id: string) {
-  const res = await executeGqlFetch(UserDocument, { id }, null, {
-    tags: [`user:${id}`],
-  });
+  const res = await executeGqlFetch(
+    UserDocument,
+    { id },
+    {},
+    {
+      tags: [`user:${id}`],
+      revalidate: 3600,
+    }
+  );
   if (res.errors) {
     console.log(res.errors[0]);
   }

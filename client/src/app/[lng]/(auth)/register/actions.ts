@@ -8,7 +8,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -31,16 +31,12 @@ export async function register({
     if (res.data.register) {
       const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      cookies().set("user", res.data.register.data.id, {
-        httpOnly: true,
-        expires,
-      });
       cookies().set("accessToken", res.data.register.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
       });
 
-      revalidateTag(res.data.register.data.id);
+      revalidatePath("/", "layout");
     }
   } catch (error: any) {
     return { success: false, message: error.message };
@@ -89,7 +85,7 @@ export async function updateUser(id: string, data: UserInput) {
 
     revalidateTag("users");
     revalidateTag(`user:${id}`);
-    revalidateTag(res.data.updateUser.data.id); //revalidate authenticated me cache if exists
+    revalidatePath("/", "layout");
     return { success: true, message: res.data.updateUser.message };
   } catch (error: any) {
     console.log(error);

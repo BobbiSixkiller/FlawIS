@@ -12,7 +12,7 @@ import { Access } from "@/lib/graphql/generated/graphql";
 interface UserData {
   id: string;
   name: string;
-  organization?: string | null;
+  organization: string;
   email: string;
   access: Access[];
   verified: boolean;

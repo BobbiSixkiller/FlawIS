@@ -1,6 +1,6 @@
 import ResetPasswordForm from "./ResetPasswordForm";
-import { useTranslation } from "@/lib/i18n";
 import { FormMessage } from "@/components/Message";
+import { translate } from "@/lib/i18n";
 import { Trans } from "react-i18next/TransWithoutContext";
 
 export default async function ResetPassword({
@@ -10,7 +10,7 @@ export default async function ResetPassword({
   params: { lng: string };
   searchParams: { token: string };
 }) {
-  const { t } = await useTranslation(lng, "resetPassword");
+  const { t } = await translate(lng, "resetPassword");
 
   return (
     <div className="mt-6 flex flex-col gap-4">

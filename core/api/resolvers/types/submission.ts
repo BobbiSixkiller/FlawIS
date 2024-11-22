@@ -5,7 +5,7 @@ import { LocalesInput } from "./translation";
 import Container from "typedi";
 import { I18nService } from "../../services/i18nService";
 import { IMutationResponse } from "./interface";
-import { Submission } from "../../entitites/Submission";
+import { PresentationLng, Submission } from "../../entitites/Submission";
 import { CreateArgs, CreateConnection } from "./pagination";
 
 @ObjectType({ implements: IMutationResponse })
@@ -67,6 +67,9 @@ export class SubmissionInput {
   @Field(() => [String], { nullable: "items" })
   @IsEmail({}, { each: true })
   authors: string[];
+
+  @Field(() => PresentationLng)
+  presentationLng: PresentationLng;
 
   @Field(() => SubmissionTranslationInput)
   translations: SubmissionTranslationInput;

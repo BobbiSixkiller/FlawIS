@@ -7,14 +7,9 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  ListboxSelectedOption,
 } from "@headlessui/react";
 import { useController } from "react-hook-form";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface Option {
   name: string;
@@ -61,6 +56,7 @@ export default function Select({
         by="value"
       >
         <ListboxButton
+          {...field}
           className={`h-9 group flex items-center justify-between px-3 ${
             multiple ? "" : "py-1.5"
           } outline-none disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none py-1 text-gray-900 shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6 ${

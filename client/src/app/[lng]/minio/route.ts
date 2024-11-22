@@ -1,9 +1,9 @@
-import { useTranslation } from "@/lib/i18n";
 import { downloadFile, uploadFile } from "@/lib/minio";
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
 import { getMe } from "../(auth)/actions";
 import archiver from "archiver";
+import { translate } from "@/lib/i18n";
 
 function nodeStreamToWebReadable(stream: Readable): ReadableStream {
   return new ReadableStream({
@@ -29,7 +29,7 @@ export async function GET(
     params: { lng: string };
   }
 ) {
-  const { t } = await useTranslation(lng, "minio");
+  const { t } = await translate(lng, "minio");
 
   const user = await getMe();
   if (!user || !user?.verified) {
@@ -105,7 +105,7 @@ export async function POST(
     params: { lng: string };
   }
 ) {
-  const { t } = await useTranslation(lng, "minio");
+  const { t } = await translate(lng, "minio");
 
   const user = await getMe();
   if (!user || !user?.verified) {

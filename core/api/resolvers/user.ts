@@ -1,6 +1,14 @@
 import "isomorphic-fetch";
 
-import { Arg, Args, Ctx, Query, Resolver, UseMiddleware } from "type-graphql";
+import {
+  Arg,
+  Args,
+  AuthenticationError,
+  Ctx,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
 import { Access, User } from "../entitites/User";
@@ -117,6 +125,7 @@ export class UserResolver {
           locale,
           name: user.name,
           email: user.email,
+          hostname: req.hostname,
           token: signJwt({ id: user.id }, { expiresIn: 3600 }),
         }),
         "mail.registration"
@@ -135,12 +144,13 @@ export class UserResolver {
   @Authorized()
   @UseMiddleware(RateLimit())
   @Mutation(() => String)
-  async resendActivationLink(@Ctx() { locale, user }: Context) {
+  async resendActivationLink(@Ctx() { locale, user, req }: Context) {
     messageBroker.produceMessage(
       JSON.stringify({
         locale,
         name: user?.name,
         email: user?.email,
+        hostname: req.hostname,
         token: signJwt({ id: user?.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
@@ -295,7 +305,7 @@ export class UserResolver {
   @UseMiddleware(RateLimit())
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { locale }: Context
+    @Ctx() { locale, req }: Context
   ) {
     const user = await this.userService.findOne({ email });
     if (!user) throw new Error(this.i18nService.translate("notRegistered"));
@@ -307,6 +317,7 @@ export class UserResolver {
         locale,
         email: user.email,
         name: user.name,
+        hostname: req.hostname,
         token,
       }),
       "mail.reset"
@@ -339,14 +350,24 @@ export class UserResolver {
     };
   }
 
-  @Authorized(["ADMIN", "IS_OWN_USER"])
+  @Authorized()
   @UseMiddleware(RateLimit())
   @Mutation(() => UserMutationResponse)
   async updateUser(
     @Arg("id") _id: ObjectId,
     @Arg("data") userInput: UserInput,
-    @LoadResource(User) user: DocumentType<User>
+    @LoadResource(User) user: DocumentType<User>,
+    @Ctx() context: Context
   ): Promise<UserMutationResponse> {
+    if (
+      !context.user?.access.includes(Access.Admin) &&
+      user.id !== context.user?.id
+    ) {
+      throw new AuthenticationError(
+        this.i18nService.translate("401", { ns: "common" })
+      );
+    }
+
     for (const [key, value] of Object.entries(userInput)) {
       (user as any)[key] = value;
     }

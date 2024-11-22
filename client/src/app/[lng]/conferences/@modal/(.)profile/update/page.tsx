@@ -1,7 +1,7 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 import { headers } from "next/headers";
 
 export default async function UpdateProfilePage({
@@ -11,7 +11,7 @@ export default async function UpdateProfilePage({
 }) {
   const user = await getMe();
 
-  const { t } = await useTranslation(lng, "profile");
+  const { t } = await translate(lng, "profile");
 
   const host = headers().get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)

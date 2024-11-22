@@ -292,6 +292,13 @@ input PasswordInput {
   password: String!
 }
 
+"""Language the speaker will be presenting his submission in"""
+enum PresentationLng {
+  CZ
+  EN
+  SK
+}
+
 type Query {
   attendee(id: ObjectId!): Attendee!
   attendees(after: ObjectId, conferenceSlug: String!, first: Int! = 20, passive: Boolean, sectionIds: [ObjectId]! = []): AttendeeConnection!
@@ -372,6 +379,7 @@ type Submission {
   createdAt: DateTimeISO!
   fileUrl: String
   id: ID!
+  presentationLng: PresentationLng
   section: Section!
   translations: SubmissionTranslation!
   updatedAt: DateTimeISO!
@@ -392,6 +400,7 @@ input SubmissionInput {
   authors: [String]!
   conference: ObjectId!
   fileUrl: String
+  presentationLng: PresentationLng!
   section: ObjectId!
   translations: SubmissionTranslationInput!
 }

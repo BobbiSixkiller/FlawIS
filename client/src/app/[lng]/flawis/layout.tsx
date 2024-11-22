@@ -1,7 +1,6 @@
 import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
 import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
-import { useTranslation } from "@/lib/i18n";
 import Logo from "@/components/Logo";
 import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
 import { Access } from "@/lib/graphql/generated/graphql";
@@ -14,6 +13,7 @@ import {
 import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
+import { translate } from "@/lib/i18n";
 
 export default async function DashboardLayout({
   children,
@@ -31,7 +31,7 @@ export default async function DashboardLayout({
     redirect("/logout");
   }
 
-  const { t, i18n } = await useTranslation(lng, "dashboard");
+  const { t, i18n } = await translate(lng, "dashboard");
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">

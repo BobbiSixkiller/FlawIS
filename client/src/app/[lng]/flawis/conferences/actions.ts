@@ -13,7 +13,7 @@ import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
 import { GetDataFilter } from "@/components/withInfiniteScroll";
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
+import { getMe } from "../../(auth)/actions";
 
 export async function getConferences(filter: GetDataFilter) {
   const res = await executeGqlFetch(
@@ -32,13 +32,15 @@ export async function getConferences(filter: GetDataFilter) {
 
 export async function getConference(slug: string) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
-  const user = cookies().get("user")?.value;
 
   const res = await executeGqlFetch(
     ConferenceDocument,
-    { slug },
-    {},
-    { tags: [`conference:${slug}`, `conference:${user}`], revalidate: 3600 }
+    { slug }
+    // {},
+    // {
+    //   tags: [`conference:${slug}`],
+    //   revalidate: 3600,
+    // }
   );
 
   if (res.errors) {

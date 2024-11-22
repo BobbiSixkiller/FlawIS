@@ -1,9 +1,9 @@
-import { useTranslation } from "@/lib/i18n";
 import Image from "next/image";
 import { Trans } from "react-i18next/TransWithoutContext";
 
 import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
 import logo from "../../public/images/Flaw-logo-notext.png";
+import { translate } from "@/lib/i18n";
 
 export default async function Logo({
   lng,
@@ -18,7 +18,7 @@ export default async function Logo({
   notext?: boolean;
   inverted?: boolean;
 }) {
-  const { t } = await useTranslation(lng, "dashboard");
+  const { t } = await translate(lng, "dashboard");
 
   return (
     <div

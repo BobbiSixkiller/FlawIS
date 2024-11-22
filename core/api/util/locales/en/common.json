@@ -1,1 +1,4 @@
-{ "ratelimit": "You're doing that too much, try it again later!" }
+{
+  "ratelimit": "You're doing that too much, try it again later!",
+  "401": "Access denied!"
+}

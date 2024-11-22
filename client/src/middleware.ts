@@ -6,7 +6,7 @@ import { withTenant } from "./middlewares/tenantMiddleware";
 export const config = {
   // do not localize next.js paths and public folder
   matcher: [
-    "/((?!api|_next|images|UKsans|site.webmanifest|browserconfig.xml|sw.js|.pdf).*)",
+    "/((?!api|_next|favicon.ico|images|UKsans|site.webmanifest|browserconfig.xml|sw.js|.pdf).*)",
   ],
 };
 

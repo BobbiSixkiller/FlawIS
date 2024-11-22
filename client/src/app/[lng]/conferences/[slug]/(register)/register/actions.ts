@@ -1,17 +1,16 @@
 "use server";
 
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import {
   AddAttendeeDocument,
   AttendeeInput,
   CreateSubmissionDocument,
-  SubmissionDocument,
   SubmissionInput,
   UpdateSubmissionDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
 
 export async function addAttendee(
   attendeeInput: AttendeeInput,
@@ -19,21 +18,7 @@ export async function addAttendee(
   submissionInput?: SubmissionInput
 ) {
   try {
-    const res = await executeGqlFetch(AddAttendeeDocument, {
-      data: attendeeInput,
-    });
     let submission;
-
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
-    }
-
     if (submissionInput && !submissionId) {
       submission = await executeGqlFetch(CreateSubmissionDocument, {
         data: submissionInput,
@@ -64,33 +49,27 @@ export async function addAttendee(
         );
       }
     }
-    const user = cookies().get("user")?.value;
-    if (user) revalidateTag(`conference:${user}`);
 
+    const res = await executeGqlFetch(AddAttendeeDocument, {
+      data: attendeeInput,
+    });
+
+    if (res.errors) {
+      const { validationErrors } = res.errors[0].extensions as ErrorException;
+
+      throw new Error(
+        validationErrors
+          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
+          : res.errors[0].message
+      );
+    }
+
+    revalidateTag(`conference:${res.data.addAttendee.data.slug}`);
     revalidateTag("attendees");
     return { success: true, message: res.data.addAttendee.message };
   } catch (error: any) {
     return { success: false, message: error.message };
   }
-}
-
-export async function getSubmission(id?: string) {
-  if (!id) {
-    return;
-  }
-  //   await new Promise((resolve) => setTimeout(resolve, 5000));
-  const res = await executeGqlFetch(
-    SubmissionDocument,
-    { id },
-    {},
-    { tags: [`submission:${id}`], revalidate: 3600 }
-  );
-
-  if (res.errors) {
-    console.log(res.errors[0]);
-  }
-
-  return res.data?.submission;
 }
 
 export async function createSubmission(data: SubmissionInput) {
@@ -107,25 +86,6 @@ export async function createSubmission(data: SubmissionInput) {
     }
 
     return { success: true, message: res.data.createSubmission.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
-}
-
-export async function updateSubmission(id: string, data: SubmissionInput) {
-  try {
-    const res = await executeGqlFetch(UpdateSubmissionDocument, { id, data });
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
-    }
-
-    return { success: true, message: res.data.updateSubmission.message };
   } catch (error: any) {
     return { success: false, message: error.message };
   }

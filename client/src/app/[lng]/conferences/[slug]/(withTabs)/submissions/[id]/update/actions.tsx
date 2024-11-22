@@ -1,5 +1,6 @@
 "use server";
 
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import {
   SubmissionInput,
   UpdateSubmissionDocument,
@@ -7,12 +8,9 @@ import {
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
-import { cookies } from "next/headers";
 
 export async function updateSubmission(id: string, data: SubmissionInput) {
   try {
-    const user = cookies().get("user")?.value;
-
     const res = await executeGqlFetch(UpdateSubmissionDocument, {
       id,
       data,
@@ -27,7 +25,11 @@ export async function updateSubmission(id: string, data: SubmissionInput) {
           : res.errors[0].message
       );
     }
-    revalidateTag(`conference:${user}`);
+
+    revalidateTag(
+      `conference:${res.data.updateSubmission.data.conference.slug}`
+    );
+
     return { success: true, message: res.data.updateSubmission.message };
   } catch (error: any) {
     return { success: false, message: error.message };

@@ -1,16 +1,16 @@
 import DeleteSubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/delete/DeleteSubmissionForm";
-import { getSubmission } from "@/app/[lng]/flawis/conferences/[slug]/register/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
 import { redirect } from "next/navigation";
+import { translate } from "@/lib/i18n";
+import { getSubmission } from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/actions";
 
 export default async function DeleteSubmissionPage({
   params: { lng, slug, id },
 }: {
   params: { slug: string; lng: string; id: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
   const submission = await getSubmission(id);
   if (!submission) {
     redirect(`/conferences/${slug}/submissions`);

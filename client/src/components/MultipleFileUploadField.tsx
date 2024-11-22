@@ -55,17 +55,14 @@ export default function MultipleFileUploadField({
     setFiles(field.value.map((file: File) => ({ file, errors: [] })));
   }, [field.value]);
 
-  const onDrop = useCallback(
-    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      const mappedAccepted = acceptedFiles.map((file) => ({
-        file,
-        errors: [],
-      }));
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const mappedAccepted = acceptedFiles.map((file) => ({
+      file,
+      errors: [],
+    }));
 
-      setFiles((curr) => [...curr, ...mappedAccepted, ...rejectedFiles]);
-    },
-    []
-  );
+    setFiles((curr) => [...curr, ...mappedAccepted]);
+  }, []);
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({ onDrop, maxFiles, maxSize, accept });

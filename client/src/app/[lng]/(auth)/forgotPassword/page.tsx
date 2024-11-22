@@ -1,15 +1,15 @@
 import Link from "next/link";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import { useTranslation } from "@/lib/i18n";
 import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
+import { translate } from "@/lib/i18n";
 
 export default async function ForgotPassword({
   params: { lng },
 }: {
   params: { lng: string };
 }) {
-  const { t } = await useTranslation(lng, "forgotPassword");
+  const { t } = await translate(lng, "forgotPassword");
 
   return (
     <div className="mt-6 flex flex-col gap-4">

@@ -1,5 +1,3 @@
-"use server";
-
 import { TypedDocumentString } from "@/lib/graphql/generated/graphql";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
@@ -17,11 +15,14 @@ export async function executeGqlFetch<Data, Variables>(
   next?: NextFetchRequestConfig,
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
+  const reqHeaders = await headers();
+  const reqCookies = await cookies();
+
   const forwardedFor =
-    headers().get("x-forwarded-for") || headers().get("x-real-ip");
+    reqHeaders.get("x-forwarded-for") || reqHeaders.get("x-real-ip");
   // The forwardedFor string may contain multiple IPs in the format "client, proxy1, proxy2"
   const clientIp = forwardedFor?.split(",")[0]?.trim(); // Take the first one which is the actual client IP
-  const host = headers().get("host");
+  const host = reqHeaders.get("host");
 
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
     cache: nextCache,
@@ -31,7 +32,7 @@ export async function executeGqlFetch<Data, Variables>(
       "Content-Type": "application/json",
       "x-forwarded-for": clientIp || "",
       host: host || "client:3000",
-      Cookie: cookies()
+      Cookie: reqCookies
         .getAll()
         .map((c) => `${c.name}=${c.value}`)
         .join(";"),

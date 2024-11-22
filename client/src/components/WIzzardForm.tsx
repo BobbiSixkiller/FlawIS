@@ -1,7 +1,7 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Children, ReactElement, ReactNode, useState } from "react";
+import { Children, ReactElement, ReactNode, useEffect, useState } from "react";
 import {
   FieldValues,
   FormProvider,
@@ -78,6 +78,7 @@ export function WizzardForm<T>({
           onSubmit={methods.handleSubmit(onSubmit)}
         >
           {steps[step]}
+
           <div className="flex justify-between">
             {steps.length > 1 && (
               <Button
@@ -89,6 +90,7 @@ export function WizzardForm<T>({
                 <ChevronLeftIcon className="h-4 w-4" />
               </Button>
             )}
+
             <Button
               fluid={steps.length === 1}
               color="primary"

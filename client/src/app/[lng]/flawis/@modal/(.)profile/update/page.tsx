@@ -1,7 +1,7 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
+import { translate } from "@/lib/i18n";
 
 export default async function UpdateProfilePage({
   params: { lng },
@@ -10,7 +10,7 @@ export default async function UpdateProfilePage({
 }) {
   const user = await getMe();
 
-  const { t } = await useTranslation(lng, "profile");
+  const { t } = await translate(lng, "profile");
 
   return (
     <Modal title={t("heading")}>

@@ -1,14 +1,14 @@
 import Heading from "@/components/Heading";
-import { useTranslation } from "@/lib/i18n";
 import { getConferences } from "../flawis/conferences/actions";
 import ListConferences from "./ListConferences";
+import { translate } from "@/lib/i18n";
 
 export default async function Conferences({
   params: { lng },
 }: {
   params: { lng: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
 
   const initialData = await getConferences({});
 

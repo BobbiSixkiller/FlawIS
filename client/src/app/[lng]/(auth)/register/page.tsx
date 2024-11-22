@@ -1,9 +1,8 @@
-import { useTranslation } from "@/lib/i18n";
-import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import { headers } from "next/headers";
 import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
+import { translate } from "@/lib/i18n";
 
 export default async function Register({
   params: { lng },
@@ -12,7 +11,7 @@ export default async function Register({
   params: { lng: string };
   searchParams: { url?: string };
 }) {
-  const { t } = await useTranslation(lng, "register");
+  const { t } = await translate(lng, "register");
 
   const host = headers().get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)

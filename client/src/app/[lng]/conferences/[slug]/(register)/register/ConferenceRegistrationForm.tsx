@@ -2,7 +2,6 @@
 
 import { WizzardForm, WizzardStep } from "@/components/WIzzardForm";
 import { useRouter, useSearchParams } from "next/navigation";
-import { array, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
@@ -10,6 +9,7 @@ import { addAttendee } from "./actions";
 import {
   AttendeeInput,
   ConferenceQuery,
+  PresentationLng,
   SubmissionFragment,
   SubmissionInput,
   UserFragment,
@@ -24,6 +24,7 @@ import {
   MultipleInput,
 } from "@/components/MultipleInput";
 import Select from "@/components/Select";
+import useValidation from "@/hooks/useValidation";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -43,6 +44,8 @@ export default function ConferenceRegistrationForm({
   const [submissionStep, setSubmissionStep] = useState(false);
 
   const { t } = useTranslation(lng, ["validation", "conferences"]);
+
+  const { yup } = useValidation();
 
   return (
     <WizzardForm<AttendeeInput & { submission: SubmissionInput }>
@@ -78,6 +81,8 @@ export default function ConferenceRegistrationForm({
           authors: [],
           conference: conference.id,
           section: submission?.section || "",
+          presentationLng: (submission?.presentationLng ||
+            "") as PresentationLng,
         },
       }}
       onSubmitCb={async (data) => {
@@ -103,24 +108,24 @@ export default function ConferenceRegistrationForm({
             type: ActionTypes.SetAppMsg,
             payload: state,
           });
-          router.push(`/conferences/${conference.slug}`);
+          router.push(`/${conference.slug}`);
         }
       }}
     >
       <WizzardStep
         name={t("registration.billing.info", { ns: "conferences" })}
-        validationSchema={object({
-          billing: object({
-            name: string().trim().required(t("required")),
-            address: object({
-              street: string().trim().required(t("required")),
-              city: string().trim().required(t("required")),
-              postal: string().trim().required(t("required")),
-              country: string().trim().required(t("required")),
+        validationSchema={yup.object({
+          billing: yup.object({
+            name: yup.string().trim().required(),
+            address: yup.object({
+              street: yup.string().trim().required(),
+              city: yup.string().trim().required(),
+              postal: yup.string().trim().required(),
+              country: yup.string().trim().required(),
             }),
-            ICO: string().trim(),
-            DIC: string().trim(),
-            ICDPH: string().trim(),
+            ICO: yup.string().trim(),
+            DIC: yup.string().trim(),
+            ICDPH: yup.string().trim(),
           }),
         })}
       >
@@ -156,8 +161,8 @@ export default function ConferenceRegistrationForm({
       </WizzardStep>
       <WizzardStep
         name={t("registration.ticket", { ns: "conferences" })}
-        validationSchema={object({
-          ticketId: string().required(t("ticket")),
+        validationSchema={yup.object({
+          ticketId: yup.string().required(t("ticket")),
         })}
       >
         <Ticket
@@ -175,28 +180,31 @@ export default function ConferenceRegistrationForm({
       {submissionStep && (
         <WizzardStep
           name={t("registration.submission.info", { ns: "conferences" })}
-          validationSchema={object({
-            submission: object({
-              section: string().required(t("required")),
-              authors: array().of(string().email()),
-              translations: object({
-                sk: object({
-                  name: string().trim().required(t("required")),
-                  abstract: string().trim().required(t("required")),
-                  keywords: array()
-                    .of(string().required().trim())
+          validationSchema={yup.object({
+            submission: yup.object({
+              section: yup.string().required(),
+              authors: yup.array().of(yup.string().email()),
+              translations: yup.object({
+                sk: yup.object({
+                  name: yup.string().trim().required(),
+                  abstract: yup.string().trim().required(),
+                  keywords: yup
+                    .array()
+                    .of(yup.string().required().trim())
                     .min(1, (val) => t("keywords", { value: val.min }))
                     .required(),
                 }),
-                en: object({
-                  name: string().trim().required(t("required")),
-                  abstract: string().trim().required(t("required")),
-                  keywords: array()
-                    .of(string().required().trim())
+                en: yup.object({
+                  name: yup.string().trim().required(),
+                  abstract: yup.string().trim().required(),
+                  keywords: yup
+                    .array()
+                    .of(yup.string().required().trim())
                     .min(1, (val) => t("keywords", { value: val.min }))
                     .required(),
                 }),
               }),
+              presentationLng: yup.string<PresentationLng>().required(),
             }),
           })}
         >
@@ -231,6 +239,16 @@ export default function ConferenceRegistrationForm({
               ns: "conferences",
             })}
             name={`submission.translations.${lng}.keywords`}
+          />
+          <Select
+            disabled={submission !== undefined}
+            name="submission.presentationLng"
+            label={t("registration.submission.lng", { ns: "conferences" })}
+            options={[
+              { name: PresentationLng.Sk, value: PresentationLng.Sk },
+              { name: PresentationLng.Cz, value: PresentationLng.Cz },
+              { name: PresentationLng.En, value: PresentationLng.En },
+            ]}
           />
           <MultipleInput
             disabled={submission !== undefined}

@@ -1,16 +1,16 @@
 import { redirect } from "next/navigation";
-import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
+import { translate } from "@/lib/i18n";
 
 export default async function AttendeeSubmissionsPage({
   params: { slug, lng },
 }: {
   params: { slug: string; lng: string };
 }) {
-  const { t } = await useTranslation(lng, "common");
+  const { t } = await translate(lng, "common");
 
   const conference = await getConference(slug);
   if (conference && !conference.attending?.ticket.withSubmission) {

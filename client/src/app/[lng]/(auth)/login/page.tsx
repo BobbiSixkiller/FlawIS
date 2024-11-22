@@ -1,9 +1,9 @@
 import LoginForm from "./LoginForm";
-import { useTranslation } from "@/lib/i18n";
 import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
 import { headers } from "next/headers";
+import { translate } from "@/lib/i18n";
 
 export default async function Login({
   params: { lng },
@@ -12,7 +12,7 @@ export default async function Login({
   params: { lng: string };
   searchParams: { url?: string };
 }) {
-  const { t } = await useTranslation(lng, "login");
+  const { t } = await translate(lng, "login");
 
   const host = headers().get("host") || "localhost:3000";
   const subdomain = host.split(".")[0];

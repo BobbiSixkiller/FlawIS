@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import { getConference } from "../actions";
 import {
-  AcademicCapIcon,
   FolderOpenIcon,
   InformationCircleIcon,
   TicketIcon,
@@ -16,8 +14,6 @@ export default async function TabsLayout({
   children: ReactNode;
   params: { slug: string; lng: string };
 }) {
-  const conference = await getConference(slug);
-
   const tabs = [
     {
       href: `/conferences/${slug}`,
@@ -40,14 +36,6 @@ export default async function TabsLayout({
       icon: <TicketIcon className="h-5 w-5" />,
     },
   ];
-
-  if (conference && !conference.attending) {
-    tabs.push({
-      href: `/conferences/${slug}/register`,
-      name: "Registrovat",
-      icon: <AcademicCapIcon className="h-5 w-5" />,
-    });
-  }
 
   return (
     <>

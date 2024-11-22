@@ -1,6 +1,6 @@
 {
   "heading": "Vytvoriť nový účet",
-  "name": "Meno a priezvisko",
+  "name": "Meno a priezvisko - bez titulov a s diakritikou",
   "email": "Email adresa",
   "phone": "Telefónne číslo",
   "org": "Organizácia",

@@ -21,7 +21,7 @@ export const AttendeeUserUnion = createUnionType({
   types: () => [User, AttendeeUser] as const, // function that returns tuple of object types classes
   // Implementation of detecting returned object type
   resolveType: (value) => {
-    if ("organization" in value) {
+    if ("createdAt" in value) {
       return User; // Return object type class (the one with `@ObjectType()`)
     } else {
       return AttendeeUser;

@@ -1,19 +1,17 @@
-import Heading from "@/components/Heading";
-
 import { getMe } from "@/app/[lng]/(auth)/actions";
+import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
-import { useTranslation } from "@/lib/i18n";
+import { PresentationLng } from "@/lib/graphql/generated/graphql";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import { getSubmission } from "../../(withTabs)/submissions/[id]/actions";
 import { updateSubmission } from "../../(withTabs)/submissions/[id]/update/actions";
-import ConferenceRegistrationForm from "@/app/[lng]/flawis/conferences/[slug]/register/ConferenceRegistrationForm";
+import { getSubmission } from "../../(withTabs)/submissions/[id]/actions";
 
 export default async function RegisterPage({
   params: { lng, slug },
   searchParams,
 }: {
   params: { slug: string; lng: string };
-  searchParams?: {
+  searchParams: {
     submission?: string;
   };
 }) {
@@ -21,37 +19,33 @@ export default async function RegisterPage({
 
   const [conference, submission] = await Promise.all([
     getConference(slug),
-    getSubmission(searchParams?.submission),
+    getSubmission(searchParams.submission),
   ]);
 
   if (conference && conference.attending && !submission) {
-    redirect(`/conferences/${slug}`);
+    redirect(`/${slug}`);
   }
+
   if (
     conference &&
     conference.attending &&
-    submission &&
-    conference.attending.ticket.withSubmission
+    conference.attending.ticket.withSubmission &&
+    submission
   ) {
-    const res = await updateSubmission(submission.id, {
+    await updateSubmission(submission.id, {
       conference: submission.conference.id,
       authors: [],
       section: submission.section.id,
       translations: submission.translations,
+      presentationLng:
+        submission.presentationLng || (lng.toUpperCase() as PresentationLng),
     });
-    console.log(res);
-    redirect(`/conferences/${slug}`);
-  }
 
-  const { t } = await useTranslation(lng, "conferences");
+    redirect(`/${slug}`);
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <Heading
-        lng={lng}
-        heading={t("registration.heading")}
-        subHeading={conference!.translations[lng as "sk" | "en"].name}
-      />
       <ConferenceRegistrationForm
         lng={lng}
         conference={conference}

@@ -4,8 +4,8 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ReactNode } from "react";
-import { useTranslation } from "@/lib/i18n";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
+import { translate } from "@/lib/i18n";
 
 export default async function Layout({
   children,
@@ -14,7 +14,7 @@ export default async function Layout({
   children: ReactNode;
   params: { lng: string; slug: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
 
   const conference = await getConference(slug);
   const tabs = [
@@ -33,7 +33,7 @@ export default async function Layout({
     tabs.push({
       href: `/${slug}/submissions`,
       name: t("submission.submissions"),
-      icon: <FolderOpenIcon className="h-5 w-5" />,
+      icon: <FolderOpenIcon className="size-5" />,
     });
   }
 

@@ -16,6 +16,7 @@
       "ICDPH": "VAT reg. no."
     },
     "submission": {
+      "lng": "Language the attendee will be presenting his submission in",
       "info": "Submission",
       "section": "Section",
       "name": "Submission name",

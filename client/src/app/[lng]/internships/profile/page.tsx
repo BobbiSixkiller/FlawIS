@@ -1,16 +1,16 @@
-import { useTranslation } from "@/lib/i18n";
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
+import { translate } from "@/lib/i18n";
 
 export default async function Profile({
   params: { lng },
 }: {
   params: { lng: string };
 }) {
-  const { t } = await useTranslation(lng, "profile");
+  const { t } = await translate(lng, "profile");
   const user = await getMe();
 
   return (

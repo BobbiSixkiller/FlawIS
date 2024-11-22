@@ -1,17 +1,17 @@
 import { redirect } from "next/navigation";
 import Heading from "@/components/Heading";
-import { useTranslation } from "@/lib/i18n";
 import { displayDate } from "@/utils/helpers";
 import DynamicImage from "@/components/DynamicImage";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import DownloadPDFButton from "@/app/[lng]/flawis/conferences/[slug]/attendees/[id]/DownloadPDFButton";
+import { translate } from "@/lib/i18n";
 
 export default async function ConferencePage({
   params: { lng, slug },
 }: {
   params: { slug: string; lng: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
   const conference = await getConference(slug);
   if (conference && !conference.attending) {
     redirect(`/${slug}/register`);

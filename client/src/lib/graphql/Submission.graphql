@@ -12,6 +12,7 @@ fragment Submission on Submission {
       keywords
     }
   }
+  presentationLng
   authors {
     id
     name

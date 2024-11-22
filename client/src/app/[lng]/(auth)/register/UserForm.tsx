@@ -193,7 +193,6 @@ export default function UserForm({
         className={`space-y-6 mt-4 w-full ${inModal && "sm:w-96"}`}
         onSubmit={methods.handleSubmit(
           async (val) => {
-            console.log(val);
             const { error, url } = await uploadOrDelete(
               "resumes",
               user?.cvUrl,

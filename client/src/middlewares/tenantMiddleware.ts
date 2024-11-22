@@ -37,7 +37,10 @@ export function withTenant(middleware: CustomMiddleware) {
       subdomain === "internships" ||
       subdomain === "internships-staging"
     ) {
-      const newUrl = new URL(`/${lng}/internships/${paths.join("/")}`, req.url); // Rewrite the path with the subdomain
+      const newUrl = new URL(
+        `/${lng}/internships/${paths.join("/")}${url.search}`,
+        req.url
+      ); // Rewrite the path with the subdomain
 
       return NextResponse.rewrite(newUrl, {
         headers: res?.headers,
@@ -45,7 +48,10 @@ export function withTenant(middleware: CustomMiddleware) {
     }
 
     if (subdomain === "flawis" || subdomain === "flawis-staging") {
-      const newUrl = new URL(`/${lng}/flawis/${paths.join("/")}`, req.url); // Rewrite the path with the subdomain
+      const newUrl = new URL(
+        `/${lng}/flawis/${paths.join("/")}${url.search}`,
+        req.url
+      );
 
       return NextResponse.rewrite(newUrl, {
         headers: res?.headers,
@@ -53,7 +59,10 @@ export function withTenant(middleware: CustomMiddleware) {
     }
 
     if (subdomain === "conferences" || "conferences-staging") {
-      const newUrl = new URL(`/${lng}/conferences/${paths.join("/")}`, req.url); // Rewrite the path with the subdomain
+      const newUrl = new URL(
+        `/${lng}/conferences/${paths.join("/")}${url.search}`,
+        req.url
+      );
 
       return NextResponse.rewrite(newUrl, {
         headers: res?.headers,

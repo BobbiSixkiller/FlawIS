@@ -10,7 +10,10 @@ import { array, object, string } from "yup";
 import { createSubmission } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Button from "@/components/Button";
-import { SectionFragment } from "@/lib/graphql/generated/graphql";
+import {
+  PresentationLng,
+  SectionFragment,
+} from "@/lib/graphql/generated/graphql";
 import Select from "@/components/Select";
 import {
   LocalizedMultipleInput,
@@ -37,6 +40,7 @@ export default function NewSubmissionForm({
       object({
         conference: string().required(t("required")),
         section: string().required(t("required")),
+        presentationLng: string<PresentationLng>().required(),
         authors: array()
           .of(string().email().required(t("required")))
           .default([]),
@@ -76,6 +80,7 @@ export default function NewSubmissionForm({
       authors: [],
       conference: conferenceId,
       section: "",
+      presentationLng: "" as PresentationLng,
     },
   });
 

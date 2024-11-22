@@ -15,7 +15,7 @@ export default async function DeleteSubmissionPage({
     <div className="flex flex-col gap-4">
       <Link
         className="rounded-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400"
-        href={`/conferences/${slug}/submissions`}
+        href={`/${slug}/submissions`}
       >
         <XMarkIcon className="w-5 h-5" />
       </Link>

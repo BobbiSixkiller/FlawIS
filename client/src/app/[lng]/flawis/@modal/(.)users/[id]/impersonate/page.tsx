@@ -1,8 +1,7 @@
 import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/impersonate/ImpersonateForm";
 import { getUser } from "@/app/[lng]/flawis/users/actions";
-import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
+import { translate } from "@/lib/i18n";
 import { redirect } from "next/navigation";
 
 export default async function UpdateUserPage({
@@ -15,7 +14,7 @@ export default async function UpdateUserPage({
     redirect("/users");
   }
 
-  const { t } = await useTranslation(lng, "common");
+  const { t } = await translate(lng, "common");
 
   return (
     <Modal title={"Impersonovat"}>

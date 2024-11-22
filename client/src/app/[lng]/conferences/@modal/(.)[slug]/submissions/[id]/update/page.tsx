@@ -1,17 +1,17 @@
 import UpdateSubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/update/UpdateSubmissionForm";
-import { getSubmission } from "@/app/[lng]/flawis/conferences/[slug]/register/actions";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";
-import { useTranslation } from "@/lib/i18n";
 import { redirect } from "next/navigation";
+import { translate } from "@/lib/i18n";
+import { getSubmission } from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/[id]/actions";
 
 export default async function UpdateSubmissionPage({
   params: { lng, slug, id },
 }: {
   params: { slug: string; lng: string; id: string };
 }) {
-  const { t } = await useTranslation(lng, "conferences");
+  const { t } = await translate(lng, "conferences");
   const [conference, submission] = await Promise.all([
     getConference(slug),
     getSubmission(id),

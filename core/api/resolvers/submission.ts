@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import {
   Arg,
+  AuthenticationError,
   Authorized,
   Ctx,
   FieldResolver,
@@ -23,7 +24,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { Submission, SubmissionTranslation } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
-import { User } from "../entitites/User";
+import { Access, User } from "../entitites/User";
 import { I18nService } from "../services/i18nService";
 
 //refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
@@ -175,8 +176,18 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionMutationResponse)
   async deleteSubmission(
     @Arg("id") _id: ObjectId,
-    @LoadResource(Submission) submission: DocumentType<Submission>
+    @LoadResource(Submission) submission: DocumentType<Submission>,
+    @Ctx() { user }: Context
   ): Promise<SubmissionMutationResponse> {
+    if (
+      !user?.access.includes(Access.Admin) &&
+      !submission.authors.includes(user!.id)
+    ) {
+      throw new AuthenticationError(
+        this.i18nService.translate("401", { ns: "common" })
+      );
+    }
+
     await this.submissionService.delete({ _id: submission.id });
 
     return {
