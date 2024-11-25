@@ -1,31 +1,32 @@
-# Developemnt Stage
-FROM node:lts-alpine AS development
+# Development Stage
+FROM node:22-alpine AS development
 
-# Create app directory
+# Set working directory
 WORKDIR /usr/app
 
-# ARG NEXT_PUBLIC_BACKEND_URL
-# ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
-
-# Install app dependencies
+# Install dependencies
 COPY package*.json ./
-
 RUN npm ci --silent --no-fund --no-audit
 
+# Copy source code and build
 COPY . .
-
 RUN npm run build
 
+# Production Stage
 FROM node:22-alpine AS production
 
+# Set working directory
 WORKDIR /usr/app
 
+# Install dependencies
 COPY package*.json ./
+RUN npm ci --silent --no-fund --no-audit --timeout=120000
 
-RUN npm install --timeout=60000
-
-COPY . .
-
+# Copy built assets from the development stage
 COPY --from=development /usr/app/.next ./.next
 
+# Copy remaining source code
+COPY . .
+
+# Start the application
 # CMD ["npm", "run", "start"]

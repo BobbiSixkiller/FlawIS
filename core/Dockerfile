@@ -1,4 +1,4 @@
-FROM node:16-alpine As development
+FROM node:22-alpine As development
 
 WORKDIR /usr/app
 
@@ -10,7 +10,7 @@ COPY . .
 
 RUN npm run build
 
-FROM node:16-alpine as production
+FROM node:22-alpine as production
 
 WORKDIR /usr/app
 
