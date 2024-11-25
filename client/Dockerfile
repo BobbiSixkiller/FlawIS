@@ -4,9 +4,11 @@ FROM node:22-alpine AS development
 # Set working directory
 WORKDIR /usr/app
 
-# Install dependencies
+# Install dependencies with cache cleaning and retries
 COPY package*.json ./
-RUN npm ci --silent --no-fund --no-audit
+RUN npm cache clean --force && \
+    npm ci --silent --no-fund --no-audit --timeout=120000 || \
+    (npm cache clean --force && npm ci --silent --no-fund --no-audit)
 
 # Copy source code and build
 COPY . .
