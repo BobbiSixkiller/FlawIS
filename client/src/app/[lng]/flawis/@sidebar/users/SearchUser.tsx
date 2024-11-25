@@ -37,7 +37,7 @@ export default function SearchConference() {
   const router = useRouter();
 
   const onOptionSelect = (opt: UserItem) => {
-    router.push(`/users/${opt.id}`);
+    router.push(`/users/${opt?.id}`);
   };
 
   return (

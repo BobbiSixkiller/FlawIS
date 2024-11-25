@@ -38,7 +38,7 @@ export function withTenant(middleware: CustomMiddleware) {
       subdomain === "internships-staging"
     ) {
       const newUrl = new URL(
-        `/${lng}/internships/${paths.join("/")}${url.search}`,
+        `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
       ); // Rewrite the path with the subdomain
 
