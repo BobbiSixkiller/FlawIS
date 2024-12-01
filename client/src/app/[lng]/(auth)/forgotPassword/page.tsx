@@ -19,24 +19,22 @@ export default async function ForgotPassword({
 
       <FormMessage />
 
-      <div>
-        <ForgotPasswordForm lng={lng} />
+      <ForgotPasswordForm />
 
-        <p className="mt-10 text-center text-sm text-gray-500">
-          <Trans
-            i18nKey={"login"}
-            t={t}
-            components={{
-              login: (
-                <Link
-                  href="/login"
-                  className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
-                />
-              ),
-            }}
-          />
-        </p>
-      </div>
+      <p className="mt-10 text-center text-sm text-gray-500">
+        <Trans
+          i18nKey={"login"}
+          t={t}
+          components={{
+            login: (
+              <Link
+                href="/login"
+                className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+              />
+            ),
+          }}
+        />
+      </p>
     </div>
   );
 }
