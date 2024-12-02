@@ -40,7 +40,7 @@ export async function impersonate(id: string) {
   }
 
   if (process.env.NODE_ENV === "development") {
-    return redirect("/");
+    redirect("https://google.sk");
   }
 
   //check for staging env

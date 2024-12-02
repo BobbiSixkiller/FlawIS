@@ -107,10 +107,10 @@ export class UserResolver {
 
     const access: Access[] = [];
 
-    if (subdomain === "conferences") {
+    if (subdomain?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
-    if (subdomain === "internships") {
+    if (subdomain?.includes("internships")) {
       access.push(Access.Student);
     }
 
