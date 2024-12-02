@@ -1,7 +1,7 @@
 "use server";
 
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import { ImpersonateDocument } from "@/lib/graphql/generated/graphql";
+import { Access, ImpersonateDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
@@ -35,8 +35,26 @@ export async function impersonate(id: string) {
       expires, //accesstoken expires in 24 hours
     });
     revalidateTag(user.id);
-    return { success: true, message: "Vitajte!" };
   } catch (error: any) {
     return { success: false, message: error.message };
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return redirect("/");
+  }
+
+  //check for staging env
+  if (process.env.API_URI) {
+    redirect(
+      user.access.includes(Access.ConferenceAttendee)
+        ? "https://conferences-staging.flaw.uniba.sk"
+        : "https://internships-staging.flaw.uniba.sk"
+    );
+  } else {
+    redirect(
+      user.access.includes(Access.ConferenceAttendee)
+        ? "https://conferences.flaw.uniba.sk"
+        : "https://internships.flaw.uniba.sk"
+    );
   }
 }

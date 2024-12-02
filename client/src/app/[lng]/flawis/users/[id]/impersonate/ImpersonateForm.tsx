@@ -36,22 +36,22 @@ export default function ImpersonateForm({
           payload: state,
         });
 
-        if (
-          user.access.includes(Access.ConferenceAttendee) &&
-          process.env.NODE_ENV !== "development"
-        ) {
-          window.location.replace(
-            process.env.NEXT_PUBLIC_NODE_ENV === "staging"
-              ? "https://conferences-staging.flaw.uniba.sk"
-              : "https://conferences.flaw.uniba.sk"
-          );
-        } else {
-          window.location.replace(
-            process.env.NEXT_PUBLIC_NODE_ENV === "staging"
-              ? "https://internships-staging.flaw.uniba.sk"
-              : "https://internships.flaw.uniba.sk"
-          );
-        }
+        //   if (
+        //     user.access.includes(Access.ConferenceAttendee) &&
+        //     process.env.NODE_ENV !== "development"
+        //   ) {
+        //     window.location.replace(
+        //       process.env.NEXT_PUBLIC_NODE_ENV === "staging"
+        //         ? "https://conferences-staging.flaw.uniba.sk"
+        //         : "https://conferences.flaw.uniba.sk"
+        //     );
+        //   } else {
+        //     window.location.replace(
+        //       process.env.NEXT_PUBLIC_NODE_ENV === "staging"
+        //         ? "https://internships-staging.flaw.uniba.sk"
+        //         : "https://internships.flaw.uniba.sk"
+        //     );
+        //   }
       }
     });
   }
