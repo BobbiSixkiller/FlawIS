@@ -26,15 +26,12 @@ export async function impersonate(id: string) {
       throw new Error(res.errors[0].message);
     }
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    cookies().set("user", res.data.user.id, {
-      httpOnly: true,
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    });
+
     cookies().set("accessToken", res.data.user.token, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
+      domain: "flaw.uniba.sk",
     });
-    revalidateTag(user.id);
   } catch (error: any) {
     return { success: false, message: error.message };
   }

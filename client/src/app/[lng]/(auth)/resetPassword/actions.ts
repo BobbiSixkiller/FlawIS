@@ -3,7 +3,6 @@
 import { PasswordResetDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -30,8 +29,8 @@ export async function resetPassword(password: string, token: string) {
       cookies().set("accessToken", res.data.passwordReset.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
+        domain: "flaw.uniba.sk",
       });
-      revalidateTag(res.data.passwordReset.data.id);
     }
   } catch (error: any) {
     return { success: false, message: error.message as string };

@@ -25,7 +25,7 @@ export function Input({
         </label>
       )}
       <div
-        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-lg text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
+        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500"
@@ -33,7 +33,7 @@ export function Input({
       >
         <input
           className={
-            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 rounded-lg placeholder:text-gray-400"
+            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 rounded-md placeholder:text-gray-400"
           }
           {...props}
           {...field}
