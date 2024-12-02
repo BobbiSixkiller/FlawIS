@@ -4,7 +4,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { Trans } from "../../../../../node_modules/react-i18next";
 import Link from "next/link";
 import Button from "@/components/Button";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { login } from "./actions";
 import { FormProvider, useForm } from "react-hook-form";
@@ -29,6 +29,8 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
     ),
     defaultValues: { email: "", password: "" },
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <FormProvider {...methods}>
@@ -68,8 +70,15 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
               ]}
             />
           </div>
-          <Input name="password" type="password" />
+
+          <Input
+            name="password"
+            type="password"
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+          />
         </div>
+
         <Button
           color="primary"
           type="submit"
