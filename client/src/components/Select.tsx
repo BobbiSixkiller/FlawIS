@@ -77,7 +77,7 @@ export default function Select({
               : placeholder}
           </span>
 
-          <ChevronDownIcon className="size-3 group-data-[open]:rotate-180" />
+          <ChevronDownIcon className="size-3 group-data-[open]:rotate-180 text-gray-300" />
         </ListboxButton>
         <ListboxOptions
           anchor="bottom"

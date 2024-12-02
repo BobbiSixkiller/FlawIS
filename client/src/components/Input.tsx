@@ -25,15 +25,15 @@ export function Input({
         </label>
       )}
       <div
-        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm sm:text-sm/6 ring-1 ring-gray-300 ${
+        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-lg text-gray-900 shadow-sm sm:text-sm/6 ring-1 ring-inset ring-gray-300 ${
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500"
-        } focus-within:ring-2`}
+        } focus-within:ring-2 border-none`}
       >
         <input
           className={
-            "border-none w-full focus:ring-0 py-1.5 rounded-md placeholder:text-gray-400"
+            "w-full bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 rounded-lg placeholder:text-gray-400"
           }
           {...props}
           {...field}
@@ -44,7 +44,7 @@ export function Input({
         {props.type === "password" && (
           <button
             type="button"
-            className="p-2 text-gray-300"
+            className="p-2 text-gray-300 hover:text-primary-500"
             onClick={() => {
               if (setShowPassword) {
                 setShowPassword(!showPassword);
