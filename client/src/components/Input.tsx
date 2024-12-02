@@ -44,7 +44,7 @@ export function Input({
         {props.type === "password" && (
           <button
             type="button"
-            className="p-2"
+            className="p-2 text-gray-300"
             onClick={() => {
               if (setShowPassword) {
                 setShowPassword(!showPassword);

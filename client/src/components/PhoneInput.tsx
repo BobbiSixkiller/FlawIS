@@ -18,8 +18,6 @@ export default function PhoneInput({
     name,
   });
 
-  console.log(field.value);
-
   const [focus, setFocus] = useState(false);
   const [phoneField, setPhoneField] = useState({
     code: parsePhoneNumberFromString(field.value)?.countryCallingCode

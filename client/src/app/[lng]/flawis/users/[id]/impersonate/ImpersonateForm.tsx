@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useTransition } from "react";
-import { UserFragment } from "@/lib/graphql/generated/graphql";
+import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
@@ -16,6 +16,8 @@ export default function ImpersonateForm({
   lng: string;
 }) {
   const [pending, startTransition] = useTransition();
+
+  console.log(process.env.NEXT_PUBLIC_NODE_ENV, process.env.NODE_ENV);
 
   function handleClick() {
     startTransition(async () => {
@@ -33,7 +35,23 @@ export default function ImpersonateForm({
           type: ActionTypes.SetAppMsg,
           payload: state,
         });
-        window.location.replace("/conferences");
+
+        if (
+          user.access.includes(Access.ConferenceAttendee) &&
+          process.env.NODE_ENV !== "development"
+        ) {
+          window.location.replace(
+            process.env.NEXT_PUBLIC_NODE_ENV === "staging"
+              ? "https://conferences-staging.flaw.uniba.sk"
+              : "https://conferences.flaw.uniba.sk"
+          );
+        } else {
+          window.location.replace(
+            process.env.NEXT_PUBLIC_NODE_ENV === "staging"
+              ? "https://internships-staging.flaw.uniba.sk"
+              : "https://internships.flaw.uniba.sk"
+          );
+        }
       }
     });
   }

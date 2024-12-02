@@ -1,9 +1,8 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { resetPassword } from "./actions";
 import { FormProvider, useForm } from "react-hook-form";
