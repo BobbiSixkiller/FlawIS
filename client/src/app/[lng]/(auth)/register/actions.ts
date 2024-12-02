@@ -34,7 +34,11 @@ export async function register({
       cookies().set("accessToken", res.data.register.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
-        domain: "flaw.uniba.sk",
+        secure: process.env.NODE_ENV !== "development",
+        domain:
+          process.env.NODE_ENV === "development"
+            ? "localhost"
+            : "flaw.uniba.sk",
       });
 
       revalidatePath("/", "layout");

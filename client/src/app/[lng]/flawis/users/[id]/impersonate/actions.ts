@@ -30,7 +30,9 @@ export async function impersonate(id: string) {
     cookies().set("accessToken", res.data.user.token, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
-      domain: "flaw.uniba.sk",
+      secure: process.env.NODE_ENV !== "development",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : "flaw.uniba.sk",
     });
   } catch (error: any) {
     return { success: false, message: error.message };
