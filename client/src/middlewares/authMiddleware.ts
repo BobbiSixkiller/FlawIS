@@ -15,7 +15,7 @@ export function withAuth(middleware: CustomMiddleware) {
     const token = req.cookies.get("accessToken")?.value;
 
     if (!token && !publicPaths.some((path) => path === url.pathname)) {
-      if (url.pathname !== "/") {
+      if (url.pathname !== "/" && url.pathname !== "/logout") {
         const fullUrl = `${url.pathname}${url.search}`;
         url.searchParams.keys().forEach((key) => url.searchParams.delete(key));
         url.searchParams.append("url", fullUrl);

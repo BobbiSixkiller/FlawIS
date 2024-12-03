@@ -17,41 +17,17 @@ export default function ImpersonateForm({
 }) {
   const [pending, startTransition] = useTransition();
 
-  console.log(process.env.NEXT_PUBLIC_NODE_ENV, process.env.NODE_ENV);
-
   function handleClick() {
     startTransition(async () => {
       const state = await impersonate(user.id);
+
+      console.log(state);
 
       if (state && !state.success) {
         dispatch({
           type: ActionTypes.SetFormMsg,
           payload: state,
         });
-      }
-
-      if (state.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: state,
-        });
-
-        //   if (
-        //     user.access.includes(Access.ConferenceAttendee) &&
-        //     process.env.NODE_ENV !== "development"
-        //   ) {
-        //     window.location.replace(
-        //       process.env.NEXT_PUBLIC_NODE_ENV === "staging"
-        //         ? "https://conferences-staging.flaw.uniba.sk"
-        //         : "https://conferences.flaw.uniba.sk"
-        //     );
-        //   } else {
-        //     window.location.replace(
-        //       process.env.NEXT_PUBLIC_NODE_ENV === "staging"
-        //         ? "https://internships-staging.flaw.uniba.sk"
-        //         : "https://internships.flaw.uniba.sk"
-        //     );
-        //   }
       }
     });
   }

@@ -1,3 +1,5 @@
+"use server";
+
 import { TypedDocumentString } from "@/lib/graphql/generated/graphql";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
@@ -15,8 +17,8 @@ export async function executeGqlFetch<Data, Variables>(
   next?: NextFetchRequestConfig,
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
-  const reqHeaders = await headers();
-  const reqCookies = await cookies();
+  const reqHeaders = headers();
+  const reqCookies = cookies();
 
   const forwardedFor =
     reqHeaders.get("x-forwarded-for") || reqHeaders.get("x-real-ip");
