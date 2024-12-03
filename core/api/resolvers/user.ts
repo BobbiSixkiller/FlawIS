@@ -34,6 +34,8 @@ import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
 import { transformIds } from "../middlewares/typegoose-middleware";
+import { client } from "../util/redis";
+import { v4 as uuidv4 } from "uuid";
 
 @Service()
 @Resolver()
@@ -47,6 +49,35 @@ export class UserResolver {
       process.env.GOOGLE_REDIRECT_URI
     )
   ) {}
+
+  // Generate a one-time-use token
+  private generateOneTimeToken(expiresIn: number) {
+    const tokenId = uuidv4();
+    const token = signJwt({ tokenId }, { expiresIn });
+
+    // Store token ID in Redis
+    client.set(tokenId, "valid", { PX: expiresIn });
+    return token;
+  }
+
+  // Verify a one-time-use token
+  private async verifyOneTimeToken(token: string) {
+    const decoded = verifyJwt<{ tokenId: string }>(token);
+    if (!decoded) {
+      throw new Error("Token has been malformed or expired");
+    }
+
+    // Check if the token ID is still valid in Redis
+    const tokenStatus = await client.get(decoded?.tokenId);
+    if (tokenStatus !== "valid") {
+      throw new Error("Token has already been used");
+    }
+
+    // Mark the token ID as used
+    await client.del(decoded.tokenId);
+
+    return decoded; // Token is valid
+  }
 
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)

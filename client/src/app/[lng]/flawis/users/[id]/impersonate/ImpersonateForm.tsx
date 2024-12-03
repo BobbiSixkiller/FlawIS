@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useTransition } from "react";
-import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
+import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
@@ -20,8 +20,6 @@ export default function ImpersonateForm({
   function handleClick() {
     startTransition(async () => {
       const state = await impersonate(user.id);
-
-      console.log(state);
 
       if (state && !state.success) {
         dispatch({
