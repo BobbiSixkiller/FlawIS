@@ -1,11 +1,14 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import { useContext, useEffect } from "react";
+import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { resetPassword } from "./actions";
+import { FormProvider, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import useValidation from "@/hooks/useValidation";
+import { Input } from "@/components/Input";
 
 export default function ResetPasswordForm({
   lng,
@@ -14,74 +17,84 @@ export default function ResetPasswordForm({
   lng: string;
   token?: string;
 }) {
-  const [state, formAction] = useFormState(resetPassword, {
-    success: false,
-    message: "",
-  });
-
   const { t } = useTranslation(lng, "resetPassword");
 
   const { dispatch } = useContext(MessageContext);
 
-  useEffect(() => {
-    if (state?.message && !state.success) {
-      dispatch({
-        type: ActionTypes.SetFormMsg,
-        payload: state,
-      });
-    }
-    if (state?.message && state.success) {
-      dispatch({
-        type: ActionTypes.SetAppMsg,
-        payload: state,
-      });
-    }
-  }, [state]);
+  const { yup } = useValidation();
+
+  const methods = useForm({
+    resolver: yupResolver(
+      yup.object({
+        password: yup
+          .string()
+          .trim()
+          .required()
+          .matches(
+            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\s]{6,}$/,
+            t("password", { ns: "validation" })
+          ),
+        confirmPass: yup
+          .string()
+          .trim()
+
+          .required()
+          .oneOf([yup.ref("password")], t("confirmPass", { ns: "validation" })),
+      })
+    ),
+    defaultValues: { password: "", confirmPass: "" },
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <form className="space-y-6 mt-4" action={formAction}>
-      <div>
-        <input type="hidden" name="token" value={token} />
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {t("password")}
-        </label>
-        <div className="mt-2">
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
+    <FormProvider {...methods}>
+      <form
+        className="space-y-6 mt-4"
+        onSubmit={methods.handleSubmit(
+          async ({ password }) => {
+            const state = await resetPassword(password, token || "");
 
-      <div>
-        <label
-          htmlFor="confirmPassword"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          {t("repeatPass")}
-        </label>
-        <div className="mt-2">
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
+            if (state?.message && !state.success) {
+              dispatch({
+                type: ActionTypes.SetFormMsg,
+                payload: state,
+              });
+            }
+            if (state?.message && state.success) {
+              dispatch({
+                type: ActionTypes.SetAppMsg,
+                payload: state,
+              });
+            }
+          },
+          (err) => console.log(err)
+        )}
+      >
+        <Input
+          name="password"
+          label={t("password")}
+          type="password"
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+        />
+        <Input
+          name="confirmPass"
+          label={t("repeatPass")}
+          type="password"
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+        />
 
-      <Button color="primary" type="submit" fluid loadingText={t("submitting")}>
-        {t("submit")}
-      </Button>
-    </form>
+        <Button
+          color="primary"
+          type="submit"
+          fluid
+          loadingText={t("submitting")}
+        >
+          {t("submit")}
+        </Button>
+      </form>
+    </FormProvider>
   );
 }

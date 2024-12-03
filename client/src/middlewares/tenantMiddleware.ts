@@ -32,11 +32,7 @@ export function withTenant(middleware: CustomMiddleware) {
     }
 
     // Rewrite the response to include the subdomain in the path
-    if (
-      subdomain === "localhost:3000" ||
-      subdomain === "internships" ||
-      subdomain === "internships-staging"
-    ) {
+    if (subdomain === "localhost:3000") {
       const newUrl = new URL(
         `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
@@ -61,6 +57,17 @@ export function withTenant(middleware: CustomMiddleware) {
     if (subdomain === "conferences" || "conferences-staging") {
       const newUrl = new URL(
         `/${lng}/conferences/${paths.join("/")}${url.search}`,
+        req.url
+      );
+
+      return NextResponse.rewrite(newUrl, {
+        headers: res?.headers,
+      });
+    }
+
+    if (subdomain === "internships" || "internships-staging") {
+      const newUrl = new URL(
+        `/${lng}/internships/${paths.join("/")}${url.search}`,
         req.url
       );
 

@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
@@ -10,7 +10,13 @@ export async function GET(req: NextRequest) {
 
   const token = cookies().get("accessToken")?.value;
   if (token) {
-    cookies().delete("accessToken");
+    cookies().delete({
+      name: "accessToken",
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : "flaw.uniba.sk",
+    });
   }
 
   revalidatePath("/", "layout");

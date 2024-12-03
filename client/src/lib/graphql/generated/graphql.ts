@@ -874,7 +874,7 @@ export type ImpersonateQueryVariables = Exact<{
 }>;
 
 
-export type ImpersonateQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, token: string } };
+export type ImpersonateQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, access: Array<Access>, token: string } };
 
 export type InvoiceFragment = { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -2667,6 +2667,7 @@ export const ImpersonateDocument = new TypedDocumentString(`
     query impersonate($id: ObjectId!) {
   user(id: $id) {
     id
+    access
     token
   }
 }

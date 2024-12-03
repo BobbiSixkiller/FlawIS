@@ -27,14 +27,6 @@ export default function ImpersonateForm({
           payload: state,
         });
       }
-
-      if (state.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: state,
-        });
-        window.location.replace("/conferences");
-      }
     });
   }
 

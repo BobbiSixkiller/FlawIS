@@ -1,9 +1,17 @@
 "use client";
 
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 import { useController } from "react-hook-form";
 
-export function Input({ name, label, onFocus, ...props }: InputProps) {
+export function Input({
+  name,
+  label,
+  onFocus,
+  showPassword,
+  setShowPassword,
+  ...props
+}: InputProps) {
   const { field, fieldState } = useController({ name });
 
   return (
@@ -16,25 +24,42 @@ export function Input({ name, label, onFocus, ...props }: InputProps) {
           {label}
         </label>
       )}
-      <input
-        {...props}
-        {...field}
-        onFocus={onFocus}
-        id={name}
-        className={
-          props.type === "file"
-            ? `mt-2 block w-full sm:text-sm/6 text-slate-500
-                  file:mr-4 file:py-2 file:px-4 file:rounded-md
-                  file:border-0 file:text-sm file:font-semibold
-                  file:bg-pink-50 file:text-pink-700
-                  hover:file:bg-pink-100`
-            : `mt-2 outline-none disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 sm:text-sm/6 ${
-                fieldState.error
-                  ? "ring-red-500 focus:ring-red-500"
-                  : "focus:ring-primary-500"
-              }`
-        }
-      />
+      <div
+        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
+          fieldState.error
+            ? "ring-red-500 focus-within:ring-red-500"
+            : "focus-within:ring-primary-500"
+        } focus-within:ring-2 border-none`}
+      >
+        <input
+          className={
+            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 rounded-md placeholder:text-gray-400"
+          }
+          {...props}
+          {...field}
+          onFocus={onFocus}
+          id={name}
+          type={showPassword ? "text" : props.type}
+        />
+        {props.type === "password" && (
+          <button
+            type="button"
+            className="p-2 text-gray-300 hover:text-primary-500"
+            onClick={() => {
+              if (setShowPassword) {
+                setShowPassword(!showPassword);
+              }
+            }}
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="size-5" />
+            ) : (
+              <EyeIcon className="size-5" />
+            )}
+          </button>
+        )}
+      </div>
+
       {fieldState.error && (
         <p className="text-sm text-red-500">{fieldState.error.message}</p>
       )}

@@ -18,8 +18,6 @@ export default function PhoneInput({
     name,
   });
 
-  console.log(field.value);
-
   const [focus, setFocus] = useState(false);
   const [phoneField, setPhoneField] = useState({
     code: parsePhoneNumberFromString(field.value)?.countryCallingCode
@@ -46,7 +44,7 @@ export default function PhoneInput({
           fieldState.error ? "ring-red-500" : ""
         } ${focus && fieldState.error ? "ring-2" : ""} ${
           focus && !fieldState.error ? "ring-2 ring-primary-500" : ""
-        } rounded-lg w-full flex mt-1 ${
+        } rounded-md w-full flex mt-1 ${
           disabled
             ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none"
             : ""

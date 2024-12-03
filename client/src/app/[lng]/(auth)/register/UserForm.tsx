@@ -180,6 +180,8 @@ export default function UserForm({
 
   const { dispatch } = useContext(MessageContext);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   if (loadingFile)
     return (
       <div className="h-full sm:w-96 mx-auto flex flex-col items-center justify-center">
@@ -309,11 +311,19 @@ export default function UserForm({
 
         {!path.includes("profile") && (
           <>
-            <Input type="password" label={t("password")} name="password" />
             <Input
+              name="password"
+              label={t("password")}
               type="password"
-              label={t("confirmPass")}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
+            <Input
               name="confirmPass"
+              label={t("confirmPass")}
+              type="password"
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
             />
           </>
         )}

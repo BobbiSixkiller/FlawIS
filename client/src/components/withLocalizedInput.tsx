@@ -16,6 +16,8 @@ export interface InputProps
   extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
   name: string;
   label?: string;
+  showPassword?: boolean;
+  setShowPassword?: (val: boolean) => void;
 }
 
 export function withLocalizedInput(

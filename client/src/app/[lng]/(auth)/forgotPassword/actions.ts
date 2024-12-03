@@ -4,11 +4,11 @@ import { ForgotPasswordDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 
-export async function sendResetLink(prevState: any, formData: FormData) {
+export async function sendResetLink(email: string) {
   try {
     const res = await executeGqlFetch(
       ForgotPasswordDocument,
-      { email: formData.get("email")?.toString() || "" },
+      { email },
       {},
       { revalidate: 60 * 60 }
     );
