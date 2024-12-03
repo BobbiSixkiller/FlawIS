@@ -8,6 +8,8 @@ acceptLanguage.languages(languages);
 export function withLocalization(middleware: CustomMiddleware) {
   return (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
+    const domain =
+      process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk";
 
     let currentLng;
     if (req.cookies.has(cookieName))
@@ -39,7 +41,7 @@ export function withLocalization(middleware: CustomMiddleware) {
           event,
           NextResponse.rewrite(url, {
             headers: {
-              "Set-Cookie": `${cookieName}=${fallbackLng}; path=/`,
+              "Set-Cookie": `${cookieName}=${fallbackLng}; path=/; Domain=${domain}`,
             },
           })
         );
@@ -52,7 +54,7 @@ export function withLocalization(middleware: CustomMiddleware) {
 
       return NextResponse.redirect(url, {
         headers: {
-          "Set-Cookie": `${cookieName}=${fallbackLng}; path=/`,
+          "Set-Cookie": `${cookieName}=${fallbackLng}; path=/; Domain=${domain}`,
         },
       });
     }
