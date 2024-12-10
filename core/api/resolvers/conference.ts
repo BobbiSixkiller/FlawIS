@@ -34,10 +34,10 @@ import { Context } from "../util/auth";
 import { Attendee } from "../entitites/Attendee";
 import { Section } from "../entitites/Section";
 import { transformIds } from "../middlewares/typegoose-middleware";
-import Messagebroker from "../util/rmq";
 import { AttendeeInput } from "./types/attendee";
 import { VerifiedTicket } from "../util/types";
 import { User } from "../entitites/User";
+import { RmqService } from "../services/rmqService";
 
 @Service()
 @Resolver(() => Conference)
@@ -47,7 +47,8 @@ export class ConferencerResolver {
     private readonly sectionService = new CRUDservice(Section),
     private readonly attendeeService = new CRUDservice(Attendee),
     private readonly userService = new CRUDservice(User),
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
+    private readonly rmqService: RmqService
   ) {}
 
   @Authorized()
@@ -297,7 +298,7 @@ export class ConferencerResolver {
       },
     });
 
-    Messagebroker.produceMessage(
+    this.rmqService.produceMessage(
       JSON.stringify({
         locale,
         name: user?.name,

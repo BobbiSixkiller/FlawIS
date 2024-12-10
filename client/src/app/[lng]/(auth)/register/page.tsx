@@ -35,7 +35,7 @@ export default async function Register({
           </div>
 
           <div className="flex justify-center pt-4">
-            <GoogleSignIn url={url} />
+            <GoogleSignIn />
           </div>
         </div>
       )}

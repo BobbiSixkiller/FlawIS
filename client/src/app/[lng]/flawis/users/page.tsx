@@ -1,7 +1,7 @@
 import Heading from "@/components/Heading";
 import { getUsers } from "./actions";
 import ListUsers from "./ListUsers";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { BuildingLibraryIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { translate } from "@/lib/i18n";
 
 export default async function Users({
@@ -24,6 +24,11 @@ export default async function Users({
             href: "/users/new",
             text: "Novy",
             icon: <PlusIcon className="size-5" />,
+          },
+          {
+            href: "/users/invite",
+            text: "Pozvat instituciu",
+            icon: <BuildingLibraryIcon className="size-5" />,
           },
         ]}
       />

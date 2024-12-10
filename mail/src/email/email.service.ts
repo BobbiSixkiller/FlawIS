@@ -12,10 +12,10 @@ import puppeteer from 'puppeteer';
 
 export interface Msg {
   locale: 'en' | 'sk';
-  name: string;
+  name?: string;
   email: string;
 }
-interface AuthMsg extends Msg {
+export interface AuthMsg extends Msg {
   hostname: string;
   token: string;
 }
@@ -195,6 +195,28 @@ export class EmailService {
         submissionName: msg.submissionName,
         submissionAbstract: msg.submissionAbstract,
         submissionKeywords: msg.submissionKeywords,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.newOrg',
+  })
+  async sendOrgRegistrationLink(msg: AuthMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/register?token=${msg.token}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
+      template: 'newOrg',
+      context: {
+        url,
+        i18nLang: msg.locale,
       },
     });
   }

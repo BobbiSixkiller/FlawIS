@@ -17,10 +17,8 @@ import { ConferencerResolver } from "./resolvers/conference";
 
 import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
-import Messagebroker from "./util/rmq";
 
 import env from "dotenv";
-import { initRedis } from "./util/redis";
 import { I18nMiddleware } from "./middlewares/i18n-middleware";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
@@ -102,8 +100,6 @@ async function main() {
   );
 
   await mongoDbConnect();
-  await Messagebroker.init();
-  initRedis();
 
   httpServer.listen({ port }, () =>
     console.log(

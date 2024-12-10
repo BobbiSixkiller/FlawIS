@@ -14,10 +14,11 @@ import { redirect } from "next/navigation";
 
 export async function register({
   url,
+  token,
   ...data
-}: RegisterUserInput & { url?: string }) {
+}: RegisterUserInput & { url?: string; token?: string }) {
   try {
-    const res = await executeGqlFetch(RegisterDocument, { data });
+    const res = await executeGqlFetch(RegisterDocument, { data }, { token });
 
     if (res.errors) {
       const { validationErrors } = res.errors[0].extensions as ErrorException;

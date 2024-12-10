@@ -12,9 +12,12 @@ const publicPaths = [
 export function withAuth(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
+    const pathWithoutLocale = url.pathname
+      .replace("/en", "")
+      .replace("/sk", "");
     const token = req.cookies.get("accessToken")?.value;
 
-    if (!token && !publicPaths.some((path) => path === url.pathname)) {
+    if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
       if (url.pathname !== "/" && url.pathname !== "/logout") {
         const fullUrl = `${url.pathname}${url.search}`;
         url.searchParams.keys().forEach((key) => url.searchParams.delete(key));
@@ -25,7 +28,7 @@ export function withAuth(middleware: CustomMiddleware) {
       return NextResponse.redirect(url);
     }
 
-    if (token && publicPaths.some((path) => path === url.pathname)) {
+    if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
       url.pathname = "/";
       return NextResponse.redirect(url);
     }

@@ -17,6 +17,9 @@ const commonPaths = [
 export function withTenant(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
+    const pathWithoutLocale = url.pathname
+      .replace("/en", "")
+      .replace("/sk", "");
 
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
@@ -27,7 +30,7 @@ export function withTenant(middleware: CustomMiddleware) {
       lng = paths.shift();
     } else lng = fallbackLng;
 
-    if (commonPaths.some((path) => url.pathname === path)) {
+    if (commonPaths.some((path) => pathWithoutLocale === path)) {
       return middleware(req, event, res);
     }
 

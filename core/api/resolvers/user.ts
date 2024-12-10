@@ -15,6 +15,7 @@ import { Access, User } from "../entitites/User";
 import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
+  OrganizationEmails,
   PasswordInput,
   RegisterUserInput,
   UserArgs,
@@ -27,22 +28,22 @@ import { Context, signJwt, verifyJwt } from "../util/auth";
 import { compare } from "bcrypt";
 import { Authorized } from "type-graphql";
 import { ResetToken } from "../util/types";
-import messageBroker from "../util/rmq";
 import { RateLimit } from "../middlewares/ratelimit-middleware";
 import { I18nService } from "../services/i18nService";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
-import { transformIds } from "../middlewares/typegoose-middleware";
-import { client } from "../util/redis";
-import { v4 as uuidv4 } from "uuid";
+import { RmqService } from "../services/rmqService";
+import { UserService } from "../services/userService";
 
 @Service()
 @Resolver()
 export class UserResolver {
   constructor(
     private readonly userService = new CRUDservice(User),
+    private readonly userServiska: UserService,
     private readonly i18nService: I18nService,
+    private readonly rmqService: RmqService,
     private readonly googleOAuthClient = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
@@ -50,51 +51,10 @@ export class UserResolver {
     )
   ) {}
 
-  // Generate a one-time-use token
-  private generateOneTimeToken(expiresIn: number) {
-    const tokenId = uuidv4();
-    const token = signJwt({ tokenId }, { expiresIn });
-
-    // Store token ID in Redis
-    client.set(tokenId, "valid", { PX: expiresIn });
-    return token;
-  }
-
-  // Verify a one-time-use token
-  private async verifyOneTimeToken(token: string) {
-    const decoded = verifyJwt<{ tokenId: string }>(token);
-    if (!decoded) {
-      throw new Error("Token has been malformed or expired");
-    }
-
-    // Check if the token ID is still valid in Redis
-    const tokenStatus = await client.get(decoded?.tokenId);
-    if (tokenStatus !== "valid") {
-      throw new Error("Token has already been used");
-    }
-
-    // Mark the token ID as used
-    await client.del(decoded.tokenId);
-
-    return decoded; // Token is valid
-  }
-
   @Authorized(["ADMIN"])
   @Query(() => UserConnection)
-  async users(@Args() { first, after }: UserArgs) {
-    const data = await this.userService.dataModel.paginatedUsers(first, after);
-
-    const connection: UserConnection = data[0];
-
-    return {
-      totalCount: connection.totalCount || 0,
-      pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
-    };
+  async users(@Args() args: UserArgs) {
+    return await this.userServiska.getPaginatedUsers(args);
   }
 
   @Authorized(["ADMIN"])
@@ -131,40 +91,18 @@ export class UserResolver {
   @UseMiddleware(RateLimit())
   async register(
     @Arg("data") registerInput: RegisterUserInput,
-    @Ctx() { locale, user: loggedInUser, req }: Context
+    @Ctx() { user: loggedInUser, req }: Context
   ): Promise<UserMutationResponse> {
-    const host = req.header("host");
-    const subdomain = host?.split(".")[0];
+    const isAdmin = loggedInUser?.access.includes(Access.Admin);
+    const token = req.headers.token as string;
+    const hostname = req.hostname;
 
-    const access: Access[] = [];
-
-    if (subdomain?.includes("conferences")) {
-      access.push(Access.ConferenceAttendee);
-    }
-    if (subdomain?.includes("internships")) {
-      access.push(Access.Student);
-    }
-
-    const user = await this.userService.create({
-      ...registerInput,
-      access: registerInput.access ? registerInput.access : access,
-    });
-
-    if (!loggedInUser) {
-      messageBroker.produceMessage(
-        JSON.stringify({
-          locale,
-          name: user.name,
-          email: user.email,
-          hostname: req.hostname,
-          token: signJwt({ id: user.id }, { expiresIn: 3600 }),
-        }),
-        "mail.registration"
-      );
-    } else {
-      user.verified = true;
-      await user.save();
-    }
+    const user = await this.userServiska.createUser(
+      registerInput,
+      hostname,
+      isAdmin,
+      token
+    );
 
     return {
       data: user,
@@ -176,7 +114,7 @@ export class UserResolver {
   @UseMiddleware(RateLimit())
   @Mutation(() => String)
   async resendActivationLink(@Ctx() { locale, user, req }: Context) {
-    messageBroker.produceMessage(
+    this.rmqService.produceMessage(
       JSON.stringify({
         locale,
         name: user?.name,
@@ -343,7 +281,7 @@ export class UserResolver {
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
-    messageBroker.produceMessage(
+    this.rmqService.produceMessage(
       JSON.stringify({
         locale,
         email: user.email,
@@ -355,6 +293,17 @@ export class UserResolver {
     );
 
     return this.i18nService.translate("resetLinkSent");
+  }
+
+  @Authorized("ADMIN")
+  @Query(() => String)
+  async inviteUsers(
+    @Arg("input") { emails }: OrganizationEmails,
+    @Ctx() { req }: Context
+  ) {
+    await this.userServiska.sendRegistrationLinks(emails, req.hostname);
+
+    return "Invites successfully sent!";
   }
 
   @Mutation(() => UserMutationResponse)

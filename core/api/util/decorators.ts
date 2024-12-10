@@ -5,7 +5,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
-import { DocumentType, getModelForClass } from "@typegoose/typegoose";
+import { getModelForClass } from "@typegoose/typegoose";
 import {
   ClassType,
   createParameterDecorator,

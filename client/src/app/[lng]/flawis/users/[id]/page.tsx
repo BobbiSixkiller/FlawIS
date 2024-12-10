@@ -84,8 +84,16 @@ export default async function User({
             <dt className="text-sm font-medium leading-6 text-gray-900">
               {t("access")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {user.access.length > 0 ? user.access.join(" ") : "N/A"}
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex flex-col gap-1">
+              {user.access.length > 0 ? (
+                <ul>
+                  {user.access.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                "N/A"
+              )}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 items-center">

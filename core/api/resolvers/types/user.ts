@@ -13,6 +13,7 @@ import {
   MaxLength,
   ValidationArguments,
   IsNumber,
+  ArrayNotEmpty,
 } from "class-validator";
 
 import { Access, StudyProgramme, User } from "../../entitites/User";
@@ -121,4 +122,15 @@ export class RegisterUserInput extends UserInput {
       }),
   })
   password: string;
+}
+
+@InputType({
+  description:
+    "Addresses of the organizations you want to invite to FlawIS/internships",
+})
+export class OrganizationEmails {
+  @Field(() => [String])
+  @ArrayNotEmpty()
+  @IsEmail({}, { each: true })
+  emails: string[];
 }
