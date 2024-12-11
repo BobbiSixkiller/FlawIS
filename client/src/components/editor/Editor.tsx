@@ -20,93 +20,32 @@ import { NodeSelector } from "./selectors/NodeSelector";
 import { LinkSelector } from "./selectors/LinkSelector";
 import { useParams } from "next/navigation";
 import { slashCommand, suggestionItems } from "./slashCommands";
+import { useController } from "react-hook-form";
 
 const extensions = [...defaultExtensions, slashCommand];
 
 interface EditorProps {
   initialValue?: JSONContent;
-  onChange: (content: string) => void;
+  name: string;
 }
 
-export default function Editor({ initialValue, onChange }: EditorProps) {
+export default function Editor({ initialValue, name }: EditorProps) {
   const { lng } = useParams<{ lng: string }>();
+  const { field, fieldState } = useController({ name });
 
   const debouncedUpdates = useDebouncedCallback(
     async (editor: EditorInstance) => {
       const json = editor.getHTML();
-      onChange(json);
+      field.onChange(json);
     },
     500
   );
-
-  const defaultContent = {
-    type: "doc",
-    content: [
-      {
-        type: "heading",
-        attrs: {
-          level: 1,
-        },
-        content: [
-          {
-            type: "text",
-            text: "Nadpis 1",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "This is an example for the editor",
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        attrs: {
-          tight: true,
-        },
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: "new idea",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: "idea",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
 
   return (
     <EditorRoot>
       <EditorContent
         immediatelyRender={false}
-        initialContent={undefined}
+        initialContent={initialValue}
         extensions={extensions}
         onUpdate={({ editor }) => debouncedUpdates(editor)}
         className="min-h-96 rounded-md ring-1 ring-gray-300 p-3 shadow-sm text-gray-900 placeholder:text-gray-400"
@@ -145,7 +84,7 @@ export default function Editor({ initialValue, onChange }: EditorProps) {
           tippyOptions={{
             placement: "top",
           }}
-          className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-muted bg-black text-white shadow-xl"
+          className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-black bg-black text-white shadow-xl"
         >
           <NodeSelector />
           <div className="w-px flex-1 bg-white/30" />
@@ -155,6 +94,7 @@ export default function Editor({ initialValue, onChange }: EditorProps) {
           {/* <ColorSelector open={openColor} onOpenChange={setOpenColor} /> */}
         </EditorBubble>
       </EditorContent>
+      {fieldState.error && <p>{fieldState.error.message}</p>}
     </EditorRoot>
   );
 }

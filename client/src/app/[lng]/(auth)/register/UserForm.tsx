@@ -153,7 +153,6 @@ export default function UserForm({
           .of(yup.mixed<File>().required())
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
-        url: yup.string(),
       })
     ),
     defaultValues: {
@@ -167,7 +166,6 @@ export default function UserForm({
       studyProgramme: user?.studyProgramme || null,
       privacy: path === "/register" ? false : true,
       files: [],
-      url: searchParams.get("url")?.toString(),
     },
   });
 
@@ -207,7 +205,8 @@ export default function UserForm({
             let state;
             if (path.includes("register")) {
               state = await register({
-                url: val.url,
+                url: searchParams.get("url")?.toString(),
+                token: searchParams.get("token")?.toString(),
                 email: val.email,
                 name: val.name,
                 password: val.password as string,

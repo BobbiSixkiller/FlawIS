@@ -2,7 +2,7 @@
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { useController } from "react-hook-form";
+import { useController, useFormContext } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 
 export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
@@ -37,9 +37,11 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
       </label>
       <div
         className={`py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 
-            disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 shadow-sm ring-1 ring-gray-300 ${
-              focus ? "ring-primary-500 ring-2" : ""
-            } shadow-sm sm:text-sm sm:leading-6 relative`}
+            disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 shadow-sm ${
+              focus ? "ring-2 ring-primary-500" : "ring-1"
+            }  ring-gray-300 ${
+          fieldState.error ? "ring-red-500" : ""
+        } shadow-sm sm:text-sm sm:leading-6 relative`}
         onClick={() => {
           if (!props.disabled) {
             setFocus(true);
@@ -101,7 +103,11 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
         </div>
       </div>
       {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+        <p className="text-sm text-red-500">
+          {Array.isArray(fieldState.error)
+            ? fieldState.error[0].message
+            : fieldState.error.message}
+        </p>
       )}
     </div>
   );

@@ -19,13 +19,13 @@ import {
   SubmissionInput,
   SubmissionMutationResponse,
 } from "./types/submission";
-import Messagebroker from "../util/rmq";
 import { DocumentType } from "@typegoose/typegoose";
 import { Submission, SubmissionTranslation } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
 import { Access, User } from "../entitites/User";
 import { I18nService } from "../services/i18nService";
+import { RmqService } from "../services/rmqService";
 
 //refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
@@ -36,7 +36,8 @@ export class SubmissionResolver {
     private readonly conferenceService = new CRUDservice(Conference),
     private readonly sectionService = new CRUDservice(Section),
     private readonly userService = new CRUDservice(User),
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
+    private readonly rmqService: RmqService
   ) {}
 
   @Authorized()
@@ -65,7 +66,7 @@ export class SubmissionResolver {
       });
 
       data.authors?.forEach((author) =>
-        Messagebroker.produceMessage(
+        this.rmqService.produceMessage(
           JSON.stringify({
             locale: this.i18nService.language(),
             name: user?.name,
@@ -130,7 +131,7 @@ export class SubmissionResolver {
       });
 
       data.authors?.forEach((author) =>
-        Messagebroker.produceMessage(
+        this.rmqService.produceMessage(
           JSON.stringify({
             locale: this.i18nService.language(),
             name: user?.name,

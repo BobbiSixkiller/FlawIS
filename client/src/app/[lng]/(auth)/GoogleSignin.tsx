@@ -1,8 +1,12 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { getGoogleAuthLink } from "./actions";
 
-export default function GoogleSignIn({ url }: { url?: string }) {
+export default function GoogleSignIn() {
+  const searchParams = useSearchParams();
+  const url = searchParams.get("url")?.toString();
+
   return (
     <button
       type="button"

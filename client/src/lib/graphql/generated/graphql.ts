@@ -443,6 +443,11 @@ export type MutationUpdateUserArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
+/** Addresses of the organizations you want to invite to FlawIS/internships */
+export type OrganizationEmails = {
+  emails: Array<Scalars['String']['input']>;
+};
+
 export type PasswordInput = {
   password: Scalars['String']['input'];
 };
@@ -462,6 +467,7 @@ export type Query = {
   conference: Conference;
   conferences: ConferenceConnection;
   forgotPassword: Scalars['String']['output'];
+  inviteUsers: Scalars['String']['output'];
   me: User;
   submission: Submission;
   textSearchAttendee: Array<Attendee>;
@@ -504,6 +510,11 @@ export type QueryConferencesArgs = {
 
 export type QueryForgotPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type QueryInviteUsersArgs = {
+  input: OrganizationEmails;
 };
 
 
@@ -1077,6 +1088,13 @@ export type DeleteUserMutationVariables = Exact<{
 
 
 export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+
+export type InviteUsersQueryVariables = Exact<{
+  input: OrganizationEmails;
+}>;
+
+
+export type InviteUsersQuery = { __typename?: 'Query', inviteUsers: string };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -3552,3 +3570,8 @@ fragment User on User {
   studyProgramme
   cvUrl
 }`) as unknown as TypedDocumentString<DeleteUserMutation, DeleteUserMutationVariables>;
+export const InviteUsersDocument = new TypedDocumentString(`
+    query inviteUsers($input: OrganizationEmails!) {
+  inviteUsers(input: $input)
+}
+    `) as unknown as TypedDocumentString<InviteUsersQuery, InviteUsersQueryVariables>;

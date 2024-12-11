@@ -288,6 +288,13 @@ type Mutation {
 """Mongo object id scalar type"""
 scalar ObjectId
 
+"""
+Addresses of the organizations you want to invite to FlawIS/internships
+"""
+input OrganizationEmails {
+  emails: [String!]!
+}
+
 input PasswordInput {
   password: String!
 }
@@ -306,6 +313,7 @@ type Query {
   conference(slug: String!): Conference!
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
+  inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
   textSearchAttendee(text: String!): [Attendee!]!

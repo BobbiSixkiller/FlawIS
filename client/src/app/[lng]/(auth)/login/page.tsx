@@ -40,7 +40,7 @@ export default async function Login({
           </div>
 
           <div className="flex justify-center pt-4">
-            <GoogleSignIn url={url} />
+            <GoogleSignIn />
           </div>
         </div>
       )}

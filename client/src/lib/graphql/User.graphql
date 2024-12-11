@@ -61,3 +61,7 @@ mutation deleteUser($id: ObjectId!) {
     }
   }
 }
+
+query inviteUsers($input: OrganizationEmails!) {
+  inviteUsers(input: $input)
+}
