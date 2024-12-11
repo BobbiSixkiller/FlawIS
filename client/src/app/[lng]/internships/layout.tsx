@@ -3,11 +3,7 @@ import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
 import Logo from "@/components/Logo";
 import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
-import {
-  BriefcaseIcon,
-  ChevronRightIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import MissingResume from "./MissingResume";
@@ -38,8 +34,8 @@ export default async function DashboardLayout({
         <div className="flex flex-1 flex-col justify-between gap-2">
           <nav>
             <NavItem route="/">
-              <BriefcaseIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-              {t("internships")}
+              <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              {t("home")}
             </NavItem>
             <ProfileMenuItem lng={lng} user={user} />
           </nav>

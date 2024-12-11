@@ -12,6 +12,7 @@ const commonPaths = [
   "/activate",
   "/minio",
   "/google/callback",
+  "/invoice",
 ];
 
 export function withTenant(middleware: CustomMiddleware) {

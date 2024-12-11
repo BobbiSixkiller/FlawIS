@@ -37,8 +37,8 @@ export default async function DashboardLayout({
         <div className="flex flex-1 flex-col justify-between gap-2">
           <nav>
             <NavItem route="/">
-              <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-              {t("conferences")}
+              <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              {t("home")}
             </NavItem>
             <ProfileMenuItem lng={lng} user={user} />
           </nav>

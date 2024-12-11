@@ -107,7 +107,7 @@ export const NodeSelector = () => {
         size="sm"
         variant="ghost"
         className={cn(
-          "gap-2 rounded-none border-none hover:bg-white/30 focus:ring-0"
+          "gap-2 rounded-none border-none hover:bg-white/30 hover:text-white focus:ring-0"
         )}
       >
         <span className="whitespace-nowrap text-sm">{activeItem.name}</span>
@@ -116,7 +116,7 @@ export const NodeSelector = () => {
       <PopoverPanel
         anchor="bottom start"
         className={
-          "z-50 w-48 rounded-md border bg-black text-white shadow-md p-1 transition duration-200 ease-in-out [--anchor-gap:4px] sm:[--anchor-gap:8px] data-[closed]:-translate-y-1 data-[closed]:opacity-0"
+          "z-50 w-48 rounded-md border bg-black border-black text-white shadow-md p-1 transition duration-200 ease-in-out [--anchor-gap:4px] sm:[--anchor-gap:8px] data-[closed]:-translate-y-1 data-[closed]:opacity-0"
         }
       >
         {items.map((item, index) => (
@@ -125,7 +125,7 @@ export const NodeSelector = () => {
             onSelect={(editor) => {
               item.command(editor);
             }}
-            className="flex cursor-pointer items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
+            className="flex cursor-pointer hover:bg-white/30 items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
           >
             <div className="flex items-center space-x-2">
               <div className="rounded-sm border p-1">

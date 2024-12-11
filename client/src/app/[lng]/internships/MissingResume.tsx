@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getMe } from "../(auth)/actions";
+import { Access } from "@/lib/graphql/generated/graphql";
 
 export default function MissingResume() {
   const router = useRouter();
@@ -11,7 +12,11 @@ export default function MissingResume() {
   useEffect(() => {
     async function checkMissing() {
       const user = await getMe();
-      if (!user?.cvUrl || !user?.studyProgramme) {
+      if (
+        (!user?.cvUrl || !user?.studyProgramme) &&
+        user.verified &&
+        user.access.includes(Access.Student)
+      ) {
         router.push("/profile/update", { scroll: false });
       }
     }

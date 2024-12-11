@@ -14,7 +14,7 @@ const buttonStyles = {
         "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent"
       ),
       secondary: cn("bg-black text-white hover:bg-black/80"),
-      ghost: cn("hover:bg-primary-200 hover:text-primary-500"),
+      ghost: cn("hover:bg-white/30"),
       link: cn("text-primary underline-offset-4 hover:underline"),
     },
     size: {
