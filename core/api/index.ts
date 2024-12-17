@@ -26,6 +26,7 @@ import cors from "cors";
 import { SectionResolver } from "./resolvers/section";
 import { SubmissionResolver } from "./resolvers/submission";
 import { AttendeeResolver } from "./resolvers/attendee";
+import { InternshipResolver } from "./resolvers/internship";
 
 env.config();
 
@@ -52,6 +53,7 @@ async function main() {
       SectionResolver,
       SubmissionResolver,
       AttendeeResolver,
+      InternshipResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],

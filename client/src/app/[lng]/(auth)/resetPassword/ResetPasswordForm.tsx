@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import Button from "@/components/Button";
 import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { resetPassword } from "./actions";
@@ -9,6 +8,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useValidation from "@/hooks/useValidation";
 import { Input } from "@/components/Input";
+import Button from "@/components/Button";
+import Spinner from "@/components/Spinner";
 
 export default function ResetPasswordForm({
   lng,
@@ -87,12 +88,19 @@ export default function ResetPasswordForm({
         />
 
         <Button
-          color="primary"
+          className="w-full items-center justify-center gap-2"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
+          size="sm"
+          disabled={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

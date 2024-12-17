@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/Input";
 import { updateConferenceDates } from "./actions";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateDatesForm({
   lng,
@@ -103,11 +104,14 @@ export default function UpdateDatesForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Aktualizovat datumy
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Aktualizovat datumy"
+          )}
         </Button>
       </form>
     </FormProvider>

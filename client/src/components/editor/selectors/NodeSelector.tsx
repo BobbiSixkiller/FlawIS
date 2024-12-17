@@ -14,8 +14,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { EditorBubbleItem, EditorInstance, useEditor } from "novel";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { Button } from "@/components/MyButton";
 import { cn } from "@/utils/helpers";
+import Button from "@/components/Button";
 
 export type SelectorItem = {
   name: string;

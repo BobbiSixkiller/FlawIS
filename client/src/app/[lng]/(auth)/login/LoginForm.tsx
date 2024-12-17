@@ -3,7 +3,6 @@
 import { useTranslation } from "@/lib/i18n/client";
 import { Trans } from "../../../../../node_modules/react-i18next";
 import Link from "next/link";
-import Button from "@/components/Button";
 import { useContext, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { login } from "./actions";
@@ -12,6 +11,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
+import Button from "@/components/Button";
+import Spinner from "@/components/Spinner";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
@@ -51,7 +52,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
       >
         <Input name="email" label="Email" />
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <label
               htmlFor="password"
               className="block text-sm font-medium leading-6 text-gray-900"
@@ -80,14 +81,19 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
         </div>
 
         <Button
-          color="primary"
+          className="w-full items-center justify-center gap-2"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
+          size="sm"
           disabled={methods.formState.isSubmitting}
-          loading={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

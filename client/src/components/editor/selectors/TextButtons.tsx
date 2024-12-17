@@ -7,8 +7,8 @@ import {
   UnderlineIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/helpers";
-import { Button } from "@/components/MyButton";
 import { SelectorItem } from "./NodeSelector";
+import Button from "@/components/Button";
 
 export const TextButtons = () => {
   const { editor } = useEditor();
@@ -56,7 +56,7 @@ export const TextButtons = () => {
           onSelect={() => item.command(editor)} // Simplified call
         >
           <Button
-            onClick={(e) => e.preventDefault()}
+            onClick={(e: any) => e.preventDefault()}
             size="sm"
             className="rounded-none"
             variant="ghost"

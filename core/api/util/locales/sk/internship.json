@@ -1,0 +1,6 @@
+{
+  "notFound": "Stáž nebola nájdená!",
+  "update": "Stáž v {{name}} bola aktualizovaná.",
+  "new": "Stáž v {{name}} bola vytvorená.",
+  "delete": "Stáž v {{name}} bola vymazaná."
+}

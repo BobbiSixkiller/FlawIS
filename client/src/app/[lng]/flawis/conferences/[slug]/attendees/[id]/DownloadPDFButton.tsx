@@ -5,6 +5,7 @@ import Button from "@/components/Button";
 import { DocumentIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/lib/i18n/client";
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
+import Spinner from "@/components/Spinner";
 
 interface DownloadPDFButtonProps {
   lng: string;
@@ -41,15 +42,18 @@ const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({ lng, data }) => {
 
   return (
     <div className="max-w-56">
-      <Button
-        fluid
-        color="red"
-        loading={isPending}
-        loadingText={t("loading")}
-        onClick={handleDownload}
-      >
-        <DocumentIcon className="h-5 w-5 mr-2" />
-        {t("download")}
+      <Button className="w-full" color="red" onClick={handleDownload}>
+        {isPending ? (
+          <div className="flex items-center gap-2">
+            <Spinner inverted />
+            {t("loading")}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <DocumentIcon className="size-5" />
+            {t("download")}
+          </div>
+        )}
       </Button>
     </div>
   );

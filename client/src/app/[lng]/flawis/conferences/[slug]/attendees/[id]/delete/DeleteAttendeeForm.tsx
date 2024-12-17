@@ -44,7 +44,7 @@ export default function DeleteAttendeeForm({
 
       <h1>Naozaj chcete zmazat ucastnika {attendee.user.name}?</h1>
 
-      <Button color="primary" type="submit" fluid>
+      <Button type="submit" className="w-full">
         Potvrdit
       </Button>
     </form>

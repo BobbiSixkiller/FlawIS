@@ -12,6 +12,7 @@ import useValidation from "@/hooks/useValidation";
 import { Input } from "@/components/Input";
 import { updateUser } from "./actions";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateProfileForm({
   lng,
@@ -71,12 +72,17 @@ export default function UpdateProfileForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
+          className="flex items-center gap-2 justify-center"
           disabled={methods.formState.isSubmitting}
-          loading={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

@@ -1,5 +1,4 @@
 import { Service } from "typedi";
-import { CRUDservice } from "../services/CRUDservice";
 import {
   Arg,
   Args,
@@ -19,14 +18,15 @@ import { SubmissionArgs, SubmissionConnection } from "./types/submission";
 import { Submission } from "../entitites/Submission";
 import { transformIds } from "../middlewares/typegoose-middleware";
 import { Conference } from "../entitites/Conference";
+import { TypegooseService } from "../services/typegooseService";
 
 @Service()
 @Resolver(() => Section)
 export class SectionResolver {
   constructor(
-    private readonly conferenceService = new CRUDservice(Conference),
-    private readonly sectionService = new CRUDservice(Section),
-    private readonly submissionService = new CRUDservice(Submission),
+    private readonly conferenceService = new TypegooseService(Conference),
+    private readonly sectionService = new TypegooseService(Section),
+    private readonly submissionService = new TypegooseService(Submission),
     private readonly i18nService: I18nService
   ) {}
 
@@ -116,11 +116,7 @@ export class SectionResolver {
 
     return {
       totalCount: connection.totalCount || 0,
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
+      edges: connection.edges || [],
       pageInfo: connection.pageInfo || { hasNextPage: false },
     };
   }

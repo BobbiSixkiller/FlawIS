@@ -8,7 +8,6 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import {
   ArgumentValidationError,
   Field,
-  ID,
   ObjectType,
   registerEnumType,
 } from "type-graphql";
@@ -109,7 +108,7 @@ export class SubmissionTranslation {
 @Index({ conference: 1, section: 1, authors: 1 })
 @ObjectType({ description: "Submission entity model type" })
 export class Submission extends TimeStamps {
-  @Field(() => ID)
+  @Field(() => ObjectId)
   id: ObjectId;
 
   @Field(() => SubmissionTranslation)

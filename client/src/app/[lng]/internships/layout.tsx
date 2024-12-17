@@ -8,6 +8,27 @@ import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import MissingResume from "./MissingResume";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+    sidebar: React.ReactNode;
+    modal: React.ReactNode;
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `${t("internships")} | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function DashboardLayout({
   children,
@@ -52,8 +73,8 @@ export default async function DashboardLayout({
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
-            homeElement={<HomeIcon className="h-5 w-5" />}
-            separator={<ChevronRightIcon className="h-3 w-3" />}
+            homeElement={<HomeIcon className="size-5" />}
+            separator={<ChevronRightIcon className="size-3" />}
             activeClasses="text-primary-500 hover:underline"
             containerClasses="flex flex-wrap text-sm gap-2 items-center"
             capitalizeLinks

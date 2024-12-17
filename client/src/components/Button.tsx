@@ -1,83 +1,80 @@
-"use client";
+import { cn } from "@/utils/helpers";
+import React, {
+  ElementType,
+  forwardRef,
+  ComponentPropsWithoutRef,
+} from "react";
 
-import { useFormStatus } from "react-dom";
-import Spinner from "./Spinner";
+const buttonStyles = {
+  base: cn(
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+  ),
+  variants: {
+    variant: {
+      default: cn("bg-primary-500 text-white hover:bg-primary-500/90"),
+      destructive: cn("bg-red-500 text-white hover:bg-red-500/90"),
+      outline: cn(
+        "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent"
+      ),
+      secondary: cn("bg-black text-white hover:bg-black/80"),
+      ghost: cn("hover:bg-white/30"),
+      link: cn("text-primary underline-offset-4 hover:underline"),
+    },
+    size: {
+      default: "h-10 px-4 py-2",
+      sm: "h-9 rounded-md px-3",
+      lg: "h-11 rounded-md px-8",
+      icon: "h-10 w-10",
+    },
+  },
+  default: {
+    variant: "default",
+    size: "default",
+  },
+};
 
-export default function Button({
-  children,
-  loadingText,
-  loading = false,
-  type = "button",
-  onClick,
-  fluid = false,
-  color,
-  disabled = false,
-}: {
-  children: React.ReactNode;
-  loadingText?: string;
-  loading?: boolean;
-  type?: "submit" | "button";
-  onClick?: () => void;
-  fluid?: boolean;
-  color: "primary" | "secondary" | "red" | "green" | "basic";
-  disabled?: boolean;
-}) {
-  const { pending } = useFormStatus();
+type VariantType = keyof typeof buttonStyles.variants.variant;
+type SizeType = keyof typeof buttonStyles.variants.size;
 
-  const btnColor = (color: string) => {
-    switch (color) {
-      case "basic":
-        return `focus-visible:outline-primary-500 text-gray-900 hover:text-gray-500`;
-      case "primary":
-        return `${
-          pending || loading || disabled
-            ? "bg-primary-400 hover:bg-primary-400"
-            : "bg-primary-500 hover:bg-primary-700"
-        } focus-visible:outline-primary-500 text-white shadow-sm`;
-      case "secondary":
-        return `${
-          pending || loading || disabled
-            ? "bg-gray-400 hover:bg-gray-400"
-            : "bg-gray-900 hover:bg-gray-500"
-        } focus-visible:outline-primary-500 text-white shadow-sm`;
-      case "red":
-        return `${
-          pending || loading || disabled
-            ? "bg-red-400 hover:bg-red-400"
-            : "bg-red-500 hover:bg-red-700"
-        } focus-visible:outline-primary-500 text-white shadow-sm`;
-      case "green":
-        return `${
-          pending || loading || disabled
-            ? "bg-green-400 hover:bg-green-400"
-            : "bg-green-500 hover:bg-green-700"
-        } focus-visible:outline-primary-500 text-white shadow-sm`;
+interface ButtonOwnProps {
+  variant?: VariantType;
+  size?: SizeType;
+  className?: string;
+}
 
-      default:
-        throw Error("Unhandled color!");
-    }
+type ButtonProps<E extends ElementType = "button"> = ButtonOwnProps &
+  Omit<ComponentPropsWithoutRef<E>, keyof ButtonOwnProps> & {
+    as?: E;
   };
 
+function Button<E extends ElementType = "button">(
+  {
+    as,
+    className,
+    variant = buttonStyles.default.variant as VariantType,
+    size = buttonStyles.default.size as SizeType,
+    ...props
+  }: ButtonProps<E>,
+  ref: React.Ref<ComponentPropsWithoutRef<E>["ref"]>
+) {
+  const Component = as || "button"; // Defaults to "button" if no "as" is provided.
+
   return (
-    <button
-      onClick={onClick}
-      type={type}
-      aria-disabled={pending || loading || disabled}
-      disabled={pending || loading || disabled}
-      className={`h-9 flex ${
-        fluid ? "w-full" : "max-w-fit"
-      } justify-center items-center rounded-md ${btnColor(
-        color
-      )} px-3 py-1.5 text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 `}
-    >
-      {pending || loading ? (
-        <span className={`flex items-center gap-3`}>
-          <Spinner inverted />
-          {loadingText}
-        </span>
-      ) : (
-        children
+    <Component
+      className={cn(
+        buttonStyles.base,
+        buttonStyles.variants.variant[variant as VariantType],
+        buttonStyles.variants.size[size as SizeType],
+        className
       )}
-    </button>
+      ref={ref}
+      {...props}
+    />
   );
 }
+
+export default forwardRef(Button) as <E extends ElementType = "button">(
+  props: ButtonProps<E> & {
+    ref?: React.Ref<ComponentPropsWithoutRef<E>["ref"]>;
+  }
+) => React.ReactElement | null;

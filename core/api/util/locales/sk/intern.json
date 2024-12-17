@@ -1,0 +1,6 @@
+{
+  "notFound": "Stážista nebol nájdený!",
+  "update": "Stážista {{name}} bola aktualizovaná.",
+  "new": "Stážista {{name}} bola vytvorená.",
+  "delete": "Stážista {{name}} bola vymazaná."
+}

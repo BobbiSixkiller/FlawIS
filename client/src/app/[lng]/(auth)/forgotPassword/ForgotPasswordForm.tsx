@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import Button from "@/components/Button";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { sendResetLink } from "./actions";
@@ -10,6 +9,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import useValidation from "@/hooks/useValidation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@/components/Input";
+import Button from "@/components/Button";
+import Spinner from "@/components/Spinner";
 
 export default function ForgotPasswordForm() {
   const { lng } = useParams<{ lng: string }>();
@@ -44,13 +45,19 @@ export default function ForgotPasswordForm() {
         <Input name="email" label={t("email")} />
 
         <Button
-          color="primary"
+          className="w-full"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          size="sm"
           disabled={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <div className="flex gap-2 items-center">
+              <Spinner inverted />
+              {t("submitting")}
+            </div>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

@@ -49,7 +49,7 @@ input AttendeeBillingInput {
 type AttendeeConnection {
   edges: [AttendeeEdge]!
   pageInfo: AttendeePageInfo!
-  totalCount: Float!
+  totalCount: Int!
 }
 
 type AttendeeEdge {
@@ -135,7 +135,7 @@ input ConferenceBillingInput {
 type ConferenceConnection {
   edges: [ConferenceEdge]!
   pageInfo: ConferencePageInfo!
-  totalCount: Float!
+  totalCount: Int!
 }
 
 type ConferenceEdge {
@@ -200,6 +200,45 @@ type ImportantDates {
   submissionDeadline: DateTimeISO
 }
 
+"""Internship object type"""
+type Internship {
+  applicationCount: Int!
+  createdAt: DateTimeISO!
+
+  """String representation of internship listing's HTML page"""
+  description: String!
+  id: ObjectId!
+  organization: String!
+  updatedAt: DateTimeISO!
+  user: UserReferece!
+}
+
+"""InternshipConnection type enabling cursor based pagination"""
+type InternshipConnection {
+  edges: [InternshipEdge]!
+  pageInfo: InternshipPageInfo!
+  totalCount: Int!
+}
+
+type InternshipEdge {
+  cursor: ObjectId!
+  node: Internship!
+}
+
+input InternshipInput {
+  description: String!
+}
+
+type InternshipMutationResponse implements IMutationResponse {
+  data: Internship!
+  message: String!
+}
+
+type InternshipPageInfo {
+  endCursor: ObjectId
+  hasNextPage: Boolean!
+}
+
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
@@ -261,11 +300,13 @@ type Mutation {
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
+  createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
+  deleteInternship(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): SectionMutationResponse!
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
   deleteTicket(slug: String!, ticketId: ObjectId!): String!
@@ -278,6 +319,7 @@ type Mutation {
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
   updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
@@ -313,6 +355,8 @@ type Query {
   conference(slug: String!): Conference!
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
+  internship(id: ObjectId!): Internship!
+  internships(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
@@ -386,7 +430,7 @@ type Submission {
   conference: Conference!
   createdAt: DateTimeISO!
   fileUrl: String
-  id: ID!
+  id: ObjectId!
   presentationLng: PresentationLng
   section: Section!
   translations: SubmissionTranslation!
@@ -396,7 +440,7 @@ type Submission {
 type SubmissionConnection {
   edges: [SubmissionEdge]!
   pageInfo: SubmissionPageInfo!
-  totalCount: Float!
+  totalCount: Int!
 }
 
 type SubmissionEdge {
@@ -491,7 +535,7 @@ type User {
 type UserConnection {
   edges: [UserEdge]!
   pageInfo: UserPageInfo!
-  totalCount: Float!
+  totalCount: Int!
 }
 
 type UserEdge {
@@ -519,4 +563,11 @@ type UserMutationResponse implements IMutationResponse {
 type UserPageInfo {
   endCursor: ObjectId
   hasNextPage: Boolean!
+}
+
+"""User stub type"""
+type UserReferece {
+  """User document reference"""
+  id: ObjectId!
+  name: String!
 }

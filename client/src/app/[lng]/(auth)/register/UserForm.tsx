@@ -4,7 +4,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
-import Button from "@/components/Button";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -30,6 +29,7 @@ import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import Button from "@/components/Button";
 
 export default function UserForm({
   user,
@@ -76,7 +76,22 @@ export default function UserForm({
     resolver: yupResolver(
       yup.object({
         name: yup.string().trim().required(),
-        email: yup.string().required().email(),
+        email: yup
+          .string()
+          .required()
+          .email()
+          .when({
+            is: () =>
+              searchParams.get("token") === null &&
+              subdomain?.includes("internships"), // When creating student account on internships tenant
+            then: (schema) =>
+              schema.matches(
+                /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)*uniba\.sk$/,
+                {
+                  message: t("isUniba"),
+                }
+              ),
+          }),
         password: yup
           .string()
           .trim()
@@ -350,14 +365,19 @@ export default function UserForm({
         )}
 
         <Button
-          color="primary"
+          className="w-full items-center justify-center gap-2"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
-          loading={methods.formState.isSubmitting}
+          size="sm"
           disabled={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

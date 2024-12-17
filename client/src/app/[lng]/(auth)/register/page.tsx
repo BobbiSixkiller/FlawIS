@@ -24,7 +24,7 @@ export default async function Register({
 
       <UserForm subdomain={subdomain} namespace="register" />
 
-      {(subdomain === "conferences" || subdomain === "conferences-staging") && (
+      {subdomain.includes("conferences") && (
         <div>
           <div className="relative flex py-6 items-center">
             <div className="flex-grow border-t border-gray-300"></div>

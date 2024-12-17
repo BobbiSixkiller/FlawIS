@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 
 interface ModalProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   togglerHidden?: boolean;
 }
 
@@ -60,14 +60,16 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className="z-20 w-full sm:w-fit overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
+            <DialogPanel className="z-20 w-full sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between mb-6">
-                <DialogTitle
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
-                >
-                  {title}
-                </DialogTitle>
+                {title && (
+                  <DialogTitle
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    {title}
+                  </DialogTitle>
+                )}
                 {!togglerHidden && (
                   <button
                     onClick={() => setShow(false)}

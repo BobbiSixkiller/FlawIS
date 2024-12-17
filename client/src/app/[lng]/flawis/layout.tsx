@@ -14,6 +14,27 @@ import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+    sidebar: React.ReactNode;
+    modal: React.ReactNode;
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `FlawIS | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function DashboardLayout({
   children,

@@ -3,14 +3,31 @@ import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
 import Logo from "@/components/Logo";
 import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
-import {
-  AcademicCapIcon,
-  ChevronRightIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+    sidebar: React.ReactNode;
+    modal: React.ReactNode;
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `${t("conferences")} | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function DashboardLayout({
   children,

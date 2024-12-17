@@ -212,14 +212,18 @@ export default function UpdateUserForm({
         <FormMessage />
 
         <Button
-          color="primary"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
-          loading={methods.formState.isSubmitting}
+          className="w-full flex items-center justify-center gap-2"
           disabled={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

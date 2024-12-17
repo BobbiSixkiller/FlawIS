@@ -7,16 +7,6 @@ import {
 import { executeGqlFetch } from "@/utils/actions";
 import { revalidatePath } from "next/cache";
 
-export async function getAttendee(id: string) {
-  const res = await executeGqlFetch(AttendeeDocument, { id });
-  if (res.errors) {
-    console.log(res.errors[0]);
-    // return notFound();
-  }
-
-  return res.data?.attendee;
-}
-
 export async function removeAuthor(
   id: string,
   authorId: string,
@@ -34,4 +24,14 @@ export async function removeAuthor(
   } catch (error: any) {
     return { success: false, message: error.message };
   }
+}
+
+export async function getAttendee(id: string) {
+  const res = await executeGqlFetch(AttendeeDocument, { id });
+  if (res.errors) {
+    console.log(res.errors[0]);
+    // return notFound();
+  }
+
+  return res.data?.attendee;
 }

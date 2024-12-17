@@ -1,18 +1,19 @@
 import { Service } from "typedi";
-import { CRUDservice } from "./CRUDservice";
 import { Access, User } from "../entitites/User";
 import { v4 as uuidv4 } from "uuid";
 import { signJwt, verifyJwt } from "../util/auth";
 import { UserArgs, UserConnection, UserInput } from "../resolvers/types/user";
-import { transformIds } from "../middlewares/typegoose-middleware";
 import { RmqService } from "./rmqService";
 import { RedisService } from "./redisService";
 import { I18nService } from "./i18nService";
+import { TypegooseService } from "./typegooseService";
+import { ObjectId } from "mongodb";
 
+// finish this service and implement refactor of user resolver with it
 @Service()
 export class UserService {
   constructor(
-    private readonly userCrudService = new CRUDservice(User),
+    private readonly crudService = new TypegooseService(User),
     private readonly rmqService: RmqService,
     private readonly redisService: RedisService,
     private readonly i18nService: I18nService
@@ -47,22 +48,28 @@ export class UserService {
     return decoded; // Token is valid
   }
 
-  async getPaginatedUsers({ first, after }: UserArgs) {
-    const data = await this.userCrudService.dataModel.paginatedUsers(
-      first,
-      after
-    );
+  async getUser(id: ObjectId) {
+    try {
+      const user = await this.crudService.findOne({ _id: id });
+      if (!user) {
+        throw new Error(this.i18nService.translate("notFound", { ns: "user" }));
+      }
+
+      return user;
+    } catch (error: any) {
+      throw new Error(`Error fetching user: ${error.message}`);
+    }
+  }
+
+  async getPaginatedUsers({ first, after }: UserArgs): Promise<UserConnection> {
+    const data = await this.crudService.dataModel.paginatedUsers(first, after);
 
     const connection: UserConnection = data[0];
 
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
+      edges: connection.edges || [],
     };
   }
 
@@ -98,7 +105,7 @@ export class UserService {
       }
     }
 
-    const user = await this.userCrudService.create({
+    const user = await this.crudService.create({
       ...data,
       access: data.access ? data.access : access,
     });

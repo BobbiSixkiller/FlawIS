@@ -22,6 +22,7 @@ import {
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import useValidation from "@/hooks/useValidation";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateSubmissionForm({
   sections,
@@ -232,11 +233,14 @@ export default function UpdateSubmissionForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting || loadingFile}
         >
-          {t("update", { ns: "common" })}
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            t("update", { ns: "common" })
+          )}
         </Button>
       </form>
     </FormProvider>

@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Stepper from "./Stepper";
 import { FormMessage } from "./Message";
+import Spinner from "./Spinner";
 
 interface WizzardStepProps {
   children: ReactNode;
@@ -92,13 +93,14 @@ export function WizzardForm<T>({
             )}
 
             <Button
-              fluid={steps.length === 1}
+              className={steps.length === 1 ? "w-full" : ""}
               color="primary"
               type="submit"
-              loading={methods.formState.isSubmitting}
               disabled={methods.formState.isSubmitting}
             >
-              {isLastStep() ? (
+              {methods.formState.isSubmitting ? (
+                <Spinner inverted />
+              ) : isLastStep() ? (
                 <CheckIcon className="h-4 w-4" />
               ) : (
                 <ChevronRightIcon className="h-4 w-4" />

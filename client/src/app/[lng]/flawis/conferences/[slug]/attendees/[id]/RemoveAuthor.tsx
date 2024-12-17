@@ -15,6 +15,7 @@ import { Fragment, useContext, useState, useTransition } from "react";
 import { removeAuthor } from "./actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function RemoveAuthor({
   author,
@@ -127,12 +128,11 @@ export default function RemoveAuthor({
                 <Button
                   color="red"
                   type="button"
-                  fluid
+                  className="w-full"
                   onClick={handleClick}
                   disabled={pending}
-                  loading={pending}
                 >
-                  Potvrdit
+                  {pending ? <Spinner inverted /> : "Potvrdit"}
                 </Button>
               </DialogPanel>
             </TransitionChild>

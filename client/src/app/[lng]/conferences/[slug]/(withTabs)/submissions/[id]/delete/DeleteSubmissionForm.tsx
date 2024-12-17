@@ -7,6 +7,7 @@ import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import { deleteSubmission } from "./actions";
+import Spinner from "@/components/Spinner";
 
 export default function DeleteSubmissionForm({
   submission,
@@ -55,12 +56,11 @@ export default function DeleteSubmissionForm({
       <Button
         color="primary"
         type="button"
-        fluid
+        className="w-full"
         onClick={handleClick}
         disabled={pending}
-        loading={pending}
       >
-        {t("confirm")}
+        {pending ? <Spinner inverted /> : t("confirm")}
       </Button>
     </div>
   );

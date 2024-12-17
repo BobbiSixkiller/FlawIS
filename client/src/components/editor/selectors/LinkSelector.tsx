@@ -3,7 +3,7 @@ import { CheckIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
-import { Button } from "@/components/MyButton";
+import Button from "@/components/Button";
 
 export function isValidUrl(url: string) {
   try {
@@ -71,7 +71,7 @@ export const LinkSelector = () => {
             variant="outline"
             type="button"
             className="flex h-8 items-center rounded p-1 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-800"
-            onClick={(e) => {
+            onClick={() => {
               editor.chain().focus().unsetLink().run();
             }}
           >
@@ -82,7 +82,7 @@ export const LinkSelector = () => {
             type="button"
             size="icon"
             className="h-8"
-            onClick={(e) => {
+            onClick={(e: any) => {
               e.preventDefault();
               const url = getUrlFromString(val);
               if (url) {

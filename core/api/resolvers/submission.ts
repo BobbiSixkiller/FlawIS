@@ -12,7 +12,6 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 
-import { CRUDservice } from "../services/CRUDservice";
 import { Context } from "../util/auth";
 import { LoadResource } from "../util/decorators";
 import {
@@ -26,16 +25,17 @@ import { Section } from "../entitites/Section";
 import { Access, User } from "../entitites/User";
 import { I18nService } from "../services/i18nService";
 import { RmqService } from "../services/rmqService";
+import { TypegooseService } from "../services/typegooseService";
 
 //refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
 @Resolver(() => Submission)
 export class SubmissionResolver {
   constructor(
-    private readonly submissionService = new CRUDservice(Submission),
-    private readonly conferenceService = new CRUDservice(Conference),
-    private readonly sectionService = new CRUDservice(Section),
-    private readonly userService = new CRUDservice(User),
+    private readonly submissionService = new TypegooseService(Submission),
+    private readonly conferenceService = new TypegooseService(Conference),
+    private readonly sectionService = new TypegooseService(Section),
+    private readonly userService = new TypegooseService(User),
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService
   ) {}

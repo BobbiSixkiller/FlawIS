@@ -27,8 +27,7 @@ export default async function Login({
 
       <LoginForm lng={lng} url={url} />
 
-      {(subdomain === "conferences" ||
-        subdomain === "conferences-staging" ||
+      {(subdomain.includes("conferences") ||
         subdomain === "localhost:3000") && (
         <div>
           <div className="relative flex py-6 items-center">

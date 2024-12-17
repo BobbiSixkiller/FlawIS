@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import { ArgsType, Field, Float, InputType, ObjectType } from "type-graphql";
-import { SubmissionInput } from "./submission";
-import { Billing, ConferenceBilling } from "../../entitites/Billing";
+import { Billing } from "../../entitites/Billing";
 import { IsString } from "class-validator";
 import { AddressInput, ConferenceBillingInput } from "./conference";
 import { CreateArgs, CreateConnection } from "./pagination";

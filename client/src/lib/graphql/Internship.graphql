@@ -1,0 +1,64 @@
+query internships(
+  $after: ObjectId
+  $first: Int
+  $user: ObjectId
+  $startDate: DateTimeISO
+  $endDate: DateTimeISO
+) {
+  internships(
+    after: $after
+    first: $first
+    user: $user
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        id
+        organization
+        applicationCount
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+query internship($id: ObjectId!) {
+  internship(id: $id) {
+    id
+    organization
+    description
+    updatedAt
+    createdAt
+    applicationCount
+  }
+}
+
+mutation createInternship($input: InternshipInput!) {
+  createInternship(input: $input) {
+    message
+    data {
+      id
+      organization
+    }
+  }
+}
+
+mutation updateInternship($id: ObjectId!, $input: InternshipInput!) {
+  updateInternship(id: $id, input: $input) {
+    message
+    data {
+      id
+      organization
+    }
+  }
+}
+
+mutation deleteInternship($id: ObjectId!) {
+  deleteInternship(id: $id)
+}

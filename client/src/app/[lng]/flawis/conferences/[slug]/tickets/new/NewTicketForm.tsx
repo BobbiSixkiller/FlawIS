@@ -13,6 +13,7 @@ import { createTicket } from "../actions";
 import { Input, LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
+import Spinner from "@/components/Spinner";
 
 export default function NewTicketForm({
   conference,
@@ -98,11 +99,14 @@ export default function NewTicketForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Vytvorit formu ucasti
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Vytvorit formu ucasti"
+          )}
         </Button>
       </form>
     </FormProvider>
