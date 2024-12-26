@@ -1,6 +1,4 @@
 import Button from "@/components/Button";
-import { InternshipDocument } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
 import {
   InboxArrowDownIcon,
   PencilIcon,
@@ -8,22 +6,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-
-async function getInternship(id: string) {
-  //   await new Promise((resolve) => setTimeout(resolve, 5000));
-  const res = await executeGqlFetch(
-    InternshipDocument,
-    { id },
-    {},
-    { tags: [`internship:${id}`], revalidate: 3600 }
-  );
-
-  if (res.errors) {
-    console.log(res.errors[0]);
-  }
-
-  return res.data?.internship;
-}
+import { getInternship } from "./actions";
+import { notFound } from "next/navigation";
 
 export default async function InternshipPge({
   params: { id },
@@ -31,7 +15,11 @@ export default async function InternshipPge({
   params: { id: string };
 }) {
   const internship = await getInternship(id);
-  console.log(internship);
+  if (!internship) {
+    return notFound();
+  }
+
+  console.log(internship.description);
 
   return (
     <div className="space-y-6">

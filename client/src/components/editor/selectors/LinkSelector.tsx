@@ -1,9 +1,9 @@
-import { useEditor } from "novel";
 import { CheckIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
 import Button from "@/components/Button";
+import { Editor } from "@tiptap/react";
 
 export function isValidUrl(url: string) {
   try {
@@ -25,10 +25,9 @@ export function getUrlFromString(str: string) {
   }
 }
 
-export const LinkSelector = () => {
+export const LinkSelector = ({ editor }: { editor?: Editor }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [val, setVal] = useState("");
-  const { editor } = useEditor();
 
   // Autofocus on input by default
   useEffect(() => {

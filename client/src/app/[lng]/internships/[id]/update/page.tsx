@@ -1,12 +1,16 @@
 import Button from "@/components/Button";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import InternshipForm from "../../new/InternshipForm";
+import { getInternship } from "../actions";
 
 export default async function UpdateInternship({
   params: { id },
 }: {
   params: { lng: string; id: string };
 }) {
+  const internship = await getInternship(id);
+
   return (
     <div className="flex flex-col">
       <Button
@@ -17,7 +21,9 @@ export default async function UpdateInternship({
       >
         <XMarkIcon className="size-5" />
       </Button>
-      <div className="mx-auto"></div>
+      <div className="mx-auto">
+        <InternshipForm data={internship} />
+      </div>
     </div>
   );
 }

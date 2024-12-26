@@ -18,6 +18,7 @@ query internships(
       node {
         id
         organization
+        description
         applicationCount
       }
     }

@@ -11,7 +11,7 @@ export async function deleteInternship(id: string) {
     return { success: false, message: res.errors[0].message };
   }
 
-  revalidatePath("/");
+  revalidatePath(`/${id}`);
 
   return { success: true };
 }

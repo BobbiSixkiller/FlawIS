@@ -1,4 +1,3 @@
-import { EditorBubbleItem, useEditor } from "novel";
 import {
   BoldIcon,
   CodeBracketIcon,
@@ -9,10 +8,9 @@ import {
 import { cn } from "@/utils/helpers";
 import { SelectorItem } from "./NodeSelector";
 import Button from "@/components/Button";
+import { Editor } from "@tiptap/core";
 
-export const TextButtons = () => {
-  const { editor } = useEditor();
-
+export const TextButtons = ({ editor }: { editor: Editor }) => {
   if (!editor) return null;
 
   const items: SelectorItem[] = [
@@ -51,23 +49,20 @@ export const TextButtons = () => {
   return (
     <div className="flex">
       {items.map((item, index) => (
-        <EditorBubbleItem
+        <Button
           key={index}
-          onSelect={() => item.command(editor)} // Simplified call
+          onClick={() => item.command(editor)}
+          size="sm"
+          className="rounded-none"
+          variant="ghost"
+          type="button"
         >
-          <Button
-            onClick={(e: any) => e.preventDefault()}
-            size="sm"
-            className="rounded-none"
-            variant="ghost"
-          >
-            <item.icon
-              className={cn("h-4 w-4", {
-                "text-blue-500": item.isActive(editor), // Ensures dynamic class application
-              })}
-            />
-          </Button>
-        </EditorBubbleItem>
+          <item.icon
+            className={cn("h-4 w-4", {
+              "text-blue-500": item.isActive(editor), // Ensures dynamic class application
+            })}
+          />
+        </Button>
       ))}
     </div>
   );

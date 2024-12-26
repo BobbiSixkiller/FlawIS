@@ -12,19 +12,19 @@ import {
   H3Icon,
   Bars3CenterLeftIcon,
 } from "@heroicons/react/24/outline";
-import { EditorBubbleItem, EditorInstance, useEditor } from "novel";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
 import Button from "@/components/Button";
+import { Editor } from "@tiptap/core";
 
 export type SelectorItem = {
   name: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Updated type for Heroicons
-  command: (editor: EditorInstance) => void;
-  isActive: (editor: EditorInstance) => boolean;
+  command: (editor: Editor) => void;
+  isActive: (editor: Editor) => boolean;
 };
 
-const items: SelectorItem[] = [
+export const items: SelectorItem[] = [
   {
     name: "Text",
     icon: Bars3CenterLeftIcon,
@@ -92,8 +92,7 @@ const items: SelectorItem[] = [
   },
 ];
 
-export const NodeSelector = () => {
-  const { editor } = useEditor();
+export const NodeSelector = ({ editor }: { editor?: Editor }) => {
   if (!editor) return null;
 
   const activeItem = items.filter((item) => item.isActive(editor)).pop() ?? {
@@ -120,9 +119,9 @@ export const NodeSelector = () => {
         }
       >
         {items.map((item, index) => (
-          <EditorBubbleItem
+          <div
             key={index}
-            onSelect={(editor) => {
+            onClick={() => {
               item.command(editor);
             }}
             className="flex cursor-pointer hover:bg-white/30 items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
@@ -134,7 +133,7 @@ export const NodeSelector = () => {
               <span>{item.name}</span>
             </div>
             {activeItem.name === item.name && <CheckIcon className="h-4 w-4" />}
-          </EditorBubbleItem>
+          </div>
         ))}
       </PopoverPanel>
     </Popover>

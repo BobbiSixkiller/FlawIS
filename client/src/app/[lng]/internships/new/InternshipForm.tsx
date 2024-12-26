@@ -1,19 +1,23 @@
 "use client";
 
-import Editor from "@/components/editor/Editor";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { createInternship } from "./actions";
+import { createInternship, updateInternship } from "./actions";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
+import Editor from "@/components/editor/Editor";
 
-export default function InternshipForm() {
+export default function InternshipForm({
+  data,
+}: {
+  data?: { id: string; description: string };
+}) {
   const { lng } = useParams<{ lng: string }>();
   const router = useRouter();
   const { t } = useTranslation(lng, "intertnships");
@@ -25,7 +29,7 @@ export default function InternshipForm() {
         description: yup.string().required(),
       })
     ),
-    defaultValues: {},
+    defaultValues: { description: data?.description || "" },
   });
 
   const defaultContent = {
@@ -263,8 +267,18 @@ export default function InternshipForm() {
         className="space-y-6 w-full"
         onSubmit={methods.handleSubmit(
           async (vals) => {
+            let state: {
+              success: boolean;
+              message: string;
+            };
             console.log(vals);
-            const state = await createInternship(vals);
+
+            if (data) {
+              state = await updateInternship({ id: data.id, input: vals });
+            } else {
+              state = await createInternship(vals);
+            }
+
             if (state && !state.success) {
               dispatch({
                 type: ActionTypes.SetFormMsg,
@@ -277,6 +291,7 @@ export default function InternshipForm() {
                 type: ActionTypes.SetAppMsg,
                 payload: state,
               });
+
               router.back();
             }
           },
@@ -285,11 +300,19 @@ export default function InternshipForm() {
           }
         )}
       >
-        <Editor
-          name="description"
-          label="Popis stáže (rich text editor)"
-          initialValue={defaultContent}
-        />
+        <div>
+          <p className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+            Deatilný popis stáže. Upravte podľa potreby pomocou rich text
+            editora.
+          </p>
+
+          {/* <Editor name="description" initialValue={defaultContent} /> */}
+
+          <Editor
+            name="description"
+            initialValue={data?.description || defaultContent}
+          />
+        </div>
 
         <FormMessage />
 

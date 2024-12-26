@@ -4,15 +4,16 @@ import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
+  GetDataFilter,
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
-import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { getInternships } from "./actions";
 
 interface InternshipData {
   id: string;
   organization: string;
   applicationCount: number;
+  description: string;
 }
 
 function ListItem({ data }: { data?: InternshipData }) {
@@ -22,6 +23,9 @@ function ListItem({ data }: { data?: InternshipData }) {
       href={`/${data?.id}`}
     >
       <h2 className="font-medium leading-6">{data?.organization}</h2>
+      <p className="line-clamp-3">
+        {data?.description.replace(/<[^>]*>/g, " ").trim()}
+      </p>
       <p className="mt-2">Pocet zaujemcov: {data?.applicationCount}</p>
     </Link>
   );
@@ -53,13 +57,13 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListInternships({
   initialData,
-  user,
+  filter,
 }: {
   initialData: Connection<InternshipData>;
-  user: UserFragment;
+  filter: GetDataFilter;
 }) {
   const InfiniteScrollListInternships = withInfiniteScroll<InternshipData>({
-    filter: { after: undefined, first: undefined, user: user.id },
+    filter,
     getData: getInternships,
     initialData,
     ListItem,

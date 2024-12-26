@@ -1,6 +1,12 @@
 "use client";
 
-import { Menu, Transition } from "@headlessui/react";
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition,
+} from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, ReactNode } from "react";
 
@@ -12,9 +18,9 @@ interface DropdownProps {
 export default function Dropdown({ trigger, items }: DropdownProps) {
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500">
+      <MenuButton className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500">
         {trigger}
-      </Menu.Button>
+      </MenuButton>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"
@@ -24,14 +30,14 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items
+        <MenuItems
           className={`absolute
              right-0 mt-2 min-w-max w-32 origin-top-right
           rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-10`}
         >
           {items.map((item, i) => (
             <div className="p-1" key={i}>
-              <Menu.Item>
+              <MenuItem>
                 {({ active, close }) => (
                   <Link
                     scroll={false}
@@ -45,10 +51,10 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
                     {item.label}
                   </Link>
                 )}
-              </Menu.Item>
+              </MenuItem>
             </div>
           ))}
-        </Menu.Items>
+        </MenuItems>
       </Transition>
     </Menu>
   );
