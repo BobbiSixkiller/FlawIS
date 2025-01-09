@@ -281,7 +281,7 @@ export class UserResolver {
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
-    console.log(req.hostname);
+    console.log("HAD", req.hostname);
 
     this.rmqService.produceMessage(
       JSON.stringify({

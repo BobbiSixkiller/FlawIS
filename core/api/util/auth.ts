@@ -21,7 +21,10 @@ export function createContext({
   res,
 }: ExpressContextFunctionArgument): Context {
   const appContext: Context = {
-    req: req as Request,
+    req: {
+      ...req,
+      hostname: (req.headers.hostname as string) || "client:3000", // setting hostname forwarded in header from nextjs client app
+    } as Request,
     res: res as Response,
     locale: req.cookies.NEXT_locale,
     user: null,
