@@ -95,7 +95,7 @@ export class UserResolver {
   ): Promise<UserMutationResponse> {
     const isAdmin = loggedInUser?.access.includes(Access.Admin);
     const token = req.headers.token as string;
-    const hostname = req.hostname;
+    const hostname = req.headers.hostname as string;
 
     const user = await this.userServiska.createUser(
       registerInput,
@@ -114,12 +114,14 @@ export class UserResolver {
   @UseMiddleware(RateLimit())
   @Mutation(() => String)
   async resendActivationLink(@Ctx() { locale, user, req }: Context) {
+    const hostname = req.headers.hostname as string;
+
     this.rmqService.produceMessage(
       JSON.stringify({
         locale,
         name: user?.name,
         email: user?.email,
-        hostname: req.hostname,
+        hostname,
         token: signJwt({ id: user?.id }, { expiresIn: 3600 }),
       }),
       "mail.registration"
@@ -281,14 +283,14 @@ export class UserResolver {
 
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
-    console.log("HAD", req.hostname);
+    console.log("HAD", req.headers.hostname);
 
     this.rmqService.produceMessage(
       JSON.stringify({
         locale,
         email: user.email,
         name: user.name,
-        hostname: req.hostname,
+        hostname: req.headers.hostname,
         token,
       }),
       "mail.reset"
