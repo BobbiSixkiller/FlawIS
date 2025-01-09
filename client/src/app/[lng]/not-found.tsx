@@ -18,7 +18,7 @@ export default async function NotFound() {
         className="rounded-full px-5 py-2 text-white bg-primary-500 hover:bg-primary-700 flex gap-2 items-center"
       >
         <HomeIcon className="h-5 w-5" />
-        {t("home", { ns: "landing" })}
+        {t("home", { ns: "dashboard" })}
       </a>
     </div>
   );

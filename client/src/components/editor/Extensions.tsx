@@ -1,25 +1,23 @@
 import { cn } from "@/utils/helpers";
 import Underline from "@tiptap/extension-underline";
-import {
-  TiptapImage,
-  TiptapLink,
-  TaskList,
-  TaskItem,
-  HorizontalRule,
-  StarterKit,
-  Placeholder,
-} from "novel/extensions";
-import { UploadImagesPlugin } from "novel/plugins";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import Link from "@tiptap/extension-link";
 
+// Placeholder configuration
 const placeholder = Placeholder.configure({
   placeholder: ({ node }) => {
-    if (node.type.name === "heading") {
-      return `Nadpis ${node.attrs.level}...`;
+    switch (node.type.name) {
+      case "heading":
+        return `Nadpis ${node.attrs.level}...`;
+      case "bulletList":
+      case "orderedList":
+      case "taskList":
+        return "Text odrazky...";
+      default:
+        return "Press '/' for commandiky...";
     }
-    if (node.type.name.includes("list")) {
-      return "Text odrazky...";
-    }
-    return "Press '/' for commands...";
   },
   emptyNodeClass: cn(
     "text-gray-400 relative before:absolute before:content-[attr(data-placeholder)]"
@@ -27,45 +25,37 @@ const placeholder = Placeholder.configure({
   includeChildren: true,
 });
 
-const tiptapLink = TiptapLink.configure({
+// Link extension configuration
+const tiptapLink = Link.configure({
   HTMLAttributes: {
     class: cn("hover:underline text-primary-500 cursor-pointer"),
   },
 });
 
-const tiptapImage = TiptapImage.extend({
-  addProseMirrorPlugins() {
-    return [
-      UploadImagesPlugin({
-        imageClass: cn("opacity-40 rounded-lg border"),
-      }),
-    ];
-  },
-}).configure({
-  allowBase64: true,
-  HTMLAttributes: {
-    class: cn("rounded-lg border"),
-  },
-});
+// Image extension configuration with custom plugin
+// const tiptapImage = Image.extend({
+//   addProseMirrorPlugins() {
+//     return [
+//       UploadImagesPlugin({
+//         imageClass: cn("opacity-40 rounded-lg border"),
+//       }),
+//     ];
+//   },
+// }).configure({
+//   allowBase64: true,
+//   HTMLAttributes: {
+//     class: cn("rounded-lg border"),
+//   },
+// });
 
-const taskList = TaskList.configure({
-  HTMLAttributes: {
-    class: cn("not-prose pl-2"),
-  },
-});
-const taskItem = TaskItem.configure({
-  HTMLAttributes: {
-    class: cn("flex gap-2 items-start my-4"),
-  },
-  nested: true,
-});
-
+// Horizontal rule configuration
 const horizontalRule = HorizontalRule.configure({
   HTMLAttributes: {
     class: cn("mt-4 mb-6 border-t"),
   },
 });
 
+// StarterKit configuration with customizations
 const starterKit = StarterKit.configure({
   bulletList: {
     HTMLAttributes: {
@@ -100,7 +90,7 @@ const starterKit = StarterKit.configure({
       spellcheck: "false",
     },
   },
-  horizontalRule: false,
+  horizontalRule: false, // Custom horizontal rule used
   dropcursor: {
     color: "#DBEAFE",
     width: 4,
@@ -108,15 +98,14 @@ const starterKit = StarterKit.configure({
   gapcursor: false,
 });
 
+// Underline extension
 const underline = Underline;
 
+// Exporting the default extensions
 export const defaultExtensions = [
   starterKit,
   placeholder,
   tiptapLink,
-  tiptapImage,
-  taskList,
-  taskItem,
   horizontalRule,
   underline,
 ];

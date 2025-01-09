@@ -19,13 +19,13 @@ export function Input({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium leading-6 text-gray-900"
+          className="block text-sm font-medium leading-6 text-gray-900 mb-2"
         >
           {label}
         </label>
       )}
       <div
-        className={`mt-2 flex items-center w-full disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
+        className={`flex items-center disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500"

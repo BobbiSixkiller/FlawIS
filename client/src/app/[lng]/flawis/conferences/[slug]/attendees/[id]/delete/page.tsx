@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { getAttendee } from "../actions";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import DeleteAttendeeForm from "./DeleteAttendeeForm";
+import { getAttendee } from "../actions";
 
 export default async function DeleteAttendee({
   params: { lng, slug, id },

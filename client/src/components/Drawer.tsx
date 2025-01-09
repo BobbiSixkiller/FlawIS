@@ -1,4 +1,10 @@
-import { Dialog, Transition } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { Fragment, ReactNode } from "react";
 
@@ -99,13 +105,13 @@ export default function Drawer({
   };
 
   return (
-    <Transition.Root show={visible} as={Fragment}>
+    <Transition show={visible} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-20"
         onClose={() => setVisible(false)}
       >
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-in-out duration-500"
           enterFrom="opacity-0"
@@ -115,12 +121,12 @@ export default function Drawer({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/25 transition-opacity" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
             <div className={drawerStyles().dialogContainer}>
-              <Transition.Child
+              <TransitionChild
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
                 enterFrom={drawerStyles().transition.enterFrom}
@@ -129,13 +135,13 @@ export default function Drawer({
                 leaveFrom={drawerStyles().transition.leaveFrom}
                 leaveTo={drawerStyles().transition.leaveTo}
               >
-                <Dialog.Panel className={drawerStyles().dialogPanel}>
+                <DialogPanel className={drawerStyles().dialogPanel}>
                   <div className="h-full flex flex-col gap-6 bg-primary-500 text-white shadow-xl px-4 py-6 sm:px-6">
                     <div className="sticky top-6 flex justify-between">
                       {title && (
-                        <Dialog.Title className="text-lg font-medium">
+                        <DialogTitle className="text-lg font-medium">
                           {title}
-                        </Dialog.Title>
+                        </DialogTitle>
                       )}
                       <div className="flex h-7 items-center">
                         <button
@@ -149,16 +155,17 @@ export default function Drawer({
                         </button>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 overflow-y-scroll pointer-events-auto">
+
+                    <div className="flex flex-1 flex-col gap-2 overflow-y-scroll pointer-events-auto">
                       {children}
                     </div>
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                </DialogPanel>
+              </TransitionChild>
             </div>
           </div>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   );
 }

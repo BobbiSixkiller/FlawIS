@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
+import Button from "./Button";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 export default function ImageFileInput({
   avatarUrl,
@@ -22,6 +24,8 @@ export default function ImageFileInput({
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(field.value);
+    } else {
+      setPreview("/images/img-placeholder.jpg");
     }
   }, [field.value]);
 
@@ -53,7 +57,7 @@ export default function ImageFileInput({
             className="rounded-full"
           />
         </div>
-        <label className="bg-primary-100 px-5 py-1 hover:bg-primary-200 text-primary-600 rounded-full font-semibold">
+        <label className="cursor-pointer bg-primary-100 px-5 py-1 hover:bg-primary-200 text-primary-600 rounded-full font-semibold">
           {label}
           <input
             {...props}
@@ -63,6 +67,16 @@ export default function ImageFileInput({
             className="hidden"
           />
         </label>
+        {field.value && (
+          <Button
+            variant="destructive"
+            type="button"
+            className="rounded-full p-2 size-8"
+            onClick={() => field.onChange(null)}
+          >
+            <TrashIcon className="size-5" />
+          </Button>
+        )}
       </div>
       {fieldState.error && (
         <p className="text-sm text-red-500">{fieldState.error.message}</p>

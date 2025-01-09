@@ -37,7 +37,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         style={{ objectFit: "cover" }}
-        containerClass="h-24 w-full max-w-72"
+        className="h-24 w-full max-w-72"
       />
 
       <h2 className="font-medium leading-6">

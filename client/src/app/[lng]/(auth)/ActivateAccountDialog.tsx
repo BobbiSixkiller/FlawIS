@@ -20,6 +20,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function ActivateAccountDialog({
   lng,
@@ -108,14 +109,13 @@ export default function ActivateAccountDialog({
                 {t("body")}
 
                 <Button
-                  color="primary"
+                  className="w-full"
                   type="button"
-                  fluid
-                  onClick={onClick}
+                  size="sm"
                   disabled={isPending}
-                  loading={isPending}
+                  onClick={onClick}
                 >
-                  {t("button")}
+                  {isPending ? <Spinner inverted /> : t("button")}
                 </Button>
 
                 <FormMessage />

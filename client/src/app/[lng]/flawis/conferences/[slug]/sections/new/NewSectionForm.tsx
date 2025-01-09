@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import { createSection } from "../actions";
 import { LocalizedTextarea } from "@/components/Textarea";
+import Spinner from "@/components/Spinner";
 
 export default function NewSectionForm({
   conference,
@@ -88,11 +89,10 @@ export default function NewSectionForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Vytvorit sekciu
+          {methods.formState.isSubmitting ? <Spinner inverted /> : "Vytvorit"}
         </Button>
       </form>
     </FormProvider>

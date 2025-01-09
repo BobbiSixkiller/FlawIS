@@ -1,0 +1,21 @@
+"use server";
+
+import { InternshipDocument } from "@/lib/graphql/generated/graphql";
+import { executeGqlFetch } from "@/utils/actions";
+
+export async function getInternship(id: string) {
+  //   await new Promise((resolve) => setTimeout(resolve, 5000));
+  const res = await executeGqlFetch(
+    InternshipDocument,
+    { id },
+    {},
+    { revalidate: 3600, tags: [`internship:${id}`] }
+  );
+  console.log(res);
+
+  if (res.errors) {
+    console.log(res.errors[0]);
+  }
+
+  return res.data?.internship;
+}

@@ -1,7 +1,7 @@
 import { Max, Min } from "class-validator";
 import { ObjectId } from "mongodb";
 import { ArgsType, ClassType, Field, Int, ObjectType } from "type-graphql";
-import { RefDocExists } from "../../util/validation";
+import { RefDocExists } from "../../util/decorators";
 
 //generic function for creating corresponding Connection Type enabling relay style pagination
 export function CreateConnection<TNode extends object>(
@@ -33,7 +33,7 @@ export function CreateConnection<TNode extends object>(
     @Field(() => PageInfo)
     pageInfo: PageInfo;
 
-    @Field()
+    @Field(() => Int)
     totalCount: number;
   }
 

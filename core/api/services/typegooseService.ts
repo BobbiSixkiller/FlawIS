@@ -3,7 +3,7 @@ import * as mongoose from "mongoose";
 import { Service } from "typedi";
 
 @Service()
-export class CRUDservice<U extends types.AnyParamConstructor<any>> {
+export class TypegooseService<U extends types.AnyParamConstructor<any>> {
   readonly dataModel: ReturnModelType<U>;
 
   constructor(entity: U) {
@@ -20,6 +20,14 @@ export class CRUDservice<U extends types.AnyParamConstructor<any>> {
     >
   ) {
     return await this.dataModel.exists(filter);
+  }
+
+  async count(
+    filter: mongoose.FilterQuery<
+      types.DocumentType<InstanceType<U>, types.BeAnObject>
+    >
+  ) {
+    return await this.dataModel.countDocuments(filter);
   }
 
   async findAll(
@@ -56,6 +64,15 @@ export class CRUDservice<U extends types.AnyParamConstructor<any>> {
     return await this.dataModel
       .findOneAndUpdate(filter, update, options)
       .exec();
+  }
+
+  async findOneAndDelete(
+    filter: mongoose.FilterQuery<
+      types.DocumentType<InstanceType<U>, types.BeAnObject>
+    >,
+    options?: mongoose.QueryOptions | null
+  ) {
+    return await this.dataModel.findOneAndDelete(filter, options).exec();
   }
 
   async update(

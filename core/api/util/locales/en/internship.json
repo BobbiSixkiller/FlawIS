@@ -1,0 +1,6 @@
+{
+  "notFound": "Internship has not been found!",
+  "update": "Internship at {{name}} has been updated.",
+  "new": "Internship at {{name}} has been created.",
+  "delete": "Internship at {{name}} has been deleted."
+}

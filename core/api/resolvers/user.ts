@@ -12,7 +12,6 @@ import {
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
 import { Access, User } from "../entitites/User";
-import { CRUDservice } from "../services/CRUDservice";
 import { Mutation } from "type-graphql";
 import {
   OrganizationEmails,
@@ -35,12 +34,13 @@ import { DocumentType } from "@typegoose/typegoose";
 import { OAuth2Client } from "google-auth-library";
 import { RmqService } from "../services/rmqService";
 import { UserService } from "../services/userService";
+import { TypegooseService } from "../services/typegooseService";
 
 @Service()
 @Resolver()
 export class UserResolver {
   constructor(
-    private readonly userService = new CRUDservice(User),
+    private readonly userService = new TypegooseService(User),
     private readonly userServiska: UserService,
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService,

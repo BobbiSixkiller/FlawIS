@@ -21,6 +21,7 @@ const nextConfig = {
         hostname: "minio-staging",
         port: "9000",
       },
+      { protocol: "https", hostname: "avatar.iran.liara.run" },
     ],
   },
 };

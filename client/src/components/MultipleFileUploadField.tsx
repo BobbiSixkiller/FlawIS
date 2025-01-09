@@ -48,21 +48,32 @@ export default function MultipleFileUploadField({
 }) {
   const { field, fieldState } = useController({ name });
 
-  const { setValue } = useFormContext();
+  const { setValue, setError } = useFormContext();
   const [files, setFiles] = useState<UploadableFile[]>([]);
 
   useEffect(() => {
     setFiles(field.value.map((file: File) => ({ file, errors: [] })));
   }, [field.value]);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const mappedAccepted = acceptedFiles.map((file) => ({
-      file,
-      errors: [],
-    }));
+  const onDrop = useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      const mappedAccepted = acceptedFiles.map((file) => ({
+        file,
+        errors: [],
+      }));
 
-    setFiles((curr) => [...curr, ...mappedAccepted]);
-  }, []);
+      if (
+        fileRejections.some((ref) =>
+          ref.errors.some((err) => err.code === "too-many-files")
+        )
+      ) {
+        setError(name, { message: "too-many-files" });
+      }
+
+      setFiles((curr) => [...curr, ...mappedAccepted]);
+    },
+    []
+  );
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({ onDrop, maxFiles, maxSize, accept });

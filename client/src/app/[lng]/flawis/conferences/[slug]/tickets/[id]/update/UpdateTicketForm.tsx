@@ -13,6 +13,7 @@ import { updateTicket } from "../../actions";
 import { Input, LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateTicketForm({
   ticket,
@@ -96,11 +97,14 @@ export default function UpdateTicketForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Aktualizovat listok
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Aktualizovat listok"
+          )}
         </Button>
       </form>
     </FormProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import Spinner from "@/components/Spinner";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -41,10 +42,14 @@ export default function ExportButton() {
 
   return (
     <div className="w-20">
-      <Button fluid loading={loading} onClick={handleClick} color="green">
-        <span className="flex gap-2 items-center">
-          .csv <TableCellsIcon className="size-5" />
-        </span>
+      <Button className="w-full" onClick={handleClick} color="green">
+        {loading ? (
+          <Spinner inverted />
+        ) : (
+          <span className="flex gap-2 items-center">
+            .csv <TableCellsIcon className="size-5" />
+          </span>
+        )}
       </Button>
     </div>
   );

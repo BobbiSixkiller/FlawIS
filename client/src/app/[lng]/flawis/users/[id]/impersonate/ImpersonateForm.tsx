@@ -7,6 +7,7 @@ import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { impersonate } from "./actions";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function ImpersonateForm({
   user,
@@ -43,12 +44,11 @@ export default function ImpersonateForm({
       <Button
         color="primary"
         type="submit"
-        fluid
+        className="w-full"
         onClick={handleClick}
-        loading={pending}
         disabled={pending}
       >
-        Potvrdit
+        {pending ? <Spinner inverted /> : "Potvridt"}
       </Button>
     </div>
   );

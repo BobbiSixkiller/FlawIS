@@ -11,5 +11,6 @@
   "confirm": "Confirm",
   "deleteConfirm": "Do you really wish to delete {{name}}?",
   "notFound": "Nothing found.",
-  "flaw": "Comenius University in Bratislava, Faculty of Law"
+  "flaw": "Comenius University in Bratislava, Faculty of Law",
+  "updatedAt": "Updated at {{ value }}"
 }

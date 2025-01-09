@@ -19,6 +19,7 @@ import {
   LocalizedMultipleInput,
   MultipleInput,
 } from "@/components/MultipleInput";
+import Spinner from "@/components/Spinner";
 
 export default function NewSubmissionForm({
   conferenceId,
@@ -148,11 +149,14 @@ export default function NewSubmissionForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          {t("create", { ns: "common" })}
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            t("create", { ns: "common" })
+          )}
         </Button>
       </form>
     </FormProvider>

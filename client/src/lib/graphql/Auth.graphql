@@ -30,6 +30,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 
 query me {

@@ -22,7 +22,7 @@ export default async function Logo({
 
   return (
     <div
-      className={`flex gap-4 font-normal m-auto ${
+      className={`flex gap-4 font-normal ${
         inverted ? "text-white" : "text-gray-900"
       }`}
     >

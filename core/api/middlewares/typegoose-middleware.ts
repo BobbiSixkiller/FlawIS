@@ -1,58 +1,39 @@
 import { Model, Document, Types } from "mongoose";
-import { getClass } from "@typegoose/typegoose";
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
+import { getClass } from "@typegoose/typegoose";
 
 export const TypegooseMiddleware: MiddlewareFn<Context> = async ({}, next) => {
   const result = await next();
 
   if (Array.isArray(result)) {
-    return result.map((item) =>
-      item instanceof Model ? convertDocument(item) : item
-    );
+    return result.map((item) => processItem(item));
   }
 
-  if (result instanceof Model) {
-    return convertDocument(result);
+  if (result) {
+    return processItem(result);
   }
 
   return result;
 };
 
-export function transformIds(doc: object) {
-  const transformed = [];
-
-  for (let [key, value] of Object.entries(doc)) {
-    if (key === "_id") {
-      key = "id";
-    }
-
-    if (key.includes("Url") && process.env.NODE_ENV === "staging") {
-      value = value.replace("minio", "minio-staging");
-    }
-
-    if (
-      value &&
-      typeof value === "object" &&
-      !Array.isArray(value) &&
-      Object.keys(value).length > 1
-    ) {
-      value = transformIds(value);
-    }
-
-    if (
-      value &&
-      typeof value === "object" &&
-      Array.isArray(value) &&
-      !value.every((i) => typeof i === "string" || Types.ObjectId.isValid(i))
-    ) {
-      value = value.map((v) => transformIds(v));
-    }
-
-    transformed.push([key, value]);
+function processItem(item: any) {
+  if (item instanceof Model) {
+    return convertDocument(item);
+  } else if (isPlainObject(item)) {
+    return transformIds(item);
   }
+  return item;
+}
 
-  return Object.fromEntries(transformed);
+function isPlainObject(value: any): value is object {
+  return (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !Types.ObjectId.isValid(value) &&
+    !(value instanceof Date)
+  );
 }
 
 export function convertDocument(doc: Document) {
@@ -60,4 +41,29 @@ export function convertDocument(doc: Document) {
   const DocumentClass = getClass(doc);
   Object.setPrototypeOf(convertedDocument, DocumentClass!.prototype);
   return convertedDocument;
+}
+
+export function transformIds(doc: object): object {
+  const transformed = [];
+
+  for (let [key, value] of Object.entries(doc)) {
+    // Rename `_id` to `id`, while preserving `ObjectId` instances
+    if (key === "_id") {
+      key = "id";
+    }
+
+    if (value instanceof Types.ObjectId) {
+      // Preserve ObjectId
+    } else if (value instanceof Date) {
+      // Ensure Dates are not altered
+    } else if (isPlainObject(value)) {
+      value = transformIds(value);
+    } else if (Array.isArray(value)) {
+      value = value.map((v) => (isPlainObject(v) ? transformIds(v) : v));
+    }
+
+    transformed.push([key, value]);
+  }
+
+  return Object.fromEntries(transformed);
 }

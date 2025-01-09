@@ -12,6 +12,7 @@ import Button from "@/components/Button";
 import { updateSection } from "../../actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateSectionForm({
   section,
@@ -88,11 +89,14 @@ export default function UpdateSectionForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Aktualizovat sekciu
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Aktualizovat sekciu"
+          )}
         </Button>
       </form>
     </FormProvider>

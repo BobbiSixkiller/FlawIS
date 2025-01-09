@@ -46,7 +46,7 @@ export default function DeleteConferenceForm({
         {conference?.translations[lng as "sk" | "en"].name} ?
       </h1>
 
-      <Button color="primary" type="submit" fluid>
+      <Button color="primary" type="submit" className="w-full">
         Potvrdit
       </Button>
     </form>

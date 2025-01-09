@@ -10,7 +10,6 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Attendee, AttendeeUserUnion } from "../entitites/Attendee";
-import { CRUDservice } from "../services/CRUDservice";
 import { I18nService } from "../services/i18nService";
 import {
   AttendeeArgs,
@@ -25,15 +24,16 @@ import { DocumentType } from "@typegoose/typegoose";
 import { User } from "../entitites/User";
 import { Submission } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
+import { TypegooseService } from "../services/typegooseService";
 
 @Service()
 @Resolver(() => Attendee)
 export class AttendeeResolver {
   constructor(
-    private readonly attendeeService = new CRUDservice(Attendee),
-    private readonly conferenceService = new CRUDservice(Conference),
-    private readonly userService = new CRUDservice(User),
-    private readonly submissionService = new CRUDservice(Submission),
+    private readonly attendeeService = new TypegooseService(Attendee),
+    private readonly conferenceService = new TypegooseService(Conference),
+    private readonly userService = new TypegooseService(User),
+    private readonly submissionService = new TypegooseService(Submission),
     private readonly i18nService: I18nService
   ) {}
 
@@ -47,11 +47,7 @@ export class AttendeeResolver {
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges:
-        connection.edges.map((e) => ({
-          cursor: e.cursor,
-          node: transformIds(e.node),
-        })) || [],
+      edges: connection.edges || [],
     };
   }
 

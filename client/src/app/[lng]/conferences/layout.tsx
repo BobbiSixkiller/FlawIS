@@ -3,14 +3,31 @@ import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
 import Logo from "@/components/Logo";
 import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
-import {
-  AcademicCapIcon,
-  ChevronRightIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+    sidebar: React.ReactNode;
+    modal: React.ReactNode;
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `${t("conferences")} | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function DashboardLayout({
   children,
@@ -50,7 +67,13 @@ export default async function DashboardLayout({
         user={user}
         logo={<Logo lng={lng} width={36} height={36} notext />}
         drawerTitle={<Logo inverted lng={lng} height={60} width={60} />}
-      />
+      >
+        <NavItem route="/">
+          <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+          {t("home")}
+        </NavItem>
+        <LngSwitcher lng={lng} className="mt-auto" />
+      </MobileNav>
       {/* Dashboard content with sidebar */}
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">

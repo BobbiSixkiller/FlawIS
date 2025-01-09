@@ -20,16 +20,14 @@ export async function getImage(src: string) {
 
 export default async function DynamicImage({
   src,
-  containerClass,
   ...props
 }: {
   src: string;
-  containerClass?: string;
 } & ImageProps) {
   const { base64 } = await getImage(src);
 
   return (
-    <div className={cn("relative", containerClass)}>
+    <div className={cn("relative", props.className)}>
       <Image {...props} src={src} placeholder="blur" blurDataURL={base64} />
     </div>
   );

@@ -3,6 +3,9 @@ import { translate } from "@/lib/i18n";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { getMe } from "../(auth)/actions";
 import { Access } from "@/lib/graphql/generated/graphql";
+import ListInternships from "./ListInternships";
+import { getAcademicYearInterval } from "@/utils/helpers";
+import { getInternships } from "./actions";
 
 export default async function InternshipsHomePage({
   params: { lng },
@@ -11,6 +14,15 @@ export default async function InternshipsHomePage({
 }) {
   const user = await getMe();
   const { t } = await translate(lng, "internships");
+
+  const { startDate, endDate } = getAcademicYearInterval();
+
+  // refactor to display
+  const filter = user.access.includes(Access.Organization)
+    ? { user: user.id }
+    : { startDate, endDate };
+
+  const initialData = await getInternships(filter);
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,7 +42,7 @@ export default async function InternshipsHomePage({
             : undefined
         }
       />
-      {/* {initialData && <ListUsers initialData={initialData} />} */}
+      <ListInternships initialData={initialData} filter={filter} />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { MultipleInput } from "@/components/MultipleInput";
-import { Button } from "@/components/MyButton";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
@@ -12,6 +11,7 @@ import { sendInvites } from "./actions";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
+import Button from "@/components/Button";
 
 export default function RegistrationInvites() {
   const { lng } = useParams<{ lng: string }>();
@@ -67,7 +67,6 @@ export default function RegistrationInvites() {
         <Button
           className="w-full"
           type="submit"
-          variant="default"
           size="sm"
           disabled={methods.formState.isSubmitting}
         >

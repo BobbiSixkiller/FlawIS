@@ -87,11 +87,13 @@ export async function uploadToMinio(
 export async function uploadOrDelete(
   bucketName: string,
   fileUrl?: string | null,
-  file?: File,
+  file?: File | null,
   path?: string
 ): Promise<{ url?: string | null; error?: string }> {
   try {
     let url;
+
+    // If no fileUrl and a file is provided, upload the file
     if (!fileUrl && file) {
       url = await uploadToMinio(
         bucketName,
@@ -99,21 +101,46 @@ export async function uploadOrDelete(
         file
       );
     }
+
+    // If a fileUrl is provided but no file, delete the file at fileUrl
     if (fileUrl && !file) {
       await deleteFiles([fileUrl]);
       url = null;
     }
-    if (fileUrl && file && file.name !== fileUrl.split("-").pop()) {
-      await deleteFiles([fileUrl]);
-      url = await uploadToMinio(
-        bucketName,
-        path ? `${path}/${file.name}` : file.name,
-        file
-      );
+
+    // If both fileUrl and file are provided, handle updates
+    if (fileUrl && file) {
+      const currentFileName = fileUrl.split("-").pop();
+      if (file.name === currentFileName) {
+        // Keep the original fileUrl if the names match
+        url = fileUrl;
+      } else {
+        // Delete the original file and upload the new file
+        await deleteFiles([fileUrl]);
+        url = await uploadToMinio(
+          bucketName,
+          path ? `${path}/${file.name}` : file.name,
+          file
+        );
+      }
     }
 
     return { url };
   } catch (error: any) {
     return { error: error.message };
   }
+}
+
+export function getAcademicYearInterval(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  // Academic year starts in September
+  const startYear = month >= 8 ? year : year - 1;
+  const endYear = startYear + 1;
+
+  const startDate = new Date(`${startYear}-09-01T00:00:00Z`);
+  const endDate = new Date(`${endYear}-06-30T23:59:59Z`);
+
+  return { startYear, endYear, startDate, endDate };
 }

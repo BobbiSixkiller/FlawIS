@@ -17,7 +17,7 @@ export default async function ConferencePage({
         <DynamicImage
           alt="conference-logo"
           src={conference!.translations[lng as "sk" | "en"].logoUrl as string}
-          containerClass="w-[300px] h-[150px]"
+          className="w-[300px] h-[150px]"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{ objectFit: "cover" }}

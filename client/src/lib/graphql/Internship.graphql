@@ -1,0 +1,148 @@
+fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}
+
+query internships(
+  $after: ObjectId
+  $first: Int
+  $user: ObjectId
+  $startDate: DateTimeISO
+  $endDate: DateTimeISO
+) {
+  internships(
+    after: $after
+    first: $first
+    user: $user
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        id
+        organization
+        description
+        applicationsCount
+        academicYear
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+query internship($id: ObjectId!) {
+  internship(id: $id) {
+    id
+    organization
+    description
+    updatedAt
+    createdAt
+    applicationsCount
+    myApplication {
+      ...Application
+    }
+  }
+}
+
+mutation createInternship($input: InternshipInput!) {
+  createInternship(input: $input) {
+    message
+    data {
+      id
+      organization
+    }
+  }
+}
+
+mutation updateInternship($id: ObjectId!, $input: InternshipInput!) {
+  updateInternship(id: $id, input: $input) {
+    message
+    data {
+      id
+      organization
+    }
+  }
+}
+
+mutation deleteInternship($id: ObjectId!) {
+  deleteInternship(id: $id)
+}
+
+query interns(
+  $after: ObjectId
+  $first: Int
+  $user: ObjectId
+  $startDate: DateTimeISO
+  $endDate: DateTimeISO
+  $internship: ObjectId
+) {
+  interns(
+    after: $after
+    first: $first
+    internship: $internship
+    user: $user
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Application
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query intern($id: ObjectId!) {
+  intern(id: $id) {
+    ...Application
+  }
+}
+
+mutation createIntern($fileUrls: [String]!, $internshipId: ObjectId!) {
+  createIntern(fileUrls: $fileUrls, internshipId: $internshipId) {
+    message
+  }
+}
+
+mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
+  updateInternFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+
+mutation deleteIntern($id: ObjectId!) {
+  deleteIntern(id: $id) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}

@@ -1,5 +1,24 @@
 import Logo from "@/components/Logo";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `${t("login")} | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function AuthLayout({
   children,
@@ -12,7 +31,9 @@ export default async function AuthLayout({
 
   return (
     <div className="mx-auto w-full max-w-96 flex flex-col justify-center px-6 py-12">
-      <Logo lng={lng} width={60} height={60} notext />
+      <div className="mx-auto">
+        <Logo lng={lng} width={60} height={60} notext />
+      </div>
 
       {children}
 

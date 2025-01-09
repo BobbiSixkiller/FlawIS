@@ -12,5 +12,6 @@
   "keywords": "Add at least {{value}} keyword!",
   "maxFiles": "Maximum number of files is {{value}}!",
   "minFiles": "Minimum number of files is {{value}}!",
-  "phone": "Invalid phone number!"
+  "phone": "Invalid phone number!",
+  "isUniba": "Email domain must include 'uniba.sk'"
 }

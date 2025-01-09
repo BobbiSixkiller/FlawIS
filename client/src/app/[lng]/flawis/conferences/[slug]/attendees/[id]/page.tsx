@@ -1,5 +1,4 @@
 import Heading from "@/components/Heading";
-import { getAttendee } from "./actions";
 import DownloadPDFButton from "./DownloadPDFButton";
 import {
   ArrowsRightLeftIcon,
@@ -11,6 +10,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import RemoveAuthor from "./RemoveAuthor";
+import { executeGqlFetch } from "@/utils/actions";
+import { AttendeeDocument } from "@/lib/graphql/generated/graphql";
+import { getAttendee } from "./actions";
 
 export default async function AttendeePage({
   params: { id, lng, slug },

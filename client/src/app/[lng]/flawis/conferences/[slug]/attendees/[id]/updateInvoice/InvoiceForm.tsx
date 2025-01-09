@@ -12,6 +12,7 @@ import { InvoiceInput } from "@/lib/graphql/generated/graphql";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import { updateInvoice } from "./actions";
+import Spinner from "@/components/Spinner";
 
 export default function UpdateInvoiceForm({
   invoice,
@@ -127,11 +128,14 @@ export default function UpdateInvoiceForm({
         <Button
           color="primary"
           type="submit"
-          fluid
-          loading={methods.formState.isSubmitting}
+          className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          Aktualizovat fakturu
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Aktualizovat fakturu"
+          )}
         </Button>
       </form>
     </FormProvider>

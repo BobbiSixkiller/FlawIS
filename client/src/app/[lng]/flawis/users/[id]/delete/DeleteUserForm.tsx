@@ -8,6 +8,7 @@ import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
 import { deleteUser } from "./actions";
 import { FormMessage } from "@/components/Message";
+import Spinner from "@/components/Spinner";
 
 export default function DeleteUserForm({
   user,
@@ -53,12 +54,11 @@ export default function DeleteUserForm({
       <Button
         color="primary"
         type="submit"
-        fluid
+        className="w-full"
         onClick={handleClick}
-        loading={pending}
         disabled={pending}
       >
-        Potvrdit
+        {pending ? <Spinner inverted /> : "Potvrdit"}
       </Button>
     </div>
   );

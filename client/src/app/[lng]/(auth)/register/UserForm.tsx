@@ -4,7 +4,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
-import Button from "@/components/Button";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -30,6 +29,9 @@ import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import Button from "@/components/Button";
+import ImageFileInput from "@/components/ImageFileInput";
+import { mixed } from "yup";
 
 export default function UserForm({
   user,
@@ -49,7 +51,9 @@ export default function UserForm({
   const searchParams = useSearchParams();
 
   const [loadingFile, setLoadingFile] = useState(
-    (user && typeof user.cvUrl === "string") || false
+    (user && typeof user.cvUrl === "string") ||
+      (user && user.avatarUrl) ||
+      false
   );
 
   const fetchFiles = useCallback(async () => {
@@ -58,6 +62,12 @@ export default function UserForm({
         const file = await fetchFromMinio("resumes", user.cvUrl);
         methods.setValue("files", [file]);
       }
+
+      if (user?.avatarUrl) {
+        const avatar = await fetchFromMinio("avatars", user.avatarUrl);
+        methods.setValue("avatar", avatar);
+      }
+
       setLoadingFile(false);
     } catch (error: any) {
       console.log(error.message);
@@ -76,7 +86,23 @@ export default function UserForm({
     resolver: yupResolver(
       yup.object({
         name: yup.string().trim().required(),
-        email: yup.string().required().email(),
+        email: yup
+          .string()
+          .required()
+          .email()
+          .when({
+            is: () =>
+              (searchParams.get("token") === null &&
+                subdomain?.includes("internships")) ||
+              user?.access.includes(Access.Student), // When creating student account on internships tenant
+            then: (schema) =>
+              schema.matches(
+                /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)*uniba\.sk$/,
+                {
+                  message: t("isUniba", { ns: "validation" }),
+                }
+              ),
+          }),
         password: yup
           .string()
           .trim()
@@ -111,24 +137,15 @@ export default function UserForm({
                   )
               : schema.transform((value) => (!value ? null : value)).nullable()
           ),
-        organization: yup
-          .string()
-          .trim()
-          .nullable()
-          .when([], {
-            is: () =>
-              subdomain === "conferences" ||
-              subdomain === "conferences-staging",
-            then: (schema) => schema.required(),
-          }),
+        organization: yup.string().trim().nullable().required(),
         telephone: yup
           .string()
           .trim()
           .nullable()
           .when([], {
             is: () =>
-              subdomain === "conferences" ||
-              subdomain === "conferences-staging",
+              subdomain?.includes("conferences") ||
+              user?.access.includes(Access.Student),
             then: (schema) =>
               schema
                 .required()
@@ -153,6 +170,11 @@ export default function UserForm({
           .of(yup.mixed<File>().required())
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
+        avatar: mixed<File>()
+          .nullable()
+          .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
+            file ? file.size < 2_000_000 : true
+          ),
       })
     ),
     defaultValues: {
@@ -166,6 +188,7 @@ export default function UserForm({
       studyProgramme: user?.studyProgramme || null,
       privacy: path === "/register" ? false : true,
       files: [],
+      avatar: undefined,
     },
   });
 
@@ -202,6 +225,15 @@ export default function UserForm({
               return methods.setError("files", { message: error });
             }
 
+            const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
+              "avatars",
+              user?.avatarUrl,
+              val.avatar
+            );
+            if (avatarErr) {
+              return methods.setError("avatar", { message: error });
+            }
+
             let state;
             if (path.includes("register")) {
               state = await register({
@@ -223,6 +255,7 @@ export default function UserForm({
                 telephone: val.telephone ? val.telephone : undefined,
                 studyProgramme: val.studyProgramme as StudyProgramme,
                 cvUrl: url,
+                avatarUrl,
               });
             } else {
               state = await addUser({
@@ -255,6 +288,8 @@ export default function UserForm({
       >
         <FormMessage />
 
+        <ImageFileInput name="avatar" label="Fotka" />
+
         <Input label={t("name")} name="name" />
         <Input label={t("email")} name="email" />
 
@@ -275,14 +310,8 @@ export default function UserForm({
           />
         )}
 
-        {(subdomain === "conferences" ||
-          subdomain === "conferences-staging" ||
-          path.includes("users")) && (
-          <>
-            <PhoneInput label={t("phone")} name="telephone" />
-            <Input label={t("org")} name="organization" />
-          </>
-        )}
+        <PhoneInput label={t("phone")} name="telephone" />
+        <Input label={t("org")} name="organization" />
 
         {(path.includes("users") || user?.access.includes(Access.Student)) && (
           <>
@@ -350,14 +379,19 @@ export default function UserForm({
         )}
 
         <Button
-          color="primary"
+          className="w-full items-center justify-center gap-2"
           type="submit"
-          fluid
-          loadingText={t("submitting")}
-          loading={methods.formState.isSubmitting}
+          size="sm"
           disabled={methods.formState.isSubmitting}
         >
-          {t("submit")}
+          {methods.formState.isSubmitting ? (
+            <>
+              <Spinner inverted />
+              {t("submitting")}
+            </>
+          ) : (
+            t("submit")
+          )}
         </Button>
       </form>
     </FormProvider>

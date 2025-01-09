@@ -8,6 +8,27 @@ import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import MissingResume from "./MissingResume";
 import { translate } from "@/lib/i18n";
+import { Metadata, ResolvingMetadata } from "next";
+
+export async function generateMetadata(
+  {
+    params: { lng },
+  }: {
+    params: { lng: string };
+    sidebar: React.ReactNode;
+    modal: React.ReactNode;
+  },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { t } = await translate(lng, "dashboard");
+
+  return {
+    title: `${t("internships")} | ${t("title")}`,
+    openGraph: {
+      images: [`/images/Praf-logo-text-${lng}.png`],
+    },
+  };
+}
 
 export default async function DashboardLayout({
   children,
@@ -27,33 +48,35 @@ export default async function DashboardLayout({
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Desktop Nav */}
-      <div className="sticky top-0 hidden lg:flex flex-col gap-6 h-screen w-full max-w-xs bg-primary-500 text-white px-4 py-6 inset-0 overflow-auto">
-        <div>
-          <Logo lng={lng} height={60} width={60} inverted />
-        </div>
-        <div className="flex flex-1 flex-col justify-between gap-2">
-          <nav>
-            <NavItem route="/">
-              <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-              {t("home")}
-            </NavItem>
-            <ProfileMenuItem lng={lng} user={user} />
-          </nav>
-          <LngSwitcher lng={lng} />
-        </div>
+      <div className="sticky top-0 hidden lg:flex flex-col h-screen w-full max-w-xs bg-primary-500 text-white px-4 py-6 inset-0">
+        <Logo lng={lng} height={60} width={60} inverted />
+        <nav className="flex-1 flex flex-col mt-6 overflow-auto">
+          <NavItem route="/">
+            <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+            {t("home")}
+          </NavItem>
+          <ProfileMenuItem lng={lng} user={user} />
+          <LngSwitcher lng={lng} className="mt-auto" />
+        </nav>
       </div>
       <MobileNav
         lng={lng}
         user={user}
         logo={<Logo lng={lng} width={36} height={36} notext />}
         drawerTitle={<Logo inverted lng={lng} height={60} width={60} />}
-      />
+      >
+        <NavItem route="/">
+          <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+          {t("home")}
+        </NavItem>
+        <LngSwitcher lng={lng} className="mt-auto" />
+      </MobileNav>
       {/* Dashboard content with sidebar */}
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
-            homeElement={<HomeIcon className="h-5 w-5" />}
-            separator={<ChevronRightIcon className="h-3 w-3" />}
+            homeElement={<HomeIcon className="size-5" />}
+            separator={<ChevronRightIcon className="size-3" />}
             activeClasses="text-primary-500 hover:underline"
             containerClasses="flex flex-wrap text-sm gap-2 items-center"
             capitalizeLinks
