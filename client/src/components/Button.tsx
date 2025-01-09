@@ -6,19 +6,17 @@ import React, {
 } from "react";
 
 const buttonStyles = {
-  base: cn(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-  ),
+  base: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   variants: {
     variant: {
-      default: cn("bg-primary-500 text-white hover:bg-primary-500/90"),
-      destructive: cn("bg-red-500 text-white hover:bg-red-500/90"),
-      outline: cn(
-        "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent"
-      ),
-      secondary: cn("bg-black text-white hover:bg-black/80"),
-      ghost: cn("hover:bg-white/30"),
-      link: cn("text-primary underline-offset-4 hover:underline"),
+      default: "bg-primary-500 text-white hover:bg-primary-500/90",
+      destructive: "bg-red-500 text-white hover:bg-red-500/90",
+      positive: "bg-green-500 text-white hover:bg-green-500/90",
+      outline:
+        "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent",
+      secondary: "bg-black text-white hover:bg-black/80",
+      ghost: "hover:bg-white/30",
+      link: "text-primary underline-offset-4 hover:underline",
     },
     size: {
       default: "h-10 px-4 py-2",

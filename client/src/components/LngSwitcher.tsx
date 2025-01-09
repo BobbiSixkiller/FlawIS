@@ -13,13 +13,14 @@ import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@/utils/helpers";
 
 export default function LngSwitcher({
   lng,
-  mobile,
+  className,
 }: {
   lng: string;
-  mobile?: boolean;
+  className?: string;
 }) {
   const router = useRouter();
   const path = usePathname();
@@ -27,16 +28,21 @@ export default function LngSwitcher({
   const { t } = useTranslation(lng, "dashboard");
 
   return (
-    <Menu as="div" className="relative">
+    <Menu as="div" className={cn("relative", className)}>
       <MenuButton
-        className={`h-full w-full ${
-          mobile
-            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
-            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
-        } flex items-center`}
+        className={`h-full w-full 
+          py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white
+        flex items-center`}
       >
-        <GlobeAltIcon className="h-5 w-5 lg:mr-2" />
-        <span className="hidden lg:block">{t(lng)}</span>
+        <Image
+          alt="Locale-flag"
+          priority
+          src={`/images/${lng}.svg`}
+          width={20}
+          height={20}
+          className="mr-2"
+        />
+        <span>{t(lng)}</span>
       </MenuButton>
       <Transition
         as={Fragment}
@@ -48,11 +54,8 @@ export default function LngSwitcher({
         leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems
-          className={`absolute ${
-            mobile
-              ? "right-0 mt-2 min-w-max w-32 origin-top-right"
-              : "inset-x-0 -top-24"
-          } rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none`}
+          className={`absolute inset-x-0 -top-24
+           rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none`}
         >
           <div className="p-1">
             {languages.map((l, i) => (

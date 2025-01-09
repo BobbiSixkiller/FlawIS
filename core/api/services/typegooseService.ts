@@ -66,6 +66,15 @@ export class TypegooseService<U extends types.AnyParamConstructor<any>> {
       .exec();
   }
 
+  async findOneAndDelete(
+    filter: mongoose.FilterQuery<
+      types.DocumentType<InstanceType<U>, types.BeAnObject>
+    >,
+    options?: mongoose.QueryOptions | null
+  ) {
+    return await this.dataModel.findOneAndDelete(filter, options).exec();
+  }
+
   async update(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<U>, types.BeAnObject>

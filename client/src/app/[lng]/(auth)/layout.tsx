@@ -7,8 +7,6 @@ export async function generateMetadata(
     params: { lng },
   }: {
     params: { lng: string };
-    sidebar: React.ReactNode;
-    modal: React.ReactNode;
   },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
@@ -33,7 +31,9 @@ export default async function AuthLayout({
 
   return (
     <div className="mx-auto w-full max-w-96 flex flex-col justify-center px-6 py-12">
-      <Logo lng={lng} width={60} height={60} notext />
+      <div className="mx-auto">
+        <Logo lng={lng} width={60} height={60} notext />
+      </div>
 
       {children}
 

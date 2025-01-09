@@ -98,6 +98,10 @@ export class UserInput implements Partial<User> {
   @Field({ nullable: true })
   @IsString()
   cvUrl?: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  avatarUrl?: string;
 }
 
 @InputType()

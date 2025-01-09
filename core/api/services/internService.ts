@@ -6,29 +6,18 @@ import { ObjectId } from "mongodb";
 import { I18nService } from "./i18nService";
 import { User } from "../util/types";
 import { InternshipService } from "./internshipService";
-import { name } from "@azure/msal-node/dist/packageMetadata";
+import { getAcademicYearInterval } from "../util/helpers";
+import { Access } from "../entitites/User";
+import { UserService } from "./userService";
 
 @Service()
 export class InternService {
   constructor(
     private readonly crudService = new TypegooseService(Intern),
     private readonly internshipService: InternshipService,
+    private readonly userService: UserService,
     private readonly i18nService: I18nService
   ) {}
-
-  private getAcademicYearInterval(date = new Date()) {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-
-    // Academic year starts in September
-    const startYear = month >= 8 ? year : year - 1;
-    const endYear = startYear + 1;
-
-    const startDate = new Date(`${startYear}-09-01T00:00:00Z`);
-    const endDate = new Date(`${endYear}-06-30T23:59:59Z`);
-
-    return { startYear, endYear, startDate, endDate };
-  }
 
   async getInterns(args: InternArgs): Promise<InternConnection> {
     try {
@@ -39,34 +28,45 @@ export class InternService {
     }
   }
 
-  async getIntern(id: ObjectId) {
-    try {
-      const intern = await this.crudService.findOne({ _id: id });
-      if (!intern) {
-        throw new Error(
-          this.i18nService.translate("notFound", { ns: "intern" })
-        );
-      }
-
-      return intern;
-    } catch (error: any) {
-      throw new Error(`Error fetching interns: ${error.message}`);
+  async getById(id: ObjectId) {
+    const intern = await this.crudService.findOne({ _id: id });
+    if (!intern) {
+      throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
     }
+
+    return intern;
   }
 
-  async createIntern(user: User, internshipID: ObjectId) {
+  async getByUserInternship(userId: ObjectId, internshipId: ObjectId) {
+    const intern = await this.crudService.findOne({
+      "user._id": userId,
+      internship: internshipId,
+    });
+    if (!intern) {
+      throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
+    }
+
+    return intern;
+  }
+
+  async createIntern(
+    userId: ObjectId,
+    internshipId: ObjectId,
+    files: string[]
+  ): Promise<Intern> {
     const session = await this.crudService.dataModel.startSession();
     session.startTransaction();
 
     try {
-      const { startDate, endDate } = this.getAcademicYearInterval();
+      const user = await this.userService.getUser(userId);
+
+      const { startDate, endDate } = getAcademicYearInterval();
 
       // Count documents within the transaction
       const count = await this.crudService.dataModel
         .countDocuments({
           "user._id": user.id,
           createdAt: { $gte: startDate, $lte: endDate },
-          status: Status.Applied,
         })
         .session(session);
 
@@ -80,7 +80,7 @@ export class InternService {
 
       // Fetch internship (ensure it exists)
       const internship = await this.internshipService.getInternship(
-        internshipID
+        internshipId
       );
 
       // Create the document within the transaction
@@ -88,9 +88,16 @@ export class InternService {
         [
           {
             internship: internship.id,
-            user: { _id: user.id, name: user.name },
+            user: {
+              _id: user.id,
+              name: user.name,
+              email: user.email,
+              telephone: user.telephone,
+              studyProgramme: user.studyProgramme,
+              avatarUrl: user.avatarUrl,
+            },
             status: Status.Applied,
-            createdAt: new Date(),
+            files,
           },
         ],
         { session }
@@ -98,7 +105,7 @@ export class InternService {
 
       await session.commitTransaction();
       session.endSession();
-      return newIntern;
+      return newIntern[0];
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
@@ -106,23 +113,65 @@ export class InternService {
     }
   }
 
-  async changeStatus(status: Status, id: ObjectId) {
-    const intern = await this.getIntern(id);
+  async changeStatus(status: Status, id: ObjectId, user: User) {
+    const intern = await this.getById(id);
+    const internship = await this.internshipService.getInternship(
+      intern.internship as ObjectId
+    );
+
+    //implement this authorization check
+    if (
+      !user.access.includes(Access.Admin) &&
+      internship.user.id.toString() !== user.id.toString()
+    ) {
+      throw new Error("Not allowed!");
+    }
 
     intern.status = status;
 
     return await intern.save();
   }
 
-  async updateFiles(files: string[], id: ObjectId) {
-    const intern = await this.getIntern(id);
+  async updateFiles(files: string[], id: ObjectId, user: User) {
+    const intern = await this.getById(id);
+    if (intern.user.id.toString() !== user.id.toString()) {
+      throw new Error("Not allowed!");
+    }
 
     intern.files = files;
 
     return await intern.save();
   }
 
-  async deleteIntern(id: ObjectId) {
-    return await this.crudService.delete({ _id: id });
+  async deleteIntern(id: ObjectId, user: User) {
+    const session = await this.crudService.dataModel.startSession();
+    session.startTransaction();
+
+    try {
+      const intern = await this.crudService.findOneAndDelete(
+        { _id: id },
+        { session }
+      );
+      if (!intern) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "intern" })
+        );
+      }
+      if (
+        user.access.includes(Access.Student) &&
+        intern.user.id.toString() !== user.id.toString()
+      ) {
+        console.log(intern.user.id.toString(), user.id.toString());
+        throw new Error("Not allowed!");
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+      return intern;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }

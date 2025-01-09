@@ -4,6 +4,7 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
+import DynamicImage from "@/components/DynamicImage";
 
 export default async function Profile({
   params: { lng },
@@ -34,7 +35,26 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center gap-2">
+              {user.avatarUrl ? (
+                <DynamicImage
+                  src={user.avatarUrl}
+                  alt="Avatar"
+                  className="size-12 rounded-full"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <DynamicImage
+                  src={"https://avatar.iran.liara.run/public"}
+                  alt="Avatar"
+                  className="size-12 rounded-full"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                />
+              )}{" "}
               {user?.name}
             </dd>
           </div>
@@ -46,26 +66,22 @@ export default async function Profile({
               {user?.email}
             </dd>
           </div>
-          {user?.access.includes(Access.Organization) && (
-            <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium leading-6 text-gray-900">
-                {t("org")}
-              </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user?.organization}
-              </dd>
-            </div>
-          )}
-          {user?.access.includes(Access.Organization) && (
-            <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium leading-6 text-gray-900">
-                {t("phone")}
-              </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                {user?.telephone}
-              </dd>
-            </div>
-          )}
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("org")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.organization}
+            </dd>
+          </div>
+          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium leading-6 text-gray-900">
+              {t("phone")}
+            </dt>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+              {user?.telephone || "N/A"}
+            </dd>
+          </div>
           {user?.access.includes(Access.Student) && (
             <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
               <dt className="text-sm font-medium leading-6 text-gray-900">

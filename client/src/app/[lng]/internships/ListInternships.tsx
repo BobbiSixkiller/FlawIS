@@ -12,7 +12,8 @@ import { getInternships } from "./actions";
 interface InternshipData {
   id: string;
   organization: string;
-  applicationCount: number;
+  academicYear: string;
+  applicationsCount: number;
   description: string;
 }
 
@@ -23,10 +24,11 @@ function ListItem({ data }: { data?: InternshipData }) {
       href={`/${data?.id}`}
     >
       <h2 className="font-medium leading-6">{data?.organization}</h2>
+      <p className="leading-none text-gray-500">{data?.academicYear}</p>
       <p className="line-clamp-3">
         {data?.description.replace(/<[^>]*>/g, " ").trim()}
       </p>
-      <p className="mt-2">Pocet zaujemcov: {data?.applicationCount}</p>
+      <p className="mt-2">Pocet zaujemcov: {data?.applicationsCount}</p>
     </Link>
   );
 }

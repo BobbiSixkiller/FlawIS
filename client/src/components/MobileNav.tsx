@@ -8,17 +8,12 @@ import {
 } from "next/navigation";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import {
-  AcademicCapIcon,
   ArrowLeftCircleIcon,
-  ArrowRightCircleIcon,
   Bars3Icon,
   UserCircleIcon,
-  UserPlusIcon,
-  UsersIcon,
 } from "@heroicons/react/24/outline";
-import LngSwitcher from "./LngSwitcher";
 import Drawer from "./Drawer";
-import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
+import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import {
   Menu,
@@ -27,6 +22,7 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
+import DynamicImageClient from "./DynamicImageClient";
 
 export function NavItem({
   children,
@@ -67,15 +63,26 @@ export function ProfileMenuItem({
   const { t } = useTranslation(lng, "dashboard");
 
   return (
-    <Menu as="div" className="relative">
+    <Menu as="div" className="relative h-fit my-auto mr-2 lg:m-0">
       <MenuButton
-        className={`h-full w-full ${
+        className={`h-fit w-full ${
           mobile
-            ? "px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500"
             : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
         } flex items-center`}
       >
-        <UserCircleIcon className="h-5 w-5 lg:mr-2" />
+        {user?.avatarUrl ? (
+          <DynamicImageClient
+            src={user.avatarUrl}
+            alt="Avatar"
+            className="size-8 lg:size-5 rounded-full lg:mr-2"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <UserCircleIcon className="size-5 lg:mr-2" />
+        )}
         <span className="hidden lg:block">{user?.name}</span>
         {path.includes("/profile") && (
           <span className="hidden lg:block ml-auto self-start">•</span>
@@ -141,14 +148,21 @@ export function MobileNav({
   user,
   logo,
   drawerTitle,
+  children,
 }: {
   lng: string;
   user?: UserFragment;
   logo: ReactNode;
   drawerTitle: ReactNode;
+  children: ReactNode;
 }) {
   const [menuShown, setMenuShown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const path = usePathname();
+
+  useEffect(() => {
+    setMenuShown(false);
+  }, [path]);
 
   // Add scroll event listener
   useEffect(() => {
@@ -172,12 +186,12 @@ export function MobileNav({
   return (
     <div
       className={`lg:hidden sticky top-0 border-b bg-white z-10 ${
-        scrolled ? "shadow" : ""
+        scrolled ? "shadow-md" : ""
       }`}
     >
       <div className="container h-[60px] mx-auto px-4 py-3 flex justify-between align-middle">
         <div className="flex gap-4">
-          <div className="hidden sm:flex">{logo}</div>
+          <div className="hidden sm:block m-auto">{logo}</div>
           <button
             className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 z-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
             onClick={() => setMenuShown(true)}
@@ -186,11 +200,12 @@ export function MobileNav({
             <span className="sr-only">Open main menu</span>
           </button>
         </div>
-        <div className="flex sm:hidden absolute inset-0 m-auto">{logo}</div>
+        <div className="flex sm:hidden absolute inset-0">
+          <div className="m-auto">{logo}</div>
+        </div>
 
         {/* Right nav controls */}
         <div className="right-0 flex gap-1">
-          <LngSwitcher mobile lng={lng} />
           {user && <ProfileMenuItem lng={lng} user={user} mobile />}
           {/* Responsive menu items inside drawer */}
           <Drawer
@@ -200,40 +215,7 @@ export function MobileNav({
             toggleStart="left"
             title={drawerTitle}
           >
-            {user ? (
-              <>
-                {user.access.includes(Access.Admin) && (
-                  <NavItem route="users" onClick={() => setMenuShown(false)}>
-                    <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                    {t("users")}
-                  </NavItem>
-                )}
-                <NavItem
-                  route="conferences"
-                  onClick={() => setMenuShown(false)}
-                >
-                  <AcademicCapIcon
-                    className="mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  {t("conferences")}
-                </NavItem>
-              </>
-            ) : (
-              <>
-                <NavItem route="login" onClick={() => setMenuShown(false)}>
-                  <ArrowRightCircleIcon
-                    className="mr-2 h-5 w-5"
-                    aria-hidden="true"
-                  />
-                  {t("login")}
-                </NavItem>
-                <NavItem route="register" onClick={() => setMenuShown(false)}>
-                  <UserPlusIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-                  {t("register")}
-                </NavItem>
-              </>
-            )}
+            {children}
           </Drawer>
         </div>
       </div>

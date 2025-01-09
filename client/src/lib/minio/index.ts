@@ -51,7 +51,7 @@ export async function uploadFile(
     (p) =>
       p
         .replace(/\s+/g, "_") // Replace spaces with underscores
-        .replace(/[^\w\-_.áčéíóúýžš]+/g, "") // Allow word characters, hyphen, underscore, period, and specific accented characters
+        .replace(/[^\w\-_.@áčéíóúýžš]+/g, "") // Allow word characters, hyphen, underscore, period, and specific accented characters
   );
   paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
 

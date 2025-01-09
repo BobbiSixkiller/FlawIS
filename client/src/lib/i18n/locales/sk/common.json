@@ -11,5 +11,6 @@
   "confirm": "Potvrdiť",
   "deleteConfirm": "Naozaj si prajete zmazať {{name}}?",
   "notFound": "Nič sa nenašlo.",
-  "flaw": "Univerzita Komenského v Bratislave, Právnická fakulta"
+  "flaw": "Univerzita Komenského v Bratislave, Právnická fakulta",
+  "updatedAt": "Aktualizované {{ value }}"
 }

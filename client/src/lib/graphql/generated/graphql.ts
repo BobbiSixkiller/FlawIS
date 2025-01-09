@@ -229,14 +229,54 @@ export type ImportantDates = {
   submissionDeadline?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
+/** Ovject type representing student who applies for an internship */
+export type Intern = {
+  __typename?: 'Intern';
+  createdAt: Scalars['DateTimeISO']['output'];
+  files: Array<Scalars['String']['output']>;
+  id: Scalars['ObjectId']['output'];
+  internship: Scalars['ObjectId']['output'];
+  status: Status;
+  updatedAt: Scalars['DateTimeISO']['output'];
+  user: UserReferece;
+};
+
+/** InternConnection type enabling cursor based pagination */
+export type InternConnection = {
+  __typename?: 'InternConnection';
+  edges: Array<Maybe<InternEdge>>;
+  pageInfo: InternPageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type InternEdge = {
+  __typename?: 'InternEdge';
+  cursor: Scalars['ObjectId']['output'];
+  node: Intern;
+};
+
+export type InternMutationResponse = IMutationResponse & {
+  __typename?: 'InternMutationResponse';
+  data: Intern;
+  message: Scalars['String']['output'];
+};
+
+export type InternPageInfo = {
+  __typename?: 'InternPageInfo';
+  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
 /** Internship object type */
 export type Internship = {
   __typename?: 'Internship';
-  applicationCount: Scalars['Int']['output'];
+  academicYear: Scalars['String']['output'];
+  applicationsCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
   /** String representation of internship listing's HTML page */
   description: Scalars['String']['output'];
   id: Scalars['ObjectId']['output'];
+  myApplication?: Maybe<Intern>;
   organization: Scalars['String']['output'];
   updatedAt: Scalars['DateTimeISO']['output'];
   user: UserReferece;
@@ -336,12 +376,14 @@ export type Mutation = {
   activateUser: UserMutationResponse;
   addAttendee: ConferenceMutationResponse;
   createConference: ConferenceMutationResponse;
+  createIntern: InternshipMutationResponse;
   createInternship: InternshipMutationResponse;
   createSection: SectionMutationResponse;
   createSubmission: SubmissionMutationResponse;
   createTicket: ConferenceMutationResponse;
   deleteAttendee: AttendeeMutationResponse;
   deleteConference: ConferenceMutationResponse;
+  deleteIntern: InternMutationResponse;
   deleteInternship: Scalars['Boolean']['output'];
   deleteSection: SectionMutationResponse;
   deleteSubmission: SubmissionMutationResponse;
@@ -355,6 +397,7 @@ export type Mutation = {
   resendActivationLink: Scalars['String']['output'];
   toggleVerifiedUser: UserMutationResponse;
   updateConferenceDates: ConferenceMutationResponse;
+  updateInternFiles: InternMutationResponse;
   updateInternship: InternshipMutationResponse;
   updateInvoice: AttendeeMutationResponse;
   updateSection: SectionMutationResponse;
@@ -371,6 +414,12 @@ export type MutationAddAttendeeArgs = {
 
 export type MutationCreateConferenceArgs = {
   data: ConferenceInput;
+};
+
+
+export type MutationCreateInternArgs = {
+  fileUrls: Array<InputMaybe<Scalars['String']['input']>>;
+  internshipId: Scalars['ObjectId']['input'];
 };
 
 
@@ -401,6 +450,11 @@ export type MutationDeleteAttendeeArgs = {
 
 
 export type MutationDeleteConferenceArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationDeleteInternArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
@@ -469,6 +523,12 @@ export type MutationUpdateConferenceDatesArgs = {
 };
 
 
+export type MutationUpdateInternFilesArgs = {
+  fileUrls: Array<InputMaybe<Scalars['String']['input']>>;
+  id: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationUpdateInternshipArgs = {
   id: Scalars['ObjectId']['input'];
   input: InternshipInput;
@@ -529,6 +589,8 @@ export type Query = {
   conference: Conference;
   conferences: ConferenceConnection;
   forgotPassword: Scalars['String']['output'];
+  intern: Intern;
+  interns: InternConnection;
   internship: Internship;
   internships: InternshipConnection;
   inviteUsers: Scalars['String']['output'];
@@ -574,6 +636,22 @@ export type QueryConferencesArgs = {
 
 export type QueryForgotPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type QueryInternArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryInternsArgs = {
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  first?: Scalars['Int']['input'];
+  internship?: InputMaybe<Scalars['ObjectId']['input']>;
+  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 
@@ -629,6 +707,7 @@ export type QueryUsersArgs = {
 /** New user input data */
 export type RegisterUserInput = {
   access?: InputMaybe<Array<Access>>;
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
   cvUrl?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -686,6 +765,14 @@ export type SectionTranslations = {
   name: Scalars['String']['output'];
   topic: Scalars['String']['output'];
 };
+
+/** Intern status */
+export enum Status {
+  Accepted = 'Accepted',
+  Applied = 'Applied',
+  Eligible = 'Eligible',
+  Rejected = 'Rejected'
+}
 
 /** Student user account StudyProgramme */
 export enum StudyProgramme {
@@ -800,6 +887,7 @@ export type TicketTranslations = {
 export type User = {
   __typename?: 'User';
   access: Array<Access>;
+  avatarUrl?: Maybe<Scalars['String']['output']>;
   billings: Array<Maybe<Billing>>;
   createdAt: Scalars['DateTimeISO']['output'];
   cvUrl?: Maybe<Scalars['String']['output']>;
@@ -831,6 +919,7 @@ export type UserEdge = {
 /** FlawIS user base input */
 export type UserInput = {
   access?: InputMaybe<Array<Access>>;
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
   cvUrl?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -855,12 +944,16 @@ export type UserPageInfo = {
 /** User stub type */
 export type UserReferece = {
   __typename?: 'UserReferece';
-  /** User document reference */
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  /** User document id */
   id: Scalars['ObjectId']['output'];
   name: Scalars['String']['output'];
+  studyProgramme?: Maybe<StudyProgramme>;
+  telephone?: Maybe<Scalars['String']['output']>;
 };
 
-export type AttendeeFragment = { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } };
+export type AttendeeFragment = { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } };
 
 export type AttendeesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
@@ -871,21 +964,21 @@ export type AttendeesQueryVariables = Exact<{
 }>;
 
 
-export type AttendeesQuery = { __typename?: 'Query', attendees: { __typename?: 'AttendeeConnection', totalCount: number, edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type AttendeesQuery = { __typename?: 'Query', attendees: { __typename?: 'AttendeeConnection', totalCount: number, edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', endCursor?: any | null, hasNextPage: boolean } } };
 
 export type AttendeeQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } };
+export type AttendeeQuery = { __typename?: 'Query', attendee: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } };
 
 export type AttendeesCsvExportQueryVariables = Exact<{
   slug: Scalars['String']['input'];
 }>;
 
 
-export type AttendeesCsvExportQuery = { __typename?: 'Query', attendeesCsvExport: Array<{ __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } }> };
+export type AttendeesCsvExportQuery = { __typename?: 'Query', attendeesCsvExport: Array<{ __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } }> };
 
 export type TextSearchAttendeeQueryVariables = Exact<{
   text: Scalars['String']['input'];
@@ -900,25 +993,25 @@ export type UpdateInvoiceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateInvoiceMutation = { __typename?: 'Mutation', updateInvoice: { __typename?: 'AttendeeMutationResponse', message: string, data: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } };
+export type UpdateInvoiceMutation = { __typename?: 'Mutation', updateInvoice: { __typename?: 'AttendeeMutationResponse', message: string, data: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } };
 
 export type DeleteAttendeeMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteAttendeeMutation = { __typename?: 'Mutation', deleteAttendee: { __typename?: 'AttendeeMutationResponse', message: string, data: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } };
+export type DeleteAttendeeMutation = { __typename?: 'Mutation', deleteAttendee: { __typename?: 'AttendeeMutationResponse', message: string, data: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } } };
 
 export type AddressFragment = { __typename?: 'Address', street: string, city: string, postal: string, country: string };
 
 export type BillingFragment = { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } };
 
-export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
+export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -926,14 +1019,14 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type GoogleSignInMutationVariables = Exact<{
   authCode: Scalars['String']['input'];
 }>;
 
 
-export type GoogleSignInMutation = { __typename?: 'Mutation', googleSignIn: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type GoogleSignInMutation = { __typename?: 'Mutation', googleSignIn: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: Scalars['String']['input'];
@@ -947,14 +1040,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type PasswordResetMutation = { __typename?: 'Mutation', passwordReset: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterUserInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -964,7 +1057,7 @@ export type ResendActivationLinkMutation = { __typename?: 'Mutation', resendActi
 export type ActivateUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type ActivateUserMutation = { __typename?: 'Mutation', activateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', token: string, id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ImpersonateQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -996,7 +1089,7 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, attending?: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } | null, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } };
+export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, attending?: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'AttendeeUser', id: any, name: string, email: string } | { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'ConferenceBilling', name: string, ICO: string, ICDPH: string, DIC: string, stampUrl: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrl: string }, en: { __typename?: 'ConferenceTranslations', logoUrl: string } } } } | null, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrl: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } };
 
 export type SubmissionFilesFragment = { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: any, node: { __typename?: 'Submission', id: any, fileUrl?: string | null } } | null> };
 
@@ -1092,6 +1185,8 @@ export type AddAttendeeMutationVariables = Exact<{
 
 export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'ConferenceMutationResponse', message: string, data: { __typename?: 'Conference', slug: string } } };
 
+export type ApplicationFragment = { __typename?: 'Intern', id: any, internship: any, files: Array<string>, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme?: StudyProgramme | null, telephone?: string | null, avatarUrl?: string | null } };
+
 export type InternshipsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1101,14 +1196,14 @@ export type InternshipsQueryVariables = Exact<{
 }>;
 
 
-export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationCount: number } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
+export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
 
 export type InternshipQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationCount: number } };
+export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, internship: any, files: Array<string>, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme?: StudyProgramme | null, telephone?: string | null, avatarUrl?: string | null } } | null } };
 
 export type CreateInternshipMutationVariables = Exact<{
   input: InternshipInput;
@@ -1131,6 +1226,48 @@ export type DeleteInternshipMutationVariables = Exact<{
 
 
 export type DeleteInternshipMutation = { __typename?: 'Mutation', deleteInternship: boolean };
+
+export type InternsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  user?: InputMaybe<Scalars['ObjectId']['input']>;
+  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  internship?: InputMaybe<Scalars['ObjectId']['input']>;
+}>;
+
+
+export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: any, node: { __typename?: 'Intern', id: any, internship: any, files: Array<string>, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme?: StudyProgramme | null, telephone?: string | null, avatarUrl?: string | null } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+
+export type InternQueryVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type InternQuery = { __typename?: 'Query', intern: { __typename?: 'Intern', id: any, internship: any, files: Array<string>, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme?: StudyProgramme | null, telephone?: string | null, avatarUrl?: string | null } } };
+
+export type CreateInternMutationVariables = Exact<{
+  fileUrls: Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>;
+  internshipId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type CreateInternMutation = { __typename?: 'Mutation', createIntern: { __typename?: 'InternshipMutationResponse', message: string } };
+
+export type UpdateInternFilesMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  fileUrls: Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateInternFilesMutation = { __typename?: 'Mutation', updateInternFiles: { __typename?: 'InternMutationResponse', message: string, data: { __typename?: 'Intern', id: any, internship: any } } };
+
+export type DeleteInternMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type DeleteInternMutation = { __typename?: 'Mutation', deleteIntern: { __typename?: 'InternMutationResponse', message: string, data: { __typename?: 'Intern', id: any, internship: any } } };
 
 export type SubmissionFragment = { __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } };
 
@@ -1184,7 +1321,7 @@ export type UserQueryVariables = Exact<{
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } };
 
 export type TextSearchUserQueryVariables = Exact<{
   text: Scalars['String']['input'];
@@ -1199,21 +1336,21 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ToggleVerifiedUserMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type ToggleVerifiedUserMutation = { __typename?: 'Mutation', toggleVerifiedUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: { __typename?: 'UserMutationResponse', message: string, data: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, billings: Array<{ __typename?: 'Billing', name: string, ICO: string, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type InviteUsersQueryVariables = Exact<{
   input: OrganizationEmails;
@@ -1276,6 +1413,7 @@ export const UserFragmentDoc = new TypedDocumentString(`
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
     fragment Address on Address {
   street
@@ -1490,6 +1628,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -1684,6 +1823,24 @@ export const SubmissionFilesFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"SubmissionFiles"}) as unknown as TypedDocumentString<SubmissionFilesFragment, unknown>;
+export const ApplicationFragmentDoc = new TypedDocumentString(`
+    fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"Application"}) as unknown as TypedDocumentString<ApplicationFragment, unknown>;
 export const AttendeesDocument = new TypedDocumentString(`
     query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!, $passive: Boolean, $sectionIds: [ObjectId!]) {
   attendees(
@@ -1773,6 +1930,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -1939,6 +2097,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -2105,6 +2264,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -2293,6 +2453,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -2462,6 +2623,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -2591,6 +2753,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<MeQuery, MeQueryVariables>;
 export const LoginDocument = new TypedDocumentString(`
     mutation login($email: String!, $password: String!) {
@@ -2632,6 +2795,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
 export const GoogleSignInDocument = new TypedDocumentString(`
     mutation googleSignIn($authCode: String!) {
@@ -2673,6 +2837,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<GoogleSignInMutation, GoogleSignInMutationVariables>;
 export const ForgotPasswordDocument = new TypedDocumentString(`
     query forgotPassword($email: String!) {
@@ -2719,6 +2884,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<PasswordResetMutation, PasswordResetMutationVariables>;
 export const RegisterDocument = new TypedDocumentString(`
     mutation register($data: RegisterUserInput!) {
@@ -2760,6 +2926,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<RegisterMutation, RegisterMutationVariables>;
 export const ResendActivationLinkDocument = new TypedDocumentString(`
     mutation resendActivationLink {
@@ -2806,6 +2973,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<ActivateUserMutation, ActivateUserMutationVariables>;
 export const ImpersonateDocument = new TypedDocumentString(`
     query impersonate($id: ObjectId!) {
@@ -2936,6 +3104,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }
 fragment Invoice on Invoice {
   body {
@@ -3240,7 +3409,8 @@ export const InternshipsDocument = new TypedDocumentString(`
         id
         organization
         description
-        applicationCount
+        applicationsCount
+        academicYear
       }
     }
     pageInfo {
@@ -3258,10 +3428,28 @@ export const InternshipDocument = new TypedDocumentString(`
     description
     updatedAt
     createdAt
-    applicationCount
+    applicationsCount
+    myApplication {
+      ...Application
+    }
   }
 }
-    `) as unknown as TypedDocumentString<InternshipQuery, InternshipQueryVariables>;
+    fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<InternshipQuery, InternshipQueryVariables>;
 export const CreateInternshipDocument = new TypedDocumentString(`
     mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
@@ -3289,6 +3477,96 @@ export const DeleteInternshipDocument = new TypedDocumentString(`
   deleteInternship(id: $id)
 }
     `) as unknown as TypedDocumentString<DeleteInternshipMutation, DeleteInternshipMutationVariables>;
+export const InternsDocument = new TypedDocumentString(`
+    query interns($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $internship: ObjectId) {
+  interns(
+    after: $after
+    first: $first
+    internship: $internship
+    user: $user
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Application
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+    fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<InternsQuery, InternsQueryVariables>;
+export const InternDocument = new TypedDocumentString(`
+    query intern($id: ObjectId!) {
+  intern(id: $id) {
+    ...Application
+  }
+}
+    fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<InternQuery, InternQueryVariables>;
+export const CreateInternDocument = new TypedDocumentString(`
+    mutation createIntern($fileUrls: [String]!, $internshipId: ObjectId!) {
+  createIntern(fileUrls: $fileUrls, internshipId: $internshipId) {
+    message
+  }
+}
+    `) as unknown as TypedDocumentString<CreateInternMutation, CreateInternMutationVariables>;
+export const UpdateInternFilesDocument = new TypedDocumentString(`
+    mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
+  updateInternFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateInternFilesMutation, UpdateInternFilesMutationVariables>;
+export const DeleteInternDocument = new TypedDocumentString(`
+    mutation deleteIntern($id: ObjectId!) {
+  deleteIntern(id: $id) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<DeleteInternMutation, DeleteInternMutationVariables>;
 export const SubmissionDocument = new TypedDocumentString(`
     query submission($id: ObjectId!) {
   submission(id: $id) {
@@ -3631,6 +3909,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<UserQuery, UserQueryVariables>;
 export const TextSearchUserDocument = new TypedDocumentString(`
     query textSearchUser($text: String!) {
@@ -3680,6 +3959,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<UpdateUserMutation, UpdateUserMutationVariables>;
 export const ToggleVerifiedUserDocument = new TypedDocumentString(`
     mutation toggleVerifiedUser($id: ObjectId!) {
@@ -3720,6 +4000,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<ToggleVerifiedUserMutation, ToggleVerifiedUserMutationVariables>;
 export const DeleteUserDocument = new TypedDocumentString(`
     mutation deleteUser($id: ObjectId!) {
@@ -3760,6 +4041,7 @@ fragment User on User {
   }
   studyProgramme
   cvUrl
+  avatarUrl
 }`) as unknown as TypedDocumentString<DeleteUserMutation, DeleteUserMutationVariables>;
 export const InviteUsersDocument = new TypedDocumentString(`
     query inviteUsers($input: OrganizationEmails!) {

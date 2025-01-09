@@ -9,8 +9,8 @@ export async function getInternships(filter: GetDataFilter) {
   const res = await executeGqlFetch(
     InternshipsDocument,
     { ...filter },
-    {}
-    // { tags: ["internships"], revalidate: 3600 }
+    {},
+    { tags: ["internships"], revalidate: 3600 }
   );
 
   if (res.errors) {

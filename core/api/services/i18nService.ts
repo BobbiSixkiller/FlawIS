@@ -41,6 +41,7 @@ export class I18nService {
             "submission",
             "validation",
             "internship",
+            "intern",
             "common",
           ],
         },

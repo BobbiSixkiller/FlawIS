@@ -1,3 +1,20 @@
+fragment Application on Intern {
+  id
+  internship
+  user {
+    id
+    name
+    email
+    studyProgramme
+    telephone
+    avatarUrl
+  }
+  files
+  status
+  createdAt
+  updatedAt
+}
+
 query internships(
   $after: ObjectId
   $first: Int
@@ -19,7 +36,8 @@ query internships(
         id
         organization
         description
-        applicationCount
+        applicationsCount
+        academicYear
       }
     }
     pageInfo {
@@ -36,7 +54,10 @@ query internship($id: ObjectId!) {
     description
     updatedAt
     createdAt
-    applicationCount
+    applicationsCount
+    myApplication {
+      ...Application
+    }
   }
 }
 
@@ -62,4 +83,66 @@ mutation updateInternship($id: ObjectId!, $input: InternshipInput!) {
 
 mutation deleteInternship($id: ObjectId!) {
   deleteInternship(id: $id)
+}
+
+query interns(
+  $after: ObjectId
+  $first: Int
+  $user: ObjectId
+  $startDate: DateTimeISO
+  $endDate: DateTimeISO
+  $internship: ObjectId
+) {
+  interns(
+    after: $after
+    first: $first
+    internship: $internship
+    user: $user
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Application
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
+query intern($id: ObjectId!) {
+  intern(id: $id) {
+    ...Application
+  }
+}
+
+mutation createIntern($fileUrls: [String]!, $internshipId: ObjectId!) {
+  createIntern(fileUrls: $fileUrls, internshipId: $internshipId) {
+    message
+  }
+}
+
+mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
+  updateInternFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+
+mutation deleteIntern($id: ObjectId!) {
+  deleteIntern(id: $id) {
+    message
+    data {
+      id
+      internship
+    }
+  }
 }

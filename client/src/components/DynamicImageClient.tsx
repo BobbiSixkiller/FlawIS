@@ -7,12 +7,11 @@ import { useState } from "react";
 export default function DynamicImageClient({
   src,
   alt,
-  containerClass,
+  className,
   ...props
 }: {
   src: string;
   alt?: string;
-  containerClass?: string;
 } & ImageProps) {
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +19,7 @@ export default function DynamicImageClient({
     <div
       className={cn(
         `relative ${loading ? "bg-slate-200 animate-pulse" : ""}`,
-        containerClass
+        className
       )}
     >
       <Image
@@ -28,9 +27,12 @@ export default function DynamicImageClient({
         src={src}
         alt={alt}
         onLoad={() => setLoading(false)}
-        className={`transition-opacity ease-in delay-100 ${
-          loading ? "opacity-0" : "opacity-100"
-        }`}
+        className={cn(
+          className,
+          `transition-opacity ease-in delay-100 ${
+            loading ? "opacity-0" : "opacity-100"
+          }`
+        )}
         priority
       />
     </div>

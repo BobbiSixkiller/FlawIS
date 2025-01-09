@@ -6,7 +6,7 @@ import {
   UpdateInternshipDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function createInternship(input: InternshipInput) {
   const res = await executeGqlFetch(CreateInternshipDocument, { input });
@@ -15,7 +15,7 @@ export async function createInternship(input: InternshipInput) {
     return { success: false, message: res.errors[0].message };
   }
 
-  revalidatePath("/");
+  revalidateTag("internships");
   return { success: true, message: res.data.createInternship.message };
 }
 
@@ -32,6 +32,7 @@ export async function updateInternship({
     return { success: false, message: res.errors[0].message };
   }
 
-  revalidatePath(`/${id}`);
+  revalidateTag("internships");
+  revalidateTag(`internship:${id}`);
   return { success: true, message: res.data.updateInternship.message };
 }

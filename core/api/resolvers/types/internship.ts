@@ -1,6 +1,6 @@
 import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
 import { CreateArgs, CreateConnection } from "./pagination";
-import { Intern, Internship } from "../../entitites/Internship";
+import { Intern, Internship, Status } from "../../entitites/Internship";
 import { IMutationResponse } from "./interface";
 import { ObjectId } from "mongodb";
 
@@ -45,6 +45,9 @@ export class InternArgs extends CreateArgs(Intern) {
 
   @Field({ nullable: true })
   endDate?: Date;
+
+  @Field({ nullable: true })
+  status?: Status;
 }
 
 @ObjectType({ implements: IMutationResponse })

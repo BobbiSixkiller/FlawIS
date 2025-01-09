@@ -125,6 +125,10 @@ export class User extends TimeStamps {
   @Property()
   cvUrl?: string;
 
+  @Field({ nullable: true })
+  @Property()
+  avatarUrl?: string;
+
   @Field(() => StudyProgramme, { nullable: true })
   @Property({ type: Number, enum: StudyProgramme })
   studyProgramme?: StudyProgramme;

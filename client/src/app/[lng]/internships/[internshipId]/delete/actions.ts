@@ -2,7 +2,7 @@
 
 import { DeleteInternshipDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 export async function deleteInternship(id: string) {
   const res = await executeGqlFetch(DeleteInternshipDocument, { id });
@@ -11,7 +11,8 @@ export async function deleteInternship(id: string) {
     return { success: false, message: res.errors[0].message };
   }
 
-  revalidatePath(`/${id}`);
+  revalidateTag("internships");
+  revalidateTag(`internship:${id}`);
 
   return { success: true };
 }

@@ -1,8 +1,5 @@
 import { cn } from "@/utils/helpers";
 import Underline from "@tiptap/extension-underline";
-import Image from "@tiptap/extension-image";
-import TaskList from "@tiptap/extension-task-list";
-import TaskItem from "@tiptap/extension-task-item";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -50,21 +47,6 @@ const tiptapLink = Link.configure({
 //     class: cn("rounded-lg border"),
 //   },
 // });
-
-// Task list configuration
-const taskList = TaskList.configure({
-  HTMLAttributes: {
-    class: cn("not-prose pl-2"),
-  },
-});
-
-// Task item configuration
-const taskItem = TaskItem.configure({
-  HTMLAttributes: {
-    class: cn("flex gap-2 items-start my-4"),
-  },
-  nested: true,
-});
 
 // Horizontal rule configuration
 const horizontalRule = HorizontalRule.configure({
@@ -124,9 +106,6 @@ export const defaultExtensions = [
   starterKit,
   placeholder,
   tiptapLink,
-  //   tiptapImage,
-  taskList,
-  taskItem,
   horizontalRule,
   underline,
 ];

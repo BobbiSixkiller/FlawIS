@@ -200,14 +200,49 @@ type ImportantDates {
   submissionDeadline: DateTimeISO
 }
 
+"""Ovject type representing student who applies for an internship"""
+type Intern {
+  createdAt: DateTimeISO!
+  files: [String!]!
+  id: ObjectId!
+  internship: ObjectId!
+  status: Status!
+  updatedAt: DateTimeISO!
+  user: UserReferece!
+}
+
+"""InternConnection type enabling cursor based pagination"""
+type InternConnection {
+  edges: [InternEdge]!
+  pageInfo: InternPageInfo!
+  totalCount: Int!
+}
+
+type InternEdge {
+  cursor: ObjectId!
+  node: Intern!
+}
+
+type InternMutationResponse implements IMutationResponse {
+  data: Intern!
+  message: String!
+}
+
+type InternPageInfo {
+  endCursor: ObjectId
+  hasNextPage: Boolean!
+}
+
 """Internship object type"""
 type Internship {
-  applicationCount: Int!
+  academicYear: String!
+  applicationsCount: Int!
   createdAt: DateTimeISO!
 
   """String representation of internship listing's HTML page"""
   description: String!
   id: ObjectId!
+  myApplication: Intern
   organization: String!
   updatedAt: DateTimeISO!
   user: UserReferece!
@@ -300,12 +335,14 @@ type Mutation {
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
+  createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternshipMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
+  deleteIntern(id: ObjectId!): InternMutationResponse!
   deleteInternship(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): SectionMutationResponse!
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
@@ -319,6 +356,7 @@ type Mutation {
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
@@ -355,6 +393,8 @@ type Query {
   conference(slug: String!): Conference!
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
+  intern(id: ObjectId!): Intern!
+  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: String, user: ObjectId): InternConnection!
   internship(id: ObjectId!): Internship!
   internships(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
@@ -370,6 +410,7 @@ type Query {
 """New user input data"""
 input RegisterUserInput {
   access: [Access!]
+  avatarUrl: String
   cvUrl: String
   email: String!
   name: String!
@@ -413,6 +454,14 @@ input SectionTranslationInput {
 type SectionTranslations {
   name: String!
   topic: String!
+}
+
+"""Intern status"""
+enum Status {
+  Accepted
+  Applied
+  Eligible
+  Rejected
 }
 
 """Student user account StudyProgramme"""
@@ -517,6 +566,7 @@ type TicketTranslations {
 """The user model entity"""
 type User {
   access: [Access!]!
+  avatarUrl: String
   billings: [Billing]!
   createdAt: DateTimeISO!
   cvUrl: String
@@ -546,6 +596,7 @@ type UserEdge {
 """FlawIS user base input"""
 input UserInput {
   access: [Access!]
+  avatarUrl: String
   cvUrl: String
   email: String!
   name: String!
@@ -567,7 +618,12 @@ type UserPageInfo {
 
 """User stub type"""
 type UserReferece {
-  """User document reference"""
+  avatarUrl: String
+  email: String!
+
+  """User document id"""
   id: ObjectId!
   name: String!
+  studyProgramme: StudyProgramme
+  telephone: String
 }

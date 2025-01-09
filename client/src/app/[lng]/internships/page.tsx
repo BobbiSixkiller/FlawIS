@@ -16,6 +16,8 @@ export default async function InternshipsHomePage({
   const { t } = await translate(lng, "internships");
 
   const { startDate, endDate } = getAcademicYearInterval();
+
+  // refactor to display
   const filter = user.access.includes(Access.Organization)
     ? { user: user.id }
     : { startDate, endDate };

@@ -8,8 +8,7 @@ export const SlashCommandExtension = Extension.create({
   addOptions() {
     return {
       items: [],
-      onSelect: null,
-      onUpdate: null,
+      onUpdate: null, // Callback for UI updates
     };
   },
 
@@ -27,11 +26,11 @@ export const SlashCommandExtension = Extension.create({
       new Plugin({
         key: new PluginKey("SlashCommand"),
         props: {
+          handleClick: (view, pos, event) => {},
           handleKeyDown: (view, event) => {
+            const editor = this.editor; // Use the TipTap editor instance
             const { storage } = this;
             const { state } = view;
-
-            const editor = this.editor; // Use the TipTap editor instance
 
             const filteredItems = this.options.items.filter(
               (item: SelectorItem) =>
@@ -82,9 +81,19 @@ export const SlashCommandExtension = Extension.create({
 
             if (event.key === "Enter" && storage.visible) {
               if (filteredItems[storage.selectedIndex]) {
-                filteredItems[storage.selectedIndex].command(editor);
+                const { from, to } = state.selection;
+                const slashStartPos = from - storage.filter.length - 1;
+                editor
+                  .chain()
+                  .focus()
+                  .deleteRange({ from: slashStartPos, to })
+                  .run();
+
+                filteredItems[storage.selectedIndex].command(editor); // Change node
+
                 storage.visible = false; // Close dropdown
                 storage.selectedIndex = 0; // Reset index
+
                 this.options.onUpdate?.(null, null);
                 event.preventDefault();
                 return true;

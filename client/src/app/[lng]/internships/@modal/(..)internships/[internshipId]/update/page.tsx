@@ -1,13 +1,13 @@
-import { getInternship } from "@/app/[lng]/internships/[id]/actions";
+import { getInternship } from "@/app/[lng]/internships/[internshipId]/actions";
 import InternshipForm from "@/app/[lng]/internships/new/InternshipForm";
 import Modal from "@/components/Modal";
 
 export default async function UpdateInternship({
-  params: { id },
+  params: { internshipId },
 }: {
-  params: { lng: string; id: string };
+  params: { lng: string; internshipId: string };
 }) {
-  const internship = await getInternship(id);
+  const internship = await getInternship(internshipId);
 
   return (
     <Modal title="Update">

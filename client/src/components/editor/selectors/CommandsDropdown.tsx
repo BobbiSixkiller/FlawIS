@@ -3,16 +3,13 @@ import { useEffect, useState } from "react";
 import { items } from "./NodeSelector";
 
 export default function CommandsDropdown({ editor }: { editor?: Editor }) {
-  const [state, setState] = useState({
-    visible: false,
-    position: { top: 0, left: 0 },
-    filter: "",
-    selectedIndex: 0,
-  });
-
-  if (!editor) return null;
-
-  const storage = editor.storage.SlashCommand;
+  const storage: {
+    visible: boolean;
+    position: { top: number; left: number };
+    filter: string;
+    selectedIndex: number;
+  } = editor?.storage.SlashCommand;
+  const [state, setState] = useState(storage);
 
   useEffect(() => {
     const handleUpdate = (
@@ -28,14 +25,14 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
       });
     };
 
-    editor.options.extensions.forEach((extension: any) => {
+    editor?.options.extensions.forEach((extension: any) => {
       if (extension.name === "SlashCommand") {
         extension.options.onUpdate = handleUpdate;
       }
     });
 
     return () => {
-      editor.options.extensions.forEach((extension: any) => {
+      editor?.options.extensions.forEach((extension: any) => {
         if (extension.name === "SlashCommand") {
           extension.options.onUpdate = null;
         }
@@ -43,7 +40,7 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
     };
   }, [editor]);
 
-  if (!state.visible) return null;
+  if (!state.visible || !editor) return null;
 
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(state.filter.toLowerCase())
@@ -56,22 +53,35 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
         top: state.position.top,
         left: state.position.left,
       }}
-      className="z-50 bg-white border shadow-md rounded-lg p-2"
+      className="z-50 bg-black border border-black shadow-md rounded-lg p-2"
     >
       {filteredItems.map((item, index) => (
         <div
           key={item.name}
-          className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded ${
-            index === state.selectedIndex ? "bg-gray-100" : ""
+          className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-white/30 rounded ${
+            index === storage.selectedIndex ? "bg-white/30" : ""
           }`}
           onClick={() => {
+            const { state: editorState } = editor.view;
+            const { from, to } = editorState.selection;
+            const slashStartPos = from - storage.filter.length - 1;
+
             item.command(editor);
+
+            editor
+              .chain()
+              .focus()
+              .deleteRange({ from: slashStartPos, to })
+              .run();
+
+            storage.visible = false;
+
             setState({ ...state, visible: false });
             editor.view.focus();
           }}
         >
-          <item.icon className="w-5 h-5 text-gray-700" />
-          <span className="text-gray-800">{item.name}</span>
+          <item.icon className="size-5 text-white" />
+          <span className="text-white">{item.name}</span>
         </div>
       ))}
     </div>

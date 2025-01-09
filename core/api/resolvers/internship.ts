@@ -3,12 +3,15 @@ import {
   Args,
   Authorized,
   Ctx,
+  FieldResolver,
+  Int,
   Mutation,
   Query,
   Resolver,
+  Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Internship } from "../entitites/Internship";
+import { Intern, Internship, Status } from "../entitites/Internship";
 import { InternshipService } from "../services/internshipService";
 import { ObjectId } from "mongodb";
 import {
@@ -20,12 +23,14 @@ import {
 import { Access } from "../entitites/User";
 import { I18nService } from "../services/i18nService";
 import { Context } from "../util/auth";
+import { InternService } from "../services/internService";
 
 @Service()
 @Resolver(() => Internship)
 export class InternshipResolver {
   constructor(
     private readonly internshipService: InternshipService,
+    private readonly internService: InternService,
     private readonly i18nService: I18nService
   ) {}
 
@@ -87,5 +92,60 @@ export class InternshipResolver {
     const { deletedCount } = await this.internshipService.deleteInternship(id);
 
     return deletedCount > 0;
+  }
+
+  @Authorized()
+  @Mutation(() => InternshipMutationResponse)
+  async createIntern(
+    @Ctx() { user }: Context,
+    @Arg("internshipId") internshipId: ObjectId,
+    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
+  ): Promise<InternshipMutationResponse> {
+    const internship = await this.internshipService.getInternship(internshipId);
+    const intern = await this.internService.createIntern(
+      user!.id,
+      internshipId,
+      fileUrls
+    );
+
+    console.log({ ...internship, myApplication: intern });
+
+    return {
+      message: "Success!",
+      data: { ...internship.toObject(), myApplication: intern },
+    };
+  }
+
+  @Authorized()
+  @FieldResolver(() => Intern, { nullable: true })
+  async myApplication(
+    @Ctx() { user }: Context,
+    @Root() { id: internshipId }: Internship
+  ) {
+    try {
+      return await this.internService.getByUserInternship(
+        user!.id,
+        internshipId
+      );
+    } catch (error) {
+      return null;
+    }
+  }
+
+  @Authorized()
+  @FieldResolver(() => Int)
+  async applicationsCount(
+    @Ctx() { user }: Context,
+    @Root() { id }: Internship
+  ): Promise<number> {
+    const { totalCount } = await this.internService.getInterns({
+      first: 1000,
+      internship: id,
+      status: user?.access.includes(Access.Organization)
+        ? Status.Eligible
+        : undefined,
+    });
+
+    return totalCount;
   }
 }

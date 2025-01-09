@@ -18,5 +18,6 @@
   "update": "Update",
   "delete": "Delete",
   "new": "New",
-  "invite": "Invite"
+  "invite": "Invite",
+  "application": "Application"
 }

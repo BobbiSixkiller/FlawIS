@@ -2,5 +2,6 @@
   "notFound": "Intern has not been found!",
   "update": "Intern {{name}} has been updated.",
   "new": "Intern {{name}} has been created.",
-  "delete": "Intern {{name}} has been deleted."
+  "delete": "Intern {{name}} has been deleted.",
+  "applicationLimitReached": "You can submit 2 applications at most!"
 }
