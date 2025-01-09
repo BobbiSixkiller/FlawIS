@@ -25,6 +25,8 @@ export function withTenant(middleware: CustomMiddleware) {
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
+    console.log(subdomain);
+
     let lng: string | undefined;
     const paths = url.pathname.split("/").filter((path) => path);
     if (paths[0]?.length === 2) {
