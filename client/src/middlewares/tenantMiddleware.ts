@@ -25,7 +25,7 @@ export function withTenant(middleware: CustomMiddleware) {
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
-    console.log(subdomain);
+    console.log("TENANT", subdomain);
 
     let lng: string | undefined;
     const paths = url.pathname.split("/").filter((path) => path);
@@ -40,7 +40,7 @@ export function withTenant(middleware: CustomMiddleware) {
     // Rewrite the response to include the subdomain in the path
     if (subdomain === "localhost:3000") {
       const newUrl = new URL(
-        `/${lng}/internships/${paths.join("/")}${url.search}`,
+        `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
       ); // Rewrite the path with the subdomain
 
