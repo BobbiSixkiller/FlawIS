@@ -47,7 +47,7 @@ export function withTenant(middleware: CustomMiddleware) {
       });
     }
 
-    if (subdomain === "flawis" || subdomain === "flawis-staging") {
+    if (subdomain.includes("flawis")) {
       const newUrl = new URL(
         `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
@@ -58,7 +58,7 @@ export function withTenant(middleware: CustomMiddleware) {
       });
     }
 
-    if (subdomain === "conferences" || "conferences-staging") {
+    if (subdomain.includes("conferences")) {
       const newUrl = new URL(
         `/${lng}/conferences/${paths.join("/")}${url.search}`,
         req.url
@@ -69,7 +69,7 @@ export function withTenant(middleware: CustomMiddleware) {
       });
     }
 
-    if (subdomain === "internships" || "internships-staging") {
+    if (subdomain.includes("internships")) {
       const newUrl = new URL(
         `/${lng}/internships/${paths.join("/")}${url.search}`,
         req.url
