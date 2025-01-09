@@ -25,6 +25,7 @@ export async function executeGqlFetch<Data, Variables>(
   // The forwardedFor string may contain multiple IPs in the format "client, proxy1, proxy2"
   const clientIp = forwardedFor?.split(",")[0]?.trim(); // Take the first one which is the actual client IP
   const host = reqHeaders.get("host");
+  console.log("ACTION", host);
 
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
     cache: nextCache,

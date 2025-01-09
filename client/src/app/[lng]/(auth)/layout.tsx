@@ -1,6 +1,7 @@
 import Logo from "@/components/Logo";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
+import { headers } from "next/headers";
 
 export async function generateMetadata(
   {
@@ -11,8 +12,14 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { t } = await translate(lng, "dashboard");
+  const host = headers().get("host") || "flawis.flaw.uniba.sk";
+  console.log("HOSTIK", host);
 
   return {
+    metadataBase:
+      process.env.NODE_ENV !== "development"
+        ? new URL(`https://${host}`)
+        : undefined,
     title: `${t("login")} | ${t("title")}`,
     openGraph: {
       images: [`/images/Praf-logo-text-${lng}.png`],
