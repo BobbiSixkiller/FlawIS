@@ -24,8 +24,8 @@ export async function executeGqlFetch<Data, Variables>(
     reqHeaders.get("x-forwarded-for") || reqHeaders.get("x-real-ip");
   // The forwardedFor string may contain multiple IPs in the format "client, proxy1, proxy2"
   const clientIp = forwardedFor?.split(",")[0]?.trim(); // Take the first one which is the actual client IP
-  const hostname = reqHeaders.get("hostname") || "client:3000";
-  console.log("ACTION", hostname, clientIp);
+  const host = reqHeaders.get("host") || "client:3000";
+  console.log("ACTION", host);
 
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
     cache: nextCache,
@@ -34,7 +34,7 @@ export async function executeGqlFetch<Data, Variables>(
     headers: {
       "Content-Type": "application/json",
       "x-forwarded-for": clientIp || "",
-      hostname,
+      "tenant-domain": host,
       Cookie: reqCookies
         .getAll()
         .map((c) => `${c.name}=${c.value}`)

@@ -9,8 +9,6 @@ const ONE_HOUR = 60 * 60;
 export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
   (limit = 50) =>
   async ({ context: { req }, info }, next) => {
-    console.log(req.ips[req.ips.length - 1]);
-
     const key = `rate-limit:${info.fieldName}:${req.ips[req.ips.length - 1]}`;
 
     const current = await Container.get(RedisService).incr(key);
