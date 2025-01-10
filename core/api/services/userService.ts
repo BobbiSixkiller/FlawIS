@@ -8,6 +8,7 @@ import { RedisService } from "./redisService";
 import { I18nService } from "./i18nService";
 import { TypegooseService } from "./typegooseService";
 import { ObjectId } from "mongodb";
+import { transformIds } from "../middlewares/typegoose-middleware";
 
 // finish this service and implement refactor of user resolver with it
 @Service()
@@ -69,7 +70,11 @@ export class UserService {
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges: connection.edges || [],
+      edges:
+        connection.edges.map((edge) => ({
+          cursor: edge.cursor,
+          node: transformIds(edge.node),
+        })) || [],
     };
   }
 

@@ -68,7 +68,7 @@ export async function InvoiceDoc({
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Image
-            src={data.conference.translations[lng as "sk" | "en"].logoUrl}
+            src={data.conference.translations[lng as "sk" | "en"].logoUrlEnv}
             style={{ maxHeight: "100px", maxWidth: "300px" }}
           />
           <View style={{ flexDirection: "column" }}>

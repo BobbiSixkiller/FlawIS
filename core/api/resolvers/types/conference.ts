@@ -152,7 +152,7 @@ export class DatesInput implements ImportantDates {
 }
 
 @InputType({ description: "Conference input type" })
-export class ConferenceInput implements Partial<Conference> {
+export class ConferenceInput {
   @Field()
   @IsString()
   slug: string;

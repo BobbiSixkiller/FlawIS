@@ -172,7 +172,8 @@ input ConferenceTranslationInput {
 }
 
 type ConferenceTranslations {
-  logoUrl: String!
+  """Logourl transformed with regards to staging/production env"""
+  logoUrlEnv: String!
   name: String!
 }
 

@@ -23,6 +23,7 @@ export async function addAttendee(
         data: submissionInput,
       });
       if (submission.errors) {
+        console.log("SUBMISSION ERR ", submission.errors[0]);
         const { validationErrors } = submission.errors[0]
           .extensions as ErrorException;
 
@@ -54,6 +55,8 @@ export async function addAttendee(
     });
 
     if (res.errors) {
+      console.log("ATTENDEE ERR ", res.errors[0]);
+
       const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       throw new Error(

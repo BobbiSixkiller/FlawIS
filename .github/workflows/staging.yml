@@ -72,6 +72,7 @@ jobs:
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           MINIO_USER: ${{ secrets.MINIO_USER }}
           MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+          MINIO_ENDPOINT: ${{ variables.MINIO_ENDPOINT }}
           SECRET: ${{ secrets.SECRET }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}

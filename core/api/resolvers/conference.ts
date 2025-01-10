@@ -66,7 +66,11 @@ export class ConferencerResolver {
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges: connection.edges || [],
+      edges:
+        connection.edges.map((edge) => ({
+          cursor: edge.cursor,
+          node: transformIds(edge.node),
+        })) || [],
     };
   }
 
@@ -294,6 +298,8 @@ export class ConferencerResolver {
       },
     });
 
+    console.log({ ...conference, attending: attendee });
+
     this.rmqService.produceMessage(
       JSON.stringify({
         locale,
@@ -317,7 +323,7 @@ export class ConferencerResolver {
           this.i18nService.language() as keyof ConferenceTranslation
         ].name,
       }),
-      data: { ...conference, attending: attendee },
+      data: conference,
     };
   }
 }
