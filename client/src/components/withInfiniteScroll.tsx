@@ -5,6 +5,7 @@ import {
   LegacyRef,
   ReactNode,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useInView } from "react-intersection-observer";
@@ -52,10 +53,12 @@ export function withInfiniteScroll<EdgeT>({
     const [data, setData] = useState(initialData);
     const { ref, inView } = useInView();
 
+    const memoizedFilter = useMemo(() => filter, [JSON.stringify(filter)]);
+
     useEffect(() => {
       async function getMore() {
         const newData = await getData({
-          ...filter,
+          ...memoizedFilter,
           after: data.pageInfo.endCursor,
         });
         setData((prevData) => ({
@@ -68,7 +71,7 @@ export function withInfiniteScroll<EdgeT>({
       if (inView && data.pageInfo.hasNextPage) {
         getMore();
       }
-    }, [inView, data, filter]);
+    }, [inView, data, memoizedFilter]);
 
     return (
       <Container>
