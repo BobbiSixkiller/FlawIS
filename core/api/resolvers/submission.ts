@@ -57,7 +57,7 @@ export class SubmissionResolver {
   ): Promise<SubmissionMutationResponse> {
     const submission = await this.submissionService.create({
       ...data,
-      authors: user?.id,
+      authors: [user?.id],
     });
 
     if (data.authors.length !== 0) {

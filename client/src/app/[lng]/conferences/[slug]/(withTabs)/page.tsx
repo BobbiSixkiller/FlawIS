@@ -22,7 +22,9 @@ export default async function ConferencePage({
       <div className="flex flex-col gap-4">
         <DynamicImage
           alt="conference-logo"
-          src={conference!.translations[lng as "sk" | "en"].logoUrl as string}
+          src={
+            conference!.translations[lng as "sk" | "en"].logoUrlEnv as string
+          }
           className="w-[300px] h-[150px]"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

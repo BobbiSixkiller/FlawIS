@@ -25,7 +25,7 @@ export function LocalesInput<TranslationType extends object>(
     @Field(() => TranslationTypeClass)
     sk: TranslationType;
 
-    @Field((type) => TranslationTypeClass)
+    @Field(() => TranslationTypeClass)
     en: TranslationType;
   }
   return TranslationsClass;

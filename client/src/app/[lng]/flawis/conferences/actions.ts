@@ -19,8 +19,8 @@ export async function getConferences(filter: GetDataFilter) {
   const res = await executeGqlFetch(
     ConferencesDocument,
     { ...filter },
-    {},
-    { tags: ["conferences"], revalidate: 3600 }
+    {}
+    // { tags: ["conferences"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -153,8 +153,8 @@ export async function deleteConference(prevState: any, data: FormData) {
     }
 
     await deleteFiles([
-      res.data.deleteConference.data.translations.sk.logoUrl,
-      res.data.deleteConference.data.translations.sk.logoUrl,
+      res.data.deleteConference.data.translations.sk.logoUrlEnv,
+      res.data.deleteConference.data.translations.sk.logoUrlEnv,
       res.data.deleteConference.data.billing.stampUrl,
     ]);
 

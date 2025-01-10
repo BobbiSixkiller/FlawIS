@@ -5,8 +5,8 @@ import {
   LegacyRef,
   ReactNode,
   useEffect,
-  useMemo,
   useState,
+  useMemo,
 } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -29,7 +29,7 @@ export interface Connection<EdgeT> {
 export interface GetDataFilter {
   after?: string;
   first?: number;
-  [key: string]: any; // This allows for any other properties with any type.
+  [key: string]: any; // Allows additional properties
 }
 
 interface ScrollProps<EdgeT> {
@@ -53,18 +53,22 @@ export function withInfiniteScroll<EdgeT>({
     const [data, setData] = useState(initialData);
     const { ref, inView } = useInView();
 
+    // Memoize the filter object to avoid unnecessary re-renders
     const memoizedFilter = useMemo(() => filter, [JSON.stringify(filter)]);
 
     useEffect(() => {
       async function getMore() {
+        if (!data.pageInfo.hasNextPage) return; // Avoid unnecessary calls
+
         const newData = await getData({
           ...memoizedFilter,
-          after: data.pageInfo.endCursor,
+          after: data.pageInfo.endCursor, // Update with the latest cursor
         });
+
         setData((prevData) => ({
-          edges: [...prevData.edges, ...newData.edges],
-          pageInfo: newData.pageInfo,
-          totalCount: newData.totalCount,
+          edges: [...prevData.edges, ...newData.edges], // Append new edges
+          pageInfo: newData.pageInfo, // Update pageInfo
+          totalCount: newData.totalCount, // Update total count
         }));
       }
 
@@ -76,7 +80,7 @@ export function withInfiniteScroll<EdgeT>({
     return (
       <Container>
         {data.edges.map((edge, i) => (
-          <ListItem key={i} data={edge?.node} />
+          <ListItem key={edge?.cursor || i} data={edge?.node} />
         ))}
         {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
       </Container>
