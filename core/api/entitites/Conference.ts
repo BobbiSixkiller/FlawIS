@@ -23,7 +23,14 @@ export class ConferenceTranslations {
 
   @Field()
   @Property()
-  logoUrl: string;
+  get logoUrl(): string {
+    const env = process.env.NODE_ENV;
+    if (env === "staging" && this.logoUrl.includes("minio")) {
+      // Transform URL for staging environment
+      return this.logoUrl.replace("minio", "minio-staging"); // Staging MinIO URL
+    }
+    return this.logoUrl;
+  }
 }
 
 @ObjectType()

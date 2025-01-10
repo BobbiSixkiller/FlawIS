@@ -26,10 +26,19 @@ jobs:
           # Step 2: Copy the backup from the production MongoDB container to the local runner
           docker cp flawis-mongo-1:/data/backup ./backup
 
-          # Step 3: Copy the backup from the runner to the staging MongoDB container
+          # Step 3: Stop the staging MongoDB container
+          docker stop flawis-mongo-staging-1
+
+          # Step 4: Remove the staging MongoDB container (optional, only if you want a clean rebuild)
+          docker rm flawis-mongo-staging-1
+
+          # Step 5: Start the staging MongoDB container
+          docker-compose -f docker-compose.staging.yml up -d mongo-staging
+
+          # Step 6: Copy the backup to the new staging MongoDB container
           docker cp ./backup flawis-mongo-staging-1:/data/backup
 
-          # Step 4: Run mongorestore inside the staging MongoDB container
+          # Step 7: Run mongorestore inside the staging MongoDB container
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
 
       - name: Install MinIO client (if not already installed)
@@ -56,36 +65,6 @@ jobs:
         run: |
           docker system prune --all --force
         continue-on-error: true # Ensures that failure here doesn't block other steps
-
-      # Step 2: Create .env file with GitHub secrets
-      # - name: Create .env file for core service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./core/.env
-      #     echo "SECRET=${{ secrets.SECRET }}" >> ./core/.env
-      #     echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> ./core/.env
-      #     echo "RMQ_URI=${{ secrets.RMQ_URI }}" >> ./core/.env
-      #     echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./core/.env
-      #     echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./core/.env
-      #     echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./core/.env
-      #     # Add more environment variables as needed
-
-      # - name: Create .env file for client service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./client/.env
-      #     echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./client/.env
-      #     echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./client/.env
-      #     echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./client/.env
-      #     # Add more environment variables as needed
-
-      # - name: Create .env file for mail service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./mail/.env
-      #     echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> ./mail/.env
-      #     echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> ./mail/.env
-      #     echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> ./mail/.env
-      #     echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> ./mail/.env
-      #     echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> ./mail/.env
-      #     # Add more environment variables as needed
 
       - name: Build and Deploy Staging
         env:
