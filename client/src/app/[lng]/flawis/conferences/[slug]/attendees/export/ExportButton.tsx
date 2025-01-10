@@ -42,7 +42,7 @@ export default function ExportButton() {
 
   return (
     <div className="w-20">
-      <Button className="w-full" onClick={handleClick} color="green">
+      <Button className="w-full" onClick={handleClick} variant="positive">
         {loading ? (
           <Spinner inverted />
         ) : (
