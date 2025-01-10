@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: "20"
 
-           - name: Copy MongoDB data from production
+      - name: Copy MongoDB data from production
         run: |
           # Step 1: Run mongodump inside the production MongoDB container
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
@@ -65,36 +65,6 @@ jobs:
         run: |
           docker system prune --all --force
         continue-on-error: true # Ensures that failure here doesn't block other steps
-
-      # Step 2: Create .env file with GitHub secrets
-      # - name: Create .env file for core service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./core/.env
-      #     echo "SECRET=${{ secrets.SECRET }}" >> ./core/.env
-      #     echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> ./core/.env
-      #     echo "RMQ_URI=${{ secrets.RMQ_URI }}" >> ./core/.env
-      #     echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./core/.env
-      #     echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./core/.env
-      #     echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./core/.env
-      #     # Add more environment variables as needed
-
-      # - name: Create .env file for client service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./client/.env
-      #     echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> ./client/.env
-      #     echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> ./client/.env
-      #     echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> ./client/.env
-      #     # Add more environment variables as needed
-
-      # - name: Create .env file for mail service
-      #   run: |
-      #     echo "NODE_ENV=production" > ./mail/.env
-      #     echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> ./mail/.env
-      #     echo "MAIL_PORT=${{ secrets.MAIL_PORT }}" >> ./mail/.env
-      #     echo "MAIL_USER=${{ secrets.MAIL_USER }}" >> ./mail/.env
-      #     echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> ./mail/.env
-      #     echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> ./mail/.env
-      #     # Add more environment variables as needed
 
       - name: Build and Deploy Staging
         env:
