@@ -47,7 +47,11 @@ export class AttendeeResolver {
     return {
       totalCount: connection.totalCount || 0,
       pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges: connection.edges || [],
+      edges:
+        connection.edges.map((edge) => ({
+          cursor: edge.cursor,
+          node: transformIds(edge.node),
+        })) || [],
     };
   }
 
