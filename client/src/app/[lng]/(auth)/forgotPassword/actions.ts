@@ -9,11 +9,12 @@ export async function sendResetLink(email: string) {
     const res = await executeGqlFetch(
       ForgotPasswordDocument,
       { email },
-      {},
-      { revalidate: 60 * 60 }
+      {}
+      // { revalidate: 60 * 60 }
     );
 
     if (res.errors) {
+      console.log(res.errors[0]);
       const { validationErrors } = res.errors[0].extensions as ErrorException;
 
       return {

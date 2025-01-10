@@ -34,7 +34,7 @@ export async function login(email: string, password: string, url?: string) {
             : "flaw.uniba.sk",
       });
 
-      revalidatePath("/", "layout");
+      revalidatePath("/");
     }
   } catch (error: any) {
     return { success: false, message: error.message };
