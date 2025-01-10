@@ -65,7 +65,7 @@ export default function AttendeeFilter({
     <Popover className="relative">
       {({ open }) => (
         <>
-          <PopoverButton as={Button} className="p-2">
+          <PopoverButton as={Button} size="small" className="p-2">
             {open ? (
               <XMarkIcon className="size-5" aria-hidden="true" />
             ) : (

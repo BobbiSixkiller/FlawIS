@@ -41,16 +41,14 @@ export default function ExportButton() {
   }
 
   return (
-    <div className="w-20">
-      <Button className="w-full" onClick={handleClick} variant="positive">
-        {loading ? (
-          <Spinner inverted />
-        ) : (
-          <span className="flex gap-2 items-center">
-            .csv <TableCellsIcon className="size-5" />
-          </span>
-        )}
-      </Button>
-    </div>
+    <Button onClick={handleClick} size="sm" variant="positive" className="w-20">
+      {loading ? (
+        <Spinner inverted />
+      ) : (
+        <span className="flex gap-2 items-center">
+          .csv <TableCellsIcon className="size-5" />
+        </span>
+      )}
+    </Button>
   );
 }
