@@ -29,7 +29,7 @@ export class ConferenceTranslations {
   })
   get logoUrlEnv(): string {
     if (process.env.NODE_ENV === "staging") {
-      this.logoUrl.replace("minio", "minio-staging");
+      return this.logoUrl.replace("minio", "minio-staging");
     }
     return this.logoUrl;
   }

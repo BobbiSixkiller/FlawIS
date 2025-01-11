@@ -75,13 +75,7 @@ export function withInfiniteScroll<EdgeT>({
       if (inView && data.pageInfo.hasNextPage) {
         getMore();
       }
-    }, [
-      inView,
-      data.pageInfo.hasNextPage,
-      data.pageInfo.endCursor,
-      memoizedFilter,
-      getData,
-    ]);
+    }, [inView, data, memoizedFilter]);
 
     return (
       <Container>
