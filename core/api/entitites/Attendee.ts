@@ -1,7 +1,7 @@
 import {
   getModelForClass,
   Index,
-  pre,
+  Pre,
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
@@ -103,7 +103,7 @@ export class AttendeeConference {
   slug: string;
 }
 
-@pre<Attendee>("save", async function () {
+@Pre<Attendee>("save", async function () {
   if (this.isNew) {
     await getModelForClass(Conference).updateOne(
       { slug: this.conference.slug },
@@ -111,6 +111,31 @@ export class AttendeeConference {
     );
   }
 })
+@Pre<Attendee>(
+  "deleteOne",
+  async function () {
+    // Get the filter used in the query
+    const queryFilter = this.getFilter();
+
+    // Retrieve the document manually using a properly typed model
+    const doc = await getModelForClass(Attendee).findOne(queryFilter);
+
+    // Proceed with the update if the document exists
+    if (doc) {
+      await Promise.all([
+        getModelForClass(Conference).updateOne(
+          { _id: doc.conference.id },
+          { $inc: { attendeesCount: -1 } }
+        ),
+        getModelForClass(Submission).updateMany(
+          { authors: doc.user.id },
+          { $pull: { authors: doc.user.id } }
+        ),
+      ]);
+    }
+  },
+  { query: true, document: false }
+)
 @ObjectType({ description: "Attendee model type" })
 @Index({ "user.name": "text", "user.email": "text" })
 @Index({ "conference.slug": 1, _id: -1 }) //attendees query

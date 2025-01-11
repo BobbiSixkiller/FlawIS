@@ -109,14 +109,14 @@ export class AttendeeResolver {
     @LoadResource(Attendee) attendee: DocumentType<Attendee>
   ): Promise<AttendeeMutationResponse> {
     await this.attendeeService.delete({ _id: attendee.id });
-    await this.conferenceService.update(
-      { slug: attendee.conference.slug },
-      { $inc: { attendeesCount: -1 } }
-    );
-    await this.submissionService.update(
-      { authors: attendee.user.id },
-      { $pull: { authors: attendee.user.id } }
-    );
+    // await this.conferenceService.update(
+    //   { slug: attendee.conference.slug },
+    //   { $inc: { attendeesCount: -1 } }
+    // );
+    // await this.submissionService.update(
+    //   { authors: attendee.user.id },
+    //   { $pull: { authors: attendee.user.id } }
+    // );
 
     return {
       data: attendee,
