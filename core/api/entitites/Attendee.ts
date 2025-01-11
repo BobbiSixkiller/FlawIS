@@ -175,73 +175,73 @@ export class Attendee extends TimeStamps {
   ) {
     return await this.aggregate([
       { $sort: { _id: -1 } },
+      { $match: { "conference.slug": conferenceSlug } },
       {
-        $facet: {
-          data: [
-            { $match: { "conference.slug": conferenceSlug } },
-            {
-              $lookup: {
-                from: "submissions",
-                let: {
-                  conference: "$conference",
-                  user: "$user",
-                },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: {
-                        $and: [
-                          { $in: ["$$user._id", "$authors"] },
-                          { $eq: ["$conference", "$$conference._id"] },
-                        ],
-                      },
-                    },
-                  },
-                ],
-                as: "submissions",
-              },
-            },
+        $lookup: {
+          from: "submissions",
+          let: {
+            conference: "$conference",
+            user: "$user",
+          },
+          pipeline: [
             {
               $match: {
                 $expr: {
-                  $cond: {
-                    if: {
-                      $or: [
-                        { $ne: [{ $size: [sectionIds] }, 0] },
-                        { $eq: [passive, true] },
-                      ],
-                    },
-                    then: {
-                      $or: [
-                        {
-                          $and: [
-                            { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
-                            {
-                              $anyElementTrue: {
-                                $map: {
-                                  input: "$submissions",
-                                  as: "nested",
-                                  in: {
-                                    $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
-                                  },
-                                },
-                              },
-                            },
-                          ],
-                        },
-                        {
-                          $and: [
-                            { $eq: [passive, true] }, // Include documents with empty submissions
-                            { $eq: [{ $size: "$submissions" }, 0] },
-                          ],
-                        },
-                      ],
-                    },
-                    else: {},
-                  },
+                  $and: [
+                    { $in: ["$$user._id", "$authors"] },
+                    { $eq: ["$conference", "$$conference._id"] },
+                  ],
                 },
               },
             },
+          ],
+          as: "submissions",
+        },
+      },
+      {
+        $match: {
+          $expr: {
+            $cond: {
+              if: {
+                $or: [
+                  { $ne: [{ $size: [sectionIds] }, 0] },
+                  { $eq: [passive, true] },
+                ],
+              },
+              then: {
+                $or: [
+                  {
+                    $and: [
+                      { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
+                      {
+                        $anyElementTrue: {
+                          $map: {
+                            input: "$submissions",
+                            as: "nested",
+                            in: {
+                              $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                            },
+                          },
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    $and: [
+                      { $eq: [passive, true] }, // Include documents with empty submissions
+                      { $eq: [{ $size: "$submissions" }, 0] },
+                    ],
+                  },
+                ],
+              },
+              else: {},
+            },
+          },
+        },
+      },
+      {
+        $facet: {
+          data: [
             {
               $match: {
                 $expr: {
@@ -271,77 +271,15 @@ export class Attendee extends TimeStamps {
             { $limit: 1 }, // just to check if there's any element
           ],
           totalCount: [
-            { $match: { "conference.slug": conferenceSlug } },
-            {
-              $lookup: {
-                from: "submissions",
-                let: {
-                  conference: "$conference",
-                  user: "$user",
-                },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: {
-                        $and: [
-                          { $in: ["$$user._id", "$authors"] },
-                          { $eq: ["$conference", "$$conference._id"] },
-                        ],
-                      },
-                    },
-                  },
-                ],
-                as: "submissions",
-              },
-            },
-            {
-              $match: {
-                $expr: {
-                  $cond: {
-                    if: {
-                      $or: [
-                        { $ne: [{ $size: [sectionIds] }, 0] },
-                        { $eq: [passive, true] },
-                      ],
-                    },
-                    then: {
-                      $or: [
-                        {
-                          $and: [
-                            { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
-                            {
-                              $anyElementTrue: {
-                                $map: {
-                                  input: "$submissions",
-                                  as: "nested",
-                                  in: {
-                                    $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
-                                  },
-                                },
-                              },
-                            },
-                          ],
-                        },
-                        {
-                          $and: [
-                            { $eq: [passive, true] }, // Include documents with empty submissions
-                            { $eq: [{ $size: "$submissions" }, 0] },
-                          ],
-                        },
-                      ],
-                    },
-                    else: {},
-                  },
-                },
-              },
-            },
             { $count: "totalCount" }, // Count matching documents
           ],
         },
       },
       {
         $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
+          },
           edges: {
             $map: {
               input: "$data",
@@ -350,8 +288,8 @@ export class Attendee extends TimeStamps {
             },
           },
           pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
+            hasNextPage: { $gt: [{ $size: "$hasNextPage" }, 0] }, // True if hasNextPage has at least one record
+            endCursor: { $ifNull: [{ $last: "$data._id" }, null] }, // Fallback to null if no records
           },
         },
       },
