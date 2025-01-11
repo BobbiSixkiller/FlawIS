@@ -25,12 +25,6 @@ export default async function AttendeesPage({
     getConference(slug),
   ]);
 
-  console.log(initialData);
-
-  console.log(initialData.totalCount);
-
-  console.log(initialData.pageInfo);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">

@@ -56,9 +56,10 @@ export class EmailService {
       const html = template(data);
 
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-gpu'],
+        args: ['--no-sandbox', '--disable-gpu', '--disable-setuid-sandbox'],
         executablePath: '/usr/bin/chromium-browser',
         headless: true,
+        timeout: 60000, // Increase to 60 seconds
       });
       const page = await browser.newPage();
 
