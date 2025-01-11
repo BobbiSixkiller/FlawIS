@@ -86,7 +86,7 @@ union AttendeeUserUnion = AttendeeUser | User
 type Billing {
   DIC: String
   ICDPH: String
-  ICO: String!
+  ICO: String
   address: Address!
   name: String!
 }

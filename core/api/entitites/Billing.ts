@@ -30,7 +30,7 @@ export class Billing {
   @Property({ _id: false })
   address: Address;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
   ICO?: string;
 
