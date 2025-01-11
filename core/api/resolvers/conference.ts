@@ -310,7 +310,7 @@ export class ConferencerResolver {
             .name,
         conferenceLogo:
           conference.translations[this.i18nService.language() as "sk" | "en"]
-            .logoUrl,
+            .logoUrlEnv,
         invoice: attendee.invoice,
       }),
       "mail.conference.invoice"
