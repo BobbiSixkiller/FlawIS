@@ -28,7 +28,7 @@ export default async function ConferencePage({
           className="w-[300px] h-[150px]"
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "contain" }}
         />
 
         <Heading
@@ -42,7 +42,7 @@ export default async function ConferencePage({
         <dl className="divide-y divide-gray-100">
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              Zaciatok
+              {t("conference.start")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.start)}
@@ -50,7 +50,7 @@ export default async function ConferencePage({
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              Koniec
+              {t("conference.end")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.end)}
@@ -58,7 +58,7 @@ export default async function ConferencePage({
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              Koniec registracie
+              {t("conference.regEnd")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.regEnd)}
@@ -66,7 +66,7 @@ export default async function ConferencePage({
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
             <dt className="text-sm font-medium leading-6 text-gray-900">
-              Deadline zaslania prispevkov
+              {t("conference.submissionDeadline")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.submissionDeadline)}
