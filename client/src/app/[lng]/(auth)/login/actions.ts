@@ -35,12 +35,10 @@ export async function login(email: string, password: string, url?: string) {
             ? "localhost"
             : ".flaw.uniba.sk",
       });
+
+      return { success: true, redirectUrl };
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
-
-  console.log(redirectUrl);
-
-  redirect(redirectUrl);
 }

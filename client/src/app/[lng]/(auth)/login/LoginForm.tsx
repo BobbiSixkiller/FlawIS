@@ -13,9 +13,11 @@ import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { useRouter } from "next/router";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
+  const router = useRouter();
 
   const { dispatch } = useContext(MessageContext);
 
@@ -43,8 +45,12 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             if (state && !state.success) {
               dispatch({
                 type: ActionTypes.SetFormMsg,
-                payload: state,
+                payload: { message: state.message, success: state.success },
               });
+            }
+
+            if (state && state.redirectUrl) {
+              router.replace(state.redirectUrl);
             }
           },
           (errs) => console.log(errs)
