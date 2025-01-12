@@ -395,7 +395,7 @@ type Query {
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
-  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: String, user: ObjectId): InternConnection!
+  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: Status, user: ObjectId): InternConnection!
   internship(id: ObjectId!): Internship!
   internships(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!

@@ -10,6 +10,7 @@ import {
 import { I18nService } from "./i18nService";
 import { User } from "../util/types";
 import { UserService } from "./userService";
+import { transformIds } from "../middlewares/typegoose-middleware";
 
 @Service()
 export class InternshipService {
@@ -22,7 +23,15 @@ export class InternshipService {
   async getInternships(args: InternshipArgs): Promise<InternshipConnection> {
     try {
       const data = await this.crudService.dataModel.paginatedInternships(args);
-      return data[0];
+      const connection = data[0] as InternshipConnection;
+
+      return {
+        ...connection,
+        edges: connection.edges.map((edge) => ({
+          cursor: edge.cursor,
+          node: transformIds(edge.node),
+        })),
+      };
     } catch (error: any) {
       throw new Error(`Error fetching internships: ${error.message}`);
     }

@@ -651,7 +651,7 @@ export type QueryInternsArgs = {
   first?: Scalars['Int']['input'];
   internship?: InputMaybe<Scalars['ObjectId']['input']>;
   startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Status>;
   user?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
@@ -1235,6 +1235,7 @@ export type InternsQueryVariables = Exact<{
   startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
   endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
   internship?: InputMaybe<Scalars['ObjectId']['input']>;
+  status?: InputMaybe<Status>;
 }>;
 
 
@@ -3479,7 +3480,7 @@ export const DeleteInternshipDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<DeleteInternshipMutation, DeleteInternshipMutationVariables>;
 export const InternsDocument = new TypedDocumentString(`
-    query interns($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $internship: ObjectId) {
+    query interns($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $internship: ObjectId, $status: Status) {
   interns(
     after: $after
     first: $first
@@ -3487,6 +3488,7 @@ export const InternsDocument = new TypedDocumentString(`
     user: $user
     startDate: $startDate
     endDate: $endDate
+    status: $status
   ) {
     totalCount
     edges {

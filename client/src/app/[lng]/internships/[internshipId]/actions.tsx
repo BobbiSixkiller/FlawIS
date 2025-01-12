@@ -11,7 +11,6 @@ export async function getInternship(id: string) {
     {},
     { revalidate: 3600, tags: [`internship:${id}`] }
   );
-  console.log(res);
 
   if (res.errors) {
     console.log(res.errors[0]);

@@ -92,6 +92,7 @@ query interns(
   $startDate: DateTimeISO
   $endDate: DateTimeISO
   $internship: ObjectId
+  $status: Status
 ) {
   interns(
     after: $after
@@ -100,6 +101,7 @@ query interns(
     user: $user
     startDate: $startDate
     endDate: $endDate
+    status: $status
   ) {
     totalCount
     edges {

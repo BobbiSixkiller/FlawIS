@@ -46,7 +46,7 @@ export class InternArgs extends CreateArgs(Intern) {
   @Field({ nullable: true })
   endDate?: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Status, { nullable: true })
   status?: Status;
 }
 
