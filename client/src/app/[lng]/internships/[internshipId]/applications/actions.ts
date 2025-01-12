@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 export async function getInterns(filter: GetDataFilter) {
   const res = await executeGqlFetch(
     InternsDocument,
-    { ...filter },
+    filter,
     {},
     { tags: ["internships"], revalidate: 3600 }
   );

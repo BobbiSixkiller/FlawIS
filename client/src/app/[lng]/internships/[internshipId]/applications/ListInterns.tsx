@@ -46,7 +46,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
               style={{ objectFit: "cover" }}
             />
           )}
-          <div className="flex-auto">
+          <div>
             <p className="text-sm/6 font-semibold text-gray-900">
               {data?.user.name}
             </p>
@@ -56,15 +56,13 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
           </div>
         </div>
 
-        <div className=" sm:flex sm:flex-col sm:items-end sm:text-right">
+        <div className="sm:flex sm:flex-col sm:items-end sm:text-right">
           <p className="text-sm/6 text-gray-900">{data?.status}</p>
           <p className="mt-1 text-xs/5 text-gray-500">
-            <time dateTime={new Date(data?.updatedAt).toISOString()}>
-              {t("updatedAt", {
-                ns: "common",
-                value: displayDate(data?.updatedAt),
-              })}
-            </time>
+            {t("updatedAt", {
+              ns: "common",
+              value: displayDate(data?.updatedAt),
+            })}
           </p>
         </div>
       </div>

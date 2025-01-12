@@ -9,6 +9,7 @@ import { InternshipService } from "./internshipService";
 import { getAcademicYearInterval } from "../util/helpers";
 import { Access } from "../entitites/User";
 import { UserService } from "./userService";
+import { transformIds } from "../middlewares/typegoose-middleware";
 
 @Service()
 export class InternService {
@@ -22,7 +23,18 @@ export class InternService {
   async getInterns(args: InternArgs): Promise<InternConnection> {
     try {
       const data = await this.crudService.dataModel.paginatedInterns(args);
-      return data[0] as InternConnection;
+      const connection = data[0] as InternConnection;
+
+      console.log(args);
+      console.log(connection);
+
+      return {
+        ...connection,
+        edges: connection.edges.map((edge) => ({
+          cursor: edge.cursor,
+          node: transformIds(edge.node),
+        })),
+      };
     } catch (error: any) {
       throw new Error(`Error fetching interns: ${error.message}`);
     }

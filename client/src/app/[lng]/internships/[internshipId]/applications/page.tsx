@@ -1,13 +1,20 @@
+import { getMe } from "@/app/[lng]/(auth)/actions";
 import { getInterns } from "./actions";
 import ListInterns from "./ListInterns";
+import { Access, Status } from "@/lib/graphql/generated/graphql";
 
 export default async function ApplicationsPage({
-  params: { id },
+  params: { internshipId },
 }: {
-  params: { id: string };
+  params: { internshipId: string };
 }) {
-  const initialData = await getInterns({ internship: id });
-  console.log(initialData);
+  const user = await getMe();
 
-  return <ListInterns initialData={initialData} filter={{ internship: id }} />;
+  const filter = user.access.includes(Access.Organization)
+    ? { internship: internshipId, status: Status.Eligible }
+    : { internship: internshipId };
+
+  const initialData = await getInterns(filter);
+
+  return <ListInterns initialData={initialData} filter={filter} />;
 }

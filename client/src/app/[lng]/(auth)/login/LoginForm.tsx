@@ -43,9 +43,13 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             if (state && !state.success) {
               dispatch({
                 type: ActionTypes.SetFormMsg,
-                payload: state,
+                payload: { message: state.message, success: state.success },
               });
             }
+
+            // if (state && state.redirectUrl) {
+            //   router.replace(state.redirectUrl);
+            // }
           },
           (errs) => console.log(errs)
         )}

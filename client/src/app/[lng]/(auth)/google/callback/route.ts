@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { executeGqlFetch } from "@/utils/actions";
 import { GoogleSignInDocument } from "@/lib/graphql/generated/graphql";
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function GET(req: NextRequest) {
@@ -26,8 +25,11 @@ export async function GET(req: NextRequest) {
   cookies().set("accessToken", res.data.googleSignIn.data.token, {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
+    secure: process.env.NODE_ENV !== "development",
+    sameSite: "lax",
+    domain:
+      process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
   });
-  revalidatePath("/", "layout");
 
   return redirect(redirectUrl);
 }
