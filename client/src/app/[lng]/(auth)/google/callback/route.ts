@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { executeGqlFetch } from "@/utils/actions";
 import { GoogleSignInDocument } from "@/lib/graphql/generated/graphql";
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function GET(req: NextRequest) {
@@ -27,7 +26,6 @@ export async function GET(req: NextRequest) {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
   });
-  revalidatePath("/", "layout");
 
   return redirect(redirectUrl);
 }

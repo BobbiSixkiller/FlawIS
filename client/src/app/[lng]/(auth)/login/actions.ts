@@ -26,7 +26,7 @@ export async function login(email: string, password: string, url?: string) {
       cookies().set("accessToken", res.data.login.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
-        secure: process.env.NODE_ENV !== "development",
+        // secure: process.env.NODE_ENV !== "development",
         sameSite: "lax",
         domain:
           process.env.NODE_ENV === "development"
@@ -40,5 +40,5 @@ export async function login(email: string, password: string, url?: string) {
 
   console.log("REDIRECTING TO: ", url);
 
-  return redirect(url || "/");
+  redirect(url || "/");
 }
