@@ -24,6 +24,10 @@ export async function generateMetadata(
   const host = headers().get("host") || "flawis.flaw.uniba.sk";
 
   return {
+    metadataBase:
+      process.env.NODE_ENV !== "development"
+        ? new URL(`https://${host}`)
+        : undefined,
     title: `${t("conferences")} | ${t("title")}`,
     openGraph: {
       images: [`/images/Praf-logo-text-${lng}.png`],

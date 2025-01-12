@@ -69,7 +69,7 @@ export async function activate() {
     }
 
     cookies().delete("activationToken");
-    revalidatePath("/", "layout");
+    revalidatePath("/");
     return { success: true, message: res.data.activateUser };
   } catch (error: any) {
     return {

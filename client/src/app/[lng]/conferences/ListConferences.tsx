@@ -36,7 +36,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
         src={data!.translations[lng as "sk" | "en"].logoUrlEnv}
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        style={{ objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         className="h-24 w-full max-w-72"
       />
 
