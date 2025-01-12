@@ -26,19 +26,11 @@ export async function login(email: string, password: string, url?: string) {
       cookies().set("accessToken", res.data.login.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
-        // secure: process.env.NODE_ENV !== "development",
-        sameSite: "lax",
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".flaw.uniba.sk",
       });
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
-
-  console.log("REDIRECTING TO: ", url);
 
   redirect(url || "/");
 }
