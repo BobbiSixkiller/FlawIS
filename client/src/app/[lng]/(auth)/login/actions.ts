@@ -4,11 +4,9 @@ import { LoginDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { cookies } from "next/headers";
-import { permanentRedirect, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export async function login(email: string, password: string, url?: string) {
-  const redirectUrl = url ? url : "/";
-
   try {
     const res = await executeGqlFetch(LoginDocument, { email, password });
 
@@ -36,9 +34,11 @@ export async function login(email: string, password: string, url?: string) {
             : ".flaw.uniba.sk",
       });
 
-      return { success: true, redirectUrl };
+      // return { success: true, redirectUrl };
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
+
+  redirect(url ? url : "/");
 }
