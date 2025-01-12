@@ -42,7 +42,7 @@ export async function register({
             : "flaw.uniba.sk",
       });
 
-      revalidatePath("/", "layout");
+      revalidatePath("/");
     }
   } catch (error: any) {
     return { success: false, message: error.message };

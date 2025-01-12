@@ -13,7 +13,6 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { t } = await translate(lng, "dashboard");
   const host = headers().get("host") || "flawis.flaw.uniba.sk";
-  console.log("HOSTIK", host);
 
   return {
     metadataBase:
