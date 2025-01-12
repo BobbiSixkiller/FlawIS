@@ -4,9 +4,11 @@ import { LoginDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 
 export async function login(email: string, password: string, url?: string) {
+  const redirectUrl = url ? url : "/";
+
   try {
     const res = await executeGqlFetch(LoginDocument, { email, password });
 
@@ -27,6 +29,7 @@ export async function login(email: string, password: string, url?: string) {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
         secure: process.env.NODE_ENV !== "development",
+        sameSite: "lax",
         domain:
           process.env.NODE_ENV === "development"
             ? "localhost"
@@ -37,7 +40,6 @@ export async function login(email: string, password: string, url?: string) {
     return { success: false, message: error.message };
   }
 
-  const redirectUrl = url ? url : "/";
   console.log(redirectUrl);
 
   redirect(redirectUrl);

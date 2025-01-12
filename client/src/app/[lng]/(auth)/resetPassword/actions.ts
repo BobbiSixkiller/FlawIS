@@ -30,6 +30,7 @@ export async function resetPassword(password: string, token: string) {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours
         secure: process.env.NODE_ENV !== "development",
+        sameSite: "lax",
         domain:
           process.env.NODE_ENV === "development"
             ? "localhost"
