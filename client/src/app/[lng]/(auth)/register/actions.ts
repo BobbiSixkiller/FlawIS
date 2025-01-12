@@ -41,8 +41,6 @@ export async function register({
             ? "localhost"
             : "flaw.uniba.sk",
       });
-
-      revalidatePath("/");
     }
   } catch (error: any) {
     return { success: false, message: error.message };
