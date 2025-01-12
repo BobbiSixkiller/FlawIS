@@ -5,7 +5,7 @@ import GoogleSignIn from "../GoogleSignin";
 import { headers } from "next/headers";
 import { translate } from "@/lib/i18n";
 
-export default async function Login({
+export default async function LoginPage({
   params: { lng },
   searchParams: { url },
 }: {

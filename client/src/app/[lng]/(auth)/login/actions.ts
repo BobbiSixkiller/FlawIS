@@ -3,7 +3,6 @@
 import { LoginDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -37,6 +36,8 @@ export async function login(email: string, password: string, url?: string) {
   } catch (error: any) {
     return { success: false, message: error.message };
   }
+
+  console.log("REDIRECTING TO: ", url);
 
   redirect(url || "/");
 }
