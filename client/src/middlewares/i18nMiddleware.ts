@@ -60,7 +60,7 @@ export function withLocalization(middleware: CustomMiddleware) {
     }
 
     const response = NextResponse.next();
-    response.cookies.set(cookieName, paths[1]);
+    response.cookies.set(cookieName, paths[1], { domain });
 
     return middleware(req, event, response);
   };
