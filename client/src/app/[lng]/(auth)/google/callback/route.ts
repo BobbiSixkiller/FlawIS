@@ -25,6 +25,9 @@ export async function GET(req: NextRequest) {
   cookies().set("accessToken", res.data.googleSignIn.data.token, {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
+    secure: process.env.NODE_ENV !== "development",
+    domain:
+      process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
   });
 
   return redirect(redirectUrl);
