@@ -19,17 +19,15 @@ export function withAuth(middleware: CustomMiddleware) {
 
     if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
       if (url.pathname !== "/" && url.pathname !== "/logout") {
-        const fullUrl = `${url.pathname}${url.search}`;
-        url.searchParams.keys().forEach((key) => url.searchParams.delete(key));
-        url.searchParams.append("url", fullUrl);
+        url.searchParams.set("url", `${url.pathname}${url.search}`);
       }
       url.pathname = "/login";
-
       return NextResponse.redirect(url);
     }
 
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
-      url.pathname = "/";
+      const redirectTo = url.searchParams.get("url") || "/";
+      url.pathname = redirectTo;
       return NextResponse.redirect(url);
     }
 

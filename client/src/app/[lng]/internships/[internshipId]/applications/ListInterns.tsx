@@ -11,7 +11,7 @@ import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { displayDate } from "@/utils/helpers";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Button from "@/components/Button";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -22,6 +22,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
     internshipId: string;
   }>();
   const { t } = useTranslation(lng, ["internships", "common"]);
+  const path = usePathname();
 
   return (
     <li className="flex sm:justify-between items-center gap-6 py-5">
@@ -70,7 +71,11 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
       <Button
         variant="ghost"
         as={Link}
-        href={`/${internshipId}/applications/${data?.id}`}
+        href={
+          path.includes("internships")
+            ? `/internships/${internshipId}/applications/${data?.id}`
+            : `/${internshipId}/applications/${data?.id}`
+        }
         className="rounded-full h-full p-2 hover:bg-gray-100 hover:text-gray-400"
       >
         <ChevronRightIcon className="size-5" />

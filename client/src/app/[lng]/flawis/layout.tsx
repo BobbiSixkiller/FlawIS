@@ -6,6 +6,7 @@ import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
 import { Access } from "@/lib/graphql/generated/graphql";
 import {
   AcademicCapIcon,
+  BriefcaseIcon,
   ChevronRightIcon,
   HomeIcon,
   UsersIcon,
@@ -77,6 +78,10 @@ export default async function DashboardLayout({
               <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
               {t("conferences")}
             </NavItem>
+            <NavItem route="internships">
+              <BriefcaseIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              {t("internships")}
+            </NavItem>
             <ProfileMenuItem lng={lng} user={user} />
           </nav>
           <LngSwitcher lng={lng} />
@@ -95,6 +100,10 @@ export default async function DashboardLayout({
         <NavItem route="conferences">
           <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
           {t("conferences")}
+        </NavItem>
+        <NavItem route="internships">
+          <BriefcaseIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+          {t("internships")}
         </NavItem>
         <LngSwitcher lng={lng} className="mt-auto" />
       </MobileNav>

@@ -1,5 +1,4 @@
 import Button from "@/components/Button";
-import { getIntern } from "../actions";
 import Link from "next/link";
 import {
   CheckIcon,
@@ -11,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { displayDate } from "@/utils/helpers";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/actions";
 import DynamicImage from "@/components/DynamicImage";
 
 export default async function InternPage({
@@ -26,7 +26,7 @@ export default async function InternPage({
         variant="ghost"
         as={Link}
         className="rounded-full h-full p-2 hover:bg-gray-100 hover:text-gray-400 ml-auto"
-        href={`/${internshipId}/applications`}
+        href={`/internships/${internshipId}/applications`}
       >
         <XMarkIcon className="size-5" />
       </Button>
@@ -45,7 +45,7 @@ export default async function InternPage({
               />
             ) : (
               <UserIcon className="size-10 rounded-full " />
-            )}{" "}
+            )}
             <div className="">
               <p className="font-semibold text-gray-900">
                 <span className="absolute inset-0" />
@@ -120,7 +120,12 @@ export default async function InternPage({
           </div>
 
           <div className="flex gap-2">
-            <Button as={Link} href={``} size="icon" variant="destructive">
+            <Button
+              as={Link}
+              href={`/internships/${internshipId}/applications/${internId}/delete`}
+              size="icon"
+              variant="destructive"
+            >
               <TrashIcon className="size-5" />
             </Button>
 

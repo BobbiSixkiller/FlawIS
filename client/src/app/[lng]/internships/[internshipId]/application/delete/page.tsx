@@ -6,7 +6,7 @@ import { getInternship } from "../../actions";
 import { redirect } from "next/navigation";
 
 export default async function DeleteApplicationPage({
-  params: { internshipId, lng },
+  params: { internshipId },
 }: {
   params: { internshipId: string; lng: string };
 }) {

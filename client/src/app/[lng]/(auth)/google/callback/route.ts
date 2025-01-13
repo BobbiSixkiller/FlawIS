@@ -31,5 +31,7 @@ export async function GET(req: NextRequest) {
       process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
   });
 
+  console.log("REDIRECTING TO", redirectUrl);
+
   return redirect(redirectUrl);
 }

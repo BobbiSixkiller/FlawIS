@@ -8,6 +8,7 @@ import {
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
+import { usePathname } from "next/navigation";
 
 interface InternshipData {
   id: string;
@@ -18,10 +19,16 @@ interface InternshipData {
 }
 
 function ListItem({ data }: { data?: InternshipData }) {
+  const path = usePathname();
+
   return (
     <Link
       className="rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
-      href={`/${data?.id}`}
+      href={
+        path.includes("internships")
+          ? `/internships/${data?.id}`
+          : `/${data?.id}`
+      }
     >
       <h2 className="font-medium leading-6">{data?.organization}</h2>
       <p className="leading-none text-gray-500">{data?.academicYear}</p>

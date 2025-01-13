@@ -3,8 +3,8 @@
 import { LoginDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { redirect, RedirectType } from "next/navigation";
 
 export async function login(email: string, password: string, url?: string) {
   try {
@@ -33,12 +33,17 @@ export async function login(email: string, password: string, url?: string) {
             ? "localhost"
             : ".flaw.uniba.sk",
       });
-
-      // return { success: true, redirectUrl };
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
 
-  redirect(url ? url : "/");
+  console.log("REDIRECTING TO", url);
+
+  const host = headers().get("host");
+
+  const fullRedirectUrl =
+    process.env.NODE_ENV === "development" ? url : `https://${host}${url}`;
+
+  redirect(url ? url : "/", RedirectType.replace);
 }

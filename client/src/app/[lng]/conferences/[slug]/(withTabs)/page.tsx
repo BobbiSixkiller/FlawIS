@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import Heading from "@/components/Heading";
 import { displayDate } from "@/utils/helpers";
 import DynamicImage from "@/components/DynamicImage";
@@ -14,7 +14,7 @@ export default async function ConferencePage({
   const { t } = await translate(lng, "conferences");
   const conference = await getConference(slug);
   if (conference && !conference.attending) {
-    redirect(`/${slug}/register`);
+    redirect(`/${slug}/register`, RedirectType.replace);
   }
 
   return (

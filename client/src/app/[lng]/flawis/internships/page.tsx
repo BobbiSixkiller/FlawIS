@@ -1,17 +1,17 @@
 import Heading from "@/components/Heading";
-import { getConferences } from "./actions";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { translate } from "@/lib/i18n";
-import ListConferences from "../../conferences/ListConferences";
+import { getInternships } from "../../internships/actions";
+import ListInternships from "../../internships/ListInternships";
 
-export default async function Conferences({
+export default async function InternshipsPage({
   params: { lng },
 }: {
   params: { lng: string };
 }) {
-  const { t } = await translate(lng, "conferences");
+  const { t } = await translate(lng, "internships");
 
-  const initialData = await getConferences({});
+  const initialData = await getInternships({});
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,7 +27,7 @@ export default async function Conferences({
           },
         ]}
       />
-      {initialData && <ListConferences initialData={initialData} />}
+      {initialData && <ListInternships initialData={initialData} filter={{}} />}
     </div>
   );
 }
