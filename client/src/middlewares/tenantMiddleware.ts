@@ -18,6 +18,9 @@ const commonPaths = [
 export function withTenant(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
+    console.log("URL PATHNAME ", url.pathname);
+    console.log("URL SEARCH ", url.search);
+
     const pathWithoutLocale = url.pathname
       .replace("/en", "")
       .replace("/sk", "");
