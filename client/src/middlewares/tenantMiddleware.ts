@@ -35,15 +35,6 @@ export function withTenant(middleware: CustomMiddleware) {
     } else lng = fallbackLng;
 
     if (commonPaths.some((path) => pathWithoutLocale === path)) {
-      console.log("PUBLIC PATH ", pathWithoutLocale);
-
-      return middleware(req, event, res);
-    }
-
-    if (
-      url.pathname.startsWith(`/${lng}/conferences`) ||
-      url.pathname.startsWith(`/${lng}/flawis`)
-    ) {
       return middleware(req, event, res);
     }
 
@@ -70,6 +61,7 @@ export function withTenant(middleware: CustomMiddleware) {
       if (url.pathname !== targetUrl) {
         const newUrl = new URL(targetUrl, req.url);
         console.log("NEW URL ", targetUrl);
+        console.log(res.headers);
         return NextResponse.rewrite(newUrl, {
           headers: res?.headers,
         });
@@ -88,7 +80,7 @@ export function withTenant(middleware: CustomMiddleware) {
     }
 
     if (subdomain.includes("conferences")) {
-      const targetUrl = `/${lng}/flawis/${paths.join("/")}${url.search}`;
+      const targetUrl = `/${lng}/conferences/${paths.join("/")}${url.search}`;
       if (url.pathname !== targetUrl) {
         const newUrl = new URL(targetUrl, req.url);
         console.log("NEW URL ", targetUrl);
