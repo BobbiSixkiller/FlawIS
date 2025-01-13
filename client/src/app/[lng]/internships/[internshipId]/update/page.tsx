@@ -5,11 +5,11 @@ import InternshipForm from "../../new/InternshipForm";
 import { getInternship } from "../actions";
 
 export default async function UpdateInternship({
-  params: { id },
+  params: { internshipId },
 }: {
-  params: { lng: string; id: string };
+  params: { lng: string; internshipId: string };
 }) {
-  const internship = await getInternship(id);
+  const internship = await getInternship(internshipId);
 
   return (
     <div className="flex flex-col">
@@ -17,7 +17,7 @@ export default async function UpdateInternship({
         variant="ghost"
         as={Link}
         className="ml-auto rounded-full h-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400"
-        href={`/${id}`}
+        href={`/${internshipId}`}
       >
         <XMarkIcon className="size-5" />
       </Button>

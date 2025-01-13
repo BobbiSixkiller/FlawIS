@@ -6,13 +6,14 @@ import {
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { getConferences } from "../flawis/conferences/actions";
 
 function ListItem({ data }: { data?: ConferenceFragment }) {
   const { lng } = useParams<{ lng: string }>();
+  const path = usePathname();
 
   // Create Date objects for start and end dates
   const startDate = data?.dates.start ? new Date(data.dates.start) : null;
@@ -29,7 +30,11 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
   return (
     <Link
       className="h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
-      href={`/${data?.slug}`}
+      href={
+        path.includes("conferences")
+          ? `/conferences/${data?.slug}`
+          : `/${data?.slug}`
+      }
     >
       <DynamicImageClient
         alt="conference-logo"

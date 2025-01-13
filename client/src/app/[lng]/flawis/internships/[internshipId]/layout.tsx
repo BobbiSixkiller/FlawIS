@@ -15,9 +15,9 @@ export default async function InternshipLayout({
     <div>
       <TabMenu
         tabs={[
-          { href: `/${internshipId}`, name: "Staz" },
+          { href: `/internships/${internshipId}`, name: "Staz" },
           {
-            href: `/${internshipId}/applications`,
+            href: `/internships/${internshipId}/applications`,
             name: `Prihlaseni ${
               internship?.applicationsCount
                 ? `(${internship.applicationsCount})`

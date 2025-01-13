@@ -1,8 +1,8 @@
 import Heading from "@/components/Heading";
 import { getConferences } from "./actions";
-import ListConferences from "./ListConferences";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { translate } from "@/lib/i18n";
+import ListConferences from "../../conferences/ListConferences";
 
 export default async function Conferences({
   params: { lng },

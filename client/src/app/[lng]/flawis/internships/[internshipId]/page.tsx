@@ -22,7 +22,7 @@ export default async function InternshipPage({
           variant="secondary"
           as={Link}
           className="rounded-full h-full p-2"
-          href={`/${internshipId}/update`}
+          href={`/internships/${internshipId}/update`}
         >
           <PencilIcon className="size-5" />
         </Button>
@@ -31,7 +31,7 @@ export default async function InternshipPage({
           variant="destructive"
           as={Link}
           className="rounded-full h-full p-2 mr-auto"
-          href={`/${internshipId}/delete`}
+          href={`/internships/${internshipId}/delete`}
         >
           <TrashIcon className="size-5" />
         </Button>
@@ -40,7 +40,7 @@ export default async function InternshipPage({
           variant="ghost"
           as={Link}
           className="rounded-full h-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400"
-          href={`/`}
+          href={`/internships`}
         >
           <XMarkIcon className="size-5" />
         </Button>
