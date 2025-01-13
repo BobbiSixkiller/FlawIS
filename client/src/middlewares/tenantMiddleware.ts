@@ -42,6 +42,15 @@ export function withTenant(middleware: CustomMiddleware) {
 
     console.log("PATH ", paths.join("/"));
 
+    // Prevent rewrite loop: Check if the current URL is the same as the URL parameter (to avoid repeated redirections)
+    const urlParam = new URLSearchParams(url.search).get("url");
+    const targetPath = urlParam ? decodeURIComponent(urlParam) : "";
+
+    if (targetPath && targetPath === url.pathname) {
+      console.log("Already at the target path, skipping rewrite.");
+      return NextResponse.next(); // Don't rewrite the URL if we are already at the target
+    }
+
     // Rewrite the response to include the subdomain in the path
     if (
       subdomain === "localhost:3000" &&
