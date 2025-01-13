@@ -34,11 +34,11 @@ export async function login(email: string, password: string, url?: string) {
             : ".flaw.uniba.sk",
       });
 
-      return { success: true, redirectUrl: url ? url : "/" };
+      // return { success: true, redirectUrl: url ? url : "/" };
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
 
-  // redirect(url ? url : "/");
+  redirect(url ? url : "/");
 }
