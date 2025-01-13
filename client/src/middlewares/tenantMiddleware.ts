@@ -18,8 +18,6 @@ const commonPaths = [
 export function withTenant(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
-    // console.log("URL PATHNAME ", url.pathname);
-    // console.log("URL SEARCH ", url.search);
 
     const pathWithoutLocale = url.pathname
       .replace("/en", "")
@@ -43,29 +41,14 @@ export function withTenant(middleware: CustomMiddleware) {
       subdomain === "localhost:3000" &&
       process.env.NODE_ENV === "development"
     ) {
-      // const newUrl = new URL(
-      //   `/${lng}/conferences/${paths.join("/")}${url.search}`,
-      //   req.url
-      // ); // Rewrite the path with the subdomain
+      const newUrl = new URL(
+        `/${lng}/conferences/${paths.join("/")}${url.search}`,
+        req.url
+      ); // Rewrite the path with the subdomain
 
-      // console.log(
-      //   "NEW URL ",
-      //   `/${lng}/conferences/${paths.join("/")}${url.search}`
-      // );
-
-      // return NextResponse.rewrite(newUrl, {
-      //   headers: res?.headers,
-      // });
-
-      const targetUrl = `/${lng}/flawis/${paths.join("/")}${url.search}`;
-      if (url.pathname !== targetUrl) {
-        const newUrl = new URL(targetUrl, req.url);
-        console.log("NEW URL ", targetUrl);
-        console.log(res.headers);
-        return NextResponse.rewrite(newUrl, {
-          headers: res?.headers,
-        });
-      }
+      return NextResponse.rewrite(newUrl, {
+        headers: res?.headers,
+      });
     }
 
     if (subdomain.includes("flawis")) {
@@ -80,31 +63,14 @@ export function withTenant(middleware: CustomMiddleware) {
     }
 
     if (subdomain.includes("conferences")) {
-      const targetUrl = `/${lng}/conferences/${paths.join("/")}${url.search}`;
-      console.log("TARGET ", targetUrl);
-      console.log("PATH ", url.pathname);
-      if (url.pathname !== targetUrl) {
-        const newUrl = new URL(targetUrl, req.url);
-        console.log("NEW URL ", targetUrl);
-        console.log(res.headers);
+      const newUrl = new URL(
+        `/${lng}/conferences/${paths.join("/")}${url.search}`,
+        req.url
+      );
 
-        return NextResponse.rewrite(newUrl, {
-          headers: res?.headers,
-        });
-      }
-      // const newUrl = new URL(
-      //   `/${lng}/conferences/${paths.join("/")}${url.search}`,
-      //   req.url
-      // );
-
-      // console.log(
-      //   "NEW URL ",
-      //   `/${lng}/conferences/${paths.join("/")}${url.search}`
-      // );
-
-      // return NextResponse.rewrite(newUrl, {
-      //   headers: res?.headers,
-      // });
+      return NextResponse.rewrite(newUrl, {
+        headers: res?.headers,
+      });
     }
 
     if (subdomain.includes("internships")) {
