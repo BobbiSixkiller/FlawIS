@@ -6,7 +6,7 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["@react-pdf/renderer"],
     serverActions: {
-      allowedOrigins: ["http://localhost"],
+      allowedOrigins: ["localhost", "*.flaw.uniba.sk"],
     },
   },
   images: {

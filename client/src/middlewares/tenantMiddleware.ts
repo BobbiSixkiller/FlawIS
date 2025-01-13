@@ -37,6 +37,8 @@ export function withTenant(middleware: CustomMiddleware) {
       return middleware(req, event, res);
     }
 
+    console.log("PATH ", paths.join("/"));
+
     // Rewrite the response to include the subdomain in the path
     if (
       subdomain === "localhost:3000" &&
@@ -46,6 +48,11 @@ export function withTenant(middleware: CustomMiddleware) {
         `/${lng}/conferences/${paths.join("/")}${url.search}`,
         req.url
       ); // Rewrite the path with the subdomain
+
+      console.log(
+        "NEW URL ",
+        `/${lng}/conferences/${paths.join("/")}${url.search}`
+      );
 
       return NextResponse.rewrite(newUrl, {
         headers: res?.headers,
