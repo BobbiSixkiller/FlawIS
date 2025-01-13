@@ -18,8 +18,8 @@ const commonPaths = [
 export function withTenant(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
-    console.log("URL PATHNAME ", url.pathname);
-    console.log("URL SEARCH ", url.search);
+    // console.log("URL PATHNAME ", url.pathname);
+    // console.log("URL SEARCH ", url.search);
 
     const pathWithoutLocale = url.pathname
       .replace("/en", "")
@@ -81,9 +81,13 @@ export function withTenant(middleware: CustomMiddleware) {
 
     if (subdomain.includes("conferences")) {
       const targetUrl = `/${lng}/conferences/${paths.join("/")}${url.search}`;
+      console.log("TARGET ", targetUrl);
+      console.log("PATH ", url.pathname);
       if (url.pathname !== targetUrl) {
         const newUrl = new URL(targetUrl, req.url);
         console.log("NEW URL ", targetUrl);
+        console.log(res.headers);
+
         return NextResponse.rewrite(newUrl, {
           headers: res?.headers,
         });

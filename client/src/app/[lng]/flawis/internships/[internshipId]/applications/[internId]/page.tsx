@@ -120,7 +120,12 @@ export default async function InternPage({
           </div>
 
           <div className="flex gap-2">
-            <Button as={Link} href={``} size="icon" variant="destructive">
+            <Button
+              as={Link}
+              href={`/internships/${internshipId}/applications/${internId}/delete`}
+              size="icon"
+              variant="destructive"
+            >
               <TrashIcon className="size-5" />
             </Button>
 
