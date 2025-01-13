@@ -32,7 +32,7 @@ export function withTenant(middleware: CustomMiddleware) {
     } else lng = fallbackLng;
 
     if (commonPaths.some((path) => pathWithoutLocale === path)) {
-      console.log(pathWithoutLocale);
+      console.log("PUBLIC PATH ", pathWithoutLocale);
 
       return middleware(req, event, res);
     }
@@ -68,6 +68,8 @@ export function withTenant(middleware: CustomMiddleware) {
         `/${lng}/conferences/${paths.join("/")}${url.search}`,
         req.url
       );
+
+      console.log("NEW URL ", newUrl);
 
       return NextResponse.rewrite(newUrl, {
         headers: res?.headers,
