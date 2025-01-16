@@ -43,5 +43,6 @@
     "end": "End",
     "regEnd": "Registration end",
     "submissionDeadline": "Submission file upload deadline"
-  }
+  },
+  "editSubmission": "Edit submission / upload submission file"
 }

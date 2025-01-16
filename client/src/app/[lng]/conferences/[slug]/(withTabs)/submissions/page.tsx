@@ -4,13 +4,14 @@ import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import { translate } from "@/lib/i18n";
+import Tooltip from "@/components/Tooltip";
 
 export default async function AttendeeSubmissionsPage({
   params: { slug, lng },
 }: {
   params: { slug: string; lng: string };
 }) {
-  const { t } = await translate(lng, "common");
+  const { t } = await translate(lng, ["common", "conferences"]);
 
   const conference = await getConference(slug);
   if (conference && !conference.attending?.ticket.withSubmission) {
@@ -19,14 +20,17 @@ export default async function AttendeeSubmissionsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <Link
-        href={`/${slug}/submissions/new`}
-        scroll={false}
-        className="p-2 rounded-md bg-green-500 hover:bg-green-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
-      >
-        <PlusIcon className="w-5 h-5 stroke-2" />
-        {t("new")}
-      </Link>
+      {conference.dates.submissionDeadline &&
+        new Date(conference.dates.submissionDeadline) > new Date() && (
+          <Link
+            href={`/${slug}/submissions/new`}
+            scroll={false}
+            className="p-2 rounded-md bg-green-500 hover:bg-green-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
+          >
+            <PlusIcon className="w-5 h-5 stroke-2" />
+            {t("new")}
+          </Link>
+        )}
       {conference?.attending?.submissions.map((s) => (
         <div
           key={s.id}
@@ -48,19 +52,25 @@ export default async function AttendeeSubmissionsPage({
           {conference.dates.submissionDeadline &&
             new Date(conference.dates.submissionDeadline) > new Date() && (
               <div className="mt-4 flex gap-2">
-                <Link
-                  href={`/${slug}/submissions/${s.id}/update`}
-                  scroll={false}
-                  className="p-2 rounded-md bg-primary-500 hover:bg-primary-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
+                <Tooltip
+                  position="below"
+                  message={t("editSubmission", { ns: "conferences" })}
                 >
-                  <PencilIcon className="w-4 h-4 stroke-2" />
-                </Link>
+                  <Link
+                    href={`/${slug}/submissions/${s.id}/update`}
+                    scroll={false}
+                    className="p-2 rounded-md bg-primary-500 hover:bg-primary-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
+                  >
+                    <PencilIcon className="size-4 stroke-2" />
+                  </Link>
+                </Tooltip>
+
                 <Link
                   href={`/${slug}/submissions/${s.id}/delete`}
                   scroll={false}
                   className="p-2 rounded-md bg-red-500 hover:bg-red-700 text-white flex justify-center items-center gap-2 sm:max-w-fit"
                 >
-                  <TrashIcon className="w-4 h-4 stroke-2" />
+                  <TrashIcon className="size-4 stroke-2" />
                 </Link>
               </div>
             )}

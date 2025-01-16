@@ -43,5 +43,6 @@
     "end": "Koniec",
     "regEnd": "Koniec registrácie",
     "submissionDeadline": "Deadline zaslania príspevkov"
-  }
+  },
+  "editSubmission": "Aktualizovať príspevok / nahrať súbor príspevku"
 }
