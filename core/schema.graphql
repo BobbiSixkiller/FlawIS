@@ -335,6 +335,7 @@ input LocalizedTicketInputs {
 type Mutation {
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
+  changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternshipMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!

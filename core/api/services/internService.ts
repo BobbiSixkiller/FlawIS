@@ -126,33 +126,58 @@ export class InternService {
   }
 
   async changeStatus(status: Status, id: ObjectId, user: User) {
-    const intern = await this.getById(id);
-    const internship = await this.internshipService.getInternship(
-      intern.internship as ObjectId
-    );
+    const session = await this.crudService.dataModel.startSession();
+    session.startTransaction();
 
-    //implement this authorization check
-    if (
-      !user.access.includes(Access.Admin) &&
-      internship.user.id.toString() !== user.id.toString()
-    ) {
-      throw new Error("Not allowed!");
+    try {
+      const intern = await this.crudService.findOneAndUpdate(
+        { _id: id },
+        { status },
+        session
+      );
+      if (!intern) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "intern" })
+        );
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+      return intern;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    intern.status = status;
-
-    return await intern.save();
   }
 
   async updateFiles(files: string[], id: ObjectId, user: User) {
-    const intern = await this.getById(id);
-    if (intern.user.id.toString() !== user.id.toString()) {
-      throw new Error("Not allowed!");
+    const session = await this.crudService.dataModel.startSession();
+    session.startTransaction();
+
+    try {
+      const intern = await this.crudService.findOneAndUpdate(
+        { _id: id },
+        { files },
+        session
+      );
+      if (!intern) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "intern" })
+        );
+      }
+      if (intern.user.id.toString() !== user.id.toString()) {
+        throw new Error("Not allowed!");
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+      return intern;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
-
-    intern.files = files;
-
-    return await intern.save();
   }
 
   async deleteIntern(id: ObjectId, user: User) {

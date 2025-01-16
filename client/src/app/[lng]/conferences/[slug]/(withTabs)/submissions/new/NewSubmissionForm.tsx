@@ -6,7 +6,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { array, object, string } from "yup";
 import { createSubmission } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Button from "@/components/Button";
@@ -20,6 +19,7 @@ import {
   MultipleInput,
 } from "@/components/MultipleInput";
 import Spinner from "@/components/Spinner";
+import useValidation from "@/hooks/useValidation";
 
 export default function NewSubmissionForm({
   conferenceId,
@@ -36,34 +36,38 @@ export default function NewSubmissionForm({
 
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
+  const { yup } = useValidation();
+
   const methods = useForm({
     resolver: yupResolver(
-      object({
-        conference: string().required(t("required")),
-        section: string().required(t("required")),
-        presentationLng: string<PresentationLng>().required(),
-        authors: array()
-          .of(string().email().required(t("required")))
-          .default([]),
-        translations: object({
-          sk: object({
-            name: string().trim().required(t("required")),
-            abstract: string().trim().required(t("required")),
-            keywords: array()
-              .of(string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
+      yup
+        .object({
+          conference: yup.string().required(),
+          section: yup.string().required(),
+          presentationLng: yup.string<PresentationLng>().required(),
+          authors: yup.array().of(yup.string().email().required()).default([]),
+          translations: yup.object({
+            sk: yup.object({
+              name: yup.string().trim().required(),
+              abstract: yup.string().trim().required(),
+              keywords: yup
+                .array()
+                .of(yup.string().required().trim())
+                .min(1, (val) => t("keywords", { value: val.min }))
+                .required(),
+            }),
+            en: yup.object({
+              name: yup.string().trim().required(),
+              abstract: yup.string().trim().required(),
+              keywords: yup
+                .array()
+                .of(yup.string().required().trim())
+                .min(1, (val) => t("keywords", { value: val.min }))
+                .required(),
+            }),
           }),
-          en: object({
-            name: string().trim().required(t("required")),
-            abstract: string().trim().required(t("required")),
-            keywords: array()
-              .of(string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
-          }),
-        }),
-      }).required(t("required"))
+        })
+        .required()
     ),
     values: {
       translations: {
@@ -136,6 +140,15 @@ export default function NewSubmissionForm({
           })}
           name={`translations.${lng}.keywords`}
         />
+        <Select
+          name="presentationLng"
+          label={t("registration.submission.lng", { ns: "conferences" })}
+          options={[
+            { name: PresentationLng.Sk, value: PresentationLng.Sk },
+            { name: PresentationLng.Cz, value: PresentationLng.Cz },
+            { name: PresentationLng.En, value: PresentationLng.En },
+          ]}
+        />
         <MultipleInput
           label={t("registration.submission.authors.label", {
             ns: "conferences",
@@ -145,7 +158,6 @@ export default function NewSubmissionForm({
           })}
           name="authors"
         />
-
         <Button
           color="primary"
           type="submit"

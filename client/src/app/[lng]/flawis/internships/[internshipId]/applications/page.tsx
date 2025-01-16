@@ -1,4 +1,3 @@
-import { getMe } from "@/app/[lng]/(auth)/actions";
 import { getInterns } from "@/app/[lng]/internships/[internshipId]/applications/actions";
 import ListInterns from "@/app/[lng]/internships/[internshipId]/applications/ListInterns";
 

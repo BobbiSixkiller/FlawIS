@@ -1,5 +1,9 @@
 {
   "heading": "Internships",
   "subHeading": "List of internships offered",
-  "new": "Create new internship"
+  "new": "Create new internship",
+  "APPLIED": "Applied",
+  "ELIGIBLE": "Forwarded by faculty",
+  "ACCEPTED": "Accepted",
+  "REJECTED": "Rejected"
 }

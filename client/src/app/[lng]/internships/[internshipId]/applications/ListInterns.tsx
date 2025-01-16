@@ -38,14 +38,14 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
               style={{ objectFit: "cover" }}
             />
           ) : (
-            <DynamicImageClient
-              src={"https://avatar.iran.liara.run/public"}
-              alt="Avatar"
-              className="size-12 rounded-full"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              style={{ objectFit: "cover" }}
-            />
+            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+              {data?.user.name
+                .split(" ")
+                .map((n, i) => {
+                  if (i < 2) return n[0].toUpperCase();
+                })
+                .join("")}
+            </div>
           )}
           <div>
             <p className="text-sm/6 font-semibold text-gray-900">

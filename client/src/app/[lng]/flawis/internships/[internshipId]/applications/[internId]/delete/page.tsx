@@ -1,4 +1,3 @@
-import { getInternship } from "@/app/[lng]/internships/[internshipId]/actions";
 import DeleteApplicationForm from "@/app/[lng]/internships/[internshipId]/application/delete/DeleteApplicationForm";
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/actions";
 import Button from "@/components/Button";

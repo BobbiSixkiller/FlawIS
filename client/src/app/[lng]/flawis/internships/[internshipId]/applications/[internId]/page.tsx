@@ -12,6 +12,9 @@ import { displayDate } from "@/utils/helpers";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/actions";
 import DynamicImage from "@/components/DynamicImage";
+import { Status } from "@/lib/graphql/generated/graphql";
+import ChangeStatusForm from "./ChangeStatusForm";
+import { Application } from "@/app/[lng]/internships/[internshipId]/Application";
 
 export default async function InternPage({
   params: { internshipId, internId },
@@ -30,95 +33,9 @@ export default async function InternPage({
       >
         <XMarkIcon className="size-5" />
       </Button>
-      <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 shadow-sm space-y-3">
-        <h2 className="text-xl text-primary-500 font-semibold">Prihlaska</h2>
-        <div className="flex flex-wrap gap-6">
-          <div className="relative flex items-center gap-x-4">
-            {intern.user.avatarUrl ? (
-              <DynamicImage
-                alt="avatar"
-                src={intern.user.avatarUrl}
-                className="w-[60px] h-[60px] rounded-full"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                style={{ objectFit: "cover" }}
-              />
-            ) : (
-              <UserIcon className="size-10 rounded-full " />
-            )}
-            <div className="">
-              <p className="font-semibold text-gray-900">
-                <span className="absolute inset-0" />
-                {intern.user.name}
-              </p>
-              <p className="text-gray-600">{intern.user.studyProgramme}</p>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex flex-wrap gap-2">
-              <p>Kontakt:</p>
-              <ul className="flex flex-wrap gap-2">
-                <li>
-                  <a
-                    className="text-primary-500 hover:underline inline-flex gap-1 items-center"
-                    href={`mailto:${intern.user.email}`}
-                  >
-                    <EnvelopeIcon className="size-4" /> {intern.user.email}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="text-primary-500 hover:underline inline-flex gap-1 items-center"
-                    href={`tel:${intern.user.telephone}`}
-                  >
-                    <PhoneIcon className="size-4" /> {intern.user.telephone}
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <p>Prilozene subory:</p>
-              <ul className="flex flex-wrap gap-2">
-                {intern.files.map((url, i) => {
-                  const fileName =
-                    url.split("/").pop()?.split("-").pop() || "File";
-
-                  return (
-                    <li key={i}>
-                      <Link
-                        className="text-primary-500 hover:underline"
-                        href={`/minio?bucketName=internships&url=${url}`}
-                      >
-                        {fileName}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* {internship.myApplication.status === Status.Accepted && (
-          <a
-            className="text-primary-500 hover:underline"
-            href="https://flaw.uniba.sk"
-            target="_blank"
-          >
-            Forms spokojnost
-          </a>
-        )} */}
-
-        <div className="flex flex-wrap items-end gap-2 justify-between">
-          <div className="flex flex-col">
-            Stav: {intern.status}
-            <span className="text-sm">
-              Aktualizovane {displayDate(intern.updatedAt)}
-            </span>
-          </div>
-
+      <Application
+        application={intern}
+        controls={
           <div className="flex gap-2">
             <Button
               as={Link}
@@ -129,16 +46,18 @@ export default async function InternPage({
               <TrashIcon className="size-5" />
             </Button>
 
-            <Button as={Link} href={``} size="icon" variant="positive">
-              <CheckIcon className="size-5" />
-            </Button>
+            <ChangeStatusForm
+              status={Status.Eligible}
+              disabled={intern.status === Status.Eligible}
+            />
 
-            <Button as={Link} href={``} size="icon">
-              <XCircleIcon className="size-5" />
-            </Button>
+            <ChangeStatusForm
+              status={Status.Rejected}
+              disabled={intern.status === Status.Rejected}
+            />
           </div>
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 }

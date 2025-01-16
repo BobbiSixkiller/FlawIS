@@ -1,5 +1,9 @@
 {
   "heading": "Stáže",
   "subHeading": "Zoznam ponúkaných stáží",
-  "new": "Vytvoriť novú staž"
+  "new": "Vytvoriť novú staž",
+  "APPLIED": "Prihlásený",
+  "ELIGIBLE": "Schválený fakultou",
+  "ACCEPTED": "Prijatý",
+  "REJECTED": "Zamietnutý"
 }

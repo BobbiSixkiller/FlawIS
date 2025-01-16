@@ -31,7 +31,7 @@ const buttonStyles = {
   },
 };
 
-type VariantType = keyof typeof buttonStyles.variants.variant;
+export type VariantType = keyof typeof buttonStyles.variants.variant;
 type SizeType = keyof typeof buttonStyles.variants.size;
 
 interface ButtonOwnProps {
