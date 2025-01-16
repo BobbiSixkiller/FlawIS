@@ -376,6 +376,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   activateUser: UserMutationResponse;
   addAttendee: ConferenceMutationResponse;
+  changeInternStatus: InternMutationResponse;
   createConference: ConferenceMutationResponse;
   createIntern: InternshipMutationResponse;
   createInternship: InternshipMutationResponse;
@@ -410,6 +411,12 @@ export type Mutation = {
 
 export type MutationAddAttendeeArgs = {
   data: AttendeeInput;
+};
+
+
+export type MutationChangeInternStatusArgs = {
+  id: Scalars['ObjectId']['input'];
+  status: Status;
 };
 
 
@@ -1270,6 +1277,14 @@ export type DeleteInternMutationVariables = Exact<{
 
 
 export type DeleteInternMutation = { __typename?: 'Mutation', deleteIntern: { __typename?: 'InternMutationResponse', message: string, data: { __typename?: 'Intern', id: any, internship: any } } };
+
+export type ChangeInternStatusMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  status: Status;
+}>;
+
+
+export type ChangeInternStatusMutation = { __typename?: 'Mutation', changeInternStatus: { __typename?: 'InternMutationResponse', message: string, data: { __typename?: 'Intern', id: any, internship: any } } };
 
 export type SubmissionFragment = { __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } };
 
@@ -3570,6 +3585,17 @@ export const DeleteInternDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<DeleteInternMutation, DeleteInternMutationVariables>;
+export const ChangeInternStatusDocument = new TypedDocumentString(`
+    mutation changeInternStatus($id: ObjectId!, $status: Status!) {
+  changeInternStatus(id: $id, status: $status) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ChangeInternStatusMutation, ChangeInternStatusMutationVariables>;
 export const SubmissionDocument = new TypedDocumentString(`
     query submission($id: ObjectId!) {
   submission(id: $id) {

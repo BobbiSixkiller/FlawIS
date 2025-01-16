@@ -14,6 +14,7 @@ export default function DynamicImageClient({
   alt?: string;
 } & ImageProps) {
   const [loading, setLoading] = useState(true);
+  const [imageSource, setImageSource] = useState(src);
 
   return (
     <div
@@ -24,9 +25,10 @@ export default function DynamicImageClient({
     >
       <Image
         {...props}
-        src={src}
+        src={imageSource}
         alt={alt}
         onLoad={() => setLoading(false)}
+        onError={() => setImageSource("/images/img-placeholder.jpg")}
         className={cn(
           className,
           `transition-opacity ease-in delay-100 ${

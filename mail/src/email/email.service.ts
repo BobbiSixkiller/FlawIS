@@ -173,9 +173,13 @@ export class EmailService {
     routingKey: 'mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    const url = `${getClientUrl()}/${msg.locale}/${
-      msg.conferenceSlug
-    }/register?submission=${msg.submissionId}`;
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.conferenceSlug}/register?submission=${
+      msg.submissionId
+    }`;
 
     await this.mailerService.sendMail({
       to: msg.email,

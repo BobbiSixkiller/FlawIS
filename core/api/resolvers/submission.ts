@@ -112,7 +112,7 @@ export class SubmissionResolver {
     @Arg("id") _id: ObjectId,
     @Arg("data") data: SubmissionInput,
     @LoadResource(Submission) submission: DocumentType<Submission>,
-    @Ctx() { user }: Context
+    @Ctx() { user, req }: Context
   ): Promise<SubmissionMutationResponse> {
     for (const [key, value] of Object.entries(data)) {
       if (key !== "authors") {
@@ -134,6 +134,7 @@ export class SubmissionResolver {
         this.rmqService.produceMessage(
           JSON.stringify({
             locale: this.i18nService.language(),
+            hostname: req.headers["tenant-domain"],
             name: user?.name,
             email: author,
             conferenceName:

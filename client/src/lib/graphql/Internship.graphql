@@ -148,3 +148,13 @@ mutation deleteIntern($id: ObjectId!) {
     }
   }
 }
+
+mutation changeInternStatus($id: ObjectId!, $status: Status!) {
+  changeInternStatus(id: $id, status: $status) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}

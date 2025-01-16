@@ -8,7 +8,7 @@ import {
   Resolver,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Intern, Internship } from "../entitites/Internship";
+import { Intern, Internship, Status } from "../entitites/Internship";
 import { InternshipService } from "../services/internshipService";
 import { InternService } from "../services/internService";
 import { I18nService } from "../services/i18nService";
@@ -42,7 +42,17 @@ export class InternResolver {
     return await this.internService.getInterns(args);
   }
 
-  async changeInternStatus() {}
+  @Authorized([Access.Admin, Access.Organization])
+  @Mutation(() => InternMutationResponse)
+  async changeInternStatus(
+    @Arg("id") id: ObjectId,
+    @Arg("status", () => Status) status: Status,
+    @Ctx() { user }: Context
+  ): Promise<InternMutationResponse> {
+    const intern = await this.internService.changeStatus(status, id, user!);
+
+    return { message: "success", data: intern };
+  }
 
   @Authorized()
   @Mutation(() => InternMutationResponse)
