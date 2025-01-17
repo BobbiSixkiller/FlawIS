@@ -12,26 +12,16 @@ import puppeteer from 'puppeteer';
 
 export interface Msg {
   locale: 'en' | 'sk';
-  name?: string;
+  hostname: string;
+  name: string;
   email: string;
 }
 export interface AuthMsg extends Msg {
-  hostname: string;
   token: string;
 }
 
-function getClientUrl() {
-  switch (process.env.NODE_ENV) {
-    case 'development':
-      return 'http://localhost:3000';
-    case 'staging':
-      return 'http://conferences-staging.flaw.uniba.sk';
-    case 'production':
-      return 'http://conferences.flaw.uniba.sk';
-
-    default:
-      throw new Error('Invalid environment!');
-  }
+export interface InternshipMsg extends Msg {
+  internshipId: string;
 }
 
 @Injectable()
@@ -222,6 +212,98 @@ export class EmailService {
       context: {
         url,
         i18nLang: msg.locale,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.applied',
+  })
+  async sendInternApplied(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.internshipId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
+      template: 'newOrg',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.eligible',
+  })
+  async sendInternEligible(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.internshipId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
+      template: 'newOrg',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.eligible',
+  })
+  async sendInternAccepted(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.internshipId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
+      template: 'newOrg',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.rejected',
+  })
+  async sendInternRejected(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.internshipId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
+      template: 'newOrg',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
       },
     });
   }

@@ -3,12 +3,19 @@ import {
   Args,
   Authorized,
   Ctx,
+  FieldResolver,
   Mutation,
   Query,
   Resolver,
+  Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Intern, Internship, Status } from "../entitites/Internship";
+import {
+  Intern,
+  Internship,
+  Status,
+  UserReferece,
+} from "../entitites/Internship";
 import { InternshipService } from "../services/internshipService";
 import { InternService } from "../services/internService";
 import { I18nService } from "../services/i18nService";
@@ -20,6 +27,7 @@ import {
 import { ObjectId } from "mongodb";
 import { Context } from "../util/auth";
 import { Access } from "../entitites/User";
+import { UserService } from "../services/userService";
 
 @Service()
 @Resolver(() => Intern)
@@ -27,6 +35,7 @@ export class InternResolver {
   constructor(
     private readonly internshipService: InternshipService,
     private readonly internService: InternService,
+    private readonly userService: UserService,
     private readonly i18nService: I18nService
   ) {}
 
@@ -78,5 +87,18 @@ export class InternResolver {
     const intern = await this.internService.deleteIntern(id, user!);
 
     return { message: "Your application has been deleted.", data: intern };
+  }
+
+  @Authorized()
+  @FieldResolver(() => UserReferece)
+  async user(@Root() { user: userReference }: Intern): Promise<UserReferece> {
+    try {
+      const user = await this.userService.getUser(userReference.id);
+
+      return { ...userReference, avatarUrl: user.avatarUrl };
+    } catch (error: any) {
+      console.log(error.message);
+      return userReference;
+    }
   }
 }

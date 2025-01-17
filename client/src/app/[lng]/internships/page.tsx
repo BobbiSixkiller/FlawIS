@@ -13,6 +13,7 @@ export default async function InternshipsHomePage({
   params: { lng: string };
 }) {
   const user = await getMe();
+
   const { t } = await translate(lng, "internships");
 
   const { startDate, endDate } = getAcademicYearInterval();

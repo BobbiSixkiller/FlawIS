@@ -1,5 +1,5 @@
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, ObjectType, registerEnumType } from "type-graphql";
+import { Field, ObjectType, registerEnumType, Root } from "type-graphql";
 import { ObjectId } from "mongodb";
 import {
   getModelForClass,
@@ -26,7 +26,7 @@ registerEnumType(Status, {
 });
 
 @ObjectType({ description: "User stub type" })
-class UserReferece {
+export class UserReferece {
   @Field(() => ObjectId, { description: "User document id" })
   id: ObjectId;
 
@@ -38,16 +38,15 @@ class UserReferece {
   @Property()
   email: string;
 
-  @Field({ nullable: true })
+  @Field()
   @Property()
-  telephone?: string;
+  telephone: string;
 
-  @Field(() => StudyProgramme, { nullable: true })
+  @Field(() => StudyProgramme)
   @Property({ type: Number, enum: StudyProgramme })
-  studyProgramme?: StudyProgramme;
+  studyProgramme: StudyProgramme;
 
   @Field({ nullable: true })
-  @Property()
   avatarUrl?: string;
 }
 

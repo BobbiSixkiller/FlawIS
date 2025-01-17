@@ -626,6 +626,6 @@ type UserReferece {
   """User document id"""
   id: ObjectId!
   name: String!
-  studyProgramme: StudyProgramme
-  telephone: String
+  studyProgramme: StudyProgramme!
+  telephone: String!
 }

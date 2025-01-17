@@ -19,6 +19,7 @@ export async function GET(
           attendee.user.__typename === "User"
             ? attendee.user.organization
             : "missing User doc",
+        ticket: attendee.ticket.translations.sk.name,
         online: attendee.ticket.online.toString(),
         variableSymbol: attendee.invoice.issuer.variableSymbol,
         price: attendee.invoice.body.price + attendee.invoice.body.vat,
@@ -44,6 +45,7 @@ export async function GET(
             attendee.user.__typename === "User"
               ? attendee.user.organization
               : "",
+          ticket: attendee.ticket.translations.sk.name,
           online: attendee.ticket.online.toString(),
           variableSymbol: attendee.invoice.issuer.variableSymbol,
           price: attendee.invoice.body.price + attendee.invoice.body.vat,

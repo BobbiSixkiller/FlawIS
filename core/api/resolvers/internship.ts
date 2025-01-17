@@ -54,7 +54,6 @@ export class InternshipResolver {
     @Arg("input") data: InternshipInput,
     @Ctx() { user }: Context
   ): Promise<InternshipMutationResponse> {
-    console.log(user);
     const internship = await this.internshipService.createInternship(
       data,
       user!

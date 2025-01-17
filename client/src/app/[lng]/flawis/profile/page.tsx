@@ -1,3 +1,4 @@
+import DynamicImage from "@/components/DynamicImage";
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
 import { translate } from "@/lib/i18n";
@@ -28,11 +29,30 @@ export default async function Profile({
 
       <div className="border-t border-gray-100">
         <dl className="divide-y divide-gray-100">
-          <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+          <div className="sm:h-20 py-6 sm:p-0 sm:grid sm:grid-cols-3 sm:gap-4 items-center">
             <dt className="text-sm font-medium leading-6 text-gray-900">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center gap-2">
+              {user.avatarUrl ? (
+                <DynamicImage
+                  src={user.avatarUrl}
+                  alt="Avatar"
+                  className="size-12 rounded-full"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                />
+              ) : (
+                <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+                  {user.name
+                    .split(" ")
+                    .map((n, i) => {
+                      if (i < 2) return n[0].toUpperCase();
+                    })
+                    .join("")}
+                </div>
+              )}
               {user?.name}
             </dd>
           </div>
