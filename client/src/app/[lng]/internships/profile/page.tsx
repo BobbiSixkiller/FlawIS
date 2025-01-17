@@ -54,19 +54,7 @@ export default async function Profile({
                     })
                     .join("")}
                 </div>
-                // <DynamicImage
-                //   // src={"https://avatar.iran.liara.run/public"}
-                //   src={`https://avatar.iran.liara.run/username?username=${user.name.replace(
-                //     " ",
-                //     "+"
-                //   )}`}
-                //   alt="Avatar"
-                //   className="size-12 rounded-full"
-                //   fill
-                //   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                //   style={{ objectFit: "cover" }}
-                // />
-              )}{" "}
+              )}
               {user?.name}
             </dd>
           </div>

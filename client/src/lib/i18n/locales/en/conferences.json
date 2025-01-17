@@ -6,7 +6,7 @@
     "ticket": "Form of attendance",
     "billing": {
       "info": "Billing information",
-      "name": "Name",
+      "name": "Full name/Name of the organization",
       "street": "Street",
       "city": "City",
       "postal": "Postal code",

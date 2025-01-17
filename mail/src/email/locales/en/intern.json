@@ -1,0 +1,6 @@
+{
+  "applied": { "body": "APPLIED BODY", "link": "GO TO INTERNSHIP" },
+  "eligible": { "body": "ELIGIBLE BODY", "link": "GO TO INTERNSHIP" },
+  "accepted": { "body": "ACCEPTED BODY", "link": "GO TO INTERNSHIP" },
+  "rejected": { "body": "REJECTED BODY", "link": "GO TO INTERNSHIP" }
+}

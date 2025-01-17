@@ -25,9 +25,6 @@ export class InternService {
       const data = await this.crudService.dataModel.paginatedInterns(args);
       const connection = data[0] as InternConnection;
 
-      console.log(args);
-      console.log(connection);
-
       return {
         ...connection,
         edges: connection.edges.map((edge) => ({
