@@ -8,7 +8,11 @@ export default function NewConferencePage({
   params: { lng: string };
 }) {
   return (
-    <Modal title="Nova konferencia">
+    <Modal
+      title="Nova konferencia"
+      dialogId="new-conference"
+      isInterceptingRoute
+    >
       <NewConferenceForm lng={lng} />
     </Modal>
   );

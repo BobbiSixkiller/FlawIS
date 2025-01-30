@@ -10,7 +10,11 @@ export default async function UpdateDatesPage({
   const conference = await getConference(slug);
 
   return (
-    <Modal title="Upravit datumy konferencie">
+    <Modal
+      title="Upravit datumy konferencie"
+      dialogId="update-dates"
+      isInterceptingRoute
+    >
       <UpdateDatesForm conference={conference} lng={lng} />
     </Modal>
   );

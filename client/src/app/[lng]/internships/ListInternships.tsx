@@ -8,7 +8,10 @@ import {
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import { ApplicationFragment, Status } from "@/lib/graphql/generated/graphql";
+import { cn } from "@/utils/helpers";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface InternshipData {
   id: string;
@@ -16,21 +19,54 @@ interface InternshipData {
   academicYear: string;
   applicationsCount: number;
   description: string;
+  myApplication?: ApplicationFragment | null;
 }
+
+const statusClasses = {
+  [Status.Applied]: {
+    card: "border-primary-500 shadow shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
+    label: "text-primary-500",
+  },
+  [Status.Eligible]: {
+    card: "border-primary-500 shadow shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
+    label: "text-primary-500",
+  },
+  [Status.Accepted]: {
+    card: "border-green-500 shadow shadow-green-500 hover:shadow-lg hover:shadow-green-500",
+    label: "text-green-500",
+  },
+  [Status.Rejected]: {
+    card: "border-red-500 shadow shadow-red-500 hover:shadow-lg hover:shadow-red-500",
+    label: "text-red-500",
+  },
+};
 
 function ListItem({ data }: { data?: InternshipData }) {
   const path = usePathname();
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "internships");
 
   return (
     <Link
-      className="rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
+      className={cn([
+        "relative rounded-2xl border shadow hover:shadow-lg p-4 text-gray-900 text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white",
+        data?.myApplication && statusClasses[data?.myApplication?.status].card,
+      ])}
       href={
         path.includes("internships")
           ? `/internships/${data?.id}`
           : `/${data?.id}`
       }
     >
-      <h2 className="font-medium leading-6">{data?.organization}</h2>
+      <div className="flex flex-wrap justify-between">
+        <h2 className="font-medium leading-6">{data?.organization}</h2>
+        {data?.myApplication && (
+          <p className={cn([statusClasses[data.myApplication.status].label])}>
+            {t(data.myApplication.status.toUpperCase())}
+          </p>
+        )}
+      </div>
+
       <p className="leading-none text-gray-500">{data?.academicYear}</p>
       <p className="line-clamp-3">
         {data?.description.replace(/<[^>]*>/g, " ").trim()}

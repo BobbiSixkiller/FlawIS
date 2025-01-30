@@ -17,7 +17,11 @@ export default async function UpdateProfilePage({
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
   return (
-    <Modal title={t("heading")}>
+    <Modal
+      title={t("heading")}
+      dialogId="update-profile"
+      isInterceptingRoute={true}
+    >
       <UserForm user={user} namespace="profile" inModal subdomain={subdomain} />
     </Modal>
   );

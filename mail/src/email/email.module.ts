@@ -30,7 +30,16 @@ import { EmailService } from './email.service';
           template: {
             dir: join(__dirname, '/templates/'),
             adapter: new HandlebarsAdapter({
-              t: i18n.hbsHelper,
+              t: (key: string, args: any) => {
+                // Extract language setting
+                const lang =
+                  args?.lookupProperty(args.data.root, 'i18nLang') || 'sk';
+
+                // Extract translation parameters, such as organization
+                const params = args?.hash || {};
+
+                return i18n.translate(key, { lang, args: params });
+              },
               SUM: (a, b) => a + b,
               DATE: (date, locale) => {
                 return new Date(date).toLocaleDateString(locale as string);

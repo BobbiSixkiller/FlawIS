@@ -62,8 +62,8 @@ export class UserService {
     }
   }
 
-  async getPaginatedUsers({ first, after }: UserArgs): Promise<UserConnection> {
-    const data = await this.crudService.dataModel.paginatedUsers(first, after);
+  async getPaginatedUsers(args: UserArgs): Promise<UserConnection> {
+    const data = await this.crudService.dataModel.paginatedUsers(args);
 
     const connection: UserConnection = data[0];
 

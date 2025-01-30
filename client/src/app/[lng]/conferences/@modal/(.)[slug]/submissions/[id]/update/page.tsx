@@ -21,7 +21,11 @@ export default async function UpdateSubmissionPage({
   }
 
   return (
-    <Modal title={t("submission.update")}>
+    <Modal
+      title={t("submission.update")}
+      dialogId="update-submission"
+      isInterceptingRoute
+    >
       <FormMessage />
       <UpdateSubmissionForm
         lng={lng}

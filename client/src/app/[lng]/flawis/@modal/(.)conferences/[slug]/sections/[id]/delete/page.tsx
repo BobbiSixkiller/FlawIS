@@ -15,7 +15,7 @@ export default async function DeleteSectionPage({
   }
 
   return (
-    <Modal title="Zmazat sekciu">
+    <Modal title="Zmazat sekciu" dialogId="delete-section" isInterceptingRoute>
       <DeleteSectionForm lng={lng} section={section} />
     </Modal>
   );

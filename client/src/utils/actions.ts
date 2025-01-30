@@ -29,6 +29,7 @@ export async function executeGqlFetch<Data, Variables>(
   const res = await fetch(process.env.API_URI || "http://core:5000/graphql", {
     cache: nextCache,
     next,
+    // cache: "no-store",
     method: "POST",
     headers: {
       "Content-Type": "application/json",

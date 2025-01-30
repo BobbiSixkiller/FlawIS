@@ -10,7 +10,7 @@ export default async function NewUserPage({
   const { t } = await translate(lng, "common");
 
   return (
-    <Modal title={t("new")}>
+    <Modal title={t("new")} dialogId="new-user" isInterceptingRoute>
       <UserForm namespace="register" inModal />
     </Modal>
   );

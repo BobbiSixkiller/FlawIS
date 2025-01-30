@@ -17,18 +17,20 @@ import { FormProvider, useForm } from "react-hook-form";
 import { changeInternFiles, createIntern } from "./actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
+import { deleteFiles } from "@/lib/minio";
 
 export default function ApplicationForm({
-  internshipId,
   user,
   application,
 }: {
-  internshipId: string;
   user: UserFragment;
   application?: ApplicationFragment | null;
 }) {
   const [loadingFiles, setLoadingFiles] = useState(true);
-  const { lng } = useParams<{ lng: string }>();
+  const { lng, internshipId } = useParams<{
+    lng: string;
+    internshipId: string;
+  }>();
   const router = useRouter();
   const { t } = useTranslation(lng, ["validation", "common"]);
 
@@ -48,42 +50,44 @@ export default function ApplicationForm({
     defaultValues: { files: [] },
   });
 
-  const fetchFiles = useCallback(async () => {
-    try {
-      const clientFiles: File[] = [];
+  useEffect(() => {
+    async function fetchFiles() {
+      {
+        try {
+          const clientFiles: File[] = [];
 
-      // If user is applying for the first time there is no application so fetch the users CV and add it to files
-      if (user?.cvUrl && !application?.files) {
-        const file = await fetchFromMinio("resumes", user.cvUrl);
-        clientFiles.push(file);
-      }
-      // If there is already application meaning user is editing his/her own application files load just the files from intern document
-      if (application?.files && application.files.length > 0) {
-        for (const url of application.files) {
-          const downloaded = await fetchFromMinio("internships", url);
-          clientFiles.push(downloaded);
+          // If user is applying for the first time there is no application so fetch the users CV and add it to files
+          if (user?.cvUrl && !application?.fileUrls) {
+            const file = await fetchFromMinio("resumes", user.cvUrl);
+            clientFiles.push(file);
+          }
+          // If there is already application meaning user is editing his/her own application files load just the files from intern document
+          if (application?.fileUrls && application.fileUrls.length > 0) {
+            for (const url of application.fileUrls) {
+              const downloaded = await fetchFromMinio("internships", url);
+              clientFiles.push(downloaded);
+            }
+          }
+
+          methods.setValue("files", clientFiles);
+
+          setLoadingFiles(false);
+        } catch (error: any) {
+          console.log(error.message);
+          methods.setError("files", { message: error.message });
+          setLoadingFiles(false);
         }
       }
-
-      methods.setValue("files", clientFiles);
-
-      setLoadingFiles(false);
-    } catch (error: any) {
-      console.log(error.message);
-      methods.setError("files", { message: error.message });
-      setLoadingFiles(false);
     }
-  }, []);
 
-  useEffect(() => {
     fetchFiles();
   }, []);
 
-  const { formMessage, dispatch } = useContext(MessageContext);
+  const { dispatch } = useContext(MessageContext);
 
   if (loadingFiles)
     return (
-      <div className="h-full sm:w-96 mx-auto flex flex-col items-center justify-center">
+      <div className="h-full mx-auto flex flex-col items-center justify-center">
         <Spinner />
       </div>
     );
@@ -106,7 +110,7 @@ export default function ApplicationForm({
               for (const [index, file] of vals.files.entries()) {
                 const { error, url } = await uploadOrDelete(
                   "internships",
-                  application?.files[index],
+                  application?.fileUrls[index],
                   file,
                   user.email
                 );
@@ -138,6 +142,9 @@ export default function ApplicationForm({
               }
 
               state = await createIntern(urls, internshipId);
+              if (!state.success) {
+                await deleteFiles(urls);
+              }
             }
 
             if (state && !state.success) {
@@ -175,7 +182,11 @@ export default function ApplicationForm({
           disabled={methods.formState.isSubmitting}
           className="w-full"
         >
-          {methods.formState.isSubmitting ? <Spinner inverted /> : "Submit"}
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            t("submit", { ns: "common" })
+          )}
         </Button>
       </form>
     </FormProvider>

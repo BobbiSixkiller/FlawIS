@@ -1,13 +1,25 @@
-import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
+import { ArgsType, Field, InputType, Int, ObjectType } from "type-graphql";
 import { CreateArgs, CreateConnection } from "./pagination";
 import { Intern, Internship, Status } from "../../entitites/Internship";
 import { IMutationResponse } from "./interface";
 import { ObjectId } from "mongodb";
 
+@ObjectType()
+class AcademicYear {
+  @Field()
+  academicYear: string;
+
+  @Field(() => Int)
+  count: number;
+}
+
 @ObjectType({
   description: "InternshipConnection type enabling cursor based pagination",
 })
-export class InternshipConnection extends CreateConnection(Internship) {}
+export class InternshipConnection extends CreateConnection(Internship) {
+  @Field(() => [AcademicYear])
+  academicYears: AcademicYear[];
+}
 
 @ArgsType()
 export class InternshipArgs extends CreateArgs(Internship) {
@@ -19,6 +31,12 @@ export class InternshipArgs extends CreateArgs(Internship) {
 
   @Field({ nullable: true })
   endDate?: Date;
+
+  @Field({ nullable: true })
+  academicYear?: string;
+
+  @Field(() => ObjectId, { nullable: true })
+  contextUserId?: ObjectId;
 }
 
 @ObjectType({ implements: IMutationResponse })
@@ -46,8 +64,8 @@ export class InternArgs extends CreateArgs(Intern) {
   @Field({ nullable: true })
   endDate?: Date;
 
-  @Field(() => Status, { nullable: true })
-  status?: Status;
+  @Field(() => [Status], { nullable: true })
+  status?: Status[];
 }
 
 @ObjectType({ implements: IMutationResponse })

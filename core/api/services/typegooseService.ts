@@ -10,8 +10,8 @@ export class TypegooseService<U extends types.AnyParamConstructor<any>> {
     this.dataModel = getModelForClass(entity);
   }
 
-  async aggregate(pipeline: mongoose.PipelineStage[] = []) {
-    return await this.dataModel.aggregate(pipeline).exec();
+  async aggregate<T>(pipeline: mongoose.PipelineStage[] = []) {
+    return await this.dataModel.aggregate<T>(pipeline).exec();
   }
 
   async exists(
@@ -20,14 +20,6 @@ export class TypegooseService<U extends types.AnyParamConstructor<any>> {
     >
   ) {
     return await this.dataModel.exists(filter);
-  }
-
-  async count(
-    filter: mongoose.FilterQuery<
-      types.DocumentType<InstanceType<U>, types.BeAnObject>
-    >
-  ) {
-    return await this.dataModel.countDocuments(filter);
   }
 
   async findAll(

@@ -13,7 +13,7 @@ export default async function DeleteUserPage({
   const { t } = await translate(lng, "common");
 
   return (
-    <Modal title={t("delete")}>
+    <Modal title={t("delete")} isInterceptingRoute dialogId="delete-user">
       <DeleteUserForm user={user} lng={lng} />
     </Modal>
   );

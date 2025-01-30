@@ -1,17 +1,12 @@
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, ObjectType, registerEnumType, Root } from "type-graphql";
+import { Field, ObjectType, registerEnumType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import {
-  getModelForClass,
-  Index,
-  Pre,
-  prop as Property,
-} from "@typegoose/typegoose";
+import { Index, Pre, prop as Property, PropType } from "@typegoose/typegoose";
 import { Ref } from "../util/types";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { InternArgs, InternshipArgs } from "../resolvers/types/internship";
-import { getAcademicYearInterval } from "../util/helpers";
-import { StudyProgramme } from "./User";
+import { StudyProgramme, User } from "./User";
+import { getAcademicYear } from "../util/helpers";
 
 export enum Status {
   Applied = "APPLIED",
@@ -50,33 +45,6 @@ export class UserReferece {
   avatarUrl?: string;
 }
 
-@Pre<Intern>("save", async function () {
-  if (this.isNew) {
-    await getModelForClass(Internship).updateOne(
-      { _id: this.internship },
-      { $inc: { applicationCount: 1 } }
-    );
-  }
-})
-@Pre<Intern>(
-  "findOneAndDelete",
-  async function () {
-    // Get the filter used in the query
-    const queryFilter = this.getFilter();
-
-    // Retrieve the document manually using a properly typed model
-    const doc = await getModelForClass(Intern).findOne(queryFilter);
-
-    // Proceed with the update if the document exists
-    if (doc) {
-      await getModelForClass(Internship).updateOne(
-        { _id: doc.internship },
-        { $inc: { applicationCount: -1 } }
-      );
-    }
-  },
-  { query: true }
-)
 @Index({ internship: 1, "user._id": 1, status: 1 })
 @Index({ "user._id": 1, createdAt: 1, status: 1 })
 @ObjectType({
@@ -94,13 +62,21 @@ export class Intern extends TimeStamps {
   @Property({ ref: () => Internship })
   internship: Ref<Internship>;
 
+  @Field()
+  @Property()
+  organization: string;
+
   @Field(() => Status)
   @Property({ enum: Status, type: String, default: Status.Applied })
   status: Status;
 
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })
-  files: string[];
+  fileUrls: string[];
+
+  @Field(() => String, { nullable: true })
+  @Property()
+  organizationFeedbackUrl?: string;
 
   @Field()
   createdAt: Date;
@@ -124,7 +100,7 @@ export class Intern extends TimeStamps {
         $match: {
           ...(internship ? { internship } : {}),
           ...(user ? { "user._id": user } : {}),
-          ...(status ? { status } : {}),
+          ...(status ? { status: { $in: status } } : {}),
           ...(endDate ? { createdAt: { $lte: endDate } } : {}),
           ...(startDate ? { createdAt: { $gte: startDate } } : {}),
         },
@@ -168,16 +144,20 @@ export class Intern extends TimeStamps {
 
 @Pre<Internship>("save", async function () {
   if (this.isNew) {
-    const { startYear, endYear } = getAcademicYearInterval();
+    const { academicYear } = getAcademicYear();
 
-    this.academicYear = `${startYear}/${endYear}`;
+    this.academicYear = academicYear;
   }
 })
-@Index({ createdAt: 1, "user._id": 1 })
+@Index({ createdAt: 1, user: 1 }) // Index for queries utilizing createdAt
+@Index({ academicYear: 1, user: 1 }) // Index for queries utilizing academicYear instead of createdAt
 @ObjectType({ description: "Internship object type" })
 export class Internship extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
+
+  @Property()
+  language: string;
 
   @Field()
   @Property()
@@ -193,9 +173,9 @@ export class Internship extends TimeStamps {
   @Property()
   description: string;
 
-  @Field(() => UserReferece)
-  @Property({ type: () => UserReferece })
-  user: UserReferece;
+  @Field(() => String, { description: "User document reference" })
+  @Property({ ref: () => User })
+  user: Ref<User>;
 
   @Field(() => Intern, { nullable: true })
   myApplication?: Intern;
@@ -207,34 +187,98 @@ export class Internship extends TimeStamps {
 
   public static async paginatedInternships(
     this: ModelType<Internship>,
-    { first = 20, after, endDate, startDate, user }: InternshipArgs
+    {
+      first = 20,
+      after,
+      endDate,
+      startDate,
+      user,
+      academicYear,
+      contextUserId,
+    }: InternshipArgs
   ) {
     return await this.aggregate([
       {
-        $match: {
-          ...(user ? { "user._id": user } : {}),
-          ...(endDate ? { createdAt: { $lte: endDate } } : {}),
-          ...(startDate ? { createdAt: { $gte: startDate } } : {}),
-        },
-      },
-      {
         $facet: {
           data: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            {
+              $match: {
+                ...(user ? { user } : {}),
+                ...(endDate ? { createdAt: { $lte: endDate } } : {}),
+                ...(startDate ? { createdAt: { $gte: startDate } } : {}),
+                ...(academicYear ? { academicYear } : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
+              },
+            },
+            ...(contextUserId
+              ? [
+                  {
+                    $lookup: {
+                      from: "interns", // Collection name for Intern
+                      let: { internshipId: "$_id" },
+                      pipeline: [
+                        {
+                          $match: {
+                            $expr: {
+                              $and: [
+                                { $eq: ["$internship", "$$internshipId"] },
+                                { $eq: ["$user._id", contextUserId] },
+                              ],
+                            },
+                          },
+                        },
+                        { $limit: 1 }, // Only need one application per internship
+                      ],
+                      as: "myApplication",
+                    },
+                  },
+                  {
+                    $addFields: {
+                      myApplication: { $arrayElemAt: ["$myApplication", 0] },
+                      hasApplication: {
+                        $cond: {
+                          if: { $gt: [{ $size: "$myApplication" }, 0] },
+                          then: 1,
+                          else: 0,
+                        },
+                      },
+                    },
+                  },
+                  {
+                    $sort: { hasApplication: -1 as -1, createdAt: 1 as -1 }, // Sort by application first, then by creation date
+                  },
+                ]
+              : []),
             { $limit: first },
           ],
           hasNextPage: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            {
+              $match: {
+                ...(user ? { user } : {}),
+                ...(endDate ? { createdAt: { $lte: endDate } } : {}),
+                ...(startDate ? { createdAt: { $gte: startDate } } : {}),
+                ...(academicYear ? { academicYear } : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
+              },
+            },
             { $skip: first },
             { $limit: 1 }, // Check if more data exists
           ],
           totalCount: [{ $count: "totalCount" }],
+          academicYearCount: [{ $sortByCount: "$academicYear" }],
         },
       },
       {
         $project: {
           totalCount: {
             $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
+          },
+          academicYears: {
+            $map: {
+              input: "$academicYearCount",
+              as: "item",
+              in: { academicYear: "$$item._id", count: "$$item.count" },
+            },
           },
           edges: {
             $map: {

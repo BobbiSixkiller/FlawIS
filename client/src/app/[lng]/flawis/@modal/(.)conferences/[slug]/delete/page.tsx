@@ -10,7 +10,11 @@ export default async function DeleteConferencePage({
   const conference = await getConference(slug);
 
   return (
-    <Modal title="Zmazat konferenciu">
+    <Modal
+      title="Zmazat konferenciu"
+      dialogId="delete-conference"
+      isInterceptingRoute
+    >
       <DeleteConferenceForm lng={lng} conference={conference} />
     </Modal>
   );

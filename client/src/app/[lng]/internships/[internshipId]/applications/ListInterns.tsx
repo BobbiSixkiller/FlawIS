@@ -62,7 +62,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
           <p className="mt-1 text-xs/5 text-gray-500">
             {t("updatedAt", {
               ns: "common",
-              value: displayDate(data?.updatedAt),
+              value: displayDate(data?.updatedAt, lng),
             })}
           </p>
         </div>

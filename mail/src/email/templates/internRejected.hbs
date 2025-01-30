@@ -12,11 +12,16 @@
     </style>
   </head>
   <body>
-    <h1>{{t 'internRejected.subject'}}</h1>
+    <h1>{{t 'intern.rejected.subject'}}</h1>
     <p>{{t 'common.greetings'}}
       {{name}}
     </p>
-    <p>{{t 'intern.rejected.body'}}</p>
-    <a href={{url}}>{{t 'intern.rejected.link'}}</a>
+    <p>{{t 'intern.rejected.body' organization=organization}}</p>
+    <a href={{url}}>{{t 'intern.link'}}</a>
+     <p>{{t 'common.bye'}}</p>
+         <p>FlawIS team</p>
+
+    </br>
+    <p>{{t 'common.no-reply'}}</p>
   </body>
 </html>

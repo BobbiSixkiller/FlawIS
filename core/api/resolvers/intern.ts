@@ -10,12 +10,7 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import {
-  Intern,
-  Internship,
-  Status,
-  UserReferece,
-} from "../entitites/Internship";
+import { Intern, Status, UserReferece } from "../entitites/Internship";
 import { InternshipService } from "../services/internshipService";
 import { InternService } from "../services/internService";
 import { I18nService } from "../services/i18nService";
@@ -33,7 +28,6 @@ import { UserService } from "../services/userService";
 @Resolver(() => Intern)
 export class InternResolver {
   constructor(
-    private readonly internshipService: InternshipService,
     private readonly internService: InternService,
     private readonly userService: UserService,
     private readonly i18nService: I18nService
@@ -56,11 +50,16 @@ export class InternResolver {
   async changeInternStatus(
     @Arg("id") id: ObjectId,
     @Arg("status", () => Status) status: Status,
-    @Ctx() { user }: Context
+    @Ctx() { req }: Context
   ): Promise<InternMutationResponse> {
-    const intern = await this.internService.changeStatus(status, id, user!);
+    const hostname = req.headers["tenant-domain"] as string;
 
-    return { message: "success", data: intern };
+    const intern = await this.internService.changeStatus(status, id, hostname);
+
+    return {
+      message: this.i18nService.translate("status", { ns: "intern" }),
+      data: intern,
+    };
   }
 
   @Authorized()
@@ -73,7 +72,26 @@ export class InternResolver {
     const intern = await this.internService.updateFiles(fileUrls, id, user!);
 
     return {
-      message: "Your application files has been updated.",
+      message: this.i18nService.translate("internFiles", { ns: "intern" }),
+      data: intern,
+    };
+  }
+
+  @Authorized([Access.Admin, Access.Organization])
+  @Mutation(() => InternMutationResponse)
+  async updateOrgFeedback(
+    @Ctx() { user }: Context,
+    @Arg("id") id: ObjectId,
+    @Arg("fileUrl", { nullable: true }) fileUrl: string
+  ): Promise<InternMutationResponse> {
+    const intern = await this.internService.updateOrganizationFeedbackUrl(
+      id,
+      user!,
+      fileUrl
+    );
+
+    return {
+      message: this.i18nService.translate("feedback", { ns: "intern" }),
       data: intern,
     };
   }
@@ -86,7 +104,13 @@ export class InternResolver {
   ): Promise<InternMutationResponse> {
     const intern = await this.internService.deleteIntern(id, user!);
 
-    return { message: "Your application has been deleted.", data: intern };
+    return {
+      message: this.i18nService.translate("delete", {
+        ns: "intern",
+        name: intern.user.name,
+      }),
+      data: intern,
+    };
   }
 
   @Authorized()

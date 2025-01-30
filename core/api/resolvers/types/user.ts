@@ -28,7 +28,10 @@ import Container from "typedi";
 export class UserConnection extends CreateConnection(User) {}
 
 @ArgsType()
-export class UserArgs extends CreateArgs(User) {}
+export class UserArgs extends CreateArgs(User) {
+  @Field(() => [Access], { nullable: true })
+  access?: Access[];
+}
 
 @ObjectType({ implements: IMutationResponse })
 export class UserMutationResponse extends IMutationResponse {

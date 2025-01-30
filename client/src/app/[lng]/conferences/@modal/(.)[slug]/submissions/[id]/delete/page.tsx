@@ -17,7 +17,11 @@ export default async function DeleteSubmissionPage({
   }
 
   return (
-    <Modal title={t("submission.delete")}>
+    <Modal
+      title={t("submission.delete")}
+      dialogId="delete-submission"
+      isInterceptingRoute
+    >
       <FormMessage />
       <DeleteSubmissionForm lng={lng} submission={submission} />
     </Modal>

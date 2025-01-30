@@ -11,12 +11,12 @@ export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function displayDate(utc?: string) {
+export function displayDate(utc?: string, locale: string = "sk") {
   if (!utc) return "N/A";
 
   const date = new Date(utc);
 
-  return date.toLocaleString("sk-SK", {
+  return date.toLocaleString(locale, {
     weekday: "long", // Display the full name of the day
     year: "numeric",
     month: "long", // Full month name
@@ -131,16 +131,19 @@ export async function uploadOrDelete(
   }
 }
 
-export function getAcademicYearInterval(date = new Date()) {
+export function getAcademicYear(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth();
 
-  // Academic year starts in September
-  const startYear = month >= 8 ? year : year - 1;
+  // Academic year starts in September but consider summer months for creating internships
+  // or applying for internships for next academic year
+  const startYear = month >= 6 ? year : year - 1;
   const endYear = startYear + 1;
 
   const startDate = new Date(`${startYear}-09-01T00:00:00Z`);
   const endDate = new Date(`${endYear}-06-30T23:59:59Z`);
 
-  return { startYear, endYear, startDate, endDate };
+  const academicYear = `${startYear}/${endYear}`;
+
+  return { startYear, endYear, startDate, endDate, academicYear };
 }

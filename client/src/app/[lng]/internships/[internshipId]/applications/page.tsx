@@ -11,7 +11,10 @@ export default async function ApplicationsPage({
   const user = await getMe();
 
   const filter = user.access.includes(Access.Organization)
-    ? { internship: internshipId, status: Status.Eligible }
+    ? {
+        internship: internshipId,
+        status: [Status.Eligible, Status.Accepted, Status.Rejected],
+      }
     : { internship: internshipId };
 
   const initialData = await getInterns(filter);

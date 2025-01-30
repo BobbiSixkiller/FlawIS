@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
@@ -32,6 +32,7 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import ImageFileInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
+import { useDialog } from "@/providers/DialogProvider";
 
 export default function UserForm({
   user,
@@ -56,27 +57,29 @@ export default function UserForm({
       false
   );
 
-  const fetchFiles = useCallback(async () => {
-    try {
-      if (user?.cvUrl) {
-        const file = await fetchFromMinio("resumes", user.cvUrl);
-        methods.setValue("files", [file]);
-      }
-
-      if (user?.avatarUrl) {
-        const avatar = await fetchFromMinio("avatars", user.avatarUrl);
-        methods.setValue("avatar", avatar);
-      }
-
-      setLoadingFile(false);
-    } catch (error: any) {
-      console.log(error.message);
-      methods.setError("files", { message: error.message });
-      setLoadingFile(false);
-    }
-  }, []);
-
   useEffect(() => {
+    async function fetchFiles() {
+      {
+        try {
+          if (user?.cvUrl) {
+            const file = await fetchFromMinio("resumes", user.cvUrl);
+            methods.setValue("files", [file]);
+          }
+
+          if (user?.avatarUrl) {
+            const avatar = await fetchFromMinio("avatars", user.avatarUrl);
+            methods.setValue("avatar", avatar);
+          }
+
+          setLoadingFile(false);
+        } catch (error: any) {
+          console.log(error.message);
+          methods.setError("files", { message: error.message });
+          setLoadingFile(false);
+        }
+      }
+    }
+
     fetchFiles();
   }, []);
 
@@ -203,6 +206,8 @@ export default function UserForm({
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { closeDialog } = useDialog();
+
   if (loadingFile)
     return (
       <div className="h-full sm:w-96 mx-auto flex flex-col items-center justify-center">
@@ -280,6 +285,8 @@ export default function UserForm({
                 type: ActionTypes.SetAppMsg,
                 payload: state,
               });
+
+              closeDialog("update-profile");
               router.back();
             }
           },

@@ -5,6 +5,7 @@ import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
 import DynamicImage from "@/components/DynamicImage";
+import Spinner from "@/components/Spinner";
 
 export default async function Profile({
   params: { lng },

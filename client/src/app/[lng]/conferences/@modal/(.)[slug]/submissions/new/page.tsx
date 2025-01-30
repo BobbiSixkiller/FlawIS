@@ -12,7 +12,11 @@ export default async function NewSubmissionPage({
   const conference = await getConference(slug);
 
   return (
-    <Modal title={t("submission.new")}>
+    <Modal
+      title={t("submission.new")}
+      dialogId="new-submission"
+      isInterceptingRoute
+    >
       <NewSubmissionForm
         lng={lng}
         conferenceId={conference.id}

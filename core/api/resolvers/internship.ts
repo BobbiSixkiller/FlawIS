@@ -96,15 +96,18 @@ export class InternshipResolver {
   @Authorized()
   @Mutation(() => InternshipMutationResponse)
   async createIntern(
-    @Ctx() { user }: Context,
+    @Ctx() { user, req }: Context,
     @Arg("internshipId") internshipId: ObjectId,
     @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
   ): Promise<InternshipMutationResponse> {
+    const hostname = req.headers["tenant-domain"] as string;
+
     const internship = await this.internshipService.getInternship(internshipId);
     const intern = await this.internService.createIntern(
       user!.id,
       internshipId,
-      fileUrls
+      fileUrls,
+      hostname
     );
 
     console.log({ ...internship, myApplication: intern });
@@ -141,7 +144,7 @@ export class InternshipResolver {
       first: 1000,
       internship: id,
       status: user?.access.includes(Access.Organization)
-        ? Status.Eligible
+        ? [Status.Eligible, Status.Accepted, Status.Rejected]
         : undefined,
     });
 

@@ -1,7 +1,10 @@
 {
   "notFound": "Stážista nebol nájdený!",
-  "update": "Stážista {{name}} bola aktualizovaná.",
-  "new": "Stážista {{name}} bola vytvorená.",
-  "delete": "Stážista {{name}} bola vymazaná.",
-  "applicationLimitReached": "Môžete podať maximálne dve prihlášky naraz!"
+  "update": "Stážista {{name}} bol aktualizovaná.",
+  "new": "Stážista {{name}} bol vytvorená.",
+  "delete": "Stážista {{name}} bol vymazaná.",
+  "applicationLimitReached": "Môžete podať maximálne dve prihlášky naraz!",
+  "internFiles": "Súbory boli aktualizované.",
+  "status": "Stav prihlášky bol úspešne zmenený.",
+  "feedback": "Výstupný list bol úspešne aktualizovaný."
 }

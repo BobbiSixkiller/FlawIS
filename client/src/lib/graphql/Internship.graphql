@@ -9,7 +9,8 @@ fragment Application on Intern {
     telephone
     avatarUrl
   }
-  files
+  fileUrls
+  organizationFeedbackUrl
   status
   createdAt
   updatedAt
@@ -21,6 +22,7 @@ query internships(
   $user: ObjectId
   $startDate: DateTimeISO
   $endDate: DateTimeISO
+  $contextUserId: ObjectId
 ) {
   internships(
     after: $after
@@ -28,8 +30,13 @@ query internships(
     user: $user
     startDate: $startDate
     endDate: $endDate
+    contextUserId: $contextUserId
   ) {
     totalCount
+    academicYears {
+      academicYear
+      count
+    }
     edges {
       cursor
       node {
@@ -38,6 +45,9 @@ query internships(
         description
         applicationsCount
         academicYear
+        myApplication {
+          ...Application
+        }
       }
     }
     pageInfo {
@@ -92,7 +102,7 @@ query interns(
   $startDate: DateTimeISO
   $endDate: DateTimeISO
   $internship: ObjectId
-  $status: Status
+  $status: [Status!]
 ) {
   interns(
     after: $after
@@ -131,6 +141,16 @@ mutation createIntern($fileUrls: [String]!, $internshipId: ObjectId!) {
 
 mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
   updateInternFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      id
+      internship
+    }
+  }
+}
+
+mutation updateOrgFeedback($fileUrl: String, $id: ObjectId!) {
+  updateOrgFeedback(id: $id, fileUrl: $fileUrl) {
     message
     data {
       id

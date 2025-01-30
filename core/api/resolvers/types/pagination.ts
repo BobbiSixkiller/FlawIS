@@ -1,4 +1,4 @@
-import { Max, Min } from "class-validator";
+import { Min } from "class-validator";
 import { ObjectId } from "mongodb";
 import { ArgsType, ClassType, Field, Int, ObjectType } from "type-graphql";
 import { RefDocExists } from "../../util/decorators";

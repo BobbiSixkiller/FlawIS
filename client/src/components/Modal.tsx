@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect } from "react";
 import {
   Dialog,
   DialogPanel,
@@ -10,34 +10,52 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
+import { useDialog } from "@/providers/DialogProvider";
 
 interface ModalProps {
-  children: React.ReactNode;
+  dialogId: string;
+  isInterceptingRoute?: boolean;
   title?: string;
   togglerHidden?: boolean;
+  children: React.ReactNode;
 }
 
 export default function Modal({
-  children,
+  dialogId,
   title,
+  children,
   togglerHidden = false,
+  isInterceptingRoute = false,
 }: ModalProps) {
-  const [show, setShow] = useState(true);
+  const { closeDialog, openDialog, isDialogOpen } = useDialog();
+
+  useEffect(() => {
+    if (isInterceptingRoute) {
+      openDialog(dialogId);
+    }
+  }, []);
+
   const router = useRouter();
+
+  function handleClose() {
+    closeDialog(dialogId);
+  }
 
   return (
     <Transition
       appear
-      show={show}
+      show={isDialogOpen(dialogId)}
       as={Fragment}
       afterLeave={() => {
-        router.back();
+        if (isInterceptingRoute) {
+          router.back();
+        }
       }}
     >
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
-        onClose={() => setShow(false)}
+        onClose={handleClose}
       >
         <TransitionChild
           enter="duration-300 ease-out"
@@ -72,7 +90,7 @@ export default function Modal({
                 )}
                 {!togglerHidden && (
                   <button
-                    onClick={() => setShow(false)}
+                    onClick={handleClose}
                     className="hover:text-gray-500 focus:outline-primary-500"
                   >
                     <XMarkIcon className="h-5 w-5" />

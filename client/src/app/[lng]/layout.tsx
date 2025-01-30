@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { dir } from "i18next";
 import MessageProvider from "@/providers/MessageProvider";
 import { AppMessage } from "@/components/Message";
+import DialogProvider from "@/providers/DialogProvider";
 
 const UKsans = localFont({
   src: [
@@ -52,8 +53,10 @@ export default async function RootLayout({
     <html lang={lng} dir={dir(lng)}>
       <body className={`${UKsans.className}`}>
         <MessageProvider>
-          {children}
-          <AppMessage lng={lng} />
+          <DialogProvider>
+            {children}
+            <AppMessage lng={lng} />
+          </DialogProvider>
         </MessageProvider>
       </body>
     </html>

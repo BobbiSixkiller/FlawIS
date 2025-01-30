@@ -4,14 +4,15 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { createInternship, updateInternship } from "./actions";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
 import Editor from "@/components/editor/Editor";
+import { useDialog } from "@/providers/DialogProvider";
+import { createInternship, updateInternship } from "./actions";
 
 export default function InternshipForm({
   data,
@@ -19,8 +20,8 @@ export default function InternshipForm({
   data?: { id: string; description: string };
 }) {
   const { lng } = useParams<{ lng: string }>();
-  const router = useRouter();
-  const { t } = useTranslation(lng, "intertnships");
+  const { t } = useTranslation(lng, ["internships", "common"]);
+  const { closeDialog } = useDialog();
 
   const { yup } = useValidation();
   const methods = useForm({
@@ -48,7 +49,7 @@ export default function InternshipForm({
                 type: "underline",
               },
             ],
-            text: "Odbor (organizačný útvar) / Sekcia:",
+            text: t("form.dept"),
           },
         ],
       },
@@ -57,33 +58,7 @@ export default function InternshipForm({
         content: [
           {
             type: "text",
-            text: "Nazov...",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: "Stáž prebieha v semestri:",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Zimný, letný",
+            text: t("form.name"),
           },
         ],
       },
@@ -100,7 +75,7 @@ export default function InternshipForm({
                 type: "underline",
               },
             ],
-            text: "Predpokladané trvanie stáže:",
+            text: t("form.semesterLabel"),
           },
         ],
       },
@@ -109,33 +84,7 @@ export default function InternshipForm({
         content: [
           {
             type: "text",
-            text: "1-2 mesiace (prípadne podľa dohody)",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: "Počet stážistov/semester:",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Max. 2",
+            text: t("form.semester"),
           },
         ],
       },
@@ -152,7 +101,7 @@ export default function InternshipForm({
                 type: "underline",
               },
             ],
-            text: "Stupeň vzdelania:",
+            text: t("form.estimatedLength"),
           },
         ],
       },
@@ -161,33 +110,7 @@ export default function InternshipForm({
         content: [
           {
             type: "text",
-            text: "študenti Mgr. štúdia",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: "Jazykové požiadavky:",
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Štátny jazyk",
+            text: t("form.timePeriod"),
           },
         ],
       },
@@ -204,7 +127,7 @@ export default function InternshipForm({
                 type: "underline",
               },
             ],
-            text: "Iné požiadavky:",
+            text: t("form.internsCountLabel"),
           },
         ],
       },
@@ -213,7 +136,7 @@ export default function InternshipForm({
         content: [
           {
             type: "text",
-            text: "Proaktívny a zodpovedný prístup k práci, dôslednosť pri plnení zadaných úloh",
+            text: t("form.internsCount"),
           },
         ],
       },
@@ -230,7 +153,85 @@ export default function InternshipForm({
                 type: "underline",
               },
             ],
-            text: "Predpokladaná náplň stáže:",
+            text: t("form.educLabel"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: t("form.educ"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            marks: [
+              {
+                type: "bold",
+              },
+              {
+                type: "underline",
+              },
+            ],
+            text: t("form.lngLabel"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: t("form.lng"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            marks: [
+              {
+                type: "bold",
+              },
+              {
+                type: "underline",
+              },
+            ],
+            text: t("form.otherLabel"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text: t("form.other"),
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            marks: [
+              {
+                type: "bold",
+              },
+              {
+                type: "underline",
+              },
+            ],
+            text: t("form.internshipDescLabel"),
           },
         ],
       },
@@ -248,7 +249,7 @@ export default function InternshipForm({
                 content: [
                   {
                     type: "text",
-                    text: "Bod naplne staze...",
+                    text: t("form.internshipDesc"),
                   },
                 ],
               },
@@ -292,7 +293,8 @@ export default function InternshipForm({
                 payload: state,
               });
 
-              router.back();
+              closeDialog("create-internship");
+              closeDialog("update-internship");
             }
           },
           (errs) => {
@@ -306,8 +308,6 @@ export default function InternshipForm({
             editora.
           </p>
 
-          {/* <Editor name="description" initialValue={defaultContent} /> */}
-
           <Editor
             name="description"
             initialValue={data?.description || defaultContent}
@@ -316,8 +316,18 @@ export default function InternshipForm({
 
         <FormMessage />
 
-        <Button type="submit" disabled={methods.formState.isSubmitting}>
-          {methods.formState.isSubmitting ? <Spinner inverted /> : "Submit"}
+        <Button
+          type="submit"
+          className="w-full sm:w-fit"
+          disabled={methods.formState.isSubmitting}
+        >
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : data ? (
+            t("confirm", { ns: "common" })
+          ) : (
+            t("submit", { ns: "common" })
+          )}
         </Button>
       </form>
     </FormProvider>
