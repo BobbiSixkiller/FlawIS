@@ -116,7 +116,7 @@ export class InternService {
               email: user.email,
               telephone: user.telephone,
               studyProgramme: user.studyProgramme,
-              avatarUrl: user.avatarUrl,
+              address: user.address,
             },
             status: Status.Applied,
             fileUrls,

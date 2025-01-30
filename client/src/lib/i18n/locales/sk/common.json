@@ -19,5 +19,10 @@
     "heading": "Nadpis {{ lvl }}...",
     "list": "Text odrazky...",
     "default": "Stlačte '/' pre zmenu textu..."
-  }
+  },
+  "street": "Ulica",
+  "city": "Mesto",
+  "postal": "PSČ",
+  "country": "Krajina",
+  "address": "Adresa"
 }

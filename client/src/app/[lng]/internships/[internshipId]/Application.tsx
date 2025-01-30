@@ -55,7 +55,7 @@ export async function Application({
 
         <div>
           <div className="flex flex-wrap gap-2">
-            <p>{t("contact")}</p>
+            <p>{t("contact")}:</p>
             <ul className="flex flex-wrap gap-2">
               <li>
                 <a
@@ -74,6 +74,11 @@ export async function Application({
                 </a>
               </li>
             </ul>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <p>{t("address", { ns: "common" })}:</p>
+            <p>{Object.values(application.user.address).join(", ")}</p>
           </div>
 
           <div className="flex flex-wrap gap-2">

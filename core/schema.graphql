@@ -423,6 +423,7 @@ type Query {
 """New user input data"""
 input RegisterUserInput {
   access: [Access!]
+  address: AddressInput
   avatarUrl: String
   cvUrl: String
   email: String!
@@ -579,6 +580,7 @@ type TicketTranslations {
 """The user model entity"""
 type User {
   access: [Access!]!
+  address: Address
   avatarUrl: String
   billings: [Billing]!
   createdAt: DateTimeISO!
@@ -609,6 +611,7 @@ type UserEdge {
 """FlawIS user base input"""
 input UserInput {
   access: [Access!]
+  address: AddressInput
   avatarUrl: String
   cvUrl: String
   email: String!
@@ -631,6 +634,7 @@ type UserPageInfo {
 
 """User stub type"""
 type UserReferece {
+  address: Address!
   avatarUrl: String
   email: String!
 

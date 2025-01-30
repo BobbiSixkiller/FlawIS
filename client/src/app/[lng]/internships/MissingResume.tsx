@@ -13,7 +13,10 @@ export default function MissingResume() {
     async function checkMissing() {
       const user = await getMe();
       if (
-        (!user?.cvUrl || !user?.studyProgramme || !user.telephone) &&
+        (!user?.cvUrl ||
+          !user?.studyProgramme ||
+          !user.telephone ||
+          !user.address) &&
         user.verified &&
         user.access.includes(Access.Student)
       ) {

@@ -22,6 +22,9 @@ fragment User on User {
   organization
   telephone
   access
+  address {
+    ...Address
+  }
   verified
   createdAt
   updatedAt

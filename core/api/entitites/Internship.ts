@@ -7,6 +7,7 @@ import { ModelType } from "@typegoose/typegoose/lib/types";
 import { InternArgs, InternshipArgs } from "../resolvers/types/internship";
 import { StudyProgramme, User } from "./User";
 import { getAcademicYear } from "../util/helpers";
+import { Address } from "./Billing";
 
 export enum Status {
   Applied = "APPLIED",
@@ -40,6 +41,10 @@ export class UserReferece {
   @Field(() => StudyProgramme)
   @Property({ type: Number, enum: StudyProgramme })
   studyProgramme: StudyProgramme;
+
+  @Field(() => Address)
+  @Property({ type: () => Address, _id: false })
+  address: Address;
 
   @Field({ nullable: true })
   avatarUrl?: string;

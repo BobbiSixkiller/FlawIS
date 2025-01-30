@@ -17,7 +17,7 @@ import { signJwt } from "../util/auth";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
-import { Billing } from "./Billing";
+import { Address, Billing } from "./Billing";
 import { UserArgs } from "../resolvers/types/user";
 
 export enum Access {
@@ -102,6 +102,10 @@ export class User extends TimeStamps {
   @Field()
   @Property()
   name: string;
+
+  @Field(() => Address, { nullable: true })
+  @Property({ type: () => Address, _id: false })
+  address?: Address;
 
   @Field({ nullable: true })
   @Property()

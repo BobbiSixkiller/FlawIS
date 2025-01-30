@@ -21,6 +21,7 @@ import { CreateArgs, CreateConnection } from "./pagination";
 import { IMutationResponse } from "./interface";
 import { I18nService } from "../../services/i18nService";
 import Container from "typedi";
+import { AddressInput } from "./conference";
 
 @ObjectType({
   description: "UserConnection type enabling cursor based pagination",
@@ -73,6 +74,9 @@ export class UserInput implements Partial<User> {
       }),
   })
   name: string;
+
+  @Field({ nullable: true })
+  address?: AddressInput;
 
   @Field({ nullable: true })
   @MaxLength(200, {

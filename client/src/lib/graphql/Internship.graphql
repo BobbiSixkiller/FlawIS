@@ -8,6 +8,9 @@ fragment Application on Intern {
     studyProgramme
     telephone
     avatarUrl
+    address {
+      ...Address
+    }
   }
   fileUrls
   organizationFeedbackUrl

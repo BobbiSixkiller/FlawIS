@@ -22,6 +22,8 @@ import {
 import Select from "@/components/Select";
 import {
   Access,
+  Address,
+  Status,
   StudyProgramme,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
@@ -140,6 +142,23 @@ export default function UserForm({
                   )
               : schema.transform((value) => (!value ? null : value)).nullable()
           ),
+        address: yup
+          .object({
+            street: yup.string(),
+            city: yup.string(),
+            postal: yup.string(),
+            country: yup.string(),
+          })
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) =>
+              schema.shape({
+                street: yup.string().trim().required(),
+                city: yup.string().trim().required(),
+                postal: yup.string().trim().required(),
+                country: yup.string().trim().required(),
+              }),
+          }),
         organization: yup.string().trim().required(),
         telephone: yup
           .string()
@@ -198,6 +217,12 @@ export default function UserForm({
       email: user?.email || "",
       password: "",
       confirmPass: "",
+      address: user?.address || {
+        city: "",
+        country: "",
+        postal: "",
+        street: "",
+      },
       access: user?.access || [],
       organization: user?.organization || "",
       telephone: user?.telephone || "",
@@ -231,7 +256,7 @@ export default function UserForm({
   return (
     <FormProvider {...methods}>
       <form
-        className={`space-y-6 mt-4 w-full ${inModal && "sm:w-96"}`}
+        className={`space-y-6 mt-4`}
         onSubmit={methods.handleSubmit(
           async (val) => {
             const { error, url } = await uploadOrDelete(
@@ -274,6 +299,7 @@ export default function UserForm({
                 studyProgramme: val.studyProgramme as StudyProgramme,
                 cvUrl: url,
                 avatarUrl,
+                address: val.address ? (val.address as Address) : undefined,
               });
             } else {
               state = await addUser({
@@ -337,6 +363,24 @@ export default function UserForm({
 
         {(path.includes("users") || user?.access.includes(Access.Student)) && (
           <>
+            <div className="flex gap-2 w-full">
+              <Input
+                label={t("street", { ns: "common" })}
+                name="address.street"
+              />
+              <Input label={t("city", { ns: "common" })} name="address.city" />
+            </div>
+            <div className="flex gap-2 w-full">
+              <Input
+                label={t("postal", { ns: "common" })}
+                name="address.postal"
+              />
+              <Input
+                label={t("country", { ns: "common" })}
+                name="address.country"
+              />
+            </div>
+
             <Select
               name="studyProgramme"
               label="Ročník"

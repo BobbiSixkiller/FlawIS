@@ -19,5 +19,10 @@
     "heading": "Heading {{ lvl }}...",
     "list": "Bullet point...",
     "default": "Press '/' to change element..."
-  }
+  },
+  "street": "Street",
+  "city": "City",
+  "postal": "Postal",
+  "country": "Country",
+  "address": "Address"
 }

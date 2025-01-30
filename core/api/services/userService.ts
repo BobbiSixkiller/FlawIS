@@ -2,7 +2,11 @@ import { Service } from "typedi";
 import { Access, User } from "../entitites/User";
 import { v4 as uuidv4 } from "uuid";
 import { signJwt, verifyJwt } from "../util/auth";
-import { UserArgs, UserConnection, UserInput } from "../resolvers/types/user";
+import {
+  RegisterUserInput,
+  UserArgs,
+  UserConnection,
+} from "../resolvers/types/user";
 import { RmqService } from "./rmqService";
 import { RedisService } from "./redisService";
 import { I18nService } from "./i18nService";
@@ -91,7 +95,7 @@ export class UserService {
   }
 
   async createUser(
-    data: UserInput,
+    data: RegisterUserInput,
     hostname: string,
     isAdmin?: boolean,
     token?: string
