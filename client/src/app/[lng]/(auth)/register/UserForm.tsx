@@ -96,7 +96,7 @@ export default function UserForm({
           .when({
             is: () =>
               (searchParams.get("token") === null &&
-                subdomain?.includes("internships")) ||
+                subdomain?.includes("intern")) ||
               user?.access.includes(Access.Student), // When creating student account on internships tenant
             then: (schema) =>
               schema.matches(
@@ -140,12 +140,12 @@ export default function UserForm({
                   )
               : schema.transform((value) => (!value ? null : value)).nullable()
           ),
-        organization: yup.string().trim().nullable().required(),
+        organization: yup.string().trim().required(),
         telephone: yup
           .string()
           .trim()
           .nullable()
-          .when([], {
+          .when({
             is: () =>
               subdomain?.includes("conferences") ||
               user?.access.includes(Access.Student),
@@ -162,7 +162,13 @@ export default function UserForm({
                   }
                 ),
           }),
-        studyProgramme: yup.mixed<StudyProgramme>().nullable(),
+        studyProgramme: yup
+          .mixed<StudyProgramme>()
+          .nullable()
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) => schema.required(),
+          }),
         access: yup.array().of(yup.string<Access>().required()),
         privacy: yup
           .boolean()
@@ -172,7 +178,14 @@ export default function UserForm({
           .array()
           .of(yup.mixed<File>().required())
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
-          .required(),
+          .required()
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) =>
+              schema.min(1, (val) =>
+                t("minFiles", { value: val.min, ns: "validation" })
+              ),
+          }),
         avatar: mixed<File>()
           .nullable()
           .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
@@ -295,7 +308,9 @@ export default function UserForm({
       >
         <FormMessage />
 
-        <ImageFileInput name="avatar" label="Fotka" />
+        {path.includes("update") && (
+          <ImageFileInput name="avatar" label="Fotka" />
+        )}
 
         <Input label={t("name")} name="name" />
         <Input label={t("email")} name="email" />

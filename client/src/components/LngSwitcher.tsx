@@ -68,8 +68,7 @@ export default function LngSwitcher({
                       l === lng ? "font-bold" : ""
                     }`}
                     onClick={() => {
-                      console.log(l);
-                      router.replace(`/${l}${path.replace("/en", "")}`);
+                      router.push(`/${l}${path.replace("/en", "")}`);
                     }}
                   >
                     <Image

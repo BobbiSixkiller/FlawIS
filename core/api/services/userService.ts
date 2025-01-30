@@ -101,7 +101,7 @@ export class UserService {
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
-    if (hostname?.includes("internships")) {
+    if (hostname?.includes("intern")) {
       if (token) {
         await this.verifyOneTimeToken(token);
         access.push(Access.Organization);
