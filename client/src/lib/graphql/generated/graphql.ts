@@ -1236,7 +1236,7 @@ export type InternshipQueryVariables = Exact<{
 }>;
 
 
-export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, internship: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
+export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, user: string, myApplication?: { __typename?: 'Intern', id: any, internship: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
 
 export type CreateInternshipMutationVariables = Exact<{
   input: InternshipInput;
@@ -3566,6 +3566,7 @@ export const InternshipDocument = new TypedDocumentString(`
     myApplication {
       ...Application
     }
+    user
   }
 }
     fragment Address on Address {

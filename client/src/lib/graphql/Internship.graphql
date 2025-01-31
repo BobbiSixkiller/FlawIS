@@ -71,6 +71,7 @@ query internship($id: ObjectId!) {
     myApplication {
       ...Application
     }
+    user
   }
 }
 
