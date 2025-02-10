@@ -22,7 +22,7 @@ export default async function UpdateProfilePage({
       dialogId="update-profile"
       isInterceptingRoute={true}
     >
-      <UserForm user={user} namespace="profile" inModal subdomain={subdomain} />
+      <UserForm user={user} namespace="profile" subdomain={subdomain} />
     </Modal>
   );
 }

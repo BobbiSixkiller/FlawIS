@@ -18,7 +18,7 @@ export default async function UpdateProfilePage({
 
   return (
     <Modal title={t("heading")} dialogId="update-profile" isInterceptingRoute>
-      <UserForm user={user} namespace="profile" inModal subdomain={subdomain} />
+      <UserForm user={user} namespace="profile" subdomain={subdomain} />
     </Modal>
   );
 }
