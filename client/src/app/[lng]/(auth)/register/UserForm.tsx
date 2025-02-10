@@ -39,12 +39,10 @@ export default function UserForm({
   user,
   subdomain,
   namespace,
-  inModal,
 }: {
   user?: UserFragment;
   subdomain?: string;
   namespace: string;
-  inModal?: boolean;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
