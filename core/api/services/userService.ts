@@ -109,7 +109,7 @@ export class UserService {
     console.log("TOKEN ", token, Boolean(token) === true);
 
     if (hostname?.includes("intern")) {
-      if (token) {
+      if (token && token !== "undefined") {
         await this.verifyOneTimeToken(token);
         access.push(Access.Organization);
       } else {
