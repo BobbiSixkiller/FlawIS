@@ -164,6 +164,7 @@ export default function UserForm({
           .when({
             is: () =>
               subdomain?.includes("conferences") ||
+              subdomain?.includes("intern") ||
               user?.access.includes(Access.Student),
             then: (schema) =>
               schema

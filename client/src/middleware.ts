@@ -10,4 +10,4 @@ export const config = {
   ],
 };
 
-export default chain([withTenant, withAuth, withLocalization]);
+export default chain([withAuth, withLocalization, withTenant]);

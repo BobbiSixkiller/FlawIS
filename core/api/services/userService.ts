@@ -106,7 +106,7 @@ export class UserService {
       access.push(Access.ConferenceAttendee);
     }
 
-    console.log("TOKEN ", token);
+    console.log("TOKEN ", token, Boolean(token) === true);
 
     if (hostname?.includes("intern")) {
       if (token) {

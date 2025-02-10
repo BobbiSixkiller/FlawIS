@@ -44,7 +44,7 @@ export default async function Profile({
                   style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+                <div className="size-12 rounded-full flex justify-center items-center bg-primary-300 text-white">
                   {user.name
                     .split(" ")
                     .map((n, i) => {
