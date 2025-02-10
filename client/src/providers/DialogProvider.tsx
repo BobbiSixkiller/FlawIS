@@ -1,7 +1,13 @@
 // DialogProvider.tsx
 "use client";
 
-import { createContext, useState, ReactNode, useContext } from "react";
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useContext,
+  useCallback,
+} from "react";
 
 // Define the shape of the context
 interface DialogContextType {
@@ -18,9 +24,10 @@ const DialogContext = createContext<DialogContextType | undefined>(undefined);
 export default function DialogProvider({ children }: { children: ReactNode }) {
   const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
 
-  const openDialog = (dialogId: string) => {
-    setOpenDialogs((prev) => new Set(prev).add(dialogId));
-  };
+  const openDialog = useCallback(
+    (dialogId: string) => setOpenDialogs((prev) => new Set(prev).add(dialogId)),
+    []
+  );
 
   const closeDialog = (dialogId: string) => {
     setOpenDialogs((prev) => {

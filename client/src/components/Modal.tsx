@@ -33,7 +33,7 @@ export default function Modal({
     if (isInterceptingRoute) {
       openDialog(dialogId);
     }
-  }, []);
+  }, [dialogId, isInterceptingRoute, openDialog]);
 
   const router = useRouter();
 
