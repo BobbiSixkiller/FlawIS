@@ -11,7 +11,7 @@ export default async function NewUserPage({
 
   return (
     <Modal title={t("new")} dialogId="new-user" isInterceptingRoute>
-      <UserForm namespace="register" inModal />
+      <UserForm namespace="register" />
     </Modal>
   );
 }
