@@ -9,7 +9,6 @@ import {
 } from "@headlessui/react";
 import { Fragment } from "react";
 import { languages } from "@/lib/i18n/settings";
-import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -68,7 +67,9 @@ export default function LngSwitcher({
                       l === lng ? "font-bold" : ""
                     }`}
                     onClick={() => {
-                      router.push(`/${l}${path.replace("/en", "")}`);
+                      router.replace(
+                        `/${l}${path.replace("/en", "").replace("/sk", "")}`
+                      );
                     }}
                   >
                     <Image
