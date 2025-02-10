@@ -105,6 +105,9 @@ export class UserService {
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
+
+    console.log("TOKEN ", token);
+
     if (hostname?.includes("intern")) {
       if (token) {
         await this.verifyOneTimeToken(token);
