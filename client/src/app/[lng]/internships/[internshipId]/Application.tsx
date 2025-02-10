@@ -49,7 +49,9 @@ export async function Application({
               <span className="absolute inset-0" />
               {application.user.name}
             </p>
-            <p className="text-gray-600">{application.user.studyProgramme}</p>
+            <p className="text-gray-600">
+              {t(application.user.studyProgramme)}
+            </p>
           </div>
         </div>
 
@@ -120,7 +122,7 @@ export async function Application({
 
       <div className="flex flex-wrap items-end gap-2 justify-between">
         <div className="flex flex-col">
-          Status: {t(application.status.toUpperCase())}
+          Status: {t(application.status)}
           <span className="text-sm">
             {t("updatedAt", {
               ns: "common",

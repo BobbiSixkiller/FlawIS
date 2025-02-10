@@ -18,5 +18,6 @@
   "Master1": "1. Magisterský",
   "Master2": "2. Magisterský",
   "password": "Heslo",
-  "confirmPass": "Potvrdiť heslo"
+  "confirmPass": "Potvrdiť heslo",
+  "address": "Adresa"
 }

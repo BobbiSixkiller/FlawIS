@@ -83,6 +83,16 @@ export default async function Profile({
               {user?.telephone || "N/A"}
             </dd>
           </div>
+          {user.access.includes(Access.Student) && (
+            <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+              <dt className="text-sm font-medium leading-6 text-gray-900">
+                {t("address")}
+              </dt>
+              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.address && Object.values(user.address).join(", ")}
+              </dd>
+            </div>
+          )}
           {user?.access.includes(Access.Student) && (
             <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
               <dt className="text-sm font-medium leading-6 text-gray-900">

@@ -62,7 +62,7 @@ function ListItem({ data }: { data?: InternshipData }) {
         <h2 className="font-medium leading-6">{data?.organization}</h2>
         {data?.myApplication && (
           <p className={cn([statusClasses[data.myApplication.status].label])}>
-            {t(data.myApplication.status.toUpperCase())}
+            {t(data.myApplication.status)}
           </p>
         )}
       </div>
