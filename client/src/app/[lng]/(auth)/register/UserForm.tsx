@@ -23,7 +23,6 @@ import Select from "@/components/Select";
 import {
   Access,
   Address,
-  Status,
   StudyProgramme,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
