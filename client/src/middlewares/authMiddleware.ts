@@ -29,9 +29,17 @@ export function withAuth(middleware: CustomMiddleware) {
     }
 
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
-      const redirectTo = url.searchParams.get("url") || "/";
-      url.pathname = redirectTo;
-      return NextResponse.redirect(url);
+      let redirectTo;
+      const referer = req.headers.get("referer");
+      if (referer) {
+        // Create a URL object from the referer to extract its path and search.
+        const refererUrl = new URL(referer);
+        redirectTo = `${refererUrl.pathname}${refererUrl.search}`;
+      } else {
+        redirectTo = "/";
+      }
+
+      return NextResponse.redirect(redirectTo);
     }
 
     return middleware(req, event, res);
