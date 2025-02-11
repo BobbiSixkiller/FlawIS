@@ -18,11 +18,14 @@ export function withAuth(middleware: CustomMiddleware) {
     const token = req.cookies.get("accessToken")?.value;
 
     if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
+      const loginUrl = new URL("/login", url.origin);
+
       if (url.pathname !== "/" && url.pathname !== "/logout") {
-        url.searchParams.set("url", `${url.pathname}${url.search}`);
+        const originalUrl = `${url.pathname}${url.search}`;
+        loginUrl.searchParams.set("url", originalUrl);
       }
-      url.pathname = "/login";
-      return NextResponse.redirect(url);
+
+      return NextResponse.redirect(loginUrl);
     }
 
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
