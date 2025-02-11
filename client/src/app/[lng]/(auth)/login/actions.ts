@@ -38,7 +38,8 @@ export async function login(email: string, password: string, url?: string) {
     return { success: false, message: error.message };
   }
 
-  console.log("REDIRECT URL ", url);
+  const target = url ? decodeURIComponent(url) : "/";
+  console.log("REDIRECT URL ", target);
 
-  redirect(url ? url : "/", RedirectType.replace);
+  redirect(target, RedirectType.replace);
 }
