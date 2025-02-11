@@ -80,7 +80,7 @@ export default function Tooltip({
 
       return setTooltipPosition((prev) => ({ ...prev, left: prev.left - 10 }));
     }
-  }, [visible, ref]);
+  }, [visible, ref, width]);
 
   return (
     <div

@@ -83,8 +83,8 @@ export default function ChangeStatusDialog({
         <div className="space-y-6">
           <FormMessage />
           <p>
-            Naozaj si prajete zmenit stav prihlasky na {t(status.toUpperCase())}{" "}
-            ?
+            Naozaj si prajete zmenit stav prihlasky na{" "}
+            {t(status).toLocaleLowerCase()} ?
           </p>
           <Button
             className="w-full"
