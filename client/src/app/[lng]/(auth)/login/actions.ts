@@ -40,5 +40,5 @@ export async function login(email: string, password: string, url?: string) {
 
   console.log("REDIRECT URL ", url);
 
-  redirect(url ? decodeURIComponent(url) : "/", RedirectType.replace);
+  redirect(url ? url : "/", RedirectType.replace);
 }
