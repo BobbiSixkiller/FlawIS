@@ -39,6 +39,8 @@ export function withAuth(middleware: CustomMiddleware) {
         redirectTo = "/";
       }
 
+      console.log("TRIGGERED PUBLIC PATH ", redirectTo);
+
       return NextResponse.redirect(redirectTo);
     }
 
