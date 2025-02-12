@@ -31,6 +31,7 @@ export function withAuth(middleware: CustomMiddleware) {
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
       let redirectTo: string;
       const referer = req.headers.get("referer");
+
       if (referer) {
         // Use the referer header to extract a clean target URL.
         const refererUrl = new URL(referer);

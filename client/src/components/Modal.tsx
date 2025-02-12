@@ -38,7 +38,9 @@ export default function Modal({
   const router = useRouter();
 
   function handleClose() {
-    closeDialog(dialogId);
+    if (!togglerHidden) {
+      closeDialog(dialogId);
+    }
   }
 
   return (

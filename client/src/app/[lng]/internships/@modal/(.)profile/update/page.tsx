@@ -16,13 +16,16 @@ export default async function UpdateProfilePage({
   const host = headers().get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
+  const dialogId = "update-profile";
+
   return (
-    <Modal
-      title={t("heading")}
-      dialogId="update-profile"
-      isInterceptingRoute={true}
-    >
-      <UserForm user={user} namespace="profile" subdomain={subdomain} />
+    <Modal title={t("heading")} dialogId={dialogId} isInterceptingRoute={true}>
+      <UserForm
+        user={user}
+        namespace="profile"
+        dialogId={dialogId}
+        subdomain={subdomain}
+      />
     </Modal>
   );
 }
