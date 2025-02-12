@@ -73,7 +73,7 @@ export function withTenant(middleware: CustomMiddleware) {
       });
     }
 
-    if (subdomain.includes("internships")) {
+    if (subdomain.includes("intern")) {
       const newUrl = new URL(
         `/${lng}/internships/${paths.join("/")}${url.search}`,
         req.url

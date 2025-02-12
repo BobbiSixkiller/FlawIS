@@ -1,6 +1,31 @@
 {
-  "applied": { "body": "APPLIED BODY", "link": "GO TO INTERNSHIP" },
-  "eligible": { "body": "ELIGIBLE BODY", "link": "GO TO INTERNSHIP" },
-  "accepted": { "body": "ACCEPTED BODY", "link": "GO TO INTERNSHIP" },
-  "rejected": { "body": "REJECTED BODY", "link": "GO TO INTERNSHIP" }
+  "link": "Go to internship",
+  "applied": {
+    "subject": "Internship application - created",
+    "body": "You have applied for an internship at {organization}. You will be notified when the status of your application changes."
+  },
+  "eligible": {
+    "subject": "Internship application - reviewed by FLAW",
+    "body": "Your application for an internship at {organization} has been reviewed and approved by the department that handles internships at Faculty of Law, Comenius University in Bratislava. You will be notified when the status of your application changes."
+  },
+  "accepted": {
+    "subject": "Internship application - accepted",
+    "body": "Congratulations! Your application for an internship at {organization} has been accepted. Further details about the internship and the next steps will be shared with you shortly."
+  },
+  "rejected": {
+    "subject": "Internship application - rejected",
+    "body": "We regret to inform you that your application for an internship at {organization} has not been successful. Thank you for your interest, and we encourage you to apply again in the future."
+  },
+  "admin": {
+    "subject": "Pending internship applications",
+    "body": "New internship application as {organization} waiting to be reviewed."
+  },
+  "org": {
+    "subject": "Pending applications at your internship",
+    "body": {
+      "one": "We would like to remind you that you have {count} application waiting to be reviewed.",
+      "other": "We would like to remind you that you have {count} applications waiting to be reviewed.",
+      "zero": "No new applications."
+    }
+  }
 }

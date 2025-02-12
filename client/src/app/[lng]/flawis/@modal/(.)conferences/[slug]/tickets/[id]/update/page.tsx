@@ -11,7 +11,7 @@ export default async function UpdateSection({
   const conference = await getConference(slug);
 
   return (
-    <Modal title="Upravit listok">
+    <Modal title="Upravit listok" dialogId="update-ticket" isInterceptingRoute>
       <UpdateTicketForm
         lng={lng}
         ticket={conference?.tickets.find((t) => t.id === id) as TicketFragment}

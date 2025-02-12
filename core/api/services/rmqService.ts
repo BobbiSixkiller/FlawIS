@@ -1,14 +1,20 @@
 import client, { Connection, Channel } from "amqplib";
 import { Service } from "typedi";
 
-type RoutingKey =
+export type RoutingKey =
   | "user.delete"
   | "user.new"
   | "mail.registration"
   | "mail.reset"
   | "mail.conference.invoice"
   | "mail.conference.coAuthor"
-  | "mail.internships.newOrg";
+  | "mail.internships.newOrg"
+  | "mail.internships.applied"
+  | "mail.internships.eligible"
+  | "mail.internships.accepted"
+  | "mail.internships.rejected"
+  | "mail.internships.admin"
+  | "mail.internships.org";
 
 const uri = process.env.RMQ_URI || "amqp://rabbitmq:5672";
 const exchange = process.env.RMQ_EXCHANGE || "FlawIS";

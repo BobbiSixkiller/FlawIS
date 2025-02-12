@@ -21,11 +21,5 @@ export default async function ApplyPage({
     redirect(`/${internshipId}`);
   }
 
-  return (
-    <ApplyForm
-      internshipId={internshipId}
-      user={user}
-      application={internship.myApplication}
-    />
-  );
+  return <ApplyForm user={user} application={internship.myApplication} />;
 }

@@ -10,7 +10,11 @@ export default async function DeleteAttendeePage({
   const attendee = await getAttendee(id);
 
   return (
-    <Modal title="Zmazat ucastnika">
+    <Modal
+      title="Zmazat ucastnika"
+      isInterceptingRoute
+      dialogId="delete-attendee"
+    >
       <DeleteAttendeeForm lng={lng} attendee={attendee} />
     </Modal>
   );

@@ -2,7 +2,11 @@ import { Service } from "typedi";
 import { Access, User } from "../entitites/User";
 import { v4 as uuidv4 } from "uuid";
 import { signJwt, verifyJwt } from "../util/auth";
-import { UserArgs, UserConnection, UserInput } from "../resolvers/types/user";
+import {
+  RegisterUserInput,
+  UserArgs,
+  UserConnection,
+} from "../resolvers/types/user";
 import { RmqService } from "./rmqService";
 import { RedisService } from "./redisService";
 import { I18nService } from "./i18nService";
@@ -62,8 +66,8 @@ export class UserService {
     }
   }
 
-  async getPaginatedUsers({ first, after }: UserArgs): Promise<UserConnection> {
-    const data = await this.crudService.dataModel.paginatedUsers(first, after);
+  async getPaginatedUsers(args: UserArgs): Promise<UserConnection> {
+    const data = await this.crudService.dataModel.paginatedUsers(args);
 
     const connection: UserConnection = data[0];
 
@@ -91,7 +95,7 @@ export class UserService {
   }
 
   async createUser(
-    data: UserInput,
+    data: RegisterUserInput,
     hostname: string,
     isAdmin?: boolean,
     token?: string
@@ -101,8 +105,11 @@ export class UserService {
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
-    if (hostname?.includes("internships")) {
-      if (token) {
+
+    console.log("TOKEN ", token, Boolean(token) === true);
+
+    if (hostname?.includes("intern")) {
+      if (token && token !== "undefined") {
         await this.verifyOneTimeToken(token);
         access.push(Access.Organization);
       } else {

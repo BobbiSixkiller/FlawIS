@@ -21,6 +21,7 @@ import { CreateArgs, CreateConnection } from "./pagination";
 import { IMutationResponse } from "./interface";
 import { I18nService } from "../../services/i18nService";
 import Container from "typedi";
+import { AddressInput } from "./conference";
 
 @ObjectType({
   description: "UserConnection type enabling cursor based pagination",
@@ -28,7 +29,10 @@ import Container from "typedi";
 export class UserConnection extends CreateConnection(User) {}
 
 @ArgsType()
-export class UserArgs extends CreateArgs(User) {}
+export class UserArgs extends CreateArgs(User) {
+  @Field(() => [Access], { nullable: true })
+  access?: Access[];
+}
 
 @ObjectType({ implements: IMutationResponse })
 export class UserMutationResponse extends IMutationResponse {
@@ -70,6 +74,9 @@ export class UserInput implements Partial<User> {
       }),
   })
   name: string;
+
+  @Field({ nullable: true })
+  address?: AddressInput;
 
   @Field({ nullable: true })
   @MaxLength(200, {

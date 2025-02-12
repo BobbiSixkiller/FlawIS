@@ -17,7 +17,7 @@ export default async function UpdateUserPage({
   const { t } = await translate(lng, "common");
 
   return (
-    <Modal title={"Impersonovat"}>
+    <Modal title={"Impersonovat"} isInterceptingRoute dialogId="impersonate">
       <ImpersonateForm lng={lng} user={user} />
     </Modal>
   );

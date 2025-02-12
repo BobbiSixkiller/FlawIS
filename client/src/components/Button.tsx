@@ -6,12 +6,14 @@ import React, {
 } from "react";
 
 const buttonStyles = {
-  base: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  base: "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   variants: {
     variant: {
       default: "bg-primary-500 text-white hover:bg-primary-500/90",
-      destructive: "bg-red-500 text-white hover:bg-red-500/90",
-      positive: "bg-green-500 text-white hover:bg-green-500/90",
+      destructive:
+        "bg-red-500 text-white hover:bg-red-500/90 focus-visible:ring-red-500",
+      positive:
+        "bg-green-500 text-white hover:bg-green-500/90 focus-visible:ring-green-500",
       outline:
         "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent",
       secondary: "bg-black text-white hover:bg-black/80",

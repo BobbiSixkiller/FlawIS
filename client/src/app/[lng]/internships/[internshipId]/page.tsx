@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import {
   InboxArrowDownIcon,
   PencilIcon,
-  TrashIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -11,11 +10,14 @@ import { redirect } from "next/navigation";
 import { getMe } from "../../(auth)/actions";
 import { Access, Status } from "@/lib/graphql/generated/graphql";
 import { Application } from "./Application";
+import InternshipDialog from "../InternshipDialog";
+import DeleteInternshipDialog from "./DeleteInternshipDialog";
+import DeleteApplicationDialog from "./DeleteApplicationDialog";
 
 export default async function InternshipPage({
-  params: { internshipId },
+  params: { internshipId, lng },
 }: {
-  params: { internshipId: string };
+  params: { internshipId: string; lng: string };
 }) {
   const [internship, user] = await Promise.all([
     getInternship(internshipId),
@@ -31,34 +33,18 @@ export default async function InternshipPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end gap-2">
+      <div className="flex gap-2">
         {showControls && (
           <>
-            <Button
-              scroll={false}
-              variant="secondary"
-              as={Link}
-              className="rounded-full h-full p-2"
-              href={`/${internshipId}/update`}
-            >
-              <PencilIcon className="size-5" />
-            </Button>
-            <Button
-              scroll={false}
-              variant="destructive"
-              as={Link}
-              className="rounded-full h-full p-2 mr-auto"
-              href={`/${internshipId}/delete`}
-            >
-              <TrashIcon className="size-5" />
-            </Button>
+            <InternshipDialog data={internship} />
+            <DeleteInternshipDialog />
           </>
         )}
 
         <Button
           variant="ghost"
           as={Link}
-          className="rounded-full h-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400"
+          className="rounded-full h-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400 ml-auto"
           href={`/`}
         >
           <XMarkIcon className="size-5" />
@@ -75,6 +61,7 @@ export default async function InternshipPage({
           <>
             <div className="border-t" />
             <Application
+              lng={lng}
               application={internship.myApplication}
               controls={
                 <div className="flex gap-2">
@@ -89,14 +76,17 @@ export default async function InternshipPage({
                   )}
 
                   {internship.myApplication.status !== Status.Accepted && (
-                    <Button
-                      as={Link}
-                      href={`/${internshipId}/application/delete`}
-                      size="icon"
-                      variant="destructive"
-                    >
-                      <TrashIcon className="size-5" />
-                    </Button>
+                    <DeleteApplicationDialog
+                      internId={internship.myApplication.id}
+                    />
+                    // <Button
+                    //   as={Link}
+                    //   href={`/${internshipId}/application/delete`}
+                    //   size="icon"
+                    //   variant="destructive"
+                    // >
+                    //   <TrashIcon className="size-5" />
+                    // </Button>
                   )}
                 </div>
               }

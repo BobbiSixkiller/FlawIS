@@ -299,13 +299,12 @@ export class UserResolver {
 
   @Authorized("ADMIN")
   @Query(() => String)
-  async inviteUsers(
-    @Arg("input") { emails }: OrganizationEmails,
-    @Ctx() { req }: Context
-  ) {
+  async inviteUsers(@Arg("input") { emails }: OrganizationEmails) {
     await this.userServiska.sendRegistrationLinks(
       emails,
-      req.headers["tenant-domain"] as string
+      process.env.NODE_ENV === "production"
+        ? "intern.flaw.uniba.sk"
+        : "intern-staging.flaw.uniba.sk"
     );
 
     return "Invites successfully sent!";

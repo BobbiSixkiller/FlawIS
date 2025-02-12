@@ -80,7 +80,7 @@ export default function ConferenceRegistrationForm({
           },
           authors: [],
           conference: conference.id,
-          section: submission?.section || "",
+          section: submission?.section.id || "",
           presentationLng: (submission?.presentationLng ||
             "") as PresentationLng,
         },

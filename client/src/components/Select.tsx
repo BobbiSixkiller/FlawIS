@@ -10,6 +10,7 @@ import {
 } from "@headlessui/react";
 import { useController } from "react-hook-form";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { cn } from "@/utils/helpers";
 
 interface Option {
   name: string;
@@ -57,17 +58,17 @@ export default function Select({
       >
         <ListboxButton
           {...field}
-          className={`h-9 group flex items-center justify-between px-3 ${
-            multiple ? "" : "py-1.5"
-          } outline-none disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none py-1 text-gray-900 shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6 ${
+          className={cn([
+            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none text-gray-900 shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
+            multiple ? "" : "py-1.5",
             fieldState.error
               ? "ring-red-500 focus:ring-red-500"
-              : "focus:ring-primary-500"
-          }`}
+              : "focus:ring-primary-500",
+          ])}
         >
           <span
             className={`line-clamp-1 ${
-              selected ? "text-gray-900" : "text-gray-400"
+              selected && !disabled ? "text-gray-900" : "text-gray-500"
             }`}
           >
             {selected

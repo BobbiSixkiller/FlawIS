@@ -29,9 +29,9 @@ export class I18nService {
       .init(
         {
           debug: false,
-          lng: "en",
-          fallbackLng: "en",
-          supportedLngs: ["en", "sk"],
+          lng: "sk",
+          fallbackLng: "sk",
+          supportedLngs: ["sk", "en"],
           defaultNS: "user",
           ns: [
             "user",

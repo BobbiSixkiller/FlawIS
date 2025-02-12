@@ -24,6 +24,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { t } = await translate(lng, "dashboard");
   const host = headers().get("host") || "flawis.flaw.uniba.sk";
+  const tenant = host.split(".")[0].replace("-staging", "");
 
   return {
     metadataBase:
@@ -31,6 +32,7 @@ export async function generateMetadata(
         ? new URL(`https://${host}`)
         : undefined,
     title: `${t("internships")} | ${t("title")}`,
+    description: t(`${tenant}Desc`),
     openGraph: {
       images: [`/images/Praf-logo-text-${lng}.png`],
     },

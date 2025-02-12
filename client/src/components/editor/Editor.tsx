@@ -7,7 +7,6 @@ import {
   Editor,
   JSONContent,
 } from "@tiptap/react";
-import { defaultExtensions } from "./Extensions";
 import { LinkSelector } from "./selectors/LinkSelector";
 import { items, NodeSelector } from "./selectors/NodeSelector";
 import { TextButtons } from "./selectors/TextButtons";
@@ -17,6 +16,7 @@ import { useController } from "react-hook-form";
 import { cn } from "@/utils/helpers";
 import { SlashCommandExtension } from "./SlashCommand";
 import CommandsDropdown from "./selectors/CommandsDropdown";
+import useLocalizedExtensions from "./Extensions";
 
 interface EditorProps {
   initialValue?: string | JSONContent; // Use HTML or JSON as needed
@@ -25,6 +25,8 @@ interface EditorProps {
 
 export default function TiptapEditor({ initialValue, name }: EditorProps) {
   const { field, fieldState } = useController({ name });
+
+  const { defaultExtensions } = useLocalizedExtensions();
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -52,26 +54,30 @@ export default function TiptapEditor({ initialValue, name }: EditorProps) {
     }
   }, 500);
 
+  if (!editor) {
+    return null;
+  }
+
   return (
     <div>
       <div className="relative">
-        {editor && (
-          <BubbleMenu
-            editor={editor}
-            tippyOptions={{
-              placement: "top",
-              duration: 100,
-            }}
-            className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-black bg-black text-white shadow-xl"
-          >
-            <NodeSelector editor={editor} />
-            <div className="w-px flex-1 bg-white/30" />
-            <LinkSelector editor={editor} />
-            <div className="w-px flex-1 bg-white/30" />
-            <TextButtons editor={editor} />
-          </BubbleMenu>
-        )}
-        {editor && <CommandsDropdown editor={editor} />}
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{
+            placement: "top",
+            duration: 100,
+          }}
+          className="flex w-fit max-w-[90vw] overflow-hidden rounded-md border border-black bg-black text-white shadow-xl"
+        >
+          <NodeSelector editor={editor} />
+          <div className="w-px flex-1 bg-white/30" />
+          <LinkSelector editor={editor} />
+          <div className="w-px flex-1 bg-white/30" />
+          <TextButtons editor={editor} />
+        </BubbleMenu>
+
+        <CommandsDropdown editor={editor} />
+
         <EditorContent editor={editor} />
       </div>
       {fieldState.error && (

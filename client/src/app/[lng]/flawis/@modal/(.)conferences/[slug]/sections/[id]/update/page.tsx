@@ -15,7 +15,11 @@ export default async function UpdateSection({
   }
 
   return (
-    <Modal title="Aktualizovat sekciu">
+    <Modal
+      title="Aktualizovat sekciu"
+      dialogId="update-section"
+      isInterceptingRoute
+    >
       <UpdateSectionForm lng={lng} section={section} />
     </Modal>
   );

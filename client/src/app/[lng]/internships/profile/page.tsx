@@ -5,6 +5,7 @@ import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
 import DynamicImage from "@/components/DynamicImage";
+import Spinner from "@/components/Spinner";
 
 export default async function Profile({
   params: { lng },
@@ -46,7 +47,7 @@ export default async function Profile({
                   style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+                <div className="size-12 rounded-full flex justify-center items-center bg-primary-300 text-white">
                   {user.name
                     .split(" ")
                     .map((n, i) => {
@@ -82,6 +83,16 @@ export default async function Profile({
               {user?.telephone || "N/A"}
             </dd>
           </div>
+          {user.access.includes(Access.Student) && (
+            <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
+              <dt className="text-sm font-medium leading-6 text-gray-900">
+                {t("address")}
+              </dt>
+              <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {user.address && Object.values(user.address).join(", ")}
+              </dd>
+            </div>
+          )}
           {user?.access.includes(Access.Student) && (
             <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
               <dt className="text-sm font-medium leading-6 text-gray-900">

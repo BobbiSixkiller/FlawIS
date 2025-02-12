@@ -7,16 +7,20 @@
     />
 
     <style>
-      h1 {font-family: UKsans, Roboto, sans-serif;} p, a{font-family: Roboto,
-      sans-serif;}
+      h1, p, a {font-family: UKsans, Roboto, sans-serif;} 
     </style>
   </head>
   <body>
-    <h1>{{t 'internEligible.subject'}}</h1>
+    <h1>{{t 'intern.eligible.subject'}}</h1>
     <p>{{t 'common.greetings'}}
       {{name}}
     </p>
-    <p>{{t 'intern.eligible.body'}}</p>
-    <a href={{url}}>{{t 'intern.eligible.link'}}</a>
+    <p>{{t 'intern.eligible.body' organization=organization}}</p>
+    <a href={{url}}>{{t 'intern.link'}}</a>
+     <p>{{t 'common.bye'}}</p>
+         <p>FlawIS team</p>
+
+    </br>
+    <p>{{t 'common.no-reply'}}</p>
   </body>
 </html>

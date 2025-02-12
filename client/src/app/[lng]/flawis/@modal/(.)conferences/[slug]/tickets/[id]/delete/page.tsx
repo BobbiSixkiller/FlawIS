@@ -10,7 +10,7 @@ export default async function DeleteTicketPage({
   const conference = await getConference(slug);
 
   return (
-    <Modal title="Zmazat listok">
+    <Modal title="Zmazat listok" dialogId="delete-ticket" i18nIsDynamicList>
       <DeleteTicketForm
         lng={lng}
         ticket={conference?.tickets.find((t) => t.id === id)}

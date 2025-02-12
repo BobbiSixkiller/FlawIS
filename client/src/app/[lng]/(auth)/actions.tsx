@@ -55,14 +55,9 @@ export async function activate() {
       return;
     }
 
-    const res = await executeGqlFetch(
-      ActivateUserDocument,
-      undefined,
-      {
-        activation: token,
-      },
-      { revalidate: 60 * 60 }
-    );
+    const res = await executeGqlFetch(ActivateUserDocument, undefined, {
+      activation: token,
+    });
 
     if (res.errors) {
       throw new Error(res.errors[0].message);

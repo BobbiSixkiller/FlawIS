@@ -13,8 +13,8 @@ export default async function UpdateProfilePage({
   const { t } = await translate(lng, "profile");
 
   return (
-    <Modal title={t("heading")}>
-      <UserForm user={user} namespace="profile" inModal />
+    <Modal title={t("heading")} dialogId="update-profile" isInterceptingRoute>
+      <UserForm user={user} namespace="profile" />
     </Modal>
   );
 }

@@ -3,6 +3,11 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type AcademicYear {
+  academicYear: String!
+  count: Int!
+}
+
 """User access inside the FLAWIS system"""
 enum Access {
   Admin
@@ -204,9 +209,11 @@ type ImportantDates {
 """Ovject type representing student who applies for an internship"""
 type Intern {
   createdAt: DateTimeISO!
-  files: [String!]!
+  fileUrls: [String!]!
   id: ObjectId!
   internship: ObjectId!
+  organization: String!
+  organizationFeedbackUrl: String
   status: Status!
   updatedAt: DateTimeISO!
   user: UserReferece!
@@ -246,11 +253,14 @@ type Internship {
   myApplication: Intern
   organization: String!
   updatedAt: DateTimeISO!
-  user: UserReferece!
+
+  """User document reference"""
+  user: String!
 }
 
 """InternshipConnection type enabling cursor based pagination"""
 type InternshipConnection {
+  academicYears: [AcademicYear!]!
   edges: [InternshipEdge]!
   pageInfo: InternshipPageInfo!
   totalCount: Int!
@@ -361,6 +371,7 @@ type Mutation {
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
+  updateOrgFeedback(fileUrl: String, id: ObjectId!): InternMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
   updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
   updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
@@ -396,9 +407,9 @@ type Query {
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
-  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: Status, user: ObjectId): InternConnection!
+  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: [Status!], user: ObjectId): InternConnection!
   internship(id: ObjectId!): Internship!
-  internships(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
+  internships(academicYear: String, after: ObjectId, contextUserId: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
@@ -406,12 +417,13 @@ type Query {
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  users(after: ObjectId, first: Int! = 20): UserConnection!
+  users(access: [Access!], after: ObjectId, first: Int! = 20): UserConnection!
 }
 
 """New user input data"""
 input RegisterUserInput {
   access: [Access!]
+  address: AddressInput
   avatarUrl: String
   cvUrl: String
   email: String!
@@ -568,6 +580,7 @@ type TicketTranslations {
 """The user model entity"""
 type User {
   access: [Access!]!
+  address: Address
   avatarUrl: String
   billings: [Billing]!
   createdAt: DateTimeISO!
@@ -598,6 +611,7 @@ type UserEdge {
 """FlawIS user base input"""
 input UserInput {
   access: [Access!]
+  address: AddressInput
   avatarUrl: String
   cvUrl: String
   email: String!
@@ -620,6 +634,7 @@ type UserPageInfo {
 
 """User stub type"""
 type UserReferece {
+  address: Address!
   avatarUrl: String
   email: String!
 

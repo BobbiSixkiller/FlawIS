@@ -38,18 +38,14 @@ export class InternshipService {
   }
 
   async getInternship(id: ObjectId) {
-    try {
-      const internship = await this.crudService.findOne({ _id: id });
-      if (!internship) {
-        throw new Error(
-          this.i18nService.translate("notFound", { ns: "internship" })
-        );
-      }
-
-      return internship;
-    } catch (error: any) {
-      throw new Error(`Error fetching internship: ${error.message}`);
+    const internship = await this.crudService.findOne({ _id: id });
+    if (!internship) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "internship" })
+      );
     }
+
+    return internship;
   }
 
   async createInternship(data: InternshipInput, ctxUser: User) {
@@ -61,10 +57,8 @@ export class InternshipService {
     return await this.crudService.create({
       ...data,
       organization: user.organization,
-      user: {
-        name: user?.name,
-        _id: user?.id,
-      },
+      user: user.id,
+      language: this.i18nService.language(),
     });
   }
 

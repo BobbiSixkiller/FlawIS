@@ -6,17 +6,21 @@
       rel='stylesheet'
     />
 
-    <style>
-      h1 {font-family: UKsans, Roboto, sans-serif;} p, a{font-family: Roboto,
-      sans-serif;}
+     <style>
+      h1, p, a {font-family: UKsans, Roboto, sans-serif;} 
     </style>
   </head>
   <body>
-    <h1>{{t 'internApplied.subject'}}</h1>
+    <h1>{{t 'intern.applied.subject'}}</h1>
     <p>{{t 'common.greetings'}}
       {{name}}
     </p>
-    <p>{{t 'intern.applied.body'}}</p>
-    <a href={{url}}>{{t 'intern.applied.link'}}</a>
+    <p>{{t 'intern.applied.body' organization=organization}}</p>
+    <a href={{url}}>{{t 'intern.link'}}</a>
+     <p>{{t 'common.bye'}}</p>
+         <p>FlawIS team</p>
+
+    </br>
+    <p>{{t 'common.no-reply'}}</p>
   </body>
 </html>

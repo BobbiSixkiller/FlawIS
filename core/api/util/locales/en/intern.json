@@ -3,5 +3,8 @@
   "update": "Intern {{name}} has been updated.",
   "new": "Intern {{name}} has been created.",
   "delete": "Intern {{name}} has been deleted.",
-  "applicationLimitReached": "You can submit 2 applications at most!"
+  "applicationLimitReached": "You can submit 2 applications at most!",
+  "internFiles": "Files has been updated.",
+  "status": "Status of the application was successfully updated.",
+  "feedback": "Certificate of internship completition has been updated."
 }

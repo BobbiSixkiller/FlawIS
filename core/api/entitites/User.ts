@@ -17,7 +17,8 @@ import { signJwt } from "../util/auth";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
-import { Billing } from "./Billing";
+import { Address, Billing } from "./Billing";
+import { UserArgs } from "../resolvers/types/user";
 
 export enum Access {
   Admin = "ADMIN",
@@ -102,6 +103,10 @@ export class User extends TimeStamps {
   @Property()
   name: string;
 
+  @Field(() => Address, { nullable: true })
+  @Property({ type: () => Address, _id: false })
+  address?: Address;
+
   @Field({ nullable: true })
   @Property()
   telephone?: string;
@@ -160,8 +165,7 @@ export class User extends TimeStamps {
 
   public static async paginatedUsers(
     this: ModelType<User>,
-    first: number,
-    after?: ObjectId
+    { first, access, after }: UserArgs
   ) {
     return await this.aggregate([
       { $sort: { _id: -1 } },
@@ -170,13 +174,8 @@ export class User extends TimeStamps {
           data: [
             {
               $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
+                ...(access ? { access: { $in: access } } : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
               },
             },
             { $limit: first || 20 },
@@ -184,13 +183,8 @@ export class User extends TimeStamps {
           hasNextPage: [
             {
               $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
+                ...(access ? { access: { $in: access } } : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
               },
             },
             { $skip: first || 20 }, // skip paginated data

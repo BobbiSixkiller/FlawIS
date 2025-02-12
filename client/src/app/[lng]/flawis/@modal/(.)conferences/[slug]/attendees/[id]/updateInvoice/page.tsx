@@ -10,7 +10,11 @@ export default async function UpdateInvoucePage({
   const attendee = await getAttendee(id);
 
   return (
-    <Modal title="Aktualizovat fakturu">
+    <Modal
+      title="Aktualizovat fakturu"
+      dialogId="update-invoice"
+      isInterceptingRoute
+    >
       <UpdateInvoiceForm lng={lng} invoice={attendee.invoice} />
     </Modal>
   );

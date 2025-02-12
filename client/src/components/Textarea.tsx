@@ -1,12 +1,11 @@
 "use client";
 
+import { cn } from "@/utils/helpers";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
-import { useFormContext } from "react-hook-form";
+import { useController } from "react-hook-form";
 
 export function Textarea({ name, label, onFocus, ...props }: InputProps) {
-  const { register, getFieldState } = useFormContext();
-
-  const { error } = getFieldState(name);
+  const { field, fieldState } = useController({ name });
 
   return (
     <div>
@@ -17,16 +16,20 @@ export function Textarea({ name, label, onFocus, ...props }: InputProps) {
         {label}
       </label>
       <textarea
+        {...field}
         {...props}
         onFocus={onFocus}
-        {...register(name)}
         id={name}
-        placeholder={props.placeholder}
-        className={
-          "disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-        }
+        className={cn([
+          "disabled:bg-slate-100 disabled:text-slate-500 disabled:ring-slate-200 border-transparent focus:border-transparent disabled:shadow-none block w-full rounded-md py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6",
+          fieldState.error
+            ? "ring-red-500 focus:ring-red-500"
+            : "focus:ring-primary-500",
+        ])}
       />
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {fieldState.error && (
+        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      )}
     </div>
   );
 }

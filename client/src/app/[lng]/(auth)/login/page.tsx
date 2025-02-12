@@ -18,7 +18,7 @@ export default async function LoginPage({
   const subdomain = host.split(".")[0];
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
         {t("heading")}
       </h2>

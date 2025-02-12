@@ -22,6 +22,9 @@ export interface AuthMsg extends Msg {
 
 export interface InternshipMsg extends Msg {
   internshipId: string;
+  internId?: string;
+  organization: string;
+  count?: number;
 }
 
 @Injectable()
@@ -229,12 +232,13 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: msg.email,
-      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
-      template: 'newOrg',
+      subject: this.i18n.t('intern.applied.subject', { lang: msg.locale }),
+      template: 'internApplied',
       context: {
         url,
         i18nLang: msg.locale,
         name: msg.name,
+        organization: msg.organization,
       },
     });
   }
@@ -252,19 +256,20 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: msg.email,
-      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
-      template: 'newOrg',
+      subject: this.i18n.t('intern.eligible.subject', { lang: msg.locale }),
+      template: 'internEligible',
       context: {
         url,
         i18nLang: msg.locale,
         name: msg.name,
+        organization: msg.organization,
       },
     });
   }
 
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
-    routingKey: 'mail.internships.eligible',
+    routingKey: 'mail.internships.accepted',
   })
   async sendInternAccepted(msg: InternshipMsg) {
     const url = `${
@@ -275,12 +280,13 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: msg.email,
-      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
-      template: 'newOrg',
+      subject: this.i18n.t('intern.accepted.subject', { lang: msg.locale }),
+      template: 'internAccepted',
       context: {
         url,
         i18nLang: msg.locale,
         name: msg.name,
+        organization: msg.organization,
       },
     });
   }
@@ -298,12 +304,65 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: msg.email,
-      subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
-      template: 'newOrg',
+      subject: this.i18n.t('intern.rejected.subject', { lang: msg.locale }),
+      template: 'internRejected',
       context: {
         url,
         i18nLang: msg.locale,
         name: msg.name,
+        organization: msg.organization,
+      },
+    });
+  }
+
+  //implement llink to intern
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.admin',
+  })
+  async sendAdminInternNotification(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/internships/${msg.internshipId}/applications/${
+      msg.internId
+    }`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('intern.admin.subject', { lang: msg.locale }),
+      template: 'adminPendingIntern',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        organization: msg.organization,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.internships.org',
+  })
+  async sendOrgInternsNotification(msg: InternshipMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.internshipId}/applications`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('intern.org.subject', { lang: msg.locale }),
+      template: 'orgPendingInterns',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        organization: msg.organization,
+        count: msg.count,
       },
     });
   }

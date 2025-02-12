@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { activate } from "../actions";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -14,5 +15,5 @@ export async function GET(req: NextRequest) {
     await activate();
   }
 
-  return NextResponse.redirect(new URL("/", req.url));
+  return redirect("/");
 }

@@ -12,5 +12,17 @@
   "deleteConfirm": "Do you really wish to delete {{name}}?",
   "notFound": "Nothing found.",
   "flaw": "Comenius University in Bratislava, Faculty of Law",
-  "updatedAt": "Updated at {{ value }}"
+  "updatedAt": "Updated at {{ value }}",
+  "submit": "Submit",
+  "upload": "Upload",
+  "placeholder": {
+    "heading": "Heading {{ lvl }}...",
+    "list": "Bullet point...",
+    "default": "Press '/' to change element..."
+  },
+  "street": "Street",
+  "city": "City",
+  "postal": "Postal",
+  "country": "Country",
+  "address": "Address"
 }

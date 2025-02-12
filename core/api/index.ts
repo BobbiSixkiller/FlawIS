@@ -28,6 +28,7 @@ import { SubmissionResolver } from "./resolvers/submission";
 import { AttendeeResolver } from "./resolvers/attendee";
 import { InternshipResolver } from "./resolvers/internship";
 import { InternResolver } from "./resolvers/intern";
+import { CronJobService } from "./services/cronService";
 
 env.config();
 
@@ -44,6 +45,8 @@ async function mongoDbConnect() {
     setTimeout(() => mongoDbConnect(), 15 * 1000);
   }
 }
+
+const cronService = Container.get(CronJobService);
 
 async function main() {
   //Build schema
@@ -104,6 +107,7 @@ async function main() {
   );
 
   await mongoDbConnect();
+  cronService.start();
 
   httpServer.listen({ port }, () =>
     console.log(

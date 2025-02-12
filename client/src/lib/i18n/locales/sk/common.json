@@ -12,5 +12,17 @@
   "deleteConfirm": "Naozaj si prajete zmazať {{name}}?",
   "notFound": "Nič sa nenašlo.",
   "flaw": "Univerzita Komenského v Bratislave, Právnická fakulta",
-  "updatedAt": "Aktualizované {{ value }}"
+  "updatedAt": "Aktualizované {{ value }}",
+  "submit": "Zaslať",
+  "upload": "Nahrať",
+  "placeholder": {
+    "heading": "Nadpis {{ lvl }}...",
+    "list": "Text odrazky...",
+    "default": "Stlačte '/' pre zmenu textu..."
+  },
+  "street": "Ulica",
+  "city": "Mesto",
+  "postal": "PSČ",
+  "country": "Krajina",
+  "address": "Adresa"
 }

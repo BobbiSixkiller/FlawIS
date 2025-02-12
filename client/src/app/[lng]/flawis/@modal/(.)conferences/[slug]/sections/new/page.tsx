@@ -10,7 +10,7 @@ export default async function NewSectionPage({
   const conference = await getConference(slug);
 
   return (
-    <Modal title="Nova sekcia">
+    <Modal title="Nova sekcia" dialogId="new-section" isInterceptingRoute>
       <NewSectionForm lng={lng} conference={conference} />
     </Modal>
   );

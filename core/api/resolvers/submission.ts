@@ -53,7 +53,7 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionMutationResponse)
   async createSubmission(
     @Arg("data") data: SubmissionInput,
-    @Ctx() { user }: Context
+    @Ctx() { user, req }: Context
   ): Promise<SubmissionMutationResponse> {
     const submission = await this.submissionService.create({
       ...data,
@@ -69,6 +69,7 @@ export class SubmissionResolver {
         this.rmqService.produceMessage(
           JSON.stringify({
             locale: this.i18nService.language(),
+            hostname: req.headers["tenant-domain"],
             name: user?.name,
             email: author,
             conferenceName:

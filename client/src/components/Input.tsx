@@ -3,6 +3,7 @@
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 import { useController } from "react-hook-form";
+import { cn } from "@/utils/helpers";
 
 export function Input({
   name,
@@ -10,6 +11,7 @@ export function Input({
   onFocus,
   showPassword,
   setShowPassword,
+  className,
   ...props
 }: InputProps) {
   const { field, fieldState } = useController({ name });
@@ -25,11 +27,13 @@ export function Input({
         </label>
       )}
       <div
-        className={`flex items-center disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
+        className={cn([
+          "flex items-center disabled:bg-slate-100 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 border-none",
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
-            : "focus-within:ring-primary-500"
-        } focus-within:ring-2 border-none`}
+            : "focus-within:ring-primary-500",
+          className,
+        ])}
       >
         <input
           className={

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
@@ -22,6 +22,7 @@ import {
 import Select from "@/components/Select";
 import {
   Access,
+  Address,
   StudyProgramme,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
@@ -32,17 +33,16 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import ImageFileInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
+import { useDialog } from "@/providers/DialogProvider";
 
 export default function UserForm({
   user,
   subdomain,
   namespace,
-  inModal,
 }: {
   user?: UserFragment;
   subdomain?: string;
   namespace: string;
-  inModal?: boolean;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
@@ -56,27 +56,29 @@ export default function UserForm({
       false
   );
 
-  const fetchFiles = useCallback(async () => {
-    try {
-      if (user?.cvUrl) {
-        const file = await fetchFromMinio("resumes", user.cvUrl);
-        methods.setValue("files", [file]);
-      }
-
-      if (user?.avatarUrl) {
-        const avatar = await fetchFromMinio("avatars", user.avatarUrl);
-        methods.setValue("avatar", avatar);
-      }
-
-      setLoadingFile(false);
-    } catch (error: any) {
-      console.log(error.message);
-      methods.setError("files", { message: error.message });
-      setLoadingFile(false);
-    }
-  }, []);
-
   useEffect(() => {
+    async function fetchFiles() {
+      {
+        try {
+          if (user?.cvUrl) {
+            const file = await fetchFromMinio("resumes", user.cvUrl);
+            methods.setValue("files", [file]);
+          }
+
+          if (user?.avatarUrl) {
+            const avatar = await fetchFromMinio("avatars", user.avatarUrl);
+            methods.setValue("avatar", avatar);
+          }
+
+          setLoadingFile(false);
+        } catch (error: any) {
+          console.log(error.message);
+          methods.setError("files", { message: error.message });
+          setLoadingFile(false);
+        }
+      }
+    }
+
     fetchFiles();
   }, []);
 
@@ -93,7 +95,7 @@ export default function UserForm({
           .when({
             is: () =>
               (searchParams.get("token") === null &&
-                subdomain?.includes("internships")) ||
+                subdomain?.includes("intern")) ||
               user?.access.includes(Access.Student), // When creating student account on internships tenant
             then: (schema) =>
               schema.matches(
@@ -137,14 +139,32 @@ export default function UserForm({
                   )
               : schema.transform((value) => (!value ? null : value)).nullable()
           ),
-        organization: yup.string().trim().nullable().required(),
+        address: yup
+          .object({
+            street: yup.string(),
+            city: yup.string(),
+            postal: yup.string(),
+            country: yup.string(),
+          })
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) =>
+              schema.shape({
+                street: yup.string().trim().required(),
+                city: yup.string().trim().required(),
+                postal: yup.string().trim().required(),
+                country: yup.string().trim().required(),
+              }),
+          }),
+        organization: yup.string().trim().required(),
         telephone: yup
           .string()
           .trim()
           .nullable()
-          .when([], {
+          .when({
             is: () =>
               subdomain?.includes("conferences") ||
+              subdomain?.includes("intern") ||
               user?.access.includes(Access.Student),
             then: (schema) =>
               schema
@@ -159,7 +179,13 @@ export default function UserForm({
                   }
                 ),
           }),
-        studyProgramme: yup.mixed<StudyProgramme>().nullable(),
+        studyProgramme: yup
+          .mixed<StudyProgramme>()
+          .nullable()
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) => schema.required(),
+          }),
         access: yup.array().of(yup.string<Access>().required()),
         privacy: yup
           .boolean()
@@ -169,7 +195,14 @@ export default function UserForm({
           .array()
           .of(yup.mixed<File>().required())
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
-          .required(),
+          .required()
+          .when({
+            is: () => user?.access.includes(Access.Student),
+            then: (schema) =>
+              schema.min(1, (val) =>
+                t("minFiles", { value: val.min, ns: "validation" })
+              ),
+          }),
         avatar: mixed<File>()
           .nullable()
           .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
@@ -182,6 +215,12 @@ export default function UserForm({
       email: user?.email || "",
       password: "",
       confirmPass: "",
+      address: user?.address || {
+        city: "",
+        country: "",
+        postal: "",
+        street: "",
+      },
       access: user?.access || [],
       organization: user?.organization || "",
       telephone: user?.telephone || "",
@@ -203,6 +242,8 @@ export default function UserForm({
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { closeDialog } = useDialog();
+
   if (loadingFile)
     return (
       <div className="h-full sm:w-96 mx-auto flex flex-col items-center justify-center">
@@ -213,7 +254,7 @@ export default function UserForm({
   return (
     <FormProvider {...methods}>
       <form
-        className={`space-y-6 mt-4 w-full ${inModal && "sm:w-96"}`}
+        className={`space-y-6 mt-4`}
         onSubmit={methods.handleSubmit(
           async (val) => {
             const { error, url } = await uploadOrDelete(
@@ -256,6 +297,7 @@ export default function UserForm({
                 studyProgramme: val.studyProgramme as StudyProgramme,
                 cvUrl: url,
                 avatarUrl,
+                address: val.address ? (val.address as Address) : undefined,
               });
             } else {
               state = await addUser({
@@ -280,6 +322,8 @@ export default function UserForm({
                 type: ActionTypes.SetAppMsg,
                 payload: state,
               });
+
+              closeDialog("update-profile");
               router.back();
             }
           },
@@ -288,7 +332,9 @@ export default function UserForm({
       >
         <FormMessage />
 
-        <ImageFileInput name="avatar" label="Fotka" />
+        {path.includes("update") && (
+          <ImageFileInput name="avatar" label="Fotka" />
+        )}
 
         <Input label={t("name")} name="name" />
         <Input label={t("email")} name="email" />
@@ -315,6 +361,24 @@ export default function UserForm({
 
         {(path.includes("users") || user?.access.includes(Access.Student)) && (
           <>
+            <div className="flex gap-2 w-full">
+              <Input
+                label={t("street", { ns: "common" })}
+                name="address.street"
+              />
+              <Input label={t("city", { ns: "common" })} name="address.city" />
+            </div>
+            <div className="flex gap-2 w-full">
+              <Input
+                label={t("postal", { ns: "common" })}
+                name="address.postal"
+              />
+              <Input
+                label={t("country", { ns: "common" })}
+                name="address.country"
+              />
+            </div>
+
             <Select
               name="studyProgramme"
               label="Ročník"

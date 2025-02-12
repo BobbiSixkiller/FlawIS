@@ -55,6 +55,7 @@ export default function ImageFileInput({
             fill
             style={{ objectFit: "cover" }}
             className="rounded-full"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
         <label className="cursor-pointer bg-primary-100 px-5 py-1 hover:bg-primary-200 text-primary-600 rounded-full font-semibold">

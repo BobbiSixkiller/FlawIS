@@ -4,27 +4,32 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
 import logo from "../../public/images/Flaw-logo-notext.png";
 import { translate } from "@/lib/i18n";
+import { cn } from "@/utils/helpers";
 
 export default async function Logo({
   lng,
   notext = false,
   inverted = false,
-  height,
-  width,
+  height = 60,
+  width = 60,
+  className,
 }: {
-  height: number;
-  width: number;
+  height?: number;
+  width?: number;
   lng: string;
   notext?: boolean;
   inverted?: boolean;
+  className?: string;
 }) {
   const { t } = await translate(lng, "dashboard");
 
   return (
     <div
-      className={`flex gap-4 font-normal ${
-        inverted ? "text-white" : "text-gray-900"
-      }`}
+      className={cn([
+        "flex gap-4 font-normal",
+        inverted ? "text-white" : "text-gray-900",
+        className,
+      ])}
     >
       <Image
         src={inverted ? logoInverted : logo}

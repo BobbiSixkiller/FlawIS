@@ -1,28 +1,29 @@
-import Button from "@/components/Button";
 import DynamicImage from "@/components/DynamicImage";
 import { ApplicationFragment, Status } from "@/lib/graphql/generated/graphql";
+import { translate } from "@/lib/i18n";
 import { displayDate } from "@/utils/helpers";
-import {
-  EnvelopeIcon,
-  PencilIcon,
-  PhoneIcon,
-  TrashIcon,
-  UserIcon,
-} from "@heroicons/react/24/outline";
+import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { ReactNode } from "react";
 
-export function Application({
+export async function Application({
   application,
   controls,
+  lng,
 }: {
   application: ApplicationFragment;
   controls: ReactNode;
+  lng: string;
 }) {
+  const { t } = await translate(lng, ["internships", "common"]);
+
   return (
     <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 shadow-sm space-y-3">
-      <h2 className="text-xl text-primary-500 font-semibold">Prihlaska</h2>
-      <div className="flex flex-wrap gap-6">
+      <h2 className="text-xl text-primary-500 font-semibold">
+        {t("application")}
+      </h2>
+
+      <div className="flex items-center flex-wrap gap-6">
         <div className="relative flex items-center gap-x-4">
           {application.user.avatarUrl ? (
             <DynamicImage
@@ -48,13 +49,15 @@ export function Application({
               <span className="absolute inset-0" />
               {application.user.name}
             </p>
-            <p className="text-gray-600">{application.user.studyProgramme}</p>
+            <p className="text-gray-600">
+              {t(application.user.studyProgramme)}
+            </p>
           </div>
         </div>
 
         <div>
           <div className="flex flex-wrap gap-2">
-            <p>Kontakt:</p>
+            <p>{t("contact")}:</p>
             <ul className="flex flex-wrap gap-2">
               <li>
                 <a
@@ -76,9 +79,14 @@ export function Application({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <p>Prilozene subory:</p>
+            <p>{t("address", { ns: "common" })}:</p>
+            <p>{Object.values(application.user.address).join(", ")}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <p>{t("files")}</p>
             <ul className="flex flex-wrap gap-2">
-              {application.files.map((url, i) => {
+              {application.fileUrls.map((url, i) => {
                 const fileName =
                   url.split("/").pop()?.split("-").pop() || "File";
 
@@ -93,26 +101,33 @@ export function Application({
                   </li>
                 );
               })}
+              {application.organizationFeedbackUrl && (
+                <li>
+                  <Link
+                    className="text-primary-500 hover:underline"
+                    href={`/minio?bucketName=internships&url=${application.organizationFeedbackUrl}`}
+                  >
+                    {application.organizationFeedbackUrl
+                      .split("/")
+                      .pop()
+                      ?.split("-")
+                      .pop() || "File"}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>
       </div>
 
-      {application.status === Status.Accepted && (
-        <a
-          className="text-primary-500 hover:underline"
-          href="https://flaw.uniba.sk"
-          target="_blank"
-        >
-          Forms spokojnost
-        </a>
-      )}
-
       <div className="flex flex-wrap items-end gap-2 justify-between">
         <div className="flex flex-col">
-          Stav: {application.status}
+          Status: {t(application.status)}
           <span className="text-sm">
-            Aktualizovane {displayDate(application.updatedAt)}
+            {t("updatedAt", {
+              ns: "common",
+              value: displayDate(application.updatedAt, lng),
+            })}
           </span>
         </div>
 

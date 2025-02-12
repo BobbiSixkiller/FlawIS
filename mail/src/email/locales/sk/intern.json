@@ -1,0 +1,31 @@
+{
+  "link": "Prejsť na stáž",
+  "applied": {
+    "subject": "Prihláška na stáž – vytvorená",
+    "body": "Požiadali ste o stáž v {organization}. Keď sa stav vašej prihlášky zmení, dostanete upozornenie."
+  },
+  "eligible": {
+    "subject": "Prihláška na stáž – potvrdená fakultou",
+    "body": "Vaša žiadosť o stáž v {organization} bola posúdená a schválená oddelením, ktoré vybavuje stáže na Právnickej fakulte Univerzity Komenského v Bratislave. O zmene stavu Vašej prihlášky Vás budeme informovať."
+  },
+  "accepted": {
+    "subject": "Prihláška na stáž – prijatá",
+    "body": "Blahoželáme! Vaša žiadosť o stáž v {organization} bola prijatá. Ďalšie podrobnosti o stáži a ďalších krokoch vám čoskoro oznámime."
+  },
+  "rejected": {
+    "subject": "Prihláška na stáž – zamietnutá",
+    "body": "S poľutovaním vám oznamujeme, že vaša žiadosť o stáž v {organization} nebola úspešná. Ďakujeme za váš záujem a odporúčame, aby ste sa v budúcnosti prihlásili znova."
+  },
+  "admin": {
+    "subject": "Nové prihlášky na stáže",
+    "body": "Bolo vytvorená nová prihláška na stáž v {organization}, ktorú je potrebné sprocesovať."
+  },
+  "org": {
+    "subject": "Nové prihlášky na vašu stáž",
+    "body": {
+      "one": "Radi by sme Vám pripomenuli, že máte {count} prihlášku čakajúcu na kontrolu.",
+      "other": "Radi by sme Vám pripomenuli, že máte {count} prihlášok čakajúcich na kontrolu.",
+      "zero": "Žiadne nové prihlášky."
+    }
+  }
+}

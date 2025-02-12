@@ -1,25 +1,16 @@
 import Button from "@/components/Button";
 import Link from "next/link";
-import {
-  CheckIcon,
-  EnvelopeIcon,
-  PhoneIcon,
-  TrashIcon,
-  UserIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { displayDate } from "@/utils/helpers";
-import { XCircleIcon } from "@heroicons/react/20/solid";
-import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/actions";
-import DynamicImage from "@/components/DynamicImage";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Status } from "@/lib/graphql/generated/graphql";
-import ChangeStatusForm from "./ChangeStatusForm";
+import ChangeStatusDialog from "./ChangeStatusDialog";
 import { Application } from "@/app/[lng]/internships/[internshipId]/Application";
+import DeleteApplicationDialog from "@/app/[lng]/internships/[internshipId]/DeleteApplicationDialog";
+import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/[internId]/actions";
 
 export default async function InternPage({
-  params: { internshipId, internId },
+  params: { internshipId, internId, lng },
 }: {
-  params: { internshipId: string; internId: string };
+  params: { internshipId: string; internId: string; lng: string };
 }) {
   const intern = await getIntern(internId);
 
@@ -34,24 +25,18 @@ export default async function InternPage({
         <XMarkIcon className="size-5" />
       </Button>
       <Application
+        lng={lng}
         application={intern}
         controls={
           <div className="flex gap-2">
-            <Button
-              as={Link}
-              href={`/internships/${internshipId}/applications/${internId}/delete`}
-              size="icon"
-              variant="destructive"
-            >
-              <TrashIcon className="size-5" />
-            </Button>
+            <DeleteApplicationDialog internId={intern.id} />
 
-            <ChangeStatusForm
+            <ChangeStatusDialog
               status={Status.Eligible}
               disabled={intern.status === Status.Eligible}
             />
 
-            <ChangeStatusForm
+            <ChangeStatusDialog
               status={Status.Rejected}
               disabled={intern.status === Status.Rejected}
             />

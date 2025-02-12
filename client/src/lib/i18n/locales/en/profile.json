@@ -18,5 +18,6 @@
   "Master1": "1st Master",
   "Master2": "2nd Master",
   "password": "Password",
-  "confirmPass": "Confirm password"
+  "confirmPass": "Confirm password",
+  "address": "Address"
 }

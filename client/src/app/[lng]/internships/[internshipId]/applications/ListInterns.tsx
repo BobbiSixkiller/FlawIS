@@ -58,11 +58,11 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
         </div>
 
         <div className="sm:flex sm:flex-col sm:items-end sm:text-right">
-          <p className="text-sm/6 text-gray-900">{data?.status}</p>
+          <p className="text-sm/6 text-gray-900">{t(data!.status)}</p>
           <p className="mt-1 text-xs/5 text-gray-500">
             {t("updatedAt", {
               ns: "common",
-              value: displayDate(data?.updatedAt),
+              value: displayDate(data?.updatedAt, lng),
             })}
           </p>
         </div>

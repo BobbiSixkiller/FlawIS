@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <link
+      href='https://fonts.googleapis.com/css2?family=Roboto&display=swap'
+      rel='stylesheet'
+    />
+
+    <style>
+      h1, p, a {font-family: "Roboto", sans-serif;}
+    </style>
+  </head>
+  <body>
+    <h1>{{t 'intern.admin.subject'}}</h1>
+    <p>{{t 'common.greetings'}}
+      {{name}}
+    </p>
+    <p>{{t 'intern.admin.body' organization=organization}}</p>
+    <a href={{url}}>{{t 'intern.link'}}</a>
+     <p>{{t 'common.bye'}}</p>
+    <p>FlawIS team</p>
+
+    </br>
+    <p>{{t 'common.no-reply'}}</p>
+  </body>
+</html>

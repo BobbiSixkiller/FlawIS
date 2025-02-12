@@ -7,5 +7,4 @@ export interface AuthorMsg extends Msg {
   submissionName: string;
   submissionAbstract: string;
   submissionKeywords: string[];
-  hostname: string;
 }
