@@ -36,7 +36,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 mt-4"
+        className="space-y-6"
         onSubmit={methods.handleSubmit(
           async (val) => {
             const state = await login(val.email, val.password, url);

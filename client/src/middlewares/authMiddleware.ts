@@ -37,8 +37,11 @@ export function withAuth(middleware: CustomMiddleware) {
         // In case the referer contains an encoded "url" parameter, decode it:
         const urlParam = refererUrl.searchParams.get("url");
         if (urlParam) {
+          console.log("RUNS WITH REFERER URL PARAM");
+
           redirectTo = decodeURIComponent(urlParam);
         } else {
+          console.log("RUNS WITH REFERER URL");
           redirectTo = `${refererUrl.pathname}${refererUrl.search}`;
         }
       } else {
