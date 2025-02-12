@@ -6,7 +6,7 @@ import { MobileNav, NavItem, ProfileMenuItem } from "@/components/MobileNav";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import MissingResume from "./MissingResume";
+import MissingStudentData from "./MissingStudentData";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
@@ -56,6 +56,9 @@ export default async function DashboardLayout({
   }
 
   const { t, i18n } = await translate(lng, "dashboard");
+
+  const host = headers().get("host") || ""; // Get the hostname from the request
+  const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
@@ -156,7 +159,7 @@ export default async function DashboardLayout({
         </div>
       </div>
 
-      <MissingResume />
+      <MissingStudentData subdomain={subdomain} user={user} />
       <ActivateAccountDialog lng={lng} user={user} />
       <SessionPolling />
       {modal}

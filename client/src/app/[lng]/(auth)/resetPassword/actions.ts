@@ -31,6 +31,7 @@ export async function resetPassword(password: string, token: string) {
         expires, //accesstoken expires in 24 hours
         secure: process.env.NODE_ENV !== "development",
         sameSite: "lax",
+        path: "/", // make it available on every route
         domain:
           process.env.NODE_ENV === "development"
             ? "localhost"

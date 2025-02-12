@@ -13,12 +13,7 @@ import CheckBox from "@/components/Checkbox";
 import PhoneInput from "@/components/PhoneInput";
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { FormMessage } from "@/components/Message";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import Select from "@/components/Select";
 import {
   Access,
@@ -39,14 +34,15 @@ export default function UserForm({
   user,
   subdomain,
   namespace,
+  dialogId,
 }: {
   user?: UserFragment;
   subdomain?: string;
   namespace: string;
+  dialogId?: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
-  const router = useRouter();
   const path = usePathname();
   const searchParams = useSearchParams();
 
@@ -109,7 +105,7 @@ export default function UserForm({
           .string()
           .trim()
           .when({
-            is: () => path.includes("update"),
+            is: () => namespace === "profile",
             then: (schema) =>
               schema
                 .transform((value) => (!value ? null : value))
@@ -286,7 +282,10 @@ export default function UserForm({
                 organization: val.organization ? val.organization : undefined,
                 telephone: val.telephone ? val.telephone : undefined,
               });
-            } else if (path.includes("update") && user) {
+            } else if (
+              (path.includes("update") || namespace === "profile") &&
+              user
+            ) {
               state = await updateUser(user.id, {
                 email: val.email,
                 name: val.name,
@@ -323,8 +322,9 @@ export default function UserForm({
                 payload: state,
               });
 
-              closeDialog("update-profile");
-              router.back();
+              if (dialogId) {
+                closeDialog(dialogId);
+              }
             }
           },
           (errors) => console.log(errors)
@@ -401,7 +401,7 @@ export default function UserForm({
           </>
         )}
 
-        {!path.includes("profile") && (
+        {!path.includes("profile") && namespace !== "profile" && (
           <>
             <Input
               name="password"

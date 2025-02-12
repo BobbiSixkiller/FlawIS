@@ -28,6 +28,7 @@ export async function login(email: string, password: string, url?: string) {
         expires, //accesstoken expires in 24 hours
         secure: process.env.NODE_ENV !== "development",
         sameSite: "lax",
+        path: "/", // make it available on every route
         domain:
           process.env.NODE_ENV === "development"
             ? "localhost"

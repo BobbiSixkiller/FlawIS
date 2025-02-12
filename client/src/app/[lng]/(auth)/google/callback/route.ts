@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     expires, //accesstoken expires in 24 hours
     secure: process.env.NODE_ENV !== "development",
     sameSite: "lax",
+    path: "/", // make it available on every route
     domain:
       process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
   });
