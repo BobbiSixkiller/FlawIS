@@ -45,6 +45,9 @@ export function withAuth(middleware: CustomMiddleware) {
         redirectTo = "/";
       }
       const finalUrl = new URL(redirectTo, url.origin);
+
+      console.log("REDIRECTING TO ", redirectTo);
+
       return NextResponse.redirect(finalUrl);
     }
 
