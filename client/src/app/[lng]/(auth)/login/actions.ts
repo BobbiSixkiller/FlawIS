@@ -38,7 +38,5 @@ export async function login(email: string, password: string, url?: string) {
     return { success: false, message: error.message };
   }
 
-  console.log("REDIRECT URL ", url);
-
   redirect(url ? url : "/", RedirectType.replace);
 }

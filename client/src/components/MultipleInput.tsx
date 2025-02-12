@@ -2,8 +2,9 @@
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { useController, useFormContext } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { InputProps, withLocalizedInput } from "./withLocalizedInput";
+import { cn } from "@/utils/helpers";
 
 export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
   const { field, fieldState } = useController({ name });
@@ -36,12 +37,14 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
         {label}
       </label>
       <div
-        className={`py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 
-            disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 shadow-sm ${
-              focus ? "ring-2 ring-primary-500" : "ring-1"
-            }  ring-gray-300 ${
-          fieldState.error ? "ring-red-500" : ""
-        } shadow-sm sm:text-sm sm:leading-6 relative`}
+        className={cn([
+          "py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6 relative",
+          focus ? "ring-2 ring-primary-500" : "ring-1",
+          fieldState.error ? "ring-red-500" : "",
+          props.disabled
+            ? "text-slate-500 bg-slate-100 ring-slate-200"
+            : "bg-white text-gray-900",
+        ])}
         onClick={() => {
           if (!props.disabled) {
             setFocus(true);
@@ -56,6 +59,7 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
             >
               {p}
               <button
+                disabled={props.disabled}
                 type="button"
                 className="hover:text-gray-500 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
                 onClick={() => {
@@ -68,12 +72,12 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
               </button>
             </div>
           ))}
-        <div className="flex-1 flex gap-1">
+        <div className="flex-1 flex gap-1 bg-transparent">
           <input
             {...props}
             {...field}
             id={name}
-            className="w-full sm:text-sm sm:leading-6 disabled:text-slate-500 disabled:bg-slate-100 text-gray-900 border-none rounded-r-none rounded-l-md p-0 placeholder:text-gray-400 placeholder:truncate focus:ring-transparent"
+            className="w-full sm:text-sm sm:leading-6 bg-transparent text-gray-900 border-none rounded-r-none rounded-l-md p-0 placeholder:truncate focus:ring-transparent"
             onFocus={(e) => {
               if (!props.disabled) {
                 setFocus(true);
@@ -88,8 +92,9 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
             onKeyDown={handleKeyDown}
           />
           <button
+            disabled={props.disabled}
             type="button"
-            className="p-2 hover:text-primary-500 text-gray-400 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
+            className="p-2 disabled:hover:text-gray-400 hover:text-primary-500 text-gray-400 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
             onClick={() => {
               if (input !== "") {
                 field.onChange(Array.from(new Set(strings).add(input)));

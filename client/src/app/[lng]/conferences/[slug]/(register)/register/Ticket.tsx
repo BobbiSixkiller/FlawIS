@@ -1,7 +1,8 @@
 "use client";
 
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
-import { RadioGroup } from "@headlessui/react";
+import { cn } from "@/utils/helpers";
+import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -37,31 +38,25 @@ export default function Ticket({
         Forma ucasti
       </label>
       <RadioGroup
+        aria-label="Conference Tickets"
         disabled={submission !== undefined}
         value={watch("ticketId")}
         onChange={(value) => setValue("ticketId", value)}
       >
-        <RadioGroup.Label className="sr-only">
-          Conference Tickete
-        </RadioGroup.Label>
         <div className="space-y-2">
           {tickets.map((ticket) => (
-            <RadioGroup.Option
+            <Radio
               onClick={() => setSubmission(ticket.withSubmission)}
               key={ticket.id}
               value={ticket.id}
-              className={({ active, checked }) =>
-                `${
-                  active
-                    ? "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300"
-                    : ""
-                }
-                  ${
-                    checked
-                      ? "bg-primary-500 text-white border-none"
-                      : "bg-white"
-                  }
-                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none border`
+              className={({ checked, focus, disabled }) =>
+                cn([
+                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white",
+                  focus &&
+                    "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300",
+                  disabled && "bg-slate-50 text-slate-500 cursor-default",
+                  checked && "bg-primary-500 text-white border-none",
+                ])
               }
             >
               {({ checked }) => (
@@ -69,24 +64,24 @@ export default function Ticket({
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">
                       <div className="text-sm">
-                        <RadioGroup.Label
+                        <Label
                           as="p"
                           className={`font-medium  ${
                             checked ? "text-white" : "text-gray-900"
                           }`}
                         >
                           {ticket.name}
-                        </RadioGroup.Label>
-                        <RadioGroup.Description
+                        </Label>
+                        <Description
                           as="span"
                           className={`inline ${
                             checked ? "text-sky-100" : "text-gray-500"
                           }`}
                         >
-                          <span>{ticket.desc}</span>{" "}
-                          <span aria-hidden="true">&middot;</span>{" "}
+                          <span>{ticket.desc}</span>
+                          <span aria-hidden="true">&middot;</span>
                           <span>{ticket.price} €</span>
-                        </RadioGroup.Description>
+                        </Description>
                       </div>
                     </div>
                     {checked && (
@@ -97,7 +92,7 @@ export default function Ticket({
                   </div>
                 </>
               )}
-            </RadioGroup.Option>
+            </Radio>
           ))}
         </div>
       </RadioGroup>

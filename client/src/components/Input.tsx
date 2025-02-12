@@ -28,7 +28,7 @@ export function Input({
       )}
       <div
         className={cn([
-          "flex items-center disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 border-none",
+          "flex items-center disabled:bg-slate-100 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 border-none",
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500",
