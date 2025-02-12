@@ -1,7 +1,7 @@
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Field, ObjectType, registerEnumType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import { Index, Pre, prop as Property, PropType } from "@typegoose/typegoose";
+import { Index, Pre, prop as Property } from "@typegoose/typegoose";
 import { Ref } from "../util/types";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { InternArgs, InternshipArgs } from "../resolvers/types/internship";
