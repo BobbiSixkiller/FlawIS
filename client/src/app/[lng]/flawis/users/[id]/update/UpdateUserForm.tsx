@@ -16,11 +16,11 @@ import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
-import { updateUser } from "../../../profile/update/actions";
 import { FormMessage } from "@/components/Message";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Spinner from "@/components/Spinner";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
+import { updateUser } from "@/app/[lng]/(auth)/register/actions";
 
 export default function UpdateUserForm({
   lng,
