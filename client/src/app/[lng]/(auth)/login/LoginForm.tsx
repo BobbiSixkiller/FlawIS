@@ -65,7 +65,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
               components={[
                 <Link
                   href="/forgotPassword"
-                  className="text-sm font-semibold text-primary-500 hover:text-primary-700 dark:hover:text-primary-300 focus:outline-primary-500"
+                  className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
                   key={0}
                 />,
               ]}
