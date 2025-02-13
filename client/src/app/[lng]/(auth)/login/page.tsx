@@ -54,7 +54,7 @@ export default async function LoginPage({
                 href={`/register${
                   url ? `?url=${encodeURIComponent(url)}` : ""
                 }`}
-                className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500 dark:hover:text-primary-300"
+                className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
               />
             ),
           }}
