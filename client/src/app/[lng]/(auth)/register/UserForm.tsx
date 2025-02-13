@@ -433,7 +433,7 @@ export default function UserForm({
                       onClick={(e) => e.stopPropagation()}
                       target="_blank"
                       href="https://uniba.sk/ochrana-osobnych-udajov/"
-                      className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+                      className="text-sm font-semibold text-primary-500 hover:text-primary-700 dark:hover:text-primary-300 focus:outline-primary-500"
                     />
                   ),
                 }}

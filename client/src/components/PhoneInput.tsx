@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { Input } from "@headlessui/react";
+import { cn } from "@/utils/helpers";
 
 export default function PhoneInput({
   label,
@@ -18,7 +19,6 @@ export default function PhoneInput({
     name,
   });
 
-  const [focus, setFocus] = useState(false);
   const [phoneField, setPhoneField] = useState({
     code: parsePhoneNumberFromString(field.value)?.countryCallingCode
       ? `+${parsePhoneNumberFromString(field.value)?.countryCallingCode}`
@@ -35,34 +35,33 @@ export default function PhoneInput({
   return (
     <div>
       {label && (
-        <label htmlFor={name} className="text-sm/6 font-medium">
+        <label htmlFor={name} className="text-sm/6 font-medium dark:text-white">
           {label}
         </label>
       )}
       <div
-        className={`border-none shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 ${
-          fieldState.error ? "ring-red-500" : ""
-        } ${focus && fieldState.error ? "ring-2" : ""} ${
-          focus && !fieldState.error ? "ring-2 ring-primary-500" : ""
-        } rounded-md w-full flex mt-1 ${
-          disabled
-            ? "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none"
-            : ""
-        }`}
+        className={cn([
+          "border-none shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 rounded-md w-full flex mt-1 focus-within:ring-2",
+          "dark:bg-gray-800 dark:ring-gray-600",
+          fieldState.error
+            ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
+            : "focus-within:ring-primary-500 ring-gray-300",
+          disabled &&
+            "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none",
+        ])}
       >
         <div className="flex items-center">
           <label htmlFor="code" className="sr-only">
             Country code
           </label>
           <select
-            className="py-1.5 pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-9"
+            className="py-1.5 pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-9 dark:text-white"
             disabled={disabled}
             id="code"
             name="code"
             onChange={(e) =>
               setPhoneField({ ...phoneField, code: e.target.value })
             }
-            onClick={() => setFocus(true)}
             value={phoneField.code}
           >
             <option value={"+421"}>SK +421</option>
@@ -104,10 +103,8 @@ export default function PhoneInput({
           type="number"
           ref={field.ref}
           id={name}
-          className="w-full h-9 sm:text-sm/6 rounded-r-lg py-1.5 text-gray-900 border-transparent focus:border-transparent focus:ring-0 bg-transparent"
-          onFocus={() => setFocus(true)}
+          className="w-full h-9 sm:text-sm/6 rounded-r-lg py-1.5 text-gray-900 dark:text-white border-transparent focus:border-transparent focus:ring-0 bg-transparent"
           onBlur={() => {
-            setFocus(false);
             field.onBlur();
           }}
           autoComplete="off"

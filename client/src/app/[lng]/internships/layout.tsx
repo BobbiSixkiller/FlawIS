@@ -9,8 +9,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import MissingStudentData from "./MissingStudentData";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import ThemeToggler from "@/components/ThemeToggler";
 
 export async function generateMetadata(
   {
@@ -60,6 +61,8 @@ export default async function DashboardLayout({
   const host = headers().get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
+  const theme = cookies().get("theme")?.value;
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Desktop Nav */}
@@ -71,7 +74,10 @@ export default async function DashboardLayout({
             {t("home")}
           </NavItem>
           <ProfileMenuItem lng={lng} user={user} />
-          <LngSwitcher lng={lng} className="mt-auto" />
+          <div className="mt-auto flex gap-2 items-center">
+            <LngSwitcher lng={lng} className="flex-1" />
+            <ThemeToggler dark={theme === "dark"} />
+          </div>
         </nav>
       </div>
       <MobileNav
@@ -84,7 +90,10 @@ export default async function DashboardLayout({
           <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
           {t("home")}
         </NavItem>
-        <LngSwitcher lng={lng} className="mt-auto" />
+        <div className="mt-auto flex gap-2 items-center">
+          <LngSwitcher lng={lng} className="flex-1" />
+          <ThemeToggler dark={theme === "dark"} />
+        </div>
       </MobileNav>
       {/* Dashboard content with sidebar */}
       <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">

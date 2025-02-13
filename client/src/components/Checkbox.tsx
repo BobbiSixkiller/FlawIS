@@ -23,7 +23,7 @@ export default function CheckBox({
         >
           <CheckIcon className="hidden size-3 stroke-2 text-white group-data-[checked]:block" />
         </Checkbox>
-        <Label className="block text-sm font-medium leading-6 text-gray-900">
+        <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
           {label}
         </Label>
       </Field>

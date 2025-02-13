@@ -42,8 +42,8 @@ export default function LngSwitcher({
           alt="Locale-flag"
           priority
           src={`/images/${lng}.svg`}
-          width={authLayout ? 30 : 20}
-          height={authLayout ? 30 : 20}
+          width={authLayout ? 32 : 20}
+          height={authLayout ? 32 : 20}
         />
         {!authLayout && <span className="ml-2">{t(lng)}</span>}{" "}
       </MenuButton>
@@ -57,9 +57,10 @@ export default function LngSwitcher({
         leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems
+          anchor={{ gap: 10, to: authLayout ? "bottom end" : "top" }}
           className={cn([
-            "absolute rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none",
-            authLayout ? "top-10 -left-2 w-28" : "inset-x-0 -top-[88px]",
+            "rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none",
+            authLayout ? "w-fit" : "absolute w-[var(--button-width)] ",
           ])}
         >
           <div className="p-1">
