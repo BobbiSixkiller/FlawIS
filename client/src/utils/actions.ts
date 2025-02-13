@@ -45,3 +45,11 @@ export async function executeGqlFetch<Data, Variables>(
   });
   return (await res.json()) as GraphQLResponse<Data>;
 }
+
+export async function setDarkThemeCookie(val: boolean) {
+  if (val) {
+    cookies().set("theme", "dark");
+  } else {
+    cookies().delete("theme");
+  }
+}

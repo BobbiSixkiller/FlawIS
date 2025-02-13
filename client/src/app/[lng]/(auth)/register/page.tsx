@@ -18,7 +18,7 @@ export default async function Register({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
         {t("heading")}
       </h2>
 
@@ -40,7 +40,7 @@ export default async function Register({
         </div>
       )}
 
-      <p className="mt-10 text-center text-sm text-gray-500">
+      <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-300">
         <Trans
           i18nKey={"login"}
           t={t}
@@ -48,7 +48,7 @@ export default async function Register({
             login: (
               <a
                 href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
-                className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+                className="text-sm font-semibold text-primary-500 hover:text-primary-700 dark:hover:text-primary-300 focus:outline-primary-500"
               />
             ),
           }}

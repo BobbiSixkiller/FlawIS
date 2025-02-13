@@ -17,9 +17,11 @@ import { cn } from "@/utils/helpers";
 export default function LngSwitcher({
   lng,
   className,
+  authLayout,
 }: {
   lng: string;
   className?: string;
+  authLayout?: boolean;
 }) {
   const router = useRouter();
   const path = usePathname();
@@ -29,19 +31,21 @@ export default function LngSwitcher({
   return (
     <Menu as="div" className={cn("relative", className)}>
       <MenuButton
-        className={`h-full w-full 
-          py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white
-        flex items-center`}
+        className={cn([
+          "h-fit w-full flex items-center",
+          authLayout
+            ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500"
+            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white",
+        ])}
       >
         <Image
           alt="Locale-flag"
           priority
           src={`/images/${lng}.svg`}
-          width={20}
-          height={20}
-          className="mr-2"
+          width={authLayout ? 32 : 20}
+          height={authLayout ? 32 : 20}
         />
-        <span>{t(lng)}</span>
+        {!authLayout && <span className="ml-2">{t(lng)}</span>}{" "}
       </MenuButton>
       <Transition
         as={Fragment}
@@ -53,8 +57,11 @@ export default function LngSwitcher({
         leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems
-          className={`absolute inset-x-0 -top-24
-           rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none`}
+          anchor={{ gap: 10, to: authLayout ? "bottom end" : "top" }}
+          className={cn([
+            "rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none",
+            authLayout ? "w-fit" : "absolute w-[var(--button-width)] ",
+          ])}
         >
           <div className="p-1">
             {languages.map((l, i) => (

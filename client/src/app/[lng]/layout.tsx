@@ -4,6 +4,7 @@ import { dir } from "i18next";
 import MessageProvider from "@/providers/MessageProvider";
 import { AppMessage } from "@/components/Message";
 import DialogProvider from "@/providers/DialogProvider";
+import { cookies } from "next/headers";
 
 const UKsans = localFont({
   src: [
@@ -49,9 +50,11 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { lng: string };
 }) {
+  const theme = cookies().get("theme")?.value;
+
   return (
     <html lang={lng} dir={dir(lng)}>
-      <body className={`${UKsans.className}`}>
+      <body className={`${UKsans.className} ${theme === "dark" ? "dark" : ""}`}>
         <MessageProvider>
           <DialogProvider>
             {children}

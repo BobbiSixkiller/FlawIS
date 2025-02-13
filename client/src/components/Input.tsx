@@ -21,23 +21,26 @@ export function Input({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium leading-6 text-gray-900 mb-2"
+          className="block text-sm font-medium leading-6 text-gray-900 mb-2 dark:text-white"
         >
           {label}
         </label>
       )}
       <div
         className={cn([
-          "flex items-center disabled:bg-slate-100 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none rounded-md text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 border-none",
+          "flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
+          "dark:bg-gray-800 dark:ring-gray-600",
           fieldState.error
-            ? "ring-red-500 focus-within:ring-red-500"
-            : "focus-within:ring-primary-500",
+            ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
+            : "focus-within:ring-primary-500 ring-gray-300",
+          props.disabled &&
+            "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
           className,
         ])}
       >
         <input
           className={
-            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 rounded-md placeholder:text-gray-400"
+            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white rounded-md disabled:text-slate-500 placeholder:text-gray-400"
           }
           {...props}
           {...field}

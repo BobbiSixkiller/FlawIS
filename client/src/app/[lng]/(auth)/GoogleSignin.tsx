@@ -11,7 +11,7 @@ export default function GoogleSignIn() {
     <button
       type="button"
       onClick={() => getGoogleAuthLink(url)}
-      className="text-sm rounded-md border border-gray-300 hover:border-primary-500  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
+      className="text-sm rounded-md border border-gray-300 hover:border-primary-500 text-gray-900 dark:text-white  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
