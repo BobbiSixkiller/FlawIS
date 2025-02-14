@@ -20,8 +20,6 @@ export function withAuth(middleware: CustomMiddleware) {
     if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
       const loginUrl = new URL("/login", url.origin);
 
-      console.log("IS TRIGGERED NO TOKEN");
-
       if (url.pathname !== "/" && url.pathname !== "/logout") {
         const originalUrl = `${url.pathname}${url.search}`;
         loginUrl.searchParams.set("url", originalUrl);
@@ -31,7 +29,7 @@ export function withAuth(middleware: CustomMiddleware) {
     }
 
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
-      let redirectTo: string;
+      let redirectTo = "/";
       const referer = req.headers.get("referer");
 
       console.log("IS TRIGGERED WITH TOKEN");
@@ -43,11 +41,9 @@ export function withAuth(middleware: CustomMiddleware) {
         const urlParam = refererUrl.searchParams.get("url");
         if (urlParam) {
           redirectTo = decodeURIComponent(urlParam);
-        } else {
+        } else if (!publicPaths.some((path) => path === pathWithoutLocale)) {
           redirectTo = `${refererUrl.pathname}${refererUrl.search}`;
         }
-      } else {
-        redirectTo = "/";
       }
       const finalUrl = new URL(redirectTo, url.origin);
 

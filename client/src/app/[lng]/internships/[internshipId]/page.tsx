@@ -53,7 +53,7 @@ export default async function InternshipPage({
       {user.access.includes(Access.Student) ? (
         internship.myApplication ? (
           <>
-            <div className="border-t" />
+            <div className="border-t dark:border-gray-600" />
             <Application
               lng={lng}
               application={internship.myApplication}
