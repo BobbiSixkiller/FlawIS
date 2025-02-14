@@ -48,18 +48,20 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
             </div>
           )}
           <div>
-            <p className="text-sm/6 font-semibold text-gray-900">
+            <p className="text-sm/6 font-semibold text-gray-900 dark:text-white">
               {data?.user.name}
             </p>
-            <p className="mt-1 truncate text-xs/5 text-gray-500">
+            <p className="mt-1 truncate text-xs/5 text-gray-500 dark:text-gray-300">
               {data?.user.email}
             </p>
           </div>
         </div>
 
         <div className="sm:flex sm:flex-col sm:items-end sm:text-right">
-          <p className="text-sm/6 text-gray-900">{t(data!.status)}</p>
-          <p className="mt-1 text-xs/5 text-gray-500">
+          <p className="text-sm/6 text-gray-900 dark:text-white">
+            {t(data!.status)}
+          </p>
+          <p className="mt-1 text-xs/5 text-gray-500 dark:text-gray-300">
             {t("updatedAt", {
               ns: "common",
               value: displayDate(data?.updatedAt, lng),
@@ -76,7 +78,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
             ? `/internships/${internshipId}/applications/${data?.id}`
             : `/${internshipId}/applications/${data?.id}`
         }
-        className="rounded-full h-full p-2 hover:bg-gray-100 hover:text-gray-400"
+        className="rounded-full h-full p-2 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <ChevronRightIcon className="size-5" />
       </Button>

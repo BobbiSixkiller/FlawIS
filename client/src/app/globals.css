@@ -14,7 +14,6 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Change Autocomplete styles in Chrome*/
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -24,5 +23,8 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  transition: background-color 5000s ease-in-out 0s;
+  @apply border-transparent focus:border-transparent focus:ring-0 focus:ring-transparent fill-gray-900 dark:fill-white;
+  /* -webkit-text-fill-color: green; */
+  /* -webkit-box-shadow: 0 0 0px 1000px #000 inset; */
+  transition: all 5000s ease-in-out 0s;
 }

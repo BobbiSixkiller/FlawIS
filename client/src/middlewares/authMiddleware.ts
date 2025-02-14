@@ -20,6 +20,8 @@ export function withAuth(middleware: CustomMiddleware) {
     if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
       const loginUrl = new URL("/login", url.origin);
 
+      console.log("IS TRIGGERED NO TOKEN");
+
       if (url.pathname !== "/" && url.pathname !== "/logout") {
         const originalUrl = `${url.pathname}${url.search}`;
         loginUrl.searchParams.set("url", originalUrl);
@@ -31,6 +33,8 @@ export function withAuth(middleware: CustomMiddleware) {
     if (token && publicPaths.some((path) => path === pathWithoutLocale)) {
       let redirectTo: string;
       const referer = req.headers.get("referer");
+
+      console.log("IS TRIGGERED WITH TOKEN");
 
       if (referer) {
         // Use the referer header to extract a clean target URL.

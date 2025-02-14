@@ -80,12 +80,12 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className="z-20 w-full sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
+            <DialogPanel className="z-20 w-full sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white dark:bg-gray-900 dark:text-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between mb-6">
                 {title && (
                   <DialogTitle
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
                   >
                     {title}
                   </DialogTitle>
@@ -93,7 +93,7 @@ export default function Modal({
                 {!togglerHidden && (
                   <button
                     onClick={handleClose}
-                    className="hover:text-gray-500 focus:outline-primary-500"
+                    className="hover:text-gray-500 dark:text-gray-300 focus:outline-primary-500"
                   >
                     <XMarkIcon className="h-5 w-5" />
                   </button>

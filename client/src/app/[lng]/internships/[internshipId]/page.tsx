@@ -13,6 +13,7 @@ import { Application } from "./Application";
 import InternshipDialog from "../InternshipDialog";
 import DeleteInternshipDialog from "./DeleteInternshipDialog";
 import DeleteApplicationDialog from "./DeleteApplicationDialog";
+import CloseButton from "@/components/CloseButton";
 
 export default async function InternshipPage({
   params: { internshipId, lng },
@@ -41,14 +42,7 @@ export default async function InternshipPage({
           </>
         )}
 
-        <Button
-          variant="ghost"
-          as={Link}
-          className="rounded-full h-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400 ml-auto"
-          href={`/`}
-        >
-          <XMarkIcon className="size-5" />
-        </Button>
+        <CloseButton />
       </div>
 
       <div
@@ -79,14 +73,6 @@ export default async function InternshipPage({
                     <DeleteApplicationDialog
                       internId={internship.myApplication.id}
                     />
-                    // <Button
-                    //   as={Link}
-                    //   href={`/${internshipId}/application/delete`}
-                    //   size="icon"
-                    //   variant="destructive"
-                    // >
-                    //   <TrashIcon className="size-5" />
-                    // </Button>
                   )}
                 </div>
               }

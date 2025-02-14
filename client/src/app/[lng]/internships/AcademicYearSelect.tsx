@@ -29,7 +29,7 @@ export default function AcademicYearSelect({
       </PopoverButton>
       <PopoverPanel
         transition
-        className="z-10 absolute max-h-44 overflow-y-auto flex flex-col mt-2 w-[var(--button-width)] text-sm p-2 rounded-lg shadow bg-white text-gray-900 border origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
+        className="z-10 absolute max-h-44 overflow-y-auto flex flex-col mt-2 w-[var(--button-width)] text-sm p-2 rounded-lg shadow-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white border dark:border-gray-700 origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
       >
         {years.map((year) => (
           <CloseButton
