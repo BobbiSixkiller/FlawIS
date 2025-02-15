@@ -64,7 +64,7 @@ export default async function DashboardLayout({
   const theme = cookies().get("theme")?.value;
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen dark:bg-gray-800">
       {/* Desktop Nav */}
       <div className="sticky top-0 hidden lg:flex flex-col h-screen w-full max-w-xs bg-primary-500 text-white px-4 py-6 inset-0">
         <Logo lng={lng} height={60} width={60} inverted />
@@ -96,13 +96,13 @@ export default async function DashboardLayout({
         </div>
       </MobileNav>
       {/* Dashboard content with sidebar */}
-      <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
+      <div className="flex-1 grid grid-cols-3 lg:divide-x dark:lg:divide-gray-600 gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
             homeElement={<HomeIcon className="size-5" />}
             separator={<ChevronRightIcon className="size-3" />}
             activeClasses="text-primary-500 hover:underline"
-            containerClasses="flex flex-wrap text-sm gap-2 items-center"
+            containerClasses="flex flex-wrap text-sm gap-2 items-center dark:text-white"
             capitalizeLinks
           />
           {children}
@@ -111,7 +111,7 @@ export default async function DashboardLayout({
         <div className="hidden px-4 py-6 lg:col-span-1 lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-between">
           <div className="w-full max-w-96">{sidebar}</div>
           <div className="hidden lg:block mt-auto">
-            <ul className="text-xs text-gray-500">
+            <ul className="text-xs text-gray-500 dark:text-gray-300">
               <li className="hover:underline hover:text-primary-500 cursor-pointer">
                 <a
                   href="mailto:matus.muransky@flaw.uniba.sk"

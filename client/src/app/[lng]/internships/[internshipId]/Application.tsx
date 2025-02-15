@@ -18,8 +18,8 @@ export async function Application({
   const { t } = await translate(lng, ["internships", "common"]);
 
   return (
-    <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 shadow-sm space-y-3">
-      <h2 className="text-xl text-primary-500 font-semibold">
+    <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 dark:text-white dark:bg-primary-800 shadow-sm space-y-3">
+      <h2 className="text-xl text-primary-500 dark:text-primary-400 font-semibold">
         {t("application")}
       </h2>
 
@@ -45,11 +45,10 @@ export async function Application({
             </div>
           )}
           <div className="">
-            <p className="font-semibold text-gray-900">
-              <span className="absolute inset-0" />
+            <p className="font-semibold text-gray-900 dark:text-white">
               {application.user.name}
             </p>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t(application.user.studyProgramme)}
             </p>
           </div>
@@ -61,7 +60,7 @@ export async function Application({
             <ul className="flex flex-wrap gap-2">
               <li>
                 <a
-                  className="text-primary-500 hover:underline inline-flex gap-1 items-center"
+                  className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                   href={`mailto:${application.user.email}`}
                 >
                   <EnvelopeIcon className="size-4" /> {application.user.email}
@@ -69,7 +68,7 @@ export async function Application({
               </li>
               <li>
                 <a
-                  className="text-primary-500 hover:underline inline-flex gap-1 items-center"
+                  className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                   href={`tel:${application.user.telephone}`}
                 >
                   <PhoneIcon className="size-4" /> {application.user.telephone}
@@ -93,7 +92,7 @@ export async function Application({
                 return (
                   <li key={i}>
                     <Link
-                      className="text-primary-500 hover:underline"
+                      className="text-primary-500 dark:text-primary-400 hover:underline"
                       href={`/minio?bucketName=internships&url=${url}`}
                     >
                       {fileName}

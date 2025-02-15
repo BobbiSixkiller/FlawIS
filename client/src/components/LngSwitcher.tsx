@@ -59,6 +59,7 @@ export default function LngSwitcher({
         <MenuItems
           anchor={{ gap: 10, to: authLayout ? "bottom end" : "top" }}
           className={cn([
+            "dark:bg-gray-700 dark:text-white",
             "rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none",
             authLayout ? "w-fit" : "absolute w-[var(--button-width)] ",
           ])}
@@ -69,7 +70,7 @@ export default function LngSwitcher({
                 {({ focus }) => (
                   <button
                     className={`${
-                      focus ? "bg-primary-500 text-white" : "text-gray-900"
+                      focus ? "bg-primary-500 text-white" : ""
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm ${
                       l === lng ? "font-bold" : ""
                     }`}

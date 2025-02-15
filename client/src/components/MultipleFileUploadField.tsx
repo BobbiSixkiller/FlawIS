@@ -114,7 +114,7 @@ export default function MultipleFileUploadField({
             isDragReject: isDragReject || fieldState.error,
             isFocused,
           }
-        )} bg-gray-50 text-gray-400 outline-none`}
+        )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-none`}
       >
         <input name={name} id={name} {...getInputProps()} />
 
@@ -239,7 +239,7 @@ function SingleUploadProgress({
             onDelete(file);
           }}
           type="button"
-          className="rounded-full bg-primary-100 text-primary-500 hover:bg-primary-200 p-2"
+          className="rounded-full bg-primary-100 dark:bg-primary-400 dark:hover:bg-primary-500 text-primary-700 hover:bg-primary-200 p-2"
         >
           <XMarkIcon className="stroke-2 size-5" />
         </button>

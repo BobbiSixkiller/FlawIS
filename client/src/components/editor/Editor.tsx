@@ -39,7 +39,7 @@ export default function TiptapEditor({ initialValue, name }: EditorProps) {
     editorProps: {
       attributes: {
         class: cn(
-          "rose prose-lg prose-headings:font-title font-default focus:outline-none max-w-full min-h-96 p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
+          "prose prose-lg prose-headings:font-title font-default focus:outline-none max-w-full min-h-96 p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 dark:ring-gray-700 dark:bg-gray-800 focus-within:ring-2",
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"
             : "ring-gray-300 focus-within:ring-primary-500"

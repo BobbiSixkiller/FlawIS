@@ -69,15 +69,20 @@ export default function useLocalizedExtensions() {
 
   // StarterKit configuration with customizations
   const starterKit = StarterKit.configure({
+    bold: { HTMLAttributes: { class: cn("dark:text-white") } },
+    heading: { HTMLAttributes: { class: cn("dark:text-white") } },
+    paragraph: { HTMLAttributes: { class: cn("dark:text-gray-300") } },
     bulletList: {
       HTMLAttributes: {
-        class: cn("list-disc list-outside leading-3 marker:text-primary-500"),
+        class: cn(
+          "list-disc list-outside leading-3 dark:text-gray-300 marker:text-primary-500"
+        ),
       },
     },
     orderedList: {
       HTMLAttributes: {
         class: cn(
-          "list-decimal list-outside leading-3 marker:text-primary-500"
+          "list-decimal list-outside leading-3 dark:text-gray-300 marker:text-primary-500"
         ),
       },
     },

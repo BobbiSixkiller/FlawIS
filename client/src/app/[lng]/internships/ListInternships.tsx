@@ -49,7 +49,7 @@ function ListItem({ data }: { data?: InternshipData }) {
   return (
     <Link
       className={cn([
-        "relative rounded-2xl border shadow hover:shadow-lg p-4 text-gray-900 text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white",
+        "relative rounded-2xl border dark:border-gray-700 shadow hover:shadow-lg p-4 text-gray-900 dark:text-white text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white dark:bg-gray-700",
         data?.myApplication && statusClasses[data?.myApplication?.status].card,
       ])}
       href={
@@ -67,7 +67,9 @@ function ListItem({ data }: { data?: InternshipData }) {
         )}
       </div>
 
-      <p className="leading-none text-gray-500">{data?.academicYear}</p>
+      <p className="leading-none text-gray-500 dark:text-gray-300">
+        {data?.academicYear}
+      </p>
       <p className="line-clamp-3">
         {data?.description.replace(/<[^>]*>/g, " ").trim()}
       </p>

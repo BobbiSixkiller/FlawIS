@@ -303,7 +303,7 @@ export default function InternshipForm({
         )}
       >
         <div>
-          <p className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+          <p className="block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-2">
             Deatilný popis stáže. Upravte podľa potreby pomocou rich text
             editora.
           </p>

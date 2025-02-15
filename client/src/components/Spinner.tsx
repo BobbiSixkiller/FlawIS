@@ -3,7 +3,7 @@ export default function Spinner({ inverted = false }: { inverted?: boolean }) {
     <div aria-label="Loading..." role="status">
       <svg
         className={`animate-spin w-6 h-6 ${
-          inverted ? "fill-white" : "fill-gray-900"
+          inverted ? "fill-white" : "fill-gray-900 dark:fill-white"
         }`}
         viewBox="3 3 18 18"
       >

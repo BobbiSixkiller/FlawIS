@@ -23,6 +23,7 @@ import {
   Transition,
 } from "@headlessui/react";
 import DynamicImageClient from "./DynamicImageClient";
+import { cn } from "@/utils/helpers";
 
 export function NavItem({
   children,
@@ -98,18 +99,20 @@ export function ProfileMenuItem({
         leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems
-          className={`absolute ${
+          className={cn([
+            "absolute rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none text-gray-900",
+            "dark:bg-gray-700 dark:text-white",
             mobile
               ? "right-0 mt-2 min-w-max w-32 origin-top-right"
-              : "inset-x-0 mt-2"
-          } rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none`}
+              : "inset-x-0 mt-2",
+          ])}
         >
           <div className="p-1">
             <MenuItem>
               {({ focus }) => (
                 <button
                   className={`${
-                    focus ? "bg-primary-500 text-white" : "text-gray-900"
+                    focus ? "bg-primary-500 text-white" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm ${
                     path.includes("/profile") ? "font-bold" : ""
                   }`}
@@ -124,7 +127,7 @@ export function ProfileMenuItem({
               {({ focus }) => (
                 <button
                   className={`${
-                    focus ? "bg-primary-500 text-white" : "text-gray-900"
+                    focus ? "bg-primary-500 text-white" : ""
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                   onClick={() => router.push("/logout")}
                 >
@@ -185,7 +188,7 @@ export function MobileNav({
 
   return (
     <div
-      className={`lg:hidden sticky top-0 border-b bg-white z-10 ${
+      className={`lg:hidden sticky top-0 border-b bg-white dark:bg-gray-900 dark:border-gray-900 z-10 ${
         scrolled ? "shadow-md" : ""
       }`}
     >
@@ -193,7 +196,7 @@ export function MobileNav({
         <div className="flex gap-4">
           <div className="hidden sm:block m-auto">{logo}</div>
           <button
-            className="px-2 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 z-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            className="px-2 py-1 rounded-md dark:text-white dark:hover:bg-gray-700 hover:bg-gray-700 hover:bg-opacity-10 z-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
             onClick={() => setMenuShown(true)}
           >
             <Bars3Icon className="h-5 w-5" />

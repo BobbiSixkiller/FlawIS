@@ -5,6 +5,7 @@ import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
 import logo from "../../public/images/Flaw-logo-notext.png";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
+import { cookies } from "next/headers";
 
 export default async function Logo({
   lng,
@@ -23,16 +24,18 @@ export default async function Logo({
 }) {
   const { t } = await translate(lng, "dashboard");
 
+  const theme = cookies().get("theme")?.value;
+
   return (
     <div
       className={cn([
         "flex gap-4 font-normal",
-        inverted ? "text-white" : "text-gray-900",
+        inverted || theme === "dark" ? "text-white" : "text-gray-900",
         className,
       ])}
     >
       <Image
-        src={inverted ? logoInverted : logo}
+        src={inverted || theme === "dark" ? logoInverted : logo}
         width={width}
         height={height}
         alt="Flaw-logo"

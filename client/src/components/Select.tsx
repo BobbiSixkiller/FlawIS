@@ -40,7 +40,7 @@ export default function Select({
   return (
     <Field>
       {label && (
-        <Label className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+        <Label className="block text-sm font-medium leading-6 text-gray-900 mb-2 dark:text-white">
           {label}
         </Label>
       )}
@@ -59,7 +59,7 @@ export default function Select({
         <ListboxButton
           {...field}
           className={cn([
-            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none text-gray-900 shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
+            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 sm:text-sm/6",
             multiple ? "" : "py-1.5",
             fieldState.error
               ? "ring-red-500 focus:ring-red-500"
@@ -68,7 +68,9 @@ export default function Select({
         >
           <span
             className={`line-clamp-1 ${
-              selected && !disabled ? "text-gray-900" : "text-gray-500"
+              selected && !disabled
+                ? "text-gray-900 dark:text-white"
+                : "text-gray-500"
             }`}
           >
             {selected
@@ -83,7 +85,7 @@ export default function Select({
         <ListboxOptions
           anchor="bottom"
           transition
-          className={`outline-none z-20 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-sm text-gray-900 bg-white ring-1 ring-gray-300 ${
+          className={`dark:bg-gray-700 dark:text-white outline-none z-20 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300 dark:ring-gray-700 ${
             fieldState.error ? "ring-red-500" : ""
           } origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 sm:text-sm/6`}
         >
