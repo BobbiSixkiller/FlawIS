@@ -256,7 +256,7 @@ export class ConferencerResolver {
     @CheckTicket() { ticket, conference }: VerifiedTicket,
     @Ctx() { user, locale }: Context
   ): Promise<ConferenceMutationResponse> {
-    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.2);
+    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.23);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
     await this.userService.update(
