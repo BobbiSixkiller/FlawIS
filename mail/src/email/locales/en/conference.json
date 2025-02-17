@@ -3,7 +3,7 @@
   "invoice": {
     "issuer": "Issued by",
     "payer": "Payer",
-    "name": "Name",
+    "name": "Name/Organization",
     "address": {
       "street": "Street",
       "city": "City",

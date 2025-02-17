@@ -13,7 +13,6 @@ import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
 import { GetDataFilter } from "@/components/withInfiniteScroll";
 import { notFound } from "next/navigation";
-import { getMe } from "../../(auth)/actions";
 
 export async function getConferences(filter: GetDataFilter) {
   const res = await executeGqlFetch(
@@ -119,7 +118,9 @@ export async function createConference(data: FormData) {
           ICDPH: data.get("billing.ICDPH")?.toString() as string,
           IBAN: data.get("billing.IBAN")?.toString() as string,
           SWIFT: data.get("billing.SWIFT")?.toString() as string,
-          variableSymbol: data.get("billing.SWIFT")?.toString() as string,
+          variableSymbol: data
+            .get("billing.variableSymbol")
+            ?.toString() as string,
           stampUrl,
         },
       },

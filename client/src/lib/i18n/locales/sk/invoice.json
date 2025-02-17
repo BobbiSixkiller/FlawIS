@@ -5,7 +5,7 @@
   "invoice": {
     "issuer": "Vydal",
     "payer": "Platca",
-    "name": "Meno",
+    "name": "Meno/organizácia",
     "address": {
       "street": "Ulica",
       "city": "Mesto",
