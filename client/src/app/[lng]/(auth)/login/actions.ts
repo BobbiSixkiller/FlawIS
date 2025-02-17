@@ -34,12 +34,10 @@ export async function login(email: string, password: string, url?: string) {
             ? "localhost"
             : ".flaw.uniba.sk",
       });
-
-      return { success: true, message: "Welcome!" };
     }
   } catch (error: any) {
     return { success: false, message: error.message };
   }
 
-  // redirect(url ? url : "/", RedirectType.replace);
+  redirect(url ? url : "/", RedirectType.replace);
 }
