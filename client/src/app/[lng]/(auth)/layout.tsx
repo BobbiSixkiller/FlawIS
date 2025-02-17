@@ -48,6 +48,7 @@ export default async function AuthLayout({
         {/* <div className="bg-primary-500/50 absolute inset-0 z-10" /> */}
         <Logo lng={lng} inverted className="absolute top-8 left-8 z-10" />
         <Image
+          priority
           alt="bg-image"
           src={"/images/UK-bg-3.jpg"}
           fill

@@ -15,11 +15,10 @@ export default async function RegisterPage({
     submission?: string;
   };
 }) {
-  const user = await getMe();
-
-  const [conference, submission] = await Promise.all([
+  const [conference, submission, user] = await Promise.all([
     getConference(slug),
     getSubmission(searchParams.submission),
+    getMe(),
   ]);
 
   if (conference && conference.attending && !submission) {

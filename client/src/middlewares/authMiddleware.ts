@@ -32,7 +32,7 @@ export function withAuth(middleware: CustomMiddleware) {
       let redirectTo = "/";
       const referer = req.headers.get("referer");
 
-      console.log("IS TRIGGERED WITH TOKEN");
+      console.log("TRIGGERED AUTH MID REF");
 
       if (referer) {
         // Use the referer header to extract a clean target URL.

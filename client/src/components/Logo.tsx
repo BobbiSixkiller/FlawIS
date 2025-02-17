@@ -35,6 +35,7 @@ export default async function Logo({
       ])}
     >
       <Image
+        priority
         src={inverted || theme === "dark" ? logoInverted : logo}
         width={width}
         height={height}
