@@ -103,7 +103,7 @@ export default function MultipleFileUploadField({
 
   return (
     <div>
-      <label htmlFor={name} className="text-sm/6 font-medium">
+      <label htmlFor={name} className="text-sm/6 font-medium dark:text-white">
         {label}
       </label>
       <div

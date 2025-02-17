@@ -80,7 +80,7 @@ export default async function InternshipPage({
           </>
         ) : (
           <>
-            <div className="text-center rounded-lg p-4 border border-orange-300 bg-orange-100 text-orange-500">
+            <div className="text-center rounded-lg p-4 border border-orange-300 bg-orange-100 text-orange-500  dark:border-orange-500 dark:bg-orange-300 dark:text-orange-700">
               Pred prihlasenim si prosim skontrolujte{" "}
               <Link
                 className="font-semibold hover:underline"

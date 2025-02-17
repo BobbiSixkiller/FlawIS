@@ -23,7 +23,7 @@ export default function TabMenu({ tabs }: { tabs: TabProps[] }) {
             <div key={i} className="h-14 flex items-center relative">
               <Link
                 href={tab.href}
-                className={`px-4 py-1 rounded-md hover:bg-gray-700 hover:bg-opacity-10 inline-flex items-center gap-2 ${
+                className={`px-4 py-1 rounded-md text-gray-900 dark:text-white hover:bg-gray-700 dark:hover:bg-gray-600 hover:bg-opacity-10 inline-flex items-center gap-2 ${
                   segment === segmentFromHref || (!segment && i === 0)
                     ? "font-bold"
                     : "font-normal"
@@ -39,7 +39,7 @@ export default function TabMenu({ tabs }: { tabs: TabProps[] }) {
           );
         })}
       </nav>
-      <div className="h-[1px] w-full bg-gray-300 -translate-y-[2px]" />
+      <div className="h-[1px] w-full bg-gray-300 dark:bg-gray-600 -translate-y-[2px]" />
     </div>
   );
 }
