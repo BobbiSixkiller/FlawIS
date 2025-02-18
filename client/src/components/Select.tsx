@@ -85,9 +85,11 @@ export default function Select({
         <ListboxOptions
           anchor="bottom"
           transition
-          className={`dark:bg-gray-700 dark:text-white outline-none z-20 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300 dark:ring-gray-700 ${
-            fieldState.error ? "ring-red-500" : ""
-          } origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 sm:text-sm/6`}
+          className={cn([
+            "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 sm:text-sm/6 outline-none z-20 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300",
+            "dark:bg-gray-700 dark:text-white dark:ring-gray-700",
+            fieldState.error ? "ring-red-500" : "",
+          ])}
         >
           {options.map((option, i) => (
             <ListboxOption

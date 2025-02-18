@@ -2,6 +2,7 @@
 
 import { Billing, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/utils/helpers";
 import {
   Combobox,
   ComboboxButton,
@@ -51,8 +52,8 @@ export default function BillingInput({
             .includes(query.toLowerCase().replace(/\s+/g, ""))
         );
 
-  function compareBillings(a: Billing, b: Billing) {
-    return a.name.toLowerCase() === b.name.toLowerCase();
+  function compareBillings(a?: Billing, b?: Billing) {
+    return a?.name.toLowerCase() === b?.name.toLowerCase();
   }
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
@@ -62,11 +63,13 @@ export default function BillingInput({
     }
   };
 
+  console.log(error);
+
   return (
     <div>
       <label
         htmlFor="billing.name"
-        className="block text-sm font-medium leading-6 text-gray-900"
+        className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
       >
         {t("registration.billing.name")}
       </label>
@@ -78,13 +81,19 @@ export default function BillingInput({
       >
         <div className="relative mt-2">
           <div
-            className={`flex gap-1 w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-gray-300 ${
-              focus ? "ring-primary-500 ring-2" : ""
-            } ${error ? "ring-red-500" : ""} shadow-sm`}
+            className={cn([
+              "flex gap-1 w-full rounded-md border-0 text-gray-900 ring-1 ring-gray-300 focus-within:ring-2 shadow-sm",
+              "dark:bg-gray-800 dark:ring-gray-600 dark:text-white",
+              error
+                ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
+                : "focus-within:ring-primary-500",
+            ])}
           >
             <ComboboxInput
               ref={ref}
-              className="w-full border-none rounded-r-none rounded-l-md py-1.5 placeholder:text-gray-400 focus:ring-transparent sm:text-sm sm:leading-6"
+              className={cn([
+                "w-full border-none rounded-r-none rounded-l-md py-1.5 bg-transparent placeholder:text-gray-400 focus:ring-transparent sm:text-sm sm:leading-6",
+              ])}
               displayValue={(billing: Billing) => billing?.name}
               onChange={handleInput}
               onFocus={() => setFocus(true)}
@@ -127,7 +136,12 @@ export default function BillingInput({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <ComboboxOptions className="empty:invisible absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+            <ComboboxOptions
+              className={cn([
+                "empty:invisible absolute mt-2 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm",
+                "dark:bg-gray-700 dark:text-white dark:ring-gray-700",
+              ])}
+            >
               {filteredBillings?.length === 0 && query !== "" ? (
                 <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                   {t("notFound", { ns: "common" })}

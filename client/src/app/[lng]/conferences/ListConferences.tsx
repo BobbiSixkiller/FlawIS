@@ -29,7 +29,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
 
   return (
     <Link
-      className="h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
+      className="h-fit w-fit rounded-2xl dark:border-gray-700 border p-4 shadow hover:shadow-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 text-sm cursor-pointer focus:outline-primary-500"
       href={
         path.includes("conferences")
           ? `/conferences/${data?.slug}`
@@ -48,7 +48,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
       <h2 className="font-medium leading-6">
         {data?.translations[lng as "sk" | "en"].name}
       </h2>
-      <p className="leading-none text-gray-500">
+      <p className="leading-none text-gray-500 dark:text-gray-300">
         Prebieha od {start} do {end}
       </p>
     </Link>
@@ -57,7 +57,9 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
 
 function Container({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {children}
+    </div>
   );
 }
 

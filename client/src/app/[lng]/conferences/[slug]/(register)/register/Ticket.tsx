@@ -34,7 +34,7 @@ export default function Ticket({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="block text-sm font-medium leading-6 text-gray-900">
+      <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
         Forma ucasti
       </label>
       <RadioGroup
@@ -51,11 +51,13 @@ export default function Ticket({
               value={ticket.id}
               className={({ checked, focus, disabled }) =>
                 cn([
-                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white",
+                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-900",
                   focus &&
                     "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300",
-                  disabled && "bg-slate-50 text-slate-500 cursor-default",
-                  checked && "bg-primary-500 text-white border-none",
+                  disabled &&
+                    "bg-slate-50 dark:bg-slate-300 text-slate-500 cursor-default",
+                  checked &&
+                    "bg-primary-500 dark:bg-primary-500 text-white border-none",
                 ])
               }
             >
@@ -67,7 +69,9 @@ export default function Ticket({
                         <Label
                           as="p"
                           className={`font-medium  ${
-                            checked ? "text-white" : "text-gray-900"
+                            checked
+                              ? "text-white"
+                              : "text-gray-900 dark:text-white"
                           }`}
                         >
                           {ticket.name}
@@ -75,7 +79,9 @@ export default function Ticket({
                         <Description
                           as="span"
                           className={`inline ${
-                            checked ? "text-sky-100" : "text-gray-500"
+                            checked
+                              ? "text-sky-100"
+                              : "text-gray-500 dark:text-gray-400"
                           }`}
                         >
                           <span>{ticket.desc}</span>

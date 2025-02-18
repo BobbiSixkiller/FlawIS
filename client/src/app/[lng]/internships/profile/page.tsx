@@ -36,7 +36,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0 flex items-center gap-2">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0 flex items-center gap-2">
               {user.avatarUrl ? (
                 <DynamicImage
                   src={user.avatarUrl}
@@ -63,7 +63,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("email")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0">
               {user?.email}
             </dd>
           </div>
@@ -71,7 +71,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("org")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0">
               {user?.organization}
             </dd>
           </div>
@@ -79,7 +79,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("phone")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0">
               {user?.telephone || "N/A"}
             </dd>
           </div>
@@ -88,7 +88,7 @@ export default async function Profile({
               <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                 {t("address")}
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0">
                 {user.address && Object.values(user.address).join(", ")}
               </dd>
             </div>
@@ -98,7 +98,7 @@ export default async function Profile({
               <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                 {t("studyProgramme")}
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300  sm:col-span-2 sm:mt-0">
                 {user?.studyProgramme ? t(user.studyProgramme) : "N/A"}
               </dd>
             </div>
@@ -108,7 +108,7 @@ export default async function Profile({
               <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
                 {t("cv")}
               </dt>
-              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-white sm:col-span-2 sm:mt-0">
+              <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0">
                 {user?.cvUrl ? (
                   <Link
                     href={`/minio?bucketName=resumes&url=${user.cvUrl}`}

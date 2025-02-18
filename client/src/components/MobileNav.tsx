@@ -70,7 +70,7 @@ export function ProfileMenuItem({
           mobile
             ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500"
             : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white"
-        } flex items-center`}
+        } flex items-center dark:text-white`}
       >
         {user?.avatarUrl ? (
           <DynamicImageClient
@@ -188,7 +188,7 @@ export function MobileNav({
 
   return (
     <div
-      className={`lg:hidden sticky top-0 border-b bg-white dark:bg-gray-900 dark:border-gray-900 z-10 ${
+      className={`lg:hidden sticky top-0 border-b bg-white dark:bg-gray-900 dark:border-gray-900 z-20 ${
         scrolled ? "shadow-md" : ""
       }`}
     >

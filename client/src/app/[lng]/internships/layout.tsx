@@ -64,7 +64,7 @@ export default async function DashboardLayout({
   const theme = cookies().get("theme")?.value;
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen dark:bg-gray-800">
+    <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Desktop Nav */}
       <div className="sticky top-0 hidden lg:flex flex-col h-screen w-full max-w-xs bg-primary-500 text-white px-4 py-6 inset-0">
         <Logo lng={lng} height={60} width={60} inverted />
@@ -96,7 +96,7 @@ export default async function DashboardLayout({
         </div>
       </MobileNav>
       {/* Dashboard content with sidebar */}
-      <div className="flex-1 grid grid-cols-3 lg:divide-x dark:lg:divide-gray-600 gap-6 lg:gap-0">
+      <div className="flex-1 grid grid-cols-3 lg:divide-x dark:bg-gray-800 dark:lg:divide-gray-600 gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
             homeElement={<HomeIcon className="size-5" />}

@@ -83,13 +83,13 @@ export default async function DashboardLayout({
         <LngSwitcher lng={lng} className="mt-auto" />
       </MobileNav>
       {/* Dashboard content with sidebar */}
-      <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
+      <div className="flex-1 grid grid-cols-3 lg:divide-x dark:bg-gray-800 dark:lg:divide-gray-600 gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
             homeElement={<HomeIcon className="h-5 w-5" />}
             separator={<ChevronRightIcon className="h-3 w-3" />}
             activeClasses="text-primary-500 hover:underline"
-            containerClasses="flex flex-wrap text-sm gap-2 items-center"
+            containerClasses="flex flex-wrap text-sm gap-2 items-center dark:text-white"
             capitalizeLinks
           />
           {children}
@@ -98,7 +98,7 @@ export default async function DashboardLayout({
         <div className="hidden px-4 py-6 lg:col-span-1 lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-col lg:justify-between">
           <div className="w-full max-w-96">{sidebar}</div>
           <div className="hidden lg:block mt-auto">
-            <ul className="text-xs text-gray-500">
+            <ul className="text-xs text-gray-500 dark:text-gray-400">
               <li className="hover:underline hover:text-primary-500 cursor-pointer">
                 <a
                   href="mailto:matus.muransky@flaw.uniba.sk"
@@ -125,7 +125,7 @@ export default async function DashboardLayout({
         </div>
       </div>
       {/* Mobile footer */}
-      <div className="lg:hidden col-span-3 bg-gray-900">
+      <div className="lg:hidden col-span-3 bg-gray-900 border-none">
         <div className="container mx-auto p-6">
           <Logo lng={lng} height={60} width={60} inverted />
 

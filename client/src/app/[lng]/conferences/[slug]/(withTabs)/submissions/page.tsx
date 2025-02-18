@@ -34,12 +34,12 @@ export default async function AttendeeSubmissionsPage({
       {conference?.attending?.submissions.map((s) => (
         <div
           key={s.id}
-          className="rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500"
+          className="rounded-2xl border dark:border-gray-700 p-4 shadow text-gray-900 text-sm focus:outline-primary-500 dark:text-white bg-white dark:bg-gray-700"
         >
           <h2 className="font-medium leading-6">
             {capitalizeFirstLetter(s.translations[lng as "sk" | "en"].name)}
           </h2>
-          <p className="leading-none text-gray-500">
+          <p className="leading-none text-gray-500 dark:text-gray-300">
             {s.section.translations[lng as "sk" | "en"].name}
           </p>
           <ul className="mt-2 flex gap-1">

@@ -32,7 +32,7 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
     <div>
       <label
         htmlFor={name}
-        className="block mb-2 text-sm font-medium leading-6 text-gray-900"
+        className="block mb-2 text-sm font-medium leading-6 text-gray-900 dark:text-white"
       >
         {label}
       </label>
@@ -55,14 +55,14 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
         {strings.length !== 0 &&
           strings.map((p, i) => (
             <div
-              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 px-1 h-7 items-center"
+              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white  px-1 h-7 items-center"
               key={i}
             >
               {p}
               <button
                 disabled={props.disabled}
                 type="button"
-                className="hover:text-gray-500 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
+                className="hover:text-gray-500 dark:hover:text-gray-900 p-1 focus:outline-none focus:ring-primary-500 focus:ring-2 rounded-md"
                 onClick={() => {
                   if (!props.disabled) {
                     field.onChange(strings.filter((i) => i !== p));
@@ -78,7 +78,7 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
             {...props}
             {...field}
             id={name}
-            className="w-full sm:text-sm sm:leading-6 bg-transparent text-gray-900 border-none rounded-r-none rounded-l-md p-0 placeholder:truncate focus:ring-transparent"
+            className="w-full sm:text-sm sm:leading-6 bg-transparent text-gray-900 dark:text-white border-none rounded-r-none rounded-l-md p-0 placeholder:truncate focus:ring-transparent"
             onFocus={(e) => {
               if (!props.disabled) {
                 setFocus(true);

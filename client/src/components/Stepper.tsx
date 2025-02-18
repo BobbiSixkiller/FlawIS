@@ -16,10 +16,10 @@ export default function Stepper({
 
   function calculateBorderColor(stepIndex: number, activeIndex: number) {
     if (activeIndex === stepIndex) {
-      return "border-primary-300";
+      return "border-primary-300 dark:border-primary-500";
     }
     if (activeIndex > stepIndex) {
-      return "border-primary-600";
+      return "border-primary-600 dark:border-primary-700";
     }
     return "border-gray-200";
   }
@@ -36,12 +36,14 @@ export default function Stepper({
           >
             <span
               className={`text-sm md:text-base ${
-                i > activeIndex ? "text-gray-400" : "text-primary-600"
+                i > activeIndex
+                  ? "text-gray-400 dark:text-gray-300"
+                  : "text-primary-600 dark:text-primary-500"
               }`}
             >
               {t("step") + " " + Number(i + 1)}
             </span>
-            <h4 className="text-base md:text-md text-gray-900">
+            <h4 className="text-base md:text-md text-gray-900 dark:text-white">
               {s.props.name}
             </h4>
           </div>

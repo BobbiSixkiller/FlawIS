@@ -56,7 +56,7 @@ export default function Modal({
     >
       <Dialog
         as="div"
-        className="fixed z-10 inset-0 overflow-y-auto"
+        className="fixed z-30 inset-0 overflow-y-auto"
         onClose={handleClose}
       >
         <TransitionChild
@@ -80,7 +80,7 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className="z-20 w-full sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white dark:bg-gray-900 dark:text-white p-6 text-left align-middle shadow-2xl">
+            <DialogPanel className="w-full z-30 sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white dark:bg-gray-700 dark:text-white p-6 text-left align-middle shadow-2xl">
               <div className="flex justify-between mb-6">
                 {title && (
                   <DialogTitle
