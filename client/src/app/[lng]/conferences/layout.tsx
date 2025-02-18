@@ -8,7 +8,8 @@ import LngSwitcher from "@/components/LngSwitcher";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import ThemeToggler from "@/components/ThemeToggler";
 
 export async function generateMetadata(
   {
@@ -52,6 +53,8 @@ export default async function DashboardLayout({
 
   const { t, i18n } = await translate(lng, "dashboard");
 
+  const theme = cookies().get("theme")?.value;
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Desktop Nav */}
@@ -67,7 +70,11 @@ export default async function DashboardLayout({
             </NavItem>
             <ProfileMenuItem lng={lng} user={user} />
           </nav>
-          <LngSwitcher lng={lng} />
+
+          <div className="mt-auto flex gap-2 items-center">
+            <LngSwitcher lng={lng} className="flex-1" />
+            <ThemeToggler dark={theme === "dark"} />
+          </div>
         </div>
       </div>
       <MobileNav
@@ -80,7 +87,11 @@ export default async function DashboardLayout({
           <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />
           {t("home")}
         </NavItem>
-        <LngSwitcher lng={lng} className="mt-auto" />
+
+        <div className="mt-auto flex gap-2 items-center">
+          <LngSwitcher lng={lng} className="flex-1" />
+          <ThemeToggler dark={theme === "dark"} />
+        </div>
       </MobileNav>
       {/* Dashboard content with sidebar */}
       <div className="flex-1 grid grid-cols-3 lg:divide-x dark:bg-gray-800 dark:lg:divide-gray-600 gap-6 lg:gap-0">
