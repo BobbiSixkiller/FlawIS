@@ -28,13 +28,12 @@ export default function BillingInput({
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [focus, setFocus] = useState(false);
   const { lng } = useParams<{ lng: string }>();
 
   const { t } = useTranslation(lng, ["conferences", "common"]);
 
-  const { watch, setValue, getFieldState, register } = useFormContext();
-  const { error } = getFieldState("billing.name");
+  const { watch, setValue, getFieldState, formState } = useFormContext();
+  const { error } = getFieldState("billing.name", formState);
 
   useEffect(() => {
     if (error) {
@@ -58,9 +57,9 @@ export default function BillingInput({
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
-    if (filteredBillings && filteredBillings.length === 0) {
-      setValue("billing.name", event.target.value, { shouldValidate: true });
-    }
+    setValue("billing.name", event.target.value, {
+      shouldValidate: true,
+    });
   };
 
   console.log(error);
@@ -74,9 +73,8 @@ export default function BillingInput({
         {t("registration.billing.name")}
       </label>
       <Combobox
-        {...register("billing.name")}
         value={watch("billing")}
-        onChange={(val) => setValue("billing", val)}
+        onChange={(val) => setValue("billing", val, { shouldValidate: true })}
         by={compareBillings}
       >
         <div className="relative mt-2">
@@ -96,8 +94,6 @@ export default function BillingInput({
               ])}
               displayValue={(billing: Billing) => billing?.name}
               onChange={handleInput}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
               id="billing.name"
             />
             <div className="flex">
@@ -138,7 +134,7 @@ export default function BillingInput({
           >
             <ComboboxOptions
               className={cn([
-                "empty:invisible absolute mt-2 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm",
+                "empty:invisible absolute mt-2 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none text-gray-900 sm:text-sm",
                 "dark:bg-gray-700 dark:text-white dark:ring-gray-700",
               ])}
             >
@@ -152,7 +148,7 @@ export default function BillingInput({
                     key={i}
                     className={({ focus }) =>
                       `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                        focus ? "bg-primary-600 text-white" : "text-gray-900"
+                        focus ? "bg-primary-600 text-white" : ""
                       }`
                     }
                     value={billing}
