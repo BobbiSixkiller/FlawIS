@@ -6,5 +6,6 @@
   "applicationLimitReached": "Môžete podať maximálne dve prihlášky naraz!",
   "internFiles": "Súbory boli aktualizované.",
   "status": "Stav prihlášky bol úspešne zmenený.",
-  "feedback": "Výstupný list bol úspešne aktualizovaný."
+  "feedback": "Výstupný list bol úspešne aktualizovaný.",
+  "applied": "Prihláška na stáž bola úspešne vytvorená."
 }

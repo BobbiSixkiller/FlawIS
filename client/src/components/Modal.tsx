@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, Suspense, useEffect } from "react";
 import {
   Dialog,
   DialogPanel,
@@ -11,6 +11,7 @@ import {
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 import { useDialog } from "@/providers/DialogProvider";
+import Spinner from "./Spinner";
 
 interface ModalProps {
   dialogId: string;
@@ -99,7 +100,16 @@ export default function Modal({
                   </button>
                 )}
               </div>
-              {children}
+
+              <Suspense
+                fallback={
+                  <div className="flex justify-center">
+                    <Spinner />
+                  </div>
+                }
+              >
+                {children}
+              </Suspense>
             </DialogPanel>
           </TransitionChild>
         </div>

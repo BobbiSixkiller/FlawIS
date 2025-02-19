@@ -6,5 +6,6 @@
   "applicationLimitReached": "You can submit 2 applications at most!",
   "internFiles": "Files has been updated.",
   "status": "Status of the application was successfully updated.",
-  "feedback": "Certificate of internship completition has been updated."
+  "feedback": "Certificate of internship completition has been updated.",
+  "applied": "You have successfully applied for an internship."
 }

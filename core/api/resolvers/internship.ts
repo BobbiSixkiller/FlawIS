@@ -113,7 +113,7 @@ export class InternshipResolver {
     console.log({ ...internship, myApplication: intern });
 
     return {
-      message: "Success!",
+      message: this.i18nService.translate("applied", { ns: "intern" }),
       data: { ...internship.toObject(), myApplication: intern },
     };
   }

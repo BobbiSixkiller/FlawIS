@@ -7,8 +7,6 @@ import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
 import InternshipForm from "./InternshipForm";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
-import { Suspense } from "react";
-import Spinner from "@/components/Spinner";
 
 export default function InternshipDialog({
   data,
@@ -40,15 +38,7 @@ export default function InternshipDialog({
       )}
 
       <Modal title={data ? t("update") : t("new")} dialogId={dialogId}>
-        <Suspense
-          fallback={
-            <div className="flex justify-center">
-              <Spinner />
-            </div>
-          }
-        >
-          <InternshipForm data={data} />
-        </Suspense>
+        <InternshipForm data={data} />
       </Modal>
     </div>
   );

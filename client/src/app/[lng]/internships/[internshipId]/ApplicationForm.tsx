@@ -11,27 +11,29 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { changeInternFiles, createIntern } from "./actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import { deleteFiles } from "@/lib/minio";
+import { changeInternFiles, createIntern } from "./actions";
+import { useDialog } from "@/providers/DialogProvider";
 
 export default function ApplicationForm({
   user,
   application,
+  dialogId,
 }: {
   user: UserFragment;
   application?: ApplicationFragment | null;
+  dialogId: string;
 }) {
   const [loadingFiles, setLoadingFiles] = useState(true);
   const { lng, internshipId } = useParams<{
     lng: string;
     internshipId: string;
   }>();
-  const router = useRouter();
   const { t } = useTranslation(lng, ["validation", "common"]);
 
   const { yup } = useValidation();
@@ -84,6 +86,8 @@ export default function ApplicationForm({
   }, []);
 
   const { dispatch } = useContext(MessageContext);
+
+  const { closeDialog } = useDialog();
 
   if (loadingFiles)
     return (
@@ -159,7 +163,7 @@ export default function ApplicationForm({
                 type: ActionTypes.SetAppMsg,
                 payload: state,
               });
-              router.back();
+              closeDialog(dialogId);
             }
           },
           (err) => console.log(err)

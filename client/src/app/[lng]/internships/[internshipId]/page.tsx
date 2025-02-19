@@ -14,6 +14,7 @@ import InternshipDialog from "../InternshipDialog";
 import DeleteInternshipDialog from "./DeleteInternshipDialog";
 import DeleteApplicationDialog from "./DeleteApplicationDialog";
 import CloseButton from "@/components/CloseButton";
+import ApplicationDialog from "./ApplicationDialog";
 
 export default async function InternshipPage({
   params: { internshipId, lng },
@@ -59,7 +60,7 @@ export default async function InternshipPage({
               application={internship.myApplication}
               controls={
                 <div className="flex gap-2">
-                  {internship.myApplication.status === Status.Applied && (
+                  {/* {internship.myApplication.status === Status.Applied && (
                     <Button
                       as={Link}
                       href={`/${internshipId}/application`}
@@ -67,6 +68,13 @@ export default async function InternshipPage({
                     >
                       <PencilIcon className="size-5" />
                     </Button>
+                  )} */}
+
+                  {internship.myApplication.status === Status.Applied && (
+                    <ApplicationDialog
+                      application={internship.myApplication}
+                      user={user}
+                    />
                   )}
 
                   {internship.myApplication.status !== Status.Accepted && (
@@ -91,14 +99,15 @@ export default async function InternshipPage({
               </Link>
               .
             </div>
-            <Button
+            {/* <Button
               type="button"
               className="w-full"
               as={Link}
               href={`/${internshipId}/application`}
             >
               <InboxArrowDownIcon className="size-5 stroke-2 mr-2" /> Prihlasit
-            </Button>
+            </Button> */}
+            <ApplicationDialog user={user} />
           </>
         )
       ) : null}
