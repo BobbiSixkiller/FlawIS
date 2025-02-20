@@ -47,8 +47,16 @@ export async function executeGqlFetch<Data, Variables>(
 }
 
 export async function setDarkThemeCookie(val: boolean) {
+  const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+
   if (val) {
-    cookies().set("theme", "dark");
+    cookies().set("theme", "dark", {
+      expires,
+      sameSite: "lax",
+      path: "/",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
   } else {
     cookies().delete("theme");
   }
