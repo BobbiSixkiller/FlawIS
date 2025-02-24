@@ -103,7 +103,7 @@ export async function Application({
               {application.organizationFeedbackUrl && (
                 <li>
                   <Link
-                    className="text-primary-500 hover:underline"
+                    className="text-primary-500 dark:text-primary-400 hover:underline"
                     href={`/minio?bucketName=internships&url=${application.organizationFeedbackUrl}`}
                   >
                     {application.organizationFeedbackUrl
