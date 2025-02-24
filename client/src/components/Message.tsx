@@ -4,19 +4,14 @@ import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useParams, useRouter } from "next/navigation";
-import { Fragment, useContext, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Fragment, useContext } from "react";
 import { setTimeout } from "timers";
 
 export function FormMessage() {
-  const router = useRouter();
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "common");
   const { formMessage, dispatch } = useContext(MessageContext);
-
-  useEffect(() => {
-    dispatch({ type: ActionTypes.ClearFormMsg });
-  }, [router]);
 
   return (
     <Transition

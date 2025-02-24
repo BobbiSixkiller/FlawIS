@@ -21,6 +21,8 @@ import {
 } from "@headlessui/react";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
+import Modal from "@/components/Modal";
+import { useDialog } from "@/providers/DialogProvider";
 
 export default function ActivateAccountDialog({
   lng,
@@ -29,27 +31,35 @@ export default function ActivateAccountDialog({
   lng: string;
   user?: UserFragment;
 }) {
-  const [open, setOpen] = useState((user && !user?.verified) || false);
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "activateAccount");
 
+  const dialogId = "activate";
+  const { closeDialog, openDialog } = useDialog();
+
+  useEffect(() => {
+    if (user?.verified) {
+      closeDialog(dialogId);
+    } else {
+      openDialog(dialogId);
+    }
+  }, [user]);
+
   useEffect(() => {
     async function activateCb() {
       const res = await activate();
-      if (res) {
-        if (res?.message && !res.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: res,
-          });
-        }
-        if (res?.message && res.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: res,
-          });
-        }
+      if (res && !res.success) {
+        dispatch({
+          type: ActionTypes.SetFormMsg,
+          payload: res,
+        });
+      }
+      if (res?.message && res.success) {
+        dispatch({
+          type: ActionTypes.SetAppMsg,
+          payload: res,
+        });
       }
     }
 
@@ -69,61 +79,22 @@ export default function ActivateAccountDialog({
   };
 
   return (
-    <Transition appear show={open} as={Fragment}>
-      <Dialog
-        as="div"
-        className="fixed inset-0 overflow-y-auto z-20"
-        onClose={() => setOpen(!user?.verified)}
-      >
-        <TransitionChild
-          enter="duration-300 ease-out"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="duration-200 ease-in"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+    <Modal dialogId={dialogId} title={t("heading")} togglerHidden>
+      <div className="flex flex-col gap-4 sm:max-w-96">
+        <p>{t("body")}</p>
+
+        <Button
+          className="w-full"
+          type="button"
+          size="sm"
+          disabled={isPending}
+          onClick={onClick}
         >
-          <DialogPanel className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+          {isPending ? <Spinner inverted /> : t("button")}
+        </Button>
 
-        <div className="flex min-h-full items-center justify-center p-4 text-center">
-          <TransitionChild
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
-          >
-            <DialogPanel className="z-20 w-full max-w-lg mx-auto overflow-hidden rounded-xl ring-1 ring-black/5 bg-white p-6 text-left align-middle shadow-2xl">
-              <div className="flex justify-between">
-                <DialogTitle
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
-                >
-                  {t("heading")}
-                </DialogTitle>
-              </div>
-              <div className="flex flex-col gap-4">
-                {t("body")}
-
-                <Button
-                  className="w-full"
-                  type="button"
-                  size="sm"
-                  disabled={isPending}
-                  onClick={onClick}
-                >
-                  {isPending ? <Spinner inverted /> : t("button")}
-                </Button>
-
-                <FormMessage />
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </Transition>
+        <FormMessage />
+      </div>
+    </Modal>
   );
 }

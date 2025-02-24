@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import {
   ActivateUserDocument,
@@ -34,11 +34,13 @@ export async function getGoogleAuthLink(url?: string) {
 }
 
 export async function getMe() {
+  const user = cookies().get("user")?.value || "me";
+
   const res = await executeGqlFetch(
     MeDocument,
     undefined,
     {},
-    { revalidate: 60 * 60 }
+    { revalidate: 60 * 60, tags: [user] }
   );
 
   if (res.errors) {
@@ -60,12 +62,14 @@ export async function activate() {
     });
 
     if (res.errors) {
+      console.log(res.errors[0]);
       throw new Error(res.errors[0].message);
     }
 
     cookies().delete("activationToken");
-    revalidatePath("/");
-    return { success: true, message: res.data.activateUser };
+    revalidateTag(res.data.activateUser.data.email);
+
+    return { success: true, message: res.data.activateUser.message };
   } catch (error: any) {
     return {
       success: false,

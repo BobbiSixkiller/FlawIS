@@ -32,6 +32,17 @@ export async function register({
     if (res.data.register) {
       const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+      cookies().set("user", res.data.register.data.email, {
+        httpOnly: true,
+        expires, //accesstoken expires in 24 hours
+        secure: process.env.NODE_ENV !== "development",
+        sameSite: "lax",
+        path: "/", // make it available on every route
+        domain:
+          process.env.NODE_ENV === "development"
+            ? "localhost"
+            : ".flaw.uniba.sk",
+      });
       cookies().set("accessToken", res.data.register.data.token, {
         httpOnly: true,
         expires, //accesstoken expires in 24 hours

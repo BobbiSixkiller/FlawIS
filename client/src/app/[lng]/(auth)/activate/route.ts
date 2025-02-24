@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { activate } from "../actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
       httpOnly: true,
       expires: new Date(Date.now() + 60 * 60 * 1000),
     });
-    await activate();
+    // await activate();
   }
 
   return redirect("/");

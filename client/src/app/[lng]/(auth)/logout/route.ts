@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
@@ -9,6 +9,8 @@ export async function GET(req: NextRequest) {
   const redirectUrl = url ? decodeURIComponent(url) : "/login";
 
   const token = cookies().get("accessToken")?.value;
+  const user = cookies().get("user")?.value;
+
   if (token) {
     cookies().delete({
       name: "accessToken",
@@ -20,7 +22,18 @@ export async function GET(req: NextRequest) {
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
   }
+  if (user) {
+    cookies().delete({
+      name: "user",
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      path: "/", // make it available on every route
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
+  }
 
-  revalidatePath("/", "layout");
+  revalidateTag(user || "me");
   redirect(redirectUrl);
 }
