@@ -27,13 +27,13 @@ export default async function Profile({
         ]}
       />
 
-      <div className="border-t border-gray-100">
-        <dl className="divide-y divide-gray-100">
+      <div className="border-t border-gray-100 dark:border-gray-700">
+        <dl className="divide-y divide-gray-100 dark:divide-gray-700">
           <div className="sm:h-20 py-6 sm:p-0 sm:grid sm:grid-cols-3 sm:gap-4 items-center">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center gap-2">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex items-center gap-2">
               {user.avatarUrl ? (
                 <DynamicImage
                   src={user.avatarUrl}
@@ -44,7 +44,7 @@ export default async function Profile({
                   style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div className="size-12 rounded-full flex justify-center items-center bg-primary-300 text-white">
+                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white">
                   {user.name
                     .split(" ")
                     .map((n, i) => {
@@ -57,27 +57,27 @@ export default async function Profile({
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("email")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user?.email}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("org")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {user?.organization || "N/A"}
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+              {user?.organization}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("phone")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {user?.telephone || "N/A"}
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+              {user?.telephone}
             </dd>
           </div>
         </dl>

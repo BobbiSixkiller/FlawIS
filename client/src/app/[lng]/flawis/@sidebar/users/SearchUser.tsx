@@ -20,12 +20,14 @@ function ConferenceOption({
   return (
     <div
       className={`px-4 py-2 ${
-        active ? "bg-primary-500 text-white" : "bg-white"
-      } flex gap-2 font-semibold cursor-pointer`}
+        active ? "bg-primary-500 text-white" : "bg-transparent"
+      } flex gap-2 font-semibold cursor-pointer dark:text-white`}
     >
       {data.name}
       <span
-        className={`font-normal ${active ? "text-gray-200" : "text-gray-500"}`}
+        className={`font-normal ${
+          active ? "text-gray-200" : "text-gray-500 dark:text-gray-400"
+        }`}
       >
         {data.email}
       </span>

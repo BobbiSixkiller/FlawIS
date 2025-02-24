@@ -46,45 +46,45 @@ export default async function User({
           },
         ]}
       />
-      <div className="mt-6 border-t border-gray-100">
-        <dl className="divide-y divide-gray-100">
+      <div className="border-t border-gray-100 dark:border-gray-700">
+        <dl className="divide-y divide-gray-100 dark:divide-gray-700">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white dark:text-white">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user.name}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("email")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user.email}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("org")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user.organization || "N/A"}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("phone")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user.telephone || "N/A"}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("access")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex flex-col gap-1">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex flex-col gap-1">
               {user.access.length > 0 ? (
                 <ul>
                   {user.access.map((item, i) => (
@@ -97,7 +97,7 @@ export default async function User({
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 items-center">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("status")}
             </dt>
             <dd
@@ -116,18 +116,18 @@ export default async function User({
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("studyProgramme")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user.studyProgramme ? t(user.studyProgramme) : "N/A"}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("cv")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user?.cvUrl ? (
                 <Link
                   href={`/minio?bucketName=resumes&url=${user.cvUrl}`}

@@ -10,6 +10,7 @@ import { useParams, usePathname } from "next/navigation";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { getConferences } from "../flawis/conferences/actions";
+import { cn } from "@/utils/helpers";
 
 function ListItem({ data }: { data?: ConferenceFragment }) {
   const { lng } = useParams<{ lng: string }>();
@@ -29,7 +30,10 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
 
   return (
     <Link
-      className="h-fit w-fit rounded-2xl dark:border-gray-700 border p-4 shadow hover:shadow-lg text-gray-900 dark:text-white bg-white dark:bg-gray-700 text-sm cursor-pointer focus:outline-primary-500"
+      className={cn([
+        "h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 bg-white text-sm cursor-pointer focus:outline-primary-500",
+        "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+      ])}
       href={
         path.includes("conferences")
           ? `/conferences/${data?.slug}`

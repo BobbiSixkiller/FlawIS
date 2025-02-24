@@ -1,6 +1,7 @@
 "use client";
 
 import Spinner from "@/components/Spinner";
+import { cn } from "@/utils/helpers";
 import {
   Combobox,
   ComboboxInput,
@@ -61,7 +62,10 @@ export default function SearchComponent<T extends { id: string }>({
     <>
       <div
         onClick={() => setOpen(true)}
-        className="cursor-pointer px-4 rounded-full border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 flex items-center text-gray-500"
+        className={cn([
+          "cursor-pointer px-4 rounded-full border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 flex items-center text-gray-500",
+          "dark:bg-gray-800 dark:ring-gray-600",
+        ])}
       >
         <MagnifyingGlassIcon className="size-6 mr-2" />
         Search...
@@ -101,7 +105,10 @@ export default function SearchComponent<T extends { id: string }>({
                   onOptionSelect(val);
                 }}
                 as="div"
-                className="z-20 relative bg-white max-w-xl mx-auto rounded-xl shadow-2xl ring-1 ring-black/5 divide-y overflow-hidden"
+                className={cn([
+                  "z-20 relative bg-white max-w-xl mx-auto rounded-xl shadow-2xl ring-1 ring-black/5 divide-y dark:divide-gray-600 overflow-hidden",
+                  "dark:bg-gray-800 dark:ring-gray-600",
+                ])}
               >
                 <div className="px-4 flex items-center">
                   <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
@@ -109,7 +116,10 @@ export default function SearchComponent<T extends { id: string }>({
                     autoComplete="off"
                     autoFocus
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder:text-gray-400 h-12"
+                    className={cn([
+                      "w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder:text-gray-400 h-12",
+                      "dark:text-white",
+                    ])}
                     placeholder="Search..."
                     displayValue={() => ""}
                   />

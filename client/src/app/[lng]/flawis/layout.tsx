@@ -119,13 +119,13 @@ export default async function DashboardLayout({
         </div>{" "}
       </MobileNav>
       {/* Dashboard content with sidebar */}
-      <div className="flex-1 grid grid-cols-3 lg:divide-x gap-6 lg:gap-0">
+      <div className="flex-1 grid grid-cols-3 lg:divide-x dark:bg-gray-800 dark:lg:divide-gray-600 gap-6 lg:gap-0">
         <div className="container mx-auto col-span-3 lg:col-span-2 p-6 flex flex-col gap-6">
           <Breadcrumbs
             homeElement={<HomeIcon className="h-5 w-5" />}
             separator={<ChevronRightIcon className="h-3 w-3" />}
             activeClasses="text-primary-500 hover:underline"
-            containerClasses="flex flex-wrap text-sm gap-2 items-center"
+            containerClasses="flex flex-wrap text-sm gap-2 items-center dark:text-white"
             capitalizeLinks
           />
           {children}

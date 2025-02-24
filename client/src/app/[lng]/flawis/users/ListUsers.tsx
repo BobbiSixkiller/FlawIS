@@ -8,6 +8,7 @@ import {
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import { Access } from "@/lib/graphql/generated/graphql";
+import { cn } from "@/utils/helpers";
 
 interface UserData {
   id: string;
@@ -21,11 +22,16 @@ interface UserData {
 function ListItem({ data }: { data?: UserData }) {
   return (
     <Link
-      className="rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
+      className={cn([
+        "rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500",
+        "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+      ])}
       href={`/users/${data?.id}`}
     >
       <h2 className="font-medium leading-6">{data?.name}</h2>
-      <p className="leading-none text-gray-500">{data?.organization}</p>
+      <p className="leading-none text-gray-500 dark:text-gray-300">
+        {data?.organization}
+      </p>
       <p className="mt-2">Email: {data?.email}</p>
       <p>Access: {data?.access.join(" ")}</p>
       <p className={`${data?.verified ? "text-green-500" : "text-red-500"}`}>

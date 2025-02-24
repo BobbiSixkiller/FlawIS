@@ -58,6 +58,12 @@ export async function setDarkThemeCookie(val: boolean) {
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
   } else {
-    cookies().delete("theme");
+    cookies().delete({
+      name: "theme",
+      sameSite: "lax",
+      path: "/",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
   }
 }

@@ -33,7 +33,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0 flex items-center gap-2">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex items-center gap-2">
               {user.avatarUrl ? (
                 <DynamicImage
                   src={user.avatarUrl}
@@ -44,7 +44,7 @@ export default async function Profile({
                   style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div className="size-12 rounded-full flex justify-center items-center bg-primary-300 text-white">
+                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white">
                   {user.name
                     .split(" ")
                     .map((n, i) => {
@@ -60,7 +60,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("email")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user?.email}
             </dd>
           </div>
@@ -68,7 +68,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("org")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user?.organization}
             </dd>
           </div>
@@ -76,7 +76,7 @@ export default async function Profile({
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("phone")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
               {user?.telephone}
             </dd>
           </div>
