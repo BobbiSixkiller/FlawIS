@@ -61,6 +61,8 @@ services:
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_FROM: ${MAIL_FROM}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       RMQ_URI: amqp://rabbitmq-staging:5672
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
