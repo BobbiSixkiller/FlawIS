@@ -50,12 +50,12 @@ export default function PhoneInput({
             "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none",
         ])}
       >
-        <div className="flex items-center">
+        <div className="flex items-center p-1">
           <label htmlFor="code" className="sr-only">
             Country code
           </label>
           <select
-            className="py-1.5 pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-9 dark:text-white dark:bg-gray-700"
+            className="py-px pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-7 dark:text-white dark:bg-gray-800"
             disabled={disabled}
             id="code"
             name="code"
