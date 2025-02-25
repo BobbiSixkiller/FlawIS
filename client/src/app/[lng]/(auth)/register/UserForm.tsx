@@ -230,7 +230,9 @@ export default function UserForm({
   const email = methods.watch("email");
   useEffect(() => {
     if (email.includes("uniba")) {
-      methods.setValue("organization", t("flaw", { ns: "common" }));
+      methods.setValue("organization", t("flaw", { ns: "common" }), {
+        shouldValidate: true,
+      });
     }
   }, [email, lng, t]);
 
