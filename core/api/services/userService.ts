@@ -102,11 +102,13 @@ export class UserService {
   ) {
     const access: Access[] = [];
 
+    const user = await this.crudService.create({
+      ...data,
+    });
+
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
-
-    console.log("TOKEN ", token, Boolean(token) === true);
 
     if (hostname?.includes("intern")) {
       if (token && token !== "undefined") {
@@ -117,10 +119,7 @@ export class UserService {
       }
     }
 
-    const user = await this.crudService.create({
-      ...data,
-      access: data.access ? data.access : access,
-    });
+    user.access = data.access ? data.access : access;
 
     if (!isAdmin) {
       this.rmqService.produceMessage(
@@ -135,8 +134,9 @@ export class UserService {
       );
     } else {
       user.verified = true;
-      await user.save();
     }
+
+    await user.save();
 
     return user;
   }
