@@ -55,7 +55,7 @@ export default function PhoneInput({
             Country code
           </label>
           <select
-            className="py-1.5 pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-9 dark:text-white dark:bg-gray-600"
+            className="py-1.5 pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-9 dark:text-white dark:bg-gray-700"
             disabled={disabled}
             id="code"
             name="code"
