@@ -18,14 +18,24 @@ export async function generateMetadata(
   const host = headers().get("host") || "flawis.flaw.uniba.sk";
   const tenant = host.split(".")[0].replace("-staging", "");
 
+  const url =
+    process.env.NODE_ENV !== "development"
+      ? new URL(`https://${host}`)
+      : undefined;
+  const title = `${t("internships")} | ${t("title")}`;
+  const description = t(`${tenant}Desc`);
+
   return {
-    metadataBase:
-      process.env.NODE_ENV !== "development"
-        ? new URL(`https://${host}`)
-        : undefined,
-    title: `${t("login")} | ${t("title")}`,
-    description: t(`${tenant}Desc`),
+    metadataBase: url,
+    title,
+    description,
     openGraph: {
+      url,
+      type: "website",
+      siteName: "FlawIS",
+      locale: lng,
+      title,
+      description,
       images: [`/images/Praf-logo-text-${lng}.png`],
     },
   };
