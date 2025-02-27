@@ -3,6 +3,7 @@
 import Button from "@/components/Button";
 import Toggle from "@/components/Toggle";
 import { SectionFragment } from "@/lib/graphql/generated/graphql";
+import { cn } from "@/utils/helpers";
 import {
   Popover,
   PopoverButton,
@@ -81,7 +82,12 @@ export default function AttendeeFilter({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <PopoverPanel className="absolute z-10 p-3 w-screen max-w-[calc(100vw-3rem)] sm:max-w-sm mt-3 -left-20 mr-20 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-y-auto h-fit max-h-48 text-sm">
+            <PopoverPanel
+              className={cn([
+                "absolute z-10 p-3 w-screen max-w-[calc(100vw-3rem)] sm:max-w-sm mt-3 -left-20 mr-20 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white text-gray-900 overflow-y-auto h-fit max-h-48 text-sm",
+                "dark:bg-gray-700 dark:text-white",
+              ])}
+            >
               <div className="flex items-center justify-between">
                 Pasivny ucastnici
                 <Toggle
