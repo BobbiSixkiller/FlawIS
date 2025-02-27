@@ -3,6 +3,7 @@ import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { conferenceSections } from "./actions";
 import { SubmissionFilesFragment } from "@/lib/graphql/generated/graphql";
+import Button from "@/components/Button";
 
 export default async function SectionsPage({
   params: { lng, slug },
@@ -24,22 +25,24 @@ export default async function SectionsPage({
 
   return (
     <div className="flex flex-col gap-2">
-      <Link
+      <Button
+        size="sm"
+        as={Link}
         href={`/conferences/${slug}/sections/new`}
         scroll={false}
         className="px-3 py-2 rounded-md max-w-fit bg-primary-500 hover:bg-primary-700 flex gap-2 items-center justify-center font-semibold text-white text-sm"
       >
         <PlusIcon className="h-5 w-5" />
         Nova
-      </Link>
-      <div className="-mx-6 sm:mx-0 divide-y">
+      </Button>
+      <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
         {conference?.sections.map((s, i) => (
           <div
-            className="p-6 sm:p-4 flex justify-between sm:items-center gap-4"
+            className="p-6 sm:p-4 flex justify-between sm:items-center gap-4 dark:text-white"
             key={i}
           >
             <div className="flex flex-col w-3/4">
-              <span className="text-lg text-gray-900">
+              <span className="text-lg">
                 {s.translations[lng as "sk" | "en"].name}
               </span>
               <span className="text-sm text-gray-400">
@@ -61,7 +64,7 @@ export default async function SectionsPage({
                   ? [
                       {
                         href: `/conferences/${slug}/sections/${s.id}/update`,
-                        label: "Aktualizovat",
+                        text: "Aktualizovat",
                       },
                       {
                         href: `/minio?bucketName=${s.conference?.slug}${
@@ -74,21 +77,21 @@ export default async function SectionsPage({
                             .filter(Boolean) // Filter out null values
                             .join("") // Join without adding commas
                         }`,
-                        label: "Prispevky.zip",
+                        text: "Prispevky.zip",
                       },
                       {
                         href: `/conferences/${slug}/sections/${s.id}/delete`,
-                        label: "Zmazat",
+                        text: "Zmazat",
                       },
                     ]
                   : [
                       {
                         href: `/conferences/${slug}/sections/${s.id}/update`,
-                        label: "Aktualizovat",
+                        text: "Aktualizovat",
                       },
                       {
                         href: `/conferences/${slug}/sections/${s.id}/delete`,
-                        label: "Zmazat",
+                        text: "Zmazat",
                       },
                     ]
               }

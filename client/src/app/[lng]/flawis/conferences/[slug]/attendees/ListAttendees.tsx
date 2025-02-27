@@ -9,11 +9,15 @@ import {
 import { LegacyRef, ReactNode } from "react";
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
 import { useParams, useSearchParams } from "next/navigation";
+import { cn } from "@/utils/helpers";
 
 function ListItem({ data }: { data?: AttendeeFragment }) {
   return (
     <Link
-      className="rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500"
+      className={cn([
+        "rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 text-sm cursor-pointer focus:outline-primary-500",
+        "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+      ])}
       href={`/conferences/${data?.conference.slug}/attendees/${data?.id}`}
     >
       <h2 className="font-medium leading-6">{data?.user.name}</h2>

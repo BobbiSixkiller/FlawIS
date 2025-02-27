@@ -46,7 +46,7 @@ export default async function User({
           },
         ]}
       />
-      <div className="border-t border-gray-100 dark:border-gray-700">
+      <div className="mt-6 border-t border-gray-100 dark:border-gray-700">
         <dl className="divide-y divide-gray-100 dark:divide-gray-700">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white dark:text-white">

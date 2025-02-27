@@ -8,11 +8,12 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { capitalizeFirstLetter } from "@/utils/helpers";
+import { capitalizeFirstLetter, cn } from "@/utils/helpers";
 import RemoveAuthor from "./RemoveAuthor";
 import { executeGqlFetch } from "@/utils/actions";
 import { AttendeeDocument } from "@/lib/graphql/generated/graphql";
 import { getAttendee } from "./actions";
+import CloseButton from "@/components/CloseButton";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
@@ -26,13 +27,8 @@ export default async function AttendeePage({
 
   return (
     <div className="flex flex-col gap-4">
-      <Link
-        className="rounded-full p-2 text-gray-900 hover:bg-gray-100 max-w-fit hover:text-gray-400"
-        href={`/conferences/${slug}/attendees`}
-        scroll={false}
-      >
-        <XMarkIcon className="w-5 h-5" />
-      </Link>
+      <CloseButton href={`/conferences/${slug}/attendees`} />
+
       <Heading
         lng={lng}
         heading={attendee.user.name}
@@ -69,7 +65,10 @@ export default async function AttendeePage({
           {attendee.submissions.map((s) => (
             <div
               key={s.id}
-              className="rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1"
+              className={cn([
+                "rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1",
+                "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+              ])}
             >
               <h2 className="font-medium leading-6">
                 {capitalizeFirstLetter(s.translations[lng as "sk" | "en"].name)}
