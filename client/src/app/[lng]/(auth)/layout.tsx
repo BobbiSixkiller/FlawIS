@@ -22,7 +22,7 @@ export async function generateMetadata(
     process.env.NODE_ENV !== "development"
       ? new URL(`https://${host}`)
       : undefined;
-  const title = `${t("internships")} | ${t("title")}`;
+  const title = `${t(tenant)} | ${t("title")}`;
   const description = t(`${tenant}Desc`);
 
   return {
