@@ -24,6 +24,19 @@ const nextConfig = {
       { protocol: "https", hostname: "avatar.iran.liara.run" },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*{ttf|ttc|otf|eot|woff|woff2|font.css}",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withPlaiceholder(nextConfig);
