@@ -72,7 +72,7 @@ export class SubmissionTranslation {
           value: submissionExists.translations.sk.name, // Value that haven't pass a validation
           constraints: {
             // Constraints that failed validation with error messages.
-            name: Container.get(I18nService).translate("nameExists", {
+            name: Container.get(I18nService).translate("skNameExists", {
               ns: "submission",
               name: submissionExists.translations.sk.name,
             }),
@@ -94,7 +94,7 @@ export class SubmissionTranslation {
           value: submissionExists.translations.en.name, // Value that haven't pass a validation
           constraints: {
             // Constraints that failed validation with error messages.
-            name: Container.get(I18nService).translate("nameExists", {
+            name: Container.get(I18nService).translate("enNameExists", {
               ns: "submission",
               name: submissionExists.translations.en.name,
             }),
