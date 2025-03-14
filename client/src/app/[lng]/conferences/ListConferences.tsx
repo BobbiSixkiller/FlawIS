@@ -11,21 +11,28 @@ import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { getConferences } from "../flawis/conferences/actions";
 import { cn } from "@/utils/helpers";
+import { useTranslation } from "@/lib/i18n/client";
 
 function ListItem({ data }: { data?: ConferenceFragment }) {
   const { lng } = useParams<{ lng: string }>();
   const path = usePathname();
 
+  const { t } = useTranslation(lng, "conferences");
+
   // Create Date objects for start and end dates
   const startDate = data?.dates.start ? new Date(data.dates.start) : null;
   const endDate = data?.dates.end ? new Date(data.dates.end) : null;
+  const regEndDate = data?.dates.regEnd ? new Date(data.dates.regEnd) : null;
 
   // Format start and end dates using toLocaleString method
   const start = startDate
     ? startDate.toLocaleString("sk", { timeZone: "UTC" })
-    : "N/A";
+    : "N'/'A";
   const end = endDate
     ? endDate.toLocaleString("sk", { timeZone: "UTC" })
+    : "N'/'A";
+  const regEnd = regEndDate
+    ? regEndDate.toLocaleString("sk", { timeZone: "UTC" })
     : "N/A";
 
   return (
@@ -53,7 +60,12 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
         {data?.translations[lng as "sk" | "en"].name}
       </h2>
       <p className="leading-none text-gray-500 dark:text-gray-300">
-        Prebieha od {start} do {end}
+        {t("conference.listItem", {
+          start,
+          end,
+          regEnd,
+          interpolation: { escapeValue: false },
+        })}
       </p>
     </Link>
   );

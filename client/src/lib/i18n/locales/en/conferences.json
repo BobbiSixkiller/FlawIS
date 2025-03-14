@@ -42,7 +42,8 @@
     "start": "Start",
     "end": "End",
     "regEnd": "Registration end",
-    "submissionDeadline": "Submission file upload deadline"
+    "submissionDeadline": "Submission file upload deadline",
+    "listItem": "Takes place from {{start}} till {{end}}. Registration ends on {{regEnd}}."
   },
   "editSubmission": "Edit submission / upload submission file"
 }

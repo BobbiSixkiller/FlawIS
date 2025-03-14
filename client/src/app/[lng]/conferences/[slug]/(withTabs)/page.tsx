@@ -13,6 +13,13 @@ export default async function ConferencePage({
 }) {
   const { t } = await translate(lng, "conferences");
   const conference = await getConference(slug);
+  if (
+    conference &&
+    !conference.attending &&
+    new Date(conference.dates.regEnd) < new Date()
+  ) {
+    redirect("/");
+  }
   if (conference && !conference.attending) {
     redirect(`/${slug}/register`);
   }
