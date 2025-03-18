@@ -50,13 +50,8 @@ export async function getConference(slug: string) {
   return res.data?.conference;
 }
 
-export async function searchConference(text: string) {
-  const res = await executeGqlFetch(
-    TextSearchConferenceDocument,
-    { text },
-    {},
-    { revalidate: 3600 }
-  );
+export async function searchConference(params: { text: string }) {
+  const res = await executeGqlFetch(TextSearchConferenceDocument, params);
 
   return res.data.textSearchConference || [];
 }
