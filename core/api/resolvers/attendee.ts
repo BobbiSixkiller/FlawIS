@@ -150,9 +150,11 @@ export class AttendeeResolver {
   async submissions(
     @Root() { user: { id: userId }, conference: { id: conferenceId } }: Attendee
   ) {
-    return await this.submissionService.findAll({
+    const res = await this.submissionService.findAll({
       conference: conferenceId,
       authors: userId,
     });
+    console.log(res);
+    return res;
   }
 }
