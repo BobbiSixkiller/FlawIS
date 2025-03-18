@@ -47,13 +47,8 @@ export async function getUser(id: string) {
   return res.data?.user;
 }
 
-export async function searchUser(text: string) {
-  const res = await executeGqlFetch(
-    TextSearchUserDocument,
-    { text },
-    {},
-    { revalidate: 3600 }
-  );
+export async function searchUser(params: { text: string }) {
+  const res = await executeGqlFetch(TextSearchUserDocument, params);
 
   return res.data.textSearchUser || [];
 }

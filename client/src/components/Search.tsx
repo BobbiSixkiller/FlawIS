@@ -15,21 +15,28 @@ import {
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ComponentType, Fragment, useEffect, useState } from "react";
 
-interface SearchComponentProps<T> {
-  fetchOptions: (search: string) => Promise<T[]>;
-  onOptionSelect: (option: T) => void;
-  Option: ComponentType<{ data: T; active: boolean }>;
+interface BaseSearchParams {
+  text: string;
 }
 
-export default function SearchComponent<T extends { id: string }>({
+interface SearchComponentProps<TOption, TParams extends BaseSearchParams> {
+  fetchOptions: (params: TParams) => Promise<TOption[]>;
+  onOptionSelect: (option: TOption) => void;
+  Option: ComponentType<{ data: TOption; active: boolean }>;
+}
+
+export default function SearchComponent<
+  TOption extends { id: string },
+  TParams extends { text: string }
+>({
   fetchOptions,
   Option,
   onOptionSelect,
-}: SearchComponentProps<T>) {
+}: SearchComponentProps<TOption, TParams>) {
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [options, setOptions] = useState<T[]>([]);
+  const [options, setOptions] = useState<TOption[]>([]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -48,15 +55,15 @@ export default function SearchComponent<T extends { id: string }>({
   useEffect(() => {
     async function fetchOptionsAsync() {
       setLoading(true);
-      const res = await fetchOptions(search);
+      const res = await fetchOptions({ text } as TParams);
       setLoading(false);
       setOptions(res);
     }
 
-    if (search) {
+    if (text) {
       fetchOptionsAsync();
     }
-  }, [search, fetchOptions]);
+  }, [text, fetchOptions]);
 
   return (
     <>
@@ -99,9 +106,9 @@ export default function SearchComponent<T extends { id: string }>({
           >
             <DialogPanel as={Fragment}>
               <Combobox
-                onChange={(val: T) => {
+                onChange={(val: TOption) => {
                   setOpen(false);
-                  setSearch("");
+                  setText("");
                   onOptionSelect(val);
                 }}
                 as="div"
@@ -115,7 +122,7 @@ export default function SearchComponent<T extends { id: string }>({
                   <ComboboxInput
                     autoComplete="off"
                     autoFocus
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => setText(e.target.value)}
                     className={cn([
                       "w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder:text-gray-400 h-12",
                       "dark:text-white",
@@ -137,7 +144,7 @@ export default function SearchComponent<T extends { id: string }>({
                     ))}
                   </ComboboxOptions>
                 )}
-                {search && options.length === 0 && (
+                {text && options.length === 0 && (
                   <p className="p-4 text-sm text-gray-500">No results found.</p>
                 )}
               </Combobox>

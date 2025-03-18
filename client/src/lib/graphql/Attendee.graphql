@@ -76,8 +76,8 @@ query attendeesCsvExport($slug: String!) {
   }
 }
 
-query textSearchAttendee($text: String!) {
-  textSearchAttendee(text: $text) {
+query textSearchAttendee($text: String!, $slug: String!) {
+  textSearchAttendee(text: $text, slug: $slug) {
     id
     user {
       ... on AttendeeUser {

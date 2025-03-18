@@ -4,14 +4,11 @@ import {
   ArrowsRightLeftIcon,
   PencilIcon,
   TrashIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter, cn } from "@/utils/helpers";
 import RemoveAuthor from "./RemoveAuthor";
-import { executeGqlFetch } from "@/utils/actions";
-import { AttendeeDocument } from "@/lib/graphql/generated/graphql";
 import { getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
 
@@ -24,8 +21,6 @@ export default async function AttendeePage({
   if (!attendee) {
     redirect(`/conferences/${slug}/attendees`);
   }
-
-  console.log("ATTENDEE PAGE ", attendee);
 
   return (
     <div className="flex flex-col gap-4">

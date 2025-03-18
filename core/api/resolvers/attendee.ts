@@ -72,11 +72,21 @@ export class AttendeeResolver {
 
   @Authorized(["ADMIN"])
   @Query(() => [Attendee])
-  async textSearchAttendee(@Arg("text") text: string) {
+  async textSearchAttendee(
+    @Arg("text") text: string,
+    @Arg("slug") slug: string
+  ) {
     await this.attendeeService.dataModel.syncIndexes();
 
     return await this.attendeeService.aggregate([
-      { $match: { $text: { $search: text } } },
+      {
+        $match: {
+          $and: [
+            { $text: { $search: text } },
+            { slug: slug }, // Replace 'slug' with the variable holding the slug value
+          ],
+        },
+      },
       { $sort: { score: { $meta: "textScore" } } },
       { $addFields: { id: "$_id", "user.id": "$user._id" } },
       { $limit: 10 },
@@ -150,11 +160,9 @@ export class AttendeeResolver {
   async submissions(
     @Root() { user: { id: userId }, conference: { id: conferenceId } }: Attendee
   ) {
-    const res = await this.submissionService.findAll({
+    return await this.submissionService.findAll({
       conference: conferenceId,
       authors: userId,
     });
-    console.log(res);
-    return res;
   }
 }

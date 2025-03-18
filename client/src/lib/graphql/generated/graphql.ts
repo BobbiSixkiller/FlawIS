@@ -707,6 +707,7 @@ export type QuerySubmissionArgs = {
 
 
 export type QueryTextSearchAttendeeArgs = {
+  slug: Scalars['String']['input'];
   text: Scalars['String']['input'];
 };
 
@@ -1014,6 +1015,7 @@ export type AttendeesCsvExportQuery = { __typename?: 'Query', attendeesCsvExport
 
 export type TextSearchAttendeeQueryVariables = Exact<{
   text: Scalars['String']['input'];
+  slug: Scalars['String']['input'];
 }>;
 
 
@@ -2433,8 +2435,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<AttendeesCsvExportQuery, AttendeesCsvExportQueryVariables>;
 export const TextSearchAttendeeDocument = new TypedDocumentString(`
-    query textSearchAttendee($text: String!) {
-  textSearchAttendee(text: $text) {
+    query textSearchAttendee($text: String!, $slug: String!) {
+  textSearchAttendee(text: $text, slug: $slug) {
     id
     user {
       ... on AttendeeUser {
