@@ -22,7 +22,7 @@ function AttendeeOption({
   return (
     <div
       className={`px-4 py-2 ${
-        active ? "bg-primary-500 text-white" : "bg-white"
+        active ? "bg-primary-500 text-white" : ""
       } flex gap-2 font-semibold cursor-pointer`}
     >
       {data.user.name}
@@ -47,7 +47,7 @@ export default function SearchAttendee() {
     <SearchComponent
       Option={AttendeeOption}
       onOptionSelect={onOptionSelect}
-      fetchOptions={searchAttendee}
+      fetchOptions={async ({ text }) => await searchAttendee({ text, slug })}
     />
   );
 }

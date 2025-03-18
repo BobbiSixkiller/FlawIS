@@ -10,13 +10,7 @@ interface UserItem {
   email: string;
 }
 
-function ConferenceOption({
-  active,
-  data,
-}: {
-  active: boolean;
-  data: UserItem;
-}) {
+function UserOption({ active, data }: { active: boolean; data: UserItem }) {
   return (
     <div
       className={`px-4 py-2 ${
@@ -35,16 +29,16 @@ function ConferenceOption({
   );
 }
 
-export default function SearchConference() {
+export default function SearchUser() {
   const router = useRouter();
 
   const onOptionSelect = (opt: UserItem) => {
-    router.push(`/users/${opt?.id}`);
+    router.push(`/users/${opt.id}`);
   };
 
   return (
     <SearchComponent
-      Option={ConferenceOption}
+      Option={UserOption}
       onOptionSelect={onOptionSelect}
       fetchOptions={searchUser}
     />

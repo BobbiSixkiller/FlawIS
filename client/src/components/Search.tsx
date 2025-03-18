@@ -109,7 +109,9 @@ export default function SearchComponent<
                 onChange={(val: TOption) => {
                   setOpen(false);
                   setText("");
-                  onOptionSelect(val);
+                  if (val) {
+                    onOptionSelect(val);
+                  }
                 }}
                 as="div"
                 className={cn([

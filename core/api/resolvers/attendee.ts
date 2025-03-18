@@ -76,15 +76,13 @@ export class AttendeeResolver {
     @Arg("text") text: string,
     @Arg("slug") slug: string
   ) {
-    await this.attendeeService.dataModel.syncIndexes();
+    // await this.attendeeService.dataModel.syncIndexes();
 
     return await this.attendeeService.aggregate([
       {
         $match: {
-          $and: [
-            { $text: { $search: text } },
-            { slug: slug }, // Replace 'slug' with the variable holding the slug value
-          ],
+          $text: { $search: text },
+          "conference.slug": slug, // Replace 'slug' with the variable holding the slug value
         },
       },
       { $sort: { score: { $meta: "textScore" } } },
