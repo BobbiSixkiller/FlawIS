@@ -25,6 +25,8 @@ export default async function AttendeePage({
     redirect(`/conferences/${slug}/attendees`);
   }
 
+  console.log("ATTENDEE PAGE ", attendee);
+
   return (
     <div className="flex flex-col gap-4">
       <CloseButton href={`/conferences/${slug}/attendees`} />
