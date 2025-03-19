@@ -22,8 +22,8 @@ function ConferenceOption({
   return (
     <div
       className={`px-4 py-2 ${
-        active ? "bg-primary-500 text-white" : "bg-white"
-      } flex gap-2 font-semibold cursor-pointer`}
+        active ? "bg-primary-500 text-white" : ""
+      } flex gap-2 font-semibold cursor-pointer dark:text-white`}
     >
       {data.translations[lng as "sk" | "en"].name}
       <span

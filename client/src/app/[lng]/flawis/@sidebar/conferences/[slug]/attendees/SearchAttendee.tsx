@@ -3,6 +3,7 @@
 import SearchComponent from "@/components/Search";
 import { useParams, useRouter } from "next/navigation";
 import { searchAttendee } from "./actions";
+import { cn } from "@/utils/helpers";
 
 interface AttendeeOpt {
   id: string;
@@ -21,9 +22,11 @@ function AttendeeOption({
 }) {
   return (
     <div
-      className={`px-4 py-2 ${
-        active ? "bg-primary-500 text-white" : ""
-      } flex gap-2 font-semibold cursor-pointer`}
+      className={cn([
+        "px-4 py-2 flex gap-2 font-semibold cursor-pointer",
+        active && "bg-primary-500 text-white",
+        "dark:text-white",
+      ])}
     >
       {data.user.name}
       <span
