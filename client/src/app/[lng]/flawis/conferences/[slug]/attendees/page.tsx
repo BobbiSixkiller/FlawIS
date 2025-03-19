@@ -30,7 +30,7 @@ export default async function AttendeesPage({
       <div className="flex gap-2 items-center">
         <ExportButton />
         <AttendeeFilter sections={conference.sections} />
-        <div className="ml-auto text-xl font-bold">
+        <div className="ml-auto text-xl font-bold dark:text-white">
           {initialData.totalCount}
         </div>
       </div>
