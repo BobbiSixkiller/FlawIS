@@ -12,9 +12,40 @@ const minioClient = new Minio.Client({
   secretKey: process.env.MINIO_SECRET_KEY || "",
 });
 
+/**
+ * Sanitizes a string to be a valid MinIO (S3-compatible) bucket name.
+ * - Converts to lowercase
+ * - Replaces invalid characters with hyphens
+ * - Trims leading/trailing non-alphanumerics
+ * - Ensures length is between 3 and 63 characters
+ */
+function sanitizeBucketName(input: string): string {
+  let sanitized = input
+    .toLowerCase()
+    .replace(/[^a-z0-9.-]/g, "-") // Replace invalid characters
+    .replace(/(^[^a-z0-9]+)|([^a-z0-9]+$)/g, ""); // Trim invalid start/end
+
+  // Remove consecutive periods or hyphens (optional, for stricter validation)
+  sanitized = sanitized.replace(/[-.]{2,}/g, "-");
+
+  // Ensure minimum length
+  if (sanitized.length < 3) {
+    sanitized = sanitized.padEnd(3, "0");
+  }
+
+  // Ensure maximum length
+  if (sanitized.length > 63) {
+    sanitized = sanitized.slice(0, 63);
+  }
+
+  return sanitized;
+}
+
 async function ensureBucketExists(bucketName: string): Promise<void> {
+  const sanitizedBucketName = sanitizeBucketName(bucketName);
+
   return new Promise<void>((resolve, reject) => {
-    minioClient.bucketExists(bucketName.toLowerCase(), (err, exists) => {
+    minioClient.bucketExists(sanitizedBucketName, (err, exists) => {
       if (err) {
         return reject(err);
       }
@@ -22,13 +53,11 @@ async function ensureBucketExists(bucketName: string): Promise<void> {
         return resolve();
       } else {
         // Create the bucket if it does not exist
-        minioClient.makeBucket(bucketName.toLowerCase(), "", (err) => {
+        minioClient.makeBucket(sanitizedBucketName, "", (err) => {
           if (err) {
             return reject(err);
           }
-          console.log(
-            `Bucket '${bucketName.toLowerCase()}' created successfully.`
-          );
+          console.log(`Bucket '${sanitizedBucketName}' created successfully.`);
           return resolve();
         });
       }
@@ -43,9 +72,10 @@ export async function uploadFile(
 ): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+  const sanitizedBucketName = sanitizeBucketName(bucketName);
 
   // Ensure the bucket exists
-  await ensureBucketExists(bucketName);
+  await ensureBucketExists(sanitizedBucketName);
 
   const paths = path.split("/").map(
     (p) =>
@@ -59,15 +89,15 @@ export async function uploadFile(
 
   // Upload the object
   return new Promise<string>((resolve, reject) => {
-    minioClient.putObject(bucketName, objectName, buffer, (err) => {
+    minioClient.putObject(sanitizedBucketName, objectName, buffer, (err) => {
       if (err) {
         console.error(`Error uploading file: ${err.message}`);
         return reject(err);
       }
       console.log(
-        `File '${objectName}' uploaded to bucket '${bucketName}' successfully.`
+        `File '${objectName}' uploaded to bucket '${sanitizedBucketName}' successfully.`
       );
-      resolve(`http://minio:9000/${bucketName}/${objectName}`);
+      resolve(`http://minio:9000/${sanitizedBucketName}/${objectName}`);
     });
   });
 }
