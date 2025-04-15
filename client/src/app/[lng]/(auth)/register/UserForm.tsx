@@ -23,7 +23,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
-import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
+import { cn, fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import ImageFileInput from "@/components/ImageFileInput";
@@ -435,7 +435,10 @@ export default function UserForm({
                       onClick={(e) => e.stopPropagation()}
                       target="_blank"
                       href="https://uniba.sk/ochrana-osobnych-udajov/"
-                      className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
+                      className={cn([
+                        "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                        "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+                      ])}
                     />
                   ),
                 }}

@@ -170,23 +170,15 @@ export class User extends TimeStamps {
     return await this.aggregate([
       { $sort: { _id: -1 } },
       {
+        $match: {
+          ...(access ? { access: { $in: access } } : {}),
+          ...(after ? { _id: { $lt: after } } : {}),
+        },
+      },
+      {
         $facet: {
-          data: [
-            {
-              $match: {
-                ...(access ? { access: { $in: access } } : {}),
-                ...(after ? { _id: { $lt: after } } : {}),
-              },
-            },
-            { $limit: first || 20 },
-          ],
+          data: [{ $limit: first || 20 }],
           hasNextPage: [
-            {
-              $match: {
-                ...(access ? { access: { $in: access } } : {}),
-                ...(after ? { _id: { $lt: after } } : {}),
-              },
-            },
             { $skip: first || 20 }, // skip paginated data
             { $limit: 1 }, // just to check if there's any element
           ],

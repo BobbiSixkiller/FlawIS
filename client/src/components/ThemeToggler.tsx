@@ -20,7 +20,7 @@ export default function ThemeToggler({ dark }: { dark: boolean }) {
       type="button"
       className={cn([
         "rounded-full h-fit p-1.5 hover:bg-primary-700",
-        dark && "bg-white/20 hover:bg-white/30",
+        dark && "dark:bg-white/20 dark:hover:bg-white/30 dark:text-white/85",
       ])}
       onClick={() => setDarkThemeCookie(!dark)}
     >

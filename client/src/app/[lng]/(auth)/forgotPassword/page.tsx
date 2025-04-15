@@ -3,6 +3,7 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import { translate } from "@/lib/i18n";
+import { cn } from "@/utils/helpers";
 
 export default async function ForgotPassword({
   params: { lng },
@@ -13,7 +14,7 @@ export default async function ForgotPassword({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
         {t("heading")}
       </h2>
 
@@ -29,7 +30,10 @@ export default async function ForgotPassword({
             login: (
               <Link
                 href="/login"
-                className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
+                className={cn([
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900",
+                ])}
               />
             ),
           }}

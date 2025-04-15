@@ -5,7 +5,6 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 import { Ref } from "../util/types";
 import { Conference } from "./Conference";
-import { Submission } from "./Submission";
 import { LocalesType } from "../resolvers/types/translation";
 
 @ObjectType()

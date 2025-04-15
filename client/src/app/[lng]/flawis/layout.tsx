@@ -135,7 +135,7 @@ export default async function DashboardLayout({
             homeElement={<HomeIcon className="h-5 w-5" />}
             separator={<ChevronRightIcon className="h-3 w-3" />}
             activeClasses="text-primary-500 hover:underline"
-            containerClasses="flex flex-wrap text-sm gap-2 items-center dark:text-white"
+            containerClasses="flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
             capitalizeLinks
           />
           {children}

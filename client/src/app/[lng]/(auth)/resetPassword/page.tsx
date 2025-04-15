@@ -1,6 +1,7 @@
 import ResetPasswordForm from "./ResetPasswordForm";
 import { FormMessage } from "@/components/Message";
 import { translate } from "@/lib/i18n";
+import { cn } from "@/utils/helpers";
 import { Trans } from "react-i18next/TransWithoutContext";
 
 export default async function ResetPassword({
@@ -14,7 +15,7 @@ export default async function ResetPassword({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
         {t("heading")}
       </h2>
 
@@ -30,7 +31,10 @@ export default async function ResetPassword({
               forgotLink: (
                 <a
                   href="/forgotPassword"
-                  className="text-sm font-semibold text-primary-500 hover:text-primary-700 focus:outline-primary-500"
+                  className={cn([
+                    "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                    "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900",
+                  ])}
                 />
               ),
             }}

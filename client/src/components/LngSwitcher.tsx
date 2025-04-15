@@ -34,7 +34,7 @@ export default function LngSwitcher({
         className={cn([
           "h-fit w-full flex items-center",
           authLayout
-            ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500"
+            ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
             : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white",
         ])}
       >

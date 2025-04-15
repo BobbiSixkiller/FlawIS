@@ -21,7 +21,7 @@ export function Input({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium leading-6 text-gray-900 mb-2 dark:text-white"
+          className="block text-sm font-medium leading-6 text-gray-900 mb-2 dark:text-white/85"
         >
           {label}
         </label>
@@ -29,10 +29,10 @@ export function Input({
       <div
         className={cn([
           "flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
-          "dark:bg-gray-800 dark:ring-gray-600",
+          "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none",
           fieldState.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
-            : "focus-within:ring-primary-500 ring-gray-300",
+            : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
           props.disabled &&
             "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
           className,
@@ -40,7 +40,7 @@ export function Input({
       >
         <input
           className={
-            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white rounded-md disabled:text-slate-500 placeholder:text-gray-400"
+            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
           }
           {...props}
           {...field}
@@ -51,7 +51,10 @@ export function Input({
         {props.type === "password" && (
           <button
             type="button"
-            className="p-2 text-gray-300 hover:text-primary-500"
+            className={cn([
+              "p-2 text-gray-400 hover:text-primary-500 focus:outline-none focus:text-primary-500",
+              "dark:hover:text-primary-300 dark:text-gray-600 dark:focus:text-primary-300",
+            ])}
             onClick={() => {
               if (setShowPassword) {
                 setShowPassword(!showPassword);

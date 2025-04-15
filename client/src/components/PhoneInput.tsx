@@ -35,7 +35,10 @@ export default function PhoneInput({
   return (
     <div>
       {label && (
-        <label htmlFor={name} className="text-sm/6 font-medium dark:text-white">
+        <label
+          htmlFor={name}
+          className="text-sm/6 font-medium dark:text-white/85"
+        >
           {label}
         </label>
       )}
@@ -45,7 +48,7 @@ export default function PhoneInput({
           "dark:bg-gray-800 dark:ring-gray-600",
           fieldState.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
-            : "focus-within:ring-primary-500 ring-gray-300",
+            : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
           disabled &&
             "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none",
         ])}

@@ -30,7 +30,7 @@ export default async function Profile({
       <div className="border-t border-gray-100 dark:border-gray-700">
         <dl className="divide-y divide-gray-100 dark:divide-gray-700">
           <div className="sm:h-20 py-6 sm:p-0 sm:grid sm:grid-cols-3 sm:gap-4 items-center">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
               {t("name")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex items-center gap-2">
@@ -44,7 +44,7 @@ export default async function Profile({
                   style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white">
+                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white/85">
                   {user.name
                     .split(" ")
                     .map((n, i) => {
@@ -57,7 +57,7 @@ export default async function Profile({
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
               {t("email")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
@@ -65,7 +65,7 @@ export default async function Profile({
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
               {t("org")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
@@ -73,7 +73,7 @@ export default async function Profile({
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
               {t("phone")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">

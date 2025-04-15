@@ -13,6 +13,7 @@ import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { cn } from "@/utils/helpers";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
@@ -55,7 +56,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           <div className="flex items-center justify-between mb-2">
             <label
               htmlFor="password"
-              className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+              className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85"
             >
               {t("password")}
             </label>
@@ -65,7 +66,10 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
               components={[
                 <Link
                   href="/forgotPassword"
-                  className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
+                  className={cn([
+                    "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
+                    "dark:text-primary-300 dark:hover:text-primary-300/90",
+                  ])}
                   key={0}
                 />,
               ]}

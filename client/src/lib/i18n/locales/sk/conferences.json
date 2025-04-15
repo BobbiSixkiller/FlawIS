@@ -43,7 +43,7 @@
     "end": "Koniec",
     "regEnd": "Koniec registrácie",
     "submissionDeadline": "Deadline zaslania príspevkov",
-    "listItem": "Prebieha od {{start}} do {{end}}. Registrácia končí {{regEnd}}."
+    "listItem": "Prebieha od {{start}} do {{end}}. Registrácia možná dos {{regEnd}}."
   },
   "editSubmission": "Aktualizovať príspevok / nahrať súbor príspevku"
 }

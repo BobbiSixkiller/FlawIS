@@ -21,24 +21,37 @@ const minioClient = new Minio.Client({
  */
 function sanitizeBucketName(input: string): string {
   let sanitized = input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // remove accents
     .toLowerCase()
-    .replace(/[^a-z0-9.-]/g, "-") // Replace invalid characters
-    .replace(/(^[^a-z0-9]+)|([^a-z0-9]+$)/g, ""); // Trim invalid start/end
+    .replace(/[^a-z0-9.-]/g, "-") // only allow DNS-safe characters
+    .replace(/(^[^a-z0-9]+)|([^a-z0-9]+$)/g, ""); // trim invalid start/end
 
-  // Remove consecutive periods or hyphens (optional, for stricter validation)
-  sanitized = sanitized.replace(/[-.]{2,}/g, "-");
+  sanitized = sanitized.replace(/[-.]{2,}/g, "-"); // prevent sequences like -- or ..
 
-  // Ensure minimum length
   if (sanitized.length < 3) {
     sanitized = sanitized.padEnd(3, "0");
   }
 
-  // Ensure maximum length
   if (sanitized.length > 63) {
     sanitized = sanitized.slice(0, 63);
   }
 
   return sanitized;
+}
+
+function sanitizeObjectPath(path: string): string {
+  const parts = path.split("/").map(
+    (p) =>
+      p
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // remove accents
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\-_.@]+/g, "") // keep safe filename chars
+  );
+
+  parts[parts.length - 1] = uuid() + "-" + parts[parts.length - 1];
+  return parts.join("/").toLowerCase();
 }
 
 async function ensureBucketExists(bucketName: string): Promise<void> {
@@ -77,15 +90,7 @@ export async function uploadFile(
   // Ensure the bucket exists
   await ensureBucketExists(sanitizedBucketName);
 
-  const paths = path.split("/").map(
-    (p) =>
-      p
-        .replace(/\s+/g, "_") // Replace spaces with underscores
-        .replace(/[^\w\-_.@áčéíóúýžš]+/g, "") // Allow word characters, hyphen, underscore, period, and specific accented characters
-  );
-  paths[paths.length - 1] = uuid() + "-" + paths[paths.length - 1];
-
-  const objectName = paths.join("/").toLowerCase();
+  const objectName = sanitizeObjectPath(path);
 
   // Upload the object
   return new Promise<string>((resolve, reject) => {

@@ -4,6 +4,7 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
 import { headers } from "next/headers";
 import { translate } from "@/lib/i18n";
+import { cn } from "@/utils/helpers";
 
 export default async function LoginPage({
   params: { lng },
@@ -19,7 +20,7 @@ export default async function LoginPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
         {t("heading")}
       </h2>
 
@@ -32,7 +33,7 @@ export default async function LoginPage({
         <div>
           <div className="relative flex py-6 items-center">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 font-light text-sm dark:text-white">
+            <span className="flex-shrink mx-4 font-light text-sm dark:text-white/85">
               {t("continue")}
             </span>
             <div className="flex-grow border-t border-gray-300"></div>
@@ -44,7 +45,7 @@ export default async function LoginPage({
         </div>
       )}
 
-      <p className="pt-10 text-center text-sm text-gray-500 dark:text-gray-300">
+      <p className="pt-10 text-center text-sm text-gray-500 dark:text-white/85">
         <Trans
           i18nKey={"register"}
           t={t}
@@ -54,7 +55,10 @@ export default async function LoginPage({
                 href={`/register${
                   url ? `?url=${encodeURIComponent(url)}` : ""
                 }`}
-                className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
+                className={cn([
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900",
+                ])}
               />
             ),
           }}

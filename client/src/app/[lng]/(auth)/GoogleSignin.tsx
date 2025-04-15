@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { getGoogleAuthLink } from "./actions";
+import { cn } from "@/utils/helpers";
 
 export default function GoogleSignIn() {
   const searchParams = useSearchParams();
@@ -11,7 +12,10 @@ export default function GoogleSignIn() {
     <button
       type="button"
       onClick={() => getGoogleAuthLink(url)}
-      className="text-sm rounded-md border border-gray-300 hover:border-primary-500 text-gray-900 dark:text-white  px-3.5 py-2 w-32 flex gap-2 justify-center items-center"
+      className={cn([
+        "text-sm rounded-md border border-gray-300 hover:border-primary-500 text-gray-900 px-3.5 py-2 w-32 flex gap-2 justify-center items-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+        "dark:border-gray-400 dark:text-white/85 dark:hover:border-primary-300 dark:focus:ring-primary-300 dark:focus:ring-offset-gray-900",
+      ])}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

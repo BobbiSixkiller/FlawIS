@@ -1,24 +1,12 @@
 "use client";
 
-import {
-  Fragment,
-  useContext,
-  useEffect,
-  useState,
-  useTransition,
-} from "react";
+import { useContext, useEffect, useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "../../../components/Button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Transition,
-  TransitionChild,
-} from "@headlessui/react";
+
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import Modal from "@/components/Modal";

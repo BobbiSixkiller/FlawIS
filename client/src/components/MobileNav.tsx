@@ -101,7 +101,7 @@ export function ProfileMenuItem({
         <MenuItems
           className={cn([
             "absolute rounded-md bg-white shadow-lg divide-y divide-gray-100 ring-1 ring-black/5 focus:outline-none text-gray-900",
-            "dark:bg-gray-700 dark:text-white",
+            "dark:bg-gray-700 dark:text-white/85",
             mobile
               ? "right-0 mt-2 min-w-max w-32 origin-top-right"
               : "inset-x-0 mt-2",

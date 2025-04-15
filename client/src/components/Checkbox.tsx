@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/utils/helpers";
 import { Checkbox, Field, Label } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { useController } from "react-hook-form";
@@ -19,11 +20,14 @@ export default function CheckBox({
         <Checkbox
           checked={field.value}
           onChange={() => field.onChange(!field.value)}
-          className="outline-none shadow-sm group size-5 p-1 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-primary-500 data-[checked]:bg-primary-500 data-[checked]:ring-primary-500 rounded-md"
+          className={cn([
+            "outline-none shadow-sm group size-5 p-1 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-primary-500 data-[checked]:bg-primary-500 data-[checked]:ring-primary-500 rounded-md",
+            "dark:focus:ring-primary-300 dark:data-[checked]:ring-primary-300 dark:data-[checked]:bg-primary-300",
+          ])}
         >
-          <CheckIcon className="hidden size-3 stroke-2 text-white group-data-[checked]:block" />
+          <CheckIcon className="hidden size-3 stroke-2 text-white dark:text-gray-900 group-data-[checked]:block" />
         </Checkbox>
-        <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
+        <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
           {label}
         </Label>
       </Field>

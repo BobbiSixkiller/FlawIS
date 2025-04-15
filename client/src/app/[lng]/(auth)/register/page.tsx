@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
 import { translate } from "@/lib/i18n";
+import { cn } from "@/utils/helpers";
 
 export default async function Register({
   params: { lng },
@@ -18,7 +19,7 @@ export default async function Register({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white">
+      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
         {t("heading")}
       </h2>
 
@@ -48,7 +49,10 @@ export default async function Register({
             login: (
               <a
                 href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
-                className="text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-primary-500"
+                className={cn([
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+                ])}
               />
             ),
           }}
