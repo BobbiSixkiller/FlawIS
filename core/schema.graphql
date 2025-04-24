@@ -100,7 +100,7 @@ type Billing {
 type Conference {
   attendeesCount: Int!
   attending: Attendee
-  billing: ConferenceBilling!
+  billing: FlawBilling!
   createdAt: DateTimeISO!
   dates: ImportantDates!
   id: ObjectId!
@@ -109,19 +109,6 @@ type Conference {
   tickets: [Ticket!]!
   translations: ConferenceTranslation!
   updatedAt: DateTimeISO!
-}
-
-"""Conference billing information"""
-type ConferenceBilling {
-  DIC: String!
-  IBAN: String!
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String!
-  address: Address!
-  name: String!
-  stampUrl: String!
-  variableSymbol: String!
 }
 
 input ConferenceBillingInput {
@@ -192,6 +179,19 @@ input DatesInput {
   regEnd: DateTimeISO
   start: DateTimeISO!
   submissionDeadline: DateTimeISO
+}
+
+"""Flaw billing information"""
+type FlawBilling {
+  DIC: String!
+  IBAN: String!
+  ICDPH: String!
+  ICO: String!
+  SWIFT: String!
+  address: Address!
+  name: String!
+  stampUrl: String!
+  variableSymbol: String!
 }
 
 interface IMutationResponse {
@@ -288,7 +288,7 @@ type InternshipPageInfo {
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
-  issuer: ConferenceBilling!
+  issuer: FlawBilling!
   payer: Billing!
 }
 

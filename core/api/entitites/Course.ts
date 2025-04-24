@@ -5,6 +5,8 @@ import { ObjectId } from "mongodb";
 import { Field, Int, ObjectType } from "type-graphql";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import { CourseArgs, CourseConnection } from "../resolvers/types/course";
+import { FlawBilling } from "./Billing";
+import { User } from "./User";
 
 @ObjectType()
 export class Course extends TimeStamps {
@@ -12,12 +14,22 @@ export class Course extends TimeStamps {
   id: ObjectId;
 
   @Field()
+  @Property()
   name: string;
+
+  @Field(() => User, { nullable: true })
+  @Property({ ref: () => User })
+  user: Ref<User>;
 
   @Field({
     description: "String representation of HTML describing the course",
   })
+  @Property()
   description: string;
+
+  @Field(() => FlawBilling)
+  @Property({ type: () => FlawBilling, _id: false })
+  billing: FlawBilling;
 
   @Field()
   createdAt: Date;
@@ -86,6 +98,24 @@ export class Module extends TimeStamps {
   updatedAt: Date;
 }
 
+export class TermCourse {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+}
+
+export class TermModule {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+}
+
 export class Term extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -94,9 +124,9 @@ export class Term extends TimeStamps {
   @Property({ ref: () => Course })
   course: Ref<Course>;
 
-  @Field(() => Module)
+  @Field(() => Module, { nullable: true })
   @Property({ ref: () => Module })
-  module: Ref<Module>;
+  module?: Ref<Module>;
 
   @Field()
   start: Date;

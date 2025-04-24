@@ -38,7 +38,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
   return (
     <Link
       className={cn([
-        "h-fit w-fit rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 bg-white text-sm cursor-pointer focus:outline-primary-500",
+        "flex flex-col gap-1 justify-between rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 bg-white text-sm cursor-pointer focus:outline-primary-500",
         "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
       ])}
       href={
@@ -47,18 +47,20 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
           : `/${data?.slug}`
       }
     >
-      <DynamicImageClient
-        alt="conference-logo"
-        src={data!.translations[lng as "sk" | "en"].logoUrlEnv}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        style={{ objectFit: "contain" }}
-        className="h-24 w-full max-w-72"
-      />
+      <div>
+        <DynamicImageClient
+          alt="conference-logo"
+          src={data!.translations[lng as "sk" | "en"].logoUrlEnv}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: "contain" }}
+          className="h-24 w-full max-w-72"
+        />
+        <h2 className="font-medium leading-6">
+          {data?.translations[lng as "sk" | "en"].name}
+        </h2>
+      </div>
 
-      <h2 className="font-medium leading-6">
-        {data?.translations[lng as "sk" | "en"].name}
-      </h2>
       <p className="leading-none text-gray-500 dark:text-gray-300">
         {t("conference.listItem", {
           start,

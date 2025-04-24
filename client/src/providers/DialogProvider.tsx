@@ -36,8 +36,6 @@ export default function DialogProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  console.log(openDialogs);
-
   const isDialogOpen = (dialogId: string) => openDialogs.has(dialogId);
 
   const someDialogOpen = openDialogs.size > 0;

@@ -56,22 +56,10 @@ export class ConferencerResolver {
   async conferences(
     @Args() { first, after }: ConferenceArgs
   ): Promise<ConferenceConnection> {
-    const data = await this.conferenceService.dataModel.paginatedConferences(
+    return await this.conferenceService.dataModel.paginatedConferences(
       first,
       after
     );
-
-    const connection: ConferenceConnection = data[0];
-
-    return {
-      totalCount: connection.totalCount || 0,
-      pageInfo: connection.pageInfo || { hasNextPage: false },
-      edges:
-        connection.edges.map((edge) => ({
-          cursor: edge.cursor,
-          node: transformIds(edge.node),
-        })) || [],
-    };
   }
 
   @Authorized()

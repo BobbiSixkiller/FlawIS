@@ -51,7 +51,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           (errs) => console.log(errs)
         )}
       >
-        <Input name="email" label="Email" />
+        <Input name="email" label="Email" autoComplete="email" />
         <div>
           <div className="flex items-center justify-between mb-2">
             <label
@@ -81,6 +81,7 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             type="password"
             showPassword={showPassword}
             setShowPassword={setShowPassword}
+            autoComplete="current-password"
           />
         </div>
 

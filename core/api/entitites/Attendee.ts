@@ -8,7 +8,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Field, Float, ObjectType, createUnionType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
-import { Billing, ConferenceBilling } from "./Billing";
+import { Billing, FlawBilling } from "./Billing";
 
 import { Conference, Ticket } from "./Conference";
 import { Submission } from "./Submission";
@@ -70,9 +70,9 @@ export class Invoice {
   @Property({ type: () => Billing, _id: false })
   payer: Billing;
 
-  @Field(() => ConferenceBilling)
-  @Property({ type: () => ConferenceBilling, _id: false })
-  issuer: ConferenceBilling;
+  @Field(() => FlawBilling)
+  @Property({ type: () => FlawBilling, _id: false })
+  issuer: FlawBilling;
 
   @Field(() => InvoiceData)
   @Property({ type: () => InvoiceData, _id: false })

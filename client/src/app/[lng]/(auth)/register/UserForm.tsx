@@ -338,8 +338,8 @@ export default function UserForm({
           <ImageFileInput name="avatar" label="Fotka" />
         )}
 
-        <Input label={t("name")} name="name" />
-        <Input label={t("email")} name="email" />
+        <Input label={t("name")} name="name" autoComplete="name" />
+        <Input label={t("email")} name="email" autoComplete="email" />
 
         {path.includes("users") && (
           <Select
@@ -358,8 +358,8 @@ export default function UserForm({
           />
         )}
 
-        <PhoneInput label={t("phone")} name="telephone" />
-        <Input label={t("org")} name="organization" />
+        <PhoneInput label={t("phone")} name="telephone" autoComplete="off" />
+        <Input label={t("org")} name="organization" autoComplete="off" />
 
         {(path.includes("users") || user?.access.includes(Access.Student)) && (
           <>
@@ -367,17 +367,24 @@ export default function UserForm({
               <Input
                 label={t("street", { ns: "common" })}
                 name="address.street"
+                autoComplete="address-line1"
               />
-              <Input label={t("city", { ns: "common" })} name="address.city" />
+              <Input
+                label={t("city", { ns: "common" })}
+                name="address.city"
+                autoComplete="address-level2"
+              />
             </div>
             <div className="flex gap-2 w-full">
               <Input
                 label={t("postal", { ns: "common" })}
                 name="address.postal"
+                autoComplete="postal-code"
               />
               <Input
                 label={t("country", { ns: "common" })}
                 name="address.country"
+                autoComplete="country"
               />
             </div>
 
@@ -411,6 +418,7 @@ export default function UserForm({
               type="password"
               showPassword={showPassword}
               setShowPassword={setShowPassword}
+              autoComplete="current-password"
             />
             <Input
               name="confirmPass"
@@ -418,6 +426,7 @@ export default function UserForm({
               type="password"
               showPassword={showPassword}
               setShowPassword={setShowPassword}
+              autoComplete="current-password"
             />
           </>
         )}

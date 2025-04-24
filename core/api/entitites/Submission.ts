@@ -13,13 +13,12 @@ import {
 } from "type-graphql";
 import { ObjectId } from "mongodb";
 
-import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { Section } from "./Section";
 import { User } from "./User";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
-import { ModelType } from "@typegoose/typegoose/lib/types";
+import { ModelType, Ref } from "@typegoose/typegoose/lib/types";
 import { SubmissionArgs } from "../resolvers/types/submission";
 
 export enum PresentationLng {
@@ -145,30 +144,38 @@ export class Submission extends TimeStamps {
     { after, first, conferenceId, sectionIds }: SubmissionArgs
   ) {
     return await this.aggregate([
+      // {
+      //   $match: {
+      //     $expr: {
+      //       $cond: {
+      //         if: { $ne: [conferenceId, null] },
+      //         then: {
+      //           $eq: ["$conference", conferenceId],
+      //         },
+      //         else: {},
+      //       },
+      //     },
+      //   },
+      // },
+      // {
+      //   $match: {
+      //     $expr: {
+      //       $cond: {
+      //         if: { $ne: [{ $size: [sectionIds] }, 0] },
+      //         then: {
+      //           $in: ["$section", sectionIds],
+      //         },
+      //         else: {},
+      //       },
+      //     },
+      //   },
+      // },
       {
         $match: {
-          $expr: {
-            $cond: {
-              if: { $ne: [conferenceId, null] },
-              then: {
-                $eq: ["$conference", conferenceId],
-              },
-              else: {},
-            },
-          },
-        },
-      },
-      {
-        $match: {
-          $expr: {
-            $cond: {
-              if: { $ne: [{ $size: [sectionIds] }, 0] },
-              then: {
-                $in: ["$section", sectionIds],
-              },
-              else: {},
-            },
-          },
+          ...(conferenceId ? { conference: conferenceId } : {}),
+          ...(sectionIds && sectionIds.length > 0
+            ? { section: { $in: sectionIds } }
+            : {}),
         },
       },
       { $sort: { _id: -1 } },
@@ -176,29 +183,14 @@ export class Submission extends TimeStamps {
         $facet: {
           data: [
             {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
+              $match: { ...(after ? { _id: { $lt: after } } : {}) },
             },
             { $limit: first || 20 },
+            { $addFields: { id: "$_id" } },
           ],
           hasNextPage: [
             {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
+              $match: { ...(after ? { _id: { $lt: after } } : {}) },
             },
             { $skip: first || 20 }, // skip paginated data
             { $limit: 1 }, // just to check if there's any element
@@ -208,7 +200,9 @@ export class Submission extends TimeStamps {
       },
       {
         $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
+          },
           edges: {
             $map: {
               input: "$data",

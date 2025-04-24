@@ -42,7 +42,7 @@ export default function ForgotPasswordForm() {
           }
         })}
       >
-        <Input name="email" label={t("email")} />
+        <Input name="email" label={t("email")} autoComplete="off" />
 
         <Button
           className="w-full"

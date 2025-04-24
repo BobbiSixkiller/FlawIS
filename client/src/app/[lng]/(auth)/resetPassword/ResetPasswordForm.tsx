@@ -78,6 +78,7 @@ export default function ResetPasswordForm({
           type="password"
           showPassword={showPassword}
           setShowPassword={setShowPassword}
+          autoComplete="off"
         />
         <Input
           name="confirmPass"
@@ -85,6 +86,7 @@ export default function ResetPasswordForm({
           type="password"
           showPassword={showPassword}
           setShowPassword={setShowPassword}
+          autoComplete="off"
         />
 
         <Button

@@ -8,12 +8,13 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { ConferenceBilling } from "./Billing";
 import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
 import { I18nService } from "../services/i18nService";
 import { LocalesType } from "../resolvers/types/translation";
 import { Attendee } from "./Attendee";
+import { FlawBilling } from "./Billing";
+import { ConferenceConnection } from "../resolvers/types/conference";
 
 @ObjectType()
 export class ConferenceTranslations {
@@ -182,9 +183,9 @@ export class Conference extends TimeStamps {
   @Property({ _id: false })
   translations: ConferenceTranslation;
 
-  @Field(() => ConferenceBilling)
-  @Property({ type: () => ConferenceBilling, _id: false })
-  billing: ConferenceBilling;
+  @Field(() => FlawBilling)
+  @Property({ type: () => FlawBilling, _id: false })
+  billing: FlawBilling;
 
   @Field(() => ImportantDates)
   @Property({ type: () => ImportantDates, _id: false })
@@ -210,46 +211,33 @@ export class Conference extends TimeStamps {
     this: ModelType<Conference>,
     first: number,
     after?: ObjectId
-  ) {
-    return await this.aggregate([
+  ): Promise<ConferenceConnection> {
+    const data = await this.aggregate([
       { $sort: { _id: -1 } },
       {
         $facet: {
           data: [
             {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
+              $match: { ...(after ? { _id: { $lt: after } } : {}) },
             },
             { $limit: first || 20 },
+            { $addFields: { id: "$_id" } },
           ],
           hasNextPage: [
             {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
+              $match: { ...(after ? { _id: { $lt: after } } : {}) },
             },
-            { $skip: first || 20 }, // skip paginated data
-            { $limit: 1 }, // just to check if there's any element
+            { $skip: first || 20 },
+            { $limit: 1 },
           ],
-          totalCount: [{ $count: "totalCount" }], // Count matching documents,
+          totalCount: [{ $count: "totalCount" }],
         },
       },
       {
         $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
+          },
           edges: {
             $map: {
               input: "$data",
@@ -264,5 +252,7 @@ export class Conference extends TimeStamps {
         },
       },
     ]);
+
+    return data[0];
   }
 }

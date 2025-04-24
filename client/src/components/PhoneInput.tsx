@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { HTMLInputTypeAttribute, useEffect, useState } from "react";
 import { useController } from "react-hook-form";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { Input } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
+import { InputProps } from "./withLocalizedInput";
 
-export default function PhoneInput({
-  label,
-  disabled,
-  name,
-}: {
-  name: string;
-  label?: string;
-  disabled?: boolean;
-}) {
+export default function PhoneInput({ label, disabled, name }: InputProps) {
   const { field, fieldState } = useController({
     name,
   });

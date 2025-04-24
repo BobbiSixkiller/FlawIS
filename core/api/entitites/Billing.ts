@@ -43,8 +43,8 @@ export class Billing {
   ICDPH?: string;
 }
 
-@ObjectType({ description: "Conference billing information" })
-export class ConferenceBilling implements Billing {
+@ObjectType({ description: "Flaw billing information" })
+export class FlawBilling implements Billing {
   @Field()
   @Property()
   name: string;

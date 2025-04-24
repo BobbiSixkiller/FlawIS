@@ -1,9 +1,8 @@
-import { prop as Property } from "@typegoose/typegoose";
+import { prop as Property, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import { Field, ID, ObjectType } from "type-graphql";
 
-import { Ref } from "../util/types";
 import { Conference } from "./Conference";
 import { LocalesType } from "../resolvers/types/translation";
 

@@ -2,8 +2,6 @@ import { ObjectId } from "mongodb";
 import { Conference, Ticket } from "../entitites/Conference";
 import { DocumentType } from "@typegoose/typegoose";
 
-export type Ref<T> = T | ObjectId;
-
 export type User = {
   id: ObjectId;
   name: string;
