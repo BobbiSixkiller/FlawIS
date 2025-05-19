@@ -25,10 +25,10 @@ function ListItem({ data }: { data?: AttendeeFragment }) {
         {data?.user.__typename === "User" ? data.user.organization : "N/A"}
       </p>
       <p className="mt-2">Email: {data?.user.email}</p>
-      <p className="text-orange-500">
-        {data?.submissions.some((submission) => !submission.fileUrl) &&
-          "Neodovzdal prispevok"}
-      </p>
+      {data?.ticket.withSubmission &&
+        data?.submissions.some((submission) => !submission.fileUrl) && (
+          <p className="text-orange-500">Neodovzdal prispevok</p>
+        )}
     </Link>
   );
 }

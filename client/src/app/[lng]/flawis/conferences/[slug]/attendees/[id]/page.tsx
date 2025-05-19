@@ -85,9 +85,9 @@ export default async function AttendeePage({
               </ul>
               <p>{s.translations[lng as "sk" | "en"].abstract}</p>
               <p>{s.translations[lng as "sk" | "en"].keywords.join(" • ")}</p>
-              <p className="text-orange-500">
-                {!s.fileUrl && "Neodovzdal prispevok"}
-              </p>
+              {attendee.ticket.withSubmission && !s.fileUrl && (
+                <p className="text-orange-500">Neodovzdal prispevok</p>
+              )}
             </div>
           ))}
         </div>
