@@ -19,7 +19,10 @@ interface DropdownProps {
 export default function Dropdown({ trigger, items }: DropdownProps) {
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="px-2 py-1 rounded-md hover:bg-gray-700 dark:hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500">
+      <MenuButton
+        as="div"
+        className="px-2 py-1 rounded-md hover:bg-gray-700 dark:hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
+      >
         {trigger}
       </MenuButton>
       <Transition
@@ -39,7 +42,7 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
         >
           {items.map((item, i) => (
             <div className="p-1" key={i}>
-              <MenuItem>
+              <MenuItem as="div">
                 {({ close, focus }) => (
                   <Link
                     scroll={false}

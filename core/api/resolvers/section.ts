@@ -10,23 +10,23 @@ import {
 } from "type-graphql";
 import { SectionInput, SectionMutationResponse } from "./types/conference";
 import { Section, SectionTranslation } from "../entitites/Section";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import { LoadResource } from "../util/decorators";
 import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 import { SubmissionArgs, SubmissionConnection } from "./types/submission";
-import { Submission } from "../entitites/Submission";
-import { transformIds } from "../middlewares/typegoose-middleware";
 import { Conference } from "../entitites/Conference";
-import { TypegooseService } from "../services/typegooseService";
+import { Repository } from "../repositories/repository";
+import { SubmissionRepository } from "../repositories/submission.repository";
+import { ConferenceRepository } from "../repositories/conference.repository";
 
 @Service()
 @Resolver(() => Section)
 export class SectionResolver {
   constructor(
-    private readonly conferenceService = new TypegooseService(Conference),
-    private readonly sectionService = new TypegooseService(Section),
-    private readonly submissionService = new TypegooseService(Submission),
+    private readonly conferenceRepository: ConferenceRepository,
+    private readonly sectionService = new Repository(Section),
+    private readonly submissionRepository: SubmissionRepository,
     private readonly i18nService: I18nService
   ) {}
 
@@ -96,28 +96,20 @@ export class SectionResolver {
   async conference(
     @Root() { conference }: Section
   ): Promise<Conference | null> {
-    return this.conferenceService.findOne({ _id: conference });
+    return this.conferenceRepository.findOne({ _id: conference });
   }
 
   @Authorized(["ADMIN"])
   @FieldResolver(() => SubmissionConnection)
   async submissions(
     @Args() { first, after }: SubmissionArgs,
-    @Root() { id, conference }: Section
+    @Root() { id: sectionId, conference }: Section
   ): Promise<SubmissionConnection> {
-    const res = await this.submissionService.dataModel.paginatedSubmissions({
+    return await this.submissionRepository.paginatedSubmissions({
       first,
       after,
-      sectionIds: [id],
-      conferenceId: conference as ObjectId,
+      sectionIds: [sectionId],
+      conferenceId: conference?.id,
     });
-
-    const connection: SubmissionConnection = res[0];
-
-    return {
-      totalCount: connection.totalCount || 0,
-      edges: connection.edges || [],
-      pageInfo: connection.pageInfo || { hasNextPage: false },
-    };
   }
 }

@@ -13,7 +13,7 @@ import {
 } from "type-graphql";
 import { Context } from "./auth";
 import Container from "typedi";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import { Conference, Ticket } from "../entitites/Conference";
 import { Attendee } from "../entitites/Attendee";
 

@@ -1,51 +1,47 @@
 import { Service } from "typedi";
 import { Internship } from "../entitites/Internship";
 import { ObjectId } from "mongodb";
-import { TypegooseService } from "./typegooseService";
 import {
   InternshipArgs,
   InternshipConnection,
   InternshipInput,
 } from "../resolvers/types/internship";
-import { I18nService } from "./i18nService";
+import { I18nService } from "./i18n.service";
 import { User } from "../util/types";
-import { UserService } from "./userService";
-import { transformIds } from "../middlewares/typegoose-middleware";
+import { UserService } from "./user.service";
+import { InternshipRepository } from "../repositories/internship.repository";
+import { DocumentType } from "@typegoose/typegoose";
+
+function toInternshipDTO(doc: DocumentType<Internship>): Internship {
+  const { _id, ...rest } = doc.toJSON({ versionKey: false });
+  return { ...rest, id: _id };
+}
 
 @Service()
 export class InternshipService {
   constructor(
-    private readonly crudService = new TypegooseService(Internship),
+    private readonly internshipRepository: InternshipRepository,
     private readonly i18nService: I18nService,
     private readonly userService: UserService
   ) {}
 
   async getInternships(args: InternshipArgs): Promise<InternshipConnection> {
     try {
-      const data = await this.crudService.dataModel.paginatedInternships(args);
-      const connection = data[0] as InternshipConnection;
-
-      return {
-        ...connection,
-        edges: connection.edges.map((edge) => ({
-          cursor: edge.cursor,
-          node: transformIds(edge.node),
-        })),
-      };
+      return await this.internshipRepository.paginatedInternships(args);
     } catch (error: any) {
       throw new Error(`Error fetching internships: ${error.message}`);
     }
   }
 
   async getInternship(id: ObjectId) {
-    const internship = await this.crudService.findOne({ _id: id });
+    const internship = await this.internshipRepository.findOne({ _id: id });
     if (!internship) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "internship" })
       );
     }
 
-    return internship;
+    return toInternshipDTO(internship);
   }
 
   async createInternship(data: InternshipInput, ctxUser: User) {
@@ -54,7 +50,7 @@ export class InternshipService {
       throw new Error("User has to have organization defined!");
     }
 
-    return await this.crudService.create({
+    return await this.internshipRepository.create({
       ...data,
       organization: user.organization,
       user: user.id,
@@ -63,16 +59,23 @@ export class InternshipService {
   }
 
   async updateInternship(data: InternshipInput, id: ObjectId) {
-    const internship = await this.getInternship(id);
+    const internship = await this.internshipRepository.findOne({ _id: id });
+    if (!internship) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "internship" })
+      );
+    }
 
     for (const [key, value] of Object.entries(data)) {
       internship[key as keyof InternshipInput] = value;
     }
 
-    return await internship.save();
+    const update = await internship.save();
+
+    return toInternshipDTO(update);
   }
 
   async deleteInternship(id: ObjectId) {
-    return await this.crudService.delete({ _id: id });
+    return await this.internshipRepository.delete({ _id: id });
   }
 }

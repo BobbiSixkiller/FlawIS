@@ -44,8 +44,8 @@ mutation updateUser($id: ObjectId!, $data: UserInput!) {
   }
 }
 
-mutation toggleVerifiedUser($id: ObjectId!) {
-  toggleVerifiedUser(id: $id) {
+mutation toggleVerifiedUser($id: ObjectId!, $verified: Boolean!) {
+  toggleVerifiedUser(id: $id, verified: $verified) {
     message
     data {
       ...User

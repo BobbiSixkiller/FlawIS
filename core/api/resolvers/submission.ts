@@ -23,19 +23,19 @@ import { Submission, SubmissionTranslation } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
 import { Access, User } from "../entitites/User";
-import { I18nService } from "../services/i18nService";
-import { RmqService } from "../services/rmqService";
-import { TypegooseService } from "../services/typegooseService";
+import { I18nService } from "../services/i18n.service";
+import { RmqService } from "../services/rmq.service";
+import { Repository } from "../repositories/repository";
 
 //refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
 @Resolver(() => Submission)
 export class SubmissionResolver {
   constructor(
-    private readonly submissionService = new TypegooseService(Submission),
-    private readonly conferenceService = new TypegooseService(Conference),
-    private readonly sectionService = new TypegooseService(Section),
-    private readonly userService = new TypegooseService(User),
+    private readonly submissionService = new Repository(Submission),
+    private readonly conferenceService = new Repository(Conference),
+    private readonly sectionService = new Repository(Section),
+    private readonly userService = new Repository(User),
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService
   ) {}

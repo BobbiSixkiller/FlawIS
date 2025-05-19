@@ -4,9 +4,15 @@ import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import { Field, Int, ObjectType } from "type-graphql";
 import { ModelType } from "@typegoose/typegoose/lib/types";
-import { CourseArgs, CourseConnection } from "../resolvers/types/course";
+import {
+  CourseArgs,
+  CourseConnection,
+  TermAttendeeArgs,
+  TermAttendeeConnection,
+} from "../resolvers/types/course";
 import { FlawBilling } from "./Billing";
-import { User } from "./User";
+import { Invoice, UserStubUnion } from "./Attendee";
+import { UserStub } from "./User";
 
 @ObjectType()
 export class Course extends TimeStamps {
@@ -17,9 +23,9 @@ export class Course extends TimeStamps {
   @Property()
   name: string;
 
-  @Field(() => User, { nullable: true })
-  @Property({ ref: () => User })
-  user: Ref<User>;
+  @Field(() => UserStubUnion)
+  @Property({ type: () => UserStub })
+  user: UserStub;
 
   @Field({
     description: "String representation of HTML describing the course",
@@ -30,6 +36,10 @@ export class Course extends TimeStamps {
   @Field(() => FlawBilling)
   @Property({ type: () => FlawBilling, _id: false })
   billing: FlawBilling;
+
+  @Field(() => Int)
+  @Property()
+  price: number;
 
   @Field()
   createdAt: Date;
@@ -42,11 +52,17 @@ export class Course extends TimeStamps {
   ): Promise<CourseConnection> {
     const data = await this.aggregate([
       { $sort: { _id: -1 } },
-      { $match: { ...(after && { _id: { $lt: after } }) } },
       {
         $facet: {
-          data: [{ $limit: first }],
-          hasNextPage: [{ $skip: first }, { $limit: 1 }],
+          data: [
+            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $limit: first },
+          ],
+          hasNextPage: [
+            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $skip: first },
+            { $limit: 1 },
+          ],
           totalCount: [{ $count: "totalCount" }],
         },
       },
@@ -84,36 +100,20 @@ export class Module extends TimeStamps {
   course: Ref<Course>;
 
   @Field()
+  @Property()
   name: string;
 
   @Field({
     description:
       "String representation of HTML describing the module of the course",
   })
+  @Property()
   description: string;
 
   @Field()
   createdAt: Date;
   @Field()
   updatedAt: Date;
-}
-
-export class TermCourse {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
-}
-
-export class TermModule {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
 }
 
 export class Term extends TimeStamps {
@@ -129,16 +129,85 @@ export class Term extends TimeStamps {
   module?: Ref<Module>;
 
   @Field()
+  @Property()
   start: Date;
 
   @Field()
+  @Property()
   end: Date;
 
   @Field(() => Int)
-  maxUsers: number;
+  @Property()
+  maxAttendees: number;
 
   @Field()
   createdAt: Date;
   @Field()
   updatedAt: Date;
+}
+
+export class TermAttendee extends TimeStamps {
+  @Field(() => UserStubUnion)
+  @Property({ type: () => UserStub })
+  user: UserStub;
+
+  @Field(() => Term)
+  @Property({ ref: () => Term })
+  term: Ref<Term>;
+
+  @Field(() => Invoice, { nullable: true })
+  @Property({ type: () => Invoice, _id: false })
+  invoice?: Invoice;
+
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
+
+  public static async paginatedTermAttendees(
+    this: ModelType<TermAttendee>,
+    { termId, first, after }: TermAttendeeArgs
+  ): Promise<TermAttendeeConnection> {
+    const data = await this.aggregate([
+      { $match: { term: termId } },
+      { $sort: { _id: -1 } },
+      {
+        $facet: {
+          data: [
+            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $limit: first },
+            { $addFields: { id: "$_id" } },
+          ],
+          hasNextPage: [
+            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $skip: first },
+            { $limit: 1 },
+          ],
+          totalCount: [{ $count: "totalCount" }],
+        },
+      },
+      {
+        $project: {
+          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          pageInfo: {
+            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
+            endCursor: { $last: "$data._id" },
+          },
+        },
+      },
+    ]);
+
+    if (data.length === 0) {
+      return { edges: [], totalCount: 0, pageInfo: { hasNextPage: false } };
+    } else {
+      return data[0];
+    }
+  }
 }

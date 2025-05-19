@@ -5,26 +5,23 @@ import {
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { Field, Float, ObjectType, createUnionType } from "type-graphql";
+import { createUnionType, Field, Float, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
 import { Billing, FlawBilling } from "./Billing";
-
 import { Conference, Ticket } from "./Conference";
 import { Submission } from "./Submission";
-import { ModelType } from "@typegoose/typegoose/lib/types";
-import { User } from "./User";
-import { AttendeeArgs } from "../resolvers/types/attendee";
+import { User, UserStub } from "./User";
 
-export const AttendeeUserUnion = createUnionType({
-  name: "AttendeeUserUnion", // Name of the GraphQL union
-  types: () => [User, AttendeeUser] as const, // function that returns tuple of object types classes
+export const UserStubUnion = createUnionType({
+  name: "UserStubUnion", // Name of the GraphQL union
+  types: () => [User, UserStub] as const, // function that returns tuple of object types classes
   // Implementation of detecting returned object type
   resolveType: (value) => {
     if ("createdAt" in value) {
       return User; // Return object type class (the one with `@ObjectType()`)
     } else {
-      return AttendeeUser;
+      return UserStub;
     }
   },
 });
@@ -77,20 +74,6 @@ export class Invoice {
   @Field(() => InvoiceData)
   @Property({ type: () => InvoiceData, _id: false })
   body: InvoiceData;
-}
-
-@ObjectType()
-export class AttendeeUser {
-  @Field()
-  id: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
-
-  @Field()
-  @Property()
-  email: string;
 }
 
 @ObjectType()
@@ -148,9 +131,9 @@ export class Attendee extends TimeStamps {
   @Property({ type: () => AttendeeConference })
   conference: AttendeeConference;
 
-  @Field(() => AttendeeUserUnion)
-  @Property({ type: () => AttendeeUser })
-  user: AttendeeUser;
+  @Field(() => UserStubUnion)
+  @Property({ type: () => UserStub })
+  user: UserStub;
 
   @Field(() => Ticket)
   @Property({ type: () => Ticket })
@@ -168,131 +151,4 @@ export class Attendee extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  public static async paginatedAttendees(
-    this: ModelType<Attendee>,
-    { conferenceSlug, sectionIds, first, after, passive }: AttendeeArgs
-  ) {
-    return await this.aggregate([
-      { $sort: { _id: -1 } },
-      { $match: { "conference.slug": conferenceSlug } },
-      {
-        $lookup: {
-          from: "submissions",
-          let: {
-            conference: "$conference",
-            user: "$user",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $in: ["$$user._id", "$authors"] },
-                    { $eq: ["$conference", "$$conference._id"] },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "submissions",
-        },
-      },
-      {
-        $match: {
-          $expr: {
-            $cond: {
-              if: {
-                $or: [
-                  { $ne: [{ $size: [sectionIds] }, 0] },
-                  { $eq: [passive, true] },
-                ],
-              },
-              then: {
-                $or: [
-                  {
-                    $and: [
-                      { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
-                      {
-                        $anyElementTrue: {
-                          $map: {
-                            input: "$submissions",
-                            as: "nested",
-                            in: {
-                              $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
-                            },
-                          },
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    $and: [
-                      { $eq: [passive, true] }, // Include documents with empty submissions
-                      { $eq: [{ $size: "$submissions" }, 0] },
-                    ],
-                  },
-                ],
-              },
-              else: {},
-            },
-          },
-        },
-      },
-      {
-        $facet: {
-          data: [
-            {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
-            },
-            { $limit: first || 20 },
-          ],
-          hasNextPage: [
-            {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
-            },
-            { $skip: first || 20 }, // skip paginated data
-            { $limit: 1 }, // just to check if there's any element
-          ],
-          totalCount: [
-            { $count: "totalCount" }, // Count matching documents
-          ],
-        },
-      },
-      {
-        $project: {
-          totalCount: {
-            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
-          },
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $gt: [{ $size: "$hasNextPage" }, 0] }, // True if hasNextPage has at least one record
-            endCursor: { $ifNull: [{ $last: "$data._id" }, null] }, // Fallback to null if no records
-          },
-        },
-      },
-    ]);
-  }
 }

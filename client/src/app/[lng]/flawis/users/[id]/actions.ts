@@ -4,8 +4,11 @@ import { ToggleVerifiedUserDocument } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import { revalidateTag } from "next/cache";
 
-export async function toggleVerified(id: string) {
-  const res = await executeGqlFetch(ToggleVerifiedUserDocument, { id });
+export async function toggleVerified(id: string, verified: boolean) {
+  const res = await executeGqlFetch(ToggleVerifiedUserDocument, {
+    id,
+    verified,
+  });
   if (res.errors) {
     return { success: false, message: res.errors[0].message };
   }

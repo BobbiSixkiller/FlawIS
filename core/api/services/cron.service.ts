@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { Service } from "typedi";
-import { InternService } from "./internService";
+import { InternService } from "./intern.service";
 
 @Service()
 class CronJobService {

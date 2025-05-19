@@ -19,7 +19,7 @@ import {
 import { Access, StudyProgramme, User } from "../../entitites/User";
 import { CreateArgs, CreateConnection } from "./pagination";
 import { IMutationResponse } from "./interface";
-import { I18nService } from "../../services/i18nService";
+import { I18nService } from "../../services/i18n.service";
 import Container from "typedi";
 import { AddressInput } from "./conference";
 
@@ -52,6 +52,16 @@ export class UserInput implements Partial<User> {
   })
   email: string;
 
+  @Field()
+  @MaxLength(100, {
+    message: (args: ValidationArguments) =>
+      Container.get(I18nService).translate("maxLength", {
+        ns: "validation",
+        length: args.constraints[0],
+      }),
+  })
+  name: string;
+
   @Field({ nullable: true })
   @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
     message: () =>
@@ -64,16 +74,6 @@ export class UserInput implements Partial<User> {
   @Authorized(["ADMIN"])
   @Field(() => [Access], { nullable: true })
   access?: Access[];
-
-  @Field()
-  @MaxLength(100, {
-    message: (args: ValidationArguments) =>
-      Container.get(I18nService).translate("maxLength", {
-        ns: "validation",
-        length: args.constraints[0],
-      }),
-  })
-  name: string;
 
   @Field({ nullable: true })
   address?: AddressInput;

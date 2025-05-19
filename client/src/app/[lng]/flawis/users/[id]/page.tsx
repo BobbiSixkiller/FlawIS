@@ -110,7 +110,7 @@ export default async function User({
                 defaultChecked={user.verified}
                 handleToggle={async () => {
                   "use server";
-                  await toggleVerified(user.id);
+                  await toggleVerified(user.id, user.verified);
                 }}
               />
             </dd>

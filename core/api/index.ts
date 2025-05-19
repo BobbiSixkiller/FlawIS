@@ -28,7 +28,7 @@ import { SubmissionResolver } from "./resolvers/submission";
 import { AttendeeResolver } from "./resolvers/attendee";
 import { InternshipResolver } from "./resolvers/internship";
 import { InternResolver } from "./resolvers/intern";
-import { CronJobService } from "./services/cronService";
+import { CronJobService } from "./services/cron.service";
 
 env.config();
 

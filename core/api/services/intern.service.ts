@@ -1,23 +1,28 @@
 import { Service } from "typedi";
-import { TypegooseService } from "./typegooseService";
-import { Intern, Internship, Status } from "../entitites/Internship";
-import { InternArgs, InternConnection } from "../resolvers/types/internship";
+import { Intern, Status } from "../entitites/Internship";
+import { InternArgs } from "../resolvers/types/internship";
 import { ObjectId } from "mongodb";
-import { I18nService } from "./i18nService";
+import { I18nService } from "./i18n.service";
 import { User } from "../util/types";
-import { InternshipService } from "./internshipService";
+import { InternshipService } from "./internship.service";
 import { getAcademicYear } from "../util/helpers";
 import { Access } from "../entitites/User";
-import { UserService } from "./userService";
-import { transformIds } from "../middlewares/typegoose-middleware";
-import { RmqService, RoutingKey } from "./rmqService";
-import { MinioService } from "./minioService";
-import { name } from "@azure/msal-node/dist/packageMetadata";
+import { UserService } from "./user.service";
+import { RmqService, RoutingKey } from "./rmq.service";
+import { MinioService } from "./minio.service";
+import { InternRepository } from "../repositories/intern.repository";
+import mongoose from "mongoose";
+import { DocumentType } from "@typegoose/typegoose";
+
+function toInternDTO(doc: DocumentType<Intern>): Intern {
+  const { _id, ...rest } = doc.toJSON({ versionKey: false });
+  return { ...rest, id: _id };
+}
 
 @Service()
 export class InternService {
   constructor(
-    private readonly crudService = new TypegooseService(Intern),
+    private readonly internRepository: InternRepository,
     private readonly internshipService: InternshipService,
     private readonly userService: UserService,
     private readonly i18nService: I18nService,
@@ -25,34 +30,21 @@ export class InternService {
     private readonly minioService: MinioService
   ) {}
 
-  async getInterns(args: InternArgs): Promise<InternConnection> {
-    try {
-      const data = await this.crudService.dataModel.paginatedInterns(args);
-      const connection = data[0] as InternConnection;
-
-      return {
-        ...connection,
-        edges: connection.edges.map((edge) => ({
-          cursor: edge.cursor,
-          node: transformIds(edge.node),
-        })),
-      };
-    } catch (error: any) {
-      throw new Error(`Error fetching interns: ${error.message}`);
-    }
+  async getInterns(args: InternArgs) {
+    return await this.internRepository.paginatedInterns(args);
   }
 
   async getById(id: ObjectId) {
-    const intern = await this.crudService.findOne({ _id: id });
+    const intern = await this.internRepository.findOne({ _id: id });
     if (!intern) {
       throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
     }
 
-    return intern;
+    return toInternDTO(intern);
   }
 
   async getByUserInternship(userId: ObjectId, internshipId: ObjectId) {
-    const intern = await this.crudService.findOne({
+    const intern = await this.internRepository.findOne({
       "user._id": userId,
       internship: internshipId,
     });
@@ -60,7 +52,7 @@ export class InternService {
       throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
     }
 
-    return intern;
+    return toInternDTO(intern);
   }
 
   async createIntern(
@@ -69,7 +61,7 @@ export class InternService {
     fileUrls: string[],
     hostname: string
   ): Promise<Intern> {
-    const session = await this.crudService.dataModel.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
@@ -83,13 +75,14 @@ export class InternService {
       const { startDate, endDate } = getAcademicYear();
 
       // Count documents within the transaction
-      const count = await this.crudService.dataModel
-        .countDocuments({
+      const count = await this.internRepository.countDocuments(
+        {
           "user._id": user.id,
           createdAt: { $gte: startDate, $lte: endDate },
           status: { $ne: Status.Rejected },
-        })
-        .session(session);
+        },
+        { session }
+      );
 
       if (count >= 2) {
         throw new Error(
@@ -105,28 +98,23 @@ export class InternService {
       );
 
       // Create the document within the transaction
-      const newIntern = await this.crudService.dataModel.create(
-        [
-          {
-            organization: internship.organization,
-            internship: internship.id,
-            user: {
-              _id: user.id,
-              name: user.name,
-              email: user.email,
-              telephone: user.telephone,
-              studyProgramme: user.studyProgramme,
-              address: user.address,
-            },
-            status: Status.Applied,
-            fileUrls,
+      const newIntern = await this.internRepository.create(
+        {
+          organization: internship.organization,
+          internship: internship.id,
+          user: {
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            telephone: user.telephone,
+            studyProgramme: user.studyProgramme,
+            address: user.address,
           },
-        ],
+          status: Status.Applied,
+          fileUrls,
+        },
         { session }
       );
-
-      await session.commitTransaction();
-      session.endSession();
 
       await this.rmqService.produceMessage(
         JSON.stringify({
@@ -151,8 +139,8 @@ export class InternService {
             locale: this.i18nService.language(),
             name: edge.node.name,
             email: edge.node.email,
-            internshipId: newIntern[0].internship,
-            internId: newIntern[0].id,
+            internshipId: newIntern.internship,
+            internId: newIntern.id,
             organization: internship.organization,
             hostname:
               process.env.NODE_ENV === "production"
@@ -163,20 +151,23 @@ export class InternService {
         )
       );
 
-      return newIntern[0];
-    } catch (error) {
+      await session.commitTransaction();
+
+      return toInternDTO(newIntern);
+    } catch (err) {
       await session.abortTransaction();
+      throw err;
+    } finally {
       session.endSession();
-      throw error;
     }
   }
 
   async changeStatus(status: Status, id: ObjectId, hostname: string) {
-    const session = await this.crudService.dataModel.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const intern = await this.crudService.findOneAndUpdate(
+      const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { status },
         session
@@ -186,9 +177,6 @@ export class InternService {
           this.i18nService.translate("notFound", { ns: "intern" })
         );
       }
-
-      await session.commitTransaction();
-      session.endSession();
 
       await this.rmqService.produceMessage(
         JSON.stringify({
@@ -202,20 +190,23 @@ export class InternService {
         `mail.internships.${status.toLowerCase()}` as RoutingKey
       );
 
-      return intern;
+      await session.commitTransaction();
+
+      return toInternDTO(intern);
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
   async updateFiles(fileUrls: string[], id: ObjectId, user: User) {
-    const session = await this.crudService.dataModel.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const intern = await this.crudService.findOneAndUpdate(
+      const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { fileUrls },
         session
@@ -233,21 +224,22 @@ export class InternService {
       }
 
       await session.commitTransaction();
-      session.endSession();
-      return intern;
+
+      return toInternDTO(intern);
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
   async deleteIntern(id: ObjectId, user: User) {
-    const session = await this.crudService.dataModel.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const intern = await this.crudService.findOneAndDelete(
+      const intern = await this.internRepository.findOneAndDelete(
         { _id: id },
         { session }
       );
@@ -267,12 +259,13 @@ export class InternService {
       await this.minioService.deleteFiles(intern.fileUrls);
 
       await session.commitTransaction();
-      session.endSession();
-      return intern;
+
+      return toInternDTO(intern);
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -281,11 +274,11 @@ export class InternService {
     user: User,
     fileUrl: string
   ) {
-    const session = await this.crudService.dataModel.startSession();
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const intern = await this.crudService.findOneAndUpdate(
+      const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { organizationFeedbackUrl: fileUrl },
         session
@@ -306,12 +299,13 @@ export class InternService {
       }
 
       await session.commitTransaction();
-      session.endSession();
-      return intern;
+
+      return toInternDTO(intern);
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
@@ -319,7 +313,7 @@ export class InternService {
     const { startDate, endDate } = getAcademicYear();
 
     // Count intern documents with status "APPLIED" for the current academic year.
-    const count = await this.crudService.dataModel.countDocuments({
+    const count = await this.internRepository.countDocuments({
       status: Status.Applied,
       createdAt: { $gte: startDate, $lte: endDate },
     });
@@ -349,55 +343,8 @@ export class InternService {
   }
 
   async notifyOrgsOfEligibleInterns() {
-    const { startDate, endDate } = getAcademicYear();
-
-    const internshipsWithEligibleInterns = await this.crudService.aggregate<{
-      count: number;
-      internship: Internship;
-      user: User;
-    }>([
-      {
-        $match: {
-          status: Status.Eligible,
-          createdAt: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: "$internship",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $lookup: {
-          from: "internships",
-          localField: "_id",
-          foreignField: "_id",
-          as: "internship",
-        },
-      },
-      {
-        $unwind: {
-          path: "$internship",
-          preserveNullAndEmptyArrays: false,
-        },
-      },
-      { $addFields: { "internship.id": "$internship._id" } },
-      {
-        $lookup: {
-          from: "users",
-          localField: "internship.user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      {
-        $unwind: {
-          path: "$user",
-          preserveNullAndEmptyArrays: false,
-        },
-      },
-    ]);
+    const internshipsWithEligibleInterns =
+      await this.internRepository.internshipsWithEligibleInterns();
 
     for (const data of internshipsWithEligibleInterns) {
       console.log(`Sending notification to ${data.internship.organization}`);

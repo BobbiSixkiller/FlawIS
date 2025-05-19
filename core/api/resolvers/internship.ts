@@ -12,7 +12,7 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Intern, Internship, Status } from "../entitites/Internship";
-import { InternshipService } from "../services/internshipService";
+import { InternshipService } from "../services/internship.service";
 import { ObjectId } from "mongodb";
 import {
   InternshipArgs,
@@ -21,9 +21,9 @@ import {
   InternshipMutationResponse,
 } from "./types/internship";
 import { Access } from "../entitites/User";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import { Context } from "../util/auth";
-import { InternService } from "../services/internService";
+import { InternService } from "../services/intern.service";
 
 @Service()
 @Resolver(() => Internship)
@@ -114,7 +114,7 @@ export class InternshipResolver {
 
     return {
       message: this.i18nService.translate("applied", { ns: "intern" }),
-      data: { ...internship.toObject(), myApplication: intern },
+      data: { ...internship, myApplication: intern },
     };
   }
 

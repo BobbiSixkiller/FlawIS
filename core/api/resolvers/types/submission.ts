@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
 import { LocalesInput } from "./translation";
 import Container from "typedi";
-import { I18nService } from "../../services/i18nService";
+import { I18nService } from "../../services/i18n.service";
 import { IMutationResponse } from "./interface";
 import { PresentationLng, Submission } from "../../entitites/Submission";
 import { CreateArgs, CreateConnection } from "./pagination";

@@ -1,8 +1,8 @@
 import { MiddlewareFn } from "type-graphql";
 import { Context } from "../util/auth";
 import Container from "typedi";
-import { I18nService } from "../services/i18nService";
-import { RedisService } from "../services/redisService";
+import { I18nService } from "../services/i18n.service";
+import { RedisService } from "../services/redis.service";
 
 const ONE_HOUR = 60 * 60;
 

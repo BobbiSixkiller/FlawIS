@@ -39,7 +39,7 @@ type Attendee {
   submissions: [Submission!]!
   ticket: Ticket!
   updatedAt: DateTimeISO!
-  user: AttendeeUserUnion!
+  user: UserStubUnion!
 }
 
 input AttendeeBillingInput {
@@ -78,14 +78,6 @@ type AttendeePageInfo {
   endCursor: ObjectId
   hasNextPage: Boolean!
 }
-
-type AttendeeUser {
-  email: String!
-  id: ObjectId!
-  name: String!
-}
-
-union AttendeeUserUnion = AttendeeUser | User
 
 """Billing information"""
 type Billing {
@@ -366,7 +358,7 @@ type Mutation {
   register(data: RegisterUserInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
-  toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
+  toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
@@ -644,3 +636,11 @@ type UserReferece {
   studyProgramme: StudyProgramme!
   telephone: String!
 }
+
+type UserStub {
+  email: String!
+  id: ObjectId!
+  name: String!
+}
+
+union UserStubUnion = User | UserStub

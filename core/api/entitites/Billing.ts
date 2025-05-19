@@ -44,15 +44,7 @@ export class Billing {
 }
 
 @ObjectType({ description: "Flaw billing information" })
-export class FlawBilling implements Billing {
-  @Field()
-  @Property()
-  name: string;
-
-  @Field(() => Address)
-  @Property({ _id: false })
-  address: Address;
-
+export class FlawBilling extends Billing {
   @Field()
   @Property()
   variableSymbol: string;

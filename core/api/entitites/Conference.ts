@@ -8,13 +8,11 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import { LocalesType } from "../resolvers/types/translation";
 import { Attendee } from "./Attendee";
 import { FlawBilling } from "./Billing";
-import { ConferenceConnection } from "../resolvers/types/conference";
 
 @ObjectType()
 export class ConferenceTranslations {
@@ -206,53 +204,4 @@ export class Conference extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  public static async paginatedConferences(
-    this: ModelType<Conference>,
-    first: number,
-    after?: ObjectId
-  ): Promise<ConferenceConnection> {
-    const data = await this.aggregate([
-      { $sort: { _id: -1 } },
-      {
-        $facet: {
-          data: [
-            {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
-            },
-            { $limit: first || 20 },
-            { $addFields: { id: "$_id" } },
-          ],
-          hasNextPage: [
-            {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
-            },
-            { $skip: first || 20 },
-            { $limit: 1 },
-          ],
-          totalCount: [{ $count: "totalCount" }],
-        },
-      },
-      {
-        $project: {
-          totalCount: {
-            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
-          },
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
-          },
-        },
-      },
-    ]);
-
-    return data[0];
-  }
 }

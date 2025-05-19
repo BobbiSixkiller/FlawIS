@@ -1,5 +1,6 @@
 import {
   ArgumentValidationError,
+  createUnionType,
   Field,
   ObjectType,
   registerEnumType,
@@ -14,11 +15,9 @@ import {
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { hash } from "bcrypt";
 import { signJwt } from "../util/auth";
-import { ModelType } from "@typegoose/typegoose/lib/types";
 import Container from "typedi";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import { Address, Billing } from "./Billing";
-import { UserArgs } from "../resolvers/types/user";
 
 export enum Access {
   Admin = "ADMIN",
@@ -47,7 +46,7 @@ registerEnumType(StudyProgramme, {
 
 @pre<User>("save", async function () {
   if ((this.isNew && this.password) || this.isModified("password")) {
-    this.password = await hash(this.password, 12);
+    this.password = await hash(String(this.password), 12);
   }
   if (this.isNew || this.isModified("email")) {
     const emailExists = await getModelForClass(User)
@@ -97,7 +96,7 @@ export class User extends TimeStamps {
   email: string;
 
   @Property()
-  password: string;
+  password?: string;
 
   @Field()
   @Property()
@@ -148,7 +147,7 @@ export class User extends TimeStamps {
   updatedAt: Date;
 
   @Field()
-  get token(): string {
+  token(): string {
     return (
       "Bearer " +
       signJwt(
@@ -162,45 +161,18 @@ export class User extends TimeStamps {
       )
     );
   }
+}
 
-  public static async paginatedUsers(
-    this: ModelType<User>,
-    { first, access, after }: UserArgs
-  ) {
-    return await this.aggregate([
-      { $sort: { _id: -1 } },
-      {
-        $match: {
-          ...(access ? { access: { $in: access } } : {}),
-          ...(after ? { _id: { $lt: after } } : {}),
-        },
-      },
-      {
-        $facet: {
-          data: [{ $limit: first || 20 }],
-          hasNextPage: [
-            { $skip: first || 20 }, // skip paginated data
-            { $limit: 1 }, // just to check if there's any element
-          ],
-          totalCount: [{ $count: "totalCount" }], // Count matching documents,
-        },
-      },
-      {
-        $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
-          },
-        },
-      },
-    ]);
-  }
+@ObjectType()
+export class UserStub {
+  @Field()
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+
+  @Field()
+  @Property()
+  email: string;
 }

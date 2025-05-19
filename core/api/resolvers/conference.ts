@@ -16,7 +16,7 @@ import {
   Ticket,
   TicketTranslation,
 } from "../entitites/Conference";
-import { I18nService } from "../services/i18nService";
+import { I18nService } from "../services/i18n.service";
 import {
   ConferenceArgs,
   ConferenceConnection,
@@ -32,21 +32,21 @@ import { DocumentType } from "@typegoose/typegoose";
 import { Context } from "../util/auth";
 import { Attendee } from "../entitites/Attendee";
 import { Section } from "../entitites/Section";
-import { transformIds } from "../middlewares/typegoose-middleware";
 import { AttendeeInput } from "./types/attendee";
 import { VerifiedTicket } from "../util/types";
 import { User } from "../entitites/User";
-import { RmqService } from "../services/rmqService";
-import { TypegooseService } from "../services/typegooseService";
+import { RmqService } from "../services/rmq.service";
+import { Repository } from "../repositories/repository";
+import { ConferenceRepository } from "../repositories/conference.repository";
 
 @Service()
 @Resolver(() => Conference)
 export class ConferencerResolver {
   constructor(
-    private readonly conferenceService = new TypegooseService(Conference),
-    private readonly sectionService = new TypegooseService(Section),
-    private readonly attendeeService = new TypegooseService(Attendee),
-    private readonly userService = new TypegooseService(User),
+    private readonly conferenceRepository: ConferenceRepository,
+    private readonly sectionService = new Repository(Section),
+    private readonly attendeeService = new Repository(Attendee),
+    private readonly userService = new Repository(User),
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService
   ) {}
@@ -54,12 +54,9 @@ export class ConferencerResolver {
   @Authorized()
   @Query(() => ConferenceConnection)
   async conferences(
-    @Args() { first, after }: ConferenceArgs
+    @Args() args: ConferenceArgs
   ): Promise<ConferenceConnection> {
-    return await this.conferenceService.dataModel.paginatedConferences(
-      first,
-      after
-    );
+    return await this.conferenceRepository.paginatedConferences(args);
   }
 
   @Authorized()
@@ -74,12 +71,7 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Query(() => [Conference])
   async textSearchConference(@Arg("text") text: string) {
-    return await this.conferenceService.aggregate([
-      { $match: { $text: { $search: text } } },
-      { $sort: { score: { $meta: "textScore" } } },
-      { $addFields: { id: "$_id" } },
-      { $limit: 10 },
-    ]);
+    return this.conferenceRepository.textSearch(text);
   }
 
   @Authorized(["ADMIN"])
@@ -87,7 +79,7 @@ export class ConferencerResolver {
   async createConference(
     @Arg("data") data: ConferenceInput
   ): Promise<ConferenceMutationResponse> {
-    const conference = await this.conferenceService.create(data);
+    const conference = await this.conferenceRepository.create(data);
 
     return {
       data: conference,
@@ -106,7 +98,7 @@ export class ConferencerResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Conference) conference: DocumentType<Conference>
   ): Promise<ConferenceMutationResponse> {
-    await this.conferenceService.delete({ _id: conference.id });
+    await this.conferenceRepository.delete({ _id: conference.id });
 
     return {
       data: conference,

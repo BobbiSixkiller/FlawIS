@@ -24,8 +24,6 @@
   "homepage": "https://github.com/BobbiSixkiller/FlawIS-users#readme",
   "dependencies": {
     "@apollo/server": "^4.10.0",
-    "@azure/msal-node": "^2.13.1",
-    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@typegoose/typegoose": "^12.2.0",
     "@types/jsonwebtoken": "^9.0.5",
     "amqplib": "^0.10.3",

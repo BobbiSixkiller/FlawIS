@@ -11,9 +11,9 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Intern, Status, UserReferece } from "../entitites/Internship";
-import { InternshipService } from "../services/internshipService";
-import { InternService } from "../services/internService";
-import { I18nService } from "../services/i18nService";
+import { InternshipService } from "../services/internship.service";
+import { InternService } from "../services/intern.service";
+import { I18nService } from "../services/i18n.service";
 import {
   InternArgs,
   InternConnection,
@@ -22,7 +22,7 @@ import {
 import { ObjectId } from "mongodb";
 import { Context } from "../util/auth";
 import { Access } from "../entitites/User";
-import { UserService } from "../services/userService";
+import { UserService } from "../services/user.service";
 
 @Service()
 @Resolver(() => Intern)

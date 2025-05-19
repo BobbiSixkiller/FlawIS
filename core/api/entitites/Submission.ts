@@ -17,9 +17,8 @@ import { Conference } from "./Conference";
 import { Section } from "./Section";
 import { User } from "./User";
 import Container from "typedi";
-import { I18nService } from "../services/i18nService";
-import { ModelType, Ref } from "@typegoose/typegoose/lib/types";
-import { SubmissionArgs } from "../resolvers/types/submission";
+import { I18nService } from "../services/i18n.service";
+import { Ref } from "@typegoose/typegoose/lib/types";
 
 export enum PresentationLng {
   SK = "SK",
@@ -138,84 +137,4 @@ export class Submission extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  public static async paginatedSubmissions(
-    this: ModelType<Submission>,
-    { after, first, conferenceId, sectionIds }: SubmissionArgs
-  ) {
-    return await this.aggregate([
-      // {
-      //   $match: {
-      //     $expr: {
-      //       $cond: {
-      //         if: { $ne: [conferenceId, null] },
-      //         then: {
-      //           $eq: ["$conference", conferenceId],
-      //         },
-      //         else: {},
-      //       },
-      //     },
-      //   },
-      // },
-      // {
-      //   $match: {
-      //     $expr: {
-      //       $cond: {
-      //         if: { $ne: [{ $size: [sectionIds] }, 0] },
-      //         then: {
-      //           $in: ["$section", sectionIds],
-      //         },
-      //         else: {},
-      //       },
-      //     },
-      //   },
-      // },
-      {
-        $match: {
-          ...(conferenceId ? { conference: conferenceId } : {}),
-          ...(sectionIds && sectionIds.length > 0
-            ? { section: { $in: sectionIds } }
-            : {}),
-        },
-      },
-      { $sort: { _id: -1 } },
-      {
-        $facet: {
-          data: [
-            {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
-            },
-            { $limit: first || 20 },
-            { $addFields: { id: "$_id" } },
-          ],
-          hasNextPage: [
-            {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
-            },
-            { $skip: first || 20 }, // skip paginated data
-            { $limit: 1 }, // just to check if there's any element
-          ],
-          totalCount: [{ $count: "totalCount" }], // Count matching documents,
-        },
-      },
-      {
-        $project: {
-          totalCount: {
-            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
-          },
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
-          },
-        },
-      },
-    ]);
-  }
 }

@@ -5,7 +5,7 @@ fragment Attendee on Attendee {
       __typename
       ...User
     }
-    ... on AttendeeUser {
+    ... on UserStub {
       __typename
       id
       name
@@ -80,7 +80,7 @@ query textSearchAttendee($text: String!, $slug: String!) {
   textSearchAttendee(text: $text, slug: $slug) {
     id
     user {
-      ... on AttendeeUser {
+      ... on UserStub {
         id
         name
         email
