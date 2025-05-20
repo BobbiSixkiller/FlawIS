@@ -24,7 +24,7 @@ import { User } from "../entitites/User";
 import { Submission } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { Repository } from "../repositories/repository";
-import { AttendeeRepository } from "../repositories/attendee.repository";
+import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
 
 @Service()
 @Resolver(() => Attendee)

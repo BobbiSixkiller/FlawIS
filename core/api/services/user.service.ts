@@ -159,8 +159,6 @@ export class UserService {
     const match = await compare(password, user.password);
     if (!match) throw new Error(this.i18nService.translate("credentials"));
 
-    console.log(toUserDTO(user));
-
     return toUserDTO(user);
   }
 

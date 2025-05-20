@@ -3,13 +3,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import { Field, Int, ObjectType } from "type-graphql";
-import { ModelType } from "@typegoose/typegoose/lib/types";
-import {
-  CourseArgs,
-  CourseConnection,
-  TermAttendeeArgs,
-  TermAttendeeConnection,
-} from "../resolvers/types/course";
+
 import { FlawBilling } from "./Billing";
 import { Invoice, UserStubUnion } from "./Attendee";
 import { UserStub } from "./User";
@@ -42,52 +36,14 @@ export class Course extends TimeStamps {
   price: number;
 
   @Field()
+  get isPaid(): boolean {
+    return this.price > 0;
+  }
+
+  @Field()
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  public static async paginatedCourses(
-    this: ModelType<Course>,
-    { first, after }: CourseArgs
-  ): Promise<CourseConnection> {
-    const data = await this.aggregate([
-      { $sort: { _id: -1 } },
-      {
-        $facet: {
-          data: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
-            { $limit: first },
-          ],
-          hasNextPage: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
-            { $skip: first },
-            { $limit: 1 },
-          ],
-          totalCount: [{ $count: "totalCount" }],
-        },
-      },
-      {
-        $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
-          },
-        },
-      },
-    ]);
-
-    if (data.length === 0) {
-      return { edges: [], pageInfo: { hasNextPage: false }, totalCount: 0 };
-    } else return data[0];
-  }
 }
 
 @ObjectType()
@@ -116,7 +72,8 @@ export class Module extends TimeStamps {
   updatedAt: Date;
 }
 
-export class Term extends TimeStamps {
+@ObjectType()
+export class CourseTerm extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
@@ -146,14 +103,18 @@ export class Term extends TimeStamps {
   updatedAt: Date;
 }
 
-export class TermAttendee extends TimeStamps {
+@ObjectType()
+export class CourseTermAttendee extends TimeStamps {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
   @Field(() => UserStubUnion)
   @Property({ type: () => UserStub })
   user: UserStub;
 
-  @Field(() => Term)
-  @Property({ ref: () => Term })
-  term: Ref<Term>;
+  @Field(() => CourseTerm)
+  @Property({ ref: () => CourseTerm })
+  term: Ref<CourseTerm>;
 
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })
@@ -163,51 +124,4 @@ export class TermAttendee extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  public static async paginatedTermAttendees(
-    this: ModelType<TermAttendee>,
-    { termId, first, after }: TermAttendeeArgs
-  ): Promise<TermAttendeeConnection> {
-    const data = await this.aggregate([
-      { $match: { term: termId } },
-      { $sort: { _id: -1 } },
-      {
-        $facet: {
-          data: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
-            { $limit: first },
-            { $addFields: { id: "$_id" } },
-          ],
-          hasNextPage: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
-            { $skip: first },
-            { $limit: 1 },
-          ],
-          totalCount: [{ $count: "totalCount" }],
-        },
-      },
-      {
-        $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
-            },
-          },
-          pageInfo: {
-            hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
-          },
-        },
-      },
-    ]);
-
-    if (data.length === 0) {
-      return { edges: [], totalCount: 0, pageInfo: { hasNextPage: false } };
-    } else {
-      return data[0];
-    }
-  }
 }

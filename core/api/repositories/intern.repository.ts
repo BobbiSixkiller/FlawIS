@@ -36,6 +36,14 @@ export class InternRepository extends Repository<typeof Intern> {
           data: [
             { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
             { $limit: first },
+            { $addFields: { id: "$_id", "user.id": "$user._id" } },
+            {
+              $project: {
+                _id: 0, // drop the raw _id
+                "user._id": 0,
+                __v: 0,
+              },
+            },
           ],
           hasNextPage: [
             { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
@@ -54,12 +62,12 @@ export class InternRepository extends Repository<typeof Intern> {
             $map: {
               input: "$data",
               as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
+              in: { cursor: "$$edge.id", node: "$$edge" },
             },
           },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
+            endCursor: { $last: "$data.id" },
           },
         },
       },

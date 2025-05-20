@@ -23,14 +23,18 @@ export class InternshipRepository extends Repository<typeof Internship> {
   }: InternshipArgs) {
     const [connection] = await this.aggregate<InternshipConnection>([
       {
+        $match: {
+          ...(user ? { user } : {}),
+          ...(endDate ? { createdAt: { $lte: endDate } } : {}),
+          ...(startDate ? { createdAt: { $gte: startDate } } : {}),
+          ...(academicYear ? { academicYear } : {}),
+        },
+      },
+      {
         $facet: {
           data: [
             {
               $match: {
-                ...(user ? { user } : {}),
-                ...(endDate ? { createdAt: { $lte: endDate } } : {}),
-                ...(startDate ? { createdAt: { $gte: startDate } } : {}),
-                ...(academicYear ? { academicYear } : {}),
                 ...(after ? { _id: { $lt: after } } : {}),
               },
             },
@@ -74,14 +78,21 @@ export class InternshipRepository extends Repository<typeof Internship> {
                 ]
               : []),
             { $limit: first },
+            {
+              $addFields: {
+                id: "$_id", // copy _id ⇒ id
+              },
+            },
+            {
+              $project: {
+                _id: 0, // drop the raw _id
+                __v: 0,
+              },
+            },
           ],
           hasNextPage: [
             {
               $match: {
-                ...(user ? { user } : {}),
-                ...(endDate ? { createdAt: { $lte: endDate } } : {}),
-                ...(startDate ? { createdAt: { $gte: startDate } } : {}),
-                ...(academicYear ? { academicYear } : {}),
                 ...(after ? { _id: { $lt: after } } : {}),
               },
             },
@@ -108,12 +119,12 @@ export class InternshipRepository extends Repository<typeof Internship> {
             $map: {
               input: "$data",
               as: "edge",
-              in: { cursor: "$$edge._id", node: "$$edge" },
+              in: { cursor: "$$edge.id", node: "$$edge" },
             },
           },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
-            endCursor: { $last: "$data._id" },
+            endCursor: { $last: "$data.id" },
           },
         },
       },
