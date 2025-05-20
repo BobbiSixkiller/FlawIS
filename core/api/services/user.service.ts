@@ -23,11 +23,22 @@ type UserUpdateData = Partial<
   Omit<UserEntity, "id" | "createdAt" | "updatedAt" | "token">
 >;
 
-function toUserDTO(doc: DocumentType<UserEntity>): UserDTO {
-  const { password, _id, ...rest } = doc.toJSON({
+function toUserDTO(doc: DocumentType<UserEntity>) {
+  const obj = doc.toJSON({
     versionKey: false,
+    virtuals: false,
+    transform(_doc, ret) {
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+      delete ret.password;
+
+      return ret;
+    },
   });
-  return { ...rest, id: _id };
+
+  return obj as UserDTO;
 }
 
 @Service()
