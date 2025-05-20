@@ -14,9 +14,22 @@ import { InternRepository } from "../repositories/intern.repository";
 import mongoose from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
 
-function toInternDTO(doc: DocumentType<Intern>): Intern {
-  const { _id, ...rest } = doc.toJSON({ versionKey: false });
-  return { ...rest, id: _id };
+function toInternDTO(doc: DocumentType<Intern>) {
+  const json = doc.toJSON({
+    virtuals: false,
+    versionKey: false, // drop __v
+    transform(_doc, ret) {
+      // copy _id → id and remove _id
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+
+      return ret;
+    },
+  });
+
+  return json as Intern;
 }
 
 @Service()

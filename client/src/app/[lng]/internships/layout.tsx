@@ -66,8 +66,6 @@ export default async function DashboardLayout({
     redirect("/logout");
   }
 
-  console.log("USER ACTIVE ", user.verified);
-
   const { t, i18n } = await translate(lng, "dashboard");
 
   const host = headers().get("host") || ""; // Get the hostname from the request

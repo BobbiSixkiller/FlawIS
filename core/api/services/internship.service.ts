@@ -12,9 +12,22 @@ import { UserService } from "./user.service";
 import { InternshipRepository } from "../repositories/internship.repository";
 import { DocumentType } from "@typegoose/typegoose";
 
-function toInternshipDTO(doc: DocumentType<Internship>): Internship {
-  const { _id, ...rest } = doc.toJSON({ versionKey: false });
-  return { ...rest, id: _id };
+function toInternshipDTO(doc: DocumentType<Internship>) {
+  const json = doc.toJSON({
+    virtuals: false,
+    versionKey: false, // drop __v
+    transform(_doc, ret) {
+      // copy _id → id and remove _id
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+
+      return ret;
+    },
+  });
+
+  return json as Internship;
 }
 
 @Service()

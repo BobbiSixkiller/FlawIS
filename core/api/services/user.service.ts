@@ -74,16 +74,12 @@ export class UserService {
   }
 
   async getUser(id: ObjectId) {
-    try {
-      const user = await this.userRepository.findOne({ _id: id });
-      if (!user) {
-        throw new Error(this.i18nService.translate("notFound", { ns: "user" }));
-      }
-
-      return toUserDTO(user);
-    } catch (error: any) {
-      throw new Error(`Error fetching user: ${error.message}`);
+    const user = await this.userRepository.findOne({ _id: id });
+    if (!user) {
+      throw new Error(this.i18nService.translate("notFound", { ns: "user" }));
     }
+
+    return toUserDTO(user);
   }
 
   async textSearchUser(text: string) {

@@ -15,8 +15,8 @@ export async function getInternship(id: string) {
   const res = await executeGqlFetch(
     InternshipDocument,
     { id },
-    {}
-    // { revalidate: 3600, tags: [`internship:${id}`] }
+    {},
+    { revalidate: 3600, tags: [`internship:${id}`] }
   );
 
   if (res.errors) {

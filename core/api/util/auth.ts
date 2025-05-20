@@ -21,8 +21,6 @@ export function createContext({
   req,
   res,
 }: ExpressContextFunctionArgument): Context {
-  console.log("INCOMING REQ HOST ", req.hostname);
-
   const appContext: Context = {
     req: req as Request,
     res: res as Response,
