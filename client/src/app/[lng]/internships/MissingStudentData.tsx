@@ -20,17 +20,13 @@ export default function MissingStudentData({
 
   const dialogId = "missiong-student-info";
 
-  const { openDialog, closeDialog } = useDialog();
+  const { openDialog } = useDialog();
 
   useEffect(() => {
-    if (
-      (!user?.cvUrl ||
-        !user?.studyProgramme ||
-        !user.telephone ||
-        !user.address) &&
-      user.verified &&
-      user.access.includes(Access.Student)
-    ) {
+    const missingData =
+      !user?.cvUrl || !user?.studyProgramme || !user.telephone || !user.address;
+
+    if (missingData && user.verified && user.access.includes(Access.Student)) {
       openDialog(dialogId);
     }
   }, [user]);
