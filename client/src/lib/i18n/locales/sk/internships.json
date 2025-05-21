@@ -44,5 +44,8 @@
     "internshipDescLabel": "Predpokladaná náplň stáže:",
     "internshipDesc": "Bod naplne staze..."
   },
-  "orgFeedback": "Potvrdenie absolvovania"
+  "orgFeedback": "Potvrdenie absolvovania",
+  "internship": "Stáž",
+  "applied_one": "Prihlásený ({{count}})",
+  "applied_other": "Prihlásených ({{count}})"
 }

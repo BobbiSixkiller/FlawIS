@@ -44,5 +44,8 @@
     "internshipDescLabel": "Internship description:",
     "internshipDesc": "Internship description point..."
   },
-  "orgFeedback": "Certificate of completition"
+  "orgFeedback": "Certificate of completition",
+  "internship": "Internship",
+  "applied_one": "Applied ({{count}})",
+  "applied_other": "Applied ({{count}})"
 }

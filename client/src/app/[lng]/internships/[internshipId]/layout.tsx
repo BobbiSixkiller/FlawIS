@@ -3,10 +3,11 @@ import { getMe } from "../../(auth)/actions";
 import TabMenu from "@/components/TabMenu";
 import { Access } from "@/lib/graphql/generated/graphql";
 import { getInternship } from "./actions";
+import { translate } from "@/lib/i18n";
 
 export default async function InternshipLayout({
   children,
-  params: { internshipId },
+  params: { internshipId, lng },
 }: {
   children: ReactNode;
   params: { lng: string; internshipId: string };
@@ -20,15 +21,19 @@ export default async function InternshipLayout({
     user.access.includes(Access.Admin) ||
     user.access.includes(Access.Organization);
 
+  const { t } = await translate(lng, "internships");
+
   return (
     <div className="flex flex-1 flex-col">
       {showTabs && internship && (
         <TabMenu
           tabs={[
-            { href: `/${internshipId}`, name: "Staz" },
+            { href: `/${internshipId}`, name: t("internship") },
             {
               href: `/${internshipId}/applications`,
-              name: `Prihlaseni (${internship.applicationsCount})`,
+              name: t("applied", {
+                count: internship.applicationsCount,
+              }),
             },
           ]}
         />
