@@ -1,11 +1,9 @@
-import Button from "@/components/Button";
-import Link from "next/link";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Status } from "@/lib/graphql/generated/graphql";
 import ChangeStatusDialog from "./ChangeStatusDialog";
 import { Application } from "@/app/[lng]/internships/[internshipId]/Application";
 import DeleteApplicationDialog from "@/app/[lng]/internships/[internshipId]/DeleteApplicationDialog";
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/[internId]/actions";
+import CloseButton from "@/components/CloseButton";
 
 export default async function InternPage({
   params: { internshipId, internId, lng },
@@ -16,14 +14,8 @@ export default async function InternPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <Button
-        variant="ghost"
-        as={Link}
-        className="rounded-full h-full p-2 hover:bg-gray-100 hover:text-gray-400 ml-auto"
-        href={`/internships/${internshipId}/applications`}
-      >
-        <XMarkIcon className="size-5" />
-      </Button>
+      <CloseButton href={`/internships/${internshipId}/applications`} />
+
       <Application
         lng={lng}
         application={intern}

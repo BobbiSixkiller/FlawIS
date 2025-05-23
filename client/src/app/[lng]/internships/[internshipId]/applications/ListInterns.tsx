@@ -71,14 +71,13 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
       </div>
 
       <Button
-        variant="ghost"
         as={Link}
         href={
           path.includes("internships")
             ? `/internships/${internshipId}/applications/${data?.id}`
             : `/${internshipId}/applications/${data?.id}`
         }
-        className="rounded-full h-full p-2 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="bg-transparent rounded-full h-full p-2 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <ChevronRightIcon className="size-5" />
       </Button>

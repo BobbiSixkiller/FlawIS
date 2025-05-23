@@ -16,15 +16,16 @@ const buttonStyles = {
       positive:
         "bg-green-500 text-white hover:bg-green-500/90 focus-visible:ring-green-500",
       outline:
-        "border-2 border-primary-500 text-primary-500 hover:text-primary-500/90 hover:border-primary-500/90 bg-transparent",
+        "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent",
       secondary: "bg-black text-white hover:bg-black/80",
+      ghost: "hover:bg-white/30 bg-transparent",
       link: "text-primary underline-offset-4 hover:underline",
     },
     size: {
       default: "h-10 px-4 py-2",
       sm: "h-9 rounded-md px-3",
       lg: "h-11 rounded-md px-8",
-      icon: "h-9 w-9",
+      icon: "h-10 w-10",
     },
   },
   default: {

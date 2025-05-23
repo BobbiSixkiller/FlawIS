@@ -29,7 +29,7 @@ type TriggerButton = {
 const triggerButton: TriggerButton = {
   Applied: {
     icon: <ArrowUturnLeftIcon className="size-5" />,
-    variant: "ghost",
+    variant: "default",
   },
   Eligible: { icon: <CheckIcon className="size-5" />, variant: "positive" },
   Accepted: { icon: <CheckIcon className="size-5" />, variant: "positive" },
