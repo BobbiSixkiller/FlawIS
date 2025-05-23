@@ -8,16 +8,13 @@ import {
   HomeIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { ReactNode, useState } from "react";
 import useScroll from "@/hooks/useScroll";
 import Drawer from "./Drawer";
 import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
-import DynamicImageClient from "./DynamicImageClient";
 import Button from "./Button";
-import Avatar from "./Avatar";
 
 export default function TopBar({
   avatar,
@@ -41,6 +38,7 @@ export default function TopBar({
     <div
       className={cn([
         "flex items-center p-4 border-b h-[60px] sticky top-0 z-10 bg-white",
+        "dark:border-gray-700 dark:bg-gray-900",
         scrolled ? "shadow-md" : "",
       ])}
     >

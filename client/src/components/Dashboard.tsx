@@ -10,6 +10,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 import Avatar from "./Avatar";
+import { cn } from "@/utils/helpers";
 
 export default function Dashboard({
   children,
@@ -27,7 +28,7 @@ export default function Dashboard({
   const theme = cookies().get("theme")?.value || "";
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-900">
       <div className="hidden md:flex flex-col gap-4 p-4 bg-primary-500  lg:w-full lg:max-w-xs h-screen sticky top-0">
         <Logo lng={lng} height={60} width={60} inverted />
 
@@ -43,7 +44,12 @@ export default function Dashboard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col md:border-r ">
+      <div
+        className={cn([
+          "flex flex-1 flex-col md:border-r",
+          "dark:border-gray-700",
+        ])}
+      >
         <TopBar
           logo={<Logo notext height={40} width={40} />}
           drawerTitle={<Logo lng={lng} height={60} width={60} inverted />}
