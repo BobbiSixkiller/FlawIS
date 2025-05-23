@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { ArgsType, Field, Float, InputType, ObjectType } from "type-graphql";
 import { Billing } from "../../entitites/Billing";
 import { IsString } from "class-validator";
-import { AddressInput, ConferenceBillingInput } from "./conference";
+import { AddressInput, FlawBillingInput } from "./conference";
 import { CreateArgs, CreateConnection } from "./pagination";
 import { Attendee, Invoice, InvoiceData } from "../../entitites/Attendee";
 import { IMutationResponse } from "./interface";
@@ -96,8 +96,8 @@ export class InvoiceInput implements Invoice {
   @Field(() => InvoiceDataInput)
   body: InvoiceDataInput;
 
-  @Field(() => ConferenceBillingInput)
-  issuer: ConferenceBillingInput;
+  @Field(() => FlawBillingInput)
+  issuer: FlawBillingInput;
 
   @Field(() => AttendeeBillingInput)
   payer: AttendeeBillingInput;

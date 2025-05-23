@@ -67,6 +67,6 @@ export class I18nService {
   }
 
   language() {
-    return i18next.language;
+    return this.i18nInstance.language;
   }
 }

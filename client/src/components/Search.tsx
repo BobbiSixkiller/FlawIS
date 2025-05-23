@@ -67,16 +67,17 @@ export default function SearchComponent<
 
   return (
     <>
-      <div
+      <button
+        type="button"
         onClick={() => setOpen(true)}
         className={cn([
-          "cursor-pointer px-4 rounded-full border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 flex items-center text-gray-500",
+          "hover:text-primary-500 hover:ring-primary-500 outline-none focus:ring-2 focus:ring-primary-500",
+          "px-4 rounded-full border-0 p-2 shadow-sm ring-1 ring-inset ring-gray-300 flex items-center text-gray-500",
           "dark:bg-gray-800 dark:ring-gray-600",
         ])}
       >
-        <MagnifyingGlassIcon className="size-6 mr-2" />
-        Search...
-      </div>
+        <MagnifyingGlassIcon className="size-4 md:size-6" />
+      </button>
       <Transition show={open} as={Fragment}>
         <Dialog
           as="div"

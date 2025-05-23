@@ -3,7 +3,7 @@ import { CreateArgs, CreateConnection } from "./pagination";
 import { IMutationResponse } from "./interface";
 import { Conference, ImportantDates, Ticket } from "../../entitites/Conference";
 import { IsBoolean, IsDate, IsString, Min } from "class-validator";
-import { Address, Billing } from "../../entitites/Billing";
+import { Address, Billing, FlawBilling } from "../../entitites/Billing";
 import { Section } from "../../entitites/Section";
 import { ObjectId } from "mongodb";
 import { LocalesInput } from "./translation";
@@ -48,7 +48,7 @@ export class AddressInput implements Address {
 }
 
 @InputType()
-export class ConferenceBillingInput implements Billing {
+export class FlawBillingInput implements FlawBilling {
   @Field()
   @IsString()
   name: string;
@@ -157,8 +157,8 @@ export class ConferenceInput {
   @IsString()
   slug: string;
 
-  @Field(() => ConferenceBillingInput)
-  billing: ConferenceBillingInput;
+  @Field(() => FlawBillingInput)
+  billing: FlawBillingInput;
 
   @Field(() => DatesInput)
   dates: DatesInput;

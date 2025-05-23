@@ -32,10 +32,10 @@ export default function LngSwitcher({
     <Menu as="div" className={cn("relative", className)}>
       <MenuButton
         className={cn([
-          "h-fit w-full flex items-center",
+          "h-fit w-full flex items-center data-[open]:bg-primary-700",
           authLayout
             ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
-            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white",
+            : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white text-white",
         ])}
       >
         <Image

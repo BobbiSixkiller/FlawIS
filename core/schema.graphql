@@ -103,18 +103,6 @@ type Conference {
   updatedAt: DateTimeISO!
 }
 
-input ConferenceBillingInput {
-  DIC: String!
-  IBAN: String!
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String!
-  address: AddressInput!
-  name: String!
-  stampUrl: String!
-  variableSymbol: String!
-}
-
 """ConferenceConnection type enabling cursor based pagination"""
 type ConferenceConnection {
   edges: [ConferenceEdge]!
@@ -129,7 +117,7 @@ type ConferenceEdge {
 
 """Conference input type"""
 input ConferenceInput {
-  billing: ConferenceBillingInput!
+  billing: FlawBillingInput!
   dates: DatesInput!
   slug: String!
   translations: ConferenceTranslationInput!
@@ -161,6 +149,48 @@ type ConferenceTranslations {
   name: String!
 }
 
+type Course {
+  billing: FlawBilling
+  createdAt: DateTimeISO!
+
+  """String representation of HTML describing the course"""
+  description: String!
+  id: ObjectId!
+  isPaid: Boolean!
+  name: String!
+  price: Int!
+  updatedAt: DateTimeISO!
+  user: UserStubUnion!
+}
+
+type CourseConnection {
+  edges: [CourseEdge]!
+  pageInfo: CoursePageInfo!
+  totalCount: Int!
+}
+
+type CourseEdge {
+  cursor: ObjectId!
+  node: Course!
+}
+
+input CourseInput {
+  billing: FlawBillingInput
+  description: String!
+  name: String!
+  price: Int!
+}
+
+type CourseMutationResponse implements IMutationResponse {
+  data: Course!
+  message: String!
+}
+
+type CoursePageInfo {
+  endCursor: ObjectId
+  hasNextPage: Boolean!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
 """
@@ -181,6 +211,18 @@ type FlawBilling {
   ICO: String!
   SWIFT: String!
   address: Address!
+  name: String!
+  stampUrl: String!
+  variableSymbol: String!
+}
+
+input FlawBillingInput {
+  DIC: String!
+  IBAN: String!
+  ICDPH: String!
+  ICO: String!
+  SWIFT: String!
+  address: AddressInput!
   name: String!
   stampUrl: String!
   variableSymbol: String!
@@ -309,7 +351,7 @@ input InvoiceDataInput {
 
 input InvoiceInput {
   body: InvoiceDataInput!
-  issuer: ConferenceBillingInput!
+  issuer: FlawBillingInput!
   payer: AttendeeBillingInput!
 }
 
@@ -339,6 +381,7 @@ type Mutation {
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
+  createCourse(data: CourseInput!): CourseMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternshipMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
@@ -346,6 +389,7 @@ type Mutation {
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
+  deleteCourse(id: ObjectId!): CourseMutationResponse!
   deleteIntern(id: ObjectId!): InternMutationResponse!
   deleteInternship(id: ObjectId!): Boolean!
   deleteSection(id: ObjectId!): SectionMutationResponse!
@@ -360,6 +404,7 @@ type Mutation {
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
@@ -397,6 +442,8 @@ type Query {
   attendeesCsvExport(slug: String!): [Attendee!]!
   conference(slug: String!): Conference!
   conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
+  course(id: ObjectId!): Course!
+  courses(after: ObjectId, first: Int! = 20): CourseConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
   interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: [Status!], user: ObjectId): InternConnection!

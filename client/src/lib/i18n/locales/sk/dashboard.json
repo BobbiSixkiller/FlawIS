@@ -1,8 +1,8 @@
 {
   "title": "Právnická fakulta Univerzity Komenského v Bratislave",
   "conferencesDesc": "Regisračný systém pre konferencie, ktoré sú organizované Právnickou fakultou Univerzity Komenského v Bratislave.",
-  "internDesc": "Regisračný systém na stáže organizované Právnickou fakultou Univerzity Komenského v Bratislave a jej partnerskými organizáciami.",
   "internshipsDesc": "Regisračný systém na stáže organizované Právnickou fakultou Univerzity Komenského v Bratislave a jej partnerskými organizáciami.",
+  "coursesDesc": "Regisračný systém na stáže organizované Právnickou fakultou Univerzity Komenského v Bratislave.",
   "flawisDesc": "Administračný panel informačného systému Právnickej fakulty Univerzity Komenského v Bratislave.",
   "faculty": "<0>Právnická fakulta</0><1>Univerzita Komenského <br/> v Bratislave</1>",
   "sk": "Slovenčina",
@@ -23,5 +23,6 @@
   "delete": "Zmazať",
   "new": "Pridať",
   "invite": "Pozvať",
-  "application": "Prihláška"
+  "application": "Prihláška",
+  "courses": "Kurzy"
 }

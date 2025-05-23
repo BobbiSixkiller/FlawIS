@@ -42,7 +42,7 @@ export function withTenant(middleware: CustomMiddleware) {
       process.env.NODE_ENV === "development"
     ) {
       const newUrl = new URL(
-        `/${lng}/internships/${paths.join("/")}${url.search}`,
+        `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
       ); // Rewrite the path with the subdomain
 
@@ -76,6 +76,17 @@ export function withTenant(middleware: CustomMiddleware) {
     if (subdomain.includes("intern")) {
       const newUrl = new URL(
         `/${lng}/internships/${paths.join("/")}${url.search}`,
+        req.url
+      );
+
+      return NextResponse.rewrite(newUrl, {
+        headers: res?.headers,
+      });
+    }
+
+    if (subdomain.includes("courses")) {
+      const newUrl = new URL(
+        `/${lng}/courses/${paths.join("/")}${url.search}`,
         req.url
       );
 

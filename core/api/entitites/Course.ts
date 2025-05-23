@@ -27,9 +27,9 @@ export class Course extends TimeStamps {
   @Property()
   description: string;
 
-  @Field(() => FlawBilling)
+  @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
-  billing: FlawBilling;
+  billing?: FlawBilling;
 
   @Field(() => Int)
   @Property()

@@ -13,7 +13,7 @@ export async function POST(
   return new Response(pdf, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-disposition": `attachment;filename="myDocument.pdf"`,
+      "Content-disposition": `attachment;filename="invoice.pdf"`,
     },
   });
 }

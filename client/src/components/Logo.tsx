@@ -17,12 +17,12 @@ export default async function Logo({
 }: {
   height?: number;
   width?: number;
-  lng: string;
+  lng?: string;
   notext?: boolean;
   inverted?: boolean;
   className?: string;
 }) {
-  const { t } = await translate(lng, "dashboard");
+  const { t } = await translate(lng || "sk", "dashboard");
 
   const theme = cookies().get("theme")?.value;
 
