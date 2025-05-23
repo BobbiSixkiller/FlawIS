@@ -48,7 +48,7 @@ export default function ImageFileInput({
   return (
     <div>
       <div className="flex gap-4 items-center">
-        <div className="w-16 h-16 rounded-full relative">
+        <div className="size-16 rounded-full relative">
           <Image
             src={preview}
             alt="Picture of the property"

@@ -9,6 +9,7 @@ import Logo from "./Logo";
 import Breadcrumbs from "./Breadcrumbs";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
+import Avatar from "./Avatar";
 
 export default function Dashboard({
   children,
@@ -20,7 +21,7 @@ export default function Dashboard({
   navLinks: NavLinkProps[];
   children: ReactNode;
   sidebar: ReactNode;
-  user?: UserFragment;
+  user: UserFragment;
   lng: string;
 }) {
   const theme = cookies().get("theme")?.value || "";
@@ -61,7 +62,7 @@ export default function Dashboard({
             </>
           }
           search={sidebar}
-          user={user}
+          avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
         />
 
         <Breadcrumbs

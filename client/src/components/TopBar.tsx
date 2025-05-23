@@ -6,21 +6,27 @@ import {
   Bars3Icon,
   ChevronRightIcon,
   HomeIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { ReactNode, useState } from "react";
 import useScroll from "@/hooks/useScroll";
-import { ProfileMenuItem } from "./ProfileMenuItem";
 import Drawer from "./Drawer";
+import Dropdown from "./Dropdown";
+import { useTranslation } from "@/lib/i18n/client";
+import { useParams } from "next/navigation";
+import DynamicImageClient from "./DynamicImageClient";
+import Button from "./Button";
+import Avatar from "./Avatar";
 
 export default function TopBar({
-  user,
+  avatar,
   search,
   drawerTitle,
   drawerContent,
   logo,
 }: {
-  user?: UserFragment;
+  avatar: ReactNode;
   search: ReactNode;
   drawerTitle: ReactNode;
   drawerContent: ReactNode;
@@ -28,6 +34,8 @@ export default function TopBar({
 }) {
   const scrolled = useScroll();
   const [visible, setVisible] = useState(false);
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "dashboard");
 
   return (
     <div
@@ -39,9 +47,9 @@ export default function TopBar({
       <button
         type="button"
         onClick={() => setVisible(true)}
-        className="md:hidden absolute left-2 p-2 rounded-md hover:bg-gray-300"
+        className="md:hidden absolute left-2 p-2 rounded-md text-gray-400 hover:bg-gray-300 outline-none focus:ring-2 focus:ring-primary-500 ring-inset"
       >
-        <Bars3Icon className="size-4" />
+        <Bars3Icon className="size-5" />
       </button>
 
       <div className="mx-auto md:hidden">{logo}</div>
@@ -56,7 +64,23 @@ export default function TopBar({
       />
       <div className="absolute right-4 flex items-center gap-2">
         {search}
-        {user ? <ProfileMenuItem user={user} /> : null}
+        <Dropdown
+          trigger={
+            <Button
+              size="icon"
+              className="rounded-full flex items-center bg-primary-400"
+            >
+              {avatar}
+            </Button>
+          }
+          items={[
+            {
+              href: "/profile",
+              icon: <UserCircleIcon className="size-5" aria-hidden="true" />,
+              text: t("profile"),
+            },
+          ]}
+        />
       </div>
 
       <Drawer

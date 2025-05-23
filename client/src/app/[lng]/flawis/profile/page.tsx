@@ -3,6 +3,7 @@ import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
 import { translate } from "@/lib/i18n";
 import { PencilIcon } from "@heroicons/react/24/outline";
+import Avatar from "@/components/Avatar";
 
 export default async function Profile({
   params: { lng },
@@ -34,25 +35,7 @@ export default async function Profile({
               {t("name")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex items-center gap-2">
-              {user.avatarUrl ? (
-                <DynamicImage
-                  src={user.avatarUrl}
-                  alt="Avatar"
-                  className="size-12 rounded-full"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ objectFit: "cover" }}
-                />
-              ) : (
-                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white/85">
-                  {user.name
-                    .split(" ")
-                    .map((n, i) => {
-                      if (i < 2) return n[0].toUpperCase();
-                    })
-                    .join("")}
-                </div>
-              )}
+              <Avatar name={user.name} avatarUrl={user.avatarUrl} />
               {user?.name}
             </dd>
           </div>

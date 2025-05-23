@@ -14,6 +14,7 @@ import {
 } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ComponentType, Fragment, useEffect, useState } from "react";
+import Button from "./Button";
 
 interface BaseSearchParams {
   text: string;
@@ -67,17 +68,16 @@ export default function SearchComponent<
 
   return (
     <>
-      <button
+      <Button
+        size="icon"
         type="button"
         onClick={() => setOpen(true)}
         className={cn([
-          "hover:text-primary-500 hover:ring-primary-500 outline-none focus:ring-2 focus:ring-primary-500",
-          "px-4 rounded-full border-0 p-2 shadow-sm ring-1 ring-inset ring-gray-300 flex items-center text-gray-500",
-          "dark:bg-gray-800 dark:ring-gray-600",
+          "rounded-full bg-transparent text-gray-400 border border-gray-400 hover:bg-transparent hover:text-primary-500 hover:border-primary-500",
         ])}
       >
-        <MagnifyingGlassIcon className="size-4 md:size-6" />
-      </button>
+        <MagnifyingGlassIcon className="size-5" />
+      </Button>
       <Transition show={open} as={Fragment}>
         <Dialog
           as="div"

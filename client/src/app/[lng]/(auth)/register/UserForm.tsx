@@ -26,7 +26,7 @@ import Spinner from "@/components/Spinner";
 import { cn, fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
-import ImageFileInput from "@/components/ImageFileInput";
+import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
 import { useDialog } from "@/providers/DialogProvider";
 
@@ -334,9 +334,7 @@ export default function UserForm({
       >
         <FormMessage />
 
-        {path.includes("update") && (
-          <ImageFileInput name="avatar" label="Fotka" />
-        )}
+        {path.includes("update") && <AvatarInput name="avatar" label="Fotka" />}
 
         <Input label={t("name")} name="name" autoComplete="name" />
         <Input label={t("email")} name="email" autoComplete="email" />

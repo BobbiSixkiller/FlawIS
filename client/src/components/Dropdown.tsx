@@ -19,12 +19,7 @@ interface DropdownProps {
 export default function Dropdown({ trigger, items }: DropdownProps) {
   return (
     <Menu as="div" className="relative">
-      <MenuButton
-        as="div"
-        className="px-2 py-1 rounded-md hover:bg-gray-700 dark:hover:bg-gray-700 hover:bg-opacity-10 outline-none	focus:ring-2 focus:ring-inset focus:ring-primary-500"
-      >
-        {trigger}
-      </MenuButton>
+      <MenuButton as={Fragment}>{trigger}</MenuButton>
       <Transition
         as={Fragment}
         enter="transition ease-out duration-100"

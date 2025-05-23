@@ -2,7 +2,12 @@ import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
 import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
 import { Access } from "@/lib/graphql/generated/graphql";
-import { AcademicCapIcon, UsersIcon } from "@heroicons/react/24/outline";
+import {
+  AcademicCapIcon,
+  BriefcaseIcon,
+  BuildingLibraryIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
@@ -79,9 +84,24 @@ export default async function DashboardLayout({
           {
             href: "/conferences",
             icon: (
-              <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              <BuildingLibraryIcon
+                className="mr-2 h-5 w-5"
+                aria-hidden="true"
+              />
             ),
             text: t("conferences"),
+          },
+          {
+            href: "/internships",
+            icon: <BriefcaseIcon className="mr-2 h-5 w-5" aria-hidden="true" />,
+            text: t("internships"),
+          },
+          {
+            href: "/courses",
+            icon: (
+              <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+            ),
+            text: t("courses"),
           },
         ]}
       >
