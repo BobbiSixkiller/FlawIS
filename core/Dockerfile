@@ -22,4 +22,4 @@ COPY . .
 
 COPY --from=development /usr/app/dist ./dist
 
-CMD ["node", "dist/api/index"]
+CMD ["node", "dist/src/index"]
