@@ -9,12 +9,12 @@ import {
   HomeIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import useScroll from "@/hooks/useScroll";
 import Drawer from "./Drawer";
 import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
 
 export default function TopBar({
@@ -34,6 +34,11 @@ export default function TopBar({
   const [visible, setVisible] = useState(false);
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");
+  const path = usePathname();
+
+  useEffect(() => {
+    setVisible(false);
+  }, [path]);
 
   return (
     <div
@@ -56,7 +61,7 @@ export default function TopBar({
       <Breadcrumbs
         homeElement={<HomeIcon className="h-5 w-5" />}
         separator={<ChevronRightIcon className="h-3 w-3" />}
-        activeClasses="text-primary-500 hover:underline"
+        activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
         containerClasses="hidden md:flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
         listClasses="outline-none focus:ring-2 focus:ring-primary-500"
         capitalizeLinks

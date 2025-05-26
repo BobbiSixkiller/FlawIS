@@ -46,7 +46,7 @@ export default function Dashboard({
 
       <div
         className={cn([
-          "flex flex-1 flex-col md:border-r",
+          "flex-1 flex flex-col md:border-r",
           "dark:border-gray-700",
         ])}
       >
@@ -74,13 +74,14 @@ export default function Dashboard({
         <Breadcrumbs
           homeElement={<HomeIcon className="h-5 w-5" />}
           separator={<ChevronRightIcon className="h-3 w-3" />}
-          activeClasses="text-primary-500 hover:underline"
+          activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="md:hidden p-4 flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
           listClasses="outline-none focus:ring-2 focus:ring-primary-500"
           capitalizeLinks
         />
 
-        <div className="h-full p-4">{children}</div>
+        <div className="flex-1 flex flex-col p-4">{children}</div>
+
         <div className="md:hidden pt-16">
           <Footer lng={lng} />
         </div>

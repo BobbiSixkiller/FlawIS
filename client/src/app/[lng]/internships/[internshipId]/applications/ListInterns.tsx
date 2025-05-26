@@ -38,7 +38,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
               style={{ objectFit: "cover" }}
             />
           ) : (
-            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white/85">
               {data?.user.name
                 .split(" ")
                 .map((n, i) => {
@@ -48,7 +48,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
             </div>
           )}
           <div>
-            <p className="text-sm/6 font-semibold text-gray-900 dark:text-white">
+            <p className="text-sm/6 font-semibold text-gray-900 dark:text-white/85">
               {data?.user.name}
             </p>
             <p className="mt-1 truncate text-xs/5 text-gray-500 dark:text-gray-300">
@@ -58,7 +58,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
         </div>
 
         <div className="sm:flex sm:flex-col sm:items-end sm:text-right">
-          <p className="text-sm/6 text-gray-900 dark:text-white">
+          <p className="text-sm/6 text-gray-900 dark:text-white/85">
             {t(data!.status)}
           </p>
           <p className="mt-1 text-xs/5 text-gray-500 dark:text-gray-300">
@@ -71,13 +71,15 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
       </div>
 
       <Button
+        size="icon"
+        variant="ghost"
+        className="rounded-full"
         as={Link}
         href={
           path.includes("internships")
             ? `/internships/${internshipId}/applications/${data?.id}`
             : `/${internshipId}/applications/${data?.id}`
         }
-        className="bg-transparent rounded-full h-full p-2 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <ChevronRightIcon className="size-5" />
       </Button>

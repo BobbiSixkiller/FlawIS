@@ -2,7 +2,7 @@ import Spinner from "@/components/Spinner";
 
 export default function Loading() {
   return (
-    <div className="h-full flex justify-center items-center">
+    <div className="self-center mx-auto">
       <Spinner />
     </div>
   );

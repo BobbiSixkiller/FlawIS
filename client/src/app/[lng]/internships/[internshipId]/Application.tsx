@@ -18,7 +18,7 @@ export async function Application({
   const { t } = await translate(lng, ["internships", "common"]);
 
   return (
-    <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 dark:text-white dark:bg-primary-800 shadow-sm space-y-3">
+    <div className="p-4 rounded-lg border border-primary-500 bg-primary-100 dark:text-white/85 dark:bg-primary-800 shadow-sm space-y-3">
       <h2 className="text-xl text-primary-500 dark:text-primary-400 font-semibold">
         {t("application")}
       </h2>
@@ -35,7 +35,7 @@ export async function Application({
               style={{ objectFit: "cover" }}
             />
           ) : (
-            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white">
+            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white/85">
               {application.user.name
                 .split(" ")
                 .map((n, i) => {
