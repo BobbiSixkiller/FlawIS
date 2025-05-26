@@ -37,16 +37,16 @@ export default function Heading({
       </div>
       <div className="mt-5 flex items-center gap-3 lg:ml-4 lg:mt-0">
         {restLinks?.map((l, i) => (
-          <span className="hidden sm:block" key={i}>
-            <Button
-              as={Link}
-              scroll={false}
-              href={l.href}
-              className="inline-flex gap-2 items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            >
-              {l.icon} {l.text}
-            </Button>
-          </span>
+          <Button
+            key={i}
+            as={Link}
+            scroll={false}
+            href={l.href}
+            className="hidden sm:flex gap-1"
+            variant="secondary"
+          >
+            {l.icon} {l.text}
+          </Button>
         ))}
 
         {first && (
@@ -54,7 +54,7 @@ export default function Heading({
             as={Link}
             scroll={false}
             href={first.href}
-            className="inline-flex items-center gap-2 rounded-md bg-primary-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            className="flex gap-1"
           >
             {first.icon} {first.text}
           </Button>
@@ -65,10 +65,10 @@ export default function Heading({
           <div className="sm:hidden">
             <Dropdown
               trigger={
-                <Button className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400 hover:bg-white/90">
+                <Button variant="secondary">
                   {t("more")}
                   <ChevronDownIcon
-                    className="-mr-1 ml-1.5 h-5 w-5 text-gray-400"
+                    className="-mr-1 ml-1.5 size-5"
                     aria-hidden="true"
                   />
                 </Button>

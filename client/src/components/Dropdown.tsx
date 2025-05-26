@@ -32,7 +32,7 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
         <MenuItems
           className={cn([
             "absolute right-0 mt-2 min-w-max w-32 origin-top-right rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
-            "dark:bg-gray-700 dark:text-white",
+            "dark:bg-gray-700 dark:text-white/85",
           ])}
         >
           {items.map((item, i) => (

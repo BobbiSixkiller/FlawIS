@@ -28,7 +28,7 @@ export default function Dashboard({
   const theme = cookies().get("theme")?.value || "";
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-900">
+    <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-950">
       <div className="hidden md:flex flex-col gap-4 p-4 bg-primary-500  lg:w-full lg:max-w-xs h-screen sticky top-0">
         <Logo lng={lng} height={60} width={60} inverted />
 
@@ -81,6 +81,9 @@ export default function Dashboard({
         />
 
         <div className="h-full p-4">{children}</div>
+        <div className="md:hidden pt-16">
+          <Footer lng={lng} />
+        </div>
       </div>
 
       <div className="hidden md:flex flex-col h-screen xl:w-full xl:max-w-sm sticky top-0">

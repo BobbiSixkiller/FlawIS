@@ -3,6 +3,7 @@
 import { cn } from "@/utils/helpers";
 import Breadcrumbs from "./Breadcrumbs";
 import {
+  ArrowLeftStartOnRectangleIcon,
   Bars3Icon,
   ChevronRightIcon,
   HomeIcon,
@@ -42,13 +43,13 @@ export default function TopBar({
         scrolled ? "shadow-md" : "",
       ])}
     >
-      <button
-        type="button"
+      <Button
         onClick={() => setVisible(true)}
-        className="md:hidden absolute left-2 p-2 rounded-md text-gray-400 hover:bg-gray-300 outline-none focus:ring-2 focus:ring-primary-500 ring-inset"
+        className="md:hidden absolute left-2 p-2 w-fit"
+        variant="ghost"
       >
         <Bars3Icon className="size-5" />
-      </button>
+      </Button>
 
       <div className="mx-auto md:hidden">{logo}</div>
 
@@ -62,11 +63,12 @@ export default function TopBar({
       />
       <div className="absolute right-4 flex items-center gap-2">
         {search}
+
         <Dropdown
           trigger={
             <Button
               size="icon"
-              className="rounded-full flex items-center bg-primary-400"
+              className="rounded-full flex items-center w-fit h-fit"
             >
               {avatar}
             </Button>
@@ -76,6 +78,16 @@ export default function TopBar({
               href: "/profile",
               icon: <UserCircleIcon className="size-5" aria-hidden="true" />,
               text: t("profile"),
+            },
+            {
+              href: "/logout",
+              icon: (
+                <ArrowLeftStartOnRectangleIcon
+                  className="size-5"
+                  aria-hidden="true"
+                />
+              ),
+              text: t("logout"),
             },
           ]}
         />

@@ -70,13 +70,14 @@ export default function SearchComponent<
     <>
       <Button
         size="icon"
-        type="button"
+        variant="ghost"
         onClick={() => setOpen(true)}
         className={cn([
-          "rounded-full bg-transparent text-gray-400 border border-gray-400 hover:bg-transparent hover:text-primary-500 hover:border-primary-500",
+          "rounded-full border text-gray-500",
+          "dark:border-white/30 dark:border dark:text-white/85",
         ])}
       >
-        <MagnifyingGlassIcon className="size-5" />
+        <MagnifyingGlassIcon className="size-4" />
       </Button>
       <Transition show={open} as={Fragment}>
         <Dialog

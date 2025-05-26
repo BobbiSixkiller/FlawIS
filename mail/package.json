@@ -2,9 +2,17 @@
   "name": "mail",
   "version": "0.0.1",
   "description": "",
-  "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BobbiSixkiller/FlawIS.git"
+  },
+  "author": "Matúš Muránsky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BobbiSixkiller/FlawIS/issues"
+  },
+  "homepage": "https://github.com/BobbiSixkiller/FlawIS#readme",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
