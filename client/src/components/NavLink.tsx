@@ -19,7 +19,7 @@ export default function NavLink({ icon, text, href, onClick }: NavLinkProps) {
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-2 p-2 text-white hover:bg-primary-700 rounded-md outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+      className="flex items-center gap-2 p-2 text-white dark:text-white/85 hover:bg-primary-700 dark:hover:bg-gray-700 rounded-md outline-none focus:ring-2 focus:ring-inset focus:ring-white"
     >
       {icon} {text}
       {active && <span className="ml-auto self-start">•</span>}

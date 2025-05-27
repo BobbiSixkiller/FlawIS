@@ -7,7 +7,7 @@ export default async function Footer({ lng }: { lng: string }) {
   const theme = cookies().get("theme")?.value || "";
 
   return (
-    <div className="mt-auto bg-black dark:bg-gray-800 md:bg-transparent dark:md:bg-transparent">
+    <div className="mt-auto bg-black dark:bg-gray-950 md:bg-transparent dark:md:bg-transparent">
       <div className="mx-auto p-6">
         <Logo lng={lng} height={60} width={60} inverted className="md:hidden" />
 

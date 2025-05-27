@@ -32,11 +32,11 @@ export default async function LoginPage({
         subdomain === "localhost:3000") && (
         <div>
           <div className="relative flex py-6 items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
             <span className="flex-shrink mx-4 font-light text-sm dark:text-white/85">
               {t("continue")}
             </span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
           </div>
 
           <div className="flex justify-center pt-4">

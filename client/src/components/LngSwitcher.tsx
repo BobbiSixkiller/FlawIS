@@ -13,6 +13,8 @@ import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/utils/helpers";
+import Dropdown from "./Dropdown";
+import Button from "./Button";
 
 export default function LngSwitcher({
   lng,
@@ -29,10 +31,45 @@ export default function LngSwitcher({
   const { t } = useTranslation(lng, "dashboard");
 
   return (
+    <Dropdown
+      className="w-full"
+      positionSettings="inset-x-0 -top-24"
+      trigger={
+        <Button variant="ghost" className="justify-start w-full">
+          <Image
+            alt="Locale-flag"
+            priority
+            src={`/images/${lng}.svg`}
+            width={authLayout ? 32 : 20}
+            height={authLayout ? 32 : 20}
+          />
+          {!authLayout && (
+            <span className="ml-2 dark:text-white/85">{t(lng)}</span>
+          )}
+        </Button>
+      }
+      items={languages.map((l) => ({
+        icon: (
+          <Image
+            alt="Locale-flag"
+            priority
+            src={`/images/${l}.svg`}
+            width={20}
+            height={20}
+            className="mr-2"
+          />
+        ),
+        href: `/${l}${path.replace("/en", "").replace("/sk", "")}`,
+        text: t(l),
+      }))}
+    />
+  );
+
+  return (
     <Menu as="div" className={cn("relative", className)}>
       <MenuButton
         className={cn([
-          "h-fit w-full flex items-center data-[open]:bg-primary-700",
+          "h-fit w-full flex items-center data-[open]:bg-primary-700 dark:data-[open]:bg-gray-700 dark:hover:bg-white/30",
           authLayout
             ? "rounded-full outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
             : "py-3 px-4 rounded-lg hover:bg-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white text-white",
@@ -45,7 +82,9 @@ export default function LngSwitcher({
           width={authLayout ? 32 : 20}
           height={authLayout ? 32 : 20}
         />
-        {!authLayout && <span className="ml-2">{t(lng)}</span>}{" "}
+        {!authLayout && (
+          <span className="ml-2 dark:text-white/85">{t(lng)}</span>
+        )}
       </MenuButton>
       <Transition
         as={Fragment}

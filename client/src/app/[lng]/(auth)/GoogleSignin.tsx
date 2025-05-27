@@ -14,7 +14,7 @@ export default function GoogleSignIn() {
       onClick={() => getGoogleAuthLink(url)}
       className={cn([
         "text-sm rounded-md border border-gray-300 hover:border-primary-500 text-gray-900 px-3.5 py-2 w-32 flex gap-2 justify-center items-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-        "dark:border-gray-400 dark:text-white/85 dark:hover:border-primary-300 dark:focus:ring-primary-300 dark:focus:ring-offset-gray-900",
+        "dark:border-gray-600 dark:bg-slate-800 dark:text-white/85 dark:hover:border-primary-300 dark:focus:ring-primary-300 dark:focus:ring-offset-gray-900",
       ])}
     >
       <svg

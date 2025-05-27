@@ -55,7 +55,6 @@ export default async function AuthLayout({
   return (
     <div className="flex h-screen dark:bg-gray-950">
       <div className="hidden md:block relative w-5/12">
-        {/* <div className="bg-primary-500/50 absolute inset-0 z-10" /> */}
         <Logo lng={lng} inverted className="absolute top-8 left-8 z-10" />
         <Image
           priority

@@ -12,13 +12,20 @@ import Link from "next/link";
 import { Fragment, ReactNode } from "react";
 
 interface DropdownProps {
+  className?: string;
   trigger: ReactNode;
   items: { text: string; href: string; icon?: ReactNode }[];
+  positionSettings?: string;
 }
 
-export default function Dropdown({ trigger, items }: DropdownProps) {
+export default function Dropdown({
+  className,
+  trigger,
+  items,
+  positionSettings,
+}: DropdownProps) {
   return (
-    <Menu as="div" className="relative">
+    <Menu as="div" className={cn("relative", className)}>
       <MenuButton as={Fragment}>{trigger}</MenuButton>
       <Transition
         as={Fragment}
@@ -31,7 +38,8 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
       >
         <MenuItems
           className={cn([
-            "absolute right-0 mt-2 min-w-max w-32 origin-top-right rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
+            positionSettings ? positionSettings : "mt-2 right-0",
+            "absolute whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
             "dark:bg-gray-700 dark:text-white/85",
           ])}
         >
@@ -44,7 +52,9 @@ export default function Dropdown({ trigger, items }: DropdownProps) {
                     onClick={close}
                     href={item.href}
                     className={`${
-                      focus ? "bg-primary-500 text-white" : ""
+                      focus
+                        ? "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white"
+                        : ""
                     } flex gap-2 w-full items-center rounded-md text-sm p-2`}
                   >
                     {item.icon}
