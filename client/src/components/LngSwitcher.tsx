@@ -44,7 +44,7 @@ export default function LngSwitcher({
             height={authLayout ? 32 : 20}
           />
           {!authLayout && (
-            <span className="ml-2 dark:text-white/85">{t(lng)}</span>
+            <span className="ml-2 text-white dark:text-white/85">{t(lng)}</span>
           )}
         </Button>
       }

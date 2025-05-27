@@ -20,7 +20,7 @@ const buttonStyles = {
       secondary:
         "border text-gray-900 dark:text-white/85 dark:bg-gray-700 dark:border-none shadow",
       ghost:
-        "text-gray-900 hover:bg-black/10 bg-transparent dark:text-white/85 dark:hover:bg-white/30",
+        "text-gray-900 hover:bg-black/20 bg-transparent dark:text-white/85 dark:hover:bg-white/20",
       link: "text-primary-500 underline-offset-4 hover:underline",
     },
     size: {
