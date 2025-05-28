@@ -21,7 +21,7 @@ export class I18nService {
           (language: string, namespace: string) =>
             import(
               path.resolve(
-                `/usr/app/api/util/locales/${language}/${namespace}.json`
+                `/usr/app/src/util/locales/${language}/${namespace}.json`
               )
             )
         )

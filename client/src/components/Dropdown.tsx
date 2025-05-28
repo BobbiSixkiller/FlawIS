@@ -37,15 +37,16 @@ export default function Dropdown({
         leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems
+          as="div"
           className={cn([
             positionSettings ? positionSettings : "mt-2 right-0",
-            "absolute whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
+            "absolute min-w-max whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
             "dark:bg-gray-700 dark:text-white/85",
           ])}
         >
           {items.map((item, i) => (
             <div className="p-1" key={i}>
-              <MenuItem as="div">
+              <MenuItem as={Fragment}>
                 {({ close, focus }) => (
                   <Link
                     scroll={false}
@@ -55,7 +56,7 @@ export default function Dropdown({
                       focus
                         ? "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white"
                         : ""
-                    } flex gap-2 w-full items-center rounded-md text-sm p-2`}
+                    } flex gap-2 items-center rounded-md text-sm p-2`}
                   >
                     {item.icon}
                     {item.text}

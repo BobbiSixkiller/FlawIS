@@ -144,8 +144,8 @@ export class UserResolver {
     await this.userService.sendRegistrationLinks(
       emails,
       process.env.NODE_ENV === "production"
-        ? "intern.flaw.uniba.sk"
-        : "intern-staging.flaw.uniba.sk"
+        ? "internships.flaw.uniba.sk"
+        : "internships-staging.flaw.uniba.sk"
     );
 
     return "Invites successfully sent!";

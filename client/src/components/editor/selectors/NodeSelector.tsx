@@ -105,9 +105,7 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
         as={Button}
         size="sm"
         variant="ghost"
-        className={cn(
-          "gap-2 rounded-none border-none hover:bg-white/30 hover:text-white focus:ring-0"
-        )}
+        className={cn("gap-2 rounded-none border-none dark focus:ring-0")}
       >
         <span className="whitespace-nowrap text-sm">{activeItem.name}</span>
         <ChevronDownIcon className="size-4 group-data-[open]:rotate-180" />

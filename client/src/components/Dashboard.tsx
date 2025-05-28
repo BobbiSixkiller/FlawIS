@@ -39,7 +39,7 @@ export default function Dashboard({
         </nav>
 
         <div className="mt-auto flex gap-2 items-center">
-          <LngSwitcher lng={lng} className="flex-1" />
+          <LngSwitcher className="flex-1" />
           <ThemeToggler dark={theme === "dark"} />
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function Dashboard({
               </nav>
 
               <div className="mt-auto flex gap-2 items-center">
-                <LngSwitcher lng={lng} className="flex-1" />
+                <LngSwitcher className="flex-1" />
                 <ThemeToggler dark={theme === "dark"} />
               </div>
             </>

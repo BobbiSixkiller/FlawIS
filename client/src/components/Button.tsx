@@ -56,6 +56,7 @@ function Button<E extends ElementType = "button">(
     className,
     variant = buttonStyles.default.variant as VariantType,
     size = buttonStyles.default.size as SizeType,
+    type,
     ...props
   }: ButtonProps<E>,
   ref: React.Ref<ComponentPropsWithoutRef<E>["ref"]>
@@ -70,6 +71,7 @@ function Button<E extends ElementType = "button">(
         buttonStyles.variants.size[size as SizeType],
         className
       )}
+      type={type || "button"}
       ref={ref}
       {...props}
     />

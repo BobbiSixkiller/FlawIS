@@ -1,9 +1,11 @@
 import { CheckIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/react";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function isValidUrl(url: string) {
   try {
@@ -29,12 +31,8 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [val, setVal] = useState("");
 
-  // Autofocus on input by default
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "textEditor");
 
   if (!editor) return null;
 
@@ -44,7 +42,7 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
         as={Button}
         size="sm"
         variant="ghost"
-        className="inline-flex gap-2 rounded-none border-none"
+        className="inline-flex gap-2 rounded-none border-none dark"
       >
         <LinkIcon className="h-4 w-4" />
         <p
@@ -55,21 +53,22 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
           Link
         </p>
       </PopoverButton>
-      <PopoverPanel className="absolute z-10 mt-2 w-60 rounded-md text-gray-900 bg-white shadow-lg p-2 dark:bg-gray-800 flex items-center space-x-2">
+      <PopoverPanel className="absolute z-10 mt-2 w-60 rounded-md text-gray-900 shadow-lg  dark:bg-gray-800 flex items-center space-x-2">
         <input
+          autoFocus
           ref={inputRef}
           type="text"
-          placeholder="Paste a link"
-          className="flex-1 bg-gray-100 dark:bg-gray-700 text-sm rounded p-1 outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder={t("linkPlaceholder")}
+          className="flex-1 bg-gray-100 dark:bg-gray-700 h-8 dark:text-white text-sm rounded p-1 outline-none focus:ring-2 focus:ring-blue-500"
           defaultValue={editor.getAttributes("link").href || ""}
           onChange={(e) => setVal(e.target.value)}
         />
+
         {editor.getAttributes("link").href ? (
           <Button
             size="icon"
-            variant="outline"
-            type="button"
-            className="flex h-8 items-center rounded p-1 text-red-600 transition-all hover:bg-red-100 dark:hover:bg-red-800"
+            variant="destructive"
+            className="h-8"
             onClick={() => {
               editor.chain().focus().unsetLink().run();
             }}
@@ -78,7 +77,6 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
           </Button>
         ) : (
           <Button
-            type="button"
             size="icon"
             className="h-8"
             onClick={(e: any) => {

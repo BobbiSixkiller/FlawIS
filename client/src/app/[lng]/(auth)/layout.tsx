@@ -67,10 +67,11 @@ export default async function AuthLayout({
       </div>
 
       <div className="px-6 py-12 flex-1 flex flex-col items-center overflow-auto relative">
-        <div className="absolute top-8 right-8 flex gap-2 items-center">
-          <ThemeToggler dark={theme === "dark"} />
-          <LngSwitcher lng={lng} authLayout />
+        <div className="absolute top-8 right-8 flex gap-2">
+          <ThemeToggler authLayout dark={theme === "dark"} />
+          <LngSwitcher authLayout />
         </div>
+
         <div className="w-full max-w-96 my-auto">
           <div className="md:hidden flex justify-center mb-6">
             <Logo

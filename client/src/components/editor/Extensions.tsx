@@ -40,7 +40,10 @@ export default function useLocalizedExtensions() {
   // Link extension configuration
   const tiptapLink = Link.configure({
     HTMLAttributes: {
-      class: cn("hover:underline text-primary-500 cursor-pointer"),
+      class: cn([
+        "hover:underline text-primary-500 hover:text-primary-500/90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+        "dark:text-primary-300 dark:hover:text-primary-200 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+      ]),
     },
   });
 

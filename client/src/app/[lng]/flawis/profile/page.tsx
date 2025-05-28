@@ -4,7 +4,6 @@ import Heading from "@/components/Heading";
 import { translate } from "@/lib/i18n";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import Avatar from "@/components/Avatar";
-import Spinner from "@/components/Spinner";
 
 export default async function Profile({
   params: { lng },

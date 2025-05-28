@@ -371,8 +371,8 @@ export class InternService {
           internshipId: data.internship.id,
           hostname:
             process.env.NODE_ENV === "production"
-              ? "intern.flaw.uniba.sk"
-              : "intern-staging.flaw.uniba.sk",
+              ? "internships.flaw.uniba.sk"
+              : "internships-staging.flaw.uniba.sk",
           count: data.count,
         }),
         "mail.internships.org"

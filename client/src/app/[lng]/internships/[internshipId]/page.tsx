@@ -41,7 +41,7 @@ export default async function InternshipPage({
       </div>
 
       <div
-        className="prose"
+        className="prose prose-a:no-underline"
         dangerouslySetInnerHTML={{ __html: internship.description }}
       />
 
@@ -54,16 +54,6 @@ export default async function InternshipPage({
               application={internship.myApplication}
               controls={
                 <div className="flex gap-2">
-                  {/* {internship.myApplication.status === Status.Applied && (
-                    <Button
-                      as={Link}
-                      href={`/${internshipId}/application`}
-                      size="icon"
-                    >
-                      <PencilIcon className="size-5" />
-                    </Button>
-                  )} */}
-
                   {internship.myApplication.status === Status.Applied && (
                     <ApplicationDialog
                       application={internship.myApplication}
@@ -93,14 +83,7 @@ export default async function InternshipPage({
               </Link>
               .
             </div>
-            {/* <Button
-              type="button"
-              className="w-full"
-              as={Link}
-              href={`/${internshipId}/application`}
-            >
-              <InboxArrowDownIcon className="size-5 stroke-2 mr-2" /> Prihlasit
-            </Button> */}
+
             <ApplicationDialog user={user} />
           </>
         )

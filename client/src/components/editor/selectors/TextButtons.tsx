@@ -53,9 +53,8 @@ export const TextButtons = ({ editor }: { editor: Editor }) => {
           key={index}
           onClick={() => item.command(editor)}
           size="sm"
-          className="rounded-none"
+          className="rounded-none border-none dark focus:ring-0"
           variant="ghost"
-          type="button"
         >
           <item.icon
             className={cn("h-4 w-4", {

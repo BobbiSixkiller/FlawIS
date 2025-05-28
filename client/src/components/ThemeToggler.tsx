@@ -6,7 +6,13 @@ import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 import Button from "./Button";
 
-export default function ThemeToggler({ dark }: { dark: boolean }) {
+export default function ThemeToggler({
+  dark,
+  authLayout,
+}: {
+  dark: boolean;
+  authLayout?: boolean;
+}) {
   useEffect(() => {
     if (dark) {
       document.body.classList.add("dark");
@@ -17,10 +23,11 @@ export default function ThemeToggler({ dark }: { dark: boolean }) {
 
   return (
     <Button
-      type="button"
+      variant={"ghost"}
+      size="icon"
       className={cn([
-        "rounded-full h-fit p-1.5 hover:bg-primary-700",
-        dark && "dark:bg-white/20 dark:hover:bg-white/30 dark:text-white/85",
+        "rounded-full p-2 text-white",
+        authLayout && "bg-primary-500 hover:bg-primary-500/90 dark:bg-white/10",
       ])}
       onClick={() => setDarkThemeCookie(!dark)}
     >
