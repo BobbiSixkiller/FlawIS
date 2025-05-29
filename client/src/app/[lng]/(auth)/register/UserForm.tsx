@@ -23,12 +23,13 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
-import { cn, fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
+import { cn, uploadOrDelete } from "@/utils/helpers";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
 import { useDialog } from "@/providers/DialogProvider";
+import usePrefillFiles from "@/hooks/usePrefillFiles";
 
 export default function UserForm({
   user,
@@ -45,38 +46,6 @@ export default function UserForm({
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
   const path = usePathname();
   const searchParams = useSearchParams();
-
-  const [loadingFile, setLoadingFile] = useState(
-    (user && typeof user.cvUrl === "string") ||
-      (user && user.avatarUrl) ||
-      false
-  );
-
-  useEffect(() => {
-    async function fetchFiles() {
-      {
-        try {
-          if (user?.cvUrl) {
-            const file = await fetchFromMinio("resumes", user.cvUrl);
-            methods.setValue("files", [file]);
-          }
-
-          if (user?.avatarUrl) {
-            const avatar = await fetchFromMinio("avatars", user.avatarUrl);
-            methods.setValue("avatar", avatar);
-          }
-
-          setLoadingFile(false);
-        } catch (error: any) {
-          console.log(error.message);
-          methods.setError("files", { message: error.message });
-          setLoadingFile(false);
-        }
-      }
-    }
-
-    fetchFiles();
-  }, []);
 
   const { yup } = useValidation();
 
@@ -225,6 +194,13 @@ export default function UserForm({
       files: [],
       avatar: undefined,
     },
+  });
+
+  const loadingFile = usePrefillFiles({
+    setError: methods.setError,
+    setValue: methods.setValue,
+    avatarUrl: user?.avatarUrl,
+    cvUrl: user?.cvUrl,
   });
 
   const email = methods.watch("email");

@@ -45,6 +45,28 @@ export class InternResolver {
     return await this.internService.getInterns(args);
   }
 
+  @Authorized()
+  @Mutation(() => InternMutationResponse)
+  async createIntern(
+    @Ctx() { user, req }: Context,
+    @Arg("internshipId") internshipId: ObjectId,
+    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
+  ): Promise<InternMutationResponse> {
+    const hostname = req.headers["tenant-domain"] as string;
+
+    const intern = await this.internService.createIntern(
+      user!.id,
+      internshipId,
+      fileUrls,
+      hostname
+    );
+
+    return {
+      message: this.i18nService.translate("applied", { ns: "intern" }),
+      data: intern,
+    };
+  }
+
   @Authorized([Access.Admin, Access.Organization])
   @Mutation(() => InternMutationResponse)
   async changeInternStatus(

@@ -134,6 +134,10 @@ export async function deleteFiles(urls: string[]) {
     for (const { bucketName, objectName } of minioObjects) {
       await ensureBucketExists(bucketName);
       await minioClient.removeObject(bucketName, objectName);
+
+      console.log(
+        `File '${objectName}' deleted from '${bucketName}' successfully.`
+      );
     }
   } catch (error) {
     console.log(error);

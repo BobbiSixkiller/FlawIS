@@ -9,6 +9,8 @@ import {
   ApplicationFragment,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function ApplicationDialog({
   user,
@@ -17,6 +19,9 @@ export default function ApplicationDialog({
   user: UserFragment;
   application?: ApplicationFragment;
 }) {
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "internships");
+
   const { openDialog } = useDialog();
 
   const dialogId = "application-dialog";
@@ -29,7 +34,8 @@ export default function ApplicationDialog({
           className="w-full"
           onClick={() => openDialog(dialogId)}
         >
-          <InboxArrowDownIcon className="size-5 stroke-2 mr-2" /> Prihlasit
+          <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
+          {t("apply")}
         </Button>
       ) : (
         <Button type="button" size="icon" onClick={() => openDialog(dialogId)}>
@@ -37,7 +43,7 @@ export default function ApplicationDialog({
         </Button>
       )}
 
-      <Modal dialogId={dialogId}>
+      <Modal title={t("docs")} dialogId={dialogId}>
         <ApplicationForm
           dialogId={dialogId}
           user={user}

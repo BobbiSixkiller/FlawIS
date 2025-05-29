@@ -7,5 +7,6 @@
   "internFiles": "Súbory boli aktualizované.",
   "status": "Stav prihlášky bol úspešne zmenený.",
   "feedback": "Výstupný list bol úspešne aktualizovaný.",
-  "applied": "Prihláška na stáž bola úspešne vytvorená."
+  "applied": "Prihláška na stáž bola úspešne vytvorená.",
+  "user": "Používateľ musí doplniť údaje o organizácii, telefóne a ročníku vo svojom profile!"
 }

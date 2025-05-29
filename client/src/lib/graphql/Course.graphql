@@ -1,0 +1,9 @@
+fragment Course on Course {
+  id
+  name
+  description
+  price
+  isPaid
+  createdAt
+  updatedAt
+}

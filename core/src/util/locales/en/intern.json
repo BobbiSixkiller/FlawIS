@@ -7,5 +7,6 @@
   "internFiles": "Files has been updated.",
   "status": "Status of the application was successfully updated.",
   "feedback": "Certificate of internship completition has been updated.",
-  "applied": "You have successfully applied for an internship."
+  "applied": "You have successfully applied for an internship.",
+  "user": "User has to have organization, telephone and study programme defined!"
 }

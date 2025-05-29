@@ -47,5 +47,7 @@
   "orgFeedback": "Certificate of completition",
   "internship": "Internship",
   "applied_one": "Applied ({{count}})",
-  "applied_other": "Applied ({{count}})"
+  "applied_other": "Applied ({{count}})",
+  "docs": "Documents",
+  "apply": "Apply"
 }

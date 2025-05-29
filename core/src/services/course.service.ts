@@ -2,11 +2,12 @@ import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 
 import { CourseArgs, CourseInput } from "../resolvers/types/course";
-import { Course } from "../entitites/Course";
+import { Course, CourseModule, CourseTerm } from "../entitites/Course";
 import { I18nService } from "./i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../repositories/course.repository";
+import { Repository } from "../repositories/repository";
 
 function toCourseDTO(doc: DocumentType<Course>) {
   const obj = doc.toJSON({
@@ -29,6 +30,8 @@ function toCourseDTO(doc: DocumentType<Course>) {
 export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
+    private readonly moduleRepository = new Repository(CourseModule),
+    private readonly termRepository = new Repository(CourseTerm),
     private readonly i18nService: I18nService
   ) {}
 
@@ -86,4 +89,16 @@ export class CourseService {
 
     return toCourseDTO(deleted);
   }
+
+  async createModule() {}
+
+  async updateModule() {}
+
+  async deleteModule() {}
+
+  async createTerm() {}
+
+  async updateTerm() {}
+
+  async deleteTerm() {}
 }

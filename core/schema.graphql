@@ -150,7 +150,6 @@ type ConferenceTranslations {
 }
 
 type Course {
-  billing: FlawBilling
   createdAt: DateTimeISO!
 
   """String representation of HTML describing the course"""
@@ -382,7 +381,7 @@ type Mutation {
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
-  createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternshipMutationResponse!
+  createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!

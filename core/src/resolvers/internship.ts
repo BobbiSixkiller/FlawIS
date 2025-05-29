@@ -93,30 +93,30 @@ export class InternshipResolver {
     return deletedCount > 0;
   }
 
-  @Authorized()
-  @Mutation(() => InternshipMutationResponse)
-  async createIntern(
-    @Ctx() { user, req }: Context,
-    @Arg("internshipId") internshipId: ObjectId,
-    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
-  ): Promise<InternshipMutationResponse> {
-    const hostname = req.headers["tenant-domain"] as string;
+  // @Authorized()
+  // @Mutation(() => InternshipMutationResponse)
+  // async createIntern(
+  //   @Ctx() { user, req }: Context,
+  //   @Arg("internshipId") internshipId: ObjectId,
+  //   @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
+  // ): Promise<InternshipMutationResponse> {
+  //   const hostname = req.headers["tenant-domain"] as string;
 
-    const internship = await this.internshipService.getInternship(internshipId);
-    const intern = await this.internService.createIntern(
-      user!.id,
-      internshipId,
-      fileUrls,
-      hostname
-    );
+  //   const internship = await this.internshipService.getInternship(internshipId);
+  //   const intern = await this.internService.createIntern(
+  //     user!.id,
+  //     internshipId,
+  //     fileUrls,
+  //     hostname
+  //   );
 
-    console.log({ ...internship, myApplication: intern });
+  //   console.log({ ...internship, myApplication: intern });
 
-    return {
-      message: this.i18nService.translate("applied", { ns: "intern" }),
-      data: { ...internship, myApplication: intern },
-    };
-  }
+  //   return {
+  //     message: this.i18nService.translate("applied", { ns: "intern" }),
+  //     data: { ...internship, myApplication: intern },
+  //   };
+  // }
 
   @Authorized()
   @FieldResolver(() => Intern, { nullable: true })

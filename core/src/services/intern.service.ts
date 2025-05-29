@@ -80,9 +80,7 @@ export class InternService {
     try {
       const user = await this.userService.getUser(userId);
       if (!user.organization || !user.telephone || !user.studyProgramme) {
-        throw new Error(
-          "User has to have organization, telephone and study programme defined!"
-        );
+        throw new Error(this.i18nService.translate("user", { ns: "intern" }));
       }
 
       const { startDate, endDate } = getAcademicYear();

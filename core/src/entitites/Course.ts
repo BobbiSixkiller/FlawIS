@@ -1,4 +1,4 @@
-import { Ref } from "@typegoose/typegoose";
+import { Index, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
@@ -8,7 +8,11 @@ import { FlawBilling } from "./Billing";
 import { Invoice, UserStubUnion } from "./Attendee";
 import { UserStub } from "./User";
 
+//implement proper indexes
+
 @ObjectType()
+@Index({ user: 1 })
+@Index({ name: "text" })
 export class Course extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -27,7 +31,6 @@ export class Course extends TimeStamps {
   @Property()
   description: string;
 
-  @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
   billing?: FlawBilling;
 
@@ -47,11 +50,11 @@ export class Course extends TimeStamps {
 }
 
 @ObjectType()
-export class Module extends TimeStamps {
+@Index({ course: 1 })
+export class CourseModule extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Field(() => Course)
   @Property({ ref: () => Course })
   course: Ref<Course>;
 
@@ -73,17 +76,16 @@ export class Module extends TimeStamps {
 }
 
 @ObjectType()
+@Index({ course: 1, module: 1 })
 export class CourseTerm extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Field(() => Course)
   @Property({ ref: () => Course })
   course: Ref<Course>;
 
-  @Field(() => Module, { nullable: true })
-  @Property({ ref: () => Module })
-  module?: Ref<Module>;
+  @Property({ ref: () => CourseModule })
+  module?: Ref<CourseModule>;
 
   @Field()
   @Property()
@@ -104,6 +106,7 @@ export class CourseTerm extends TimeStamps {
 }
 
 @ObjectType()
+@Index({ "user._id": 1, term: 1 })
 export class CourseTermAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -112,7 +115,6 @@ export class CourseTermAttendee extends TimeStamps {
   @Property({ type: () => UserStub })
   user: UserStub;
 
-  @Field(() => CourseTerm)
   @Property({ ref: () => CourseTerm })
   term: Ref<CourseTerm>;
 

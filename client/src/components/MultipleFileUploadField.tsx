@@ -9,6 +9,7 @@ import {
 } from "react-dropzone";
 
 import { useController, useFormContext } from "react-hook-form";
+import Button from "./Button";
 
 const getColorClasses = ({
   isDragAccept,
@@ -103,7 +104,10 @@ export default function MultipleFileUploadField({
 
   return (
     <div>
-      <label htmlFor={name} className="text-sm/6 font-medium dark:text-white">
+      <label
+        htmlFor={name}
+        className="text-sm/6 font-medium dark:text-white/85"
+      >
         {label}
       </label>
       <div
@@ -118,12 +122,9 @@ export default function MultipleFileUploadField({
       >
         <input name={name} id={name} {...getInputProps()} />
 
-        <button
-          type="button"
-          className="rounded-full bg-primary-500 text-sm font-semibold text-white p-2 hover:bg-primary-700"
-        >
+        <Button className="rounded-full" size="icon">
           <PlusIcon className="stroke-2 size-5" />
-        </button>
+        </Button>
         {/* <p className="text-xs text-center">Drag n drop</p> */}
       </div>
 
@@ -229,20 +230,21 @@ function SingleUploadProgress({
         <a
           href={URL.createObjectURL(file)}
           download={file.name}
-          className="text-primary-500 hover:underline whitespace-normal overflow-hidden truncate"
+          className="text-primary-500 dark:text-primary-300 hover:underline whitespace-normal overflow-hidden truncate"
         >
           {file?.name}
         </a>
-        <button
+        <Button
           onClick={async (e) => {
             e.preventDefault();
             onDelete(file);
           }}
-          type="button"
-          className="rounded-full bg-primary-100 dark:bg-primary-400 dark:hover:bg-primary-500 text-primary-700 hover:bg-primary-200 p-2"
+          size="icon"
+          variant="ghost"
+          className="rounded-full"
         >
           <XMarkIcon className="stroke-2 size-5" />
-        </button>
+        </Button>
       </div>
       {/* <ProgressBar progress={progress} /> */}
       <p className="text-sm text-red-500">{errors.map((e) => e.message)}</p>

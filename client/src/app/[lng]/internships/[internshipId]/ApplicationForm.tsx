@@ -9,16 +9,17 @@ import {
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
+import { uploadOrDelete } from "@/utils/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternFiles, createIntern } from "./actions";
 import { useDialog } from "@/providers/DialogProvider";
+import usePrefillFiles from "@/hooks/usePrefillFiles";
 
 export default function ApplicationForm({
   user,
@@ -29,7 +30,7 @@ export default function ApplicationForm({
   application?: ApplicationFragment | null;
   dialogId: string;
 }) {
-  const [loadingFiles, setLoadingFiles] = useState(true);
+  // const [loadingFiles, setLoadingFiles] = useState(true);
   const { lng, internshipId } = useParams<{
     lng: string;
     internshipId: string;
@@ -52,38 +53,12 @@ export default function ApplicationForm({
     defaultValues: { files: [] },
   });
 
-  useEffect(() => {
-    async function fetchFiles() {
-      {
-        try {
-          const clientFiles: File[] = [];
-
-          // If user is applying for the first time there is no application so fetch the users CV and add it to files
-          if (user?.cvUrl && !application?.fileUrls) {
-            const file = await fetchFromMinio("resumes", user.cvUrl);
-            clientFiles.push(file);
-          }
-          // If there is already application meaning user is editing his/her own application files load just the files from intern document
-          if (application?.fileUrls && application.fileUrls.length > 0) {
-            for (const url of application.fileUrls) {
-              const downloaded = await fetchFromMinio("internships", url);
-              clientFiles.push(downloaded);
-            }
-          }
-
-          methods.setValue("files", clientFiles);
-
-          setLoadingFiles(false);
-        } catch (error: any) {
-          console.log(error.message);
-          methods.setError("files", { message: error.message });
-          setLoadingFiles(false);
-        }
-      }
-    }
-
-    fetchFiles();
-  }, []);
+  const loadingFiles = usePrefillFiles({
+    setError: methods.setError,
+    setValue: methods.setValue,
+    cvUrl: user?.cvUrl && !application?.fileUrls ? user.cvUrl : undefined,
+    fileUrls: application?.fileUrls,
+  });
 
   const { dispatch } = useContext(MessageContext);
 
@@ -168,7 +143,7 @@ export default function ApplicationForm({
           },
           (err) => console.log(err)
         )}
-        className="space-y-6"
+        className="space-y-6 sm:w-96"
       >
         <FormMessage />
 
@@ -180,7 +155,6 @@ export default function ApplicationForm({
             "application/pdf": [".pdf"],
           }}
         />
-
         <Button
           type="submit"
           disabled={methods.formState.isSubmitting}
