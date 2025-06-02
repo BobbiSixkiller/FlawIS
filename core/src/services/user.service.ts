@@ -11,11 +11,12 @@ import { RmqService } from "./rmq.service";
 import { RedisService } from "./redis.service";
 import { I18nService } from "./i18n.service";
 import { ObjectId } from "mongodb";
-import { ResetToken, User } from "../util/types";
+import { ResetToken, User as CtxUser } from "../util/types";
 import { DocumentType, mongoose } from "@typegoose/typegoose";
 import { compare } from "bcrypt";
 import { OAuth2Client } from "google-auth-library";
 import { UserRepository } from "../repositories/user.repository";
+import { ArgumentValidationError } from "type-graphql";
 
 type UserDTO = Omit<UserEntity, "password">;
 
@@ -116,14 +117,13 @@ export class UserService {
   async createUser(
     data: RegisterUserInput,
     hostname: string,
-    isAdmin?: boolean,
+    ctxUser: CtxUser | null,
     token?: string
   ) {
+    const isUniba = data.email.split("@")[1].includes("uniba");
+    const isAdmin = ctxUser?.access.includes(Access.Admin);
     const access: Access[] = [];
 
-    const user = await this.userRepository.create({
-      ...data,
-    });
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
@@ -136,7 +136,50 @@ export class UserService {
       }
     }
 
-    user.access = data.access ? data.access : access;
+    const emailExists = await this.userRepository.findOne({
+      email: data.email,
+    });
+    if (emailExists && emailExists._id !== ctxUser?.id) {
+      throw new ArgumentValidationError([
+        {
+          // target: User, // Object that was validated.
+          property: "email", // Object's property that haven't pass validation.
+          value: data.email, // Value that haven't pass a validation.
+          constraints: {
+            // Constraints that failed validation with error messages.
+            emailExist: this.i18nService.translate("emailExists", {
+              ns: "user",
+            }),
+          },
+          //children?: ValidationError[], // Contains all nested validation errors of the property
+        },
+      ]);
+    }
+
+    const user = await this.userRepository.create({
+      ...data,
+      access: data.access ? data.access : access,
+      verified: isAdmin,
+      organization: isUniba
+        ? "Univerzita Komenského v Bratislave, Právnická fakulta"
+        : data.organization,
+      billings: isUniba
+        ? [
+            {
+              name: "Univerzita Komenského v Bratislave, Právnická fakulta",
+              address: {
+                street: "Šafárikovo nám. č. 6",
+                city: "Bratislava",
+                postal: "810 00",
+                country: "Slovensko",
+              },
+              ICO: "00397865",
+              DIC: "2020845332",
+              ICDPH: "SK2020845332 ",
+            },
+          ]
+        : [],
+    });
 
     if (!isAdmin) {
       this.rmqService.produceMessage(
@@ -149,11 +192,7 @@ export class UserService {
         }),
         "mail.registration"
       );
-    } else {
-      user.verified = true;
     }
-
-    await user.save();
 
     return toUserDTO(user);
   }
@@ -222,7 +261,7 @@ export class UserService {
     return this.i18nService.translate("resetLinkSent");
   }
 
-  resendActivationLink(user: User, hostname: string) {
+  resendActivationLink(user: CtxUser, hostname: string) {
     const token = signJwt({ id: user.id }, { expiresIn: "1h" });
 
     this.rmqService.produceMessage(
@@ -240,7 +279,7 @@ export class UserService {
   }
 
   async activateUser(token: string) {
-    const user: Partial<User> | null = verifyJwt(token);
+    const user: CtxUser | null = verifyJwt(token);
     if (!user) {
       throw new Error(this.i18nService.translate("invalidActivationToken"));
     }
@@ -274,7 +313,7 @@ export class UserService {
    * Update a user inside a transaction, only if ctxUser is admin or the user themself.
    */
   async updateUser(
-    ctxUser: User,
+    ctxUser: CtxUser,
     id: ObjectId,
     data: UserUpdateData
   ): Promise<UserDTO> {

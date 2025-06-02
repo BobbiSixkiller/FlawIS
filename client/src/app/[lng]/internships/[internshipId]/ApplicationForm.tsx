@@ -30,7 +30,6 @@ export default function ApplicationForm({
   application?: ApplicationFragment | null;
   dialogId: string;
 }) {
-  // const [loadingFiles, setLoadingFiles] = useState(true);
   const { lng, internshipId } = useParams<{
     lng: string;
     internshipId: string;

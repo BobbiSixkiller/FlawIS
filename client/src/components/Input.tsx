@@ -17,7 +17,7 @@ export function Input({
   const { field, fieldState } = useController({ name });
 
   return (
-    <div>
+    <div className="w-full">
       {label && (
         <label
           htmlFor={name}

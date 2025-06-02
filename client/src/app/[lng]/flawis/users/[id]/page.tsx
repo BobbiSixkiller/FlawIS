@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
+import Spinner from "@/components/Spinner";
 
 export default async function User({
   params: { id, lng },

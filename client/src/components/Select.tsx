@@ -37,9 +37,6 @@ export default function Select({
     ? options.filter((o) => field.value.includes(o.value))
     : options.find((o) => o.value === field.value);
 
-  console.log(field.value);
-  console.log(options);
-
   return (
     <Field>
       {label && (

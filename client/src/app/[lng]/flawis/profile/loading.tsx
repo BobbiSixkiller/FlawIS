@@ -2,7 +2,7 @@ import Spinner from "@/components/Spinner";
 
 export default function Loading() {
   return (
-    <div className="self-center mx-auto">
+    <div className="m-auto">
       <Spinner />
     </div>
   );

@@ -17,95 +17,92 @@ export async function register({
   token,
   ...data
 }: RegisterUserInput & { url?: string; token?: string }) {
-  try {
-    const res = await executeGqlFetch(RegisterDocument, { data }, { token });
+  const res = await executeGqlFetch(RegisterDocument, { data }, { token });
 
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
+  if (res.errors) {
+    const { validationErrors } = res.errors[0].extensions as ErrorException;
 
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
-    }
-    if (res.data.register) {
-      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    return {
+      success: false,
+      message: res.errors[0].message,
+      errors: validationErrors
+        ? parseValidationErrors(validationErrors)
+        : undefined,
+    };
+  }
 
-      cookies().set("user", res.data.register.data.email, {
-        httpOnly: true,
-        expires, //accesstoken expires in 24 hours
-        secure: process.env.NODE_ENV !== "development",
-        sameSite: "lax",
-        path: "/", // make it available on every route
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".flaw.uniba.sk",
-      });
-      cookies().set("accessToken", res.data.register.data.token, {
-        httpOnly: true,
-        expires, //accesstoken expires in 24 hours
-        secure: process.env.NODE_ENV !== "development",
-        sameSite: "lax",
-        path: "/", // make it available on every route
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".flaw.uniba.sk",
-      });
-    }
-  } catch (error: any) {
-    return { success: false, message: error.message };
+  if (res.data.register) {
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    cookies().set("user", res.data.register.data.email, {
+      httpOnly: true,
+      expires, //accesstoken expires in 24 hours
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      path: "/", // make it available on every route
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
+    cookies().set("accessToken", res.data.register.data.token, {
+      httpOnly: true,
+      expires, //accesstoken expires in 24 hours
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      path: "/", // make it available on every route
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
   }
 
   redirect(url || "/");
 }
 
 export async function addUser(data: RegisterUserInput) {
-  try {
-    const res = await executeGqlFetch(RegisterDocument, { data });
+  const res = await executeGqlFetch(RegisterDocument, { data });
 
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
+  if (res.errors) {
+    const { validationErrors } = res.errors[0].extensions as ErrorException;
 
-      return {
-        success: false,
-        message: validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message,
-      };
-    }
-    revalidateTag("users");
-    return { success: true, message: res.data.register.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
+    console.log(validationErrors);
+
+    return {
+      success: false,
+      message: res.errors[0].message,
+      errors: validationErrors
+        ? parseValidationErrors(validationErrors)
+        : undefined,
+    };
   }
+
+  revalidateTag("users");
+  return {
+    success: true,
+    message: res.data.register.message,
+  };
 }
 
 export async function updateUser(id: string, data: UserInput) {
-  try {
-    const res = await executeGqlFetch(UpdateUserDocument, {
-      id,
-      data,
-    });
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
+  const res = await executeGqlFetch(UpdateUserDocument, {
+    id,
+    data,
+  });
+  if (res.errors) {
+    const { validationErrors } = res.errors[0].extensions as ErrorException;
 
-      return {
-        success: false,
-        message: validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message,
-      };
-    }
-
-    revalidateTag("users");
-    revalidateTag(`user:${id}`);
-    revalidatePath("/", "layout");
-    return { success: true, message: res.data.updateUser.message };
-  } catch (error: any) {
-    console.log(error);
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: res.errors[0].message,
+      errors: validationErrors
+        ? parseValidationErrors(validationErrors)
+        : undefined,
+    };
   }
+
+  revalidateTag("users");
+  revalidateTag(`user:${id}`);
+  revalidatePath("/", "layout");
+  return {
+    success: true,
+    message: res.data.updateUser.message,
+  };
 }

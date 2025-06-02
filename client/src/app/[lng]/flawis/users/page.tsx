@@ -32,6 +32,7 @@ export default async function Users({
           },
         ]}
       />
+
       {initialData && <ListUsers initialData={initialData} />}
     </div>
   );

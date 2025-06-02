@@ -45,7 +45,7 @@ interface ButtonOwnProps {
   className?: string;
 }
 
-type ButtonProps<E extends ElementType = "button"> = ButtonOwnProps &
+export type ButtonProps<E extends ElementType = "button"> = ButtonOwnProps &
   Omit<ComponentPropsWithoutRef<E>, keyof ButtonOwnProps> & {
     as?: E;
   };

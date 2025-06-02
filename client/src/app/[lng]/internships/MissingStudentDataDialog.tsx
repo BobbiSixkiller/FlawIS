@@ -8,7 +8,7 @@ import UserForm from "../(auth)/register/UserForm";
 import { useTranslation } from "@/lib/i18n/client";
 import { useDialog } from "@/providers/DialogProvider";
 
-export default function MissingStudentData({
+export default function MissingStudentDataDialog({
   subdomain,
   user,
 }: {
@@ -25,8 +25,9 @@ export default function MissingStudentData({
   useEffect(() => {
     const missingData =
       !user?.cvUrl || !user?.studyProgramme || !user.telephone || !user.address;
+    const isStudent = user.verified && user.access.includes(Access.Student);
 
-    if (missingData && user.verified && user.access.includes(Access.Student)) {
+    if (missingData && isStudent) {
       openDialog(dialogId);
     }
   }, [user]);

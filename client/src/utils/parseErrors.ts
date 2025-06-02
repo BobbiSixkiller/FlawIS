@@ -13,7 +13,7 @@ interface ValidationErrors {
 
 export default function parseValidationErrors(
   errors: ValidationErrors[]
-): object {
+): Record<string, string> {
   return errors.reduce(
     (previous, current) => ({
       ...previous,

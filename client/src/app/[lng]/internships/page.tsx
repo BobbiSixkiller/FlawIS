@@ -6,6 +6,7 @@ import { getAcademicYear } from "@/utils/helpers";
 import { getInternships } from "./actions";
 import InternshipDialog from "./InternshipDialog";
 import AcademicYearSelect from "./AcademicYearSelect";
+import Tooltip from "@/components/Tooltip";
 
 export default async function InternshipsHomePage({
   params: { lng },
@@ -44,7 +45,12 @@ export default async function InternshipsHomePage({
         </div>
         {user.access.includes(Access.Organization) ||
         user.access.includes(Access.Admin) ? (
-          <InternshipDialog />
+          <Tooltip
+            message="Vytvaranie staze pre nasledujuci akademicky rok je mozne od juna aktualneho roka."
+            position="below"
+          >
+            <InternshipDialog />
+          </Tooltip>
         ) : (
           <AcademicYearSelect
             selectedYear={academicYear}

@@ -44,6 +44,7 @@ export default function Heading({
             href={l.href}
             className="hidden sm:flex gap-1"
             variant="secondary"
+            size="sm"
           >
             {l.icon} {l.text}
           </Button>
@@ -55,6 +56,7 @@ export default function Heading({
             scroll={false}
             href={first.href}
             className="flex gap-1"
+            size="sm"
           >
             {first.icon} {first.text}
           </Button>
@@ -65,7 +67,7 @@ export default function Heading({
           <div className="sm:hidden">
             <Dropdown
               trigger={
-                <Button variant="secondary">
+                <Button variant="secondary" size="sm">
                   {t("more")}
                   <ChevronDownIcon
                     className="-mr-1 ml-1.5 size-5"

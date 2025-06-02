@@ -30,20 +30,17 @@ export default function Tooltip({
     top: 0,
     left: 0,
   });
-  const width = useWidth();
+  const viewportWidth = useWidth();
   const { someDialogOpen } = useDialog();
 
   const showTooltip = useCallback(
     (e: MouseEvent | TouchEvent) => {
       if (someDialogOpen) return;
       const rect = e.currentTarget.getBoundingClientRect();
-      const top = position === "above" ? rect.top - 40 : rect.bottom + 10;
+      const top = position === "above" ? rect.top - 40 : rect.bottom;
       const left = rect.left + rect.width / 2;
 
-      setTooltipPosition({
-        top,
-        left: left + 10,
-      });
+      setTooltipPosition((prev) => ({ ...prev, top, left: left + 10 }));
       setVisible(true);
     },
     [position, someDialogOpen]
@@ -61,30 +58,44 @@ export default function Tooltip({
   }, [hideTooltipOnScroll]);
 
   useEffect(() => {
-    if (visible && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
+    if (!visible || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const margin = 14; // small padding from edges
+    const overflowRight = rect.right > viewportWidth;
+    const overflowLeft = rect.left < 0;
 
-      if (rect.right > width) {
-        return setTooltipPosition((prev) => ({
-          ...prev,
-          left: prev.left - (rect.right - width + 6),
-        }));
-      }
+    let newLeft = tooltipPosition.left;
+    let newWidth: number | undefined;
 
-      if (rect.left < 0) {
-        return setTooltipPosition((prev) => ({
-          ...prev,
-          left: prev.left + (Math.abs(rect.left) + 6),
-        }));
-      }
+    console.log(rect, viewportWidth);
 
-      return setTooltipPosition((prev) => ({ ...prev, left: prev.left - 10 }));
+    newWidth = viewportWidth < rect.width ? viewportWidth : rect.width;
+
+    if (overflowRight) {
+      newLeft -= rect.right - viewportWidth + margin;
+      // newWidth = 150;
+    } else if (overflowLeft) {
+      newLeft += Math.abs(rect.left) + margin;
+    } else {
+      console.log("DEF");
+      newLeft -= 10;
     }
-  }, [visible, ref, width]);
+
+    setTooltipPosition((prev) => ({
+      ...prev,
+      left: newLeft,
+    }));
+
+    if (newWidth !== undefined) {
+      ref.current.style.width = `${newWidth}px`;
+    } else {
+      ref.current.style.width = "";
+    }
+  }, [visible, ref, viewportWidth]);
 
   return (
     <div
-      className="relative inline-block"
+      className="relative h-fit w-fit"
       onMouseEnter={showTooltip}
       onMouseLeave={() => {
         setVisible(false);
@@ -93,15 +104,15 @@ export default function Tooltip({
       onTouchEnd={() => setTimeout(() => setVisible(false), 2000)}
       onClick={() => setVisible(false)}
     >
-      <div className="inline-block">{children}</div>
+      {children}
 
       {visible &&
         createPortal(
           <div
             ref={ref}
             className={cn([
-              "fixed z-10  transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-pre-line",
-              position === "above" ? "mb-2" : "mt-2",
+              position === "above" ? "mb-1" : "mt-1",
+              "absolute z-10 transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-pre-line",
             ])}
             style={{
               top: tooltipPosition.top,

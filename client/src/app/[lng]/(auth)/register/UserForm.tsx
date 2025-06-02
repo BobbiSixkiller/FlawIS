@@ -39,7 +39,7 @@ export default function UserForm({
 }: {
   user?: UserFragment;
   subdomain?: string;
-  namespace: string;
+  namespace: "profile" | "register" | "login";
   dialogId?: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
@@ -228,7 +228,7 @@ export default function UserForm({
   return (
     <FormProvider {...methods}>
       <form
-        className={`space-y-6 mt-4`}
+        className="space-y-6 mt-4 sm:w-96"
         onSubmit={methods.handleSubmit(
           async (val) => {
             const { error, url } = await uploadOrDelete(
@@ -249,7 +249,11 @@ export default function UserForm({
               return methods.setError("avatar", { message: error });
             }
 
-            let state;
+            let state: {
+              success: boolean;
+              message: string;
+              errors?: Record<string, string>;
+            };
             if (path.includes("register")) {
               state = await register({
                 url: searchParams.get("url")?.toString(),
@@ -288,10 +292,22 @@ export default function UserForm({
             }
 
             if (state && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: state,
-              });
+              if (state.errors) {
+                for (const [key, value] of Object.entries(state.errors)) {
+                  methods.setError(
+                    key as "email",
+                    {
+                      message: value,
+                    },
+                    { shouldFocus: true }
+                  );
+                }
+              } else {
+                dispatch({
+                  type: ActionTypes.SetFormMsg,
+                  payload: state,
+                });
+              }
             }
 
             if (state && state.success) {
@@ -337,7 +353,7 @@ export default function UserForm({
 
         {(path.includes("users") || user?.access.includes(Access.Student)) && (
           <>
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-2">
               <Input
                 label={t("street", { ns: "common" })}
                 name="address.street"
@@ -349,7 +365,7 @@ export default function UserForm({
                 autoComplete="address-level2"
               />
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-2">
               <Input
                 label={t("postal", { ns: "common" })}
                 name="address.postal"

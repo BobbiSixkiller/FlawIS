@@ -1,22 +1,9 @@
-import {
-  ArgumentValidationError,
-  createUnionType,
-  Field,
-  ObjectType,
-  registerEnumType,
-} from "type-graphql";
+import { Field, ObjectType, registerEnumType } from "type-graphql";
 import { ObjectId } from "mongodb";
-import {
-  getModelForClass,
-  Index,
-  pre,
-  prop as Property,
-} from "@typegoose/typegoose";
+import { Index, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { hash } from "bcrypt";
 import { signJwt } from "../util/auth";
-import Container from "typedi";
-import { I18nService } from "../services/i18n.service";
 import { Address, Billing } from "./Billing";
 
 export enum Access {
@@ -47,42 +34,6 @@ registerEnumType(StudyProgramme, {
 @pre<User>("save", async function () {
   if ((this.isNew && this.password) || this.isModified("password")) {
     this.password = await hash(String(this.password), 12);
-  }
-  if (this.isNew || this.isModified("email")) {
-    const emailExists = await getModelForClass(User)
-      .findOne({ email: this.email })
-      .exec();
-    if (emailExists && emailExists.id !== this.id) {
-      throw new ArgumentValidationError([
-        {
-          target: User, // Object that was validated.
-          property: "email", // Object's property that haven't pass validation.
-          value: this.email, // Value that haven't pass a validation.
-          constraints: {
-            // Constraints that failed validation with error messages.
-            emailExists: Container.get(I18nService).translate("emailExists"),
-          },
-          //children?: ValidationError[], // Contains all nested validation errors of the property
-        },
-      ]);
-    }
-  }
-  if (this.email.split("@")[1].includes("uniba")) {
-    this.organization = "Univerzita Komenského v Bratislave, Právnická fakulta";
-  }
-  if (this.isNew && this.email.split("@")[1].includes("uniba")) {
-    this.billings.push({
-      name: "Univerzita Komenského v Bratislave, Právnická fakulta",
-      address: {
-        street: "Šafárikovo nám. č. 6",
-        city: "Bratislava",
-        postal: "810 00",
-        country: "Slovensko",
-      },
-      ICO: "00397865",
-      DIC: "2020845332",
-      ICDPH: "SK2020845332 ",
-    });
   }
 })
 @Index({ name: "text", email: "text" })

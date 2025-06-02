@@ -58,16 +58,15 @@ export class UserResolver {
   @UseMiddleware(RateLimit())
   async register(
     @Arg("data") registerInput: RegisterUserInput,
-    @Ctx() { user: loggedInUser, req }: Context
+    @Ctx() { user: ctxUser, req }: Context
   ): Promise<UserMutationResponse> {
-    const isAdmin = loggedInUser?.access.includes(Access.Admin);
     const token = req.headers.token as string;
     const hostname = req.headers["tenant-domain"] as string;
 
     const user = await this.userService.createUser(
       registerInput,
       hostname,
-      isAdmin,
+      ctxUser,
       token
     );
 
