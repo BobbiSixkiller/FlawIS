@@ -30,6 +30,7 @@ import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
+import useUser from "@/hooks/useUser";
 
 export default function UserForm({
   user,
@@ -47,6 +48,8 @@ export default function UserForm({
   const path = usePathname();
   const searchParams = useSearchParams();
 
+  const ctxUser = useUser();
+
   const { yup } = useValidation();
 
   const methods = useForm({
@@ -61,7 +64,7 @@ export default function UserForm({
             is: () =>
               (searchParams.get("token") === null &&
                 subdomain?.includes("intern")) ||
-              user?.access.includes(Access.Student), // When creating student account on internships tenant
+              ctxUser?.access.includes(Access.Student), // When creating student account on internships tenant
             then: (schema) =>
               schema.matches(
                 /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)*uniba\.sk$/,
@@ -112,7 +115,7 @@ export default function UserForm({
             country: yup.string(),
           })
           .when({
-            is: () => user?.access.includes(Access.Student),
+            is: () => ctxUser?.access.includes(Access.Student),
             then: (schema) =>
               schema.shape({
                 street: yup.string().trim().required(),
@@ -130,7 +133,7 @@ export default function UserForm({
             is: () =>
               subdomain?.includes("conferences") ||
               subdomain?.includes("intern") ||
-              user?.access.includes(Access.Student),
+              ctxUser?.access.includes(Access.Student),
             then: (schema) =>
               schema
                 .required()
@@ -148,7 +151,7 @@ export default function UserForm({
           .mixed<StudyProgramme>()
           .nullable()
           .when({
-            is: () => user?.access.includes(Access.Student),
+            is: () => ctxUser?.access.includes(Access.Student),
             then: (schema) => schema.required(),
           }),
         access: yup.array().of(yup.string<Access>().required()),
@@ -162,7 +165,7 @@ export default function UserForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required()
           .when({
-            is: () => user?.access.includes(Access.Student),
+            is: () => ctxUser?.access.includes(Access.Student),
             then: (schema) =>
               schema.min(1, (val) =>
                 t("minFiles", { value: val.min, ns: "validation" })

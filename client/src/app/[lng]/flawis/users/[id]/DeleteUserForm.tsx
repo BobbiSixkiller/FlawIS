@@ -6,9 +6,9 @@ import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { useRouter } from "next/navigation";
-import { deleteUser } from "./actions";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
+import { deleteUser } from "./actions";
 
 export default function DeleteUserForm({
   user,

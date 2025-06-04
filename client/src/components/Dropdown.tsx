@@ -72,7 +72,6 @@ export default function Dropdown({
                         item.element.props?.className,
                       ]),
                       onClick: (e: React.MouseEvent) => {
-                        console.log("CLICKED");
                         item.element.props.onClick?.(e);
                         close(); // close dropdown after click
                       },

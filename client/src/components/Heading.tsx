@@ -47,7 +47,7 @@ export default function Heading({
                   as={Link}
                   scroll={false}
                   href={item.href}
-                  className="hidden sm:block"
+                  className="hidden sm:flex"
                   variant="secondary"
                   size="sm"
                 >

@@ -10,6 +10,12 @@ import {
 import Link from "next/link";
 import { toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
+import ModalTrigger from "@/components/ModalTrigger";
+import Button from "@/components/Button";
+import Modal from "@/components/Modal";
+import UserForm from "@/app/[lng]/(auth)/register/UserForm";
+import DeleteUserForm from "./DeleteUserForm";
+import ImpersonateForm from "./ImpersonateForm";
 
 export default async function User({
   params: { id, lng },
@@ -23,6 +29,10 @@ export default async function User({
 
   const { t } = await translate(lng, ["profile", "common"]);
 
+  const updateUserDialogId = "update-user";
+  const deleteUserDialogId = "delete-user";
+  const impersonateDialogId = "impersonate-user";
+
   return (
     <div>
       <Heading
@@ -30,29 +40,44 @@ export default async function User({
         heading={user.name}
         links={[
           {
-            type: "link",
-            href: `/users/${user.id}/impersonate`,
-            text: "Impersonovat",
-            icon: <ArrowsRightLeftIcon className="size-5" />,
+            type: "custom",
+            element: (
+              <ModalTrigger dialogId={impersonateDialogId}>
+                <Button size="sm">
+                  <ArrowsRightLeftIcon className="size-5" />
+                  Impersonovat
+                </Button>
+              </ModalTrigger>
+            ),
           },
           {
-            type: "link",
-            href: `/users/${user.id}/update`,
-            text: "Aktualizovat",
-            icon: <PencilIcon className="size-5" />,
+            type: "custom",
+            element: (
+              <ModalTrigger dialogId={updateUserDialogId}>
+                <Button variant="secondary" size="sm">
+                  <PencilIcon className="size-5" />
+                  Aktualizovat
+                </Button>
+              </ModalTrigger>
+            ),
           },
           {
-            type: "link",
-            href: `/users/${user.id}/delete`,
-            text: "Zmazat",
-            icon: <TrashIcon className="size-5" />,
+            type: "custom",
+            element: (
+              <ModalTrigger dialogId={deleteUserDialogId}>
+                <Button variant="secondary" size="sm">
+                  <TrashIcon className="size-5" />
+                  Zmazat
+                </Button>
+              </ModalTrigger>
+            ),
           },
         ]}
       />
       <div className="mt-6 border-t border-gray-100 dark:border-gray-700">
         <dl className="divide-y divide-gray-100 dark:divide-gray-700">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
               {t("name")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
@@ -145,6 +170,20 @@ export default async function User({
           </div>
         </dl>
       </div>
+
+      <Modal title="Aktualizovat pouzivatela" dialogId={updateUserDialogId}>
+        <UserForm
+          namespace="profile"
+          dialogId={updateUserDialogId}
+          user={user}
+        />
+      </Modal>
+      <Modal title="Zmazat pouzivatela" dialogId={deleteUserDialogId}>
+        <DeleteUserForm lng={lng} user={user} />
+      </Modal>
+      <Modal title="Impersonovat pouzivatela" dialogId={impersonateDialogId}>
+        <ImpersonateForm lng={lng} user={user} />
+      </Modal>
     </div>
   );
 }

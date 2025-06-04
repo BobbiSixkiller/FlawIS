@@ -5,9 +5,9 @@ import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { impersonate } from "./actions";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
+import { impersonate } from "./actions";
 
 export default function ImpersonateForm({
   user,
