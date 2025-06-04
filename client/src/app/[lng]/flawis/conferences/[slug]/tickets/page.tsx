@@ -41,10 +41,12 @@ export default async function TicketsPage({
               trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
               items={[
                 {
+                  type: "link",
                   href: `/conferences/${slug}/tickets/${t.id}/update`,
                   text: "Aktualizovat",
                 },
                 {
+                  type: "link",
                   href: `/conferences/${slug}/tickets/${t.id}/delete`,
                   text: "Zmazat",
                 },

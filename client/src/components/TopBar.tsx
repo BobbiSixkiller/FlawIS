@@ -80,11 +80,13 @@ export default function TopBar({
           }
           items={[
             {
+              type: "link",
               href: "/profile",
               icon: <UserCircleIcon className="size-5" aria-hidden="true" />,
               text: t("profile"),
             },
             {
+              type: "link",
               href: "/logout",
               icon: (
                 <ArrowLeftStartOnRectangleIcon

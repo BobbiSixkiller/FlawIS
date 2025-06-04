@@ -10,7 +10,6 @@ import {
 import Link from "next/link";
 import { toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
-import Spinner from "@/components/Spinner";
 
 export default async function User({
   params: { id, lng },
@@ -31,16 +30,19 @@ export default async function User({
         heading={user.name}
         links={[
           {
+            type: "link",
             href: `/users/${user.id}/impersonate`,
             text: "Impersonovat",
             icon: <ArrowsRightLeftIcon className="size-5" />,
           },
           {
+            type: "link",
             href: `/users/${user.id}/update`,
             text: "Aktualizovat",
             icon: <PencilIcon className="size-5" />,
           },
           {
+            type: "link",
             href: `/users/${user.id}/delete`,
             text: "Zmazat",
             icon: <TrashIcon className="size-5" />,

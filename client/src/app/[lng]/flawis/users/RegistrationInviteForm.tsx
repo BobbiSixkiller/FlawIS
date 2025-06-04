@@ -5,15 +5,20 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { sendInvites } from "./actions";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
+import { useDialogStore } from "@/stores/dialogStore";
+import { sendInvites } from "./actions";
 
-export default function RegistrationInvites() {
+export default function RegistrationInviteForm({
+  dialogId,
+}: {
+  dialogId: string;
+}) {
   const { lng } = useParams<{ lng: string }>();
   const { yup } = useValidation();
 
@@ -33,7 +38,8 @@ export default function RegistrationInvites() {
   const { t } = useTranslation(lng, "common");
 
   const { dispatch } = useContext(MessageContext);
-  const router = useRouter();
+
+  const { closeDialog } = useDialogStore();
 
   return (
     <FormProvider {...methods}>
@@ -49,7 +55,7 @@ export default function RegistrationInvites() {
 
             if (res.success) {
               dispatch({ type: ActionTypes.SetAppMsg, payload: res });
-              router.back();
+              closeDialog(dialogId);
             }
           },
           (errs) => {

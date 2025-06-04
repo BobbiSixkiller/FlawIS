@@ -28,8 +28,8 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
-import { useDialog } from "@/providers/DialogProvider";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function UserForm({
   user,
@@ -39,7 +39,7 @@ export default function UserForm({
 }: {
   user?: UserFragment;
   subdomain?: string;
-  namespace: "profile" | "register" | "login";
+  namespace: "profile" | "register";
   dialogId?: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
@@ -213,10 +213,9 @@ export default function UserForm({
   }, [email, lng, t]);
 
   const { dispatch } = useContext(MessageContext);
+  const { closeDialog } = useDialogStore();
 
   const [showPassword, setShowPassword] = useState(false);
-
-  const { closeDialog } = useDialog();
 
   if (loadingFile)
     return (
@@ -264,10 +263,7 @@ export default function UserForm({
                 organization: val.organization ? val.organization : undefined,
                 telephone: val.telephone ? val.telephone : undefined,
               });
-            } else if (
-              (path.includes("update") || namespace === "profile") &&
-              user
-            ) {
+            } else if (user) {
               state = await updateUser(user.id, {
                 email: val.email,
                 name: val.name,

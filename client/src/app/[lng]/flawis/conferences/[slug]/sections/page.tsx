@@ -63,10 +63,12 @@ export default async function SectionsPage({
                 countFiles(s.submissions) > 0
                   ? [
                       {
+                        type: "link",
                         href: `/conferences/${slug}/sections/${s.id}/update`,
                         text: "Aktualizovat",
                       },
                       {
+                        type: "link",
                         href: `/minio?bucketName=${s.conference?.slug}${
                           s.submissions.edges
                             .map((sub) =>
@@ -80,16 +82,19 @@ export default async function SectionsPage({
                         text: "Prispevky.zip",
                       },
                       {
+                        type: "link",
                         href: `/conferences/${slug}/sections/${s.id}/delete`,
                         text: "Zmazat",
                       },
                     ]
                   : [
                       {
+                        type: "link",
                         href: `/conferences/${slug}/sections/${s.id}/update`,
                         text: "Aktualizovat",
                       },
                       {
+                        type: "link",
                         href: `/conferences/${slug}/sections/${s.id}/delete`,
                         text: "Zmazat",
                       },

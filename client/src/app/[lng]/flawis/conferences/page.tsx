@@ -21,6 +21,7 @@ export default async function Conferences({
         lng={lng}
         links={[
           {
+            type: "link",
             href: "/conferences/new",
             text: "Nova",
             icon: <PlusIcon className="size-5" />,

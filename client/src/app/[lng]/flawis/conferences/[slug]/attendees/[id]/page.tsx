@@ -36,11 +36,13 @@ export default async function AttendeePage({
         }
         links={[
           {
+            type: "link",
             href: `/users/${attendee.user.id}/impersonate`,
             text: "Impersonovat",
             icon: <ArrowsRightLeftIcon className="size-5" />,
           },
           {
+            type: "link",
             href: `/conferences/${slug}/attendees/${id}/delete`,
             text: "Zmazat",
             icon: <TrashIcon className="size-5" />,

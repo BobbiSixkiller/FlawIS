@@ -9,12 +9,27 @@ import {
   Transition,
 } from "@headlessui/react";
 import Link from "next/link";
-import { Fragment, ReactNode } from "react";
+import {
+  cloneElement,
+  Fragment,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+} from "react";
+
+interface CustomDropdownElementProps {
+  className?: string;
+  onClick?: (e: React.MouseEvent) => void;
+}
+
+export type DropdownItem =
+  | { type: "link"; text: string; href: string; icon?: ReactNode }
+  | { type: "custom"; element: ReactElement<CustomDropdownElementProps> };
 
 interface DropdownProps {
   className?: string;
   trigger: ReactNode;
-  items: { text: string; href: string; icon?: ReactNode }[];
+  items: DropdownItem[];
   positionSettings?: string;
 }
 
@@ -47,21 +62,45 @@ export default function Dropdown({
           {items.map((item, i) => (
             <div className="p-1" key={i}>
               <MenuItem as={Fragment}>
-                {({ close, focus }) => (
-                  <Link
-                    scroll={false}
-                    onClick={close}
-                    href={item.href}
-                    className={`${
-                      focus
-                        ? "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white"
-                        : ""
-                    } flex gap-2 items-center rounded-md text-sm p-2`}
-                  >
-                    {item.icon}
-                    {item.text}
-                  </Link>
-                )}
+                {({ close, focus }) => {
+                  if (item.type === "custom" && isValidElement(item.element)) {
+                    return cloneElement(item.element, {
+                      className: cn([
+                        "flex gap-2 items-center rounded-md text-sm p-2",
+                        focus &&
+                          "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
+                        item.element.props?.className,
+                      ]),
+                      onClick: (e: React.MouseEvent) => {
+                        console.log("CLICKED");
+                        item.element.props.onClick?.(e);
+                        close(); // close dropdown after click
+                      },
+                    });
+                  }
+
+                  if (item.type === "link") {
+                    return (
+                      <Link
+                        scroll={false}
+                        onClick={close}
+                        href={item.href}
+                        className={`${
+                          focus
+                            ? "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white"
+                            : ""
+                        } flex gap-2 items-center rounded-md text-sm p-2`}
+                      >
+                        {item.icon}
+                        {item.text}
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <div className="text-sm p-2 text-red-500">Invalid item</div>
+                  );
+                }}
               </MenuItem>
             </div>
           ))}

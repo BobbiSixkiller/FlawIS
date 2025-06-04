@@ -4,24 +4,25 @@ import { ReactNode } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "@/lib/i18n/client";
 import Link from "next/link";
-import Dropdown from "./Dropdown";
+import Dropdown, { DropdownItem } from "./Dropdown";
 import Button from "./Button";
+
+interface HeadingProps {
+  heading: string;
+  subHeading?: ReactNode;
+  links?: DropdownItem[];
+  lng: string;
+}
 
 export default function Heading({
   heading,
   subHeading,
-  links,
+  links = [],
   lng,
-}: {
-  heading: string;
-  subHeading?: ReactNode;
-  links?: { text: string; href: string; icon?: ReactNode }[];
-  lng: string;
-}) {
-  const first = links?.[0];
-  const restLinks = links?.slice(1);
-
+}: HeadingProps) {
   const { t } = useTranslation(lng, "common");
+
+  const [primaryAction, ...secondaryActions] = links;
 
   return (
     <div className="lg:flex lg:items-center lg:justify-between">
@@ -36,34 +37,38 @@ export default function Heading({
         )}
       </div>
       <div className="mt-5 flex items-center gap-3 lg:ml-4 lg:mt-0">
-        {restLinks?.map((l, i) => (
-          <Button
-            key={i}
-            as={Link}
-            scroll={false}
-            href={l.href}
-            className="hidden sm:flex gap-1"
-            variant="secondary"
-            size="sm"
-          >
-            {l.icon} {l.text}
-          </Button>
-        ))}
+        {/* Desktop buttons */}
+        <div className="hidden sm:flex gap-3 items-center">
+          {secondaryActions?.map((item, i) => {
+            if (item.type === "link") {
+              return (
+                <Button
+                  key={i}
+                  as={Link}
+                  scroll={false}
+                  href={item.href}
+                  className="hidden sm:block"
+                  variant="secondary"
+                  size="sm"
+                >
+                  {item.icon} {item.text}
+                </Button>
+              );
+            } else return item.element;
+          })}
+        </div>
 
-        {first && (
-          <Button
-            as={Link}
-            scroll={false}
-            href={first.href}
-            className="flex gap-1"
-            size="sm"
-          >
-            {first.icon} {first.text}
+        {/* Primary button */}
+        {primaryAction?.type === "link" ? (
+          <Button as={Link} scroll={false} href={primaryAction.href} size="sm">
+            {primaryAction.icon} {primaryAction.text}
           </Button>
+        ) : (
+          primaryAction.element
         )}
 
-        {/* Dropdown */}
-        {restLinks && restLinks.length > 0 && (
+        {/* Mobile dropdown */}
+        {secondaryActions.length > 0 && (
           <div className="sm:hidden">
             <Dropdown
               trigger={
@@ -75,7 +80,7 @@ export default function Heading({
                   />
                 </Button>
               }
-              items={restLinks}
+              items={secondaryActions}
             />
           </div>
         )}

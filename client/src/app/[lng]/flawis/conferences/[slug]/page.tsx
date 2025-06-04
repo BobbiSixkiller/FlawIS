@@ -31,11 +31,13 @@ export default async function ConferencePage({
           subHeading={conference!.translations[lng as "sk" | "en"].name}
           links={[
             {
+              type: "link",
               href: `/conferences/${slug}/updateDates`,
               text: "Aktualizovat",
               icon: <PencilIcon className="size-5" />,
             },
             {
+              type: "link",
               href: `/conferences/${slug}/delete`,
               text: "Zmazat",
               icon: <TrashIcon className="size-5" />,

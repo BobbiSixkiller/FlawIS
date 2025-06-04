@@ -15,6 +15,7 @@ export default async function CoursesPage({
         subHeading="Kurzy na falkute"
         links={[
           {
+            type: "link",
             href: "/courses/new",
             text: "Novy",
             icon: <PlusIcon className="size-5" />,

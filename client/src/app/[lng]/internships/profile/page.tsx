@@ -23,6 +23,7 @@ export default async function Profile({
         lng={lng}
         links={[
           {
+            type: "link",
             href: "/profile/update",
             text: t("update"),
             icon: <PencilIcon className="size-5" />,

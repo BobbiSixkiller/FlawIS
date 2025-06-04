@@ -1,6 +1,15 @@
 "use client";
 
-import React, { Fragment, Suspense, useEffect } from "react";
+import {
+  cloneElement,
+  forwardRef,
+  Fragment,
+  ReactElement,
+  ReactNode,
+  Ref,
+  Suspense,
+  useEffect,
+} from "react";
 import {
   Dialog,
   DialogPanel,
@@ -10,15 +19,15 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
-import { useDialog } from "@/providers/DialogProvider";
 import Spinner from "./Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
 
 interface ModalProps {
   dialogId: string;
   isInterceptingRoute?: boolean;
   title?: string;
   togglerHidden?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function Modal({
@@ -28,7 +37,7 @@ export default function Modal({
   togglerHidden = false,
   isInterceptingRoute = false,
 }: ModalProps) {
-  const { closeDialog, openDialog, isDialogOpen } = useDialog();
+  const { isDialogOpen, closeDialog, openDialog } = useDialogStore();
 
   useEffect(() => {
     if (isInterceptingRoute) {
