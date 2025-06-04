@@ -54,7 +54,7 @@ export default function Heading({
                   {item.icon} {item.text}
                 </Button>
               );
-            } else return item.element;
+            } else return item?.element;
           })}
         </div>
 
@@ -64,7 +64,7 @@ export default function Heading({
             {primaryAction.icon} {primaryAction.text}
           </Button>
         ) : (
-          primaryAction.element
+          primaryAction?.element
         )}
 
         {/* Mobile dropdown */}
