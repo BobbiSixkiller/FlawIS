@@ -66,7 +66,7 @@ export default function Dropdown({
                   if (item.type === "custom" && isValidElement(item.element)) {
                     return cloneElement(item.element, {
                       className: cn([
-                        "flex gap-2 items-center rounded-md text-sm p-2",
+                        "flex w-full gap-2 items-center rounded-md text-sm p-2",
                         focus &&
                           "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
                         item.element.props?.className,

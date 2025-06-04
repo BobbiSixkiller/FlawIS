@@ -2,25 +2,24 @@
 
 import { useContext } from "react";
 import { SectionFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { useParams, useRouter } from "next/navigation";
-import { deleteSection } from "../../actions";
+import { deleteSection } from "./actions";
 import { FormMessage } from "@/components/Message";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function DeleteSectionForm({
   section,
   lng,
+  dialogId,
 }: {
   section: SectionFragment;
   lng: string;
+  dialogId: string;
 }) {
-  const router = useRouter();
-
-  const { t } = useTranslation(lng, ["profile", "common"]);
-
   const { dispatch } = useContext(MessageContext);
+
+  const { closeDialog } = useDialogStore();
 
   return (
     <form
@@ -31,16 +30,17 @@ export default function DeleteSectionForm({
         if (state.message && !state.success) {
           dispatch({
             type: ActionTypes.SetFormMsg,
-            payload: state.message,
+            payload: state,
           });
         }
 
         if (state.success) {
           dispatch({
             type: ActionTypes.SetAppMsg,
-            payload: state.message,
+            payload: state,
           });
-          router.back();
+
+          closeDialog(dialogId);
         }
       }}
     >

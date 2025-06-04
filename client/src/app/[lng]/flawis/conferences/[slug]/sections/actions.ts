@@ -51,19 +51,15 @@ export async function createSection(
 }
 
 export async function deleteSection(prevState: any, data: FormData) {
-  try {
-    const res = await executeGqlFetch(DeleteSectionDocument, {
-      id: data.get("id")?.toString(),
-    });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
-    }
-
-    revalidateTag(`conference:${res.data.deleteSection.data.conference?.slug}`);
-    return { success: true, message: res.data.deleteSection };
-  } catch (error: any) {
-    return { success: false, message: error.message };
+  const res = await executeGqlFetch(DeleteSectionDocument, {
+    id: data.get("id")?.toString(),
+  });
+  if (res.errors) {
+    return { success: false, message: res.errors[0].message };
   }
+
+  revalidateTag(`conference:${res.data.deleteSection.data.conference?.slug}`);
+  return { success: true, message: res.data.deleteSection.message };
 }
 
 export async function updateSection(data: SectionInput, sectionId: string) {

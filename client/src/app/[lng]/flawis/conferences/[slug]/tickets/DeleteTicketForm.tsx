@@ -4,20 +4,24 @@ import { useContext } from "react";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { useParams, useRouter } from "next/navigation";
-import { deleteTicket } from "../../actions";
+import { useParams } from "next/navigation";
+import { deleteTicket } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function DeleteTicketForm({
   ticket,
   lng,
+  dialogId,
 }: {
   ticket?: TicketFragment;
   lng: string;
+  dialogId: string;
 }) {
-  const router = useRouter();
   const { slug } = useParams();
 
   const { dispatch } = useContext(MessageContext);
+
+  const { closeDialog } = useDialogStore();
 
   return (
     <form
@@ -37,7 +41,8 @@ export default function DeleteTicketForm({
             type: ActionTypes.SetAppMsg,
             payload: state,
           });
-          router.back();
+
+          closeDialog(dialogId);
         }
       }}
     >

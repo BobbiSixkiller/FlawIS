@@ -9,20 +9,22 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
-import { updateTicket } from "../../actions";
+import { updateTicket } from "./actions";
 import { Input, LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function UpdateTicketForm({
   ticket,
   lng,
+  dialogId,
 }: {
   lng: string;
   ticket: TicketFragment;
+  dialogId: string;
 }) {
-  const router = useRouter();
   const { slug } = useParams<{ slug: string }>();
 
   const { dispatch } = useContext(MessageContext);
@@ -57,6 +59,8 @@ export default function UpdateTicketForm({
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -76,7 +80,8 @@ export default function UpdateTicketForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >

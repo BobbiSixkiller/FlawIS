@@ -1,9 +1,16 @@
-import Dropdown from "@/components/Dropdown";
+import Dropdown, { DropdownItem } from "@/components/Dropdown";
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { conferenceSections } from "./actions";
-import { SubmissionFilesFragment } from "@/lib/graphql/generated/graphql";
+import {
+  SectionFragment,
+  SubmissionFilesFragment,
+} from "@/lib/graphql/generated/graphql";
 import Button from "@/components/Button";
+import ModalTrigger from "@/components/ModalTrigger";
+import Modal from "@/components/Modal";
+import NewSectionForm from "./NewSectionForm";
+import DeleteSectionForm from "./DeleteSectionForm";
+import UpdateSectionForm from "./UpdateSectionForm";
 
 export default async function SectionsPage({
   params: { lng, slug },
@@ -15,6 +22,41 @@ export default async function SectionsPage({
     first: 1000,
   });
 
+  const newSectionDialogId = "new-section";
+
+  return (
+    <div>
+      <ModalTrigger dialogId={newSectionDialogId}>
+        <Button size="sm">
+          <PlusIcon className="h-5 w-5" />
+          Nova
+        </Button>
+      </ModalTrigger>
+
+      <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
+        {conference?.sections.map((s) => (
+          <Section key={s.id} lng={lng} section={s} />
+        ))}
+      </div>
+
+      <Modal title="Nova sekcia" dialogId={newSectionDialogId}>
+        <NewSectionForm
+          lng={lng}
+          conferenceId={conference.id}
+          dialogId={newSectionDialogId}
+        />
+      </Modal>
+    </div>
+  );
+}
+
+function Section({
+  lng,
+  section,
+}: {
+  lng: string;
+  section: SectionFragment & { submissions: SubmissionFilesFragment };
+}) {
   function countFiles(submissions: SubmissionFilesFragment) {
     return submissions.edges?.reduce((acc, edge) => {
       if (edge?.node.fileUrl) {
@@ -23,87 +65,87 @@ export default async function SectionsPage({
     }, 0);
   }
 
+  const updateSectionDialogId = "update-section";
+  const deleteSectionDialogId = "delete-section";
+
+  const dropdownItems: DropdownItem[] = [
+    {
+      type: "custom",
+      element: (
+        <ModalTrigger dialogId={updateSectionDialogId}>
+          <Button size="sm">Aktualizovat</Button>
+        </ModalTrigger>
+      ),
+    },
+    {
+      type: "custom",
+      element: (
+        <ModalTrigger dialogId={deleteSectionDialogId}>
+          <Button size="sm">Zmazat</Button>
+        </ModalTrigger>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex flex-col gap-2">
-      <Button
-        size="sm"
-        as={Link}
-        href={`/conferences/${slug}/sections/new`}
-        scroll={false}
-        className="px-3 py-2 rounded-md max-w-fit bg-primary-500 hover:bg-primary-700 flex gap-2 items-center justify-center font-semibold text-white text-sm"
-      >
-        <PlusIcon className="h-5 w-5" />
-        Nova
-      </Button>
-      <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
-        {conference?.sections.map((s, i) => (
-          <div
-            className="p-6 sm:p-4 flex justify-between sm:items-center gap-4 dark:text-white"
-            key={i}
-          >
-            <div className="flex flex-col w-3/4">
-              <span className="text-lg">
-                {s.translations[lng as "sk" | "en"].name}
-              </span>
-              <span className="text-sm text-gray-400">
-                {s.translations[lng as "sk" | "en"].topic}
-              </span>
-              <span className="whitespace-nowrap sm:hidden text-sm">
-                {countFiles(s.submissions)}/ {s.submissions.totalCount}
-              </span>
-            </div>
-
-            <span className="whitespace-nowrap hidden sm:block">
-              {countFiles(s.submissions)} / {s.submissions.totalCount}
-            </span>
-
-            <Dropdown
-              trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
-              items={
-                countFiles(s.submissions) > 0
-                  ? [
-                      {
-                        type: "link",
-                        href: `/conferences/${slug}/sections/${s.id}/update`,
-                        text: "Aktualizovat",
-                      },
-                      {
-                        type: "link",
-                        href: `/minio?bucketName=${s.conference?.slug}${
-                          s.submissions.edges
-                            .map((sub) =>
-                              sub?.node.fileUrl
-                                ? `&url=${sub.node.fileUrl}`
-                                : null
-                            ) // Return null for invalid entries
-                            .filter(Boolean) // Filter out null values
-                            .join("") // Join without adding commas
-                        }`,
-                        text: "Prispevky.zip",
-                      },
-                      {
-                        type: "link",
-                        href: `/conferences/${slug}/sections/${s.id}/delete`,
-                        text: "Zmazat",
-                      },
-                    ]
-                  : [
-                      {
-                        type: "link",
-                        href: `/conferences/${slug}/sections/${s.id}/update`,
-                        text: "Aktualizovat",
-                      },
-                      {
-                        type: "link",
-                        href: `/conferences/${slug}/sections/${s.id}/delete`,
-                        text: "Zmazat",
-                      },
-                    ]
-              }
-            />
-          </div>
-        ))}
+    <div className="p-6 sm:p-4 flex justify-between sm:items-center gap-4 dark:text-white">
+      <div className="flex flex-col w-3/4">
+        <span className="text-lg">
+          {section.translations[lng as "sk" | "en"].name}
+        </span>
+        <span className="text-sm text-gray-400">
+          {section.translations[lng as "sk" | "en"].topic}
+        </span>
+        <span className="whitespace-nowrap sm:hidden text-sm">
+          {countFiles(section.submissions)}/ {section.submissions.totalCount}
+        </span>
       </div>
+
+      <span className="whitespace-nowrap hidden sm:block">
+        {countFiles(section.submissions)} / {section.submissions.totalCount}
+      </span>
+
+      <Dropdown
+        trigger={
+          <Button variant="ghost" size="icon">
+            <EllipsisHorizontalIcon className="h-5 w-5" />
+          </Button>
+        }
+        items={
+          countFiles(section.submissions) > 0
+            ? [
+                ...dropdownItems,
+                {
+                  type: "link",
+                  href: `/minio?bucketName=${section.conference?.slug}${
+                    section.submissions.edges
+                      .map((sub) =>
+                        sub?.node.fileUrl ? `&url=${sub.node.fileUrl}` : null
+                      ) // Return null for invalid entries
+                      .filter(Boolean) // Filter out null values
+                      .join("") // Join without adding commas
+                  }`,
+                  text: "Prispevky.zip",
+                },
+              ]
+            : dropdownItems
+        }
+      />
+
+      <Modal dialogId={deleteSectionDialogId} title="Zmazat sekciu">
+        <DeleteSectionForm
+          dialogId={deleteSectionDialogId}
+          lng={lng}
+          section={section}
+        />
+      </Modal>
+      <Modal dialogId={updateSectionDialogId} title="Aktualizovat sekciu">
+        <UpdateSectionForm
+          dialogId={updateSectionDialogId}
+          lng={lng}
+          section={section}
+        />
+      </Modal>
     </div>
   );
 }

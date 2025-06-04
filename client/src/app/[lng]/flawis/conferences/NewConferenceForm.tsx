@@ -6,8 +6,7 @@ import {
   objectToFormData,
 } from "@/components/WIzzardForm";
 import { Input } from "@/components/Input";
-import { useRouter } from "next/navigation";
-import { createConference } from "../actions";
+import { createConference } from "./actions";
 import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { useContext } from "react";
@@ -16,6 +15,7 @@ import { LocalizedTextarea } from "@/components/Textarea";
 import ImageFileInput, {
   LocalizedImageFileInput,
 } from "@/components/ImageFileInput";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export interface ConferenceInputType {
   slug: string;
@@ -37,11 +37,18 @@ export interface ConferenceInputType {
   };
 }
 
-export default function NewConferenceForm({ lng }: { lng: string }) {
-  const router = useRouter();
+export default function NewConferenceForm({
+  lng,
+  dialogId,
+}: {
+  lng: string;
+  dialogId: string;
+}) {
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "validation");
+
+  const { closeDialog } = useDialogStore();
 
   return (
     <WizzardForm<ConferenceInputType>
@@ -86,7 +93,8 @@ export default function NewConferenceForm({ lng }: { lng: string }) {
             type: ActionTypes.SetAppMsg,
             payload: state,
           });
-          router.back();
+
+          closeDialog(dialogId);
         }
       }}
     >

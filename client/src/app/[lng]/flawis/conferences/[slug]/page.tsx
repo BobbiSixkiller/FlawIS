@@ -3,6 +3,11 @@ import Heading from "@/components/Heading";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { displayDate } from "@/utils/helpers";
 import DynamicImage from "@/components/DynamicImage";
+import ModalTrigger from "@/components/ModalTrigger";
+import Button from "@/components/Button";
+import Modal from "@/components/Modal";
+import UpdateDatesForm from "./UpdateDatesForm";
+import DeleteConferenceForm from "./DeleteConferenceForm";
 
 export default async function ConferencePage({
   params: { lng, slug },
@@ -10,6 +15,9 @@ export default async function ConferencePage({
   params: { slug: string; lng: string };
 }) {
   const conference = await getConference(slug);
+
+  const updateDatesDialogId = "update-dates";
+  const deleteConfDialogId = "delete-conference";
 
   return (
     <div className="text-gray-900 dark:text-white flex flex-col gap-6">
@@ -31,16 +39,26 @@ export default async function ConferencePage({
           subHeading={conference!.translations[lng as "sk" | "en"].name}
           links={[
             {
-              type: "link",
-              href: `/conferences/${slug}/updateDates`,
-              text: "Aktualizovat",
-              icon: <PencilIcon className="size-5" />,
+              type: "custom",
+              element: (
+                <ModalTrigger dialogId={updateDatesDialogId}>
+                  <Button size="sm">
+                    <PencilIcon className="size-5" />
+                    Aktualizovat
+                  </Button>
+                </ModalTrigger>
+              ),
             },
             {
-              type: "link",
-              href: `/conferences/${slug}/delete`,
-              text: "Zmazat",
-              icon: <TrashIcon className="size-5" />,
+              type: "custom",
+              element: (
+                <ModalTrigger dialogId={deleteConfDialogId}>
+                  <Button size="sm" variant="secondary">
+                    <TrashIcon className="size-5" />
+                    Zmazat
+                  </Button>
+                </ModalTrigger>
+              ),
             },
           ]}
         />
@@ -82,6 +100,17 @@ export default async function ConferencePage({
           </div>
         </dl>
       </div>
+
+      <Modal dialogId={updateDatesDialogId} title="Aktualizovat datumy">
+        <UpdateDatesForm
+          dialogId={updateDatesDialogId}
+          conference={conference}
+          lng={lng}
+        />
+      </Modal>
+      <Modal dialogId={deleteConfDialogId} title="Zmazat konferenciu">
+        <DeleteConferenceForm conference={conference} lng={lng} />
+      </Modal>
     </div>
   );
 }

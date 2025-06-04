@@ -3,6 +3,11 @@ import { getConference } from "../../actions";
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import Button from "@/components/Button";
+import ModalTrigger from "@/components/ModalTrigger";
+import Modal from "@/components/Modal";
+import NewTicketForm from "./NewTicketForm";
+import UpdateTicketForm from "./UpdateTicketForm";
+import DeleteTicketForm from "./DeleteTicketForm";
 
 export default async function TicketsPage({
   params: { lng, slug },
@@ -11,18 +16,19 @@ export default async function TicketsPage({
 }) {
   const conference = await getConference(slug);
 
+  const newTicketDialogId = "new-ticket";
+  const updateTicketDialogId = "update-ticket";
+  const deleteTicketDialogId = "delete-ticket";
+
   return (
-    <div className="flex flex-col gap-2">
-      <Button
-        size="sm"
-        as={Link}
-        href={`/conferences/${slug}/tickets/new`}
-        scroll={false}
-        className="px-3 py-2 rounded-md max-w-fit bg-primary-500 hover:bg-primary-700 flex gap-2 items-center justify-center font-semibold text-white text-sm"
-      >
-        <PlusIcon className="h-5 w-5" />
-        Novy
-      </Button>
+    <div className="">
+      <ModalTrigger dialogId={newTicketDialogId}>
+        <Button size="sm">
+          <PlusIcon className="h-5 w-5" />
+          Novy
+        </Button>
+      </ModalTrigger>
+
       <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
         {conference?.tickets.map((t, i) => (
           <div
@@ -37,24 +43,58 @@ export default async function TicketsPage({
                 {t.translations[lng as "sk" | "en"].description}
               </span>
             </div>
+
             <Dropdown
-              trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
+              trigger={
+                <Button size="icon" variant="ghost">
+                  <EllipsisHorizontalIcon className="h-5 w-5" />
+                </Button>
+              }
               items={[
                 {
-                  type: "link",
-                  href: `/conferences/${slug}/tickets/${t.id}/update`,
-                  text: "Aktualizovat",
+                  type: "custom",
+                  element: (
+                    <ModalTrigger dialogId={updateTicketDialogId}>
+                      <Button size="sm">Aktualizovat</Button>
+                    </ModalTrigger>
+                  ),
                 },
                 {
-                  type: "link",
-                  href: `/conferences/${slug}/tickets/${t.id}/delete`,
-                  text: "Zmazat",
+                  type: "custom",
+                  element: (
+                    <ModalTrigger dialogId={deleteTicketDialogId}>
+                      <Button size="sm">Zmazat</Button>
+                    </ModalTrigger>
+                  ),
                 },
               ]}
             />
+
+            <Modal dialogId={updateTicketDialogId} title="Upravit listok">
+              <UpdateTicketForm
+                dialogId={updateTicketDialogId}
+                lng={lng}
+                ticket={t}
+              />
+            </Modal>
+            <Modal dialogId={deleteTicketDialogId} title="Zmazat listok">
+              <DeleteTicketForm
+                dialogId={deleteTicketDialogId}
+                lng={lng}
+                ticket={t}
+              />
+            </Modal>
           </div>
         ))}
       </div>
+
+      <Modal dialogId={newTicketDialogId} title="Pridat listok">
+        <NewTicketForm
+          dialogId={newTicketDialogId}
+          lng={lng}
+          conference={conference}
+        />
+      </Modal>
     </div>
   );
 }

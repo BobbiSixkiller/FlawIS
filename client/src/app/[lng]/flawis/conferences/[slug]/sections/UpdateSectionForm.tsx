@@ -4,26 +4,25 @@ import { SectionFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useParams, useRouter } from "next/navigation";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
 import Button from "@/components/Button";
-import { updateSection } from "../../actions";
+import { updateSection } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function UpdateSectionForm({
   section,
   lng,
+  dialogId,
 }: {
   lng: string;
   section: SectionFragment;
+  dialogId: string;
 }) {
-  const router = useRouter();
-  const { slug } = useParams<{ slug: string }>();
-
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "validation");
@@ -50,6 +49,8 @@ export default function UpdateSectionForm({
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -69,7 +70,8 @@ export default function UpdateSectionForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >

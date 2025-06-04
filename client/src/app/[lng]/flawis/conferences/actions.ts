@@ -138,26 +138,3 @@ export async function createConference(data: FormData) {
     return { success: false, message: error.message };
   }
 }
-
-export async function deleteConference(prevState: any, data: FormData) {
-  try {
-    const res = await executeGqlFetch(DeleteConferenceDocument, {
-      id: data.get("id")?.toString(),
-    });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
-    }
-
-    await deleteFiles([
-      res.data.deleteConference.data.translations.sk.logoUrlEnv,
-      res.data.deleteConference.data.translations.sk.logoUrlEnv,
-      res.data.deleteConference.data.billing.stampUrl,
-    ]);
-
-    revalidateTag("conferences");
-    revalidateTag(`conference:${res.data.deleteConference.data.slug}`);
-    return { success: true, message: res.data.deleteConference.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
-}

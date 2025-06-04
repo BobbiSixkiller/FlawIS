@@ -4,22 +4,24 @@ import { useDialogStore } from "@/stores/dialogStore";
 import {
   cloneElement,
   forwardRef,
-  HtmlHTMLAttributes,
+  isValidElement,
   ReactElement,
   Ref,
 } from "react";
 
-interface ModalTriggerProps extends HtmlHTMLAttributes<HTMLButtonElement> {
+interface ModalTriggerProps {
   children: ReactElement;
   dialogId: string;
+  onClick?: (e: any) => void;
+  className?: string;
 }
 
 function ModalTrigger(
   { children, dialogId, ...props }: ModalTriggerProps,
   ref: Ref<HTMLElement>
 ) {
-  if (children.type !== "button") {
-    console.warn("ModalTrigger expects a <button> element as its child.");
+  if (isValidElement(children) && children.type !== "button") {
+    throw new Error("ModalTrigger expects a <button> element as its child.");
   }
 
   const { openDialog } = useDialogStore();

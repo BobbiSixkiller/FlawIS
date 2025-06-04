@@ -2,9 +2,7 @@ import { getMe } from "@/app/[lng]/(auth)/actions";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import { headers } from "next/headers";
 
-export default async function UpdateProfilePage({
-  params: { lng },
-}: {
+export default async function UpdateProfilePage(props: {
   params: { lng: string };
 }) {
   const user = await getMe();

@@ -129,18 +129,6 @@ export type Conference = {
   updatedAt: Scalars['DateTimeISO']['output'];
 };
 
-export type ConferenceBillingInput = {
-  DIC: Scalars['String']['input'];
-  IBAN: Scalars['String']['input'];
-  ICDPH: Scalars['String']['input'];
-  ICO: Scalars['String']['input'];
-  SWIFT: Scalars['String']['input'];
-  address: AddressInput;
-  name: Scalars['String']['input'];
-  stampUrl: Scalars['String']['input'];
-  variableSymbol: Scalars['String']['input'];
-};
-
 /** ConferenceConnection type enabling cursor based pagination */
 export type ConferenceConnection = {
   __typename?: 'ConferenceConnection';
@@ -157,7 +145,7 @@ export type ConferenceEdge = {
 
 /** Conference input type */
 export type ConferenceInput = {
-  billing: ConferenceBillingInput;
+  billing: FlawBillingInput;
   dates: DatesInput;
   slug: Scalars['String']['input'];
   translations: ConferenceTranslationInput;
@@ -193,6 +181,51 @@ export type ConferenceTranslations = {
   name: Scalars['String']['output'];
 };
 
+export type Course = {
+  __typename?: 'Course';
+  createdAt: Scalars['DateTimeISO']['output'];
+  /** String representation of HTML describing the course */
+  description: Scalars['String']['output'];
+  id: Scalars['ObjectId']['output'];
+  isPaid: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  price: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
+  user: UserStubUnion;
+};
+
+export type CourseConnection = {
+  __typename?: 'CourseConnection';
+  edges: Array<Maybe<CourseEdge>>;
+  pageInfo: CoursePageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CourseEdge = {
+  __typename?: 'CourseEdge';
+  cursor: Scalars['ObjectId']['output'];
+  node: Course;
+};
+
+export type CourseInput = {
+  billing?: InputMaybe<FlawBillingInput>;
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  price: Scalars['Int']['input'];
+};
+
+export type CourseMutationResponse = IMutationResponse & {
+  __typename?: 'CourseMutationResponse';
+  data: Course;
+  message: Scalars['String']['output'];
+};
+
+export type CoursePageInfo = {
+  __typename?: 'CoursePageInfo';
+  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
 export type DatesInput = {
   end: Scalars['DateTimeISO']['input'];
   regEnd?: InputMaybe<Scalars['DateTimeISO']['input']>;
@@ -212,6 +245,18 @@ export type FlawBilling = {
   name: Scalars['String']['output'];
   stampUrl: Scalars['String']['output'];
   variableSymbol: Scalars['String']['output'];
+};
+
+export type FlawBillingInput = {
+  DIC: Scalars['String']['input'];
+  IBAN: Scalars['String']['input'];
+  ICDPH: Scalars['String']['input'];
+  ICO: Scalars['String']['input'];
+  SWIFT: Scalars['String']['input'];
+  address: AddressInput;
+  name: Scalars['String']['input'];
+  stampUrl: Scalars['String']['input'];
+  variableSymbol: Scalars['String']['input'];
 };
 
 export type IMutationResponse = {
@@ -348,7 +393,7 @@ export type InvoiceDataInput = {
 
 export type InvoiceInput = {
   body: InvoiceDataInput;
-  issuer: ConferenceBillingInput;
+  issuer: FlawBillingInput;
   payer: AttendeeBillingInput;
 };
 
@@ -379,13 +424,15 @@ export type Mutation = {
   addAttendee: ConferenceMutationResponse;
   changeInternStatus: InternMutationResponse;
   createConference: ConferenceMutationResponse;
-  createIntern: InternshipMutationResponse;
+  createCourse: CourseMutationResponse;
+  createIntern: InternMutationResponse;
   createInternship: InternshipMutationResponse;
   createSection: SectionMutationResponse;
   createSubmission: SubmissionMutationResponse;
   createTicket: ConferenceMutationResponse;
   deleteAttendee: AttendeeMutationResponse;
   deleteConference: ConferenceMutationResponse;
+  deleteCourse: CourseMutationResponse;
   deleteIntern: InternMutationResponse;
   deleteInternship: Scalars['Boolean']['output'];
   deleteSection: SectionMutationResponse;
@@ -400,6 +447,7 @@ export type Mutation = {
   resendActivationLink: Scalars['String']['output'];
   toggleVerifiedUser: UserMutationResponse;
   updateConferenceDates: ConferenceMutationResponse;
+  updateCourse: CourseMutationResponse;
   updateInternFiles: InternMutationResponse;
   updateInternship: InternshipMutationResponse;
   updateInvoice: AttendeeMutationResponse;
@@ -424,6 +472,11 @@ export type MutationChangeInternStatusArgs = {
 
 export type MutationCreateConferenceArgs = {
   data: ConferenceInput;
+};
+
+
+export type MutationCreateCourseArgs = {
+  data: CourseInput;
 };
 
 
@@ -460,6 +513,11 @@ export type MutationDeleteAttendeeArgs = {
 
 
 export type MutationDeleteConferenceArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationDeleteCourseArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
@@ -534,6 +592,12 @@ export type MutationUpdateConferenceDatesArgs = {
 };
 
 
+export type MutationUpdateCourseArgs = {
+  data: CourseInput;
+  id: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationUpdateInternFilesArgs = {
   fileUrls: Array<InputMaybe<Scalars['String']['input']>>;
   id: Scalars['ObjectId']['input'];
@@ -605,6 +669,8 @@ export type Query = {
   attendeesCsvExport: Array<Attendee>;
   conference: Conference;
   conferences: ConferenceConnection;
+  course: Course;
+  courses: CourseConnection;
   forgotPassword: Scalars['String']['output'];
   intern: Intern;
   interns: InternConnection;
@@ -646,6 +712,17 @@ export type QueryConferenceArgs = {
 
 
 export type QueryConferencesArgs = {
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: Scalars['Int']['input'];
+};
+
+
+export type QueryCourseArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryCoursesArgs = {
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: Scalars['Int']['input'];
 };
@@ -1220,6 +1297,8 @@ export type AddAttendeeMutationVariables = Exact<{
 
 export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'ConferenceMutationResponse', message: string, data: { __typename?: 'Conference', slug: string } } };
 
+export type CourseFragment = { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any };
+
 export type ApplicationFragment = { __typename?: 'Intern', id: any, internship: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type InternshipsQueryVariables = Exact<{
@@ -1289,7 +1368,7 @@ export type CreateInternMutationVariables = Exact<{
 }>;
 
 
-export type CreateInternMutation = { __typename?: 'Mutation', createIntern: { __typename?: 'InternshipMutationResponse', message: string } };
+export type CreateInternMutation = { __typename?: 'Mutation', createIntern: { __typename?: 'InternMutationResponse', message: string } };
 
 export type UpdateInternFilesMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1883,6 +1962,17 @@ export const SubmissionFilesFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"SubmissionFiles"}) as unknown as TypedDocumentString<SubmissionFilesFragment, unknown>;
+export const CourseFragmentDoc = new TypedDocumentString(`
+    fragment Course on Course {
+  id
+  name
+  description
+  price
+  isPaid
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"Course"}) as unknown as TypedDocumentString<CourseFragment, unknown>;
 export const ApplicationFragmentDoc = new TypedDocumentString(`
     fragment Application on Intern {
   id

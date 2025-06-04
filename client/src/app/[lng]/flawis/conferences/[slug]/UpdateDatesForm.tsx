@@ -8,20 +8,21 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { date, object, ref } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/Input";
-import { updateConferenceDates } from "./actions";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
+import { updateConferenceDates } from "./actions";
 
 export default function UpdateDatesForm({
   lng,
   conference,
+  dialogId,
 }: {
   lng: string;
   conference?: ConferenceFragment;
+  dialogId: string;
 }) {
-  const router = useRouter();
   const { t } = useTranslation(lng, "validation");
 
   function setDefaultVal(utc: string) {
@@ -62,12 +63,13 @@ export default function UpdateDatesForm({
 
   const { dispatch } = useContext(MessageContext);
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          console.log(data.submissionDeadline);
           const state = await updateConferenceDates(conference!.slug, data);
 
           if (state.message && !state.success) {
@@ -82,7 +84,8 @@ export default function UpdateDatesForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >

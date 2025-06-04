@@ -1,28 +1,29 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { object, string } from "yup";
+import { boolean, number, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
-import { createSection } from "../actions";
+import { createTicket } from "./actions";
+import { Input, LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
+import CheckBox from "@/components/Checkbox";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
 
-export default function NewSectionForm({
+export default function NewTicketForm({
   conference,
   lng,
+  dialogId,
 }: {
   lng: string;
   conference?: ConferenceFragment;
+  dialogId: string;
 }) {
-  const router = useRouter();
-  const { slug } = useParams<{ slug: string }>();
-
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "validation");
@@ -30,34 +31,42 @@ export default function NewSectionForm({
   const methods = useForm({
     resolver: yupResolver(
       object({
-        conference: string().required(),
+        online: boolean().required(),
+        withSubmission: boolean().required(),
+        price: number()
+          .min(100, t("min", { value: 100 }))
+          .required(),
         translations: object({
           sk: object({
             name: string().trim().required(t("required")),
-            topic: string().trim().required(t("required")),
+            description: string().trim().required(t("required")),
           }),
           en: object({
             name: string().trim().required(t("required")),
-            topic: string().trim().required(t("required")),
+            description: string().trim().required(t("required")),
           }),
         }),
       }).required(t("required"))
     ),
     values: {
-      conference: conference?.id,
+      online: false,
+      withSubmission: false,
+      price: 0,
       translations: {
-        sk: { name: "", topic: "" },
-        en: { name: "", topic: "" },
+        sk: { name: "", description: "" },
+        en: { name: "", description: "" },
       },
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 min-w-80"
+        className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await createSection(data, slug);
+          const state = await createTicket(data, conference!.slug);
 
           if (state.message && !state.success) {
             dispatch({
@@ -71,20 +80,24 @@ export default function NewSectionForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >
-        <LocalizedTextarea
+        <LocalizedInput
           lng={lng}
-          label="Nazov sekcie"
+          label="Nazov listku"
           name={`translations.${lng}.name`}
         />
         <LocalizedTextarea
           lng={lng}
-          label="Tema sekcie"
-          name={`translations.${lng}.topic`}
+          label="Popis listku"
+          name={`translations.${lng}.description`}
         />
+        <Input label="Cena s DPH v centoch" name="price" type="number" />
+        <CheckBox label="Online" name="online" />
+        <CheckBox label="S prispevkom" name="withSubmission" />
 
         <Button
           color="primary"
@@ -92,7 +105,11 @@ export default function NewSectionForm({
           className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          {methods.formState.isSubmitting ? <Spinner inverted /> : "Vytvorit"}
+          {methods.formState.isSubmitting ? (
+            <Spinner inverted />
+          ) : (
+            "Vytvorit formu ucasti"
+          )}
         </Button>
       </form>
     </FormProvider>

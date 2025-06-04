@@ -4,8 +4,9 @@ import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { useContext } from "react";
 import Button from "@/components/Button";
-import { deleteConference } from "../../actions";
 import { useRouter } from "next/navigation";
+import { FormMessage } from "@/components/Message";
+import { deleteConference } from "./actions";
 
 export default function DeleteConferenceForm({
   lng,
@@ -39,6 +40,7 @@ export default function DeleteConferenceForm({
         }
       }}
     >
+      <FormMessage />
       <input type="hidden" name="id" value={conference?.id} />
 
       <h1>
