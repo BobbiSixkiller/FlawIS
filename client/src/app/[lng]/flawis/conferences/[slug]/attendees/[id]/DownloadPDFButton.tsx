@@ -42,12 +42,7 @@ const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({ lng, data }) => {
 
   return (
     <div className="max-w-56">
-      <Button
-        className="w-full"
-        size="sm"
-        variant="destructive"
-        onClick={handleDownload}
-      >
+      <Button size="sm" variant="destructive" onClick={handleDownload}>
         {isPending ? (
           <>
             <Spinner inverted />
