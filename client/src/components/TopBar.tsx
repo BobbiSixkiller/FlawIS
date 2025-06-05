@@ -45,7 +45,7 @@ export default function TopBar({
       className={cn([
         "flex items-center p-4 border-b h-[60px] sticky top-0 z-10 bg-white",
         "dark:border-gray-700 dark:bg-gray-900",
-        scrolled ? "shadow-md" : "",
+        scrolled ? "shadow-bottom" : "",
       ])}
     >
       <Button
