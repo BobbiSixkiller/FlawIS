@@ -51,6 +51,7 @@ export function withInfiniteScroll<EdgeT>({
 }: ScrollProps<EdgeT>) {
   return function WithInfiniteScrollComponent() {
     const [data, setData] = useState(initialData);
+    const [loading, setLoading] = useState(false);
     const { ref, inView } = useInView();
 
     // Memoize the filter object to avoid unnecessary re-renders
@@ -58,7 +59,7 @@ export function withInfiniteScroll<EdgeT>({
 
     useEffect(() => {
       async function getMore() {
-        if (!data.pageInfo.hasNextPage) return; // Avoid unnecessary calls
+        setLoading(true);
 
         const newData = await getData({
           ...memoizedFilter,
@@ -70,18 +71,22 @@ export function withInfiniteScroll<EdgeT>({
           pageInfo: newData.pageInfo, // Update pageInfo
           totalCount: newData.totalCount, // Update total count
         }));
+
+        setLoading(false);
       }
 
-      if (inView && data.pageInfo.hasNextPage) {
+      if (inView && data.pageInfo.hasNextPage && !loading) {
         getMore();
       }
     }, [inView, data, memoizedFilter]);
 
     return (
       <Container>
-        {data.edges.map((edge, i) => (
-          <ListItem key={edge?.cursor || i} data={edge?.node} />
-        ))}
+        {data.edges
+          // .filter((edge) => edge?.node !== undefined && edge !== null)
+          .map((edge, i) => (
+            <ListItem key={edge?.cursor || i} data={edge?.node} />
+          ))}
         {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
       </Container>
     );

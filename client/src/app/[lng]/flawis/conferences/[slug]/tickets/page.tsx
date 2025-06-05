@@ -1,7 +1,6 @@
 import Dropdown from "@/components/Dropdown";
 import { getConference } from "../../actions";
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";

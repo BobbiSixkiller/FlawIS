@@ -14,7 +14,7 @@ export default async function Users({
 }: {
   params: { lng: string };
 }) {
-  const initialData = await getUsers({});
+  const initialData = await getUsers({ first: 5 });
 
   const { t } = await translate(lng, "users");
 
