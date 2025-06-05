@@ -8,7 +8,6 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { useDialog } from "@/providers/DialogProvider";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import { InboxArrowDownIcon } from "@heroicons/react/24/outline";
@@ -17,6 +16,7 @@ import { useParams } from "next/navigation";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { updateOrgFeedback } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function InternCertificateDialog({
   application,
@@ -72,7 +72,7 @@ export default function InternCertificateDialog({
   }, []);
 
   const { dispatch } = useContext(MessageContext);
-  const { openDialog, closeDialog } = useDialog();
+  const { openDialog, closeDialog } = useDialogStore();
 
   return (
     <div>

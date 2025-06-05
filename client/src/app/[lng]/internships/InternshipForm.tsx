@@ -11,8 +11,8 @@ import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
 import Editor from "@/components/editor/Editor";
-import { useDialog } from "@/providers/DialogProvider";
 import { createInternship, updateInternship } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function InternshipForm({
   data,
@@ -21,7 +21,7 @@ export default function InternshipForm({
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, ["internships", "common"]);
-  const { closeDialog } = useDialog();
+  const { closeDialog } = useDialogStore();
 
   const { yup } = useValidation();
   const methods = useForm({

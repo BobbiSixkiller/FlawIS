@@ -2,7 +2,6 @@
 
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
-import { useDialog } from "@/providers/DialogProvider";
 import { InboxArrowDownIcon, PencilIcon } from "@heroicons/react/24/outline";
 import ApplicationForm from "./ApplicationForm";
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function ApplicationDialog({
   user,
@@ -22,7 +22,7 @@ export default function ApplicationDialog({
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "internships");
 
-  const { openDialog } = useDialog();
+  const { openDialog } = useDialogStore();
 
   const dialogId = "application-dialog";
 

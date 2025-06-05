@@ -6,7 +6,7 @@ import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
 import Modal from "@/components/Modal";
 import UserForm from "../(auth)/register/UserForm";
 import { useTranslation } from "@/lib/i18n/client";
-import { useDialog } from "@/providers/DialogProvider";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function MissingStudentDataDialog({
   subdomain,
@@ -20,7 +20,7 @@ export default function MissingStudentDataDialog({
 
   const dialogId = "missiong-student-info";
 
-  const { openDialog } = useDialog();
+  const { openDialog } = useDialogStore();
 
   useEffect(() => {
     const missingData =

@@ -18,8 +18,8 @@ import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternFiles, createIntern } from "./actions";
-import { useDialog } from "@/providers/DialogProvider";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function ApplicationForm({
   user,
@@ -61,7 +61,7 @@ export default function ApplicationForm({
 
   const { dispatch } = useContext(MessageContext);
 
-  const { closeDialog } = useDialog();
+  const { closeDialog } = useDialogStore();
 
   if (loadingFiles)
     return (

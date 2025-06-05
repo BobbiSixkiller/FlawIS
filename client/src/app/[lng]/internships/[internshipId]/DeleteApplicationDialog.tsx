@@ -8,9 +8,9 @@ import { useParams } from "next/navigation";
 import { useContext, useTransition } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Spinner from "@/components/Spinner";
-import { useDialog } from "@/providers/DialogProvider";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { deleteIntern } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function DeleteApplicationDialog({
   internId,
@@ -23,7 +23,7 @@ export default function DeleteApplicationDialog({
   const { t } = useTranslation(lng, ["internships", "common"]);
 
   const [pending, startTransition] = useTransition();
-  const { closeDialog, openDialog } = useDialog();
+  const { closeDialog, openDialog } = useDialogStore();
   const { dispatch } = useContext(MessageContext);
 
   function handleClick() {

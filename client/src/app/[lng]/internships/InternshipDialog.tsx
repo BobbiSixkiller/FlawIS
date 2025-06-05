@@ -2,11 +2,11 @@
 
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
-import { useDialog } from "@/providers/DialogProvider";
 import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
 import InternshipForm from "./InternshipForm";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function InternshipDialog({
   data,
@@ -16,7 +16,7 @@ export default function InternshipDialog({
   const dialogId = data ? "update-internship" : "create-internship";
   const { lng } = useParams<{ lng: string }>();
 
-  const { openDialog } = useDialog();
+  const { openDialog } = useDialogStore();
 
   const { t } = useTranslation(lng, ["internships", "common"]);
 

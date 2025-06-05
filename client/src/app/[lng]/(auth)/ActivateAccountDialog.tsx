@@ -10,7 +10,7 @@ import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import Modal from "@/components/Modal";
-import { useDialog } from "@/providers/DialogProvider";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function ActivateAccountDialog({
   lng,
@@ -24,7 +24,7 @@ export default function ActivateAccountDialog({
   const { t } = useTranslation(lng, "activateAccount");
 
   const dialogId = "activate";
-  const { closeDialog, openDialog } = useDialog();
+  const { closeDialog, openDialog } = useDialogStore();
 
   useEffect(() => {
     if (user?.verified) {

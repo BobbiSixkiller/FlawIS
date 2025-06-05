@@ -12,7 +12,7 @@ import { FormMessage } from "@/components/Message";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
 import Modal from "@/components/Modal";
-import { useDialog } from "@/providers/DialogProvider";
+import { useDialogStore } from "@/stores/dialogStore";
 
 type TriggerButtonState = {
   icon: ReactNode;
@@ -49,7 +49,7 @@ export default function ChangeStatusDialog({
   const [pending, startTransition] = useTransition();
   const { internId: id, lng } = useParams<{ internId: string; lng: string }>();
 
-  const { openDialog, closeDialog } = useDialog();
+  const { openDialog, closeDialog } = useDialogStore();
   const { dispatch } = useContext(MessageContext);
 
   const handleClick = () =>

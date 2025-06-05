@@ -1,5 +1,5 @@
 import DynamicImage from "@/components/DynamicImage";
-import { ApplicationFragment, Status } from "@/lib/graphql/generated/graphql";
+import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
 import { displayDate } from "@/utils/helpers";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
