@@ -3,7 +3,7 @@ import { getAttendees } from "./actions";
 import AttendeeFilter from "./AttendeeFilter";
 import { getConference } from "../../actions";
 
-import ExportButton from "./export/ExportButton";
+import ExportButton from "./ExportButton";
 
 export default async function AttendeesPage({
   params: { slug },

@@ -182,7 +182,7 @@ export default async function User({
         <DeleteUserForm lng={lng} user={user} />
       </Modal>
       <Modal title="Impersonovat pouzivatela" dialogId={impersonateDialogId}>
-        <ImpersonateForm lng={lng} user={user} />
+        <ImpersonateForm lng={lng} user={user} dialogId={impersonateDialogId} />
       </Modal>
     </div>
   );

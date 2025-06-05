@@ -4,13 +4,19 @@ import {
   ArrowsRightLeftIcon,
   PencilIcon,
   TrashIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter, cn } from "@/utils/helpers";
-import RemoveAuthor from "./RemoveAuthor";
+import RemoveAuthorForm from "./RemoveAuthorForm";
 import { getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
+import ModalTrigger from "@/components/ModalTrigger";
+import Button from "@/components/Button";
+import DeleteAttendeeForm from "./DeleteAttendeeForm";
+import Modal from "@/components/Modal";
+import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
+import UpdateInvoiceForm from "./InvoiceForm";
 
 export default async function AttendeePage({
   params: { id, lng, slug },
@@ -21,6 +27,11 @@ export default async function AttendeePage({
   if (!attendee) {
     redirect(`/conferences/${slug}/attendees`);
   }
+
+  const deleteDialogId = "delete-attendee";
+  const impersonateDialogId = "imperonate-attendee";
+  const deleteAuthorDialogId = "delete-author";
+  const updateInvoiceDialogId = "update-invoice";
 
   return (
     <div className="flex flex-col gap-4">
@@ -36,28 +47,37 @@ export default async function AttendeePage({
         }
         links={[
           {
-            type: "link",
-            href: `/users/${attendee.user.id}/impersonate`,
-            text: "Impersonovat",
-            icon: <ArrowsRightLeftIcon className="size-5" />,
+            type: "custom",
+            element: (
+              <ModalTrigger dialogId={impersonateDialogId}>
+                <Button size="sm">
+                  <ArrowsRightLeftIcon className="size-5" />
+                  Impersonovat
+                </Button>
+              </ModalTrigger>
+            ),
           },
           {
-            type: "link",
-            href: `/conferences/${slug}/attendees/${id}/delete`,
-            text: "Zmazat",
-            icon: <TrashIcon className="size-5" />,
+            type: "custom",
+            element: (
+              <ModalTrigger dialogId={deleteDialogId}>
+                <Button size="sm" variant="secondary">
+                  <TrashIcon className="size-5" />
+                  Zmazat
+                </Button>
+              </ModalTrigger>
+            ),
           },
         ]}
       />
       <div className="flex gap-2">
         <DownloadPDFButton lng={lng} data={attendee} />
-        <Link
-          scroll={false}
-          href={`/conferences/${slug}/attendees/${id}/updateInvoice`}
-          className="text-gray-900 rounded-md bg-gray-300 hover:bg-gray-100 max-w-fit hover:text-gray-400 p-2 w-fit hover"
-        >
-          <PencilIcon className="w-5 h-5" />
-        </Link>
+
+        <ModalTrigger dialogId={updateInvoiceDialogId}>
+          <Button size="icon" variant="ghost">
+            <PencilIcon className="w-5 h-5" />
+          </Button>
+        </ModalTrigger>
       </div>
       {attendee.submissions.length > 0 && (
         <div className="flex flex-col gap-4">
@@ -81,7 +101,26 @@ export default async function AttendeePage({
                 {s.authors.map((a) => (
                   <li key={a.id} className="flex gap-1">
                     {a.name}
-                    <RemoveAuthor author={a} submission={s} />
+
+                    <ModalTrigger dialogId={`${deleteAuthorDialogId}-${a.id}`}>
+                      <Button
+                        variant="ghost"
+                        className="p-1 h-fit bg-transparent"
+                      >
+                        <XMarkIcon className="size-3 stroke-2" />
+                      </Button>
+                    </ModalTrigger>
+
+                    <Modal
+                      title="Zmazat autora"
+                      dialogId={`${deleteAuthorDialogId}-${a.id}`}
+                    >
+                      <RemoveAuthorForm
+                        dialogId={`${deleteAuthorDialogId}-${a.id}`}
+                        author={a}
+                        submission={s}
+                      />
+                    </Modal>
                   </li>
                 ))}
               </ul>
@@ -94,6 +133,28 @@ export default async function AttendeePage({
           ))}
         </div>
       )}
+
+      <Modal dialogId={deleteDialogId} title="Zmazat ucastnika">
+        <DeleteAttendeeForm
+          dialogId={deleteDialogId}
+          lng={lng}
+          attendee={attendee}
+        />
+      </Modal>
+      <Modal dialogId={impersonateDialogId} title="Impersonovat ucastnika">
+        <ImpersonateForm
+          dialogId={impersonateDialogId}
+          lng={lng}
+          user={attendee.user}
+        />
+      </Modal>
+      <Modal dialogId={updateInvoiceDialogId} title="Upravit fakturu">
+        <UpdateInvoiceForm
+          dialogId={updateInvoiceDialogId}
+          lng={lng}
+          invoice={attendee.invoice}
+        />
+      </Modal>
     </div>
   );
 }

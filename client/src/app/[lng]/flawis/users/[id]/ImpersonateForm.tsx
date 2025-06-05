@@ -8,15 +8,19 @@ import Button from "@/components/Button";
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import { impersonate } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
 
 export default function ImpersonateForm({
   user,
-  lng,
+  dialogId,
 }: {
-  user: UserFragment;
+  user: Pick<UserFragment, "id" | "name">;
   lng: string;
+  dialogId: string;
 }) {
   const [pending, startTransition] = useTransition();
+
+  const { closeDialog } = useDialogStore();
 
   function handleClick() {
     startTransition(async () => {
@@ -28,10 +32,12 @@ export default function ImpersonateForm({
           payload: state,
         });
       }
+
+      if (state && state.success) {
+        closeDialog(dialogId);
+      }
     });
   }
-
-  const { t } = useTranslation(lng, ["profile", "common"]);
 
   const { dispatch } = useContext(MessageContext);
 

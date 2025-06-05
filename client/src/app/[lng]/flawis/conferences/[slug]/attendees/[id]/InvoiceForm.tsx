@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { useContext } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
@@ -11,17 +11,19 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { InvoiceInput } from "@/lib/graphql/generated/graphql";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
-import { updateInvoice } from "./actions";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
+import { updateInvoice } from "./actions";
 
 export default function UpdateInvoiceForm({
   invoice,
   lng,
+  dialogId,
 }: {
   lng: string;
   invoice: InvoiceInput;
+  dialogId: string;
 }) {
-  const router = useRouter();
   const { id } = useParams<{ id: string }>();
 
   const { dispatch } = useContext(MessageContext);
@@ -83,6 +85,8 @@ export default function UpdateInvoiceForm({
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -102,7 +106,8 @@ export default function UpdateInvoiceForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >
