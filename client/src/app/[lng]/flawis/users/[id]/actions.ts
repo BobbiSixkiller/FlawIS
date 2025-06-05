@@ -5,11 +5,29 @@ import {
   DeleteUserDocument,
   ImpersonateDocument,
   ToggleVerifiedUserDocument,
+  UserDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+
+export async function getUser(id: string) {
+  const res = await executeGqlFetch(
+    UserDocument,
+    { id },
+    {},
+    {
+      tags: [`user:${id}`],
+      revalidate: 3600,
+    }
+  );
+  if (res.errors) {
+    console.log(res.errors[0]);
+  }
+
+  return res.data?.user;
+}
 
 export async function toggleVerified(id: string, verified: boolean) {
   const res = await executeGqlFetch(ToggleVerifiedUserDocument, {

@@ -4,25 +4,27 @@ import { useContext, useTransition } from "react";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
-import { deleteSubmission } from "./actions";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
+import { deleteSubmission } from "./actions";
 
 export default function DeleteSubmissionForm({
   submission,
   lng,
+  dialogId,
 }: {
   submission: SubmissionFragment;
   lng: string;
+  dialogId: string;
 }) {
-  const router = useRouter();
-
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "common");
 
   const [pending, startTransition] = useTransition();
+
+  const { closeDialog } = useDialogStore();
 
   function handleClick() {
     startTransition(async () => {
@@ -40,7 +42,8 @@ export default function DeleteSubmissionForm({
           type: ActionTypes.SetAppMsg,
           payload: state,
         });
-        router.back();
+
+        closeDialog(dialogId);
       }
     });
   }

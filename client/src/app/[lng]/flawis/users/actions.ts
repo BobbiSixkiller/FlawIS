@@ -31,23 +31,6 @@ export async function getUsers(filter: GetDataFilter) {
   );
 }
 
-export async function getUser(id: string) {
-  const res = await executeGqlFetch(
-    UserDocument,
-    { id },
-    {},
-    {
-      tags: [`user:${id}`],
-      revalidate: 3600,
-    }
-  );
-  if (res.errors) {
-    console.log(res.errors[0]);
-  }
-
-  return res.data?.user;
-}
-
 export async function searchUser(params: { text: string }) {
   const res = await executeGqlFetch(TextSearchUserDocument, params);
 

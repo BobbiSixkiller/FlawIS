@@ -1,4 +1,3 @@
-import { getUser } from "../actions";
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
@@ -8,7 +7,7 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { toggleVerified } from "./actions";
+import { getUser, toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";

@@ -3,8 +3,10 @@ import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
 import { PresentationLng } from "@/lib/graphql/generated/graphql";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import { updateSubmission } from "../../(withTabs)/submissions/[id]/update/actions";
-import { getSubmission } from "../../(withTabs)/submissions/[id]/actions";
+import {
+  getSubmission,
+  updateSubmission,
+} from "../../(withTabs)/submissions/actions";
 
 export default async function RegisterPage({
   params: { lng, slug },

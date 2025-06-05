@@ -3,10 +3,8 @@
 import { useTranslation } from "@/lib/i18n/client";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { createSubmission } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Button from "@/components/Button";
 import {
@@ -20,18 +18,20 @@ import {
 } from "@/components/MultipleInput";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
+import { useDialogStore } from "@/stores/dialogStore";
+import { createSubmission } from "./actions";
 
 export default function NewSubmissionForm({
   conferenceId,
   sections,
   lng,
+  dialogId,
 }: {
   conferenceId: string;
   sections: SectionFragment[];
   lng: string;
+  dialogId: string;
 }) {
-  const router = useRouter();
-
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
@@ -89,6 +89,8 @@ export default function NewSubmissionForm({
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -108,7 +110,8 @@ export default function NewSubmissionForm({
               type: ActionTypes.SetAppMsg,
               payload: state,
             });
-            router.back();
+
+            closeDialog(dialogId);
           }
         })}
       >

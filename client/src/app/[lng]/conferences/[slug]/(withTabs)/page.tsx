@@ -11,7 +11,7 @@ export default async function ConferencePage({
 }: {
   params: { slug: string; lng: string };
 }) {
-  const { t } = await translate(lng, "conferences");
+  const { t } = await translate(lng, ["conferences"]);
   const conference = await getConference(slug);
   if (
     conference &&
@@ -26,25 +26,28 @@ export default async function ConferencePage({
 
   return (
     <div className="text-gray-900 flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <DynamicImage
-          alt="conference-logo"
-          src={
-            conference!.translations[lng as "sk" | "en"].logoUrlEnv as string
-          }
-          className="w-[300px] h-[150px]"
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          style={{ objectFit: "contain" }}
-        />
+      <DynamicImage
+        alt="conference-logo"
+        src={conference!.translations[lng as "sk" | "en"].logoUrlEnv as string}
+        className="w-[300px] h-[150px]"
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        style={{ objectFit: "contain" }}
+      />
 
-        <Heading
-          lng={lng}
-          heading={conference!.slug}
-          subHeading={conference!.translations[lng as "sk" | "en"].name}
-        />
-        <DownloadPDFButton lng={lng} data={conference?.attending!} />
-      </div>
+      <Heading
+        lng={lng}
+        heading={conference!.slug}
+        subHeading={conference!.translations[lng as "sk" | "en"].name}
+        links={[
+          {
+            type: "custom",
+            element: (
+              <DownloadPDFButton lng={lng} data={conference?.attending!} />
+            ),
+          },
+        ]}
+      />
       <div className="border-t border-gray-100 dark:border-gray-600">
         <dl className="divide-y divide-gray-100 dark:divide-gray-600">
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">

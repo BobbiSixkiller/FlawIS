@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
@@ -13,7 +12,6 @@ import {
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { LocalizedTextarea } from "@/components/Textarea";
-import { updateSubmission } from "./actions";
 import Select from "@/components/Select";
 import {
   LocalizedMultipleInput,
@@ -23,18 +21,20 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
+import { useDialogStore } from "@/stores/dialogStore";
+import { updateSubmission } from "./actions";
 
 export default function UpdateSubmissionForm({
   sections,
   submission,
   lng,
+  dialogId,
 }: {
   lng: string;
   submission: SubmissionFragment;
   sections: SectionFragment[];
+  dialogId: string;
 }) {
-  const router = useRouter();
-
   const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
@@ -121,6 +121,8 @@ export default function UpdateSubmissionForm({
     },
   });
 
+  const { closeDialog } = useDialogStore();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -165,7 +167,8 @@ export default function UpdateSubmissionForm({
                 type: ActionTypes.SetAppMsg,
                 payload: state,
               });
-              router.back();
+
+              closeDialog(dialogId);
             }
           }
         )}
