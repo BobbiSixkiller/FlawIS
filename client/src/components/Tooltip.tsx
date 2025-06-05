@@ -1,7 +1,7 @@
 "use client";
 
 import useWidth from "@/hooks/useWidth";
-import { useDialog } from "@/providers/DialogProvider";
+import { useDialogStore } from "@/stores/dialogStore";
 import { cn } from "@/utils/helpers";
 import React, {
   MouseEvent,
@@ -31,11 +31,12 @@ export default function Tooltip({
     left: 0,
   });
   const viewportWidth = useWidth();
-  const { someDialogOpen } = useDialog();
+
+  const { openDialogs } = useDialogStore();
 
   const showTooltip = useCallback(
     (e: MouseEvent | TouchEvent) => {
-      if (someDialogOpen) return;
+      if (openDialogs) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const top = position === "above" ? rect.top - 40 : rect.bottom;
       const left = rect.left + rect.width / 2;
@@ -43,7 +44,7 @@ export default function Tooltip({
       setTooltipPosition((prev) => ({ ...prev, top, left: left + 10 }));
       setVisible(true);
     },
-    [position, someDialogOpen]
+    [position, openDialogs]
   );
 
   const hideTooltipOnScroll = useCallback(() => setVisible(false), []);
