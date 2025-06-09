@@ -1,5 +1,5 @@
-import client, { Connection, Channel } from "amqplib";
 import { Service } from "typedi";
+import * as amqp from "amqplib";
 
 export type RoutingKey =
   | "user.delete"
@@ -21,8 +21,8 @@ const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
 
 @Service()
 export class RmqService {
-  private connection?: Connection;
-  private channel?: Channel;
+  private connection?: amqp.ChannelModel;
+  private channel?: amqp.Channel;
 
   constructor() {
     this.init(); // Initialize connection and channel on service creation
@@ -31,15 +31,15 @@ export class RmqService {
   private async createConnection() {
     try {
       if (!this.connection) {
-        this.connection = await client.connect(uri);
+        this.connection = await amqp.connect(uri);
 
-        this.connection.on("error", (err) => {
+        this.connection?.on("error", (err) => {
           console.error("RMQ Error:", err);
           this.connection = undefined;
           this.retryInit();
         });
 
-        this.connection.on("close", () => {
+        this.connection?.on("close", () => {
           console.error(
             "Connection to RMQ server closed! Trying to re-establish..."
           );
@@ -57,7 +57,7 @@ export class RmqService {
     try {
       if (!this.channel && this.connection) {
         this.channel = await this.connection.createChannel();
-        await this.channel.assertExchange(exchange, "topic", {
+        await this.channel?.assertExchange(exchange, "topic", {
           durable: false,
         });
       }
