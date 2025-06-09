@@ -15,7 +15,9 @@ export default function usePrefillFiles({
   setError: UseFormSetError<any>;
   setValue: UseFormSetValue<any>;
 }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(
+    cvUrl || fileUrls || avatarUrl ? true : false
+  );
 
   useEffect(() => {
     async function fetchFiles() {

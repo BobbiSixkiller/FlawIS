@@ -5,7 +5,7 @@ import {
   InternshipArgs,
   InternshipConnection,
   InternshipInput,
-} from "../resolvers/types/internship";
+} from "../resolvers/types/internship.types";
 import { I18nService } from "./i18n.service";
 import { User } from "../util/types";
 import { UserService } from "./user.service";

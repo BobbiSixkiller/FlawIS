@@ -1,4 +1,6 @@
 {
   "ratelimit": "Akciu opakujete príliš často, skúste to prosím neskôr!",
-  "401": "Prístup zamietnutý!"
+  "400": "Neplatné vstupné údaje",
+  "401": "Prístup zamietnutý!",
+  "500": "Niečo sa pokazilo. Akciu sa pokúste zopakovať neskôr!"
 }

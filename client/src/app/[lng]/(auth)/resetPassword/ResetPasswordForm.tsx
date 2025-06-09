@@ -1,8 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext, useState } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { useState } from "react";
 import { resetPassword } from "./actions";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,6 +9,7 @@ import useValidation from "@/hooks/useValidation";
 import { Input } from "@/components/Input";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ResetPasswordForm({
   lng,
@@ -19,8 +19,6 @@ export default function ResetPasswordForm({
   token?: string;
 }) {
   const { t } = useTranslation(lng, "resetPassword");
-
-  const { dispatch } = useContext(MessageContext);
 
   const { yup } = useValidation();
 
@@ -48,25 +46,17 @@ export default function ResetPasswordForm({
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const setMessage = useMessageStore((s) => s.setMessage);
+
   return (
     <FormProvider {...methods}>
       <form
         className="space-y-6 mt-4"
         onSubmit={methods.handleSubmit(
           async ({ password }) => {
-            const state = await resetPassword(password, token || "");
-
-            if (state?.message && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: state,
-              });
-            }
-            if (state?.message && state.success) {
-              dispatch({
-                type: ActionTypes.SetAppMsg,
-                payload: state,
-              });
+            const res = await resetPassword({ password }, token || "");
+            if (res) {
+              setMessage(res.message, res.success);
             }
           },
           (err) => console.log(err)

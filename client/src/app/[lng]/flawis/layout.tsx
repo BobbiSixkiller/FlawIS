@@ -13,6 +13,7 @@ import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import Dashboard from "@/components/Dashboard";
+import { Snackbar } from "@/components/Message";
 
 export async function generateMetadata(
   {
@@ -110,6 +111,7 @@ export default async function DashboardLayout({
 
       {modal}
 
+      <Snackbar />
       <ActivateAccountDialog lng={lng} user={user} />
       <SessionPolling />
     </div>

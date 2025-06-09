@@ -1,10 +1,12 @@
+import { Service } from "typedi";
 import { CourseTermAttendee } from "../entitites/Course";
 import {
   CourseTermAttendeeArgs,
   CourseTermAttendeeConnection,
-} from "../resolvers/types/course";
-import { Repository } from "./repository";
+} from "../resolvers/types/course.types";
+import { Repository } from "./base.repository";
 
+@Service()
 export class CourseTermAttendeeRepository extends Repository<
   typeof CourseTermAttendee
 > {

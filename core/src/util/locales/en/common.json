@@ -1,4 +1,6 @@
 {
   "ratelimit": "You're doing that too much, try it again later!",
-  "401": "Access denied!"
+  "400": "Bad request!",
+  "401": "Access denied!",
+  "500": "Something wen wrong. Try it again later!"
 }

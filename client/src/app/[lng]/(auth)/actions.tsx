@@ -10,9 +10,9 @@ import {
   ResendActivationLinkDocument,
 } from "@/lib/graphql/generated/graphql";
 import parseErrors, { ErrorException } from "@/utils/parseErrors";
-import { executeGqlFetch } from "@/utils/actions";
 
 import { OAuth2Client } from "google-auth-library";
+import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -51,50 +51,35 @@ export async function getMe() {
 }
 
 export async function activate() {
-  try {
-    const token = cookies().get("activationToken")?.value;
-    if (!token) {
-      return;
-    }
-
-    const res = await executeGqlFetch(ActivateUserDocument, undefined, {
-      activation: token,
-    });
-
-    if (res.errors) {
-      console.log(res.errors[0]);
-      throw new Error(res.errors[0].message);
-    }
-
-    cookies().delete("activationToken");
-    revalidateTag(res.data.activateUser.data.email);
-
-    return { success: true, message: res.data.activateUser.message };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: error.message,
-    };
+  const token = cookies().get("activationToken")?.value;
+  if (!token) {
+    return;
   }
+
+  const res = await executeGqlMutation(
+    ActivateUserDocument,
+    {},
+    (data) => ({
+      message: data.activateUser.message,
+      data: data.activateUser.data,
+    }),
+    { revalidateTags: (data) => [data.activateUser.data.email] },
+    {
+      activation: token,
+    }
+  );
+
+  cookies().delete("activationToken");
+  return res;
 }
 
 export async function resendActivationLink() {
-  const res = await executeGqlFetch(
+  return await executeGqlMutation(
     ResendActivationLinkDocument,
     {},
-    {},
-    { revalidate: 60 * 15 }
+    (data) => ({ message: data.resendActivationLink }),
+    undefined,
+    undefined,
+    { revalidate: 15 * 60 }
   );
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions
-      .exception as ErrorException;
-
-    return {
-      success: false,
-      message: validationErrors
-        ? Object.values(parseErrors(validationErrors)).join(" ")
-        : res.errors[0].message,
-    };
-  }
-  return { success: true, message: res.data.resendActivationLink };
 }

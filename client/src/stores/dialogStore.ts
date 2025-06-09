@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-type DialogState = {
+interface DialogState {
   openDialogs: Record<string, boolean>;
   openDialog: (id: string) => void;
   closeDialog: (id: string) => void;
   isDialogOpen: (id: string) => boolean;
-};
+}
 
 export const useDialogStore = create<DialogState>((set, get) => ({
   openDialogs: {},

@@ -7,9 +7,7 @@ import {
   SubmissionInput,
   UpdateSubmissionDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidateTag } from "next/cache";
+import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 import { cookies } from "next/headers";
 
 export async function getSubmission(id?: string) {
@@ -26,54 +24,43 @@ export async function getSubmission(id?: string) {
 export async function createSubmission(data: SubmissionInput) {
   const user = cookies().get("user")?.value;
 
-  const res = await executeGqlFetch(CreateSubmissionDocument, {
-    data,
-  });
-  if (res.errors) {
-    console.log(res.errors[0], data);
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    return {
-      success: false,
-      message: validationErrors
-        ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-        : res.errors[0].message,
-    };
-  }
-
-  revalidateTag(`conference:${user}`);
-  return { success: true, message: res.data.createSubmission.message };
+  return await executeGqlMutation(
+    CreateSubmissionDocument,
+    { data },
+    (data) => ({
+      message: data.createSubmission.message,
+      data: data.createSubmission.data,
+    }),
+    { revalidateTags: (data) => [`conference:${user}`] }
+  );
 }
 
 export async function updateSubmission(id: string, data: SubmissionInput) {
-  const res = await executeGqlFetch(UpdateSubmissionDocument, {
-    id,
-    data,
-  });
-
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    return {
-      success: false,
-      message: validationErrors
-        ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-        : res.errors[0].message,
-    };
-  }
-
-  revalidateTag(`conference:${res.data.updateSubmission.data.conference.slug}`);
-  return { success: true, message: res.data.updateSubmission.message };
+  return await executeGqlMutation(
+    UpdateSubmissionDocument,
+    { id, data },
+    (data) => ({
+      message: data.updateSubmission.message,
+      data: data.updateSubmission.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `conference:${data.updateSubmission.data.conference.slug}`,
+      ],
+    }
+  );
 }
 
 export async function deleteSubmission(id: string) {
   const user = cookies().get("user")?.value;
 
-  const res = await executeGqlFetch(DeleteSubmissionDocument, { id });
-  if (res.errors) {
-    return { success: false, message: res.errors[0].message };
-  }
-
-  revalidateTag(`conference:${user}`);
-  return { success: true, message: res.data.deleteSubmission.message };
+  return executeGqlMutation(
+    DeleteSubmissionDocument,
+    { id },
+    (data) => ({
+      message: data.deleteSubmission.message,
+      data: data.deleteSubmission.data,
+    }),
+    { revalidateTags: () => [`conference:${user}`] }
+  );
 }

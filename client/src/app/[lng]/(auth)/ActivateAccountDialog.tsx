@@ -1,16 +1,16 @@
 "use client";
 
-import { useContext, useEffect, useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "../../../components/Button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 
 import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import Modal from "@/components/Modal";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ActivateAccountDialog({
   lng,
@@ -19,12 +19,12 @@ export default function ActivateAccountDialog({
   lng: string;
   user?: UserFragment;
 }) {
-  const { dispatch } = useContext(MessageContext);
-
   const { t } = useTranslation(lng, "activateAccount");
 
   const dialogId = "activate";
-  const { closeDialog, openDialog } = useDialogStore();
+  const openDialog = useDialogStore((s) => s.openDialog);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   useEffect(() => {
     if (user?.verified) {
@@ -37,17 +37,8 @@ export default function ActivateAccountDialog({
   useEffect(() => {
     async function activateCb() {
       const res = await activate();
-      if (res && !res.success) {
-        dispatch({
-          type: ActionTypes.SetFormMsg,
-          payload: res,
-        });
-      }
-      if (res?.message && res.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: res,
-        });
+      if (res) {
+        setMessage(res.message, res.success);
       }
     }
 
@@ -58,11 +49,10 @@ export default function ActivateAccountDialog({
 
   const onClick = () => {
     startTransition(async () => {
-      const state = await resendActivationLink();
-      dispatch({
-        type: ActionTypes.SetFormMsg,
-        payload: state,
-      });
+      const res = await resendActivationLink();
+      if (res) {
+        setMessage(res.message, res.success);
+      }
     });
   };
 
@@ -80,8 +70,6 @@ export default function ActivateAccountDialog({
         >
           {isPending ? <Spinner inverted /> : t("button")}
         </Button>
-
-        <FormMessage />
       </div>
     </Modal>
   );

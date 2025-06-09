@@ -1,13 +1,13 @@
 import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 
-import { CourseArgs, CourseInput } from "../resolvers/types/course";
+import { CourseArgs, CourseInput } from "../resolvers/types/course.types";
 import { Course, CourseModule, CourseTerm } from "../entitites/Course";
 import { I18nService } from "./i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../repositories/course.repository";
-import { Repository } from "../repositories/repository";
+import { Repository } from "../repositories/base.repository";
 
 function toCourseDTO(doc: DocumentType<Course>) {
   const obj = doc.toJSON({

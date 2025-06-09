@@ -23,6 +23,7 @@ import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { updateSubmission } from "./actions";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function UpdateSubmissionForm({
   sections,
@@ -35,8 +36,6 @@ export default function UpdateSubmissionForm({
   sections: SectionFragment[];
   dialogId: string;
 }) {
-  const { dispatch } = useContext(MessageContext);
-
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
   const [loadingFile, setLoadingFile] = useState(true);
@@ -121,7 +120,8 @@ export default function UpdateSubmissionForm({
     },
   });
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -155,19 +155,23 @@ export default function UpdateSubmissionForm({
               fileUrl: url,
             });
 
-            if (state.message && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: state,
-              });
+            console.log(state);
+
+            if (state.errors) {
+              for (const [key, val] of Object.entries(state.errors)) {
+                methods.setError(
+                  key as keyof (typeof methods)["formState"]["errors"],
+                  { message: val },
+                  {
+                    shouldFocus: true,
+                  }
+                );
+              }
             }
 
-            if (state.success) {
-              dispatch({
-                type: ActionTypes.SetAppMsg,
-                payload: state,
-              });
+            setMessage(state.message, state.success);
 
+            if (state.success) {
               closeDialog(dialogId);
             }
           }

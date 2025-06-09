@@ -24,7 +24,7 @@ export default function DeleteSubmissionForm({
 
   const [pending, startTransition] = useTransition();
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
 
   function handleClick() {
     startTransition(async () => {

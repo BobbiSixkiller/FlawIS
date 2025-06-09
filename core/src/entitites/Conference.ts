@@ -10,7 +10,7 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { ObjectId } from "mongodb";
 import Container from "typedi";
 import { I18nService } from "../services/i18n.service";
-import { LocalesType } from "../resolvers/types/translation";
+import { LocalesType } from "../resolvers/types/translation.types";
 import { Attendee } from "./Attendee";
 import { FlawBilling } from "./Billing";
 

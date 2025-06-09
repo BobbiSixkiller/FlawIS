@@ -1,11 +1,10 @@
 import { Service } from "typedi";
-
-import { Repository } from "./repository";
+import { Repository } from "./base.repository";
 import { Submission } from "../entitites/Submission";
 import {
   SubmissionArgs,
   SubmissionConnection,
-} from "../resolvers/types/submission";
+} from "../resolvers/types/submission.types";
 
 @Service()
 export class SubmissionRepository extends Repository<typeof Submission> {

@@ -6,7 +6,7 @@ import {
   RegisterUserInput,
   UserArgs,
   UserConnection,
-} from "../resolvers/types/user";
+} from "../resolvers/types/user.types";
 import { RmqService } from "./rmq.service";
 import { RedisService } from "./redis.service";
 import { I18nService } from "./i18n.service";
@@ -257,6 +257,8 @@ export class UserService {
       }),
       "mail.reset"
     );
+
+    console.log(this.i18nService.translate("resetLinkSent"));
 
     return this.i18nService.translate("resetLinkSent");
   }

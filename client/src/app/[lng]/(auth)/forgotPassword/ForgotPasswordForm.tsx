@@ -1,8 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { sendResetLink } from "./actions";
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,12 +9,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "@/components/Input";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ForgotPasswordForm() {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "forgotPassword");
-
-  const { dispatch } = useContext(MessageContext);
 
   const { yup } = useValidation();
 
@@ -27,19 +24,16 @@ export default function ForgotPasswordForm() {
     defaultValues: { email: "" },
   });
 
+  const setMessage = useMessageStore((s) => s.setMessage);
+
   return (
     <FormProvider {...methods}>
       <form
         className="space-y-6 mt-4"
         onSubmit={methods.handleSubmit(async (val) => {
-          const state = await sendResetLink(val.email);
+          const { message, success } = await sendResetLink(val.email);
 
-          if (state?.message) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+          setMessage(message, success);
         })}
       >
         <Input name="email" label={t("email")} autoComplete="off" />

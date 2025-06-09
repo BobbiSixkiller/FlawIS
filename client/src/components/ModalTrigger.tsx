@@ -28,12 +28,12 @@ function ModalTrigger(
 
   return cloneElement(children, {
     ...props,
-    ref,
     onClick: (e: any) => {
       props.onClick?.(e); // from ModalTrigger usage
       children.props.onClick?.(e); // original child
       openDialog(dialogId);
     },
+    ref,
   });
 }
 

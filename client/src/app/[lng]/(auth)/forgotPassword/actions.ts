@@ -1,32 +1,15 @@
 "use server";
 
 import { ForgotPasswordDocument } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
+import { executeGqlMutation } from "@/utils/actions";
 
 export async function sendResetLink(email: string) {
-  try {
-    const res = await executeGqlFetch(
-      ForgotPasswordDocument,
-      { email },
-      {}
-      // { revalidate: 60 * 60 }
-    );
-
-    if (res.errors) {
-      console.log(res.errors[0]);
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      return {
-        success: false,
-        message: validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message,
-      };
-    } else {
-      return { success: true, message: res.data.forgotPassword };
-    }
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+  return await executeGqlMutation(
+    ForgotPasswordDocument,
+    { email },
+    (data) => ({ message: data.forgotPassword }),
+    undefined,
+    undefined,
+    { revalidate: 3600 }
+  );
 }

@@ -4,8 +4,32 @@ import { TypedDocumentString } from "@/lib/graphql/generated/graphql";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { cookies, headers } from "next/headers";
+import parseValidationErrors, { ValidationErrors } from "./parseErrors";
+import { revalidatePath, revalidateTag } from "next/cache";
 
-type GraphQLResponse<GraphQLData> = {
+export async function setDarkThemeCookie(val: boolean) {
+  const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+
+  if (val) {
+    cookies().set("theme", "dark", {
+      expires,
+      sameSite: "lax",
+      path: "/",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
+  } else {
+    cookies().delete({
+      name: "theme",
+      sameSite: "lax",
+      path: "/",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
+    });
+  }
+}
+
+export type GraphQLResponse<GraphQLData> = {
   data: GraphQLData;
   errors?: GraphQLError[];
 };
@@ -45,24 +69,64 @@ export async function executeGqlFetch<Data, Variables>(
   return (await res.json()) as GraphQLResponse<Data>;
 }
 
-export async function setDarkThemeCookie(val: boolean) {
-  const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
+type MutationOptions<Data> = {
+  revalidateTags?: (data: Data) => string[];
+  revalidatePaths?: (data: Data) => string[];
+};
 
-  if (val) {
-    cookies().set("theme", "dark", {
-      expires,
-      sameSite: "lax",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
-    });
-  } else {
-    cookies().delete({
-      name: "theme",
-      sameSite: "lax",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
-    });
+type GqlMutationResponse<TransformedData> = {
+  success: boolean;
+  message: string;
+  data?: TransformedData;
+  errors?: Record<string, string>; // or whatever format you use
+};
+
+export async function executeGqlMutation<Data, Variables, TransformedData>(
+  document: TypedDocumentString<Data, Variables>,
+  variables: Variables,
+  getResult: (data: Data) => { message: string; data?: TransformedData },
+  options?: MutationOptions<Data>,
+  customHeaders: IncomingHttpHeaders | null = null,
+  next?: NextFetchRequestConfig,
+  nextCache?: RequestCache
+): Promise<GqlMutationResponse<TransformedData>> {
+  const res = await executeGqlFetch(
+    document,
+    variables,
+    customHeaders,
+    next,
+    nextCache
+  );
+
+  if (res.errors) {
+    const { validationErrors } = res.errors[0].extensions;
+    return {
+      success: false,
+      message: res.errors[0].message,
+      errors: validationErrors
+        ? parseValidationErrors(validationErrors as ValidationErrors[])
+        : undefined,
+    };
   }
+
+  // Optional cache revalidation
+  if (options?.revalidateTags) {
+    for (const tag of options.revalidateTags(res.data)) {
+      revalidateTag(tag);
+    }
+  }
+
+  if (options?.revalidatePaths) {
+    for (const path of options.revalidatePaths(res.data)) {
+      revalidatePath(path);
+    }
+  }
+
+  const { message, data } = getResult(res.data);
+
+  return {
+    success: true,
+    message,
+    data,
+  };
 }

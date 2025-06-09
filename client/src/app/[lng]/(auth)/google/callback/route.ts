@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { executeGqlFetch } from "@/utils/actions";
 import { GoogleSignInDocument } from "@/lib/graphql/generated/graphql";
 import { cookies } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
+import { redirect } from "next/navigation";
+import { executeGqlFetch } from "@/utils/actions";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);

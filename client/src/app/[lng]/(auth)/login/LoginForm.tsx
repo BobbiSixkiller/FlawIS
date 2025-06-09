@@ -3,8 +3,7 @@
 import { useTranslation } from "@/lib/i18n/client";
 import { Trans } from "../../../../../node_modules/react-i18next";
 import Link from "next/link";
-import { useContext, useState } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { useState } from "react";
 import { login } from "./actions";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -14,11 +13,11 @@ import useValidation from "@/hooks/useValidation";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { cn } from "@/utils/helpers";
+import { useMessageStore } from "@/stores/messageStore";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
-
-  const { dispatch } = useContext(MessageContext);
 
   const { yup } = useValidation();
 
@@ -34,6 +33,10 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const setMessage = useMessageStore((s) => s.setMessage);
+
+  const router = useRouter();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -41,11 +44,8 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
         onSubmit={methods.handleSubmit(
           async (val) => {
             const state = await login(val.email, val.password, url);
-            if (state && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: { message: state.message, success: state.success },
-              });
+            if (state) {
+              setMessage(state.message, state.success);
             }
           },
           (errs) => console.log(errs)

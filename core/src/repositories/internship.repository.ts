@@ -1,11 +1,10 @@
 import { Service } from "typedi";
-
-import { Repository } from "./repository";
+import { Repository } from "./base.repository";
 import { Internship } from "../entitites/Internship";
 import {
   InternshipArgs,
   InternshipConnection,
-} from "../resolvers/types/internship";
+} from "../resolvers/types/internship.types";
 
 @Service()
 export class InternshipRepository extends Repository<typeof Internship> {

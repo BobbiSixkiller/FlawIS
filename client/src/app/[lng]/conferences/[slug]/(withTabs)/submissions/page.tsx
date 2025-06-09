@@ -74,14 +74,17 @@ export default async function AttendeeSubmissionsPage({
                   </Tooltip>
 
                   <ModalTrigger
-                    dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                    dialogId={`${deleteSubmissionDialogId}-${s.id}`}
                   >
                     <Button size="icon" variant="destructive">
                       <TrashIcon className="size-4 stroke-2" />
                     </Button>
                   </ModalTrigger>
 
-                  <Modal dialogId={`${updateSubmissionDialogId}-${s.id}`}>
+                  <Modal
+                    dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                    title={t("submission.update")}
+                  >
                     <UpdateSubmissionForm
                       dialogId={`${updateSubmissionDialogId}-${s.id}`}
                       lng={lng}

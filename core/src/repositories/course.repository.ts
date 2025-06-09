@@ -1,7 +1,7 @@
 import { Service } from "typedi";
-import { Repository } from "./repository";
+import { Repository } from "./base.repository";
 import { Course } from "../entitites/Course";
-import { CourseArgs, CourseConnection } from "../resolvers/types/course";
+import { CourseArgs, CourseConnection } from "../resolvers/types/course.types";
 
 @Service()
 export class CourseRepository extends Repository<typeof Course> {

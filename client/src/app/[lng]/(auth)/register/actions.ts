@@ -6,35 +6,27 @@ import {
   UpdateUserDocument,
   UserInput,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { executeGqlMutation } from "@/utils/actions";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 export async function register({
   url,
   token,
   ...data
 }: RegisterUserInput & { url?: string; token?: string }) {
-  const res = await executeGqlFetch(RegisterDocument, { data }, { token });
+  const res = await executeGqlMutation(
+    RegisterDocument,
+    { data },
+    (data) => ({ message: data.register.message, data: data.register.data }),
+    {},
+    { token }
+  );
 
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    return {
-      success: false,
-      message: res.errors[0].message,
-      errors: validationErrors
-        ? parseValidationErrors(validationErrors)
-        : undefined,
-    };
-  }
-
-  if (res.data.register) {
+  if (res.data) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    cookies().set("user", res.data.register.data.email, {
+    cookies().set("user", res.data.email, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
       secure: process.env.NODE_ENV !== "development",
@@ -43,7 +35,7 @@ export async function register({
       domain:
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
-    cookies().set("accessToken", res.data.register.data.token, {
+    cookies().set("accessToken", res.data.token, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
       secure: process.env.NODE_ENV !== "development",
@@ -52,57 +44,39 @@ export async function register({
       domain:
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
+
+    redirect(url ? url : "/", RedirectType.replace);
   }
 
-  redirect(url || "/");
+  return res;
 }
 
 export async function addUser(data: RegisterUserInput) {
-  const res = await executeGqlFetch(RegisterDocument, { data });
-
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    console.log(validationErrors);
-
-    return {
-      success: false,
-      message: res.errors[0].message,
-      errors: validationErrors
-        ? parseValidationErrors(validationErrors)
-        : undefined,
-    };
-  }
-
-  revalidateTag("users");
-  return {
-    success: true,
-    message: res.data.register.message,
-  };
+  return await executeGqlMutation(
+    RegisterDocument,
+    { data },
+    (data) => ({
+      message: data.register.message,
+      data: data.register.data,
+    }),
+    { revalidateTags: () => ["users"] }
+  );
 }
 
 export async function updateUser(id: string, data: UserInput) {
-  const res = await executeGqlFetch(UpdateUserDocument, {
-    id,
-    data,
-  });
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    return {
-      success: false,
-      message: res.errors[0].message,
-      errors: validationErrors
-        ? parseValidationErrors(validationErrors)
-        : undefined,
-    };
-  }
-
-  revalidateTag("users");
-  revalidateTag(`user:${id}`);
-  revalidatePath("/", "layout");
-  return {
-    success: true,
-    message: res.data.updateUser.message,
-  };
+  return await executeGqlMutation(
+    UpdateUserDocument,
+    {
+      id,
+      data,
+    },
+    (data) => ({
+      message: data.updateUser.message,
+      data: data.updateUser.data,
+    }),
+    {
+      revalidateTags: (data) => ["users", `user:${data.updateUser.data.id}`],
+      revalidatePaths: () => ["/profile"],
+    }
+  );
 }

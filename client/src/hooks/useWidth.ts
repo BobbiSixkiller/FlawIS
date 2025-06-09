@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function useWidth() {
-  const [width, setWidth] = useState(0); // default width, detect on server.
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

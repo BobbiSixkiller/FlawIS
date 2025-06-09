@@ -10,26 +10,27 @@ import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
 import { ObjectIdScalar } from "./util/scalars";
-import { TypegooseMiddleware } from "./middlewares/typegoose-middleware";
+import { TypegooseMiddleware } from "./middlewares/typegoose.middleware";
 
-import { UserResolver } from "./resolvers/user";
-import { ConferencerResolver } from "./resolvers/conference";
+import { UserResolver } from "./resolvers/user.resolver";
+import { ConferencerResolver } from "./resolvers/conference.resolver";
 
 import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import env from "dotenv";
-import { I18nMiddleware } from "./middlewares/i18n-middleware";
+import { I18nMiddleware } from "./middlewares/i18n.middleware";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { SectionResolver } from "./resolvers/section";
-import { SubmissionResolver } from "./resolvers/submission";
-import { AttendeeResolver } from "./resolvers/attendee";
-import { InternshipResolver } from "./resolvers/internship";
-import { InternResolver } from "./resolvers/intern";
+import { SectionResolver } from "./resolvers/section.resolver";
+import { SubmissionResolver } from "./resolvers/submission.resolver";
+import { AttendeeResolver } from "./resolvers/attendee.resolver";
+import { InternshipResolver } from "./resolvers/internship.resolver";
+import { InternResolver } from "./resolvers/intern.resolver";
 import { CronJobService } from "./services/cron.service";
-import { CourseResolver } from "./resolvers/course";
+import { CourseResolver } from "./resolvers/course.resolver";
+import { ErrorsMiddleware } from "./middlewares/errors.middleware";
 
 env.config();
 
@@ -63,7 +64,7 @@ async function main() {
       CourseResolver,
     ],
     // use document converting middleware
-    globalMiddlewares: [TypegooseMiddleware, I18nMiddleware],
+    globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],
     // use ObjectId scalar mapping
     scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
     emitSchemaFile: true,

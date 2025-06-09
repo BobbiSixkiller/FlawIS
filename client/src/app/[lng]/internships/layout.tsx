@@ -7,6 +7,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/Dashboard";
+import { Snackbar } from "@/components/Message";
 
 export async function generateMetadata(
   {
@@ -84,6 +85,7 @@ export default async function DashboardLayout({
 
       <ActivateAccountDialog lng={lng} user={user} />
       <SessionPolling />
+      <Snackbar />
     </div>
   );
 }

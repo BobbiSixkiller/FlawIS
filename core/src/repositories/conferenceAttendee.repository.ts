@@ -1,7 +1,10 @@
 import { Service } from "typedi";
-import { Repository } from "./repository";
+import { Repository } from "./base.repository";
 import { Attendee } from "../entitites/Attendee";
-import { AttendeeArgs, AttendeeConnection } from "../resolvers/types/attendee";
+import {
+  AttendeeArgs,
+  AttendeeConnection,
+} from "../resolvers/types/attendee.types";
 
 @Service()
 export class AttendeeRepository extends Repository<typeof Attendee> {

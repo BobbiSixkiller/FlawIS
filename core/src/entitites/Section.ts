@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { Field, ID, ObjectType } from "type-graphql";
 
 import { Conference } from "./Conference";
-import { LocalesType } from "../resolvers/types/translation";
+import { LocalesType } from "../resolvers/types/translation.types";
 
 @ObjectType()
 export class SectionTranslations {

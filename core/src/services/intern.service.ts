@@ -1,6 +1,6 @@
 import { Service } from "typedi";
 import { Intern, Status } from "../entitites/Internship";
-import { InternArgs } from "../resolvers/types/internship";
+import { InternArgs } from "../resolvers/types/internship.types";
 import { ObjectId } from "mongodb";
 import { I18nService } from "./i18n.service";
 import { User } from "../util/types";

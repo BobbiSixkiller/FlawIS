@@ -20,6 +20,8 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { createSubmission } from "./actions";
+import { FormMessage } from "@/components/Message";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function NewSubmissionForm({
   conferenceId,
@@ -89,7 +91,8 @@ export default function NewSubmissionForm({
     },
   });
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -97,6 +100,7 @@ export default function NewSubmissionForm({
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
           const state = await createSubmission(data);
+          console.log(state);
 
           if (state.message && !state.success) {
             dispatch({

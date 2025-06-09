@@ -2,6 +2,7 @@ import { objectToFormData } from "@/components/WIzzardForm";
 import { deleteFiles } from "@/lib/minio";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { GraphQLResponse } from "./actions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -147,3 +148,10 @@ export function getAcademicYear(date = new Date()) {
 
   return { startYear, endYear, startDate, endDate, academicYear };
 }
+
+export type ServerActionResponse<T = undefined> = {
+  success: boolean;
+  message: string;
+  data?: T;
+  errors?: Record<string, string[]>; // or whatever your error map looks like
+};

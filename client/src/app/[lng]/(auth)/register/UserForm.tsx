@@ -1,10 +1,9 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { addUser, register, updateUser } from "./actions";
@@ -31,6 +30,7 @@ import { mixed } from "yup";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
 import useUser from "@/hooks/useUser";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function UserForm({
   user,
@@ -47,6 +47,8 @@ export default function UserForm({
   const { t } = useTranslation(lng, [namespace, "validation", "common"]);
   const path = usePathname();
   const searchParams = useSearchParams();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const ctxUser = useUser();
 
@@ -215,10 +217,8 @@ export default function UserForm({
     }
   }, [email, lng, t]);
 
-  const { dispatch } = useContext(MessageContext);
-  const { closeDialog } = useDialogStore();
-
-  const [showPassword, setShowPassword] = useState(false);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   if (loadingFile)
     return (
@@ -251,11 +251,7 @@ export default function UserForm({
               return methods.setError("avatar", { message: error });
             }
 
-            let state: {
-              success: boolean;
-              message: string;
-              errors?: Record<string, string>;
-            };
+            let state;
             if (path.includes("register")) {
               state = await register({
                 url: searchParams.get("url")?.toString(),
@@ -273,7 +269,7 @@ export default function UserForm({
                 organization: val.organization ? val.organization : undefined,
                 access: val.access,
                 password: val.password ? val.password : undefined,
-                telephone: val.telephone ? val.telephone : undefined,
+                telephone: val.telephone ? val.telephone : null,
                 studyProgramme: val.studyProgramme as StudyProgramme,
                 cvUrl: url,
                 avatarUrl,
@@ -290,41 +286,29 @@ export default function UserForm({
               });
             }
 
-            if (state && !state.success) {
-              if (state.errors) {
-                for (const [key, value] of Object.entries(state.errors)) {
-                  methods.setError(
-                    key as "email",
-                    {
-                      message: value,
-                    },
-                    { shouldFocus: true }
-                  );
-                }
-              } else {
-                dispatch({
-                  type: ActionTypes.SetFormMsg,
-                  payload: state,
-                });
+            if (state?.errors) {
+              for (const [key, value] of Object.entries(state.errors)) {
+                methods.setError(
+                  key as keyof (typeof methods)["formState"]["errors"],
+                  {
+                    message: value,
+                  },
+                  { shouldFocus: true }
+                );
               }
             }
 
-            if (state && state.success) {
-              dispatch({
-                type: ActionTypes.SetAppMsg,
-                payload: state,
-              });
+            if (state) {
+              setMessage(state.message, state.success);
+            }
 
-              if (dialogId) {
-                closeDialog(dialogId);
-              }
+            if (state?.success && dialogId) {
+              closeDialog(dialogId);
             }
           },
           (errors) => console.log(errors)
         )}
       >
-        <FormMessage />
-
         {path.includes("update") && <AvatarInput name="avatar" label="Fotka" />}
 
         <Input label={t("name")} name="name" autoComplete="name" />

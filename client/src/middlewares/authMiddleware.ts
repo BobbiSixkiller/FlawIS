@@ -2,7 +2,6 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chainMiddleware";
 
 const publicPaths = [
-  "/",
   "/login",
   "/register",
   "/forgotPassword",
@@ -34,6 +33,8 @@ export function withAuth(middleware: CustomMiddleware) {
       publicPaths.some((path) => path === pathWithoutLocale) &&
       pathWithoutLocale !== "/"
     ) {
+      console.log("RUNS");
+
       let redirectTo = "/";
       const referer = req.headers.get("referer");
 

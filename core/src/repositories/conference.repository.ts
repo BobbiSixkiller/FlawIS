@@ -1,11 +1,10 @@
 import { Service } from "typedi";
-
-import { Repository } from "./repository";
+import { Repository } from "./base.repository";
 import { Conference } from "../entitites/Conference";
 import {
   ConferenceArgs,
   ConferenceConnection,
-} from "../resolvers/types/conference";
+} from "../resolvers/types/conference.types";
 
 @Service()
 export class ConferenceRepository extends Repository<typeof Conference> {
