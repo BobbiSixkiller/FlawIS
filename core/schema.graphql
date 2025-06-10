@@ -376,6 +376,8 @@ input LocalizedTicketInputs {
 }
 
 type Mutation {
+  """Adds currently logged in user as the co-author of a submission"""
+  acceptAuthorInvite: SubmissionMutationResponse!
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!

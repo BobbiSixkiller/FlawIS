@@ -1,6 +1,5 @@
 import { Service } from "typedi";
 import { Access, User as UserEntity } from "../entitites/User";
-import { v4 as uuidv4 } from "uuid";
 import { signJwt, verifyJwt } from "../util/auth";
 import {
   RegisterUserInput,
@@ -8,15 +7,15 @@ import {
   UserConnection,
 } from "../resolvers/types/user.types";
 import { RmqService } from "./rmq.service";
-import { RedisService } from "./redis.service";
 import { I18nService } from "./i18n.service";
 import { ObjectId } from "mongodb";
-import { ResetToken, User as CtxUser } from "../util/types";
+import { CtxUser, ResetToken } from "../util/types";
 import { DocumentType, mongoose } from "@typegoose/typegoose";
 import { compare } from "bcrypt";
 import { OAuth2Client } from "google-auth-library";
 import { UserRepository } from "../repositories/user.repository";
 import { ArgumentValidationError } from "type-graphql";
+import { TokenService } from "./token.service";
 
 type UserDTO = Omit<UserEntity, "password">;
 
@@ -46,8 +45,8 @@ function toUserDTO(doc: DocumentType<UserEntity>) {
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly tokenService: TokenService,
     private readonly rmqService: RmqService,
-    private readonly redisService: RedisService,
     private readonly i18nService: I18nService,
     private readonly googleOAuthClient = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
@@ -55,35 +54,6 @@ export class UserService {
       process.env.GOOGLE_REDIRECT_URI
     )
   ) {}
-
-  // Generate a one-time-use token
-  private async generateOneTimeToken(expiresIn: number) {
-    const tokenId = uuidv4();
-    const token = signJwt({ tokenId }, { expiresIn });
-
-    // Store token ID in Redis
-    await this.redisService.set(tokenId, "valid", expiresIn);
-    return token;
-  }
-
-  // Verify a one-time-use token
-  private async verifyOneTimeToken(token: string) {
-    const decoded = verifyJwt<{ tokenId: string }>(token);
-    if (!decoded) {
-      throw new Error("Token has been malformed or expired");
-    }
-
-    // Check if the token ID is still valid in Redis
-    const tokenStatus = await this.redisService.get(decoded?.tokenId);
-    if (tokenStatus !== "valid") {
-      throw new Error("Token has already been used");
-    }
-
-    // Mark the token ID as used
-    await this.redisService.delete(decoded.tokenId);
-
-    return decoded; // Token is valid
-  }
 
   async getUser(id: ObjectId) {
     const user = await this.userRepository.findOne({ _id: id });
@@ -104,7 +74,9 @@ export class UserService {
 
   async sendRegistrationLinks(emails: string[], hostname: string) {
     for await (const email of emails) {
-      const token = await this.generateOneTimeToken(60 * 60 * 24 * 7); // Token valid for 7 days
+      const token = await this.tokenService.generateOneTimeToken(
+        60 * 60 * 24 * 7
+      ); // Token valid for 7 days
       const locale = this.i18nService.language();
 
       await this.rmqService.produceMessage(
@@ -129,7 +101,7 @@ export class UserService {
     }
     if (hostname?.includes("intern")) {
       if (token && token !== "undefined") {
-        await this.verifyOneTimeToken(token);
+        await this.tokenService.verifyOneTimeToken(token);
         access.push(Access.Organization);
       } else {
         access.push(Access.Student);

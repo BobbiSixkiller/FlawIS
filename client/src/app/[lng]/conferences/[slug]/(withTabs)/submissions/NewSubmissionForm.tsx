@@ -1,9 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Button from "@/components/Button";
@@ -20,7 +18,6 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { createSubmission } from "./actions";
-import { FormMessage } from "@/components/Message";
 import { useMessageStore } from "@/stores/messageStore";
 
 export default function NewSubmissionForm({
@@ -34,8 +31,6 @@ export default function NewSubmissionForm({
   lng: string;
   dialogId: string;
 }) {
-  const { dispatch } = useContext(MessageContext);
-
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
   const { yup } = useValidation();
@@ -99,22 +94,21 @@ export default function NewSubmissionForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await createSubmission(data);
-          console.log(state);
-
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
+          const res = await createSubmission(data);
+          console.log(res);
+          if (res.errors) {
+            for (const [key, val] of Object.entries(res.errors)) {
+              methods.setError(
+                key as keyof typeof methods.formState.errors,
+                { message: val },
+                { shouldFocus: true }
+              );
+            }
           }
 
-          if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
+          setMessage(res.message, res.success);
 
+          if (res.success) {
             closeDialog(dialogId);
           }
         })}

@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import {
   Arg,
-  AuthenticationError,
   Authorized,
   Ctx,
   FieldResolver,
@@ -13,40 +12,36 @@ import {
 import { Service } from "typedi";
 
 import { Context } from "../util/auth";
-import { LoadResource } from "../util/decorators";
 import {
   SubmissionInput,
   SubmissionMutationResponse,
 } from "./types/submission.types";
-import { DocumentType } from "@typegoose/typegoose";
 import { Submission, SubmissionTranslation } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { Section } from "../entitites/Section";
-import { Access, User } from "../entitites/User";
+import { User } from "../entitites/User";
 import { I18nService } from "../services/i18n.service";
-import { RmqService } from "../services/rmq.service";
 import { Repository } from "../repositories/base.repository";
+import { ConferenceRepository } from "../repositories/conference.repository";
+import { UserRepository } from "../repositories/user.repository";
+import { SubmissionService } from "../services/submission.service";
 
-//refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
+// Refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
 @Resolver(() => Submission)
 export class SubmissionResolver {
   constructor(
-    private readonly submissionService = new Repository(Submission),
-    private readonly conferenceService = new Repository(Conference),
+    private readonly submissionService: SubmissionService,
+    private readonly conferenceRepository: ConferenceRepository,
     private readonly sectionService = new Repository(Section),
-    private readonly userService = new Repository(User),
-    private readonly i18nService: I18nService,
-    private readonly rmqService: RmqService
+    private readonly userRepository: UserRepository,
+    private readonly i18nService: I18nService
   ) {}
 
   @Authorized()
   @Query(() => Submission)
-  async submission(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Submission) submission: DocumentType<Submission>
-  ): Promise<Submission> {
-    return submission;
+  async submission(@Arg("id") id: ObjectId) {
+    return await this.submissionService.getSubmission(id);
   }
 
   @Authorized()
@@ -54,47 +49,13 @@ export class SubmissionResolver {
   async createSubmission(
     @Arg("data") data: SubmissionInput,
     @Ctx() { user, req }: Context
-  ): Promise<SubmissionMutationResponse> {
-    const submission = await this.submissionService.create({
-      ...data,
-      authors: [user?.id],
-    });
-
-    if (data.authors.length !== 0) {
-      const conference = await this.conferenceService.findOne({
-        _id: submission.conference,
-      });
-
-      data.authors?.forEach((author) =>
-        this.rmqService.produceMessage(
-          JSON.stringify({
-            locale: this.i18nService.language(),
-            hostname: req.headers["tenant-domain"],
-            name: user?.name,
-            email: author,
-            conferenceName:
-              conference?.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].name,
-            conferenceSlug: conference?.slug,
-            submissionId: submission.id,
-            submissionName:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].name,
-            submissionAbstract:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].abstract,
-            submissionKeywords:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].keywords,
-          }),
-          "mail.conference.coAuthor"
-        )
-      );
-    }
+  ) {
+    const hostname = req.headers["tenant-domain"] as string;
+    const submission = await this.submissionService.createSubmission(
+      hostname,
+      user!,
+      data
+    );
 
     return {
       data: submission,
@@ -110,59 +71,17 @@ export class SubmissionResolver {
   @Authorized()
   @Mutation(() => SubmissionMutationResponse)
   async updateSubmission(
-    @Arg("id") _id: ObjectId,
+    @Arg("id") id: ObjectId,
     @Arg("data") data: SubmissionInput,
-    @LoadResource(Submission) submission: DocumentType<Submission>,
     @Ctx() { user, req }: Context
-  ): Promise<SubmissionMutationResponse> {
-    for (const [key, value] of Object.entries(data)) {
-      if (key !== "authors") {
-        submission[key as keyof Submission] = value;
-      }
-    }
-
-    await this.submissionService.update(
-      { _id: submission.id },
-      { $addToSet: { authors: user?.id } }
+  ) {
+    const hostname = req.headers["tenant-domain"] as string;
+    const submission = await this.submissionService.updateSubmission(
+      id,
+      hostname,
+      user!,
+      data
     );
-
-    if (data.authors.length !== 0) {
-      const conference = await this.conferenceService.findOne({
-        _id: submission.conference,
-      });
-
-      data.authors?.forEach((author) =>
-        this.rmqService.produceMessage(
-          JSON.stringify({
-            locale: this.i18nService.language(),
-            hostname: req.headers["tenant-domain"],
-            name: user?.name,
-            email: author,
-            conferenceName:
-              conference?.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].name,
-            conferenceSlug: conference?.slug,
-            submissionId: submission.id,
-            submissionName:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].name,
-            submissionAbstract:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].abstract,
-            submissionKeywords:
-              submission.translations[
-                this.i18nService.language() as "sk" | "en"
-              ].keywords,
-          }),
-          "mail.conference.coAuthor"
-        )
-      );
-    }
-
-    await submission.save();
 
     return {
       message: this.i18nService.translate("update", {
@@ -177,21 +96,8 @@ export class SubmissionResolver {
 
   @Authorized()
   @Mutation(() => SubmissionMutationResponse)
-  async deleteSubmission(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Submission) submission: DocumentType<Submission>,
-    @Ctx() { user }: Context
-  ): Promise<SubmissionMutationResponse> {
-    if (
-      !user?.access.includes(Access.Admin) &&
-      !submission.authors.includes(user!.id)
-    ) {
-      throw new AuthenticationError(
-        this.i18nService.translate("401", { ns: "common" })
-      );
-    }
-
-    await this.submissionService.delete({ _id: submission.id });
+  async deleteSubmission(@Arg("id") id: ObjectId, @Ctx() { user }: Context) {
+    const submission = await this.submissionService.deleteSubmission(id, user!);
 
     return {
       message: this.i18nService.translate("delete", {
@@ -204,21 +110,36 @@ export class SubmissionResolver {
     };
   }
 
+  @Authorized()
+  @Mutation(() => SubmissionMutationResponse, {
+    description:
+      "Adds currently logged in user as the co-author of a submission",
+  })
+  async acceptAuthorInvite(@Ctx() { req, user }: Context) {
+    const token = req.headers["token"] as string;
+    const submission = await this.submissionService.addCoAuthor(token, user!);
+
+    return {
+      message: this.i18nService.translate("update", {
+        ns: "submission",
+        name: submission.translations[
+          this.i18nService.language() as keyof SubmissionTranslation
+        ].name,
+      }),
+      data: submission,
+    };
+  }
+
   @Authorized(["ADMIN"])
   @Mutation(() => SubmissionMutationResponse)
   async removeAuthor(
-    @Arg("id") _id: ObjectId,
-    @Arg("authorId") authorId: ObjectId,
-    @LoadResource(Submission) submission: DocumentType<Submission>
+    @Arg("id") id: ObjectId,
+    @Arg("authorId") authorId: ObjectId
   ): Promise<SubmissionMutationResponse> {
-    submission.authors = submission.authors.filter(
-      (a) => a.toString() !== authorId.toString()
-    );
-
-    await submission.save();
+    const submission = await this.submissionService.removeAuthor(id, authorId);
 
     return {
-      message: this.i18nService.translate("authorRemoved", {
+      message: this.i18nService.translate("update", {
         ns: "submission",
         name: submission.translations[
           this.i18nService.language() as keyof SubmissionTranslation
@@ -231,7 +152,7 @@ export class SubmissionResolver {
   @Authorized()
   @FieldResolver(() => Conference, { nullable: true })
   async conference(@Root() { conference }: Submission) {
-    return await this.conferenceService.findOne({ _id: conference });
+    return await this.conferenceRepository.findOne({ _id: conference });
   }
 
   @Authorized()
@@ -243,6 +164,6 @@ export class SubmissionResolver {
   @Authorized()
   @FieldResolver(() => [User])
   async authors(@Root() { authors }: Submission) {
-    return await this.userService.findAll({ _id: { $in: authors } });
+    return await this.userRepository.findAll({ _id: { $in: authors } });
   }
 }

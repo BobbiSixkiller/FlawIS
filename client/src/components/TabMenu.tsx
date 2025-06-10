@@ -33,7 +33,7 @@ export default function TabMenu({ tabs }: { tabs: TabProps[] }) {
                 {tab.name}
               </Link>
               {segment === segmentFromHref || (!segment && i === 0) ? (
-                <div className="h-1 z-10 rounded-full bg-primary-500 absolute bottom-0 left-0 right-0" />
+                <div className="h-1 z-10 rounded-full bg-primary-500 dark:bg-primary-300 absolute bottom-0 left-0 right-0" />
               ) : null}
             </div>
           );

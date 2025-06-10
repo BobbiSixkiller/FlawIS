@@ -7,10 +7,10 @@ import {
   InternshipInput,
 } from "../resolvers/types/internship.types";
 import { I18nService } from "./i18n.service";
-import { User } from "../util/types";
 import { UserService } from "./user.service";
 import { DocumentType } from "@typegoose/typegoose";
 import { InternshipRepository } from "../repositories/internship.repository";
+import { CtxUser } from "../util/types";
 
 function toInternshipDTO(doc: DocumentType<Internship>) {
   const json = doc.toJSON({
@@ -57,7 +57,7 @@ export class InternshipService {
     return toInternshipDTO(internship);
   }
 
-  async createInternship(data: InternshipInput, ctxUser: User) {
+  async createInternship(data: InternshipInput, ctxUser: CtxUser) {
     const user = await this.userService.getUser(ctxUser.id);
     if (!user.organization) {
       throw new Error("User has to have organization defined!");

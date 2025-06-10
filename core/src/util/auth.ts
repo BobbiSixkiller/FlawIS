@@ -2,17 +2,18 @@ import { Request, Response } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
 
 import { AuthChecker } from "type-graphql";
-import { User } from "./types";
 
 import env from "dotenv";
 import { ExpressContextFunctionArgument } from "@apollo/server/dist/esm/express4";
+import { CtxUser } from "./types";
+import { Access } from "../entitites/User";
 
 env.config();
 
 export interface Context {
   req: Request;
   res: Response;
-  user: User | null;
+  user: CtxUser | null;
   locale: string;
 }
 
@@ -47,7 +48,7 @@ export function signJwt(object: Object, options?: SignOptions | undefined) {
   });
 }
 
-export function verifyJwt<T>(token: string): T | null {
+export function verifyJwt<T>(token: string) {
   try {
     const decoded = verify(token, process.env.SECRET || "JWT_SECRET") as T;
     return decoded;
@@ -69,7 +70,7 @@ export const authChecker: AuthChecker<Context> = (
   if (!user) return false;
 
   //check if user role matches the defined role
-  if (roles.some((role) => user.access.includes(role))) return true;
+  if (roles.some((role) => user.access.includes(role as Access))) return true;
 
   //no roles matched
   return false;

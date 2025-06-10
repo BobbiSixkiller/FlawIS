@@ -38,6 +38,8 @@ import { User } from "../entitites/User";
 import { RmqService } from "../services/rmq.service";
 import { Repository } from "../repositories/base.repository";
 import { ConferenceRepository } from "../repositories/conference.repository";
+import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
+import { UserRepository } from "../repositories/user.repository";
 
 @Service()
 @Resolver(() => Conference)
@@ -45,8 +47,8 @@ export class ConferencerResolver {
   constructor(
     private readonly conferenceRepository: ConferenceRepository,
     private readonly sectionService = new Repository(Section),
-    private readonly attendeeService = new Repository(Attendee),
-    private readonly userService = new Repository(User),
+    private readonly attendeeRepository: AttendeeRepository,
+    private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService
   ) {}
@@ -136,7 +138,7 @@ export class ConferencerResolver {
   @Authorized()
   @FieldResolver(() => Attendee)
   async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
-    return await this.attendeeService.findOne({
+    return await this.attendeeRepository.findOne({
       "conference._id": id,
       "user._id": user?.id,
     });
@@ -239,7 +241,7 @@ export class ConferencerResolver {
     const priceWithouTax = ticket.price / Number(process.env.VAT || 1.23);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
-    await this.userService.update(
+    await this.userRepository.update(
       { _id: user?.id },
       {
         $addToSet: { billings: billing },
@@ -247,7 +249,7 @@ export class ConferencerResolver {
       { upsert: true }
     );
 
-    const attendee = await this.attendeeService.create({
+    const attendee = await this.attendeeRepository.create({
       conference: { _id: conference.id, slug: conference.slug },
       user: { _id: user?.id, name: user?.name, email: user?.email },
       ticket,

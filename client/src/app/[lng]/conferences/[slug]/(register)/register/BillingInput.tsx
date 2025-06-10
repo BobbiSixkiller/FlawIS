@@ -62,8 +62,6 @@ export default function BillingInput({
     });
   };
 
-  console.log(error);
-
   return (
     <div>
       <label

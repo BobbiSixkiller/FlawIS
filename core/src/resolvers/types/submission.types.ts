@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsEmail, IsString } from "class-validator";
+import { ArrayMinSize, IsEmail, IsMongoId, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
 import { LocalesInput } from "./translation.types";

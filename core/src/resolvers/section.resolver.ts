@@ -28,7 +28,7 @@ import { SubmissionRepository } from "../repositories/submission.repository";
 export class SectionResolver {
   constructor(
     private readonly conferenceRepository: ConferenceRepository,
-    private readonly sectionService = new Repository(Section),
+    private readonly sectionRepository = new Repository(Section),
     private readonly submissionRepository: SubmissionRepository,
     private readonly i18nService: I18nService
   ) {}
@@ -38,7 +38,7 @@ export class SectionResolver {
   async createSection(
     @Arg("data") data: SectionInput
   ): Promise<SectionMutationResponse> {
-    const section = await this.sectionService.create(data);
+    const section = await this.sectionRepository.create(data);
 
     return {
       data: section,
@@ -81,7 +81,7 @@ export class SectionResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Section) section: DocumentType<Section>
   ): Promise<SectionMutationResponse> {
-    await this.sectionService.delete({ _id: section.id });
+    await this.sectionRepository.delete({ _id: section.id });
 
     return {
       data: section,

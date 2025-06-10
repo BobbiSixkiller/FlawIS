@@ -4,6 +4,5 @@
   "new": "Príspevok {{name}} bol vytvorený.",
   "delete": "Príspevok {{name}} bola vymazaný.",
   "skNameExists": "Príspevok s názvom {{name}} po slovensky už existuje!",
-  "enNameExists": "Príspevok s názvom {{name}} po anglicky už existuje!",
-  "authorRemoved": "Autor bol vymazaný."
+  "enNameExists": "Príspevok s názvom {{name}} po anglicky už existuje!"
 }

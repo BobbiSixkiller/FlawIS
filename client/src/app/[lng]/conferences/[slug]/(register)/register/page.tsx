@@ -1,12 +1,9 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
-import { PresentationLng } from "@/lib/graphql/generated/graphql";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import {
-  getSubmission,
-  updateSubmission,
-} from "../../(withTabs)/submissions/actions";
+import { getSubmission } from "../../(withTabs)/submissions/actions";
+import { acceptAuthorInvite } from "./actions";
 
 export default async function RegisterPage({
   params: { lng, slug },
@@ -15,6 +12,7 @@ export default async function RegisterPage({
   params: { slug: string; lng: string };
   searchParams: {
     submission?: string;
+    token?: string;
   };
 }) {
   const [conference, submission, user] = await Promise.all([
@@ -23,24 +21,16 @@ export default async function RegisterPage({
     getMe(),
   ]);
 
-  if (conference && conference.attending && !submission) {
+  if (conference?.attending && !submission) {
     redirect(`/${slug}`);
   }
 
   if (
-    conference &&
-    conference.attending &&
-    conference.attending.ticket.withSubmission &&
-    submission
+    conference?.attending?.ticket.withSubmission &&
+    submission &&
+    searchParams.token
   ) {
-    await updateSubmission(submission.id, {
-      conference: submission.conference.id,
-      authors: [],
-      section: submission.section.id,
-      translations: submission.translations,
-      presentationLng:
-        submission.presentationLng || (lng.toUpperCase() as PresentationLng),
-    });
+    await acceptAuthorInvite(searchParams.token);
 
     redirect(`/${slug}`);
   }

@@ -20,20 +20,21 @@ import {
 import { ObjectId } from "mongodb";
 import { LoadResource } from "../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
-import { User } from "../entitites/User";
 import { Submission } from "../entitites/Submission";
 import { Conference } from "../entitites/Conference";
 import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
-import { Repository } from "../repositories/base.repository";
+import { ConferenceRepository } from "../repositories/conference.repository";
+import { UserRepository } from "../repositories/user.repository";
+import { SubmissionRepository } from "../repositories/submission.repository";
 
 @Service()
 @Resolver(() => Attendee)
 export class AttendeeResolver {
   constructor(
     private readonly attendeeRepository: AttendeeRepository,
-    private readonly conferenceService = new Repository(Conference),
-    private readonly userService = new Repository(User),
-    private readonly submissionService = new Repository(Submission),
+    private readonly conferenceRepository: ConferenceRepository,
+    private readonly userRepository: UserRepository,
+    private readonly submissionRepository: SubmissionRepository,
     private readonly i18nService: I18nService
   ) {}
 
@@ -107,7 +108,7 @@ export class AttendeeResolver {
   async user(
     @Root() { user: userStub }: Attendee
   ): Promise<typeof UserStubUnion> {
-    const user = await this.userService.findOne({ _id: userStub.id });
+    const user = await this.userRepository.findOne({ _id: userStub.id });
     if (user) {
       return user;
     } else {
@@ -118,7 +119,7 @@ export class AttendeeResolver {
   @Authorized()
   @FieldResolver(() => Conference)
   async conference(@Root() { conference: { id } }: Attendee) {
-    return this.conferenceService.findOne({ _id: id });
+    return this.conferenceRepository.findOne({ _id: id });
   }
 
   @Authorized()
@@ -126,7 +127,7 @@ export class AttendeeResolver {
   async submissions(
     @Root() { user: { id: userId }, conference: { id: conferenceId } }: Attendee
   ) {
-    return await this.submissionService.findAll({
+    return await this.submissionRepository.findAll({
       conference: conferenceId,
       authors: userId,
     });

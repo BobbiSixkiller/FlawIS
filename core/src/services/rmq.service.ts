@@ -21,8 +21,9 @@ const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
 
 @Service()
 export class RmqService {
-  private connection?: amqp.ChannelModel;
+  private connection?: amqp.ChannelModel; // FIXED TYPE
   private channel?: amqp.Channel;
+  private initializing: Promise<void> | null = null;
 
   constructor() {
     this.init(); // Initialize connection and channel on service creation
@@ -68,8 +69,13 @@ export class RmqService {
   }
 
   private async init() {
-    await this.createConnection();
-    await this.createChannel();
+    if (this.initializing) return this.initializing;
+    this.initializing = (async () => {
+      await this.createConnection();
+      await this.createChannel();
+    })();
+    await this.initializing;
+    this.initializing = null;
   }
 
   private retryInit() {
@@ -84,9 +90,14 @@ export class RmqService {
     }
 
     if (this.channel) {
-      this.channel.publish(exchange, key, Buffer.from(msg), {
-        persistent: true,
-      });
+      try {
+        this.channel.publish(exchange, key, Buffer.from(msg), {
+          persistent: true,
+        });
+      } catch (err) {
+        console.error("Failed to publish RMQ message:", err);
+        // Optionally retry or queue message locally
+      }
     } else {
       console.error("Failed to publish message: RMQ channel is unavailable.");
     }

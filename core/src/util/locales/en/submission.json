@@ -4,6 +4,5 @@
   "new": "Submission {{name}} has been created.",
   "delete": "Submission {{name}} has been deleted.",
   "skNameExists": "Submission name {{name}} in Slovak is already taken!",
-  "enNameExists": "Submission name {{name}} in English is already taken!",
-  "authorRemoved": "Author has been remved."
+  "enNameExists": "Submission name {{name}} in English is already taken!"
 }

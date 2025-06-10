@@ -3,8 +3,7 @@
 import { WizzardForm, WizzardStep } from "@/components/WIzzardForm";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext, useState } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
+import { useState } from "react";
 import { addAttendee } from "./actions";
 import {
   AttendeeInput,
@@ -25,6 +24,7 @@ import {
 } from "@/components/MultipleInput";
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -40,12 +40,12 @@ export default function ConferenceRegistrationForm({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { dispatch } = useContext(MessageContext);
   const [submissionStep, setSubmissionStep] = useState(false);
 
   const { t } = useTranslation(lng, ["validation", "conferences"]);
 
   const { yup } = useValidation();
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <WizzardForm<AttendeeInput & { submission: SubmissionInput }>
@@ -86,28 +86,22 @@ export default function ConferenceRegistrationForm({
         },
       }}
       onSubmitCb={async (data) => {
-        const state = await addAttendee(
+        const res = await addAttendee(
           {
             ticketId: data.ticketId,
             conferenceId: data.conferenceId,
             billing: data.billing,
           },
           searchParams.get("submission"),
+          searchParams.get("token"),
           submissionStep ? data.submission : undefined
         );
 
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
+        console.log(res);
 
-        if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
+        setMessage(res.message, res.success);
+
+        if (res.success) {
           router.push(`/${conference.slug}`);
         }
       }}

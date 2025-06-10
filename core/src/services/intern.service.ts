@@ -3,7 +3,6 @@ import { Intern, Status } from "../entitites/Internship";
 import { InternArgs } from "../resolvers/types/internship.types";
 import { ObjectId } from "mongodb";
 import { I18nService } from "./i18n.service";
-import { User } from "../util/types";
 import { InternshipService } from "./internship.service";
 import { getAcademicYear } from "../util/helpers";
 import { Access } from "../entitites/User";
@@ -13,6 +12,7 @@ import { MinioService } from "./minio.service";
 import mongoose from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
 import { InternRepository } from "../repositories/intern.repository";
+import { CtxUser } from "../util/types";
 
 function toInternDTO(doc: DocumentType<Intern>) {
   const json = doc.toJSON({
@@ -212,7 +212,7 @@ export class InternService {
     }
   }
 
-  async updateFiles(fileUrls: string[], id: ObjectId, user: User) {
+  async updateFiles(fileUrls: string[], id: ObjectId, user: CtxUser) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -245,7 +245,7 @@ export class InternService {
     }
   }
 
-  async deleteIntern(id: ObjectId, user: User) {
+  async deleteIntern(id: ObjectId, ctxUser: CtxUser) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -260,10 +260,10 @@ export class InternService {
         );
       }
       if (
-        user.access.includes(Access.Student) &&
-        intern.user.id.toString() !== user.id.toString()
+        ctxUser.access.includes(Access.Student) &&
+        intern.user.id.toString() !== ctxUser.id.toString()
       ) {
-        console.log(intern.user.id.toString(), user.id.toString());
+        console.log(intern.user.id.toString(), ctxUser.id.toString());
         throw new Error("Not allowed!");
       }
 
@@ -282,7 +282,7 @@ export class InternService {
 
   async updateOrganizationFeedbackUrl(
     id: ObjectId,
-    user: User,
+    user: CtxUser,
     fileUrl: string
   ) {
     const session = await mongoose.startSession();

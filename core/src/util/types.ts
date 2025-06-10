@@ -1,13 +1,8 @@
-import { ObjectId } from "mongodb";
 import { Conference, Ticket } from "../entitites/Conference";
 import { DocumentType } from "@typegoose/typegoose";
+import { User } from "../entitites/User";
 
-export type User = {
-  id: ObjectId;
-  name: string;
-  email: string;
-  access: string[];
-};
+export type CtxUser = Pick<User, "id" | "email" | "name" | "access">;
 
 export type ResetToken = {
   id: string;

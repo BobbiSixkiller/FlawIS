@@ -71,3 +71,12 @@ mutation removeAuthor($id: ObjectId!, $authorId: ObjectId!) {
     }
   }
 }
+
+mutation acceptAuthorInvite {
+  acceptAuthorInvite {
+    message
+    data {
+      ...Submission
+    }
+  }
+}

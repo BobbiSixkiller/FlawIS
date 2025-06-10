@@ -172,7 +172,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.conferenceSlug}/register?submission=${
       msg.submissionId
-    }`;
+    }&token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -189,7 +189,6 @@ export class EmailService {
         i18nLang: msg.locale,
         conferenceName: msg.conferenceName,
         conferenceSlug: msg.conferenceSlug,
-        submissionId: msg.submissionId,
         submissionName: msg.submissionName,
         submissionAbstract: msg.submissionAbstract,
         submissionKeywords: msg.submissionKeywords,

@@ -420,6 +420,8 @@ export type LocalizedTicketInputs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Adds currently logged in user as the co-author of a submission */
+  acceptAuthorInvite: SubmissionMutationResponse;
   activateUser: UserMutationResponse;
   addAttendee: ConferenceMutationResponse;
   changeInternStatus: InternMutationResponse;
@@ -1439,6 +1441,11 @@ export type RemoveAuthorMutationVariables = Exact<{
 
 
 export type RemoveAuthorMutation = { __typename?: 'Mutation', removeAuthor: { __typename?: 'SubmissionMutationResponse', message: string, data: { __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } } } };
+
+export type AcceptAuthorInviteMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AcceptAuthorInviteMutation = { __typename?: 'Mutation', acceptAuthorInvite: { __typename?: 'SubmissionMutationResponse', message: string, data: { __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } } } };
 
 export type UsersQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
@@ -4131,6 +4138,63 @@ fragment Submission on Submission {
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<RemoveAuthorMutation, RemoveAuthorMutationVariables>;
+export const AcceptAuthorInviteDocument = new TypedDocumentString(`
+    mutation acceptAuthorInvite {
+  acceptAuthorInvite {
+    message
+    data {
+      ...Submission
+    }
+  }
+}
+    fragment Section on Section {
+  id
+  conference {
+    id
+    slug
+  }
+  translations {
+    sk {
+      name
+      topic
+    }
+    en {
+      name
+      topic
+    }
+  }
+}
+fragment Submission on Submission {
+  id
+  translations {
+    sk {
+      name
+      abstract
+      keywords
+    }
+    en {
+      name
+      abstract
+      keywords
+    }
+  }
+  presentationLng
+  authors {
+    id
+    name
+    email
+  }
+  fileUrl
+  conference {
+    id
+    slug
+  }
+  section {
+    ...Section
+  }
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<AcceptAuthorInviteMutation, AcceptAuthorInviteMutationVariables>;
 export const UsersDocument = new TypedDocumentString(`
     query users($after: ObjectId, $first: Int) {
   users(after: $after, first: $first) {
