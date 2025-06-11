@@ -200,6 +200,7 @@ export class UserService {
             name: payload.name,
             email: payload.email,
             verified: payload.email_verified,
+            access: Access.ConferenceAttendee,
           });
         }
         if (!user) {
