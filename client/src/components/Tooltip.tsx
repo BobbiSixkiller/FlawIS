@@ -36,7 +36,7 @@ export default function Tooltip({
 
   const showTooltip = useCallback(
     (e: MouseEvent | TouchEvent) => {
-      if (openDialogs) return;
+      if (Object.values(openDialogs).some((val) => val)) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const top = position === "above" ? rect.top - 40 : rect.bottom;
       const left = rect.left + rect.width / 2;
@@ -66,19 +66,12 @@ export default function Tooltip({
     const overflowLeft = rect.left < 0;
 
     let newLeft = tooltipPosition.left;
-    let newWidth: number | undefined;
-
-    console.log(rect, viewportWidth);
-
-    newWidth = viewportWidth < rect.width ? viewportWidth : rect.width;
 
     if (overflowRight) {
       newLeft -= rect.right - viewportWidth + margin;
-      // newWidth = 150;
     } else if (overflowLeft) {
       newLeft += Math.abs(rect.left) + margin;
     } else {
-      console.log("DEF");
       newLeft -= 10;
     }
 
@@ -86,12 +79,6 @@ export default function Tooltip({
       ...prev,
       left: newLeft,
     }));
-
-    if (newWidth !== undefined) {
-      ref.current.style.width = `${newWidth}px`;
-    } else {
-      ref.current.style.width = "";
-    }
   }, [visible, ref, viewportWidth]);
 
   return (
@@ -113,7 +100,7 @@ export default function Tooltip({
             ref={ref}
             className={cn([
               position === "above" ? "mb-1" : "mt-1",
-              "absolute z-10 transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-pre-line",
+              "absolute z-10 transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-pre-wrap break-words max-w-[calc(100vw-28px)]",
             ])}
             style={{
               top: tooltipPosition.top,

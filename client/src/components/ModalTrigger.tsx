@@ -13,6 +13,10 @@ interface ModalTriggerProps {
   children: ReactElement;
   dialogId: string;
   onClick?: (e: any) => void;
+  onMouseEnter?: (e: any) => void;
+  onMouseLeave?: (e: any) => void;
+  onTouchStart?: (e: any) => void;
+  onTouchEnd?: (e: any) => void;
   className?: string;
 }
 
