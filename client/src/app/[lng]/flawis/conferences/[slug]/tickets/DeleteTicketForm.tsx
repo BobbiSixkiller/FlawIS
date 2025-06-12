@@ -1,12 +1,11 @@
 "use client";
 
-import { useContext } from "react";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { useParams } from "next/navigation";
 import { deleteTicket } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteTicketForm({
   ticket,
@@ -19,9 +18,8 @@ export default function DeleteTicketForm({
 }) {
   const { slug } = useParams();
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <form
@@ -29,19 +27,9 @@ export default function DeleteTicketForm({
       action={async (data) => {
         const state = await deleteTicket(null, data);
 
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
+        setMessage(state.message, state.success);
 
         if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
-
           closeDialog(dialogId);
         }
       }}

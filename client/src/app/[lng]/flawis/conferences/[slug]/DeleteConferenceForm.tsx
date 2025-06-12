@@ -1,22 +1,22 @@
 "use client";
 
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { useContext } from "react";
 import Button from "@/components/Button";
-import { useRouter } from "next/navigation";
-import { FormMessage } from "@/components/Message";
 import { deleteConference } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteConferenceForm({
   lng,
   conference,
+  dialogId,
 }: {
   lng: string;
+  dialogId: string;
   conference?: ConferenceFragment;
 }) {
-  const router = useRouter();
-  const { dispatch } = useContext(MessageContext);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <form
@@ -24,23 +24,13 @@ export default function DeleteConferenceForm({
       action={async (data) => {
         const state = await deleteConference(null, data);
 
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
+        setMessage(state.message, state.success);
 
         if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
-          router.back();
+          closeDialog(dialogId);
         }
       }}
     >
-      <FormMessage />
       <input type="hidden" name="id" value={conference?.id} />
 
       <h1>

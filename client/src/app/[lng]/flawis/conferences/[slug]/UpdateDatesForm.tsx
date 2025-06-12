@@ -1,18 +1,16 @@
 "use client";
 
 import Button from "@/components/Button";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { date, object, ref } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
 import { Input } from "@/components/Input";
-import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { updateConferenceDates } from "./actions";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function UpdateDatesForm({
   lng,
@@ -61,9 +59,8 @@ export default function UpdateDatesForm({
     ),
   });
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -72,25 +69,13 @@ export default function UpdateDatesForm({
         onSubmit={methods.handleSubmit(async (data) => {
           const state = await updateConferenceDates(conference!.slug, data);
 
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+          setMessage(state.message, state.success);
 
           if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
-
             closeDialog(dialogId);
           }
         })}
       >
-        <FormMessage />
-
         <Input
           type="datetime-local"
           name="start"

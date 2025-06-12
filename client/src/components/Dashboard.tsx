@@ -11,6 +11,7 @@ import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 import Avatar from "./Avatar";
 import { cn } from "@/utils/helpers";
+import { Snackbar } from "./Message";
 
 export default function Dashboard({
   children,
@@ -90,6 +91,8 @@ export default function Dashboard({
       <div className="hidden md:flex flex-col h-screen xl:w-full xl:max-w-sm sticky top-0">
         <Footer lng={lng} />
       </div>
+
+      <Snackbar />
     </div>
   );
 }

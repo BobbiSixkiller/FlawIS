@@ -1,54 +1,38 @@
 "use client";
 
-import { useContext, useTransition } from "react";
+import { useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { useRouter } from "next/navigation";
-import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import { deleteUser } from "./actions";
+import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteUserForm({
   user,
-  lng,
+  dialogId,
 }: {
   user: UserFragment;
-  lng: string;
+  dialogId: string;
 }) {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   function handleClick() {
     startTransition(async () => {
-      const state = await deleteUser(user.id);
+      const res = await deleteUser(user.id);
 
-      if (state.message && !state.success) {
-        dispatch({
-          type: ActionTypes.SetFormMsg,
-          payload: state,
-        });
-      }
+      setMessage(res.message, res.success);
 
-      if (state.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: state,
-        });
-        router.back();
+      if (res.success) {
+        closeDialog(dialogId);
       }
     });
   }
 
-  const { t } = useTranslation(lng, ["profile", "common"]);
-
-  const { dispatch } = useContext(MessageContext);
-
   return (
     <div className="space-y-6 mt-4 sm:w-96 mx-auto">
-      <FormMessage />
-
       <h1>Naozaj chcete zmazat pouzivatela {user.name} ?</h1>
 
       <Button

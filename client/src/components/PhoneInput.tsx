@@ -1,6 +1,6 @@
 "use client";
 
-import { HTMLInputTypeAttribute, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { Input } from "@headlessui/react";

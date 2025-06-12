@@ -1,12 +1,12 @@
 "use client";
 
-import { useContext, useTransition } from "react";
+import { useTransition } from "react";
 import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
 import { deleteAttendee } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import Spinner from "@/components/Spinner";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteAttendeeForm({
   attendee,
@@ -18,27 +18,16 @@ export default function DeleteAttendeeForm({
 }) {
   const [pending, startTransition] = useTransition();
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   function handleClik() {
     startTransition(async () => {
       const state = await deleteAttendee(attendee.id);
 
-      if (state.message && !state.success) {
-        dispatch({
-          type: ActionTypes.SetFormMsg,
-          payload: state,
-        });
-      }
+      setMessage(state.message, state.success);
 
       if (state.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: state,
-        });
-
         closeDialog(dialogId);
       }
     });

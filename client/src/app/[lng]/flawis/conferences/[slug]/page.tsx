@@ -109,7 +109,11 @@ export default async function ConferencePage({
         />
       </Modal>
       <Modal dialogId={deleteConfDialogId} title="Zmazat konferenciu">
-        <DeleteConferenceForm conference={conference} lng={lng} />
+        <DeleteConferenceForm
+          dialogId={deleteConfDialogId}
+          conference={conference}
+          lng={lng}
+        />
       </Modal>
     </div>
   );

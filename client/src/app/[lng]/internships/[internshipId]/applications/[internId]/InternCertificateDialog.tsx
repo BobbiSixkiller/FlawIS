@@ -8,15 +8,15 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { fetchFromMinio, uploadOrDelete } from "@/utils/helpers";
 import { InboxArrowDownIcon } from "@heroicons/react/24/outline";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { updateOrgFeedback } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function InternCertificateDialog({
   application,
@@ -71,8 +71,9 @@ export default function InternCertificateDialog({
     fetchFiles();
   }, []);
 
-  const { dispatch } = useContext(MessageContext);
-  const { openDialog, closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const openDialog = useDialogStore((s) => s.openDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <div>
@@ -102,12 +103,9 @@ export default function InternCertificateDialog({
                 }
                 if (url) {
                   const state = await updateOrgFeedback(application.id, url);
-                  if (!state.success && state.message) {
-                    dispatch({ type: ActionTypes.SetFormMsg, payload: state });
-                  }
+                  setMessage(state.message, state.success);
 
                   if (state.success) {
-                    dispatch({ type: ActionTypes.SetAppMsg, payload: state });
                     closeDialog(dialogId);
                   }
                 }

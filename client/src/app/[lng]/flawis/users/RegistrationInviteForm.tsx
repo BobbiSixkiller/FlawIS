@@ -7,12 +7,10 @@ import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
 import { useDialogStore } from "@/stores/dialogStore";
 import { sendInvites } from "./actions";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function RegistrationInviteForm({
   dialogId,
@@ -37,9 +35,8 @@ export default function RegistrationInviteForm({
 
   const { t } = useTranslation(lng, "common");
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -49,12 +46,9 @@ export default function RegistrationInviteForm({
           async (vals) => {
             const res = await sendInvites(vals.emails);
 
-            if (!res.success) {
-              dispatch({ type: ActionTypes.SetFormMsg, payload: res });
-            }
+            setMessage(res.message, res.success);
 
             if (res.success) {
-              dispatch({ type: ActionTypes.SetAppMsg, payload: res });
               closeDialog(dialogId);
             }
           },
@@ -63,8 +57,6 @@ export default function RegistrationInviteForm({
           }
         )}
       >
-        <FormMessage />
-
         <MultipleInput
           name="emails"
           placeholder="Pre pridanie adresy stlacte Enter..."

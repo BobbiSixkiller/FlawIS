@@ -38,6 +38,7 @@ export default function Tooltip({
     (e: MouseEvent | TouchEvent) => {
       if (Object.values(openDialogs).some((val) => val)) return;
       const rect = e.currentTarget.getBoundingClientRect();
+
       const top = position === "above" ? rect.top - 40 : rect.bottom;
       const left = rect.left + rect.width / 2;
 
@@ -61,11 +62,17 @@ export default function Tooltip({
   useEffect(() => {
     if (!visible || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const margin = 14; // small padding from edges
+    const margin = 14; // small margin from edges
     const overflowRight = rect.right > viewportWidth;
     const overflowLeft = rect.left < 0;
 
+    console.log(rect);
+
     let newLeft = tooltipPosition.left;
+    let newTop =
+      rect.height > 40 && position === "above"
+        ? tooltipPosition.top - (rect.height - 40 + 4)
+        : tooltipPosition.top;
 
     if (overflowRight) {
       newLeft -= rect.right - viewportWidth + margin;
@@ -77,6 +84,7 @@ export default function Tooltip({
 
     setTooltipPosition((prev) => ({
       ...prev,
+      top: newTop,
       left: newLeft,
     }));
   }, [visible, ref, viewportWidth]);

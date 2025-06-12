@@ -1,9 +1,7 @@
 import "../globals.css";
 import localFont from "next/font/local";
 import { dir } from "i18next";
-import MessageProvider from "@/providers/MessageProvider";
 import { cookies } from "next/headers";
-import { Snackbar } from "@/components/Message";
 
 const UKsans = localFont({
   src: [
@@ -54,7 +52,7 @@ export default async function RootLayout({
   return (
     <html lang={lng} dir={dir(lng)}>
       <body className={`${UKsans.className} ${theme === "dark" ? "dark" : ""}`}>
-        <MessageProvider>{children}</MessageProvider>
+        {children}
       </body>
     </html>
   );

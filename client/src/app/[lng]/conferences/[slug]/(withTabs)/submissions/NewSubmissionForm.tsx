@@ -95,7 +95,6 @@ export default function NewSubmissionForm({
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
           const res = await createSubmission(data);
-          console.log(res);
           if (res.errors) {
             for (const [key, val] of Object.entries(res.errors)) {
               methods.setError(

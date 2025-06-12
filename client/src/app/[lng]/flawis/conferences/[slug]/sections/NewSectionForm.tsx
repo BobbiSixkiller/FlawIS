@@ -2,8 +2,6 @@
 
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
@@ -12,7 +10,7 @@ import { createSection } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
-import { FormMessage } from "@/components/Message";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function NewSectionForm({
   conferenceId,
@@ -24,8 +22,6 @@ export default function NewSectionForm({
   dialogId: string;
 }) {
   const { slug } = useParams<{ slug: string }>();
-
-  const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "validation");
 
@@ -54,7 +50,8 @@ export default function NewSectionForm({
     },
   });
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -63,24 +60,13 @@ export default function NewSectionForm({
         onSubmit={methods.handleSubmit(async (data) => {
           const state = await createSection(data, slug);
 
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+          setMessage(state.message, state.success);
 
           if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
             closeDialog(dialogId);
           }
         })}
       >
-        <FormMessage />
-
         <LocalizedTextarea
           lng={lng}
           label="Nazov sekcie"

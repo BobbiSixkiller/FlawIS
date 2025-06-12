@@ -6,13 +6,12 @@ import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
 import Editor from "@/components/editor/Editor";
 import { createInternship, updateInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function InternshipForm({
   data,
@@ -260,7 +259,7 @@ export default function InternshipForm({
     ],
   };
 
-  const { dispatch } = useContext(MessageContext);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -280,19 +279,9 @@ export default function InternshipForm({
               state = await createInternship(vals);
             }
 
-            if (state && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: state,
-              });
-            }
+            setMessage(state.message, state.success);
 
             if (state && state.success) {
-              dispatch({
-                type: ActionTypes.SetAppMsg,
-                payload: state,
-              });
-
               closeDialog("create-internship");
               closeDialog("update-internship");
             }

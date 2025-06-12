@@ -1,18 +1,17 @@
 "use client";
 
 import { Status } from "@/lib/graphql/generated/graphql";
-import { ReactNode, useContext, useTransition } from "react";
+import { ReactNode, useTransition } from "react";
 import { changeInternStatus } from "./actions";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import Button, { VariantType } from "@/components/Button";
 import Spinner from "@/components/Spinner";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { FormMessage } from "@/components/Message";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ArrowUturnLeftIcon } from "@heroicons/react/20/solid";
 import Modal from "@/components/Modal";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 type TriggerButtonState = {
   icon: ReactNode;
@@ -49,18 +48,17 @@ export default function ChangeStatusDialog({
   const [pending, startTransition] = useTransition();
   const { internId: id, lng } = useParams<{ internId: string; lng: string }>();
 
-  const { openDialog, closeDialog } = useDialogStore();
-  const { dispatch } = useContext(MessageContext);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const openDialog = useDialogStore((s) => s.openDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   const handleClick = () =>
     startTransition(async () => {
-      const state = await changeInternStatus({ id, status });
-      if (!state.success) {
-        dispatch({ type: ActionTypes.SetFormMsg, payload: state });
-      }
+      const res = await changeInternStatus({ id, status });
 
-      if (state.success) {
-        dispatch({ type: ActionTypes.SetAppMsg, payload: state });
+      setMessage(res.message, res.success);
+
+      if (res.success) {
         closeDialog(status);
       }
     });
@@ -81,11 +79,11 @@ export default function ChangeStatusDialog({
 
       <Modal title="Zmenit status" dialogId={status}>
         <div className="space-y-6">
-          <FormMessage />
           <p>
             Naozaj si prajete zmenit stav prihlasky na{" "}
             {t(status).toLocaleLowerCase()} ?
           </p>
+
           <Button
             className="w-full"
             type="button"

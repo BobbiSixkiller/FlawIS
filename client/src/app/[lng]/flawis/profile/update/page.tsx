@@ -10,5 +10,9 @@ export default async function UpdateProfilePage(props: {
   const host = headers().get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
-  return <UserForm user={user} namespace="profile" subdomain={subdomain} />;
+  return (
+    <div className="flex justify-center items-center">
+      <UserForm user={user} namespace="profile" subdomain={subdomain} />
+    </div>
+  );
 }

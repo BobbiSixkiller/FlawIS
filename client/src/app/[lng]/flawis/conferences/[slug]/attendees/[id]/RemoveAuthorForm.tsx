@@ -4,12 +4,11 @@ import Button from "@/components/Button";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 
 import { useParams } from "next/navigation";
-import { useContext, useTransition } from "react";
+import { useTransition } from "react";
 import { removeAuthor } from "./actions";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
-import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function RemoveAuthor({
   author,
@@ -28,30 +27,16 @@ export default function RemoveAuthor({
 
   const [pending, startTransition] = useTransition();
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   function handleClick() {
     startTransition(async () => {
-      const { message, success } = await removeAuthor(
-        submission.id,
-        author.id,
-        { slug, id }
-      );
-      if (!success) {
-        dispatch({
-          type: ActionTypes.SetFormMsg,
-          payload: { message, success },
-        });
-      }
+      const res = await removeAuthor(submission.id, author.id, { slug, id });
 
-      if (success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: { message, success },
-        });
+      setMessage(res.message, res.success);
 
+      if (res.success) {
         closeDialog(dialogId);
       }
     });
@@ -59,8 +44,6 @@ export default function RemoveAuthor({
 
   return (
     <div className="space-y-6">
-      <FormMessage />
-
       <p>
         Naozaj chcete zmazat {author.name} ako autora prispevku{" "}
         {submission.translations[lng as "sk" | "en"].name} ?

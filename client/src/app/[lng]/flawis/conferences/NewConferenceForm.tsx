@@ -9,13 +9,12 @@ import { Input } from "@/components/Input";
 import { createConference } from "./actions";
 import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { LocalizedTextarea } from "@/components/Textarea";
 import ImageFileInput, {
   LocalizedImageFileInput,
 } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export interface ConferenceInputType {
   slug: string;
@@ -44,11 +43,10 @@ export default function NewConferenceForm({
   lng: string;
   dialogId: string;
 }) {
-  const { dispatch } = useContext(MessageContext);
-
   const { t } = useTranslation(lng, "validation");
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <WizzardForm<ConferenceInputType>
@@ -81,19 +79,9 @@ export default function NewConferenceForm({
         const formData = objectToFormData(data);
         const state = await createConference(formData);
 
-        if (state.message && !state.success) {
-          dispatch({
-            type: ActionTypes.SetFormMsg,
-            payload: state,
-          });
-        }
+        setMessage(state.message, state.success);
 
         if (state.success) {
-          dispatch({
-            type: ActionTypes.SetAppMsg,
-            payload: state,
-          });
-
           closeDialog(dialogId);
         }
       }}

@@ -2,8 +2,6 @@
 
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { date, number, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
@@ -14,6 +12,7 @@ import { Textarea } from "@/components/Textarea";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { updateInvoice } from "./actions";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function UpdateInvoiceForm({
   invoice,
@@ -25,8 +24,6 @@ export default function UpdateInvoiceForm({
   dialogId: string;
 }) {
   const { id } = useParams<{ id: string }>();
-
-  const { dispatch } = useContext(MessageContext);
 
   const { t } = useTranslation(lng, "validation");
 
@@ -85,7 +82,8 @@ export default function UpdateInvoiceForm({
     },
   });
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
@@ -94,19 +92,9 @@ export default function UpdateInvoiceForm({
         onSubmit={methods.handleSubmit(async (data) => {
           const state = await updateInvoice(id, data);
 
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+          setMessage(state.message, state.success);
 
           if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
-
             closeDialog(dialogId);
           }
         })}

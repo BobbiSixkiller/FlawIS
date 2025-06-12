@@ -221,7 +221,7 @@ export default function UserForm({
 
   if (loadingFile)
     return (
-      <div className="h-full sm:w-96 mx-auto flex flex-col items-center justify-center">
+      <div className="flex justify-center">
         <Spinner />
       </div>
     );
@@ -229,7 +229,7 @@ export default function UserForm({
   return (
     <FormProvider {...methods}>
       <form
-        className="space-y-6 mt-4 sm:w-96"
+        className="space-y-6"
         onSubmit={methods.handleSubmit(
           async (val) => {
             const { error, url } = await uploadOrDelete(

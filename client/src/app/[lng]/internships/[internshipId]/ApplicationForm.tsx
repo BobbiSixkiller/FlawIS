@@ -14,12 +14,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { FormMessage } from "@/components/Message";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternFiles, createIntern } from "./actions";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ApplicationForm({
   user,
@@ -59,9 +59,8 @@ export default function ApplicationForm({
     fileUrls: application?.fileUrls,
   });
 
-  const { dispatch } = useContext(MessageContext);
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   if (loadingFiles)
     return (
@@ -125,18 +124,9 @@ export default function ApplicationForm({
               }
             }
 
-            if (state && !state.success) {
-              dispatch({
-                type: ActionTypes.SetFormMsg,
-                payload: state,
-              });
-            }
+            setMessage(state.message, state.success);
 
-            if (state && state.success) {
-              dispatch({
-                type: ActionTypes.SetAppMsg,
-                payload: state,
-              });
+            if (state.success) {
               closeDialog(dialogId);
             }
           },

@@ -178,7 +178,7 @@ export default async function User({
         />
       </Modal>
       <Modal title="Zmazat pouzivatela" dialogId={deleteUserDialogId}>
-        <DeleteUserForm lng={lng} user={user} />
+        <DeleteUserForm dialogId={deleteUserDialogId} user={user} />
       </Modal>
       <Modal title="Impersonovat pouzivatela" dialogId={impersonateDialogId}>
         <ImpersonateForm lng={lng} user={user} dialogId={impersonateDialogId} />

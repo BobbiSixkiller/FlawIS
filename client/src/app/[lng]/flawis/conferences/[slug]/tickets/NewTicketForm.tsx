@@ -1,8 +1,6 @@
 "use client";
 
 import { FormProvider, useForm } from "react-hook-form";
-import { useContext } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { boolean, number, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
@@ -14,6 +12,7 @@ import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function NewTicketForm({
   conference,
@@ -24,8 +23,6 @@ export default function NewTicketForm({
   conference?: ConferenceFragment;
   dialogId: string;
 }) {
-  const { dispatch } = useContext(MessageContext);
-
   const { t } = useTranslation(lng, "validation");
 
   const methods = useForm({
@@ -59,28 +56,19 @@ export default function NewTicketForm({
     },
   });
 
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <FormProvider {...methods}>
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await createTicket(data, conference!.slug);
+          const res = await createTicket(data, conference!.slug);
 
-          if (state.message && !state.success) {
-            dispatch({
-              type: ActionTypes.SetFormMsg,
-              payload: state,
-            });
-          }
+          setMessage(res.message, res.success);
 
-          if (state.success) {
-            dispatch({
-              type: ActionTypes.SetAppMsg,
-              payload: state,
-            });
-
+          if (res.success) {
             closeDialog(dialogId);
           }
         })}

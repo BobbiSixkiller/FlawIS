@@ -1,14 +1,12 @@
 "use client";
 
-import { useContext, useTransition } from "react";
+import { useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Button from "@/components/Button";
-import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import { impersonate } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function ImpersonateForm({
   user,
@@ -19,32 +17,23 @@ export default function ImpersonateForm({
   dialogId: string;
 }) {
   const [pending, startTransition] = useTransition();
-
-  const { closeDialog } = useDialogStore();
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   function handleClick() {
     startTransition(async () => {
-      const state = await impersonate(user.id);
+      const res = await impersonate(user.id);
 
-      if (state && !state.success) {
-        dispatch({
-          type: ActionTypes.SetFormMsg,
-          payload: state,
-        });
-      }
+      setMessage(res.message, res.success);
 
-      if (state && state.success) {
+      if (res.success) {
         closeDialog(dialogId);
       }
     });
   }
 
-  const { dispatch } = useContext(MessageContext);
-
   return (
     <div className="space-y-6 mt-4 sm:w-96 mx-auto">
-      <FormMessage />
-
       <h1>Prihlasit sa ako {user.name} ?</h1>
 
       <Button

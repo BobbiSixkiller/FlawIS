@@ -6,11 +6,11 @@ import Modal from "@/components/Modal";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import { useContext, useTransition } from "react";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import Spinner from "@/components/Spinner";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { deleteIntern } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteApplicationDialog({
   internId,
@@ -23,22 +23,16 @@ export default function DeleteApplicationDialog({
   const { t } = useTranslation(lng, ["internships", "common"]);
 
   const [pending, startTransition] = useTransition();
-  const { closeDialog, openDialog } = useDialogStore();
-  const { dispatch } = useContext(MessageContext);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const openDialog = useDialogStore((s) => s.openDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   function handleClick() {
     startTransition(async () => {
       const state = await deleteIntern(internId);
-      if (!state.success && state.message) {
-        dispatch({ type: ActionTypes.SetFormMsg, payload: state });
-      }
+      setMessage(state.message, state.success);
 
       if (state.success) {
-        dispatch({
-          type: ActionTypes.SetAppMsg,
-          payload: state,
-        });
-
         closeDialog(dialogId);
       }
     });

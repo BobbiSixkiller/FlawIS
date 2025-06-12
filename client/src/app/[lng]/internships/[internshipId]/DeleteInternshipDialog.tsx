@@ -4,13 +4,13 @@ import Button from "@/components/Button";
 import { FormMessage } from "@/components/Message";
 import Modal from "@/components/Modal";
 import { useTranslation } from "@/lib/i18n/client";
-import { ActionTypes, MessageContext } from "@/providers/MessageProvider";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
-import { useContext, useTransition } from "react";
+import { useTransition } from "react";
 import Spinner from "@/components/Spinner";
 import { deleteInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
 
 export default function DeleteInternshipDialog() {
   const { internshipId, lng } = useParams<{
@@ -21,18 +21,16 @@ export default function DeleteInternshipDialog() {
 
   const dialogIg = "delete-internship";
 
-  const { openDialog, closeDialog } = useDialogStore();
-  const { dispatch } = useContext(MessageContext);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const openDialog = useDialogStore((s) => s.openDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   const handleClick = () =>
     startTransition(async () => {
       const state = await deleteInternship(internshipId);
-      if (!state.success) {
-        dispatch({ type: ActionTypes.SetFormMsg, payload: state });
-      }
+      setMessage(state.message, state.success);
 
       if (state.success) {
-        dispatch({ type: ActionTypes.SetAppMsg, payload: state });
         closeDialog(dialogIg);
       }
     });
