@@ -6,7 +6,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { FormMessage } from "@/components/Message";
 import Button from "@/components/Button";
 import Editor from "@/components/editor/Editor";
 import { createInternship, updateInternship } from "./actions";
@@ -15,8 +14,10 @@ import { useMessageStore } from "@/stores/messageStore";
 
 export default function InternshipForm({
   data,
+  dialogId,
 }: {
   data?: { id: string; description: string };
+  dialogId: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, ["internships", "common"]);
@@ -282,8 +283,7 @@ export default function InternshipForm({
             setMessage(state.message, state.success);
 
             if (state && state.success) {
-              closeDialog("create-internship");
-              closeDialog("update-internship");
+              closeDialog(dialogId);
             }
           },
           (errs) => {
@@ -302,8 +302,6 @@ export default function InternshipForm({
             initialValue={data?.description || defaultContent}
           />
         </div>
-
-        <FormMessage />
 
         <Button
           type="submit"

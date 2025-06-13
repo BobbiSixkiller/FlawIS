@@ -49,5 +49,12 @@
   "applied_one": "Prihlásený ({{count}})",
   "applied_other": "Prihlásených ({{count}})",
   "docs": "Dokumenty",
-  "apply": "Prihlásiť sa"
+  "apply": "Prihlásiť sa",
+  "tooltip": {
+    "new": "Vytvaránie stáže pre nasledujúci akademický rok je možné od júna aktuálneho roka."
+  },
+  "statusChange": {
+    "title": "Zmeniť stav",
+    "body": "Naozaj si prajete zmenit stav prihlasky na: {{status}}?"
+  }
 }

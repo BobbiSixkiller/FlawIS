@@ -12,9 +12,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { uploadOrDelete } from "@/utils/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
-import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { FormMessage } from "@/components/Message";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternFiles, createIntern } from "./actions";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
@@ -64,7 +62,7 @@ export default function ApplicationForm({
 
   if (loadingFiles)
     return (
-      <div className="h-full mx-auto flex flex-col items-center justify-center">
+      <div className="flex justify-center">
         <Spinner />
       </div>
     );
@@ -134,8 +132,6 @@ export default function ApplicationForm({
         )}
         className="space-y-6 sm:w-96"
       >
-        <FormMessage />
-
         <MultipleFileUploadField
           label="CV, motivacny list, ine... (.pdf)"
           name="files"

@@ -56,6 +56,7 @@ export default function Breadcrumbs({
           let itemLink = capitalizeLinks
             ? link[0].toUpperCase() + link.slice(1, link.length)
             : link;
+
           return (
             <React.Fragment key={index}>
               {separator}

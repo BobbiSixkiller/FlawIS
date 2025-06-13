@@ -66,7 +66,7 @@ export default function TopBar({
         listClasses="outline-none focus:ring-2 focus:ring-primary-500"
         capitalizeLinks
       />
-      <div className="absolute right-4 flex items-center gap-2">
+      <div className="absolute sm:static right-4 flex md:flex-1 md:justify-end items-center gap-2">
         {search}
 
         <Dropdown

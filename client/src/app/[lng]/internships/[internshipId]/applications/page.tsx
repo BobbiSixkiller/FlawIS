@@ -15,7 +15,9 @@ export default async function ApplicationsPage({
     getMe(),
     getInternship(internshipId),
   ]);
-
+  if (!internship) {
+    redirect("/");
+  }
   if (!user.access.includes(Access.Admin) && user.id !== internship.user) {
     redirect(`/${internship}`);
   }

@@ -66,8 +66,6 @@ export default function Tooltip({
     const overflowRight = rect.right > viewportWidth;
     const overflowLeft = rect.left < 0;
 
-    console.log(rect);
-
     let newLeft = tooltipPosition.left;
     let newTop =
       rect.height > 40 && position === "above"

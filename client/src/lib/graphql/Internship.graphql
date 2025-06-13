@@ -1,6 +1,5 @@
 fragment Application on Intern {
   id
-  internship
   user {
     id
     name
@@ -63,6 +62,7 @@ query internships(
 query internship($id: ObjectId!) {
   internship(id: $id) {
     id
+    user
     organization
     description
     updatedAt
@@ -71,17 +71,12 @@ query internship($id: ObjectId!) {
     myApplication {
       ...Application
     }
-    user
   }
 }
 
 mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
     message
-    data {
-      id
-      organization
-    }
   }
 }
 
@@ -90,13 +85,17 @@ mutation updateInternship($id: ObjectId!, $input: InternshipInput!) {
     message
     data {
       id
-      organization
     }
   }
 }
 
 mutation deleteInternship($id: ObjectId!) {
-  deleteInternship(id: $id)
+  deleteInternship(id: $id) {
+    message
+    data {
+      id
+    }
+  }
 }
 
 query interns(
@@ -147,7 +146,6 @@ mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
   updateInternFiles(id: $id, fileUrls: $fileUrls) {
     message
     data {
-      id
       internship
     }
   }
@@ -157,7 +155,6 @@ mutation updateOrgFeedback($fileUrl: String, $id: ObjectId!) {
   updateOrgFeedback(id: $id, fileUrl: $fileUrl) {
     message
     data {
-      id
       internship
     }
   }
@@ -167,7 +164,6 @@ mutation deleteIntern($id: ObjectId!) {
   deleteIntern(id: $id) {
     message
     data {
-      id
       internship
     }
   }
@@ -177,7 +173,6 @@ mutation changeInternStatus($id: ObjectId!, $status: Status!) {
   changeInternStatus(id: $id, status: $status) {
     message
     data {
-      id
       internship
     }
   }

@@ -4,11 +4,20 @@ import { redirect } from "next/navigation";
 import { getMe } from "../../(auth)/actions";
 import { Access, Status } from "@/lib/graphql/generated/graphql";
 import { Application } from "./Application";
-import InternshipDialog from "../InternshipDialog";
-import DeleteInternshipDialog from "./DeleteInternshipDialog";
-import DeleteApplicationDialog from "./DeleteApplicationDialog";
 import CloseButton from "@/components/CloseButton";
-import ApplicationDialog from "./ApplicationDialog";
+import ModalTrigger from "@/components/ModalTrigger";
+import {
+  InboxArrowDownIcon,
+  PencilIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import Button from "@/components/Button";
+import Modal from "@/components/Modal";
+import InternshipForm from "../InternshipForm";
+import { translate } from "@/lib/i18n";
+import DeleteInternshipForm from "./DeleteInternshipForm";
+import DeleteApplicationForm from "./DeleteApplicationForm";
+import ApplicationForm from "./ApplicationForm";
 
 export default async function InternshipPage({
   params: { internshipId, lng },
@@ -27,13 +36,32 @@ export default async function InternshipPage({
     user.access.includes(Access.Admin) ||
     user.access.includes(Access.Organization);
 
+  const updateInternshipDialogId = "update-internship";
+  const deleteInternshipDialogId = "delete-internship";
+  const applicationDialogId = "application";
+  const deleteApplicationDialogId = "delete-application";
+
+  const { t } = await translate(lng, "internships");
+
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
         {showControls && (
           <>
-            <InternshipDialog data={internship} />
-            <DeleteInternshipDialog />
+            <ModalTrigger dialogId={updateInternshipDialogId}>
+              <Button size="icon" className="rounded-full">
+                <PencilIcon className="size-5" />
+              </Button>
+            </ModalTrigger>
+            <ModalTrigger dialogId={deleteInternshipDialogId}>
+              <Button
+                variant="destructive"
+                size="icon"
+                className="rounded-full"
+              >
+                <TrashIcon className="size-5" />
+              </Button>
+            </ModalTrigger>
           </>
         )}
 
@@ -55,16 +83,19 @@ export default async function InternshipPage({
               controls={
                 <div className="flex gap-2">
                   {internship.myApplication.status === Status.Applied && (
-                    <ApplicationDialog
-                      application={internship.myApplication}
-                      user={user}
-                    />
+                    <ModalTrigger dialogId={applicationDialogId}>
+                      <Button size="icon">
+                        <PencilIcon className="size-5" />
+                      </Button>
+                    </ModalTrigger>
                   )}
 
                   {internship.myApplication.status !== Status.Accepted && (
-                    <DeleteApplicationDialog
-                      internId={internship.myApplication.id}
-                    />
+                    <ModalTrigger dialogId={deleteApplicationDialogId}>
+                      <Button size="icon" variant="destructive">
+                        <TrashIcon className="size-5" />
+                      </Button>
+                    </ModalTrigger>
                   )}
                 </div>
               }
@@ -84,10 +115,38 @@ export default async function InternshipPage({
               .
             </div>
 
-            <ApplicationDialog user={user} />
+            <ModalTrigger dialogId={applicationDialogId}>
+              <Button className="w-full">
+                <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
+                {t("apply")}
+              </Button>
+            </ModalTrigger>
           </>
         )
       ) : null}
+
+      <Modal dialogId={updateInternshipDialogId} title={t("update")}>
+        <InternshipForm dialogId={updateInternshipDialogId} data={internship} />
+      </Modal>
+      <Modal dialogId={deleteInternshipDialogId} title={t("delete.title")}>
+        <DeleteInternshipForm dialogId={deleteInternshipDialogId} />
+      </Modal>
+      <Modal
+        dialogId={deleteApplicationDialogId}
+        title={t("deleteIntern.title")}
+      >
+        <DeleteApplicationForm
+          dialogId={deleteApplicationDialogId}
+          internId={internship.myApplication?.id}
+        />
+      </Modal>
+      <Modal dialogId={applicationDialogId} title={t("docs")}>
+        <ApplicationForm
+          dialogId={applicationDialogId}
+          user={user}
+          application={internship.myApplication}
+        />
+      </Modal>
     </div>
   );
 }

@@ -86,37 +86,18 @@ export class InternshipResolver {
   }
 
   @Authorized([Access.Admin, Access.Organization])
-  @Mutation(() => Boolean)
-  async deleteInternship(@Arg("id") id: ObjectId): Promise<boolean> {
-    const { deletedCount } = await this.internshipService.deleteInternship(id);
+  @Mutation(() => InternshipMutationResponse)
+  async deleteInternship(@Arg("id") id: ObjectId) {
+    const internship = await this.internshipService.deleteInternship(id);
 
-    return deletedCount > 0;
+    return {
+      data: internship,
+      message: this.i18nService.translate("delete", {
+        ns: "internship",
+        name: internship.organization,
+      }),
+    };
   }
-
-  // @Authorized()
-  // @Mutation(() => InternshipMutationResponse)
-  // async createIntern(
-  //   @Ctx() { user, req }: Context,
-  //   @Arg("internshipId") internshipId: ObjectId,
-  //   @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
-  // ): Promise<InternshipMutationResponse> {
-  //   const hostname = req.headers["tenant-domain"] as string;
-
-  //   const internship = await this.internshipService.getInternship(internshipId);
-  //   const intern = await this.internService.createIntern(
-  //     user!.id,
-  //     internshipId,
-  //     fileUrls,
-  //     hostname
-  //   );
-
-  //   console.log({ ...internship, myApplication: intern });
-
-  //   return {
-  //     message: this.i18nService.translate("applied", { ns: "intern" }),
-  //     data: { ...internship, myApplication: intern },
-  //   };
-  // }
 
   @Authorized()
   @FieldResolver(() => Intern, { nullable: true })
@@ -139,7 +120,7 @@ export class InternshipResolver {
   async applicationsCount(
     @Ctx() { user }: Context,
     @Root() { id }: Internship
-  ): Promise<number> {
+  ) {
     const { totalCount } = await this.internService.getInterns({
       first: 1000,
       internship: id,

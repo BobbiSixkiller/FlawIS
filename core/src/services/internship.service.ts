@@ -89,6 +89,15 @@ export class InternshipService {
   }
 
   async deleteInternship(id: ObjectId) {
-    return await this.internshipRepository.delete({ _id: id });
+    const internship = await this.internshipRepository.findOneAndDelete({
+      _id: id,
+    });
+    if (!internship) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "internship" })
+      );
+    }
+
+    return internship;
   }
 }

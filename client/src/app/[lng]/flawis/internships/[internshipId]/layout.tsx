@@ -12,7 +12,7 @@ export default async function InternshipLayout({
   const internship = await getInternship(internshipId);
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <TabMenu
         tabs={[
           { href: `/internships/${internshipId}`, name: "Staz" },
@@ -26,7 +26,7 @@ export default async function InternshipLayout({
           },
         ]}
       />
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   );
 }

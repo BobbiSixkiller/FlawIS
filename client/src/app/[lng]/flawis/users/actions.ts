@@ -4,13 +4,11 @@ import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
   InviteUsersDocument,
   TextSearchUserDocument,
-  UserDocument,
   UsersDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 
 export async function getUsers(filter: GetDataFilter) {
-  //   await new Promise((resolve) => setTimeout(resolve, 5000));
   const res = await executeGqlFetch(
     UsersDocument,
     { ...filter },

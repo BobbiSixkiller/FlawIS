@@ -4,16 +4,21 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useMessageStore } from "@/stores/messageStore";
 import { Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useParams } from "next/navigation";
-import { Fragment } from "react";
+import { useParams, usePathname } from "next/navigation";
+import { Fragment, useEffect } from "react";
 import { setTimeout } from "timers";
 
 export function FormMessage() {
   const { lng } = useParams<{ lng: string }>();
+  const path = usePathname();
   const { t } = useTranslation(lng, "common");
 
   const message = useMessageStore((s) => s.message);
   const clear = useMessageStore((s) => s.clearMessage);
+
+  useEffect(() => {
+    clear();
+  }, [path]);
 
   return (
     <Transition
@@ -59,10 +64,15 @@ export function FormMessage() {
 
 export function Snackbar() {
   const { lng } = useParams<{ lng: string }>();
+  const path = usePathname();
   const { t } = useTranslation(lng, "common");
 
   const message = useMessageStore((s) => s.message);
   const clear = useMessageStore((s) => s.clearMessage);
+
+  useEffect(() => {
+    clear();
+  }, [path]);
 
   return (
     <Transition

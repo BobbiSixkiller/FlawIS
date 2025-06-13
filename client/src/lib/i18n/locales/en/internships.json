@@ -49,5 +49,12 @@
   "applied_one": "Applied ({{count}})",
   "applied_other": "Applied ({{count}})",
   "docs": "Documents",
-  "apply": "Apply"
+  "apply": "Apply",
+  "tooltip": {
+    "new": "Internships created starting from june are for the upcoming academic year."
+  },
+  "statusChange": {
+    "title": "Change status",
+    "body": "Do you really want to change the application status to: {{status}}?"
+  }
 }

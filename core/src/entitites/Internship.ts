@@ -118,7 +118,7 @@ export class Internship extends TimeStamps {
   @Property()
   description: string;
 
-  @Field(() => String, { description: "User document reference" })
+  @Field(() => ObjectId)
   @Property({ ref: () => User })
   user: Ref<User>;
 

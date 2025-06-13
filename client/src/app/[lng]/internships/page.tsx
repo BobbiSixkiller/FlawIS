@@ -4,9 +4,13 @@ import { Access } from "@/lib/graphql/generated/graphql";
 import ListInternships from "./ListInternships";
 import { getAcademicYear } from "@/utils/helpers";
 import { getInternships } from "./actions";
-import InternshipDialog from "./InternshipDialog";
 import AcademicYearSelect from "./AcademicYearSelect";
 import Tooltip from "@/components/Tooltip";
+import ModalTrigger from "@/components/ModalTrigger";
+import Button from "@/components/Button";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import Modal from "@/components/Modal";
+import InternshipForm from "./InternshipForm";
 
 export default async function InternshipsHomePage({
   params: { lng },
@@ -15,12 +19,10 @@ export default async function InternshipsHomePage({
   params: { lng: string };
   searchParams?: { academicYear?: string };
 }) {
-  const user = await getMe();
-
-  const { t } = await translate(lng, "internships");
-
   const { startYear, endYear } = getAcademicYear();
   const academicYear = searchParams?.academicYear || `${startYear}/${endYear}`;
+
+  const user = await getMe();
 
   // If user is an organization get all internships associated with the organization,
   // otherwise return internships for given academic year
@@ -31,6 +33,10 @@ export default async function InternshipsHomePage({
       : { academicYear, contextUserId: user.id };
 
   const initialData = await getInternships(filter);
+
+  const addDialogId = "add-internship";
+
+  const { t } = await translate(lng, ["internships", "common"]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,11 +51,13 @@ export default async function InternshipsHomePage({
         </div>
         {user.access.includes(Access.Organization) ||
         user.access.includes(Access.Admin) ? (
-          <Tooltip
-            message="Vytvaranie staze pre nasledujuci akademicky rok je mozne od juna aktualneho roka."
-            position="below"
-          >
-            <InternshipDialog />
+          <Tooltip message={t("tooltip.new")} position="below">
+            <ModalTrigger dialogId={addDialogId}>
+              <Button size="sm">
+                <PlusIcon className="size-5 mr-2" />
+                {t("create", { ns: "common" })}
+              </Button>
+            </ModalTrigger>
           </Tooltip>
         ) : (
           <AcademicYearSelect
@@ -60,6 +68,10 @@ export default async function InternshipsHomePage({
       </div>
 
       <ListInternships initialData={initialData} filter={filter} />
+
+      <Modal dialogId={addDialogId} title={t("new")}>
+        <InternshipForm dialogId={addDialogId} />
+      </Modal>
     </div>
   );
 }

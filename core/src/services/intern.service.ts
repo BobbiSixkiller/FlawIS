@@ -268,6 +268,9 @@ export class InternService {
       }
 
       await this.minioService.deleteFiles(intern.fileUrls);
+      if (intern.organizationFeedbackUrl) {
+        await this.minioService.deleteFiles([intern.organizationFeedbackUrl]);
+      }
 
       await session.commitTransaction();
 
