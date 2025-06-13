@@ -20,7 +20,7 @@ export default function MissingStudentDataDialog({
 
   const dialogId = "missiong-student-info";
 
-  const { openDialog } = useDialogStore();
+  const openDialog = useDialogStore((s) => s.openDialog);
 
   useEffect(() => {
     const missingData =
