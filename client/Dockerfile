@@ -22,12 +22,16 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm ci --only=production --silent --no-fund --no-audit
 
-# Copy required build assets
+# Critical: add this line to include client chunks
+COPY --from=builder /usr/app/.next/static ./.next/static
+
+# Copy rest of necessary build files
+COPY --from=builder /usr/app/.next/standalone ./.next/standalone # only if using standalone
 COPY --from=builder /usr/app/.next ./.next
 COPY --from=builder /usr/app/public ./public
 COPY --from=builder /usr/app/next.config.mjs ./next.config.mjs
 COPY --from=builder /usr/app/package.json ./package.json
 COPY --from=builder /usr/app/node_modules ./node_modules
 
-# Start the app
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]
+
