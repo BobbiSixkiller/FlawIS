@@ -14,7 +14,10 @@ export function Input({
   className,
   ...props
 }: InputProps) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({
+    name,
+    rules: props.type === "number" ? { valueAsNumber: true } : undefined,
+  });
 
   return (
     <div className="w-full">

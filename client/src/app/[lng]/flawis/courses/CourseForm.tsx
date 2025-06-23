@@ -22,9 +22,7 @@ export default function CourseForm(props: { dialogId: string }) {
 
   const values = useWizardStore((s) => s.values);
 
-  useEffect(() => {
-    console.log(values);
-  }, [values]);
+  console.log(values);
 
   return (
     <WizzardForm<CourseInput>

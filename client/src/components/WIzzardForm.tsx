@@ -64,7 +64,7 @@ export function WizzardForm<T>({
   }
 
   const onSubmit: SubmitHandler<typeof values> = async (data) => {
-    setValues(values);
+    setValues(data);
 
     if (isLastStep()) {
       await onSubmitCb(data);
