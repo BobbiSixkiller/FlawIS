@@ -9,3 +9,5 @@ export default async function Sidebar({
 
   return <SearchConference />;
 }
+
+export const dynamic = "force-dynamic";

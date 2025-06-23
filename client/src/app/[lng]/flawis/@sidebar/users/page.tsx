@@ -10,4 +10,4 @@ export default async function Sidebar({
   return <SearchUser />;
 }
 
-export const dynamic = "force-static"; // or "force-dynamic" if needed
+export const dynamic = "force-dynamic";

@@ -9,3 +9,5 @@ export default async function Sidebar({
 
   return <SearchAttendee />;
 }
+
+export const dynamic = "force-dynamic";
