@@ -26,7 +26,7 @@ RUN npm ci --only=production --silent --no-fund --no-audit
 COPY --from=builder /usr/app/.next/static ./.next/static
 
 # Copy rest of necessary build files
-COPY --from=builder /usr/app/.next/standalone ./.next/standalone # only if using standalone
+COPY --from=builder /usr/app/.next/standalone ./.next/standalone
 COPY --from=builder /usr/app/.next ./.next
 COPY --from=builder /usr/app/public ./public
 COPY --from=builder /usr/app/next.config.mjs ./next.config.mjs
