@@ -1,35 +1,33 @@
 # Development Stage
-FROM node:22-alpine AS development
+FROM node:22-alpine AS builder
 
-# Set working directory
 WORKDIR /usr/app
 
-# Install dependencies with cache cleaning and retries
 COPY package*.json ./
-RUN npm cache clean --force && \
-    npm ci --silent --no-fund --no-audit --timeout=120000 || \
-    (npm cache clean --force && npm ci --silent --no-fund --no-audit)
+RUN npm ci --silent --no-fund --no-audit
 
-# Copy source code and build
 COPY . .
-RUN rm -rf .next 
+
+# Optional: ensure clean build
+RUN rm -rf .next
 RUN npm run build
 
 # Production Stage
 FROM node:22-alpine AS production
 
-# Set working directory
 WORKDIR /usr/app
+ENV NODE_ENV=production
 
-# Install dependencies
+# Install only prod deps
 COPY package*.json ./
-RUN npm ci --silent --no-fund --no-audit --timeout=120000
+RUN npm ci --only=production --silent --no-fund --no-audit
 
-# Copy built assets from the development stage
-COPY --from=development /usr/app/.next ./.next
+# Copy required build assets
+COPY --from=builder /usr/app/.next ./.next
+COPY --from=builder /usr/app/public ./public
+COPY --from=builder /usr/app/next.config.js ./next.config.js
+COPY --from=builder /usr/app/package.json ./package.json
+COPY --from=builder /usr/app/node_modules ./node_modules
 
-# Copy remaining source code
-COPY . .
-
-# Start the application
-# CMD ["npm", "run", "start"]
+# Start the app
+CMD ["npm", "start"]
