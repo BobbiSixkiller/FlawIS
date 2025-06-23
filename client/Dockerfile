@@ -12,6 +12,7 @@ RUN npm cache clean --force && \
 
 # Copy source code and build
 COPY . .
+RUN rm -rf .next 
 RUN npm run build
 
 # Production Stage
