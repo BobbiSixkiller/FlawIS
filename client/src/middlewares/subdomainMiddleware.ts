@@ -23,8 +23,6 @@ export function withSubdomain(middleware: CustomMiddleware) {
       .replace("/en", "")
       .replace("/sk", "");
 
-    console.log(pathWithoutLocale);
-
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
