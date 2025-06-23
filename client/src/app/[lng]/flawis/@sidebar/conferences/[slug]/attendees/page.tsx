@@ -1,4 +1,9 @@
+import { languages } from "@/lib/i18n/settings";
 import SearchAttendee from "./SearchAttendee";
+
+export function generateStaticParams() {
+  return languages.map((lng) => ({ lng }));
+}
 
 export default async function Sidebar({
   params,
@@ -9,5 +14,3 @@ export default async function Sidebar({
 
   return <SearchAttendee />;
 }
-
-export const dynamic = "force-dynamic";
