@@ -5,6 +5,7 @@ import { InputProps, withLocalizedInput } from "./withLocalizedInput";
 import { useController } from "react-hook-form";
 import { cn } from "@/utils/helpers";
 
+//refactor to handle number and dates
 export function Input({
   name,
   label,
@@ -14,6 +15,8 @@ export function Input({
   className,
   ...props
 }: InputProps) {
+  const isNumberInput = props.type === "number";
+
   const { field, fieldState } = useController({
     name,
   });

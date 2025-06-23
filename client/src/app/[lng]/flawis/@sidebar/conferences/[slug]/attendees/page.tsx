@@ -5,5 +5,7 @@ export default async function Sidebar({
 }: {
   params: Promise<{ lng: string }>;
 }) {
+  await params;
+
   return <SearchAttendee />;
 }
