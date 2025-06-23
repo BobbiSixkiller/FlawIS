@@ -16,7 +16,6 @@ export function Input({
 }: InputProps) {
   const { field, fieldState } = useController({
     name,
-    rules: props.type === "number" ? { valueAsNumber: true } : undefined,
   });
 
   return (
