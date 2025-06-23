@@ -28,7 +28,9 @@ export default function Modal({
   togglerHidden = false,
   isInterceptingRoute = false,
 }: ModalProps) {
-  const { isDialogOpen, closeDialog, openDialog } = useDialogStore();
+  const isDialogOpen = useDialogStore((s) => s.isDialogOpen);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const openDialog = useDialogStore((s) => s.openDialog);
 
   useEffect(() => {
     if (isInterceptingRoute) {
