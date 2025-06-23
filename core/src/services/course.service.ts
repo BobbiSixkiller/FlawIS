@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../repositories/course.repository";
 import { Repository } from "../repositories/base.repository";
+import { CourseAttendeeRepository } from "../repositories/courseTermAttendee.repository";
 
 function toCourseDTO(doc: DocumentType<Course>) {
   const obj = doc.toJSON({
@@ -32,6 +33,7 @@ export class CourseService {
     private readonly courseRepository: CourseRepository,
     private readonly moduleRepository = new Repository(CourseModule),
     private readonly termRepository = new Repository(CourseTerm),
+    private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly i18nService: I18nService
   ) {}
 

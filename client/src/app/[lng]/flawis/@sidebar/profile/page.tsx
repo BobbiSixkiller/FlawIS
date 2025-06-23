@@ -1,3 +1,3 @@
-export default function Sidebar() {
+export default function Profile() {
   return null;
 }

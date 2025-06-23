@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
   }
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-  cookies().set("accessToken", res.data.googleSignIn.data.token, {
+  const cookieStore = await cookies();
+  cookieStore.set("accessToken", res.data.googleSignIn.data.token, {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
     secure: process.env.NODE_ENV !== "development",

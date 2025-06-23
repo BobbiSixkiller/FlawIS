@@ -8,10 +8,11 @@ import parseValidationErrors, { ValidationErrors } from "./parseErrors";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function setDarkThemeCookie(val: boolean) {
+  const cookieStore = await cookies();
   const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
 
   if (val) {
-    cookies().set("theme", "dark", {
+    cookieStore.set("theme", "dark", {
       expires,
       sameSite: "lax",
       path: "/",
@@ -19,7 +20,7 @@ export async function setDarkThemeCookie(val: boolean) {
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
   } else {
-    cookies().delete({
+    cookieStore.delete({
       name: "theme",
       sameSite: "lax",
       path: "/",
@@ -41,8 +42,8 @@ export async function executeGqlFetch<Data, Variables>(
   next?: NextFetchRequestConfig,
   nextCache?: RequestCache
 ): Promise<GraphQLResponse<Data>> {
-  const reqHeaders = headers();
-  const reqCookies = cookies();
+  const reqHeaders = await headers();
+  const reqCookies = await cookies();
 
   const forwardedFor =
     reqHeaders.get("x-forwarded-for") || reqHeaders.get("x-real-ip");
@@ -129,4 +130,12 @@ export async function executeGqlMutation<Data, Variables, TransformedData>(
     message,
     data,
   };
+}
+
+export async function getSubdomain() {
+  const headerStore = await headers();
+  const host = headerStore.get("host") || "localhost:3000"; // Get the hostname from the request
+  const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
+
+  return subdomain;
 }

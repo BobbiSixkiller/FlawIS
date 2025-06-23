@@ -21,11 +21,15 @@ import useLocalizedExtensions from "./Extensions";
 interface EditorProps {
   initialValue?: string | JSONContent; // Use HTML or JSON as needed
   name: string;
+  className?: string;
 }
 
-export default function TiptapEditor({ initialValue, name }: EditorProps) {
+export default function TiptapEditor({
+  className,
+  initialValue,
+  name,
+}: EditorProps) {
   const { field, fieldState } = useController({ name });
-
   const { defaultExtensions } = useLocalizedExtensions();
 
   const editor = useEditor({
@@ -39,8 +43,9 @@ export default function TiptapEditor({ initialValue, name }: EditorProps) {
     editorProps: {
       attributes: {
         class: cn([
+          className,
           "prose prose-lg prose-headings:font-title font-default prose-a:no-underline",
-          "focus:outline-none max-w-full min-h-96 p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
+          "focus:outline-none min-h-96 p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
           "dark:ring-gray-700 dark:bg-gray-800",
           fieldState.error
             ? "ring-red-500 focus-within:ring-red-500"

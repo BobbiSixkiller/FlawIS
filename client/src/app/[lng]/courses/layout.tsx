@@ -4,14 +4,17 @@ import { headers } from "next/headers";
 
 export async function generateMetadata(
   {
-    params: { lng },
+    params,
   }: {
-    params: { lng: string };
+    params: Promise<{ lng: string }>;
   },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
-  const host = headers().get("host") || "flawis.flaw.uniba.sk";
+  const headerStore = await headers();
+
+  const host = headerStore.get("host") || "flawis.flaw.uniba.sk";
   const tenant = host.split(".")[0].replace("-staging", "");
 
   const url =
@@ -41,7 +44,7 @@ export default async function CoursesLayout({
   children,
 }: {
   children: React.ReactNode;
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
   return <div>{children}</div>;
 }

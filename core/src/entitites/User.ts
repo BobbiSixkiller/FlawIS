@@ -115,7 +115,7 @@ export class User extends TimeStamps {
 }
 
 @ObjectType()
-export class UserStub {
+export class UserStub implements Partial<User> {
   @Field()
   id: ObjectId;
 

@@ -8,11 +8,12 @@ export async function GET(req: NextRequest) {
   const url = searchParams.get("url");
   const redirectUrl = url ? decodeURIComponent(url) : "/login";
 
-  const token = cookies().get("accessToken")?.value;
-  const user = cookies().get("user")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value;
+  const user = cookieStore.get("user")?.value;
 
   if (token) {
-    cookies().delete({
+    cookieStore.delete({
       name: "accessToken",
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     });
   }
   if (user) {
-    cookies().delete({
+    cookieStore.delete({
       name: "user",
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",

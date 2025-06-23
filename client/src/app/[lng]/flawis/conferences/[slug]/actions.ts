@@ -4,55 +4,53 @@ import {
   DatesInput,
   DeleteConferenceDocument,
   UpdateConferenceDatesDocument,
+  UpdateConferenceDatesMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles } from "@/lib/minio";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidateTag } from "next/cache";
+import { executeGqlMutation } from "@/utils/actions";
 
-export async function deleteConference(prevState: any, data: FormData) {
-  try {
-    const res = await executeGqlFetch(DeleteConferenceDocument, {
-      id: data.get("id")?.toString(),
-    });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
+export async function deleteConference(id: string) {
+  const res = await executeGqlMutation(
+    DeleteConferenceDocument,
+    {
+      id,
+    },
+    (data) => ({
+      message: data.deleteConference.message,
+      data: data.deleteConference.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        "conferences",
+        `conference:${data.deleteConference.data.slug}`,
+      ],
     }
-
+  );
+  if (res.data) {
     await deleteFiles([
-      res.data.deleteConference.data.translations.sk.logoUrlEnv,
-      res.data.deleteConference.data.translations.sk.logoUrlEnv,
-      res.data.deleteConference.data.billing.stampUrl,
+      res.data.translations.sk.logoUrlEnv,
+      res.data.translations.sk.logoUrlEnv,
+      res.data.billing.stampUrl,
     ]);
-
-    revalidateTag("conferences");
-    revalidateTag(`conference:${res.data.deleteConference.data.slug}`);
-    return { success: true, message: res.data.deleteConference.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
   }
+  return res;
 }
 
-export async function updateConferenceDates(slug: string, data: DatesInput) {
-  try {
-    const res = await executeGqlFetch(UpdateConferenceDatesDocument, {
-      slug,
-      data,
-    });
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
+export async function updateConferenceDates(
+  vars: UpdateConferenceDatesMutationVariables
+) {
+  return await executeGqlMutation(
+    UpdateConferenceDatesDocument,
+    vars,
+    (data) => ({
+      message: data.updateConferenceDates.message,
+      data: data.updateConferenceDates.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        "conferences",
+        `conference:${data.updateConferenceDates.data.slug}`,
+      ],
     }
-
-    revalidateTag("conferences");
-    revalidateTag(`conference:${res.data.updateConferenceDates.data.slug}`);
-    return { success: true, message: res.data.updateConferenceDates.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+  );
 }

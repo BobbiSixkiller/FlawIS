@@ -11,16 +11,16 @@ import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { updateConferenceDates } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
+import { useParams } from "next/navigation";
 
 export default function UpdateDatesForm({
-  lng,
   conference,
   dialogId,
 }: {
-  lng: string;
-  conference?: ConferenceFragment;
+  conference: ConferenceFragment;
   dialogId: string;
 }) {
+  const { lng, slug } = useParams<{ lng: string; slug: string }>();
   const { t } = useTranslation(lng, "validation");
 
   function setDefaultVal(utc: string) {
@@ -32,14 +32,14 @@ export default function UpdateDatesForm({
 
   const methods = useForm({
     defaultValues: {
-      start: setDefaultVal(conference?.dates.start) as unknown as Date,
-      end: setDefaultVal(conference?.dates.end) as unknown as Date,
-      regEnd: conference?.dates.regEnd
-        ? (setDefaultVal(conference?.dates.regEnd) as unknown as Date)
+      start: setDefaultVal(conference.dates.start) as unknown as Date,
+      end: setDefaultVal(conference.dates.end) as unknown as Date,
+      regEnd: conference.dates.regEnd
+        ? (setDefaultVal(conference.dates.regEnd) as unknown as Date)
         : null,
-      submissionDeadline: conference?.dates.submissionDeadline
+      submissionDeadline: conference.dates.submissionDeadline
         ? (setDefaultVal(
-            conference?.dates.submissionDeadline
+            conference.dates.submissionDeadline
           ) as unknown as Date)
         : null,
     },
@@ -67,11 +67,11 @@ export default function UpdateDatesForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateConferenceDates(conference!.slug, data);
+          const res = await updateConferenceDates({ slug, data });
 
-          setMessage(state.message, state.success);
+          setMessage(res.message, res.success);
 
-          if (state.success) {
+          if (res.success) {
             closeDialog(dialogId);
           }
         })}

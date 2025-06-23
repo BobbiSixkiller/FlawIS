@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Course, CourseTermAttendee } from "../../entitites/Course";
+import { Course, CourseAttendee } from "../../entitites/Course";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import { ArgsType, Field, InputType, Int, ObjectType } from "type-graphql";
 import { IMutationResponse } from "./interface.types";
@@ -14,14 +14,14 @@ export class CourseArgs extends CreateArgs(Course) {}
 export class CourseConnection extends CreateConnection(Course) {}
 
 @ArgsType()
-export class CourseTermAttendeeArgs extends CreateArgs(CourseTermAttendee) {
+export class CourseAttendeeArgs extends CreateArgs(CourseAttendee) {
   @Field(() => ObjectId)
   termId: ObjectId;
 }
 
 @ObjectType()
-export class CourseTermAttendeeConnection extends CreateConnection(
-  CourseTermAttendee
+export class CourseAttendeeConnection extends CreateConnection(
+  CourseAttendee
 ) {}
 
 @ObjectType({ implements: IMutationResponse })

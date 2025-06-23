@@ -20,10 +20,11 @@ import DeleteApplicationForm from "./DeleteApplicationForm";
 import ApplicationForm from "./ApplicationForm";
 
 export default async function InternshipPage({
-  params: { internshipId, lng },
+  params,
 }: {
-  params: { internshipId: string; lng: string };
+  params: Promise<{ internshipId: string; lng: string }>;
 }) {
+  const { internshipId, lng } = await params;
   const [internship, user] = await Promise.all([
     getInternship(internshipId),
     getMe(),

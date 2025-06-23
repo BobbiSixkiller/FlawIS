@@ -8,15 +8,15 @@ import {
 import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
-import NewSectionForm from "./NewSectionForm";
+import SectionForm from "./SectionForm";
 import DeleteSectionForm from "./DeleteSectionForm";
-import UpdateSectionForm from "./UpdateSectionForm";
 
 export default async function SectionsPage({
-  params: { lng, slug },
+  params,
 }: {
-  params: { lng: string; slug: string };
+  params: Promise<{ lng: string; slug: string }>;
 }) {
+  const { slug, lng } = await params;
   const conference = await conferenceSections({
     slug,
     first: 1000,
@@ -40,10 +40,9 @@ export default async function SectionsPage({
       </div>
 
       <Modal title="Nova sekcia" dialogId={newSectionDialogId}>
-        <NewSectionForm
-          lng={lng}
-          conferenceId={conference.id}
+        <SectionForm
           dialogId={newSectionDialogId}
+          conferenceId={conference.id}
         />
       </Modal>
     </div>
@@ -140,9 +139,9 @@ function Section({
         />
       </Modal>
       <Modal dialogId={updateSectionDialogId} title="Aktualizovat sekciu">
-        <UpdateSectionForm
+        <SectionForm
           dialogId={updateSectionDialogId}
-          lng={lng}
+          conferenceId={section.conference?.id}
           section={section}
         />
       </Modal>

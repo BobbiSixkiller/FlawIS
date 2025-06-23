@@ -22,7 +22,8 @@ export async function getSubmission(id?: string) {
 }
 
 export async function createSubmission(data: SubmissionInput) {
-  const user = cookies().get("user")?.value;
+  const cookieStore = await cookies();
+  const user = cookieStore.get("user")?.value;
 
   return await executeGqlMutation(
     CreateSubmissionDocument,
@@ -52,7 +53,8 @@ export async function updateSubmission(id: string, data: SubmissionInput) {
 }
 
 export async function deleteSubmission(id: string) {
-  const user = cookies().get("user")?.value;
+  const cookieStore = await cookies();
+  const user = cookieStore.get("user")?.value;
 
   return executeGqlMutation(
     DeleteSubmissionDocument,

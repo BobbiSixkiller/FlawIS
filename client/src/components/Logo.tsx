@@ -24,7 +24,8 @@ export default async function Logo({
 }) {
   const { t } = await translate(lng || "sk", "dashboard");
 
-  const theme = cookies().get("theme")?.value;
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
 
   return (
     <div

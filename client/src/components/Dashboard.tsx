@@ -13,7 +13,7 @@ import Avatar from "./Avatar";
 import { cn } from "@/utils/helpers";
 import { Snackbar } from "./Message";
 
-export default function Dashboard({
+export default async function Dashboard({
   children,
   navLinks,
   sidebar,
@@ -26,7 +26,8 @@ export default function Dashboard({
   user: UserFragment;
   lng: string;
 }) {
-  const theme = cookies().get("theme")?.value || "";
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value || "";
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-950">

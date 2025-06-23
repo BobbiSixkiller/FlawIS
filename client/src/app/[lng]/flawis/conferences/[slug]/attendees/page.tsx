@@ -6,20 +6,22 @@ import { getConference } from "../../actions";
 import ExportButton from "./ExportButton";
 
 export default async function AttendeesPage({
-  params: { slug },
+  params,
   searchParams,
 }: {
-  params: { lng: string; slug: string };
-  searchParams?: { passive?: string; sectionId?: string[] };
+  params: Promise<{ lng: string; slug: string }>;
+  searchParams?: Promise<{ passive?: string; sectionId?: string[] }>;
 }) {
+  const { lng, slug } = await params;
+  const queryParams = await searchParams;
   const [initialData, conference] = await Promise.all([
     getAttendees({
-      passive: searchParams?.passive ? searchParams.passive === "true" : null,
+      passive: queryParams?.passive ? queryParams.passive === "true" : null,
       conferenceSlug: slug,
-      sectionIds: searchParams?.sectionId
-        ? Array.isArray(searchParams?.sectionId)
-          ? searchParams.sectionId
-          : [searchParams.sectionId]
+      sectionIds: queryParams?.sectionId
+        ? Array.isArray(queryParams?.sectionId)
+          ? queryParams.sectionId
+          : [queryParams.sectionId]
         : [],
     }),
     getConference(slug),

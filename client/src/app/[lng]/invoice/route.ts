@@ -3,9 +3,10 @@ import { InvoiceDoc } from "./InvoiceDoc";
 
 export async function POST(
   request: Request,
-  { params: { lng } }: { params: { lng: string } }
+  { params }: { params: Promise<{ lng: string }> }
 ) {
   const data = await request.json();
+  const { lng } = await params;
 
   const document = await InvoiceDoc({ data, lng });
   const pdf = await renderToBuffer(document);

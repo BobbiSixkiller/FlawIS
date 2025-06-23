@@ -14,7 +14,7 @@ import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { cn } from "@/utils/helpers";
 import { useMessageStore } from "@/stores/messageStore";
-import { useRouter } from "next/navigation";
+import { useScrollStore } from "@/stores/scrollStore";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
@@ -35,17 +35,15 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
-  const router = useRouter();
-
   return (
     <FormProvider {...methods}>
       <form
         className="space-y-6"
         onSubmit={methods.handleSubmit(
           async (val) => {
-            const state = await login(val.email, val.password, url);
-            if (state) {
-              setMessage(state.message, state.success);
+            const res = await login(val.email, val.password, url);
+            if (res) {
+              setMessage(res.message, res.success);
             }
           },
           (errs) => console.log(errs)

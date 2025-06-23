@@ -73,7 +73,7 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Query(() => [Conference])
   async textSearchConference(@Arg("text") text: string) {
-    return this.conferenceRepository.textSearch(text);
+    return await this.conferenceRepository.textSearch(text);
   }
 
   @Authorized(["ADMIN"])
@@ -204,12 +204,12 @@ export class ConferencerResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Mutation(() => String)
+  @Mutation(() => ConferenceMutationResponse)
   async deleteTicket(
     @Arg("slug") _slug: string,
     @Arg("ticketId") ticketId: ObjectId,
     @LoadResource(Conference) conference: DocumentType<Conference>
-  ): Promise<string> {
+  ) {
     const ticket = conference.tickets.find(
       (t) => t.id.toString() === ticketId.toString()
     );
@@ -222,12 +222,15 @@ export class ConferencerResolver {
     );
     await conference.save();
 
-    return this.i18nService.translate("delete", {
-      ns: "ticket",
-      name: ticket.translations[
-        this.i18nService.language() as keyof TicketTranslation
-      ].name,
-    });
+    return {
+      data: conference,
+      message: this.i18nService.translate("delete", {
+        ns: "ticket",
+        name: ticket.translations[
+          this.i18nService.language() as keyof TicketTranslation
+        ].name,
+      }),
+    };
   }
 
   @Authorized()

@@ -2,7 +2,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chainMiddleware";
 import { fallbackLng } from "@/lib/i18n/settings";
 
-//paths that are shared by all tenants
+//paths that are shared by all subdomains
 const commonPaths = [
   "/logout",
   "/login",
@@ -22,6 +22,8 @@ export function withSubdomain(middleware: CustomMiddleware) {
     const pathWithoutLocale = url.pathname
       .replace("/en", "")
       .replace("/sk", "");
+
+    console.log(pathWithoutLocale);
 
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)

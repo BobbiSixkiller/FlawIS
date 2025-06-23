@@ -13,14 +13,17 @@ import Modal from "@/components/Modal";
 import InternshipForm from "./InternshipForm";
 
 export default async function InternshipsHomePage({
-  params: { lng },
+  params,
   searchParams,
 }: {
-  params: { lng: string };
-  searchParams?: { academicYear?: string };
+  params: Promise<{ lng: string }>;
+  searchParams?: Promise<{ academicYear?: string }>;
 }) {
+  const { lng } = await params;
+  const queryParams = await searchParams;
+
   const { startYear, endYear } = getAcademicYear();
-  const academicYear = searchParams?.academicYear || `${startYear}/${endYear}`;
+  const academicYear = queryParams?.academicYear || `${startYear}/${endYear}`;
 
   const user = await getMe();
 

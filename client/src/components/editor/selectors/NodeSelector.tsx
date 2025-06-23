@@ -16,6 +16,8 @@ import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/core";
+import { useTranslation } from "@/lib/i18n/client";
+import { useParams } from "next/navigation";
 
 export type SelectorItem = {
   name: string;
@@ -55,13 +57,6 @@ export const items: SelectorItem[] = [
       editor.chain().focus().clearNodes().toggleHeading({ level: 3 }).run(),
     isActive: (editor) => editor.isActive("heading", { level: 3 }),
   },
-  //   {
-  //     name: "To-do List",
-  //     icon: CheckCircleIcon,
-  //     command: (editor) =>
-  //       editor.chain().focus().clearNodes().toggleTaskList().run(),
-  //     isActive: (editor) => editor.isActive("taskItem"),
-  //   },
   {
     name: "Bullet List",
     icon: ListBulletIcon,
@@ -93,6 +88,9 @@ export const items: SelectorItem[] = [
 ];
 
 export const NodeSelector = ({ editor }: { editor?: Editor }) => {
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "editor");
+
   if (!editor) return null;
 
   const activeItem = items.filter((item) => item.isActive(editor)).pop() ?? {
@@ -107,7 +105,7 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
         variant="ghost"
         className={cn("gap-2 rounded-none border-none dark focus:ring-0")}
       >
-        <span className="whitespace-nowrap text-sm">{activeItem.name}</span>
+        <span className="whitespace-nowrap text-sm">{t(activeItem.name)}</span>
         <ChevronDownIcon className="size-4 group-data-[open]:rotate-180" />
       </PopoverButton>
       <PopoverPanel
@@ -128,7 +126,7 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
               <div className="rounded-sm border p-1">
                 <item.icon className="h-5 w-5" />
               </div>
-              <span>{item.name}</span>
+              <span>{t(item.name)}</span>
             </div>
             {activeItem.name === item.name && <CheckIcon className="h-4 w-4" />}
           </div>

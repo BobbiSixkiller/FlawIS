@@ -8,13 +8,18 @@ import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import UpdateDatesForm from "./UpdateDatesForm";
 import DeleteConferenceForm from "./DeleteConferenceForm";
+import { redirect } from "next/navigation";
 
 export default async function ConferencePage({
-  params: { lng, slug },
+  params,
 }: {
-  params: { slug: string; lng: string };
+  params: Promise<{ slug: string; lng: string }>;
 }) {
+  const { lng, slug } = await params;
   const conference = await getConference(slug);
+  if (!conference) {
+    redirect("/conferences");
+  }
 
   const updateDatesDialogId = "update-dates";
   const deleteConfDialogId = "delete-conference";
@@ -105,14 +110,12 @@ export default async function ConferencePage({
         <UpdateDatesForm
           dialogId={updateDatesDialogId}
           conference={conference}
-          lng={lng}
         />
       </Modal>
       <Modal dialogId={deleteConfDialogId} title="Zmazat konferenciu">
         <DeleteConferenceForm
           dialogId={deleteConfDialogId}
           conference={conference}
-          lng={lng}
         />
       </Modal>
     </div>

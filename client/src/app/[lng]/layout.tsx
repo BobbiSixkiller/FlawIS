@@ -42,12 +42,14 @@ const UKsans = localFont({
 
 export default async function RootLayout({
   children,
-  params: { lng },
+  params,
 }: {
   children: React.ReactNode;
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
-  const theme = cookies().get("theme")?.value;
+  const { lng } = await params;
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
 
   return (
     <html lang={lng} dir={dir(lng)}>

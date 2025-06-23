@@ -5,9 +5,9 @@ import { capitalizeFirstLetter } from "@/utils/helpers";
 
 export async function GET(
   req: NextRequest,
-  { params: { lng, slug } }: { params: { lng: string; slug: string } }
+  { params }: { params: Promise<{ lng: string; slug: string }> }
 ) {
-  await new Promise((res) => setTimeout(() => res("success"), 4000));
+  const { lng, slug } = await params;
   const data = await getAllAttendees(slug);
 
   const exportData = data.flatMap((attendee) => {

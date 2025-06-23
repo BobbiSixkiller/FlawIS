@@ -19,10 +19,11 @@ import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
 
 export default async function AttendeePage({
-  params: { id, lng, slug },
+  params,
 }: {
-  params: { slug: string; id: string; lng: string };
+  params: Promise<{ slug: string; id: string; lng: string }>;
 }) {
+  const { id, lng, slug } = await params;
   const attendee = await getAttendee(id);
   if (!attendee) {
     redirect(`/conferences/${slug}/attendees`);

@@ -5,16 +5,18 @@ import { getAcademicYear } from "@/utils/helpers";
 import AcademicYearSelect from "../../internships/AcademicYearSelect";
 
 export default async function InternshipsPage({
-  params: { lng },
+  params,
   searchParams,
 }: {
-  params: { lng: string };
-  searchParams?: { academicYear?: string };
+  params: Promise<{ lng: string }>;
+  searchParams?: Promise<{ academicYear?: string }>;
 }) {
+  const { lng } = await params;
+  const queryParams = await searchParams;
   const { t } = await translate(lng, "internships");
 
   const { startYear, endYear } = getAcademicYear();
-  const academicYear = searchParams?.academicYear || `${startYear}/${endYear}`;
+  const academicYear = queryParams?.academicYear || `${startYear}/${endYear}`;
 
   const initialData = await getInternships({ academicYear });
 

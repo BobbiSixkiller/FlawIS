@@ -5,6 +5,8 @@ import Button from "@/components/Button";
 import { deleteSection } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
+import { useTransition } from "react";
+import Spinner from "@/components/Spinner";
 
 export default function DeleteSectionForm({
   section,
@@ -18,18 +20,22 @@ export default function DeleteSectionForm({
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const [pending, startTransition] = useTransition();
+
   return (
     <form
       className="space-y-6 min-w-80"
-      action={async (data) => {
-        const state = await deleteSection(null, data);
+      action={() =>
+        startTransition(async () => {
+          const res = await deleteSection({ id: section.id });
 
-        setMessage(state.message, state.success);
+          setMessage(res.message, res.success);
 
-        if (state.success) {
-          closeDialog(dialogId);
-        }
-      }}
+          if (res.success) {
+            closeDialog(dialogId);
+          }
+        })
+      }
     >
       <input type="hidden" name="id" value={section.id} />
 
@@ -38,8 +44,13 @@ export default function DeleteSectionForm({
         {section?.translations[lng as "sk" | "en"].name} ?
       </h1>
 
-      <Button color="primary" type="submit" className="w-full">
-        Potvrdit
+      <Button
+        disabled={pending}
+        color="primary"
+        type="submit"
+        className="w-full"
+      >
+        {pending ? <Spinner inverted /> : "Potvrdit"}
       </Button>
     </form>
   );

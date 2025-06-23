@@ -7,7 +7,6 @@ import {
 } from "@/components/WIzzardForm";
 import { Input } from "@/components/Input";
 import { createConference } from "./actions";
-import { date, mixed, object, ref, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { LocalizedTextarea } from "@/components/Textarea";
 import ImageFileInput, {
@@ -15,6 +14,7 @@ import ImageFileInput, {
 } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
+import useValidation from "@/hooks/useValidation";
 
 export interface ConferenceInputType {
   slug: string;
@@ -44,6 +44,7 @@ export default function NewConferenceForm({
   dialogId: string;
 }) {
   const { t } = useTranslation(lng, "validation");
+  const { yup } = useValidation();
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
@@ -88,11 +89,12 @@ export default function NewConferenceForm({
     >
       <WizzardStep
         name="O konferencii"
-        validationSchema={object({
-          translations: object({
-            sk: object({
-              name: string().trim().required(t("required")),
-              logo: mixed<File>() // Pass in the type of `fileUpload`
+        validationSchema={yup.object({
+          translations: yup.object({
+            sk: yup.object({
+              name: yup.string().trim().required(),
+              logo: yup
+                .mixed<File>() // Pass in the type of `fileUpload`
                 .test("required", t("required"), (file) => file !== undefined)
                 .test(
                   "fileSize",
@@ -100,9 +102,10 @@ export default function NewConferenceForm({
                   (file) => file && file.size < 2_000_000
                 ),
             }),
-            en: object({
-              name: string().trim().required(t("required")),
-              logo: mixed<File>() // Pass in the type of `fileUpload`
+            en: yup.object({
+              name: yup.string().trim().required(),
+              logo: yup
+                .mixed<File>() // Pass in the type of `fileUpload`
                 .test("required", t("required"), (file) => file !== undefined)
                 .test(
                   "fileSize",
@@ -111,12 +114,13 @@ export default function NewConferenceForm({
                 ),
             }),
           }),
-          slug: string().trim().required(t("required")),
-          dates: object({
-            start: date().typeError(t("date")),
-            end: date()
+          slug: yup.string().trim().required(),
+          dates: yup.object({
+            start: yup.date().typeError(t("date")),
+            end: yup
+              .date()
               .typeError(t("date"))
-              .min(ref("start"), t("endDateInvalid")),
+              .min(yup.ref("start"), t("endDateInvalid")),
           }),
         })}
       >
@@ -144,22 +148,23 @@ export default function NewConferenceForm({
       </WizzardStep>
       <WizzardStep
         name="Fakturacne udaje"
-        validationSchema={object({
-          billing: object({
-            name: string().trim().required(t("required")),
-            address: object({
-              street: string().trim().required(t("required")),
-              city: string().trim().required(t("required")),
-              postal: string().trim().required(t("required")),
-              country: string().trim().required(t("required")),
+        validationSchema={yup.object({
+          billing: yup.object({
+            name: yup.string().trim().required(),
+            address: yup.object({
+              street: yup.string().trim().required(),
+              city: yup.string().trim().required(),
+              postal: yup.string().trim().required(),
+              country: yup.string().trim().required(),
             }),
-            variableSymbol: string().trim().required(t("required")),
-            IBAN: string().trim().required(t("required")),
-            SWIFT: string().trim().required(t("required")),
-            ICO: string().trim().required(t("required")),
-            DIC: string().trim().required(t("required")),
-            ICDPH: string().trim().required(t("required")),
-            stamp: mixed<File>() // Pass in the type of `fileUpload`
+            variableSymbol: yup.string().trim().required(),
+            IBAN: yup.string().trim().required(),
+            SWIFT: yup.string().trim().required(),
+            ICO: yup.string().trim().required(),
+            DIC: yup.string().trim().required(),
+            ICDPH: yup.string().trim().required(),
+            stamp: yup
+              .mixed<File>() // Pass in the type of `fileUpload`
               .test("required", t("required"), (file) => file !== undefined)
               .test(
                 "fileSize",

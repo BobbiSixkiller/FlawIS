@@ -5,18 +5,20 @@ import { translate } from "@/lib/i18n";
 import { headers } from "next/headers";
 
 export default async function UpdateProfilePage({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
-  const user = await getMe();
-
+  const { lng } = await params;
   const { t } = await translate(lng, "profile");
 
-  const host = headers().get("host") || ""; // Get the hostname from the request
+  const headerStore = await headers();
+  const host = headerStore.get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
   const dialogId = "update-profile";
+
+  const user = await getMe();
 
   return (
     <Modal title={t("heading")} dialogId="update-profile" isInterceptingRoute>

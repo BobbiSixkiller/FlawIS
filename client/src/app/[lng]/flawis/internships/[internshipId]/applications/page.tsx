@@ -2,10 +2,11 @@ import { getInterns } from "@/app/[lng]/internships/[internshipId]/applications/
 import ListInterns from "@/app/[lng]/internships/[internshipId]/applications/ListInterns";
 
 export default async function ApplicationsPage({
-  params: { internshipId },
+  params,
 }: {
-  params: { internshipId: string };
+  params: Promise<{ internshipId: string }>;
 }) {
+  const { internshipId } = await params;
   const filter = { internship: internshipId };
 
   const initialData = await getInterns(filter);

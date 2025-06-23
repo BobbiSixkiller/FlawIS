@@ -9,16 +9,18 @@ import Dashboard from "@/components/Dashboard";
 
 export async function generateMetadata(
   {
-    params: { lng },
+    params,
   }: {
-    params: { lng: string };
+    params: Promise<{ lng: string }>;
     sidebar: React.ReactNode;
     modal: React.ReactNode;
   },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
-  const host = headers().get("host") || "flawis.flaw.uniba.sk";
+  const headerStore = await headers();
+  const host = headerStore.get("host") || "flawis.flaw.uniba.sk";
   const tenant = host.split(".")[0].replace("-staging", "");
 
   const url =
@@ -48,16 +50,17 @@ export default async function DashboardLayout({
   children,
   modal,
   sidebar,
-  params: { lng },
+  params,
 }: {
   children: React.ReactNode;
   sidebar: React.ReactNode;
   modal: React.ReactNode;
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
-  const user = await getMe();
-
+  const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
+
+  const user = await getMe();
 
   return (
     <div>

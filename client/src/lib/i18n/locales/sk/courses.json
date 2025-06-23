@@ -1,4 +1,16 @@
 {
   "course_one": "Kurz",
-  "course_other": "Kury"
+  "course_other": "Kury",
+  "editor": {
+    "label": "Detailný popis kurzu. Upravte podľa potreby pomocou rich text editora.",
+    "term": "Termín kurzu:",
+    "termValue": "Termín je možné určiť po individuálnej dohode",
+    "variableSymbol": "Variabilný symbol:",
+    "variableSymbolValue": "123456",
+    "price": "Rozsah a cena kurzu:",
+    "priceValue": "4 hodiny/ 99,- € cena bez DPH",
+    "syllabus": "Obsah kurzu:",
+    "profile": "Kurz je určený pre:",
+    "lecturers": "Lektori:"
+  }
 }

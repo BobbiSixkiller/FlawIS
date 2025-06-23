@@ -1,28 +1,30 @@
 import { ReactNode } from "react";
 import TabMenu from "@/components/TabMenu";
 import { getInternship } from "@/app/[lng]/internships/[internshipId]/actions";
+import { translate } from "@/lib/i18n";
 
 export default async function InternshipLayout({
   children,
-  params: { internshipId },
+  params,
 }: {
   children: ReactNode;
-  params: { lng: string; internshipId: string };
+  params: Promise<{ lng: string; internshipId: string }>;
 }) {
+  const { internshipId, lng } = await params;
   const internship = await getInternship(internshipId);
+
+  const { t } = await translate(lng, "internships");
 
   return (
     <div className="h-full flex flex-col">
       <TabMenu
         tabs={[
-          { href: `/internships/${internshipId}`, name: "Staz" },
+          { href: `/internships/${internshipId}`, name: t("internship") },
           {
             href: `/internships/${internshipId}/applications`,
-            name: `Prihlaseni ${
-              internship?.applicationsCount
-                ? `(${internship.applicationsCount})`
-                : ""
-            }`,
+            name: t("applied", {
+              count: internship.applicationsCount,
+            }),
           },
         ]}
       />

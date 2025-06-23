@@ -2,14 +2,12 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath, revalidateTag } from "next/cache";
 
 import {
   ActivateUserDocument,
   MeDocument,
   ResendActivationLinkDocument,
 } from "@/lib/graphql/generated/graphql";
-import parseErrors, { ErrorException } from "@/utils/parseErrors";
 
 import { OAuth2Client } from "google-auth-library";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
@@ -34,7 +32,8 @@ export async function getGoogleAuthLink(url?: string) {
 }
 
 export async function getMe() {
-  const user = cookies().get("user")?.value || "me";
+  const cookieStore = await cookies();
+  const user = cookieStore.get("user")?.value || "me";
 
   const res = await executeGqlFetch(
     MeDocument,
@@ -51,7 +50,8 @@ export async function getMe() {
 }
 
 export async function activate() {
-  const token = cookies().get("activationToken")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("activationToken")?.value;
   if (!token) {
     return;
   }
@@ -69,7 +69,7 @@ export async function activate() {
     }
   );
 
-  cookies().delete("activationToken");
+  cookieStore.delete("activationToken");
   return res;
 }
 

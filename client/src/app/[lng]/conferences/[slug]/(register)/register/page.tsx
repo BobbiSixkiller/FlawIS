@@ -6,18 +6,21 @@ import { getSubmission } from "../../(withTabs)/submissions/actions";
 import { acceptAuthorInvite } from "./actions";
 
 export default async function RegisterPage({
-  params: { lng, slug },
+  params,
   searchParams,
 }: {
-  params: { slug: string; lng: string };
-  searchParams: {
+  params: Promise<{ slug: string; lng: string }>;
+  searchParams: Promise<{
     submission?: string;
     token?: string;
-  };
+  }>;
 }) {
+  const { lng, slug } = await params;
+  const { submission: submissionId, token } = await searchParams;
+
   const [conference, submission, user] = await Promise.all([
     getConference(slug),
-    getSubmission(searchParams.submission),
+    getSubmission(submissionId),
     getMe(),
   ]);
 
@@ -25,12 +28,8 @@ export default async function RegisterPage({
     redirect(`/${slug}`);
   }
 
-  if (
-    conference?.attending?.ticket.withSubmission &&
-    submission &&
-    searchParams.token
-  ) {
-    await acceptAuthorInvite(searchParams.token);
+  if (conference?.attending?.ticket.withSubmission && submission && token) {
+    await acceptAuthorInvite(token);
 
     redirect(`/${slug}`);
   }

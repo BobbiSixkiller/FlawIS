@@ -1,25 +1,26 @@
 import { Service } from "typedi";
-import { CourseTermAttendee } from "../entitites/Course";
-import {
-  CourseTermAttendeeArgs,
-  CourseTermAttendeeConnection,
-} from "../resolvers/types/course.types";
+
 import { Repository } from "./base.repository";
+import { CourseAttendee } from "../entitites/Course";
+import {
+  CourseAttendeeArgs,
+  CourseAttendeeConnection,
+} from "../resolvers/types/course.types";
 
 @Service()
-export class CourseTermAttendeeRepository extends Repository<
-  typeof CourseTermAttendee
+export class CourseAttendeeRepository extends Repository<
+  typeof CourseAttendee
 > {
   constructor() {
-    super(CourseTermAttendee);
+    super(CourseAttendee);
   }
 
   async paginatedCourseTermAttendees({
     termId,
     first,
     after,
-  }: CourseTermAttendeeArgs) {
-    const [connection] = await this.aggregate<CourseTermAttendeeConnection>([
+  }: CourseAttendeeArgs) {
+    const [connection] = await this.aggregate<CourseAttendeeConnection>([
       { $match: { term: termId } },
       { $sort: { _id: -1 } },
       {

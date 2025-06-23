@@ -8,9 +8,10 @@ import {
 } from "../resolvers/types/internship.types";
 import { I18nService } from "./i18n.service";
 import { UserService } from "./user.service";
-import { DocumentType } from "@typegoose/typegoose";
+import { DocumentType, mongoose } from "@typegoose/typegoose";
 import { InternshipRepository } from "../repositories/internship.repository";
 import { CtxUser } from "../util/types";
+import { Access } from "../entitites/User";
 
 function toInternshipDTO(doc: DocumentType<Internship>) {
   const json = doc.toJSON({
@@ -71,21 +72,41 @@ export class InternshipService {
     });
   }
 
-  async updateInternship(data: InternshipInput, id: ObjectId) {
-    const internship = await this.internshipRepository.findOne({ _id: id });
-    if (!internship) {
-      throw new Error(
-        this.i18nService.translate("notFound", { ns: "internship" })
+  async updateInternship(
+    data: InternshipInput,
+    id: ObjectId,
+    ctxUser: CtxUser
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const internship = await this.internshipRepository.findOneAndUpdate(
+        { _id: id },
+        data,
+        { session }
       );
+      if (!internship) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "internship" })
+        );
+      }
+
+      if (
+        !ctxUser.access.includes(Access.Admin) &&
+        ctxUser.id.toString() !== internship.user.toString()
+      ) {
+        throw new Error("Not allowed!");
+      }
+
+      await session.commitTransaction();
+      return toInternshipDTO(internship);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    for (const [key, value] of Object.entries(data)) {
-      internship[key as keyof InternshipInput] = value;
-    }
-
-    const update = await internship.save();
-
-    return toInternshipDTO(update);
   }
 
   async deleteInternship(id: ObjectId) {

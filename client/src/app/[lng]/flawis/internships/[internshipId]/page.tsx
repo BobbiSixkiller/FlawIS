@@ -8,13 +8,13 @@ import Modal from "@/components/Modal";
 import InternshipForm from "@/app/[lng]/internships/InternshipForm";
 import DeleteInternshipForm from "@/app/[lng]/internships/[internshipId]/DeleteInternshipForm";
 import { translate } from "@/lib/i18n";
-import Spinner from "@/components/Spinner";
 
 export default async function InternshipPage({
-  params: { internshipId, lng },
+  params,
 }: {
-  params: { internshipId: string; lng: string };
+  params: Promise<{ internshipId: string; lng: string }>;
 }) {
+  const { internshipId, lng } = await params;
   const internship = await getInternship(internshipId);
   if (!internship) {
     redirect("/");

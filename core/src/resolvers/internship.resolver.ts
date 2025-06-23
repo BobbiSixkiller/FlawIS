@@ -72,9 +72,14 @@ export class InternshipResolver {
   @Mutation(() => InternshipMutationResponse)
   async updateInternship(
     @Arg("input") data: InternshipInput,
-    @Arg("id") id: ObjectId
+    @Arg("id") id: ObjectId,
+    @Ctx() { user }: Context
   ): Promise<InternshipMutationResponse> {
-    const internship = await this.internshipService.updateInternship(data, id);
+    const internship = await this.internshipService.updateInternship(
+      data,
+      id,
+      user!
+    );
 
     return {
       data: internship,

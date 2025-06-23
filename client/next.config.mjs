@@ -3,8 +3,8 @@ import withPlaiceholder from "@plaiceholder/next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   logging: { fetches: { fullUrl: true } },
+  serverExternalPackages: ["@react-pdf/renderer"],
   experimental: {
-    serverComponentsExternalPackages: ["@react-pdf/renderer"],
     serverActions: {
       allowedOrigins: ["localhost", "*.flaw.uniba.sk"],
     },

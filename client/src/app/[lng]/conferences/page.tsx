@@ -4,10 +4,11 @@ import ListConferences from "./ListConferences";
 import { translate } from "@/lib/i18n";
 
 export default async function Conferences({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { t } = await translate(lng, "conferences");
 
   const initialData = await getConferences({});

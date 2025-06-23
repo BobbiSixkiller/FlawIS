@@ -1,5 +1,6 @@
 import LngSwitcher from "@/components/LngSwitcher";
 import Logo from "@/components/Logo";
+import ScrollWrapper from "@/components/ScrollWrapper";
 import ThemeToggler from "@/components/ThemeToggler";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
@@ -8,14 +9,16 @@ import Image from "next/image";
 
 export async function generateMetadata(
   {
-    params: { lng },
+    params,
   }: {
-    params: { lng: string };
+    params: Promise<{ lng: string }>;
   },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
-  const host = headers().get("host") || "flawis.flaw.uniba.sk";
+  const headerStore = await headers();
+  const host = headerStore.get("host") || "flawis.flaw.uniba.sk";
   const tenant = host.split(".")[0].replace("-staging", "");
 
   const url =
@@ -43,14 +46,16 @@ export async function generateMetadata(
 
 export default async function AuthLayout({
   children,
-  params: { lng },
+  params,
 }: {
   children: React.ReactNode;
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { i18n, t } = await translate(lng, "dashboard");
 
-  const theme = cookies().get("theme")?.value;
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value;
 
   return (
     <div className="flex h-screen dark:bg-gray-950">
@@ -66,7 +71,10 @@ export default async function AuthLayout({
         />
       </div>
 
-      <div className="px-6 py-12 flex-1 flex flex-col items-center overflow-auto relative">
+      <ScrollWrapper
+        id="auth-scroll"
+        className="px-6 py-12 flex-1 flex flex-col items-center relative"
+      >
         <div className="absolute top-8 right-8 flex gap-2">
           <ThemeToggler authLayout dark={theme === "dark"} />
           <LngSwitcher authLayout />
@@ -111,7 +119,7 @@ export default async function AuthLayout({
             </ul>
           </footer>
         </div>
-      </div>
+      </ScrollWrapper>
     </div>
   );
 }

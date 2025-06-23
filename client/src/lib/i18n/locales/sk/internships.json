@@ -26,7 +26,8 @@
     "title": "Zmazať prihlášku",
     "text": "Naozaj si prajete zmazať túto prihlášku?"
   },
-  "form": {
+  "editor": {
+    "label": "Deatilný popis stáže. Upravte podľa potreby pomocou rich text editora.",
     "dept": "Odbor (organizačný útvar) / Sekcia:",
     "name": "Nazov...",
     "semesterLabel": "Stáž prebieha v semestri:",

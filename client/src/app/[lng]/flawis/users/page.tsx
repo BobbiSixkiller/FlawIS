@@ -10,13 +10,14 @@ import UserForm from "../../(auth)/register/UserForm";
 import RegistrationInviteForm from "./RegistrationInviteForm";
 
 export default async function Users({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
-  const initialData = await getUsers({ first: 5 });
-
+  const { lng } = await params;
   const { t } = await translate(lng, "users");
+
+  const initialData = await getUsers({ first: 5 });
 
   const newUserDialogId = "new-user";
   const inviteUserDialogId = "invite-user";
@@ -31,7 +32,7 @@ export default async function Users({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={newUserDialogId}>
+              <ModalTrigger key={newUserDialogId} dialogId={newUserDialogId}>
                 <Button size="sm">
                   <PlusIcon className="size-5" />
                   Novy
@@ -42,7 +43,10 @@ export default async function Users({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={inviteUserDialogId}>
+              <ModalTrigger
+                key={inviteUserDialogId}
+                dialogId={inviteUserDialogId}
+              >
                 <Button size="sm" variant="secondary">
                   <BuildingLibraryIcon className="size-5" />
                   Pozvat instituciu

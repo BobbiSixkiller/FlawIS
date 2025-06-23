@@ -5,10 +5,11 @@ import { translate } from "@/lib/i18n";
 import { PencilIcon } from "@heroicons/react/24/outline";
 
 export default async function Profile({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { t } = await translate(lng, "profile");
   const user = await getMe();
 

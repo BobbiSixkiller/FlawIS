@@ -5,17 +5,21 @@ import GoogleSignIn from "../GoogleSignin";
 import { headers } from "next/headers";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
+import Link from "next/link";
 
 export default async function LoginPage({
-  params: { lng },
-  searchParams: { url },
+  params,
+  searchParams,
 }: {
-  params: { lng: string };
-  searchParams: { url?: string };
+  params: Promise<{ lng: string }>;
+  searchParams: Promise<{ url?: string }>;
 }) {
+  const { lng } = await params;
+  const { url } = await searchParams;
   const { t } = await translate(lng, "login");
 
-  const host = headers().get("host") || "localhost:3000";
+  const headerStore = await headers();
+  const host = headerStore.get("host") || "localhost:3000";
   const subdomain = host.split(".")[0];
 
   return (
@@ -51,7 +55,8 @@ export default async function LoginPage({
           t={t}
           components={{
             reg: (
-              <a
+              <Link
+                key={"reg"}
                 href={`/register${
                   url ? `?url=${encodeURIComponent(url)}` : ""
                 }`}

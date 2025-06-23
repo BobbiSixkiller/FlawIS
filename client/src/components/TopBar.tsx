@@ -10,12 +10,12 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ReactNode, useEffect, useState } from "react";
-import useScroll from "@/hooks/useScroll";
 import Drawer from "./Drawer";
 import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
+import useScrolled from "@/hooks/useScrolled";
 
 export default function TopBar({
   avatar,
@@ -30,7 +30,7 @@ export default function TopBar({
   drawerContent: ReactNode;
   logo: ReactNode;
 }) {
-  const scrolled = useScroll();
+  const scrolled = useScrolled();
   const [visible, setVisible] = useState(false);
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");

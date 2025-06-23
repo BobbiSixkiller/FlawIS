@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useScroll() {
+export default function useScrolled() {
   const [scrolled, setScrolled] = useState(false);
 
   // Add scroll event listener

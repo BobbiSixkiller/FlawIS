@@ -14,8 +14,9 @@ export async function login(email: string, password: string, url?: string) {
 
   if (res.data) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const cookieStore = await cookies();
 
-    cookies().set("user", res.data.email, {
+    cookieStore.set("user", res.data.email, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
       secure: process.env.NODE_ENV !== "development",
@@ -24,7 +25,7 @@ export async function login(email: string, password: string, url?: string) {
       domain:
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
-    cookies().set("accessToken", res.data.token, {
+    cookieStore.set("accessToken", res.data.token, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours
       secure: process.env.NODE_ENV !== "development",

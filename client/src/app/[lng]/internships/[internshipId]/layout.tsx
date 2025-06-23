@@ -7,11 +7,12 @@ import { translate } from "@/lib/i18n";
 
 export default async function InternshipLayout({
   children,
-  params: { internshipId, lng },
+  params,
 }: {
   children: ReactNode;
-  params: { lng: string; internshipId: string };
+  params: Promise<{ lng: string; internshipId: string }>;
 }) {
+  const { internshipId, lng } = await params;
   const [user, internship] = await Promise.all([
     getMe(),
     getInternship(internshipId),

@@ -20,7 +20,7 @@ registerEnumType(Status, {
 });
 
 @ObjectType({ description: "User stub type" })
-export class UserReferece {
+export class StudentReference implements Partial<User> {
   @Field(() => ObjectId, { description: "User document id" })
   id: ObjectId;
 
@@ -57,9 +57,9 @@ export class Intern extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Field(() => UserReferece)
-  @Property({ type: () => UserReferece })
-  user: UserReferece;
+  @Field(() => StudentReference)
+  @Property({ type: () => StudentReference })
+  user: StudentReference;
 
   @Field(() => ObjectId)
   @Property({ ref: () => Internship })

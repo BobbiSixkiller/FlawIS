@@ -9,11 +9,12 @@ import { translate } from "@/lib/i18n";
 
 export default async function Layout({
   children,
-  params: { slug, lng },
+  params,
 }: {
   children: ReactNode;
-  params: { lng: string; slug: string };
+  params: Promise<{ lng: string; slug: string }>;
 }) {
+  const { lng, slug } = await params;
   const { t } = await translate(lng, "conferences");
 
   const conference = await getConference(slug);

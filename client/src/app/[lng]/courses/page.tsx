@@ -1,7 +1,7 @@
 export default async function CoursesPage({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
   return <div>KURZIKY</div>;
 }

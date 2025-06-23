@@ -6,7 +6,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "../../../components/Button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
 
-import { FormMessage } from "@/components/Message";
 import Spinner from "@/components/Spinner";
 import Modal from "@/components/Modal";
 import { useDialogStore } from "@/stores/dialogStore";

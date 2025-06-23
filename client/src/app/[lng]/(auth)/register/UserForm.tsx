@@ -30,6 +30,7 @@ import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
 import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
+import { useScrollStore } from "@/stores/scrollStore";
 
 export default function UserForm({
   user,
@@ -218,6 +219,7 @@ export default function UserForm({
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
+  const scrollToTop = useScrollStore((s) => s.getScroll);
 
   if (loadingFile)
     return (
@@ -250,9 +252,9 @@ export default function UserForm({
               return methods.setError("avatar", { message: error });
             }
 
-            let state;
+            let res;
             if (path.includes("register")) {
-              state = await register({
+              res = await register({
                 url: searchParams.get("url")?.toString(),
                 token: searchParams.get("token")?.toString(),
                 email: val.email,
@@ -262,7 +264,7 @@ export default function UserForm({
                 telephone: val.telephone ? val.telephone : undefined,
               });
             } else if (user) {
-              state = await updateUser(user.id, {
+              res = await updateUser(user.id, {
                 email: val.email,
                 name: val.name,
                 organization: val.organization ? val.organization : undefined,
@@ -275,7 +277,7 @@ export default function UserForm({
                 address: val.address ? (val.address as Address) : undefined,
               });
             } else {
-              state = await addUser({
+              res = await addUser({
                 email: val.email,
                 name: val.name,
                 password: val.password as string,
@@ -285,8 +287,12 @@ export default function UserForm({
               });
             }
 
-            if (state?.errors) {
-              for (const [key, value] of Object.entries(state.errors)) {
+            if (res) {
+              setMessage(res.message, res.success);
+            }
+
+            if (res?.errors) {
+              for (const [key, value] of Object.entries(res.errors)) {
                 methods.setError(
                   key as keyof (typeof methods)["formState"]["errors"],
                   {
@@ -297,11 +303,12 @@ export default function UserForm({
               }
             }
 
-            if (state) {
-              setMessage(state.message, state.success);
+            // Scroll to top of the ScrollWrapper component only of there is no form field error set
+            if (!res?.success && !res?.errors) {
+              scrollToTop("auth-scroll");
             }
 
-            if (state?.success && dialogId) {
+            if (res?.success && dialogId) {
               closeDialog(dialogId);
             }
           },

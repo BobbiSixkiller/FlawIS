@@ -6,7 +6,7 @@ import { withSubdomain } from "./middlewares/subdomainMiddleware";
 export const config = {
   // do not localize next.js paths and public folder
   matcher: [
-    "/((?!api|_next|favicon.ico|images|UKsans|site.webmanifest|browserconfig.xml|sw.js|.pdf).*)",
+    "/((?!api|_next|favicon.ico|apple-icon|images|UKsans|manifest.webmanifest|browserconfig.xml|sw.js|.pdf).*)",
   ],
 };
 

@@ -9,10 +9,11 @@ import Modal from "@/components/Modal";
 import NewConferenceForm from "./NewConferenceForm";
 
 export default async function Conferences({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { t } = await translate(lng, "conferences");
 
   const initialData = await getConferences({});
@@ -39,6 +40,7 @@ export default async function Conferences({
           },
         ]}
       />
+
       {initialData && <ListConferences initialData={initialData} />}
 
       <Modal title="Nova konferencia" dialogId={newConferenceDialogId}>

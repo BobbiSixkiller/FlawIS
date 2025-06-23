@@ -9,11 +9,12 @@ import TabMenu from "@/components/TabMenu";
 
 export default async function TabsLayout({
   children,
-  params: { lng, slug },
+  params,
 }: {
   children: ReactNode;
-  params: { slug: string; lng: string };
+  params: Promise<{ slug: string; lng: string }>;
 }) {
+  const { slug } = await params;
   const tabs = [
     {
       href: `/conferences/${slug}`,

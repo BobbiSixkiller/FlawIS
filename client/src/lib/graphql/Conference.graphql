@@ -201,6 +201,11 @@ mutation updateConferenceDates($slug: String!, $data: DatesInput!) {
 mutation createSection($data: SectionInput!) {
   createSection(data: $data) {
     message
+    data {
+      conference {
+        slug
+      }
+    }
   }
 }
 
@@ -243,7 +248,9 @@ mutation updateTicket(
 }
 
 mutation deleteTicket($slug: String!, $ticketId: ObjectId!) {
-  deleteTicket(slug: $slug, ticketId: $ticketId)
+  deleteTicket(slug: $slug, ticketId: $ticketId) {
+    message
+  }
 }
 
 mutation addAttendee($data: AttendeeInput!) {

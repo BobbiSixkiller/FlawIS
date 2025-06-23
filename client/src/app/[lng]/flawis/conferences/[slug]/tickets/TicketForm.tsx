@@ -7,7 +7,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
-import { updateTicket } from "./actions";
+import { createTicket, updateTicket } from "./actions";
 import { Input, LocalizedInput } from "@/components/Input";
 import { LocalizedTextarea } from "@/components/Textarea";
 import CheckBox from "@/components/Checkbox";
@@ -15,13 +15,13 @@ import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 
-export default function UpdateTicketForm({
+export default function TicketForm({
   ticket,
   lng,
   dialogId,
 }: {
   lng: string;
-  ticket: TicketFragment;
+  ticket?: TicketFragment;
   dialogId: string;
 }) {
   const { slug } = useParams<{ slug: string }>();
@@ -49,10 +49,13 @@ export default function UpdateTicketForm({
       }).required(t("required"))
     ),
     values: {
-      online: ticket?.online,
-      withSubmission: ticket?.withSubmission,
-      price: ticket?.price,
-      translations: ticket?.translations,
+      online: ticket?.online || false,
+      withSubmission: ticket?.withSubmission || false,
+      price: ticket?.price || 0,
+      translations: ticket?.translations || {
+        en: { name: "", description: "" },
+        sk: { name: "", description: "" },
+      },
     },
   });
 
@@ -64,7 +67,12 @@ export default function UpdateTicketForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const res = await updateTicket(data, slug, ticket.id);
+          let res;
+          if (ticket) {
+            res = await updateTicket({ data, slug, ticketId: ticket.id });
+          } else {
+            res = await createTicket({ data, slug });
+          }
 
           setMessage(res.message, res.success);
 
@@ -83,7 +91,7 @@ export default function UpdateTicketForm({
           label="Popis listku"
           name={`translations.${lng}.description`}
         />
-        <Input label="Cena" name="price" type="number" />
+        <Input label="Cena v centoch" name="price" type="number" />
         <CheckBox label="Online" name="online" />
         <CheckBox label="S prispevkom" name="withSubmission" />
 

@@ -96,18 +96,6 @@ export class UserService {
     const isAdmin = ctxUser?.access.includes(Access.Admin);
     const access: Access[] = [];
 
-    if (hostname?.includes("conferences")) {
-      access.push(Access.ConferenceAttendee);
-    }
-    if (hostname?.includes("intern")) {
-      if (token && token !== "undefined") {
-        await this.tokenService.verifyOneTimeToken(token);
-        access.push(Access.Organization);
-      } else {
-        access.push(Access.Student);
-      }
-    }
-
     const emailExists = await this.userRepository.findOne({
       email: data.email,
     });
@@ -126,6 +114,18 @@ export class UserService {
           //children?: ValidationError[], // Contains all nested validation errors of the property
         },
       ]);
+    }
+
+    if (hostname?.includes("conferences")) {
+      access.push(Access.ConferenceAttendee);
+    }
+    if (hostname?.includes("intern") || true) {
+      if (token && token !== "undefined") {
+        await this.tokenService.verifyOneTimeToken(token);
+        access.push(Access.Organization);
+      } else {
+        access.push(Access.Student);
+      }
     }
 
     const user = await this.userRepository.create({
@@ -230,8 +230,6 @@ export class UserService {
       }),
       "mail.reset"
     );
-
-    console.log(this.i18nService.translate("resetLinkSent"));
 
     return this.i18nService.translate("resetLinkSent");
   }

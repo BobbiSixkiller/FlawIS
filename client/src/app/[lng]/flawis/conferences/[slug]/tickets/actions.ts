@@ -2,80 +2,43 @@
 
 import {
   CreateTicketDocument,
+  CreateTicketMutationVariables,
   DeleteTicketDocument,
-  TicketInput,
+  DeleteTicketMutationVariables,
   UpdateTicketDocument,
+  UpdateTicketMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidateTag } from "next/cache";
+import { executeGqlMutation } from "@/utils/actions";
 
-export async function createTicket(data: TicketInput, conferenceSlug: string) {
-  try {
-    const res = await executeGqlFetch(CreateTicketDocument, {
-      slug: conferenceSlug,
-      data,
-    });
-
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
-    }
-
-    revalidateTag(`conference:${conferenceSlug}`);
-    return { success: true, message: res.data.createTicket.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+export async function createTicket(vars: CreateTicketMutationVariables) {
+  return await executeGqlMutation(
+    CreateTicketDocument,
+    vars,
+    (data) => ({
+      message: data.createTicket.message,
+    }),
+    { revalidateTags: () => [`conference:${vars.slug}`] }
+  );
 }
 
-export async function updateTicket(
-  data: TicketInput,
-  conferenceSlug: string,
-  ticketId: string
-) {
-  try {
-    const res = await executeGqlFetch(UpdateTicketDocument, {
-      data,
-      ticketId,
-      slug: conferenceSlug,
-    });
-
-    if (res.errors) {
-      const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-      throw new Error(
-        validationErrors
-          ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-          : res.errors[0].message
-      );
-    }
-
-    revalidateTag(`conference:${conferenceSlug}`);
-    return { success: true, message: res.data.updateTicket.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+export async function updateTicket(vars: UpdateTicketMutationVariables) {
+  return await executeGqlMutation(
+    UpdateTicketDocument,
+    vars,
+    (data) => ({
+      message: data.updateTicket.message,
+    }),
+    { revalidateTags: () => [`conference:${vars.slug}`] }
+  );
 }
 
-export async function deleteTicket(prevState: any, data: FormData) {
-  try {
-    const res = await executeGqlFetch(DeleteTicketDocument, {
-      slug: data.get("slug")?.toString() || "",
-      ticketId: data.get("ticketId")?.toString() || "",
-    });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
-    }
-
-    revalidateTag(`conference:${data.get("slug")?.toString()}`);
-    return { success: true, message: res.data.deleteTicket };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+export async function deleteTicket(vars: DeleteTicketMutationVariables) {
+  return await executeGqlMutation(
+    DeleteTicketDocument,
+    vars,
+    (data) => ({
+      message: data.deleteTicket.message,
+    }),
+    { revalidateTags: (data) => [`conference:${vars.slug}`] }
+  );
 }

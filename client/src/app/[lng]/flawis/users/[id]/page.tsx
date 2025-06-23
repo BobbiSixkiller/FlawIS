@@ -17,16 +17,17 @@ import DeleteUserForm from "./DeleteUserForm";
 import ImpersonateForm from "./ImpersonateForm";
 
 export default async function User({
-  params: { id, lng },
+  params,
 }: {
-  params: { lng: string; id: string };
+  params: Promise<{ lng: string; id: string }>;
 }) {
+  const { id, lng } = await params;
+  const { t } = await translate(lng, ["profile", "common"]);
+
   const user = await getUser(id);
   if (!user) {
     redirect("/users");
   }
-
-  const { t } = await translate(lng, ["profile", "common"]);
 
   const updateUserDialogId = "update-user";
   const deleteUserDialogId = "delete-user";

@@ -4,16 +4,20 @@ import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
-import NewTicketForm from "./NewTicketForm";
-import UpdateTicketForm from "./UpdateTicketForm";
 import DeleteTicketForm from "./DeleteTicketForm";
+import { redirect } from "next/navigation";
+import TicketForm from "./TicketForm";
 
 export default async function TicketsPage({
-  params: { lng, slug },
+  params,
 }: {
-  params: { lng: string; slug: string };
+  params: Promise<{ lng: string; slug: string }>;
 }) {
+  const { lng, slug } = await params;
   const conference = await getConference(slug);
+  if (!conference) {
+    redirect("/conferences");
+  }
 
   const newTicketDialogId = "new-ticket";
   const updateTicketDialogId = "update-ticket";
@@ -70,7 +74,7 @@ export default async function TicketsPage({
             />
 
             <Modal dialogId={updateTicketDialogId} title="Upravit listok">
-              <UpdateTicketForm
+              <TicketForm
                 dialogId={updateTicketDialogId}
                 lng={lng}
                 ticket={t}
@@ -88,11 +92,7 @@ export default async function TicketsPage({
       </div>
 
       <Modal dialogId={newTicketDialogId} title="Pridat listok">
-        <NewTicketForm
-          dialogId={newTicketDialogId}
-          lng={lng}
-          conference={conference}
-        />
+        <TicketForm dialogId={newTicketDialogId} lng={lng} />
       </Modal>
     </div>
   );

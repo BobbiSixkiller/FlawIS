@@ -4,10 +4,11 @@ import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import { translate } from "@/lib/i18n";
 
 export default async function UpdateProfilePage({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const user = await getMe();
 
   const { t } = await translate(lng, "profile");

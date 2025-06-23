@@ -11,6 +11,7 @@ import Editor from "@/components/editor/Editor";
 import { createInternship, updateInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
+import useDefaultContent from "@/components/editor/useDefaultContent";
 
 export default function InternshipForm({
   data,
@@ -33,232 +34,7 @@ export default function InternshipForm({
     defaultValues: { description: data?.description || "" },
   });
 
-  const defaultContent = {
-    type: "doc",
-    content: [
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.dept"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.name"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.semesterLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.semester"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.estimatedLength"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.timePeriod"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.internsCountLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.internsCount"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.educLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.educ"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.lngLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.lng"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.otherLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("form.other"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("form.internshipDescLabel"),
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        attrs: {
-          tight: true,
-        },
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: t("form.internshipDesc"),
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+  const { defaultInternshipEditorContent } = useDefaultContent(lng);
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
@@ -293,13 +69,12 @@ export default function InternshipForm({
       >
         <div>
           <p className="block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-2">
-            Deatilný popis stáže. Upravte podľa potreby pomocou rich text
-            editora.
+            {t("form.label")}
           </p>
 
           <Editor
             name="description"
-            initialValue={data?.description || defaultContent}
+            initialValue={data?.description || defaultInternshipEditorContent}
           />
         </div>
 

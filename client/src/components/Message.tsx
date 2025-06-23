@@ -34,6 +34,7 @@ export function FormMessage() {
       afterEnter={() => setTimeout(() => clear(), 3000)}
     >
       <div
+        role="alert"
         className={`flex flex-col gap-1 p-3 rounded-lg border ${
           message.success
             ? "border-green-500 text-green-500 bg-green-200"
@@ -88,6 +89,7 @@ export function Snackbar() {
       afterEnter={() => setTimeout(() => clear(), 3000)}
     >
       <div
+        role="alert"
         className={`
            fixed h-fit z-40 inset-x-0 bottom-0 text-center flex flex-col gap-1 p-3 border-t ${
              message.success

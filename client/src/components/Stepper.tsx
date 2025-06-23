@@ -25,7 +25,7 @@ export default function Stepper({
   }
 
   return (
-    <ol className="md:flex items-start justify-center space-y-4 md:space-x-8 md:space-y-0 w-full">
+    <ol className="md:flex items-center space-y-4 md:space-x-8 md:space-y-0 w-full">
       {steps.map((s, i) => (
         <li className="flex-1 max-w-40" key={i}>
           <div

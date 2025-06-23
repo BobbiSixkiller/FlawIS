@@ -4,7 +4,6 @@ import {
   ConferenceDocument,
   ConferencesDocument,
   CreateConferenceDocument,
-  TextSearchConferenceDocument,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
@@ -47,12 +46,6 @@ export async function getConference(slug: string) {
   }
 
   return res.data?.conference;
-}
-
-export async function searchConference(params: { text: string }) {
-  const res = await executeGqlFetch(TextSearchConferenceDocument, params);
-
-  return res.data.textSearchConference || [];
 }
 
 export async function createConference(data: FormData) {

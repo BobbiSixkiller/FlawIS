@@ -157,9 +157,10 @@ type Course {
   id: ObjectId!
   isPaid: Boolean!
   name: String!
+  owner: UserStub!
   price: Int!
+  procurer: UserStub
   updatedAt: DateTimeISO!
-  user: UserStubUnion!
 }
 
 type CourseConnection {
@@ -249,7 +250,7 @@ type Intern {
   organizationFeedbackUrl: String
   status: Status!
   updatedAt: DateTimeISO!
-  user: UserReferece!
+  user: StudentReference!
 }
 
 """InternConnection type enabling cursor based pagination"""
@@ -393,7 +394,7 @@ type Mutation {
   deleteInternship(id: ObjectId!): InternshipMutationResponse!
   deleteSection(id: ObjectId!): SectionMutationResponse!
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
-  deleteTicket(slug: String!, ticketId: ObjectId!): String!
+  deleteTicket(slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
   login(email: String!, password: String!): UserMutationResponse!
@@ -514,6 +515,19 @@ enum Status {
   Applied
   Eligible
   Rejected
+}
+
+"""User stub type"""
+type StudentReference {
+  address: Address!
+  avatarUrl: String
+  email: String!
+
+  """User document id"""
+  id: ObjectId!
+  name: String!
+  studyProgramme: StudyProgramme!
+  telephone: String!
 }
 
 """Student user account StudyProgramme"""
@@ -668,19 +682,6 @@ type UserMutationResponse implements IMutationResponse {
 type UserPageInfo {
   endCursor: ObjectId
   hasNextPage: Boolean!
-}
-
-"""User stub type"""
-type UserReferece {
-  address: Address!
-  avatarUrl: String
-  email: String!
-
-  """User document id"""
-  id: ObjectId!
-  name: String!
-  studyProgramme: StudyProgramme!
-  telephone: String!
 }
 
 type UserStub {

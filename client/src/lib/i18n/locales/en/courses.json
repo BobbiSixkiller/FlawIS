@@ -1,4 +1,16 @@
 {
   "course_one": "Course",
-  "course_other": "Courses"
+  "course_other": "Courses",
+  "editor": {
+    "label": "Detailed course description. Edit as needed using the rich text editor.",
+    "term": "Course term:",
+    "termValue": "The term can be determined by individual agreement",
+    "variableSymbol": "Variable symbol:",
+    "variableSymbolValue": "123456",
+    "price": "Course scope and price:",
+    "priceValue": "4 hours/ €99,- price excluding VAT",
+    "syllabus": "Course content:",
+    "profile": "The course is intended for:",
+    "lecturers": "Lecturers:"
+  }
 }

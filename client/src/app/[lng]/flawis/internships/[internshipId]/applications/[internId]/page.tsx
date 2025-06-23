@@ -12,10 +12,11 @@ import ChangeStatusForm from "./ChangeStatusForm";
 import { redirect } from "next/navigation";
 
 export default async function InternPage({
-  params: { internshipId, internId, lng },
+  params,
 }: {
-  params: { internshipId: string; internId: string; lng: string };
+  params: Promise<{ internshipId: string; internId: string; lng: string }>;
 }) {
+  const { internId, internshipId, lng } = await params;
   const intern = await getIntern(internId);
   if (!intern) {
     return redirect(`/internships/${internshipId}/applications`);

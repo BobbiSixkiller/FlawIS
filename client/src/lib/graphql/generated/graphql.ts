@@ -189,9 +189,10 @@ export type Course = {
   id: Scalars['ObjectId']['output'];
   isPaid: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  owner: UserStub;
   price: Scalars['Int']['output'];
+  procurer?: Maybe<UserStub>;
   updatedAt: Scalars['DateTimeISO']['output'];
-  user: UserStubUnion;
 };
 
 export type CourseConnection = {
@@ -283,7 +284,7 @@ export type Intern = {
   organizationFeedbackUrl?: Maybe<Scalars['String']['output']>;
   status: Status;
   updatedAt: Scalars['DateTimeISO']['output'];
-  user: UserReferece;
+  user: StudentReference;
 };
 
 /** InternConnection type enabling cursor based pagination */
@@ -438,7 +439,7 @@ export type Mutation = {
   deleteInternship: InternshipMutationResponse;
   deleteSection: SectionMutationResponse;
   deleteSubmission: SubmissionMutationResponse;
-  deleteTicket: Scalars['String']['output'];
+  deleteTicket: ConferenceMutationResponse;
   deleteUser: UserMutationResponse;
   googleSignIn: UserMutationResponse;
   login: UserMutationResponse;
@@ -874,6 +875,19 @@ export enum Status {
   Rejected = 'Rejected'
 }
 
+/** User stub type */
+export type StudentReference = {
+  __typename?: 'StudentReference';
+  address: Address;
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  /** User document id */
+  id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+  studyProgramme: StudyProgramme;
+  telephone: Scalars['String']['output'];
+};
+
 /** Student user account StudyProgramme */
 export enum StudyProgramme {
   Bachelor1 = 'Bachelor1',
@@ -1041,19 +1055,6 @@ export type UserPageInfo = {
   __typename?: 'UserPageInfo';
   endCursor?: Maybe<Scalars['ObjectId']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
-};
-
-/** User stub type */
-export type UserReferece = {
-  __typename?: 'UserReferece';
-  address: Address;
-  avatarUrl?: Maybe<Scalars['String']['output']>;
-  email: Scalars['String']['output'];
-  /** User document id */
-  id: Scalars['ObjectId']['output'];
-  name: Scalars['String']['output'];
-  studyProgramme: StudyProgramme;
-  telephone: Scalars['String']['output'];
 };
 
 export type UserStub = {
@@ -1249,7 +1250,7 @@ export type CreateSectionMutationVariables = Exact<{
 }>;
 
 
-export type CreateSectionMutation = { __typename?: 'Mutation', createSection: { __typename?: 'SectionMutationResponse', message: string } };
+export type CreateSectionMutation = { __typename?: 'Mutation', createSection: { __typename?: 'SectionMutationResponse', message: string, data: { __typename?: 'Section', conference?: { __typename?: 'Conference', slug: string } | null } } };
 
 export type UpdateSectionMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1289,7 +1290,7 @@ export type DeleteTicketMutationVariables = Exact<{
 }>;
 
 
-export type DeleteTicketMutation = { __typename?: 'Mutation', deleteTicket: string };
+export type DeleteTicketMutation = { __typename?: 'Mutation', deleteTicket: { __typename?: 'ConferenceMutationResponse', message: string } };
 
 export type AddAttendeeMutationVariables = Exact<{
   data: AttendeeInput;
@@ -1300,7 +1301,7 @@ export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __ty
 
 export type CourseFragment = { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any };
 
-export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
+export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type InternshipsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
@@ -1312,14 +1313,14 @@ export type InternshipsQueryVariables = Exact<{
 }>;
 
 
-export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
+export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
 
 export type InternshipQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, user: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
+export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, user: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
 
 export type CreateInternshipMutationVariables = Exact<{
   input: InternshipInput;
@@ -1354,14 +1355,14 @@ export type InternsQueryVariables = Exact<{
 }>;
 
 
-export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: any, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: any, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: any | null, hasNextPage: boolean } } };
 
 export type InternQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type InternQuery = { __typename?: 'Query', intern: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'UserReferece', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } };
+export type InternQuery = { __typename?: 'Query', intern: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } };
 
 export type CreateInternMutationVariables = Exact<{
   fileUrls: Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>;
@@ -3537,6 +3538,11 @@ export const CreateSectionDocument = new TypedDocumentString(`
     mutation createSection($data: SectionInput!) {
   createSection(data: $data) {
     message
+    data {
+      conference {
+        slug
+      }
+    }
   }
 }
     `) as unknown as TypedDocumentString<CreateSectionMutation, CreateSectionMutationVariables>;
@@ -3580,7 +3586,9 @@ export const UpdateTicketDocument = new TypedDocumentString(`
     `) as unknown as TypedDocumentString<UpdateTicketMutation, UpdateTicketMutationVariables>;
 export const DeleteTicketDocument = new TypedDocumentString(`
     mutation deleteTicket($slug: String!, $ticketId: ObjectId!) {
-  deleteTicket(slug: $slug, ticketId: $ticketId)
+  deleteTicket(slug: $slug, ticketId: $ticketId) {
+    message
+  }
 }
     `) as unknown as TypedDocumentString<DeleteTicketMutation, DeleteTicketMutationVariables>;
 export const AddAttendeeDocument = new TypedDocumentString(`

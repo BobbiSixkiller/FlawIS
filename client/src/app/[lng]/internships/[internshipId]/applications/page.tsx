@@ -6,11 +6,12 @@ import { getInternship } from "../actions";
 import { redirect } from "next/navigation";
 
 export default async function ApplicationsPage({
-  params: { internshipId },
+  params,
 }: {
-  params: { internshipId: string };
+  params: Promise<{ internshipId: string }>;
 }) {
-  // Implement checking if user with org access is viewing someone elses internship applications
+  const { internshipId } = await params;
+  // Implement backend checking if user with org access is viewing someone elses internship applications
   const [user, internship] = await Promise.all([
     getMe(),
     getInternship(internshipId),

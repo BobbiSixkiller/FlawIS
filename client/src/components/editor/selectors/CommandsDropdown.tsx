@@ -1,6 +1,8 @@
 import { Editor } from "@tiptap/core";
 import { useEffect, useState } from "react";
 import { items } from "./NodeSelector";
+import { useParams } from "next/navigation";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function CommandsDropdown({ editor }: { editor?: Editor }) {
   const storage: {
@@ -10,6 +12,8 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
     selectedIndex: number;
   } = editor?.storage.SlashCommand;
   const [state, setState] = useState(storage);
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "editor");
 
   useEffect(() => {
     const handleUpdate = (
@@ -57,7 +61,7 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
     >
       {filteredItems.map((item, index) => (
         <div
-          key={item.name}
+          key={index}
           className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-white/30 rounded ${
             index === storage.selectedIndex ? "bg-white/30" : ""
           }`}
@@ -81,7 +85,7 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
           }}
         >
           <item.icon className="size-5 text-white" />
-          <span className="text-white">{item.name}</span>
+          <span className="text-white">{t(item.name)}</span>
         </div>
       ))}
     </div>

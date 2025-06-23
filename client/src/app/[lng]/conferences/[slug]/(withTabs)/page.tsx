@@ -7,10 +7,11 @@ import DownloadPDFButton from "@/app/[lng]/flawis/conferences/[slug]/attendees/[
 import { translate } from "@/lib/i18n";
 
 export default async function ConferencePage({
-  params: { lng, slug },
+  params,
 }: {
-  params: { slug: string; lng: string };
+  params: Promise<{ slug: string; lng: string }>;
 }) {
+  const { lng, slug } = await params;
   const { t } = await translate(lng, ["conferences"]);
   const conference = await getConference(slug);
   if (

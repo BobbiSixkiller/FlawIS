@@ -64,7 +64,7 @@ export class ConferenceRepository extends Repository<typeof Conference> {
   }
 
   async textSearch(text: string) {
-    await this.aggregate([
+    return await this.aggregate([
       { $match: { $text: { $search: text } } },
       { $sort: { score: { $meta: "textScore" } } },
       { $addFields: { id: "$_id", "tickets.id": "$tickets._id" } },

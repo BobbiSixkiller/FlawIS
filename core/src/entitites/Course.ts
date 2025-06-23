@@ -5,10 +5,9 @@ import { ObjectId } from "mongodb";
 import { Field, Int, ObjectType } from "type-graphql";
 
 import { FlawBilling } from "./Billing";
-import { Invoice, UserStubUnion } from "./Attendee";
+import { Invoice } from "./Attendee";
 import { UserStub } from "./User";
-
-//implement proper indexes
+import { Status } from "./Internship";
 
 @ObjectType()
 @Index({ user: 1 })
@@ -17,13 +16,17 @@ export class Course extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
+  @Field(() => UserStub)
+  @Property({ type: () => UserStub })
+  owner: UserStub;
+
+  @Field(() => UserStub, { nullable: true })
+  @Property({ type: () => UserStub })
+  procurer?: UserStub;
+
   @Field()
   @Property()
   name: string;
-
-  @Field(() => UserStubUnion)
-  @Property({ type: () => UserStub })
-  user: UserStub;
 
   @Field({
     description: "String representation of HTML describing the course",
@@ -106,17 +109,36 @@ export class CourseTerm extends TimeStamps {
 }
 
 @ObjectType()
-@Index({ "user._id": 1, term: 1 })
-export class CourseTermAttendee extends TimeStamps {
+export class CourseAttendeeUserStub extends UserStub {
+  @Field()
+  @Property()
+  organizatation: string;
+
+  @Field()
+  @Property()
+  department: string;
+}
+
+@ObjectType()
+@Index({ "user._id": 1, term: 1, status: 1 })
+export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Field(() => UserStubUnion)
-  @Property({ type: () => UserStub })
-  user: UserStub;
+  @Field(() => CourseAttendeeUserStub)
+  @Property({ type: () => CourseAttendeeUserStub })
+  user: CourseAttendeeUserStub;
 
   @Property({ ref: () => CourseTerm })
   term: Ref<CourseTerm>;
+
+  @Field(() => Status)
+  @Property({ enum: Status, type: String, default: Status.Applied })
+  status: Status;
+
+  @Field(() => [String])
+  @Property({ type: () => [String], default: [] })
+  fileUrls: string[];
 
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })

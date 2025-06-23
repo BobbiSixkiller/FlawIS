@@ -24,11 +24,12 @@ function nodeStreamToWebReadable(stream: Readable): ReadableStream {
 export async function GET(
   request: NextRequest,
   {
-    params: { lng },
+    params,
   }: {
-    params: { lng: string };
+    params: Promise<{ lng: string }>;
   }
 ) {
+  const { lng } = await params;
   const { t } = await translate(lng, "minio");
 
   const user = await getMe();
@@ -108,11 +109,12 @@ export async function GET(
 export async function POST(
   request: NextRequest,
   {
-    params: { lng },
+    params,
   }: {
-    params: { lng: string };
+    params: Promise<{ lng: string }>;
   }
 ) {
+  const { lng } = await params;
   const { t } = await translate(lng, "minio");
 
   const user = await getMe();

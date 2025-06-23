@@ -10,7 +10,7 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Intern, Status, UserReferece } from "../entitites/Internship";
+import { Intern, Status, StudentReference } from "../entitites/Internship";
 import { InternService } from "../services/intern.service";
 import { I18nService } from "../services/i18n.service";
 import {
@@ -135,15 +135,15 @@ export class InternResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => UserReferece)
-  async user(@Root() { user: userReference }: Intern): Promise<UserReferece> {
+  @FieldResolver(() => StudentReference)
+  async user(@Root() { user: studentReference }: Intern) {
     try {
-      const user = await this.userService.getUser(userReference.id);
+      const user = await this.userService.getUser(studentReference.id);
 
-      return { ...userReference, avatarUrl: user.avatarUrl };
+      return { ...studentReference, avatarUrl: user.avatarUrl };
     } catch (error: any) {
       console.log(error.message);
-      return userReference;
+      return studentReference;
     }
   }
 }

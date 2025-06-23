@@ -26,7 +26,8 @@
     "title": "Delete application",
     "text": "Do you really want to delete this application?"
   },
-  "form": {
+  "editor": {
+    "label": "A detailed description of the internship. Edit as needed using the rich text editor.",
     "dept": "Department (organizational unit) / Section:",
     "name": "Name...",
     "semesterLabel": "The internship takes place in the semester:",

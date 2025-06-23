@@ -6,10 +6,11 @@ import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
 
 export default async function ForgotPassword({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { t } = await translate(lng, "forgotPassword");
 
   return (
@@ -29,6 +30,7 @@ export default async function ForgotPassword({
           components={{
             login: (
               <Link
+                key={"login"}
                 href="/login"
                 className={cn([
                   "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",

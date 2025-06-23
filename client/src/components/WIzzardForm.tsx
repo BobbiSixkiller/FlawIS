@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Stepper from "./Stepper";
 import Spinner from "./Spinner";
+import { useWizardStore } from "@/stores/wizzardStore";
 
 interface WizzardStepProps {
   children: ReactNode;
@@ -42,7 +43,9 @@ export function WizzardForm<T>({
   lng,
 }: WizzardFormProps<T & FieldValues>) {
   const steps = Children.toArray(children) as ReactElement<WizzardStepProps>[];
-  const [step, setStep] = useState(0);
+  const setValues = useWizardStore((s) => s.setValues);
+  const setStep = useWizardStore((s) => s.setStep);
+  const step = useWizardStore((s) => s.currentStep);
   const currentStep = steps[step];
 
   function isLastStep() {
@@ -61,6 +64,8 @@ export function WizzardForm<T>({
   }
 
   const onSubmit: SubmitHandler<typeof values> = async (data) => {
+    setValues(values);
+
     if (isLastStep()) {
       await onSubmitCb(data);
     } else {
@@ -70,43 +75,41 @@ export function WizzardForm<T>({
 
   return (
     <FormProvider {...methods}>
-      <div className="w-full flex flex-col gap-6">
-        <Stepper activeIndex={step} steps={steps} lng={lng} />
-        <form
-          className="space-y-6 w-full md:max-w-96 mx-auto"
-          onSubmit={methods.handleSubmit(onSubmit)}
-        >
-          {steps[step]}
+      <Stepper activeIndex={step} steps={steps} lng={lng} />
+      <form
+        className="space-y-6 mt-6 w-full"
+        onSubmit={methods.handleSubmit(onSubmit, (errs) => console.log(errs))}
+      >
+        {steps[step]}
 
-          <div className="flex justify-between">
-            {steps.length > 1 && (
-              <Button
-                color="secondary"
-                type="button"
-                onClick={back}
-                disabled={step === 0}
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-              </Button>
-            )}
-
+        <div className="flex justify-between">
+          {steps.length > 1 && (
             <Button
-              className={steps.length === 1 ? "w-full" : ""}
-              color="primary"
-              type="submit"
-              disabled={methods.formState.isSubmitting}
+              color="secondary"
+              type="button"
+              onClick={back}
+              disabled={step === 0}
             >
-              {methods.formState.isSubmitting ? (
-                <Spinner inverted />
-              ) : isLastStep() ? (
-                <CheckIcon className="h-4 w-4" />
-              ) : (
-                <ChevronRightIcon className="h-4 w-4" />
-              )}
+              <ChevronLeftIcon className="h-4 w-4" />
             </Button>
-          </div>
-        </form>
-      </div>
+          )}
+
+          <Button
+            className={steps.length === 1 ? "w-full" : ""}
+            color="primary"
+            type="submit"
+            disabled={methods.formState.isSubmitting}
+          >
+            {methods.formState.isSubmitting ? (
+              <Spinner inverted />
+            ) : isLastStep() ? (
+              <CheckIcon className="h-4 w-4" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </form>
     </FormProvider>
   );
 }

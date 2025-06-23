@@ -5,13 +5,13 @@ import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
 import DynamicImage from "@/components/DynamicImage";
-import Spinner from "@/components/Spinner";
 
 export default async function Profile({
-  params: { lng },
+  params,
 }: {
-  params: { lng: string };
+  params: Promise<{ lng: string }>;
 }) {
+  const { lng } = await params;
   const { t } = await translate(lng, "profile");
   const user = await getMe();
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { searchConference } from "../../conferences/actions";
 import SearchComponent from "@/components/Search";
+import { searchConference } from "./actions";
 
 interface ConferenceItem {
   id: string;

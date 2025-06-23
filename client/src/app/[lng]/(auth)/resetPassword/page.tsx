@@ -2,15 +2,18 @@ import ResetPasswordForm from "./ResetPasswordForm";
 import { FormMessage } from "@/components/Message";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
+import Link from "next/link";
 import { Trans } from "react-i18next/TransWithoutContext";
 
 export default async function ResetPassword({
-  params: { lng },
-  searchParams: { token },
+  params,
+  searchParams,
 }: {
-  params: { lng: string };
-  searchParams: { token: string };
+  params: Promise<{ lng: string }>;
+  searchParams: Promise<{ token: string }>;
 }) {
+  const { lng } = await params;
+  const { token } = await searchParams;
   const { t } = await translate(lng, "resetPassword");
 
   return (
@@ -29,7 +32,8 @@ export default async function ResetPassword({
             t={t}
             components={{
               forgotLink: (
-                <a
+                <Link
+                  key="forgot"
                   href="/forgotPassword"
                   className={cn([
                     "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",

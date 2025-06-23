@@ -4,17 +4,22 @@ import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
+import { FormMessage } from "@/components/Message";
+import Link from "next/link";
 
 export default async function Register({
-  params: { lng },
-  searchParams: { url },
+  params,
+  searchParams,
 }: {
-  params: { lng: string };
-  searchParams: { url?: string };
+  params: Promise<{ lng: string }>;
+  searchParams: Promise<{ url?: string }>;
 }) {
+  const { lng } = await params;
+  const { url } = await searchParams;
   const { t } = await translate(lng, "register");
 
-  const host = headers().get("host") || ""; // Get the hostname from the request
+  const headerStore = await headers();
+  const host = headerStore.get("host") || ""; // Get the hostname from the request
   const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
 
   return (
@@ -22,6 +27,8 @@ export default async function Register({
       <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
         {t("heading")}
       </h2>
+
+      <FormMessage />
 
       <UserForm subdomain={subdomain} namespace="register" />
 
@@ -47,7 +54,8 @@ export default async function Register({
           t={t}
           components={{
             login: (
-              <a
+              <Link
+                key={"login"}
                 href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
                 className={cn([
                   "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",

@@ -1,26 +1,29 @@
 "use client";
 
-import { SectionFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { useParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { object, string } from "yup";
+import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import { updateSection } from "./actions";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { createSection, updateSection } from "./actions";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
+import { SectionFragment } from "@/lib/graphql/generated/graphql";
 
-export default function UpdateSectionForm({
-  section,
-  lng,
+export default function SectionForm({
+  conferenceId,
   dialogId,
+  section,
 }: {
-  lng: string;
-  section: SectionFragment;
   dialogId: string;
+  conferenceId: string;
+  section?: SectionFragment;
 }) {
+  const { slug, lng } = useParams<{ slug: string; lng: string }>();
+
   const { t } = useTranslation(lng, "validation");
 
   const methods = useForm({
@@ -40,8 +43,11 @@ export default function UpdateSectionForm({
       }).required(t("required"))
     ),
     values: {
-      conference: section.conference?.id,
-      translations: section.translations,
+      conference: conferenceId,
+      translations: section?.translations || {
+        sk: { name: "", topic: "" },
+        en: { name: "", topic: "" },
+      },
     },
   });
 
@@ -53,11 +59,16 @@ export default function UpdateSectionForm({
       <form
         className="space-y-6 min-w-80"
         onSubmit={methods.handleSubmit(async (data) => {
-          const state = await updateSection(data, section?.id);
+          let res;
+          if (section) {
+            res = await updateSection({ id: section.id, data });
+          } else {
+            res = await createSection({ data });
+          }
 
-          setMessage(state.message, state.success);
+          setMessage(res.message, res.success);
 
-          if (state.success) {
+          if (res.success) {
             closeDialog(dialogId);
           }
         })}
@@ -79,11 +90,7 @@ export default function UpdateSectionForm({
           className="w-full"
           disabled={methods.formState.isSubmitting}
         >
-          {methods.formState.isSubmitting ? (
-            <Spinner inverted />
-          ) : (
-            "Aktualizovat sekciu"
-          )}
+          {methods.formState.isSubmitting ? <Spinner inverted /> : "Vytvorit"}
         </Button>
       </form>
     </FormProvider>

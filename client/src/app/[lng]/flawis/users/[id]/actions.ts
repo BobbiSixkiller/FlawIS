@@ -76,7 +76,9 @@ export async function impersonate(id: string) {
   }
 
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  cookies().set("accessToken", res.data.user.token, {
+  const cookieStore = await cookies();
+
+  cookieStore.set("accessToken", res.data.user.token, {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
     secure: process.env.NODE_ENV !== "development",

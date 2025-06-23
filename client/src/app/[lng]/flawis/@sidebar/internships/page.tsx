@@ -1,3 +1,3 @@
-export default function Sidebar() {
+export default function Internships() {
   return null;
 }

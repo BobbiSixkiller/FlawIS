@@ -5,41 +5,49 @@ import Button from "@/components/Button";
 import { deleteConference } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
+import { useTransition } from "react";
+import Spinner from "@/components/Spinner";
+import { useParams } from "next/navigation";
 
 export default function DeleteConferenceForm({
-  lng,
   conference,
   dialogId,
 }: {
-  lng: string;
   dialogId: string;
   conference?: ConferenceFragment;
 }) {
+  const { lng } = useParams<{ lng: string }>();
+  const [pending, startTransition] = useTransition();
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <form
       className="space-y-6 w-full sm:w-96"
-      action={async (data) => {
-        const state = await deleteConference(null, data);
+      action={() =>
+        startTransition(async () => {
+          const res = await deleteConference(conference?.id);
 
-        setMessage(state.message, state.success);
+          setMessage(res.message, res.success);
 
-        if (state.success) {
-          closeDialog(dialogId);
-        }
-      }}
+          if (res.success) {
+            closeDialog(dialogId);
+          }
+        })
+      }
     >
-      <input type="hidden" name="id" value={conference?.id} />
-
       <h1>
         Naozaj chcete zmazat konferenciu{" "}
         {conference?.translations[lng as "sk" | "en"].name} ?
       </h1>
 
-      <Button color="primary" type="submit" className="w-full">
-        Potvrdit
+      <Button
+        disabled={pending}
+        color="primary"
+        type="submit"
+        className="w-full"
+      >
+        {pending ? <Spinner inverted /> : "Potvrdit"}
       </Button>
     </form>
   );

@@ -12,10 +12,11 @@ import DeleteSubmissionForm from "./DeleteSubmissionForm";
 import UpdateSubmissionForm from "./UpdateSubmissionForm";
 
 export default async function AttendeeSubmissionsPage({
-  params: { slug, lng },
+  params,
 }: {
-  params: { slug: string; lng: string };
+  params: Promise<{ slug: string; lng: string }>;
 }) {
+  const { lng, slug } = await params;
   const { t } = await translate(lng, ["common", "conferences"]);
 
   const conference = await getConference(slug);

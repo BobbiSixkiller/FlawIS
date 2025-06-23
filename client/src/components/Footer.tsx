@@ -1,10 +1,8 @@
-import { cookies } from "next/headers";
 import Logo from "./Logo";
 import { translate } from "@/lib/i18n";
 
 export default async function Footer({ lng }: { lng: string }) {
   const { t, i18n } = await translate(lng, "dashboard");
-  const theme = cookies().get("theme")?.value || "";
 
   return (
     <div className="mt-auto bg-black dark:bg-gray-950 md:bg-transparent dark:md:bg-transparent">
