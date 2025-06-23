@@ -64,8 +64,8 @@ function Section({
     }, 0);
   }
 
-  const updateSectionDialogId = "update-section";
-  const deleteSectionDialogId = "delete-section";
+  const updateSectionDialogId = `update-section-${section.id}`;
+  const deleteSectionDialogId = `delete-section-${section.id}`;
 
   const dropdownItems: DropdownItem[] = [
     {

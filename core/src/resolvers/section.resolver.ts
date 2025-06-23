@@ -112,7 +112,7 @@ export class SectionResolver {
       first,
       after,
       sectionIds: [sectionId],
-      conferenceId: conference?.id,
+      conferenceId: conference?._id,
     });
   }
 }

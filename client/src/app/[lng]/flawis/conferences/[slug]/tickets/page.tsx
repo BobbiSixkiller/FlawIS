@@ -20,8 +20,8 @@ export default async function TicketsPage({
   }
 
   const newTicketDialogId = "new-ticket";
-  const updateTicketDialogId = "update-ticket";
-  const deleteTicketDialogId = "delete-ticket";
+  const updateTicketDialogId = (id: string) => `update-ticket-${id}`;
+  const deleteTicketDialogId = (id: string) => `delete-ticket-${id}`;
 
   return (
     <div className="">
@@ -33,10 +33,10 @@ export default async function TicketsPage({
       </ModalTrigger>
 
       <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
-        {conference?.tickets.map((t, i) => (
+        {conference?.tickets.map((t) => (
           <div
             className="p-6 sm:p-4 flex justify-between gap-4 text-gray-900 dark:text-white"
-            key={i}
+            key={t.id}
           >
             <div className="flex flex-col">
               <span className="text-lg">
@@ -57,7 +57,7 @@ export default async function TicketsPage({
                 {
                   type: "custom",
                   element: (
-                    <ModalTrigger dialogId={updateTicketDialogId}>
+                    <ModalTrigger dialogId={updateTicketDialogId(t.id)}>
                       <Button size="sm">Aktualizovat</Button>
                     </ModalTrigger>
                   ),
@@ -65,7 +65,7 @@ export default async function TicketsPage({
                 {
                   type: "custom",
                   element: (
-                    <ModalTrigger dialogId={deleteTicketDialogId}>
+                    <ModalTrigger dialogId={deleteTicketDialogId(t.id)}>
                       <Button size="sm">Zmazat</Button>
                     </ModalTrigger>
                   ),
@@ -73,16 +73,16 @@ export default async function TicketsPage({
               ]}
             />
 
-            <Modal dialogId={updateTicketDialogId} title="Upravit listok">
+            <Modal dialogId={updateTicketDialogId(t.id)} title="Upravit listok">
               <TicketForm
-                dialogId={updateTicketDialogId}
+                dialogId={updateTicketDialogId(t.id)}
                 lng={lng}
                 ticket={t}
               />
             </Modal>
-            <Modal dialogId={deleteTicketDialogId} title="Zmazat listok">
+            <Modal dialogId={deleteTicketDialogId(t.id)} title="Zmazat listok">
               <DeleteTicketForm
-                dialogId={deleteTicketDialogId}
+                dialogId={deleteTicketDialogId(t.id)}
                 lng={lng}
                 ticket={t}
               />
