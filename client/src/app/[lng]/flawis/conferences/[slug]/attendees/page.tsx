@@ -45,3 +45,5 @@ export default async function AttendeesPage({
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
