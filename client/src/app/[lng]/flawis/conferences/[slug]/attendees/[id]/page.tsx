@@ -50,7 +50,7 @@ export default async function AttendeePage({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={impersonateDialogId}>
+              <ModalTrigger key={0} dialogId={impersonateDialogId}>
                 <Button size="sm">
                   <ArrowsRightLeftIcon className="size-5" />
                   Impersonovat
@@ -61,7 +61,7 @@ export default async function AttendeePage({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={deleteDialogId}>
+              <ModalTrigger key={1} dialogId={deleteDialogId}>
                 <Button size="sm" variant="secondary">
                   <TrashIcon className="size-5" />
                   Zmazat
