@@ -2,7 +2,7 @@ import withPlaiceholder from "@plaiceholder/next";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // output: "standalone",
   logging: { fetches: { fullUrl: true } },
   serverExternalPackages: ["@react-pdf/renderer"],
   experimental: {
