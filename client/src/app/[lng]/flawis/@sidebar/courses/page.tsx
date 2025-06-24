@@ -3,7 +3,5 @@ export default async function Courses({
 }: {
   params: Promise<{ lng: string }>;
 }) {
-  await params;
-
   return null;
 }

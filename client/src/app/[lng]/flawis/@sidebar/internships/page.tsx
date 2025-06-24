@@ -3,7 +3,5 @@ export default async function Internships({
 }: {
   params: Promise<{ lng: string }>;
 }) {
-  await params;
-
   return null;
 }
