@@ -46,7 +46,7 @@ export default async function ConferencePage({
             {
               type: "custom",
               element: (
-                <ModalTrigger dialogId={updateDatesDialogId}>
+                <ModalTrigger key={0} dialogId={updateDatesDialogId}>
                   <Button size="sm">
                     <PencilIcon className="size-5" />
                     Aktualizovat
@@ -57,7 +57,7 @@ export default async function ConferencePage({
             {
               type: "custom",
               element: (
-                <ModalTrigger dialogId={deleteConfDialogId}>
+                <ModalTrigger key={1} dialogId={deleteConfDialogId}>
                   <Button size="sm" variant="secondary">
                     <TrashIcon className="size-5" />
                     Zmazat

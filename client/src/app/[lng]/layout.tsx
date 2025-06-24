@@ -2,7 +2,6 @@ import "../globals.css";
 import localFont from "next/font/local";
 import { dir } from "i18next";
 import { cookies } from "next/headers";
-import { languages } from "@/lib/i18n/settings";
 
 const UKsans = localFont({
   src: [
@@ -40,10 +39,6 @@ const UKsans = localFont({
   display: "swap",
   variable: "--font-UKsans",
 });
-
-export function generateStaticParams() {
-  return languages.map((lng) => ({ lng }));
-}
 
 export default async function RootLayout({
   children,

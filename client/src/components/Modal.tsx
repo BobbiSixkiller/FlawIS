@@ -28,7 +28,7 @@ export default function Modal({
   togglerHidden = false,
   isInterceptingRoute = false,
 }: ModalProps) {
-  const isDialogOpen = useDialogStore((s) => s.isDialogOpen);
+  const openDialogs = useDialogStore((s) => s.openDialogs);
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const openDialog = useDialogStore((s) => s.openDialog);
 
@@ -49,7 +49,7 @@ export default function Modal({
   return (
     <Transition
       appear
-      show={isDialogOpen(dialogId)}
+      show={openDialogs[dialogId] || false}
       as={Fragment}
       afterLeave={() => {
         if (isInterceptingRoute) {

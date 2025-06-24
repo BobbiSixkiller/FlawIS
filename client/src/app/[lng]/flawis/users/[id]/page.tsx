@@ -42,7 +42,7 @@ export default async function User({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={impersonateDialogId}>
+              <ModalTrigger key={0} dialogId={impersonateDialogId}>
                 <Button size="sm">
                   <ArrowsRightLeftIcon className="size-5" />
                   Impersonovat
@@ -53,7 +53,7 @@ export default async function User({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={updateUserDialogId}>
+              <ModalTrigger key={1} dialogId={updateUserDialogId}>
                 <Button variant="secondary" size="sm">
                   <PencilIcon className="size-5" />
                   Aktualizovat
@@ -64,7 +64,7 @@ export default async function User({
           {
             type: "custom",
             element: (
-              <ModalTrigger dialogId={deleteUserDialogId}>
+              <ModalTrigger key={2} dialogId={deleteUserDialogId}>
                 <Button variant="secondary" size="sm">
                   <TrashIcon className="size-5" />
                   Zmazat

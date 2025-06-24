@@ -32,7 +32,7 @@ export default async function Users({
           {
             type: "custom",
             element: (
-              <ModalTrigger key={newUserDialogId} dialogId={newUserDialogId}>
+              <ModalTrigger key={0} dialogId={newUserDialogId}>
                 <Button size="sm">
                   <PlusIcon className="size-5" />
                   Novy
@@ -43,10 +43,7 @@ export default async function Users({
           {
             type: "custom",
             element: (
-              <ModalTrigger
-                key={inviteUserDialogId}
-                dialogId={inviteUserDialogId}
-              >
+              <ModalTrigger key={1} dialogId={inviteUserDialogId}>
                 <Button size="sm" variant="secondary">
                   <BuildingLibraryIcon className="size-5" />
                   Pozvat instituciu
