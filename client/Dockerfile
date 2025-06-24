@@ -1,4 +1,4 @@
-# Development Stage
+# === Build Stage ===
 FROM node:22-alpine AS builder
 
 WORKDIR /usr/app
@@ -8,30 +8,28 @@ RUN npm ci --silent --no-fund --no-audit
 
 COPY . .
 
-# Optional: ensure clean build
+# Optional: clean previous builds
 RUN rm -rf .next
+
+# Important: Next.js 15 uses output: 'standalone'
 RUN npm run build
 
-# Production Stage
+# === Production Stage ===
 FROM node:22-alpine AS production
 
 WORKDIR /usr/app
 ENV NODE_ENV=production
 
-# Install only prod deps
+# Install only production dependencies
 COPY package*.json ./
 RUN npm ci --only=production --silent --no-fund --no-audit
 
-# Critical: add this line to include client chunks
+# Copy necessary build output (standalone includes everything needed)
+COPY --from=builder /usr/app/.next/standalone ./
 COPY --from=builder /usr/app/.next/static ./.next/static
-
-# Copy rest of necessary build files
-COPY --from=builder /usr/app/.next/standalone ./.next/standalone
-COPY --from=builder /usr/app/.next ./.next
 COPY --from=builder /usr/app/public ./public
+
+# If needed, also copy your config
 COPY --from=builder /usr/app/next.config.mjs ./next.config.mjs
-COPY --from=builder /usr/app/package.json ./package.json
-COPY --from=builder /usr/app/node_modules ./node_modules
 
-CMD ["npm", "run", "start"]
-
+CMD ["node", "server.js"]
