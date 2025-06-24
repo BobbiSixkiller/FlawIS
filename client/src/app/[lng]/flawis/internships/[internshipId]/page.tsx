@@ -17,7 +17,7 @@ export default async function InternshipPage({
   const { internshipId, lng } = await params;
   const internship = await getInternship(internshipId);
   if (!internship) {
-    redirect("/");
+    redirect("/internships");
   }
 
   const { t } = await translate(lng, "internships");
