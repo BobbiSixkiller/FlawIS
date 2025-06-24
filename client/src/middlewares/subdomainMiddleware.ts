@@ -19,9 +19,8 @@ export function withSubdomain(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
 
-    const pathWithoutLocale = url.pathname
-      .replace("/en", "")
-      .replace("/sk", "");
+    const localeRegex = /^\/(en|sk)(?=\/|$)/;
+    const pathWithoutLocale = url.pathname.replace(localeRegex, "");
 
     const hostname = req.headers.get("host") || ""; // Get the hostname from the request
     const subdomain = hostname.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)

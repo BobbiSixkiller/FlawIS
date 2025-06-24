@@ -13,9 +13,8 @@ const publicPaths = [
 export function withAuth(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
-    const pathWithoutLocale = url.pathname
-      .replace("/en", "")
-      .replace("/sk", "");
+    const localeRegex = /^\/(en|sk)(?=\/|$)/;
+    const pathWithoutLocale = url.pathname.replace(localeRegex, "");
     const token = req.cookies.get("accessToken")?.value;
 
     if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
@@ -25,6 +24,12 @@ export function withAuth(middleware: CustomMiddleware) {
         const originalUrl = `${url.pathname}${url.search}`;
         loginUrl.searchParams.set("url", originalUrl);
       }
+
+      console.log(
+        "REDIRECTING ",
+        loginUrl.pathname,
+        loginUrl.searchParams.get("url")
+      );
 
       return NextResponse.redirect(loginUrl);
     }
