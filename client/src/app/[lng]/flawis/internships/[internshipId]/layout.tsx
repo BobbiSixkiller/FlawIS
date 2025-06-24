@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import TabMenu from "@/components/TabMenu";
 import { getInternship } from "@/app/[lng]/internships/[internshipId]/actions";
 import { translate } from "@/lib/i18n";
+import { redirect } from "next/navigation";
 
 export default async function InternshipLayout({
   children,
@@ -12,6 +13,9 @@ export default async function InternshipLayout({
 }) {
   const { internshipId, lng } = await params;
   const internship = await getInternship(internshipId);
+  if (!internship) {
+    redirect("/internships");
+  }
 
   const { t } = await translate(lng, "internships");
 

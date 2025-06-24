@@ -1,4 +1,3 @@
-import DynamicImage from "@/components/DynamicImage";
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
 import { translate } from "@/lib/i18n";
@@ -11,8 +10,9 @@ export default async function Profile({
   params: Promise<{ lng: string }>;
 }) {
   const { lng } = await params;
-  const { t } = await translate(lng, "profile");
   const user = await getMe();
+
+  const { t } = await translate(lng, "profile");
 
   return (
     <div className="flex flex-col gap-6">
