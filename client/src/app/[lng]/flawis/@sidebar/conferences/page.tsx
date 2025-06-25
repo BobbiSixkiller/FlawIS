@@ -1,9 +1,5 @@
 import SearchConference from "./SearchConference";
 
-export default async function Sidebar({
-  params,
-}: {
-  params: Promise<{ lng: string }>;
-}) {
+export default async function ConferencesControls() {
   return <SearchConference />;
 }

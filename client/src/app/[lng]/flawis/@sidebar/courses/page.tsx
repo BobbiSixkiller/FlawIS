@@ -1,7 +1,3 @@
-export default async function Courses({
-  params,
-}: {
-  params: Promise<{ lng: string }>;
-}) {
+export default async function CoursesControls() {
   return null;
 }

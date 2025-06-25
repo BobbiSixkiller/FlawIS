@@ -47,6 +47,7 @@ export default function SearchConference() {
       Option={ConferenceOption}
       onOptionSelect={onOptionSelect}
       fetchOptions={searchConference}
+      placeholder="Hladat konferenciu..."
     />
   );
 }

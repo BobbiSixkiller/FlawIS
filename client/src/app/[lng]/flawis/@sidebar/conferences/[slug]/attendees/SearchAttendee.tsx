@@ -51,6 +51,7 @@ export default function SearchAttendee() {
       Option={AttendeeOption}
       onOptionSelect={onOptionSelect}
       fetchOptions={async ({ text }) => await searchAttendee({ text, slug })}
+      placeholder="Hladat ucastnika..."
     />
   );
 }

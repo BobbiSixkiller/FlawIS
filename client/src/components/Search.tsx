@@ -15,6 +15,7 @@ import {
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ComponentType, Fragment, useEffect, useState } from "react";
 import Button from "./Button";
+import { useDebouncedCallback } from "use-debounce";
 
 interface BaseSearchParams {
   text: string;
@@ -24,6 +25,7 @@ interface SearchComponentProps<TOption, TParams extends BaseSearchParams> {
   fetchOptions: (params: TParams) => Promise<TOption[]>;
   onOptionSelect: (option: TOption) => void;
   Option: ComponentType<{ data: TOption; active: boolean }>;
+  placeholder?: string;
 }
 
 export default function SearchComponent<
@@ -33,11 +35,21 @@ export default function SearchComponent<
   fetchOptions,
   Option,
   onOptionSelect,
+  placeholder,
 }: SearchComponentProps<TOption, TParams>) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<TOption[]>([]);
+
+  const debounced = useDebouncedCallback(
+    // function
+    (value: string) => {
+      setText(value);
+    },
+    // delay in ms
+    800
+  );
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -112,6 +124,7 @@ export default function SearchComponent<
                   setText("");
                   if (val) {
                     onOptionSelect(val);
+                    setOpen(false);
                   }
                 }}
                 as="div"
@@ -125,12 +138,12 @@ export default function SearchComponent<
                   <ComboboxInput
                     autoComplete="off"
                     autoFocus
-                    onChange={(e) => setText(e.target.value)}
+                    onChange={(e) => debounced(e.target.value)}
                     className={cn([
                       "w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 placeholder:text-gray-400 h-12",
                       "dark:text-white",
                     ])}
-                    placeholder="Search..."
+                    placeholder={placeholder ? placeholder : "Search..."}
                     displayValue={() => ""}
                   />
                   {loading && <Spinner />}

@@ -1,3 +1,3 @@
-export default function Profile() {
+export default function ProfileControls() {
   return null;
 }

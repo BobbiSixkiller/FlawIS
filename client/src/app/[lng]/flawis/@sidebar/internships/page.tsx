@@ -1,7 +1,3 @@
-export default async function Internships({
-  params,
-}: {
-  params: Promise<{ lng: string }>;
-}) {
+export default async function InternshipsControls() {
   return null;
 }
