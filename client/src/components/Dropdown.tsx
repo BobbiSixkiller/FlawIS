@@ -23,7 +23,13 @@ interface CustomDropdownElementProps {
 }
 
 export type DropdownItem =
-  | { type: "link"; text: string; href: string; icon?: ReactNode }
+  | {
+      type: "link";
+      text: string;
+      href: string;
+      icon?: ReactNode;
+      prefetch?: boolean;
+    }
   | { type: "custom"; element: ReactElement<CustomDropdownElementProps> };
 
 interface DropdownProps {
@@ -81,6 +87,7 @@ export default function Dropdown({
                   if (item.type === "link") {
                     return (
                       <Link
+                        prefetch={item.prefetch}
                         scroll={false}
                         onClick={close}
                         href={item.href}

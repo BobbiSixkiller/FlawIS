@@ -88,6 +88,7 @@ export default function TopBar({
             {
               type: "link",
               href: "/logout",
+              prefetch: false,
               icon: (
                 <ArrowLeftStartOnRectangleIcon
                   className="size-5"
