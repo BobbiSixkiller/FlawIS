@@ -25,12 +25,6 @@ export function withAuth(middleware: CustomMiddleware) {
         loginUrl.searchParams.set("url", originalUrl);
       }
 
-      console.log(
-        "REDIRECTING ",
-        loginUrl.pathname,
-        loginUrl.searchParams.get("url")
-      );
-
       return NextResponse.redirect(loginUrl);
     }
 

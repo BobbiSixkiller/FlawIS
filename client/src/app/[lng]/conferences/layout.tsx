@@ -6,6 +6,7 @@ import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import Dashboard from "@/components/Dashboard";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata(
   {
@@ -61,6 +62,9 @@ export default async function DashboardLayout({
   const { t } = await translate(lng, "dashboard");
 
   const user = await getMe();
+  if (!user) {
+    redirect("/logout");
+  }
 
   return (
     <div>
