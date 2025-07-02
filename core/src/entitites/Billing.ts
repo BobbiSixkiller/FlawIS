@@ -69,7 +69,7 @@ export class FlawBilling extends Billing {
   @Property()
   SWIFT: string;
 
-  @Field()
-  @Property()
-  stampUrl: string;
+  // @Field()
+  // @Property()
+  // stampUrl: string;
 }

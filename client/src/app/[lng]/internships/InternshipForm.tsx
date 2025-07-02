@@ -12,6 +12,7 @@ import { createInternship, updateInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useDefaultContent from "@/components/editor/useDefaultContent";
+import { useEffect } from "react";
 
 export default function InternshipForm({
   data,
@@ -42,34 +43,25 @@ export default function InternshipForm({
     <FormProvider {...methods}>
       <form
         className="space-y-6 w-full"
-        onSubmit={methods.handleSubmit(
-          async (vals) => {
-            let state: {
-              success: boolean;
-              message: string;
-            };
-            console.log(vals);
+        onSubmit={methods.handleSubmit(async (vals) => {
+          let state;
 
-            if (data) {
-              state = await updateInternship({ id: data.id, input: vals });
-            } else {
-              state = await createInternship(vals);
-            }
-
-            setMessage(state.message, state.success);
-
-            if (state && state.success) {
-              closeDialog(dialogId);
-            }
-          },
-          (errs) => {
-            console.log(errs);
+          if (data) {
+            state = await updateInternship({ id: data.id, input: vals });
+          } else {
+            state = await createInternship(vals);
           }
-        )}
+
+          setMessage(state.message, state.success);
+
+          if (state && state.success) {
+            closeDialog(dialogId);
+          }
+        })}
       >
         <div>
           <p className="block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-2">
-            {t("form.label")}
+            {t("editor.label")}
           </p>
 
           <Editor

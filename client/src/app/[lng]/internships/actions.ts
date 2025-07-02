@@ -7,8 +7,7 @@ import {
   InternshipsDocument,
   UpdateInternshipDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import { revalidateTag } from "next/cache";
+import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
 export async function getInternships(filter: GetDataFilter) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -27,14 +26,14 @@ export async function getInternships(filter: GetDataFilter) {
 }
 
 export async function createInternship(input: InternshipInput) {
-  const res = await executeGqlFetch(CreateInternshipDocument, { input });
-  if (res.errors) {
-    console.log(res.errors[0]);
-    return { success: false, message: res.errors[0].message };
-  }
-
-  revalidateTag("internships");
-  return { success: true, message: res.data.createInternship.message };
+  return await executeGqlMutation(
+    CreateInternshipDocument,
+    { input },
+    (data) => ({
+      message: data.createInternship.message,
+    }),
+    { revalidateTags: () => ["internships"] }
+  );
 }
 
 export async function updateInternship({
@@ -44,13 +43,15 @@ export async function updateInternship({
   id: string;
   input: InternshipInput;
 }) {
-  const res = await executeGqlFetch(UpdateInternshipDocument, { id, input });
-  if (res.errors) {
-    console.log(res.errors[0]);
-    return { success: false, message: res.errors[0].message };
-  }
-
-  revalidateTag("internships");
-  revalidateTag(`internship:${id}`);
-  return { success: true, message: res.data.updateInternship.message };
+  return executeGqlMutation(
+    UpdateInternshipDocument,
+    { id, input },
+    (data) => ({
+      message: data.updateInternship.message,
+      data: data.updateInternship.data,
+    }),
+    {
+      revalidateTags: () => ["internships", `internship:${id}`],
+    }
+  );
 }

@@ -7,6 +7,7 @@ import {
   FormProvider,
   SubmitHandler,
   useForm,
+  UseFormReturn,
 } from "react-hook-form";
 import { ObjectSchema } from "yup";
 import Button from "./Button";
@@ -17,7 +18,6 @@ import {
 } from "@heroicons/react/24/outline";
 import Stepper from "./Stepper";
 import Spinner from "./Spinner";
-import { useWizardStore } from "@/stores/wizzardStore";
 
 interface WizzardStepProps {
   children: ReactNode;
@@ -32,7 +32,10 @@ export function WizzardStep({ children }: WizzardStepProps) {
 interface WizzardFormProps<T> {
   lng: string;
   values: T;
-  onSubmitCb: (values: T) => Promise<void>;
+  onSubmitCb: (
+    values: T,
+    methods: UseFormReturn<T & FieldValues, any, T & FieldValues>
+  ) => Promise<void>;
   children: ReactNode;
 }
 
@@ -43,9 +46,7 @@ export function WizzardForm<T>({
   lng,
 }: WizzardFormProps<T & FieldValues>) {
   const steps = Children.toArray(children) as ReactElement<WizzardStepProps>[];
-  const setValues = useWizardStore((s) => s.setValues);
-  const setStep = useWizardStore((s) => s.setStep);
-  const step = useWizardStore((s) => s.currentStep);
+  const [step, setStep] = useState(0);
   const currentStep = steps[step];
 
   function isLastStep() {
@@ -64,10 +65,8 @@ export function WizzardForm<T>({
   }
 
   const onSubmit: SubmitHandler<typeof values> = async (data) => {
-    setValues(data);
-
     if (isLastStep()) {
-      await onSubmitCb(data);
+      await onSubmitCb(data, methods);
     } else {
       setStep(step + 1);
     }

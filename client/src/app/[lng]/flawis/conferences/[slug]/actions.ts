@@ -30,7 +30,6 @@ export async function deleteConference(id: string) {
     await deleteFiles([
       res.data.translations.sk.logoUrlEnv,
       res.data.translations.sk.logoUrlEnv,
-      res.data.billing.stampUrl,
     ]);
   }
   return res;

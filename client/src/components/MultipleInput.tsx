@@ -40,7 +40,7 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
         className={cn([
           "py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6 relative",
           "dark:bg-gray-800 dark:ring-gray-600",
-          focus ? "ring-2 ring-primary-500 dark:ring-primary-500" : "ring-1",
+          focus ? "ring-2 ring-primary-500 dark:ring-primary-300" : "ring-1",
           fieldState.error ? "ring-red-500 dark:ring-red-500" : "",
           props.disabled
             ? "text-slate-500 bg-slate-100 ring-slate-200 dark:bg-gray-800 dark:ring-gray-600 dark:text-slate-500 focus-within:ring-transparent"

@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export async function InvoiceDoc({
+export default async function InvoiceDoc({
   data,
   lng,
 }: {
@@ -298,7 +298,7 @@ export async function InvoiceDoc({
         <Text style={{ textAlign: "center" }}>{data.invoice.body.body}</Text>
         <Text style={{ textAlign: "center" }}>{data.invoice.body.comment}</Text>
         <Image
-          src={data.invoice.issuer.stampUrl as string}
+          src={"http://client:3000/images/peciatka.jpeg"}
           style={{
             maxHeight: "100px",
             maxWidth: "200px",

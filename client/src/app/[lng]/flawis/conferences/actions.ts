@@ -52,12 +52,10 @@ export async function createConference(data: FormData) {
   try {
     const logo: File | null = data.get("translations.sk.logo") as File;
     const logoLocalized: File | null = data.get("translations.en.logo") as File;
-    const stamp: File | null = data.get("billing.stamp") as File;
 
-    if (!logo || !logoLocalized || !stamp)
-      throw new Error("Files not provided!");
+    if (!logo || !logoLocalized) throw new Error("Files not provided!");
 
-    const [logoUrl, logoLocalizedUrl, stampUrl] = await Promise.all([
+    const [logoUrl, logoLocalizedUrl] = await Promise.all([
       uploadFile(
         "images",
         logo.name.toLocaleLowerCase().replaceAll(" ", "-"),
@@ -67,11 +65,6 @@ export async function createConference(data: FormData) {
         "images",
         logoLocalized.name.toLocaleLowerCase().replaceAll(" ", "-"),
         logoLocalized
-      ),
-      uploadFile(
-        "images",
-        stamp.name.toLocaleLowerCase().replaceAll(" ", "-"),
-        stamp
       ),
     ]);
 
@@ -108,14 +101,13 @@ export async function createConference(data: FormData) {
           variableSymbol: data
             .get("billing.variableSymbol")
             ?.toString() as string,
-          stampUrl,
         },
       },
     });
     if (res.errors) {
       const { validationErrors } = res.errors[0].extensions as ErrorException;
 
-      await deleteFiles([logoUrl, logoLocalizedUrl, stampUrl]);
+      await deleteFiles([logoUrl, logoLocalizedUrl]);
 
       throw new Error(
         validationErrors

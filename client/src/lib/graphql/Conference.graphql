@@ -17,7 +17,6 @@ fragment Invoice on Invoice {
     ICO
     ICDPH
     DIC
-    stampUrl
     variableSymbol
     IBAN
     SWIFT
@@ -173,9 +172,6 @@ mutation deleteConference($id: ObjectId!) {
         en {
           logoUrlEnv
         }
-      }
-      billing {
-        stampUrl
       }
     }
   }

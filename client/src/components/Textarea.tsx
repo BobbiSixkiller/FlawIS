@@ -25,7 +25,7 @@ export function Textarea({ name, label, onFocus, ...props }: InputProps) {
           "dark:bg-gray-800 dark:ring-gray-600 dark:disabled:bg-gray-900 dark:disabled:ring-gray-700 dark:disabled:text-slate-500 dark:text-white",
           fieldState.error
             ? "ring-red-500 focus:ring-red-500"
-            : "focus:ring-primary-500",
+            : "focus:ring-primary-500 dark:focus:ring-primary-300",
         ])}
       />
       {fieldState.error && (

@@ -1,5 +1,5 @@
 import { renderToBuffer } from "@react-pdf/renderer";
-import { InvoiceDoc } from "./InvoiceDoc";
+import InvoiceDoc from "./InvoiceDoc";
 
 export async function POST(
   request: Request,

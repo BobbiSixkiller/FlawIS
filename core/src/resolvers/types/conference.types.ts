@@ -79,10 +79,6 @@ export class FlawBillingInput implements FlawBilling {
   @Field()
   @IsString()
   variableSymbol: string;
-
-  @Field()
-  @IsString()
-  stampUrl: string;
 }
 
 @InputType()

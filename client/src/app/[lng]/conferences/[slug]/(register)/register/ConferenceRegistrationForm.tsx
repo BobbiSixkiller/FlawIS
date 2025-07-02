@@ -85,7 +85,7 @@ export default function ConferenceRegistrationForm({
             "") as PresentationLng,
         },
       }}
-      onSubmitCb={async (data) => {
+      onSubmitCb={async (data, methods) => {
         const res = await addAttendee(
           {
             ticketId: data.ticketId,
@@ -97,7 +97,12 @@ export default function ConferenceRegistrationForm({
           submissionStep ? data.submission : undefined
         );
 
-        console.log(res);
+        if (res.errors) {
+          console.log(res.errors);
+          for (const [key, val] of Object.entries(res.errors)) {
+            methods.setError(key, { message: val }, { shouldFocus: true });
+          }
+        }
 
         setMessage(res.message, res.success);
 

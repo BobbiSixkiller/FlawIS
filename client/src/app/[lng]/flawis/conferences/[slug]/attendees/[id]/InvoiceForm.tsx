@@ -44,7 +44,6 @@ export default function UpdateInvoiceForm({
           ICO: string().trim().required(t("required")),
           DIC: string().trim().required(t("required")),
           ICDPH: string().trim().required(t("required")),
-          stampUrl: string().trim().required(t("required")),
         }).required(t("required")),
         payer: object({
           name: string().trim().required(t("required")),

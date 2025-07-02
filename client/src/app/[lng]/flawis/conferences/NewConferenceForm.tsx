@@ -9,9 +9,7 @@ import { Input } from "@/components/Input";
 import { createConference } from "./actions";
 import { useTranslation } from "@/lib/i18n/client";
 import { LocalizedTextarea } from "@/components/Textarea";
-import ImageFileInput, {
-  LocalizedImageFileInput,
-} from "@/components/ImageFileInput";
+import { LocalizedImageFileInput } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useValidation from "@/hooks/useValidation";
@@ -69,7 +67,6 @@ export default function NewConferenceForm({
           ICDPH: "",
           IBAN: "",
           SWIFT: "",
-          stamp: undefined,
         },
         translations: {
           sk: { name: "", logo: undefined },
@@ -163,14 +160,6 @@ export default function NewConferenceForm({
             ICO: yup.string().trim().required(),
             DIC: yup.string().trim().required(),
             ICDPH: yup.string().trim().required(),
-            stamp: yup
-              .mixed<File>() // Pass in the type of `fileUpload`
-              .test("required", t("required"), (file) => file !== undefined)
-              .test(
-                "fileSize",
-                "Only documents up to 2MB are permitted.",
-                (file) => file && file.size < 2_000_000
-              ),
           }),
         })}
       >
@@ -185,7 +174,6 @@ export default function NewConferenceForm({
         <Input label="ICO" name="billing.ICO" />
         <Input label="DIC" name="billing.DIC" />
         <Input label="ICDPH" name="billing.ICDPH" />
-        <ImageFileInput label="Peciatka" name="billing.stamp" />
       </WizzardStep>
     </WizzardForm>
   );

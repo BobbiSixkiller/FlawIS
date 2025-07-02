@@ -63,7 +63,7 @@ export default function Select({
             multiple ? "" : "py-1.5",
             fieldState.error
               ? "ring-red-500 focus:ring-red-500"
-              : "focus:ring-primary-500",
+              : "focus:ring-primary-500 dark:focus:ring-primary-300",
           ])}
         >
           <span
@@ -87,7 +87,7 @@ export default function Select({
           transition
           className={cn([
             "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 sm:text-sm/6 outline-none z-50 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300",
-            "dark:bg-gray-700 dark:text-white dark:ring-gray-700",
+            "dark:bg-gray-800 dark:text-white dark:ring-gray-800",
             fieldState.error ? "ring-red-500" : "",
           ])}
         >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/utils/helpers";
 import { ReactElement } from "react";
 
 export default function Stepper({
@@ -16,10 +17,10 @@ export default function Stepper({
 
   function calculateBorderColor(stepIndex: number, activeIndex: number) {
     if (activeIndex === stepIndex) {
-      return "border-primary-300 dark:border-primary-500";
+      return "border-primary-300";
     }
     if (activeIndex > stepIndex) {
-      return "border-primary-600 dark:border-primary-700";
+      return "border-primary-600 dark:border-primary-400";
     }
     return "border-gray-200";
   }
@@ -35,11 +36,12 @@ export default function Stepper({
             )} font-medium md:pt-4 md:border-t-2 md:border-l-0 md:pl-0`}
           >
             <span
-              className={`text-sm md:text-base ${
-                i > activeIndex
-                  ? "text-gray-400 dark:text-gray-300"
-                  : "text-primary-600 dark:text-primary-500"
-              }`}
+              className={cn([
+                "text-sm md:text-base",
+                i === activeIndex && "text-primary-500 dark:text-primary-300",
+                i > activeIndex && "text-gray-400 dark:text-gray-300",
+                i < activeIndex && "text-primary-600 dark:text-primary-400",
+              ])}
             >
               {t("step") + " " + Number(i + 1)}
             </span>

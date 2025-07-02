@@ -17,16 +17,7 @@ export async function addAttendee(
 ) {
   let submission;
   if (submissionInput && !submissionId) {
-    submission = await executeGqlMutation(
-      CreateSubmissionDocument,
-      {
-        data: submissionInput,
-      },
-      (data) => ({
-        message: data.createSubmission.message,
-        data: data.createSubmission.data,
-      })
-    );
+    submission = await createSubmission(submissionInput, true);
     if (!submission.success) {
       return submission;
     }
@@ -55,8 +46,11 @@ export async function addAttendee(
   );
 }
 
-export async function createSubmission(data: SubmissionInput) {
-  return await executeGqlMutation(
+export async function createSubmission(
+  data: SubmissionInput,
+  fromAddAttendee: boolean = false
+) {
+  const res = await executeGqlMutation(
     CreateSubmissionDocument,
     { data },
     (data) => ({
@@ -64,6 +58,20 @@ export async function createSubmission(data: SubmissionInput) {
       data: data.createSubmission.data,
     })
   );
+
+  if (!res.success && res.errors && fromAddAttendee) {
+    const transformedErrors: Record<string, string> = {};
+    for (const [key, value] of Object.entries(res.errors)) {
+      transformedErrors[`submission.${key}`] = value;
+    }
+
+    return {
+      ...res,
+      errors: transformedErrors,
+    };
+  }
+
+  return res;
 }
 
 export async function acceptAuthorInvite(token: string) {

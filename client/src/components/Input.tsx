@@ -15,8 +15,6 @@ export function Input({
   className,
   ...props
 }: InputProps) {
-  const isNumberInput = props.type === "number";
-
   const { field, fieldState } = useController({
     name,
   });
@@ -49,7 +47,18 @@ export function Input({
           }
           {...props}
           {...field}
+          onChange={(e) => {
+            if (props.onChange) {
+              props.onChange(e);
+            }
+            field.onChange(e);
+          }}
           onFocus={onFocus}
+          onWheel={(e) => {
+            if (props.type === "number") {
+              e.currentTarget.blur();
+            }
+          }}
           id={name}
           type={showPassword ? "text" : props.type}
         />

@@ -212,7 +212,6 @@ type FlawBilling {
   SWIFT: String!
   address: Address!
   name: String!
-  stampUrl: String!
   variableSymbol: String!
 }
 
@@ -224,7 +223,6 @@ input FlawBillingInput {
   SWIFT: String!
   address: AddressInput!
   name: String!
-  stampUrl: String!
   variableSymbol: String!
 }
 

@@ -130,6 +130,10 @@ export class EmailService {
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
+    // console.log();
+    // const stamp = readFileSync(
+    //   join(__dirname, '../../', 'assets/peciatka.jpeg'),
+    // );
     const pdfBuffer = await this.createPDF(
       {
         name: msg.name,
@@ -137,6 +141,7 @@ export class EmailService {
         conferenceLogo: msg.conferenceLogo,
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
+        // stamp,
       },
       'invoice.hbs',
     );
