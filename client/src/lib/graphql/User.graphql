@@ -1,5 +1,5 @@
-query users($after: ObjectId, $first: Int) {
-  users(after: $after, first: $first) {
+query users($after: ObjectId, $first: Int, $access: [Access!]) {
+  users(after: $after, first: $first, access: $access) {
     totalCount
     edges {
       cursor

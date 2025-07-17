@@ -113,6 +113,14 @@ export type Billing = {
   name: Scalars['String']['output'];
 };
 
+/** Course category */
+export type Category = {
+  __typename?: 'Category';
+  id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 /** Conference model type */
 export type Conference = {
   __typename?: 'Conference';
@@ -183,6 +191,7 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: 'Course';
+  categories: Array<Category>;
   createdAt: Scalars['DateTimeISO']['output'];
   /** String representation of HTML describing the course */
   description: Scalars['String']['output'];
@@ -210,6 +219,7 @@ export type CourseEdge = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
+  categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
@@ -1448,6 +1458,7 @@ export type AcceptAuthorInviteMutation = { __typename?: 'Mutation', acceptAuthor
 export type UsersQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  access?: InputMaybe<Array<Access> | Access>;
 }>;
 
 
@@ -4185,8 +4196,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<AcceptAuthorInviteMutation, AcceptAuthorInviteMutationVariables>;
 export const UsersDocument = new TypedDocumentString(`
-    query users($after: ObjectId, $first: Int) {
-  users(after: $after, first: $first) {
+    query users($after: ObjectId, $first: Int, $access: [Access!]) {
+  users(after: $after, first: $first, access: $access) {
     totalCount
     edges {
       cursor

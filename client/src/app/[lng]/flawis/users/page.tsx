@@ -8,19 +8,27 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import UserForm from "../../(auth)/register/UserForm";
 import RegistrationInviteForm from "./RegistrationInviteForm";
+import UsersFilter from "./UsersFilter";
+import { Access } from "@/lib/graphql/generated/graphql";
 
 export default async function Users({
   params,
+  searchParams,
 }: {
   params: Promise<{ lng: string }>;
+  searchParams?: Promise<{ access?: string[] }>;
 }) {
   const { lng } = await params;
-  const { t } = await translate(lng, "users");
+  const queryParams = await searchParams;
 
-  const initialData = await getUsers({ first: 5 });
+  const initialData = await getUsers({
+    access: queryParams?.access as Access[],
+  });
 
   const newUserDialogId = "new-user";
   const inviteUserDialogId = "invite-user";
+
+  const { t } = await translate(lng, "users");
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,6 +61,19 @@ export default async function Users({
           },
         ]}
       />
+      <div className="flex justify-between">
+        <UsersFilter
+          access={[
+            Access.Admin,
+            Access.Student,
+            Access.Organization,
+            Access.ConferenceAttendee,
+          ]}
+        />
+        <div className="ml-auto text-xl font-bold dark:text-white">
+          {initialData.totalCount}
+        </div>
+      </div>
 
       {initialData && <ListUsers initialData={initialData} />}
 

@@ -2,13 +2,14 @@
 
 import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
+  Access,
   InviteUsersDocument,
   TextSearchUserDocument,
   UsersDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 
-export async function getUsers(filter: GetDataFilter) {
+export async function getUsers(filter: GetDataFilter & { access?: Access[] }) {
   const res = await executeGqlFetch(
     UsersDocument,
     { ...filter },
