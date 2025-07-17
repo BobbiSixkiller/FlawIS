@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Course, CourseAttendee } from "../../entitites/Course";
+import { Category, Course, CourseAttendee } from "../../entitites/Course";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import {
   ArgsType,
@@ -13,6 +13,9 @@ import { IMutationResponse } from "./interface.types";
 import { FlawBilling } from "../../entitites/Billing";
 import { FlawBillingInput } from "./conference.types";
 import { IsInt, IsString, Min } from "class-validator";
+import { RefDocExists } from "../../util/decorators";
+import Container from "typedi";
+import { I18nService } from "../../services/i18n.service";
 
 export enum CourseSortableField {}
 
@@ -71,6 +74,16 @@ export class CourseInput implements Partial<Course> {
   @Field()
   @IsString()
   name: string;
+
+  @Field(() => [ObjectId])
+  @RefDocExists(Category, {
+    each: true,
+    message: () =>
+      Container.get(I18nService).translate("categoryNotFound", {
+        ns: "course",
+      }),
+  })
+  categoryIds: ObjectId[];
 
   @Field()
   @IsString()

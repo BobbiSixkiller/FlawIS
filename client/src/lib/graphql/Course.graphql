@@ -7,3 +7,28 @@ fragment Course on Course {
   createdAt
   updatedAt
 }
+
+query courses($after: ObjectId, $first: Int) {
+  courses(after: $after, first: $first) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Course
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation createCourse($data: CourseInput!) {
+  createCourse(data: $data) {
+    message
+    data {
+      ...Course
+    }
+  }
+}

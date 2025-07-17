@@ -80,7 +80,9 @@ export class ConferencerResolver {
   async createConference(
     @Arg("data") data: ConferenceInput
   ): Promise<ConferenceMutationResponse> {
+    console.log(data);
     const conference = await this.conferenceRepository.create(data);
+    console.log(conference);
 
     return {
       data: conference,

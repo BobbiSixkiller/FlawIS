@@ -105,6 +105,13 @@ type Billing {
   name: String!
 }
 
+"""Course category"""
+type Category {
+  id: ObjectId!
+  name: String!
+  slug: String!
+}
+
 """Conference model type"""
 type Conference {
   attendeesCount: Int!
@@ -177,6 +184,7 @@ type ConferenceTranslations {
 }
 
 type Course {
+  categories: [Category!]!
   createdAt: DateTimeISO!
 
   """String representation of HTML describing the course"""
@@ -192,6 +200,7 @@ type Course {
 
 input CourseInput {
   billing: FlawBillingInput
+  categoryIds: [ObjectId!]!
   description: String!
   name: String!
   price: Int!

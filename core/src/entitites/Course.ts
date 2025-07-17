@@ -9,6 +9,20 @@ import { Invoice } from "./Attendee";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
 
+@ObjectType({ description: "Course category" })
+export class Category {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+
+  @Field()
+  @Property()
+  slug: string;
+}
+
 @ObjectType()
 @Index({ user: 1 })
 @Index({ name: "text" })
@@ -23,6 +37,10 @@ export class Course extends TimeStamps {
   @Field(() => UserStub, { nullable: true })
   @Property({ type: () => UserStub })
   procurer?: UserStub;
+
+  @Field(() => [Category])
+  @Property({ type: () => [Category], default: [] })
+  categories: Category[];
 
   @Field()
   @Property()

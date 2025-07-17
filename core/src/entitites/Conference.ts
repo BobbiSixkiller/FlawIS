@@ -131,7 +131,7 @@ export class Ticket {
             // Constraints that failed validation with error messages.
             name: Container.get(I18nService).translate("nameExists", {
               ns: "conference",
-              name: conferenceExists.translations.sk.name,
+              name: conferenceExists.translations.en.name,
             }),
           },
           //children?: ValidationError[], // Contains all nested validation errors of the property

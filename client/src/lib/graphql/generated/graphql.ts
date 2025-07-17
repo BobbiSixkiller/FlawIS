@@ -130,6 +130,14 @@ export type Billing = {
   name: Scalars['String']['output'];
 };
 
+/** Course category */
+export type Category = {
+  __typename?: 'Category';
+  id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 /** Conference model type */
 export type Conference = {
   __typename?: 'Conference';
@@ -210,6 +218,7 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: 'Course';
+  categories: Array<Category>;
   createdAt: Scalars['DateTimeISO']['output'];
   /** String representation of HTML describing the course */
   description: Scalars['String']['output'];
@@ -224,6 +233,7 @@ export type Course = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
+  categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
@@ -1378,6 +1388,21 @@ export type AddAttendeeMutationVariables = Exact<{
 export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'ConferenceMutationResponse', message: string, data: { __typename?: 'Conference', slug: string } } };
 
 export type CourseFragment = { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any };
+
+export type CoursesQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: any, node: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: any | null } } };
+
+export type CreateCourseMutationVariables = Exact<{
+  data: CourseInput;
+}>;
+
+
+export type CreateCourseMutation = { __typename?: 'Mutation', createCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } } };
 
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -3668,6 +3693,49 @@ export const AddAttendeeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
+export const CoursesDocument = new TypedDocumentString(`
+    query courses($after: ObjectId, $first: Int) {
+  courses(after: $after, first: $first) {
+    totalCount
+    edges {
+      cursor
+      node {
+        ...Course
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    fragment Course on Course {
+  id
+  name
+  description
+  price
+  isPaid
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CoursesQuery, CoursesQueryVariables>;
+export const CreateCourseDocument = new TypedDocumentString(`
+    mutation createCourse($data: CourseInput!) {
+  createCourse(data: $data) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+    fragment Course on Course {
+  id
+  name
+  description
+  price
+  isPaid
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateCourseMutation, CreateCourseMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {

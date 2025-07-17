@@ -5,6 +5,8 @@ import ModalTrigger from "@/components/ModalTrigger";
 import { translate } from "@/lib/i18n";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import CourseForm from "./CourseForm";
+import { getCourses } from "./actions";
+import CourseList from "./CourseList";
 
 export default async function CoursesPage({
   params,
@@ -13,6 +15,8 @@ export default async function CoursesPage({
 }) {
   const { lng } = await params;
   const createCourseDialogId = "create-course";
+
+  const initialData = await getCourses({});
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,6 +37,8 @@ export default async function CoursesPage({
           },
         ]}
       />
+
+      <CourseList initialData={initialData} filter={{}} />
 
       <Modal dialogId={createCourseDialogId} title="Novy kurz">
         <CourseForm dialogId={createCourseDialogId} />

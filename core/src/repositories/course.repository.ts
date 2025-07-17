@@ -44,7 +44,11 @@ export class CourseRepository extends Repository<typeof Course> {
       { $sort: mongoSort },
       {
         $facet: {
-          data: [{ $match: { ...cursorFilter } }, { $limit: first }],
+          data: [
+            { $match: { ...cursorFilter } },
+            { $limit: first },
+            { $addFields: { id: "$_id" } },
+          ],
           hasNextPage: [
             { $match: { ...cursorFilter } },
             { $skip: first },

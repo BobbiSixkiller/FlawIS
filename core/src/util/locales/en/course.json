@@ -2,5 +2,6 @@
   "notFound": "Course has not been found!",
   "update": "Course {{name}} has been updated.",
   "new": "Course {{name}} has been created.",
-  "delete": "Course {{name}} has been deleted."
+  "delete": "Course {{name}} has been deleted.",
+  "categoryNotFound": "Category not found!"
 }

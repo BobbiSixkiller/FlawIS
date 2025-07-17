@@ -3,8 +3,9 @@
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useController } from "react-hook-form";
-import { InputProps, withLocalizedInput } from "./withLocalizedInput";
+import { withLocalizedInput } from "./withLocalizedInput";
 import { cn } from "@/utils/helpers";
+import { InputProps } from "./Input";
 
 export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
   const { field, fieldState } = useController({ name });
@@ -55,7 +56,7 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
         {strings.length !== 0 &&
           strings.map((p, i) => (
             <div
-              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white  px-1 h-7 items-center"
+              className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white px-1 h-7 items-center"
               key={i}
             >
               {p}
@@ -119,14 +120,4 @@ export function MultipleInput({ label, name, onFocus, ...props }: InputProps) {
   );
 }
 
-export function LocalizedMultipleInput({
-  lng,
-  ...props
-}: { lng: string } & InputProps) {
-  const LocalizedMultipleInput = withLocalizedInput(
-    { lng, ...props },
-    MultipleInput
-  );
-
-  return <LocalizedMultipleInput />;
-}
+export const LocalizedMultipleInput = withLocalizedInput(MultipleInput);

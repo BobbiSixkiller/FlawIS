@@ -6,18 +6,17 @@ export default function usePrefillFiles({
   cvUrl,
   avatarUrl,
   fileUrls,
-  setError,
-  setValue,
 }: {
   cvUrl?: string | null;
   avatarUrl?: string | null;
   fileUrls?: string[];
-  setError: UseFormSetError<any>;
-  setValue: UseFormSetValue<any>;
 }) {
   const [loading, setLoading] = useState(
     cvUrl || fileUrls || avatarUrl ? true : false
   );
+  const [files, setFiles] = useState<File[]>([]);
+  const [avatar, setAvatar] = useState<File>();
+  const [errors, setErrors] = useState<Record<string, string>>();
 
   useEffect(() => {
     async function fetchFiles() {
@@ -37,23 +36,26 @@ export default function usePrefillFiles({
         }
 
         if (files.length > 0) {
-          setValue("files", files);
+          setFiles(files);
         }
+      } catch (error: any) {
+        setErrors((prev) => ({ ...prev, files: error.message }));
+      }
 
+      try {
         if (avatarUrl) {
           const avatar = await fetchFromMinio("avatars", avatarUrl);
-          setValue("avatar", avatar);
+          setAvatar(avatar);
         }
-
-        setLoading(false);
-      } catch (err: any) {
-        setError("files", { message: err.message });
-        setLoading(false);
+      } catch (error: any) {
+        setErrors((prev) => ({ ...prev, avatar: error.message }));
       }
+
+      setLoading(false);
     }
 
     fetchFiles();
-  }, [cvUrl, avatarUrl, fileUrls, setError, setValue]);
+  }, [cvUrl, avatarUrl, fileUrls]);
 
-  return loading;
+  return { loading, errors, files, avatar };
 }

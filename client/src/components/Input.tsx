@@ -1,23 +1,61 @@
 "use client";
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { InputProps, withLocalizedInput } from "./withLocalizedInput";
-import { useController } from "react-hook-form";
+import { withLocalizedInput } from "./withLocalizedInput";
+import {
+  Control,
+  UseFormRegister,
+  UseFormSetFocus,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 import { cn } from "@/utils/helpers";
+import { InputHTMLAttributes, useState } from "react";
+
+interface RHFmethodsProps {
+  register: UseFormRegister<any>;
+  setFocus: UseFormSetFocus<any>;
+  setValue: UseFormSetValue<any>;
+  watch: UseFormWatch<any>;
+}
+
+function formatDatetimeLocal(val: any): string {
+  if (!val) return "";
+  const date = val instanceof Date ? val : new Date(val);
+  if (isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 16); // ⏰ "2025-07-19T11:30"
+}
+
+export interface InputProps
+  extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+  name: string;
+  label?: string;
+  error?: string;
+  errors?: any;
+  methods?: RHFmethodsProps;
+  control?: Control<any>;
+}
 
 //refactor to handle number and dates
 export function Input({
+  error,
+  methods,
   name,
   label,
   onFocus,
-  showPassword,
-  setShowPassword,
   className,
   ...props
 }: InputProps) {
-  const { field, fieldState } = useController({
-    name,
+  const field = methods?.register?.(name, {
+    valueAsDate: props.type === "datetime-local", // ✅
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const val = methods?.watch(name);
+  if (name === "slug") {
+    console.log(val);
+  }
 
   return (
     <div className="w-full">
@@ -33,7 +71,7 @@ export function Input({
         className={cn([
           "flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
           "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none",
-          fieldState.error
+          error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
           props.disabled &&
@@ -47,11 +85,16 @@ export function Input({
           }
           {...props}
           {...field}
+          value={
+            props.type === "datetime-local"
+              ? formatDatetimeLocal(val)
+              : val ?? ""
+          }
           onChange={(e) => {
             if (props.onChange) {
               props.onChange(e);
             }
-            field.onChange(e);
+            field?.onChange(e);
           }}
           onFocus={onFocus}
           onWheel={(e) => {
@@ -70,9 +113,7 @@ export function Input({
               "dark:hover:text-primary-300 dark:text-gray-600 dark:focus:text-primary-300",
             ])}
             onClick={() => {
-              if (setShowPassword) {
-                setShowPassword(!showPassword);
-              }
+              setShowPassword(!showPassword);
             }}
           >
             {showPassword ? (
@@ -84,18 +125,9 @@ export function Input({
         )}
       </div>
 
-      {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-      )}
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }
 
-export function LocalizedInput({
-  lng,
-  ...props
-}: { lng: string } & InputProps) {
-  const LocalizedInput = withLocalizedInput({ lng, ...props }, Input);
-
-  return <LocalizedInput />;
-}
+export const LocalizedInput = withLocalizedInput(Input);

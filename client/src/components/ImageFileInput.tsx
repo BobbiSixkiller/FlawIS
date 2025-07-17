@@ -3,19 +3,21 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
-import { InputProps, withLocalizedInput } from "./withLocalizedInput";
+import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { InputProps } from "./Input";
 
 export default function ImageFileInput({
   avatarUrl,
   label,
   name,
+  control,
   ...props
 }: {
   avatarUrl?: string;
 } & InputProps) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({ name, control });
 
   useEffect(() => {
     if (field.value) {
@@ -86,14 +88,4 @@ export default function ImageFileInput({
   );
 }
 
-export function LocalizedImageFileInput({
-  lng,
-  ...props
-}: { lng: string } & InputProps) {
-  const LocalizedImageFileInput = withLocalizedInput(
-    { lng, ...props },
-    ImageFileInput
-  );
-
-  return <LocalizedImageFileInput />;
-}
+export const LocalizedImageFileInput = withLocalizedInput(ImageFileInput);

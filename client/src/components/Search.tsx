@@ -17,11 +17,7 @@ import { ComponentType, Fragment, useEffect, useState } from "react";
 import Button from "./Button";
 import { useDebouncedCallback } from "use-debounce";
 
-interface BaseSearchParams {
-  text: string;
-}
-
-interface SearchComponentProps<TOption, TParams extends BaseSearchParams> {
+interface SearchComponentProps<TOption, TParams> {
   fetchOptions: (params: TParams) => Promise<TOption[]>;
   onOptionSelect: (option: TOption) => void;
   Option: ComponentType<{ data: TOption; active: boolean }>;
@@ -105,10 +101,7 @@ export default function SearchComponent<
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div
-              // onClick={() => setOpen(false)}
-              className="fixed inset-0 bg-black/25 z-10"
-            />
+            <div className="fixed inset-0 bg-black/25 z-10" />
           </TransitionChild>
           <TransitionChild
             enter="duration-300 ease-out"

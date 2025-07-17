@@ -1,6 +1,5 @@
 "use client";
 
-import { WizzardForm, WizzardStep } from "@/components/WIzzardForm";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import { useState } from "react";
@@ -25,6 +24,7 @@ import {
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
 import { useMessageStore } from "@/stores/messageStore";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -100,7 +100,11 @@ export default function ConferenceRegistrationForm({
         if (res.errors) {
           console.log(res.errors);
           for (const [key, val] of Object.entries(res.errors)) {
-            methods.setError(key, { message: val }, { shouldFocus: true });
+            methods.setError(
+              key as keyof (typeof methods)["formState"]["errors"],
+              { message: val },
+              { shouldFocus: true }
+            );
           }
         }
 
@@ -113,7 +117,7 @@ export default function ConferenceRegistrationForm({
     >
       <WizzardStep
         name={t("registration.billing.info", { ns: "conferences" })}
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           billing: yup.object({
             name: yup.string().trim().required(),
             address: yup.object({
@@ -128,58 +132,64 @@ export default function ConferenceRegistrationForm({
           }),
         })}
       >
-        <BillingInput billings={billings} />
-        <Input
-          label={t("registration.billing.street", { ns: "conferences" })}
-          name="billing.address.street"
-        />
-        <Input
-          label={t("registration.billing.city", { ns: "conferences" })}
-          name="billing.address.city"
-        />
-        <Input
-          label={t("registration.billing.postal", { ns: "conferences" })}
-          name="billing.address.postal"
-        />
-        <Input
-          label={t("registration.billing.country", { ns: "conferences" })}
-          name="billing.address.country"
-        />
-        <Input
-          label={t("registration.billing.ICO", { ns: "conferences" })}
-          name="billing.ICO"
-        />
-        <Input
-          label={t("registration.billing.DIC", { ns: "conferences" })}
-          name="billing.DIC"
-        />
-        <Input
-          label={t("registration.billing.ICDPH", { ns: "conferences" })}
-          name="billing.ICDPH"
-        />
+        {() => (
+          <>
+            <BillingInput billings={billings} />
+            <Input
+              label={t("registration.billing.street", { ns: "conferences" })}
+              name="billing.address.street"
+            />
+            <Input
+              label={t("registration.billing.city", { ns: "conferences" })}
+              name="billing.address.city"
+            />
+            <Input
+              label={t("registration.billing.postal", { ns: "conferences" })}
+              name="billing.address.postal"
+            />
+            <Input
+              label={t("registration.billing.country", { ns: "conferences" })}
+              name="billing.address.country"
+            />
+            <Input
+              label={t("registration.billing.ICO", { ns: "conferences" })}
+              name="billing.ICO"
+            />
+            <Input
+              label={t("registration.billing.DIC", { ns: "conferences" })}
+              name="billing.DIC"
+            />
+            <Input
+              label={t("registration.billing.ICDPH", { ns: "conferences" })}
+              name="billing.ICDPH"
+            />
+          </>
+        )}
       </WizzardStep>
       <WizzardStep
         name={t("registration.ticket", { ns: "conferences" })}
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           ticketId: yup.string().required(t("ticket")),
         })}
       >
-        <Ticket
-          submission={submission}
-          setSubmission={setSubmissionStep}
-          tickets={conference.tickets.map((t) => ({
-            id: t.id,
-            name: t.translations[lng as "sk" | "en"].name,
-            desc: t.translations[lng as "sk" | "en"].description,
-            price: t.price / 100,
-            withSubmission: t.withSubmission,
-          }))}
-        />
+        {(methods) => (
+          <Ticket
+            submission={submission}
+            setSubmission={setSubmissionStep}
+            tickets={conference.tickets.map((t) => ({
+              id: t.id,
+              name: t.translations[lng as "sk" | "en"].name,
+              desc: t.translations[lng as "sk" | "en"].description,
+              price: t.price / 100,
+              withSubmission: t.withSubmission,
+            }))}
+          />
+        )}
       </WizzardStep>
       {submissionStep && (
         <WizzardStep
           name={t("registration.submission.info", { ns: "conferences" })}
-          validationSchema={yup.object({
+          yupSchema={yup.object({
             submission: yup.object({
               section: yup.string().required(),
               authors: yup.array().of(yup.string().email()),

@@ -1,62 +1,54 @@
 "use client";
 
-import { yupResolver } from "@hookform/resolvers/yup";
 import { Children, ReactElement, ReactNode, useState } from "react";
-import {
-  FieldValues,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-  UseFormReturn,
-} from "react-hook-form";
+import { DefaultValues, Path, UseFormReturn } from "react-hook-form";
 import { ObjectSchema } from "yup";
+import RHFormContainer from "./RHFormContainer";
+import Stepper from "./Stepper";
 import Button from "./Button";
 import {
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
-import Stepper from "./Stepper";
 import Spinner from "./Spinner";
 
-interface WizzardStepProps {
-  children: ReactNode;
-  validationSchema: ObjectSchema<any>;
+interface WizzardStepProps<TVals extends Record<string, any>> {
   name: string;
+  yupSchema: ObjectSchema<TVals>;
+  children: ((methods: UseFormReturn<TVals>) => ReactNode) | ReactNode;
 }
 
-export function WizzardStep({ children }: WizzardStepProps) {
+export function WizzardStep<TVals extends Record<string, any>>({
+  children,
+}: WizzardStepProps<TVals>) {
   return <>{children}</>;
 }
 
-interface WizzardFormProps<T> {
+interface WizzardFormProps<TVals extends Record<string, any>> {
   lng: string;
-  values: T;
-  onSubmitCb: (
-    values: T,
-    methods: UseFormReturn<T & FieldValues, any, T & FieldValues>
-  ) => Promise<void>;
+  defaultValues?: DefaultValues<TVals>;
+  values?: TVals;
+  onSubmitCb: (values: TVals, methods: UseFormReturn<TVals>) => Promise<void>;
   children: ReactNode;
 }
 
-export function WizzardForm<T>({
-  onSubmitCb,
+export default function WizzardForm<TInputVals extends Record<string, any>>({
   children,
-  values,
   lng,
-}: WizzardFormProps<T & FieldValues>) {
-  const steps = Children.toArray(children) as ReactElement<WizzardStepProps>[];
+  values,
+  defaultValues,
+  onSubmitCb,
+}: WizzardFormProps<TInputVals>) {
+  const steps = Children.toArray(children) as ReactElement<
+    WizzardStepProps<TInputVals>
+  >[];
+
   const [step, setStep] = useState(0);
-  const currentStep = steps[step];
 
   function isLastStep() {
     return step === steps.length - 1;
   }
-
-  const methods = useForm<typeof values>({
-    resolver: yupResolver(currentStep.props.validationSchema),
-    values,
-  });
 
   function back() {
     if (step > 0) {
@@ -64,97 +56,100 @@ export function WizzardForm<T>({
     }
   }
 
-  const onSubmit: SubmitHandler<typeof values> = async (data) => {
-    if (isLastStep()) {
-      await onSubmitCb(data, methods);
-    } else {
-      setStep(step + 1);
+  const activeStep = steps[step];
+
+  function handleApiErrors(
+    apiErrors: Record<string, string>,
+    methods: UseFormReturn<TInputVals>
+  ) {
+    const firstField = Object.keys(apiErrors)[0];
+
+    // Determine step index based on field names and schema
+    const stepIndex = steps.findIndex((step) => {
+      const keys = Object.keys(step.props.yupSchema.fields);
+      return keys.some(
+        (k) => firstField === k || firstField.startsWith(`${k}.`)
+      );
+    });
+
+    if (stepIndex !== -1) {
+      setStep(stepIndex);
     }
-  };
+
+    setTimeout(() => {
+      for (const [key, msg] of Object.entries(apiErrors)) {
+        methods.setError(
+          key as Path<TInputVals>,
+          {
+            message: msg,
+          },
+          { shouldFocus: true }
+        );
+      }
+    }, 0);
+  }
 
   return (
-    <FormProvider {...methods}>
-      <Stepper activeIndex={step} steps={steps} lng={lng} />
-      <form
-        className="space-y-6 mt-6 w-full"
-        onSubmit={methods.handleSubmit(onSubmit, (errs) => console.log(errs))}
+    <div className="space-y-6">
+      <Stepper activeIndex={step} lng={lng} steps={steps} />
+      <RHFormContainer<TInputVals>
+        values={values}
+        defaultValues={defaultValues}
+        yupSchema={steps[step].props.yupSchema}
+        shouldUnregister={false}
       >
-        {steps[step]}
-
-        <div className="flex justify-between">
-          {steps.length > 1 && (
-            <Button
-              color="secondary"
-              type="button"
-              onClick={back}
-              disabled={step === 0}
-            >
-              <ChevronLeftIcon className="h-4 w-4" />
-            </Button>
-          )}
-
-          <Button
-            className={steps.length === 1 ? "w-full" : ""}
-            color="primary"
-            type="submit"
-            disabled={methods.formState.isSubmitting}
-          >
-            {methods.formState.isSubmitting ? (
-              <Spinner inverted />
-            ) : isLastStep() ? (
-              <CheckIcon className="h-4 w-4" />
-            ) : (
-              <ChevronRightIcon className="h-4 w-4" />
+        {(methods) => (
+          <form
+            onSubmit={methods.handleSubmit(
+              async (vals) => {
+                try {
+                  if (isLastStep()) {
+                    await onSubmitCb(vals, methods);
+                  } else {
+                    setStep(step + 1);
+                  }
+                } catch (errors: any) {
+                  if (errors && typeof errors === "object") {
+                    handleApiErrors(errors, methods);
+                  }
+                }
+              },
+              (err) => console.log(err)
             )}
-          </Button>
-        </div>
-      </form>
-    </FormProvider>
+          >
+            {typeof activeStep.props.children === "function"
+              ? activeStep.props.children(methods)
+              : activeStep.props.children}
+
+            <div className="flex justify-between mt-6">
+              {steps.length > 1 && (
+                <Button
+                  color="secondary"
+                  type="button"
+                  onClick={back}
+                  disabled={step === 0}
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                </Button>
+              )}
+              <Button
+                className={steps.length === 1 ? "w-full" : ""}
+                color="primary"
+                type="submit"
+                disabled={methods.formState.isSubmitting}
+              >
+                {methods.formState.isSubmitting ? (
+                  <Spinner inverted />
+                ) : isLastStep() ? (
+                  <CheckIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronRightIcon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </form>
+        )}
+      </RHFormContainer>
+    </div>
   );
-}
-
-export function objectToFormData(
-  obj: any,
-  formData: FormData = new FormData(),
-  parentKey: string = ""
-): FormData {
-  for (let key in obj) {
-    if (
-      obj.hasOwnProperty(key) &&
-      obj[key] !== null &&
-      obj[key] !== undefined
-    ) {
-      const propName = parentKey ? `${parentKey}.${key}` : key;
-
-      if (Array.isArray(obj[key])) {
-        obj[key].forEach((item: any) => {
-          if (item !== null && item !== undefined) {
-            if (item instanceof File) {
-              // Append each file under the same key
-              formData.append(propName, item);
-              console.log(`Appending file under key: ${propName}`);
-            } else if (typeof item === "object") {
-              // Recursive call for objects that are not Files
-              objectToFormData(item, formData, propName);
-            } else {
-              // Append non-object items
-              formData.append(propName, item);
-            }
-          }
-        });
-      } else if (obj[key] instanceof File) {
-        // Directly append File objects
-        formData.append(propName, obj[key]);
-        console.log(`Appending file under key: ${propName}`);
-      } else if (typeof obj[key] === "object") {
-        // Recursive call for nested objects
-        objectToFormData(obj[key], formData, propName);
-      } else {
-        // Append primitive values
-        formData.append(propName, obj[key]);
-      }
-      console.log(`Appending key: ${propName}, value: ${obj[key]}`);
-    }
-  }
-  return formData;
 }

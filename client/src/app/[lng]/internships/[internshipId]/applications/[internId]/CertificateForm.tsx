@@ -7,13 +7,12 @@ import useValidation from "@/hooks/useValidation";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { uploadOrDelete } from "@/utils/helpers";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useParams } from "next/navigation";
-import { FormProvider, useForm } from "react-hook-form";
 import { updateOrgFeedback } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
+import RHFormContainer from "@/components/RHFormContainer";
 
 export default function CertificateForm({
   application,
@@ -27,32 +26,16 @@ export default function CertificateForm({
 
   const { yup } = useValidation();
 
-  const methods = useForm({
-    resolver: yupResolver(
-      yup.object({
-        files: yup
-          .array()
-          .of(yup.mixed<File>().required())
-          .min(1, (val) => t("minFiles", { value: val.min, ns: "validation" }))
-          .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
-          .required(),
-      })
-    ),
-    defaultValues: { files: [] },
-  });
-
-  const isLoading = usePrefillFiles({
+  const { loading, files, errors } = usePrefillFiles({
     fileUrls: application.organizationFeedbackUrl
       ? [application.organizationFeedbackUrl]
       : undefined,
-    setError: methods.setError,
-    setValue: methods.setValue,
   });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center">
         <Spinner />
@@ -61,50 +44,63 @@ export default function CertificateForm({
   }
 
   return (
-    <FormProvider {...methods}>
-      <form
-        className="space-y-6"
-        onSubmit={methods.handleSubmit(
-          async (vals) => {
-            console.log(vals);
-            const { url, error } = await uploadOrDelete(
-              "internships",
-              application.organizationFeedbackUrl,
-              vals.files[0],
-              application.user.email
-            );
-            if (error) {
-              return methods.setError("files", { message: error });
-            }
-            if (url) {
-              const res = await updateOrgFeedback(application.id, url);
-              setMessage(res.message, res.success);
-
-              if (res.success) {
-                closeDialog(dialogId);
+    <RHFormContainer
+      yupSchema={yup.object({
+        files: yup
+          .array()
+          .of(yup.mixed<File>().required())
+          .min(1, (val) => t("minFiles", { value: val.min, ns: "validation" }))
+          .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
+          .required(),
+      })}
+      defaultValues={{ files }}
+      errors={errors}
+    >
+      {(methods) => (
+        <form
+          className="space-y-6"
+          onSubmit={methods.handleSubmit(
+            async (vals) => {
+              console.log(vals);
+              const { url, error } = await uploadOrDelete(
+                "internships",
+                application.organizationFeedbackUrl,
+                vals.files[0],
+                application.user.email
+              );
+              if (error) {
+                return methods.setError("files", { message: error });
               }
-            }
-          },
-          (err) => console.log(err)
-        )}
-      >
-        <MultipleFileUploadField
-          name="files"
-          label={t("orgFeedback", { ns: "internships" })}
-          maxFiles={1}
-          accept={{
-            "application/pdf": [".pdf"],
-          }}
-        />
+              if (url) {
+                const res = await updateOrgFeedback(application.id, url);
+                setMessage(res.message, res.success);
 
-        <Button type="submit" size="sm" className="w-full">
-          {methods.formState.isSubmitting ? (
-            <Spinner inverted />
-          ) : (
-            t("submit", { ns: "common" })
+                if (res.success) {
+                  closeDialog(dialogId);
+                }
+              }
+            },
+            (err) => console.log(err)
           )}
-        </Button>
-      </form>
-    </FormProvider>
+        >
+          <MultipleFileUploadField
+            name="files"
+            label={t("orgFeedback", { ns: "internships" })}
+            maxFiles={1}
+            accept={{
+              "application/pdf": [".pdf"],
+            }}
+          />
+
+          <Button type="submit" size="sm" className="w-full">
+            {methods.formState.isSubmitting ? (
+              <Spinner inverted />
+            ) : (
+              t("submit", { ns: "common" })
+            )}
+          </Button>
+        </form>
+      )}
+    </RHFormContainer>
   );
 }

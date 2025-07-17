@@ -71,10 +71,6 @@ export function Snackbar() {
   const message = useMessageStore((s) => s.message);
   const clear = useMessageStore((s) => s.clearMessage);
 
-  useEffect(() => {
-    clear();
-  }, [path]);
-
   return (
     <Transition
       appear

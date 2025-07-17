@@ -2,44 +2,33 @@
 
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { Transition } from "@headlessui/react";
-import {
-  ComponentType,
-  Fragment,
-  InputHTMLAttributes,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useController } from "react-hook-form";
-
-export interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-  name: string;
-  label?: string;
-  showPassword?: boolean;
-  setShowPassword?: (val: boolean) => void;
-}
+import { ComponentType, Fragment, useEffect, useRef, useState } from "react";
+import { InputProps } from "./Input";
+import { get } from "lodash";
 
 export function withLocalizedInput(
-  { lng, ...props }: { lng: string } & InputProps,
-  InputComponent: ComponentType<InputProps>
+  InputComponent: ComponentType<InputProps & { lng: string }>
 ) {
-  return function WithLocalizedInputComponent() {
+  return function WithLocalizedInputWrapper(
+    props: InputProps & { lng: string }
+  ) {
     const [visible, setVisible] = useState(false);
-    //if there is an error in the localized field make it visible
-    const { fieldState } = useController({
-      name: props.name.replace(lng, lng === "sk" ? "en" : "sk"),
-    });
+
+    const localizedInputName = props.name?.replace(
+      props.lng,
+      props.lng === "sk" ? "en" : "sk"
+    );
+    const localizedError = get(props.errors, localizedInputName)?.message;
 
     useEffect(() => {
-      if (fieldState.error) {
-        setVisible(true);
+      if (props.error || localizedError) {
+        setVisible(true); // only trigger visibility
       }
-    }, [fieldState.error]);
+    }, [props.error, localizedError]);
 
     const ref = useRef<HTMLDivElement>(null);
     useOnClickOutside(ref, () => {
-      if (!fieldState.error) {
+      if (!props.error) {
         setVisible(false);
       }
     });
@@ -60,16 +49,22 @@ export function withLocalizedInput(
           leave="ease-in duration-200"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
+          afterEnter={() => {
+            if (localizedError) {
+              props.methods?.setFocus?.(localizedInputName);
+            }
+          }}
         >
           <div className="mt-2">
             <InputComponent
               {...props}
+              error={localizedError}
               label={
-                lng === "sk"
+                props.lng === "sk"
                   ? `${props.label} anglicky`
                   : `${props.label} in Slovak`
               }
-              name={props.name.replace(lng, lng === "sk" ? "en" : "sk")}
+              name={localizedInputName}
               onFocus={() => setVisible(true)}
             />
           </div>

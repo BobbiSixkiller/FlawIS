@@ -1,13 +1,11 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { useEffect, useState } from "react";
+import { ComponentType, useEffect } from "react";
 import { Trans } from "react-i18next";
 
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { addUser, register, updateUser } from "./actions";
-import { Input } from "@/components/Input";
+import { Input, InputProps } from "@/components/Input";
 import CheckBox from "@/components/Checkbox";
 import PhoneInput from "@/components/PhoneInput";
 import parsePhoneNumberFromString from "libphonenumber-js";
@@ -31,6 +29,7 @@ import { useDialogStore } from "@/stores/dialogStore";
 import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
 import { useScrollStore } from "@/stores/scrollStore";
+import RHFormContainer from "@/components/RHFormContainer";
 
 export default function UserForm({
   user,
@@ -48,15 +47,49 @@ export default function UserForm({
   const path = usePathname();
   const searchParams = useSearchParams();
 
-  const [showPassword, setShowPassword] = useState(false);
-
   const ctxUser = useUser();
 
   const { yup } = useValidation();
 
-  const methods = useForm({
-    resolver: yupResolver(
-      yup.object({
+  const { loading, avatar, files, errors } = usePrefillFiles({
+    avatarUrl: user?.avatarUrl,
+    cvUrl: user?.cvUrl,
+  });
+
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
+  const scrollToTop = useScrollStore((s) => s.getScroll);
+
+  if (loading)
+    return (
+      <div className="flex justify-center">
+        <Spinner />
+      </div>
+    );
+
+  return (
+    <RHFormContainer
+      errors={errors}
+      defaultValues={{
+        name: user?.name || "",
+        email: user?.email || "",
+        password: "",
+        confirmPass: "",
+        address: user?.address || {
+          city: "",
+          country: "",
+          postal: "",
+          street: "",
+        },
+        access: user?.access || [],
+        organization: user?.organization || "",
+        telephone: user?.telephone || "",
+        studyProgramme: user?.studyProgramme || null,
+        privacy: path === "/register" ? false : true,
+        files,
+        avatar,
+      }}
+      yupSchema={yup.object({
         name: yup.string().trim().required(),
         email: yup
           .string()
@@ -130,7 +163,6 @@ export default function UserForm({
         telephone: yup
           .string()
           .trim()
-          .nullable()
           .when({
             is: () =>
               subdomain?.includes("conferences") ||
@@ -148,6 +180,7 @@ export default function UserForm({
                     return phoneNumber?.isValid() || false;
                   }
                 ),
+            otherwise: (schema) => schema.nullable(),
           }),
         studyProgramme: yup
           .mixed<StudyProgramme>()
@@ -178,279 +211,265 @@ export default function UserForm({
           .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
             file ? file.size < 2_000_000 : true
           ),
-      })
-    ),
-    defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
-      password: "",
-      confirmPass: "",
-      address: user?.address || {
-        city: "",
-        country: "",
-        postal: "",
-        street: "",
-      },
-      access: user?.access || [],
-      organization: user?.organization || "",
-      telephone: user?.telephone || "",
-      studyProgramme: user?.studyProgramme || null,
-      privacy: path === "/register" ? false : true,
-      files: [],
-      avatar: undefined,
-    },
-  });
-
-  const loadingFile = usePrefillFiles({
-    setError: methods.setError,
-    setValue: methods.setValue,
-    avatarUrl: user?.avatarUrl,
-    cvUrl: user?.cvUrl,
-  });
-
-  const email = methods.watch("email");
-  useEffect(() => {
-    if (email.includes("uniba")) {
-      methods.setValue("organization", t("flaw", { ns: "common" }), {
-        shouldValidate: true,
-      });
-    }
-  }, [email, lng, t]);
-
-  const closeDialog = useDialogStore((s) => s.closeDialog);
-  const setMessage = useMessageStore((s) => s.setMessage);
-  const scrollToTop = useScrollStore((s) => s.getScroll);
-
-  if (loadingFile)
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
-
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="space-y-6"
-        onSubmit={methods.handleSubmit(
-          async (val) => {
-            const { error, url } = await uploadOrDelete(
-              "resumes",
-              user?.cvUrl,
-              val.files[0]
-            );
-            if (error) {
-              return methods.setError("files", { message: error });
-            }
-
-            const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
-              "avatars",
-              user?.avatarUrl,
-              val.avatar
-            );
-            if (avatarErr) {
-              return methods.setError("avatar", { message: error });
-            }
-
-            let res;
-            if (path.includes("register")) {
-              res = await register({
-                url: searchParams.get("url")?.toString(),
-                token: searchParams.get("token")?.toString(),
-                email: val.email,
-                name: val.name,
-                password: val.password as string,
-                organization: val.organization ? val.organization : undefined,
-                telephone: val.telephone ? val.telephone : undefined,
-              });
-            } else if (user) {
-              res = await updateUser(user.id, {
-                email: val.email,
-                name: val.name,
-                organization: val.organization ? val.organization : undefined,
-                access: val.access,
-                password: val.password ? val.password : undefined,
-                telephone: val.telephone ? val.telephone : null,
-                studyProgramme: val.studyProgramme as StudyProgramme,
-                cvUrl: url,
-                avatarUrl,
-                address: val.address ? (val.address as Address) : undefined,
-              });
-            } else {
-              res = await addUser({
-                email: val.email,
-                name: val.name,
-                password: val.password as string,
-                organization: val.organization,
-                telephone: val.telephone,
-                access: val.access,
-              });
-            }
-
-            if (res) {
-              setMessage(res.message, res.success);
-            }
-
-            if (res?.errors) {
-              for (const [key, value] of Object.entries(res.errors)) {
-                methods.setError(
-                  key as keyof (typeof methods)["formState"]["errors"],
-                  {
-                    message: value,
-                  },
-                  { shouldFocus: true }
-                );
+      })}
+    >
+      {(methods) => (
+        <form
+          className="space-y-6"
+          onSubmit={methods.handleSubmit(
+            async (val) => {
+              const { error, url } = await uploadOrDelete(
+                "resumes",
+                user?.cvUrl,
+                val.files[0]
+              );
+              if (error) {
+                return methods.setError("files", { message: error });
               }
-            }
 
-            // Scroll to top of the ScrollWrapper component only of there is no form field error set
-            if (!res?.success && !res?.errors) {
-              scrollToTop("auth-scroll");
-            }
+              const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
+                "avatars",
+                user?.avatarUrl,
+                val.avatar
+              );
+              if (avatarErr) {
+                return methods.setError("avatar", { message: error });
+              }
 
-            if (res?.success && dialogId) {
-              closeDialog(dialogId);
-            }
-          },
-          (errors) => console.log(errors)
-        )}
-      >
-        {path.includes("update") && <AvatarInput name="avatar" label="Fotka" />}
+              let res;
+              if (path.includes("register")) {
+                res = await register({
+                  url: searchParams.get("url")?.toString(),
+                  token: searchParams.get("token")?.toString(),
+                  email: val.email,
+                  name: val.name,
+                  password: val.password as string,
+                  organization: val.organization ? val.organization : undefined,
+                  telephone: val.telephone ? val.telephone : undefined,
+                });
+              } else if (user) {
+                res = await updateUser(user.id, {
+                  email: val.email,
+                  name: val.name,
+                  organization: val.organization ? val.organization : undefined,
+                  access: val.access,
+                  password: val.password ? val.password : undefined,
+                  telephone: val.telephone ? val.telephone : null,
+                  studyProgramme: val.studyProgramme as StudyProgramme,
+                  cvUrl: url,
+                  avatarUrl,
+                  address: val.address ? (val.address as Address) : undefined,
+                });
+              } else {
+                res = await addUser({
+                  email: val.email,
+                  name: val.name,
+                  password: val.password as string,
+                  organization: val.organization,
+                  telephone: val.telephone,
+                  access: val.access,
+                });
+              }
 
-        <Input label={t("name")} name="name" autoComplete="name" />
-        <Input label={t("email")} name="email" autoComplete="email" />
+              if (res) {
+                setMessage(res.message, res.success);
+              }
 
-        {path.includes("users") && (
-          <Select
-            name="access"
-            label="Access"
-            multiple
-            options={[
-              { name: Access.Admin, value: Access.Admin },
-              {
-                name: Access.ConferenceAttendee,
-                value: Access.ConferenceAttendee,
-              },
-              { name: Access.Organization, value: Access.Organization },
-              { name: Access.Student, value: Access.Student },
-            ]}
+              if (res?.errors) {
+                for (const [key, value] of Object.entries(res.errors)) {
+                  methods.setError(
+                    key as keyof (typeof methods)["formState"]["errors"],
+                    {
+                      message: value,
+                    },
+                    { shouldFocus: true }
+                  );
+                }
+              }
+
+              // Scroll to top of the ScrollWrapper component only of there is no form field error set
+              if (!res?.success && !res?.errors) {
+                scrollToTop("auth-scroll");
+              }
+
+              if (res?.success && dialogId) {
+                closeDialog(dialogId);
+              }
+            },
+            (errors) => console.log(errors)
+          )}
+        >
+          {path.includes("update") && (
+            <AvatarInput
+              control={methods.control}
+              name="avatar"
+              label="Fotka"
+            />
+          )}
+          <Input label={t("name")} name="name" autoComplete="name" />
+          <IsUnibaMailInput
+            label={t("email")}
+            name="email"
+            autoComplete="email"
           />
-        )}
 
-        <PhoneInput label={t("phone")} name="telephone" autoComplete="off" />
-        <Input label={t("org")} name="organization" autoComplete="off" />
-
-        {(path.includes("users") || user?.access.includes(Access.Student)) && (
-          <>
-            <div className="flex gap-2">
-              <Input
-                label={t("street", { ns: "common" })}
-                name="address.street"
-                autoComplete="address-line1"
-              />
-              <Input
-                label={t("city", { ns: "common" })}
-                name="address.city"
-                autoComplete="address-level2"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Input
-                label={t("postal", { ns: "common" })}
-                name="address.postal"
-                autoComplete="postal-code"
-              />
-              <Input
-                label={t("country", { ns: "common" })}
-                name="address.country"
-                autoComplete="country"
-              />
-            </div>
-
+          {path.includes("users") && (
             <Select
-              name="studyProgramme"
-              label="Ročník"
+              name="access"
+              label="Access"
+              multiple
               options={[
-                { name: "1. bakalársky", value: StudyProgramme.Bachelor1 },
-                { name: "2. bakalársky", value: StudyProgramme.Bachelor2 },
-                { name: "3. bakalársky", value: StudyProgramme.Bachelor3 },
-                { name: "1. magisterský", value: StudyProgramme.Master1 },
-                { name: "2. magisterský", value: StudyProgramme.Master2 },
+                { name: Access.Admin, value: Access.Admin },
+                {
+                  name: Access.ConferenceAttendee,
+                  value: Access.ConferenceAttendee,
+                },
+                { name: Access.Organization, value: Access.Organization },
+                { name: Access.Student, value: Access.Student },
               ]}
             />
-            <MultipleFileUploadField
-              label="CV.pdf"
-              name="files"
-              maxFiles={1}
-              accept={{
-                "application/pdf": [".pdf"],
-              }}
-            />
-          </>
-        )}
+          )}
 
-        {!path.includes("profile") && namespace !== "profile" && (
-          <>
-            <Input
-              name="password"
-              label={t("password")}
-              type="password"
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-              autoComplete="current-password"
-            />
-            <Input
-              name="confirmPass"
-              label={t("confirmPass")}
-              type="password"
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-              autoComplete="current-password"
-            />
-          </>
-        )}
+          <PhoneInput
+            label={t("phone")}
+            name="telephone"
+            control={methods.control}
+          />
+          <Input label={t("org")} name="organization" autoComplete="off" />
 
-        {path.includes("register") && (
-          <CheckBox
-            name="privacy"
-            label={
-              <Trans
-                i18nKey={"privacy"}
-                t={t}
-                components={{
-                  privacy: (
-                    <a
-                      onClick={(e) => e.stopPropagation()}
-                      target="_blank"
-                      href="https://uniba.sk/ochrana-osobnych-udajov/"
-                      className={cn([
-                        "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                        "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
-                      ])}
-                    />
-                  ),
+          {(path.includes("users") ||
+            user?.access.includes(Access.Student)) && (
+            <>
+              <div className="flex gap-2">
+                <Input
+                  label={t("street", { ns: "common" })}
+                  name="address.street"
+                  autoComplete="address-line1"
+                />
+                <Input
+                  label={t("city", { ns: "common" })}
+                  name="address.city"
+                  autoComplete="address-level2"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  label={t("postal", { ns: "common" })}
+                  name="address.postal"
+                  autoComplete="postal-code"
+                />
+                <Input
+                  label={t("country", { ns: "common" })}
+                  name="address.country"
+                  autoComplete="country"
+                />
+              </div>
+
+              <Select
+                name="studyProgramme"
+                label="Ročník"
+                options={[
+                  { name: "1. bakalársky", value: StudyProgramme.Bachelor1 },
+                  { name: "2. bakalársky", value: StudyProgramme.Bachelor2 },
+                  { name: "3. bakalársky", value: StudyProgramme.Bachelor3 },
+                  { name: "1. magisterský", value: StudyProgramme.Master1 },
+                  { name: "2. magisterský", value: StudyProgramme.Master2 },
+                ]}
+              />
+              <MultipleFileUploadField
+                label="CV.pdf"
+                name="files"
+                maxFiles={1}
+                accept={{
+                  "application/pdf": [".pdf"],
                 }}
               />
-            }
-          />
-        )}
-
-        <Button
-          className="w-full items-center justify-center gap-2"
-          type="submit"
-          size="sm"
-          disabled={methods.formState.isSubmitting}
-        >
-          {methods.formState.isSubmitting ? (
-            <>
-              <Spinner inverted />
-              {t("submitting")}
             </>
-          ) : (
-            t("submit")
           )}
-        </Button>
-      </form>
-    </FormProvider>
+
+          {!path.includes("profile") && namespace !== "profile" && (
+            <>
+              <Input
+                name="password"
+                label={t("password")}
+                type="password"
+                autoComplete="current-password"
+              />
+              <Input
+                name="confirmPass"
+                label={t("confirmPass")}
+                type="password"
+                autoComplete="current-password"
+              />
+            </>
+          )}
+
+          {path.includes("register") && (
+            <CheckBox
+              control={methods.control}
+              name="privacy"
+              label={
+                <Trans
+                  i18nKey={"privacy"}
+                  t={t}
+                  components={{
+                    privacy: (
+                      <a
+                        key={0}
+                        onClick={(e) => e.stopPropagation()}
+                        target="_blank"
+                        href="https://uniba.sk/ochrana-osobnych-udajov/"
+                        className={cn([
+                          "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                          "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+                        ])}
+                      />
+                    ),
+                  }}
+                />
+              }
+            />
+          )}
+
+          <Button
+            className="w-full items-center justify-center gap-2"
+            type="submit"
+            size="sm"
+            disabled={methods.formState.isSubmitting}
+          >
+            {methods.formState.isSubmitting ? (
+              <>
+                <Spinner inverted />
+                {t("submitting")}
+              </>
+            ) : (
+              t("submit")
+            )}
+          </Button>
+        </form>
+      )}
+    </RHFormContainer>
   );
 }
+
+function withUnibaEmail(InputComponent: ComponentType<InputProps>) {
+  return function WithUnibaEmailWrapper(props: InputProps) {
+    const { methods } = props;
+    const email = methods?.watch("email");
+
+    const { lng } = useParams<{ lng: string }>();
+    const { t } = useTranslation(lng, ["common"]);
+
+    useEffect(() => {
+      if (email.includes("uniba")) {
+        methods?.setValue("organization", t("flaw", { ns: "common" }), {
+          shouldValidate: true,
+        });
+      }
+    }, [email, lng, t]);
+
+    return <InputComponent {...props} />;
+  };
+}
+
+const IsUnibaMailInput = withUnibaEmail(Input);

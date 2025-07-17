@@ -61,6 +61,7 @@ export default function Modal({
         as="div"
         className="fixed z-30 inset-0 overflow-y-auto"
         onClose={handleClose}
+        unmount
       >
         <TransitionChild
           enter="duration-300 ease-out"

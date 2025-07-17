@@ -1,80 +1,85 @@
 name: Build and Deploy to Staging
+
 on:
   push:
     branches:
       - staging
+
 jobs:
-  build:
+  # ----------------------------
+  # Job 1: MongoDB Backup
+  # ----------------------------
+  mongo:
     runs-on: [HyperV]
-    environment: staging
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      - name: Show workspace
+        run: echo "Workspace: $PWD"
 
-      - name: Setting up node version
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Stop and remove staging containers
-        run: |
-          docker ps -a --format '{{.Names}}' | grep 'staging' | xargs -r docker rm -f
-
-      - name: Clean up unused Docker resources and staging volumes
-        run: |
-          docker system prune -af
-          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
-        continue-on-error: true
+      - name: Ensure backup directory exists
+        run: mkdir -p ./backup
 
       - name: Copy MongoDB data from production
         run: |
-          # Step 1: Run mongodump inside the production MongoDB container
+          echo "Starting MongoDB backup from production..."
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
-
-          # Step 2: Copy the backup from the production MongoDB container to the local runner
           docker cp flawis-mongo-1:/data/backup ./backup
+          echo "MongoDB backup saved to ./backup"
 
-          # # Step 3: Stop the staging MongoDB container
-          # docker stop flawis-mongo-staging-1
+  # ----------------------------
+  # Job 2: MinIO Sync
+  # ----------------------------
+  minio:
+    runs-on: [HyperV]
+    steps:
+      - name: Show workspace
+        run: echo "Workspace: $PWD"
 
-          # # Step 4: Remove the staging MongoDB container (optional, only if you want a clean rebuild)
-          # docker rm flawis-mongo-staging-1
-
-          # Step 5: Start the staging MongoDB container
-          docker-compose -f docker-compose.staging.yml up -d mongo-staging
-
-          # Step 6: Copy the backup to the new staging MongoDB container
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
-
-          # Step 7: Run mongorestore inside the staging MongoDB container
-          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
-
-      - name: Install MinIO client (if not already installed)
+      - name: Install MinIO client
         run: |
-          if ! command -v mc &> /dev/null
-          then
+          if ! command -v mc &> /dev/null; then
             wget https://dl.min.io/client/mc/release/linux-amd64/mc
             chmod +x mc
             mkdir -p $HOME/bin
-            mv mc $HOME/bin/
+            mv mc $HOME/bin
             echo "$HOME/bin" >> $GITHUB_PATH
-          else
-            echo "MinIO client is already installed."
           fi
 
       - name: Copy Data from Production MinIO to Staging MinIO
         run: |
+          echo "Syncing MinIO production data to staging..."
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-
           mc mirror production/ staging/
+          echo "MinIO sync completed."
 
-      - name: Clean up unused Docker resources and stagin volumes
+  # ----------------------------
+  # Job 3: Deploy Staging
+  # ----------------------------
+  deploy:
+    runs-on: [HyperV]
+    needs: [mongo, minio]
+    environment: staging
+    steps:
+      - name: Show workspace
+        run: echo "Workspace: $PWD"
+        
+      - name: Checkout code (if needed)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Restore MongoDB to staging
         run: |
-          docker system prune -af  # safe for volumes
-          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
+          echo "Restoring MongoDB backup to staging..."
+          docker stop flawis-mongo-staging-1 || true
+          docker rm flawis-mongo-staging-1 || true
+          docker-compose -f docker-compose.staging.yml up -d mongo-staging
+          docker cp ./backup flawis-mongo-staging-1:/data/backup
+          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
+          echo "MongoDB restore completed."
+
+      - name: Clean up unused Docker resources
+        run: docker system prune --all --force
         continue-on-error: true
 
       - name: Build and Deploy Staging
@@ -91,10 +96,12 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ vars.MAIL_FROM }}
           RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
           REDIS_URI: ${{ vars.REDIS_URI }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
+          echo "Building and deploying staging services..."
           docker-compose -f docker-compose.staging.yml up -d --build
+          echo "Staging deployment completed."

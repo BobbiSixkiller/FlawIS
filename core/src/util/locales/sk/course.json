@@ -2,5 +2,6 @@
   "notFound": "Kurz nebol nájdený!",
   "update": "Kurz {{name}} bol aktualizovaný.",
   "new": "Kurz {{name}} bol vytvorený.",
-  "delete": "Kurz {{name}} bol vymazaný."
+  "delete": "Kurz {{name}} bol vymazaný.",
+  "categoryNotFound": "Kategória nebola nájdená!"
 }

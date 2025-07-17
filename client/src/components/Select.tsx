@@ -95,7 +95,10 @@ export default function Select({
             <ListboxOption
               key={i}
               value={option}
-              className="data-[focus]:bg-primary-500 data-[focus]:text-white data-[selected]:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between"
+              className={cn([
+                "data-[focus]:bg-primary-500 data-[focus]:text-white data-[selected]:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between",
+                "dark:data-[focus]:bg-primary-300",
+              ])}
             >
               {option.name}
               <CheckIcon className="size-3 stroke-2 hidden group-data-[selected]:block" />
