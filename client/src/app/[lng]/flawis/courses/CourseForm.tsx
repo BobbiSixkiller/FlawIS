@@ -24,6 +24,7 @@ export default function CourseForm(props: { dialogId: string }) {
     <WizzardForm<CourseInput>
       lng={lng}
       values={{
+        categoryIds: [],
         name: "",
         description: "",
         price: 0,
