@@ -7,7 +7,6 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import NewConferenceForm from "./NewConferenceForm";
-import { ConferenceSortInput } from "@/lib/graphql/generated/graphql";
 
 export default async function Conferences({
   params,

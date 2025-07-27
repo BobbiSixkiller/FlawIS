@@ -1,7 +1,6 @@
 "use server";
 
 import {
-  Access,
   InviteUsersDocument,
   TextSearchUserDocument,
   UsersDocument,
@@ -12,9 +11,9 @@ import { executeGqlFetch } from "@/utils/actions";
 export async function getUsers(vars: UsersQueryVariables) {
   const res = await executeGqlFetch(
     UsersDocument,
-    vars
-    // {},
-    // { tags: ["users"], revalidate: 3600 }
+    vars,
+    {},
+    { tags: ["users"], revalidate: 3600 }
   );
 
   if (res.errors) {

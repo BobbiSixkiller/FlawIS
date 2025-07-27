@@ -21,6 +21,8 @@ export default async function Users({
   const { lng } = await params;
   const queryParams = await searchParams;
 
+  const { t } = await translate(lng, "users");
+
   const vars: UsersQueryVariables = {
     sort: [],
     filter: { access: queryParams?.access as Access[] },
@@ -30,8 +32,6 @@ export default async function Users({
 
   const newUserDialogId = "new-user";
   const inviteUserDialogId = "invite-user";
-
-  const { t } = await translate(lng, "users");
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,7 +66,6 @@ export default async function Users({
       />
       <div className="flex justify-between">
         <FilterDropdown
-          anchor="bottom start"
           filters={[
             {
               label: "Access",

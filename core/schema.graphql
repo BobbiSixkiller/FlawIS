@@ -8,7 +8,9 @@ type AcademicYear {
   count: Int!
 }
 
-"""User access inside the FLAWIS system"""
+"""
+User access inside the FLAWIS system
+"""
 enum Access {
   Admin
   ConferenceAttendee
@@ -30,7 +32,9 @@ input AddressInput {
   street: String!
 }
 
-"""Attendee model type"""
+"""
+Attendee model type
+"""
 type Attendee {
   conference: Conference!
   createdAt: DateTimeISO!
@@ -50,7 +54,9 @@ input AttendeeBillingInput {
   name: String!
 }
 
-"""AttendeeConnection type enabling cursor based pagination"""
+"""
+AttendeeConnection type enabling cursor based pagination
+"""
 type AttendeeConnection {
   edges: [AttendeeEdge]!
   pageInfo: AttendeePageInfo!
@@ -68,7 +74,9 @@ input AttendeeFilterInput {
   sectionIds: [ObjectId]! = []
 }
 
-"""Conference registration input type"""
+"""
+Conference registration input type
+"""
 input AttendeeInput {
   billing: AttendeeBillingInput!
   conferenceId: ObjectId!
@@ -90,13 +98,17 @@ input AttendeeSortInput {
   field: AttendeeSortableField!
 }
 
-"""Sortable enum definition for attendees query"""
+"""
+Sortable enum definition for attendees query
+"""
 enum AttendeeSortableField {
   ID
   NAME
 }
 
-"""Billing information"""
+"""
+Billing information
+"""
 type Billing {
   DIC: String
   ICDPH: String
@@ -105,14 +117,18 @@ type Billing {
   name: String!
 }
 
-"""Course category"""
+"""
+Course category
+"""
 type Category {
   id: ObjectId!
   name: String!
   slug: String!
 }
 
-"""Conference model type"""
+"""
+Conference model type
+"""
 type Conference {
   attendeesCount: Int!
   attending: Attendee
@@ -127,7 +143,9 @@ type Conference {
   updatedAt: DateTimeISO!
 }
 
-"""ConferenceConnection type enabling cursor based pagination"""
+"""
+ConferenceConnection type enabling cursor based pagination
+"""
 type ConferenceConnection {
   edges: [ConferenceEdge]!
   pageInfo: ConferencePageInfo!
@@ -139,7 +157,9 @@ type ConferenceEdge {
   node: Conference!
 }
 
-"""Conference input type"""
+"""
+Conference input type
+"""
 input ConferenceInput {
   billing: FlawBillingInput!
   dates: DatesInput!
@@ -162,7 +182,9 @@ input ConferenceSortInput {
   field: ConferenceSortableField!
 }
 
-"""Sortable enum definition for conferences query"""
+"""
+Sortable enum definition for conferences query
+"""
 enum ConferenceSortableField {
   ID
 }
@@ -178,7 +200,9 @@ input ConferenceTranslationInput {
 }
 
 type ConferenceTranslations {
-  """Logourl transformed with regards to staging/production env"""
+  """
+  Logourl transformed with regards to staging/production env
+  """
   logoUrlEnv: String!
   name: String!
 }
@@ -187,7 +211,9 @@ type Course {
   categories: [Category!]!
   createdAt: DateTimeISO!
 
-  """String representation of HTML describing the course"""
+  """
+  String representation of HTML describing the course
+  """
   description: String!
   id: ObjectId!
   isPaid: Boolean!
@@ -223,7 +249,9 @@ input DatesInput {
   submissionDeadline: DateTimeISO
 }
 
-"""Flaw billing information"""
+"""
+Flaw billing information
+"""
 type FlawBilling {
   DIC: String!
   IBAN: String!
@@ -250,7 +278,9 @@ interface IMutationResponse {
   message: String!
 }
 
-"""Important dates regarding conference"""
+"""
+Important dates regarding conference
+"""
 type ImportantDates {
   end: DateTimeISO!
   regEnd: DateTimeISO
@@ -258,7 +288,9 @@ type ImportantDates {
   submissionDeadline: DateTimeISO
 }
 
-"""Ovject type representing student who applies for an internship"""
+"""
+Ovject type representing student who applies for an internship
+"""
 type Intern {
   createdAt: DateTimeISO!
   fileUrls: [String!]!
@@ -271,7 +303,9 @@ type Intern {
   user: StudentReference!
 }
 
-"""InternConnection type enabling cursor based pagination"""
+"""
+InternConnection type enabling cursor based pagination
+"""
 type InternConnection {
   edges: [InternEdge]!
   pageInfo: InternPageInfo!
@@ -306,19 +340,25 @@ input InternSortInput {
   field: InternSortableField!
 }
 
-"""Sortable enum definition for interns query"""
+"""
+Sortable enum definition for interns query
+"""
 enum InternSortableField {
   ID
   NAME
 }
 
-"""Internship object type"""
+"""
+Internship object type
+"""
 type Internship {
   academicYear: String!
   applicationsCount: Int!
   createdAt: DateTimeISO!
 
-  """String representation of internship listing's HTML page"""
+  """
+  String representation of internship listing's HTML page
+  """
   description: String!
   id: ObjectId!
   myApplication: Intern
@@ -327,7 +367,9 @@ type Internship {
   user: ObjectId!
 }
 
-"""InternshipConnection type enabling cursor based pagination"""
+"""
+InternshipConnection type enabling cursor based pagination
+"""
 type InternshipConnection {
   academicYears: [AcademicYear!]!
   edges: [InternshipEdge]!
@@ -368,21 +410,27 @@ input InternshipSortInput {
   field: InternshipSortableField!
 }
 
-"""Sortable enum definition for interships query"""
+"""
+Sortable enum definition for interships query
+"""
 enum InternshipSortableField {
   CREARTED_AT
   HAS_APPLICATION
   ORGANIZATION
 }
 
-"""Invoice entity subdocument type"""
+"""
+Invoice entity subdocument type
+"""
 type Invoice {
   body: InvoiceData!
   issuer: FlawBilling!
   payer: Billing!
 }
 
-"""The body of an invoice"""
+"""
+The body of an invoice
+"""
 type InvoiceData {
   body: String!
   comment: String!
@@ -433,14 +481,19 @@ input LocalizedTicketInputs {
 }
 
 type Mutation {
-  """Adds currently logged in user as the co-author of a submission"""
+  """
+  Adds currently logged in user as the co-author of a submission
+  """
   acceptAuthorInvite: SubmissionMutationResponse!
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
-  createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
+  createIntern(
+    fileUrls: [String]!
+    internshipId: ObjectId!
+  ): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
@@ -461,19 +514,34 @@ type Mutation {
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
-  updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateConferenceDates(
+    data: DatesInput!
+    slug: String!
+  ): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
-  updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
+  updateInternship(
+    id: ObjectId!
+    input: InternshipInput!
+  ): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateOrgFeedback(fileUrl: String, id: ObjectId!): InternMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
-  updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
-  updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
+  updateSubmission(
+    data: SubmissionInput!
+    id: ObjectId!
+  ): SubmissionMutationResponse!
+  updateTicket(
+    data: TicketInput!
+    slug: String!
+    ticketId: ObjectId!
+  ): ConferenceMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }
 
-"""Mongo object id scalar type"""
+"""
+Mongo object id scalar type
+"""
 scalar ObjectId
 
 type OrganizationCount {
@@ -492,7 +560,9 @@ input PasswordInput {
   password: String!
 }
 
-"""Language the speaker will be presenting his submission in"""
+"""
+Language the speaker will be presenting his submission in
+"""
 enum PresentationLng {
   CZ
   EN
@@ -501,17 +571,36 @@ enum PresentationLng {
 
 type Query {
   attendee(id: ObjectId!): Attendee!
-  attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
+  attendees(
+    after: String
+    filter: AttendeeFilterInput
+    first: Int! = 20
+    sort: [AttendeeSortInput]!
+  ): AttendeeConnection!
   attendeesCsvExport(slug: String!): [Attendee!]!
   conference(slug: String!): Conference!
-  conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
+  conferences(
+    after: String
+    first: Int! = 20
+    sort: [ConferenceSortInput]!
+  ): ConferenceConnection!
   course(id: ObjectId!): Course!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
-  interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
+  interns(
+    after: String
+    filter: InternFilterInput
+    first: Int! = 20
+    sort: [InternSortInput]!
+  ): InternConnection!
   internsExport: [Intern]!
   internship(id: ObjectId!): Internship!
-  internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
+  internships(
+    after: String
+    filter: InternshipFilterInput
+    first: Int! = 20
+    sort: [InternshipSortInput]!
+  ): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
@@ -519,10 +608,17 @@ type Query {
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  users(after: String, filter: UserFilterInput, first: Int! = 20, sort: [UserSortInput]!): UserConnection!
+  users(
+    after: String
+    filter: UserFilterInput
+    first: Int! = 20
+    sort: [UserSortInput]!
+  ): UserConnection!
 }
 
-"""New user input data"""
+"""
+New user input data
+"""
 input RegisterUserInput {
   access: [Access!]
   address: AddressInput
@@ -536,17 +632,26 @@ input RegisterUserInput {
   telephone: String
 }
 
-"""Conference's section entity model type"""
+"""
+Conference's section entity model type
+"""
 type Section {
   conference: Conference
   createdAt: DateTimeISO!
   id: ID!
-  submissions(after: String, filter: SubmissionFilterInput, first: Int! = 20, sort: [SubmissionSortInput]!): SubmissionConnection!
+  submissions(
+    after: String
+    filter: SubmissionFilterInput
+    first: Int! = 20
+    sort: [SubmissionSortInput]!
+  ): SubmissionConnection!
   translations: SectionTranslation!
   updatedAt: DateTimeISO!
 }
 
-"""Section input type"""
+"""
+Section input type
+"""
 input SectionInput {
   conference: ObjectId!
   translations: SectionTranslationInput!
@@ -572,13 +677,17 @@ type SectionTranslations {
   topic: String!
 }
 
-"""Ascending/descending direction of the sort field"""
+"""
+Ascending/descending direction of the sort field
+"""
 enum SortDirection {
   ASC
   DESC
 }
 
-"""Intern status"""
+"""
+Intern status
+"""
 enum Status {
   Accepted
   Applied
@@ -586,20 +695,26 @@ enum Status {
   Rejected
 }
 
-"""User stub type"""
+"""
+User stub type
+"""
 type StudentReference {
   address: Address!
   avatarUrl: String
   email: String!
 
-  """User document id"""
+  """
+  User document id
+  """
   id: ObjectId!
   name: String!
   studyProgramme: StudyProgramme!
   telephone: String!
 }
 
-"""Student user account StudyProgramme"""
+"""
+Student user account StudyProgramme
+"""
 enum StudyProgramme {
   Bachelor1
   Bachelor2
@@ -608,7 +723,9 @@ enum StudyProgramme {
   Master2
 }
 
-"""Submission entity model type"""
+"""
+Submission entity model type
+"""
 type Submission {
   authors: [User!]!
   conference: Conference!
@@ -661,7 +778,9 @@ input SubmissionSortInput {
   field: SubmissionSortableField!
 }
 
-"""Sortable enum definition for submissions query"""
+"""
+Sortable enum definition for submissions query
+"""
 enum SubmissionSortableField {
   ID
 }
@@ -682,7 +801,9 @@ input SubmissionTranslationInput {
   sk: LocalizedSubmissionInputs!
 }
 
-"""Conference ticket"""
+"""
+Conference ticket
+"""
 type Ticket {
   id: ObjectId!
   online: Boolean!
@@ -713,7 +834,9 @@ type TicketTranslations {
   name: String!
 }
 
-"""The user model entity"""
+"""
+The user model entity
+"""
 type User {
   access: [Access!]!
   address: Address
@@ -732,7 +855,9 @@ type User {
   verified: Boolean!
 }
 
-"""UserConnection type enabling cursor based pagination"""
+"""
+UserConnection type enabling cursor based pagination
+"""
 type UserConnection {
   edges: [UserEdge]!
   pageInfo: UserPageInfo!
@@ -748,7 +873,9 @@ input UserFilterInput {
   access: [Access!]
 }
 
-"""FlawIS user base input"""
+"""
+FlawIS user base input
+"""
 input UserInput {
   access: [Access!]
   address: AddressInput
@@ -777,7 +904,9 @@ input UserSortInput {
   field: UserSortableField!
 }
 
-"""Sortable enum definition for users query"""
+"""
+Sortable enum definition for users query
+"""
 enum UserSortableField {
   ID
   NAME
