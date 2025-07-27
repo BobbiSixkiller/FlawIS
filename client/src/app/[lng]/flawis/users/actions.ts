@@ -1,18 +1,18 @@
 "use server";
 
-import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
   Access,
   InviteUsersDocument,
   TextSearchUserDocument,
   UsersDocument,
+  UsersQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 
-export async function getUsers(filter: GetDataFilter & { access?: Access[] }) {
+export async function getUsers(vars: UsersQueryVariables) {
   const res = await executeGqlFetch(
     UsersDocument,
-    { ...filter },
+    vars,
     {},
     { tags: ["users"], revalidate: 3600 }
   );

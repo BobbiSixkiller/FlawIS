@@ -7,8 +7,10 @@ import {
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
-import { AttendeeFragment } from "@/lib/graphql/generated/graphql";
-import { useParams, useSearchParams } from "next/navigation";
+import {
+  AttendeeFragment,
+  AttendeesQueryVariables,
+} from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 
 function ListItem({ data }: { data?: AttendeeFragment }) {
@@ -59,20 +61,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListAttendees({
   initialData,
+  filter,
 }: {
   initialData: Connection<AttendeeFragment>;
+  filter: AttendeesQueryVariables;
 }) {
-  const { slug } = useParams();
-  const searchParams = useSearchParams();
-
-  const InfiniteScrollListAttendees = withInfiniteScroll<AttendeeFragment>({
-    filter: {
-      after: undefined,
-      first: undefined,
-      conferenceSlug: slug,
-      sectionIds: searchParams.getAll("sectionId"),
-      passive: searchParams.get("passive") === "true" ? true : null,
-    },
+  const InfiniteScrollListAttendees = withInfiniteScroll<
+    AttendeeFragment,
+    AttendeesQueryVariables
+  >({
+    filter,
     getData: getAttendees,
     initialData,
     ListItem,

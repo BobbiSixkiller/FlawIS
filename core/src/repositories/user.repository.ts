@@ -9,12 +9,12 @@ export class UserRepository extends Repository<typeof User> {
     super(User);
   }
 
-  async paginatedUsers({ first, access, after }: UserArgs) {
+  async paginatedUsers({ first, after, filter }: UserArgs) {
     const [connection] = await this.aggregate<UserConnection>([
       { $sort: { _id: -1 } },
       {
         $match: {
-          ...(access ? { access: { $in: access } } : {}),
+          ...(filter?.access ? { access: { $in: filter?.access } } : {}),
         },
       },
       {

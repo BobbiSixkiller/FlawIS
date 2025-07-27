@@ -28,10 +28,16 @@ import { AddressInput } from "./conference.types";
 })
 export class UserConnection extends CreateConnection(User) {}
 
-@ArgsType()
-export class UserArgs extends CreateArgs(User) {
+@InputType()
+export class UserFilterInput {
   @Field(() => [Access], { nullable: true })
   access?: Access[];
+}
+
+@ArgsType()
+export class UserArgs extends CreateArgs(User) {
+  @Field(() => UserFilterInput, { nullable: true })
+  filter?: UserFilterInput;
 }
 
 @ObjectType({ implements: IMutationResponse })

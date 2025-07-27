@@ -1,9 +1,10 @@
 import ListAttendees from "./ListAttendees";
 import { getAttendees } from "./actions";
-import AttendeeFilter from "./AttendeeFilter";
 import { getConference } from "../../actions";
 
 import ExportButton from "./ExportButton";
+import FilterDropdown from "@/components/FilterDropdown";
+import { AttendeesQueryVariables } from "@/lib/graphql/generated/graphql";
 
 export default async function AttendeesPage({
   params,
@@ -14,16 +15,19 @@ export default async function AttendeesPage({
 }) {
   const { lng, slug } = await params;
   const queryParams = await searchParams;
+
+  const filter: AttendeesQueryVariables = {
+    passive: queryParams?.passive ? queryParams.passive === "true" : null,
+    conferenceSlug: slug,
+    sectionIds: queryParams?.sectionId
+      ? Array.isArray(queryParams?.sectionId)
+        ? queryParams.sectionId
+        : [queryParams.sectionId]
+      : [],
+  };
+
   const [initialData, conference] = await Promise.all([
-    getAttendees({
-      passive: queryParams?.passive ? queryParams.passive === "true" : null,
-      conferenceSlug: slug,
-      sectionIds: queryParams?.sectionId
-        ? Array.isArray(queryParams?.sectionId)
-          ? queryParams.sectionId
-          : [queryParams.sectionId]
-        : [],
-    }),
+    getAttendees(filter),
     getConference(slug),
   ]);
 
@@ -31,14 +35,32 @@ export default async function AttendeesPage({
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">
         <ExportButton />
-        <AttendeeFilter sections={conference.sections} />
+
+        <FilterDropdown
+          filters={[
+            {
+              label: "Pasivny ucastnici",
+              type: "boolean",
+              queryKey: "passive",
+            },
+            {
+              label: "Sekcie",
+              type: "multi",
+              queryKey: "sectionId",
+              options: conference.sections.map((s) => ({
+                label: s.translations[lng as "sk" | "en"].name,
+                value: s.id,
+              })),
+            },
+          ]}
+        />
         <div className="ml-auto text-xl font-bold dark:text-white">
           {initialData.totalCount}
         </div>
       </div>
 
       {initialData.pageInfo.endCursor ? (
-        <ListAttendees initialData={initialData} />
+        <ListAttendees filter={filter} initialData={initialData} />
       ) : (
         "Ziadny"
       )}

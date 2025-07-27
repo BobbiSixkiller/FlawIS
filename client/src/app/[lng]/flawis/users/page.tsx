@@ -8,8 +8,8 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import UserForm from "../../(auth)/register/UserForm";
 import RegistrationInviteForm from "./RegistrationInviteForm";
-import UsersFilter from "./UsersFilter";
-import { Access } from "@/lib/graphql/generated/graphql";
+import { Access, UsersQueryVariables } from "@/lib/graphql/generated/graphql";
+import FilterDropdown from "@/components/FilterDropdown";
 
 export default async function Users({
   params,
@@ -21,9 +21,11 @@ export default async function Users({
   const { lng } = await params;
   const queryParams = await searchParams;
 
-  const initialData = await getUsers({
-    access: queryParams?.access as Access[],
-  });
+  const vars: UsersQueryVariables = {
+    filter: { access: queryParams?.access as Access[] },
+  };
+
+  const initialData = await getUsers(vars);
 
   const newUserDialogId = "new-user";
   const inviteUserDialogId = "invite-user";
@@ -62,20 +64,31 @@ export default async function Users({
         ]}
       />
       <div className="flex justify-between">
-        <UsersFilter
-          access={[
-            Access.Admin,
-            Access.Student,
-            Access.Organization,
-            Access.ConferenceAttendee,
+        <FilterDropdown
+          filters={[
+            {
+              label: "Access",
+              type: "multi",
+              queryKey: "access",
+              options: [
+                { label: Access.Admin, value: Access.Admin },
+                { label: Access.Student, value: Access.Student },
+                { label: Access.Organization, value: Access.Organization },
+                {
+                  label: Access.ConferenceAttendee,
+                  value: Access.ConferenceAttendee,
+                },
+              ],
+            },
           ]}
         />
+
         <div className="ml-auto text-xl font-bold dark:text-white">
           {initialData.totalCount}
         </div>
       </div>
 
-      {initialData && <ListUsers initialData={initialData} />}
+      {initialData && <ListUsers filter={vars} initialData={initialData} />}
 
       <Modal title="Novy pouzivatel" dialogId={newUserDialogId}>
         <UserForm namespace="register" dialogId={newUserDialogId} />

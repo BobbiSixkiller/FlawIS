@@ -3,11 +3,13 @@
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  GetDataFilter,
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInterns } from "./actions";
-import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
+import {
+  ApplicationFragment,
+  InternsQueryVariables,
+} from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { displayDate } from "@/utils/helpers";
 import { useTranslation } from "@/lib/i18n/client";
@@ -120,18 +122,19 @@ export default function ListInterns({
   filter,
 }: {
   initialData: Connection<ApplicationFragment>;
-  filter: GetDataFilter;
+  filter: InternsQueryVariables;
 }) {
-  const InfiniteScrollListInternships = withInfiniteScroll<ApplicationFragment>(
-    {
-      filter,
-      getData: getInterns,
-      initialData,
-      ListItem,
-      Container,
-      Placeholder,
-    }
-  );
+  const InfiniteScrollListInternships = withInfiniteScroll<
+    ApplicationFragment,
+    InternsQueryVariables
+  >({
+    filter,
+    getData: getInterns,
+    initialData,
+    ListItem,
+    Container,
+    Placeholder,
+  });
 
   return <InfiniteScrollListInternships />;
 }

@@ -3,19 +3,19 @@
 import {
   ConferenceDocument,
   ConferencesDocument,
+  ConferencesQueryVariables,
   CreateConferenceDocument,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles, uploadFile } from "@/lib/minio";
 import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
 import { revalidateTag } from "next/cache";
-import { GetDataFilter } from "@/components/withInfiniteScroll";
 import { notFound } from "next/navigation";
 import { executeGqlFetch } from "@/utils/actions";
 
-export async function getConferences(filter: GetDataFilter) {
+export async function getConferences(vars: ConferencesQueryVariables) {
   const res = await executeGqlFetch(
     ConferencesDocument,
-    { ...filter },
+    vars,
     {}
     // { tags: ["conferences"], revalidate: 3600 }
   );

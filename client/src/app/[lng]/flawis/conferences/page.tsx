@@ -41,7 +41,7 @@ export default async function Conferences({
         ]}
       />
 
-      {initialData && <ListConferences initialData={initialData} />}
+      {initialData && <ListConferences initialData={initialData} filter={{}} />}
 
       <Modal title="Nova konferencia" dialogId={newConferenceDialogId}>
         <NewConferenceForm lng={lng} dialogId={newConferenceDialogId} />

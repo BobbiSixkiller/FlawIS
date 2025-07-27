@@ -16,7 +16,7 @@ export default async function Conferences({
   return (
     <div className="flex flex-col gap-6">
       <Heading heading={t("heading")} subHeading={t("subheading")} lng={lng} />
-      {initialData && <ListConferences initialData={initialData} />}
+      {initialData && <ListConferences filter={{}} initialData={initialData} />}
     </div>
   );
 }

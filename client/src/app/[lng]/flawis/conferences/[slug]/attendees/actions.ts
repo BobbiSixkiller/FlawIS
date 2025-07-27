@@ -1,19 +1,14 @@
 "use server";
 
-import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
   AttendeesCsvExportDocument,
   AttendeesDocument,
+  AttendeesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
 
-export async function getAttendees(filter: GetDataFilter) {
-  const res = await executeGqlFetch(AttendeesDocument, {
-    ...filter,
-    conferenceSlug: filter.conferenceSlug,
-    passive: filter.passive,
-    sectionIds: filter.sectionIds,
-  });
+export async function getAttendees(vars: AttendeesQueryVariables) {
+  const res = await executeGqlFetch(AttendeesDocument, vars);
 
   if (res.errors) {
     console.log(res.errors[0]);

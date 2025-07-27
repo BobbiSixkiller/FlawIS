@@ -21,6 +21,7 @@ fragment Application on Intern {
 query internships(
   $after: ObjectId
   $first: Int
+  $academicYear: String
   $user: ObjectId
   $startDate: DateTimeISO
   $endDate: DateTimeISO
@@ -29,6 +30,7 @@ query internships(
   internships(
     after: $after
     first: $first
+    academicYear: $academicYear
     user: $user
     startDate: $startDate
     endDate: $endDate

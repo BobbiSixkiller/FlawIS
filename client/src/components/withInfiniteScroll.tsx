@@ -26,40 +26,39 @@ export interface Connection<EdgeT> {
   totalCount: number;
 }
 
-export interface GetDataFilter {
+export interface PaginationArgs {
   after?: string;
   first?: number;
-  [key: string]: any; // Allows additional properties
 }
 
-interface ScrollProps<EdgeT> {
+interface ScrollProps<EdgeT, FilterT> {
   initialData: Connection<EdgeT>;
-  filter: GetDataFilter;
-  getData: (filter: GetDataFilter) => Promise<Connection<EdgeT>>;
+  filter: FilterT;
+  getData: (vars: PaginationArgs & FilterT) => Promise<Connection<EdgeT>>;
   ListItem: ComponentType<{ data?: EdgeT }>;
   Placeholder: ComponentType<{ cardRef?: LegacyRef<HTMLDivElement> }>;
   Container: ComponentType<{ children: ReactNode }>;
 }
 
-export function withInfiniteScroll<EdgeT>({
+export function withInfiniteScroll<EdgeT, FilterT>({
   Container,
   ListItem,
   filter,
   getData,
   Placeholder,
   initialData,
-}: ScrollProps<EdgeT>) {
+}: ScrollProps<EdgeT, FilterT>) {
   return function WithInfiniteScrollComponent() {
     const [data, setData] = useState(initialData);
     const { ref, inView } = useInView();
 
     // Memoize the filter object to avoid unnecessary re-renders
-    const memoizedFilter = useMemo(() => filter, [JSON.stringify(filter)]);
+    const filterKey = JSON.stringify(filter);
 
     useEffect(() => {
       async function getMore() {
         const newData = await getData({
-          ...memoizedFilter,
+          ...filter,
           after: data.pageInfo.endCursor, // Update with the latest cursor
         });
 
@@ -73,7 +72,7 @@ export function withInfiniteScroll<EdgeT>({
       if (inView && data.pageInfo.hasNextPage) {
         getMore();
       }
-    }, [inView, data, memoizedFilter]);
+    }, [inView, data, filterKey]);
 
     return (
       <Container>

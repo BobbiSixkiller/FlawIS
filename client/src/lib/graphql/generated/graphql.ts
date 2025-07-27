@@ -113,14 +113,6 @@ export type Billing = {
   name: Scalars['String']['output'];
 };
 
-/** Course category */
-export type Category = {
-  __typename?: 'Category';
-  id: Scalars['ObjectId']['output'];
-  name: Scalars['String']['output'];
-  slug: Scalars['String']['output'];
-};
-
 /** Conference model type */
 export type Conference = {
   __typename?: 'Conference';
@@ -191,7 +183,6 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: 'Course';
-  categories: Array<Category>;
   createdAt: Scalars['DateTimeISO']['output'];
   /** String representation of HTML describing the course */
   description: Scalars['String']['output'];
@@ -219,7 +210,6 @@ export type CourseEdge = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
-  categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
@@ -807,8 +797,8 @@ export type QueryUserArgs = {
 
 
 export type QueryUsersArgs = {
-  access?: InputMaybe<Array<Access>>;
   after?: InputMaybe<Scalars['ObjectId']['input']>;
+  filter?: InputMaybe<UserFilterInput>;
   first?: Scalars['Int']['input'];
 };
 
@@ -1037,6 +1027,10 @@ export type UserEdge = {
   __typename?: 'UserEdge';
   cursor: Scalars['ObjectId']['output'];
   node: User;
+};
+
+export type UserFilterInput = {
+  access?: InputMaybe<Array<Access>>;
 };
 
 /** FlawIS user base input */
@@ -1314,6 +1308,7 @@ export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Ar
 export type InternshipsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  academicYear?: InputMaybe<Scalars['String']['input']>;
   user?: InputMaybe<Scalars['ObjectId']['input']>;
   startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
   endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
@@ -1458,7 +1453,7 @@ export type AcceptAuthorInviteMutation = { __typename?: 'Mutation', acceptAuthor
 export type UsersQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  access?: InputMaybe<Array<Access> | Access>;
+  filter?: InputMaybe<UserFilterInput>;
 }>;
 
 
@@ -3604,10 +3599,11 @@ export const AddAttendeeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
-    query internships($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $contextUserId: ObjectId) {
+    query internships($after: ObjectId, $first: Int, $academicYear: String, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $contextUserId: ObjectId) {
   internships(
     after: $after
     first: $first
+    academicYear: $academicYear
     user: $user
     startDate: $startDate
     endDate: $endDate
@@ -4196,8 +4192,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<AcceptAuthorInviteMutation, AcceptAuthorInviteMutationVariables>;
 export const UsersDocument = new TypedDocumentString(`
-    query users($after: ObjectId, $first: Int, $access: [Access!]) {
-  users(after: $after, first: $first, access: $access) {
+    query users($after: ObjectId, $first: Int, $filter: UserFilterInput) {
+  users(after: $after, first: $first, filter: $filter) {
     totalCount
     edges {
       cursor

@@ -7,7 +7,11 @@ import {
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
-import { Access } from "@/lib/graphql/generated/graphql";
+import {
+  Access,
+  UserFilterInput,
+  UsersQueryVariables,
+} from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 
 interface UserData {
@@ -17,6 +21,8 @@ interface UserData {
   email: string;
   access: Access[];
   verified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function ListItem({ data }: { data?: UserData }) {
@@ -67,11 +73,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListUsers({
   initialData,
+  filter,
 }: {
   initialData: Connection<UserData>;
+  filter: UsersQueryVariables;
 }) {
-  const InfiniteScrollListUsers = withInfiniteScroll<UserData>({
-    filter: { after: undefined, first: undefined },
+  const InfiniteScrollListUsers = withInfiniteScroll<
+    UserData,
+    UsersQueryVariables
+  >({
+    filter,
     getData: getUsers,
     initialData,
     ListItem,

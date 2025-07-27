@@ -141,7 +141,7 @@ export class InternService {
 
       const admins = await this.userService.getPaginatedUsers({
         first: 100,
-        access: [Access.Admin],
+        filter: { access: [Access.Admin] },
       });
 
       admins.edges.forEach((edge) =>
@@ -335,7 +335,7 @@ export class InternService {
       console.log("Sending notifications to FlawIS admins");
       const admins = await this.userService.getPaginatedUsers({
         first: 100,
-        access: [Access.Admin],
+        filter: { access: [Access.Admin] },
       });
 
       admins.edges.forEach((edge) =>

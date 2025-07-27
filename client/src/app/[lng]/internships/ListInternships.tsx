@@ -4,12 +4,15 @@ import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  GetDataFilter,
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
 import { useParams, usePathname } from "next/navigation";
-import { ApplicationFragment, Status } from "@/lib/graphql/generated/graphql";
+import {
+  ApplicationFragment,
+  InternshipsQueryVariables,
+  Status,
+} from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { useTranslation } from "@/lib/i18n/client";
 
@@ -107,9 +110,12 @@ export default function ListInternships({
   filter,
 }: {
   initialData: Connection<InternshipData>;
-  filter: GetDataFilter;
+  filter: InternshipsQueryVariables;
 }) {
-  const InfiniteScrollListInternships = withInfiniteScroll<InternshipData>({
+  const InfiniteScrollListInternships = withInfiniteScroll<
+    InternshipData,
+    InternshipsQueryVariables
+  >({
     filter,
     getData: getInternships,
     initialData,

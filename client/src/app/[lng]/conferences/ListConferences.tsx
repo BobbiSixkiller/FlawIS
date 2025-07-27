@@ -7,7 +7,10 @@ import {
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import { useParams, usePathname } from "next/navigation";
-import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
+import {
+  ConferenceFragment,
+  ConferencesQueryVariables,
+} from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { getConferences } from "../flawis/conferences/actions";
 import { cn } from "@/utils/helpers";
@@ -97,11 +100,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListConferences({
   initialData,
+  filter,
 }: {
   initialData: Connection<ConferenceFragment & {}>;
+  filter: ConferencesQueryVariables;
 }) {
-  const InfiniteScrollListUsers = withInfiniteScroll<ConferenceFragment>({
-    filter: { after: undefined, first: undefined },
+  const InfiniteScrollListUsers = withInfiniteScroll<
+    ConferenceFragment,
+    ConferencesQueryVariables
+  >({
+    filter,
     getData: getConferences,
     initialData,
     Container,

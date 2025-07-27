@@ -454,7 +454,7 @@ type Query {
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  users(access: [Access!], after: ObjectId, first: Int! = 20): UserConnection!
+  users(after: ObjectId, filter: UserFilterInput, first: Int! = 20): UserConnection!
 }
 
 """New user input data"""
@@ -656,6 +656,10 @@ type UserConnection {
 type UserEdge {
   cursor: ObjectId!
   node: User!
+}
+
+input UserFilterInput {
+  access: [Access!]
 }
 
 """FlawIS user base input"""

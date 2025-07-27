@@ -1,19 +1,19 @@
 "use server";
 
-import { GetDataFilter } from "@/components/withInfiniteScroll";
 import {
   CreateInternshipDocument,
   InternshipInput,
   InternshipsDocument,
+  InternshipsQueryVariables,
   UpdateInternshipDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
-export async function getInternships(filter: GetDataFilter) {
+export async function getInternships(vars: InternshipsQueryVariables) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
   const res = await executeGqlFetch(
     InternshipsDocument,
-    { ...filter },
+    vars,
     {},
     { tags: ["internships"], revalidate: 3600 }
   );
