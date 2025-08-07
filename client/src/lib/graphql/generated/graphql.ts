@@ -143,6 +143,14 @@ export type Billing = {
   name: Scalars["String"]["output"];
 };
 
+/** Course category */
+export type Category = {
+  __typename?: "Category";
+  id: Scalars["ObjectId"]["output"];
+  name: Scalars["String"]["output"];
+  slug: Scalars["String"]["output"];
+};
+
 /** Conference model type */
 export type Conference = {
   __typename?: "Conference";
@@ -223,6 +231,7 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: "Course";
+  categories: Array<Category>;
   createdAt: Scalars["DateTimeISO"]["output"];
   /** String representation of HTML describing the course */
   description: Scalars["String"]["output"];
@@ -237,6 +246,7 @@ export type Course = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
+  categoryIds: Array<Scalars["ObjectId"]["input"]>;
   description: Scalars["String"]["input"];
   name: Scalars["String"]["input"];
   price: Scalars["Int"]["input"];

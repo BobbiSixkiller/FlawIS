@@ -92,7 +92,7 @@ services:
       - production-network
 
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:4.1.2
     restart: unless-stopped
     ports:
       - "5672:5672"
@@ -108,7 +108,7 @@ services:
       - production-network
 
   redis:
-    image: redis
+    image: redis:8.0.3
     restart: unless-stopped
     ports:
       - "6379:6379"

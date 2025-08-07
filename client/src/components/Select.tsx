@@ -8,7 +8,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/helpers";
 
@@ -24,6 +24,7 @@ export default function Select({
   options,
   disabled = false,
   multiple = false,
+  control,
 }: {
   disabled?: boolean;
   label?: string;
@@ -31,8 +32,9 @@ export default function Select({
   name: string;
   options: Option[];
   multiple?: boolean;
+  control: Control<any>;
 }) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({ name, control });
   const selected = Array.isArray(field.value)
     ? options.filter((o) => field.value.includes(o.value))
     : options.find((o) => o.value === field.value);
@@ -62,7 +64,7 @@ export default function Select({
             "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:bg-gray-800 focus:ring-2 sm:text-sm/6",
             multiple ? "" : "py-1.5",
             fieldState.error
-              ? "ring-red-500 focus:ring-red-500"
+              ? "ring-red-500 focus:ring-red-500 dark:ring-red-500 dark:focus:ring-red-500"
               : "focus:ring-primary-500 dark:focus:ring-primary-300",
           ])}
         >

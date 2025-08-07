@@ -4,13 +4,12 @@ import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  GetDataFilter,
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { useParams, usePathname } from "next/navigation";
 import {
-  ApplicationFragment,
   CourseFragment,
+  CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { useTranslation } from "@/lib/i18n/client";
@@ -71,9 +70,12 @@ export default function CourseList({
   filter,
 }: {
   initialData: Connection<CourseFragment>;
-  filter: GetDataFilter;
+  filter: CoursesQueryVariables;
 }) {
-  const InfiniteScrollCourseList = withInfiniteScroll<CourseFragment>({
+  const InfiniteScrollCourseList = withInfiniteScroll<
+    CourseFragment,
+    CoursesQueryVariables
+  >({
     filter,
     getData: getCourses,
     initialData,

@@ -217,58 +217,68 @@ export default function ConferenceRegistrationForm({
             }),
           })}
         >
-          <Select
-            disabled={submission !== undefined}
-            name="submission.section"
-            label={t("registration.submission.section", { ns: "conferences" })}
-            options={conference.sections.map((s) => ({
-              name: s.translations[lng as "sk" | "en"].name,
-              value: s.id,
-            }))}
-          />
-          <LocalizedTextarea
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.name", { ns: "conferences" })}
-            name={`submission.translations.${lng}.name`}
-          />
-          <LocalizedTextarea
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.abstract", { ns: "conferences" })}
-            name={`submission.translations.${lng}.abstract`}
-          />
-          <LocalizedMultipleInput
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.keywords.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.keywords.placeholder", {
-              ns: "conferences",
-            })}
-            name={`submission.translations.${lng}.keywords`}
-          />
-          <Select
-            disabled={submission !== undefined}
-            name="submission.presentationLng"
-            label={t("registration.submission.lng", { ns: "conferences" })}
-            options={[
-              { name: PresentationLng.Sk, value: PresentationLng.Sk },
-              { name: PresentationLng.Cz, value: PresentationLng.Cz },
-              { name: PresentationLng.En, value: PresentationLng.En },
-            ]}
-          />
-          <MultipleInput
-            disabled={submission !== undefined}
-            label={t("registration.submission.authors.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.authors.placeholder", {
-              ns: "conferences",
-            })}
-            name="submission.authors"
-          />
+          {(methods) => (
+            <>
+              <Select
+                control={methods.control}
+                disabled={submission !== undefined}
+                name="submission.section"
+                label={t("registration.submission.section", {
+                  ns: "conferences",
+                })}
+                options={conference.sections.map((s) => ({
+                  name: s.translations[lng as "sk" | "en"].name,
+                  value: s.id,
+                }))}
+              />
+              <LocalizedTextarea
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.name", { ns: "conferences" })}
+                name={`submission.translations.${lng}.name`}
+              />
+              <LocalizedTextarea
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.abstract", {
+                  ns: "conferences",
+                })}
+                name={`submission.translations.${lng}.abstract`}
+              />
+              <LocalizedMultipleInput
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.keywords.label", {
+                  ns: "conferences",
+                })}
+                placeholder={t("registration.submission.keywords.placeholder", {
+                  ns: "conferences",
+                })}
+                name={`submission.translations.${lng}.keywords`}
+              />
+              <Select
+                control={methods.control}
+                disabled={submission !== undefined}
+                name="submission.presentationLng"
+                label={t("registration.submission.lng", { ns: "conferences" })}
+                options={[
+                  { name: PresentationLng.Sk, value: PresentationLng.Sk },
+                  { name: PresentationLng.Cz, value: PresentationLng.Cz },
+                  { name: PresentationLng.En, value: PresentationLng.En },
+                ]}
+              />
+              <MultipleInput
+                disabled={submission !== undefined}
+                label={t("registration.submission.authors.label", {
+                  ns: "conferences",
+                })}
+                placeholder={t("registration.submission.authors.placeholder", {
+                  ns: "conferences",
+                })}
+                name="submission.authors"
+              />
+            </>
+          )}
         </WizzardStep>
       )}
     </WizzardForm>

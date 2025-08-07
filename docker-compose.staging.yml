@@ -96,7 +96,7 @@ services:
       - staging-network
 
   rabbitmq-staging:
-    image: rabbitmq
+    image: rabbitmq:4.1.2
     restart: unless-stopped
     ports:
       - "5673:5672"
@@ -112,7 +112,7 @@ services:
       - staging-network
 
   redis-staging:
-    image: redis
+    image: redis:8.0.3
     restart: unless-stopped
     ports:
       - "6380:6379"

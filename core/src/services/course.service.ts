@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 
 import { CourseArgs, CourseInput } from "../resolvers/types/course.types";
-import { Course, CourseModule, CourseTerm } from "../entitites/Course";
+import { Course, CourseTerm } from "../entitites/Course";
 import { I18nService } from "./i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
@@ -31,7 +31,6 @@ function toCourseDTO(doc: DocumentType<Course>) {
 export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
-    private readonly moduleRepository = new Repository(CourseModule),
     private readonly termRepository = new Repository(CourseTerm),
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly i18nService: I18nService

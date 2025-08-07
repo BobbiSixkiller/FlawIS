@@ -24,7 +24,9 @@ export class Category {
 }
 
 @ObjectType()
-@Index({ user: 1 })
+@Index({ "category._id": 1 })
+@Index({ owner: 1 })
+@Index({ procurer: 1 })
 @Index({ name: "text" })
 export class Course extends TimeStamps {
   @Field(() => ObjectId)
@@ -52,6 +54,11 @@ export class Course extends TimeStamps {
   @Property()
   description: string;
 
+  @Field(() => Int)
+  @Property()
+  maxAttendees: number;
+
+  @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
   billing?: FlawBilling;
 
@@ -72,41 +79,20 @@ export class Course extends TimeStamps {
 
 @ObjectType()
 @Index({ course: 1 })
-export class CourseModule extends TimeStamps {
+export class CourseTerm extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
-
-  @Property({ ref: () => Course })
-  course: Ref<Course>;
 
   @Field()
   @Property()
   name: string;
 
-  @Field({
-    description:
-      "String representation of HTML describing the module of the course",
-  })
+  @Field()
   @Property()
   description: string;
 
-  @Field()
-  createdAt: Date;
-  @Field()
-  updatedAt: Date;
-}
-
-@ObjectType()
-@Index({ course: 1, module: 1 })
-export class CourseTerm extends TimeStamps {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
   @Property({ ref: () => Course })
   course: Ref<Course>;
-
-  @Property({ ref: () => CourseModule })
-  module?: Ref<CourseModule>;
 
   @Field()
   @Property()
@@ -131,10 +117,6 @@ export class CourseAttendeeUserStub extends UserStub {
   @Field()
   @Property()
   organizatation: string;
-
-  @Field()
-  @Property()
-  department: string;
 }
 
 @ObjectType()
@@ -147,8 +129,15 @@ export class CourseAttendee extends TimeStamps {
   @Property({ type: () => CourseAttendeeUserStub })
   user: CourseAttendeeUserStub;
 
+  @Property({ ref: () => Course })
+  course: Ref<Course>;
+
+  @Field()
+  @Property()
+  grade: string;
+
   @Property({ ref: () => CourseTerm })
-  term: Ref<CourseTerm>;
+  term?: Ref<CourseTerm>;
 
   @Field(() => Status)
   @Property({ enum: Status, type: String, default: Status.Applied })

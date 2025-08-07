@@ -208,6 +208,7 @@ type ConferenceTranslations {
 }
 
 type Course {
+  billing: FlawBilling
   categories: [Category!]!
   createdAt: DateTimeISO!
 
@@ -217,6 +218,7 @@ type Course {
   description: String!
   id: ObjectId!
   isPaid: Boolean!
+  maxAttendees: Int!
   name: String!
   owner: UserStub!
   price: Int!

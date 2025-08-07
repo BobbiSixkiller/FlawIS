@@ -3,18 +3,29 @@
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { Transition } from "@headlessui/react";
 import { ComponentType, Fragment, useEffect, useRef, useState } from "react";
-import { InputProps } from "./Input";
 import { get } from "lodash";
+import { RHFmethodsProps } from "./Input";
+import { Control } from "react-hook-form";
 
-export function withLocalizedInput(
-  InputComponent: ComponentType<InputProps & { lng: string }>
+type WithLocalizedInputProps = {
+  name: string;
+  lng: string;
+  disabled?: boolean;
+  errors?: Record<string, any>;
+  error?: string;
+  label?: string;
+  placeholder?: string;
+  methods?: RHFmethodsProps;
+  control?: Control<any>;
+};
+
+export function withLocalizedInput<T extends WithLocalizedInputProps>(
+  InputComponent: ComponentType<T>
 ) {
-  return function WithLocalizedInputWrapper(
-    props: InputProps & { lng: string }
-  ) {
+  return function WithLocalizedInputWrapper(props: T) {
     const [visible, setVisible] = useState(false);
 
-    const localizedInputName = props.name?.replace(
+    const localizedInputName = props.name.replace(
       props.lng,
       props.lng === "sk" ? "en" : "sk"
     );
@@ -22,7 +33,7 @@ export function withLocalizedInput(
 
     useEffect(() => {
       if (props.error || localizedError) {
-        setVisible(true); // only trigger visibility
+        setVisible(true);
       }
     }, [props.error, localizedError]);
 

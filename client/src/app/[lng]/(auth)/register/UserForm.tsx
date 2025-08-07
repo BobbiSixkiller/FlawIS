@@ -315,6 +315,7 @@ export default function UserForm({
 
           {path.includes("users") && (
             <Select
+              control={methods.control}
               name="access"
               label="Access"
               multiple
@@ -366,6 +367,7 @@ export default function UserForm({
               </div>
 
               <Select
+                control={methods.control}
                 name="studyProgramme"
                 label="Ročník"
                 options={[
@@ -377,6 +379,9 @@ export default function UserForm({
                 ]}
               />
               <MultipleFileUploadField
+                control={methods.control}
+                setError={methods.setError}
+                setValue={methods.setValue}
                 label="CV.pdf"
                 name="files"
                 maxFiles={1}

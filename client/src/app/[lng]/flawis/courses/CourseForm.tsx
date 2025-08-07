@@ -33,7 +33,7 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
       lng={lng}
       defaultValues={{
         name: "",
-        categoryIds: [],
+        // categoryIds: [],
         description: "",
         price: 0,
         billing: {

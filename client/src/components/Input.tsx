@@ -12,18 +12,11 @@ import {
 import { cn } from "@/utils/helpers";
 import { InputHTMLAttributes, useState } from "react";
 
-interface RHFmethodsProps {
+export interface RHFmethodsProps {
   register: UseFormRegister<any>;
   setFocus: UseFormSetFocus<any>;
   setValue: UseFormSetValue<any>;
   watch: UseFormWatch<any>;
-}
-
-function formatDatetimeLocal(val: any): string {
-  if (!val) return "";
-  const date = val instanceof Date ? val : new Date(val);
-  if (isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16); // ⏰ "2025-07-19T11:30"
 }
 
 export interface InputProps
@@ -34,6 +27,13 @@ export interface InputProps
   errors?: any;
   methods?: RHFmethodsProps;
   control?: Control<any>;
+}
+
+function formatDatetimeLocal(val: any): string {
+  if (!val) return "";
+  const date = val instanceof Date ? val : new Date(val);
+  if (isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 16); // ⏰ "2025-07-19T11:30"
 }
 
 //refactor to handle number and dates
@@ -53,9 +53,6 @@ export function Input({
   const [showPassword, setShowPassword] = useState(false);
 
   const val = methods?.watch(name);
-  if (name === "slug") {
-    console.log(val);
-  }
 
   return (
     <div className="w-full">

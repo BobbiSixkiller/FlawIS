@@ -8,7 +8,12 @@ import {
   useDropzone,
 } from "react-dropzone";
 
-import { useController, useFormContext } from "react-hook-form";
+import {
+  Control,
+  useController,
+  UseFormSetError,
+  UseFormSetValue,
+} from "react-hook-form";
 import Button from "./Button";
 
 const getColorClasses = ({
@@ -36,20 +41,25 @@ export interface UploadableFile {
 
 export default function MultipleFileUploadField({
   name,
+  control,
+  setValue,
+  setError,
   label,
   maxFiles,
   maxSize,
   accept,
 }: {
   name: string;
+  control: Control<any>;
+  setValue: UseFormSetValue<any>;
+  setError: UseFormSetError<any>;
   label: string;
   maxFiles?: number;
   maxSize?: number;
   accept?: Accept;
 }) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({ name, control });
 
-  const { setValue, setError } = useFormContext();
   const [files, setFiles] = useState<UploadableFile[]>([]);
 
   useEffect(() => {

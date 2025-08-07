@@ -1,5 +1,5 @@
 export default () => ({
-  rmqUri: process.env.RMQ_URI || 'amqp://rabbitmq:5672',
+  rmqUri: process.env.RMQ_URI || 'amqp://rabbitmq:5672?frameMax=131072',
   rmqExchange: process.env.RMQ_EXCHANGE || 'FlawIS',
   transport: {
     host: process.env.MAIL_HOST,

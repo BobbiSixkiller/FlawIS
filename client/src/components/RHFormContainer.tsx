@@ -68,17 +68,14 @@ function enhanceChildren(
     const name = child.props.name;
     const error = name ? lodash.get(errors, name)?.message : undefined;
 
-    console.log(errors, name, error);
-
     const isUncontrolled = name && !child.props.control;
 
     const newProps: Record<string, any> = {
       ...child.props,
+      ...(name && { error, errors }),
       ...(isUncontrolled && {
-        error,
-        errors,
         methods: { register, setFocus, setValue, watch },
-      }), // if the component has name prop add RHF methods
+      }), // if the component is uncontrolled add RHF methods and errors
     };
 
     if (child.props.children) {

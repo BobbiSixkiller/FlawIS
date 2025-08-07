@@ -128,6 +128,9 @@ export default function ApplicationForm({
           className="space-y-6 sm:w-96"
         >
           <MultipleFileUploadField
+            control={methods.control}
+            setValue={methods.setValue}
+            setError={methods.setError}
             label="CV, motivacny list, ine... (.pdf)"
             name="files"
             maxFiles={5}

@@ -84,6 +84,9 @@ export default function CertificateForm({
           )}
         >
           <MultipleFileUploadField
+            control={methods.control}
+            setValue={methods.setValue}
+            setError={methods.setError}
             name="files"
             label={t("orgFeedback", { ns: "internships" })}
             maxFiles={1}
