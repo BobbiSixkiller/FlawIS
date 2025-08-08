@@ -95,7 +95,8 @@ export class Intern extends TimeStamps {
   }
 })
 @Index({ createdAt: 1, user: 1 }) // Index for queries utilizing createdAt
-@Index({ academicYear: 1, user: 1 }) // Index for queries utilizing academicYear instead of createdAt
+@Index({ academicYear: 1, user: 1 }) // Index for student queries utilizing academicYear and context user
+@Index({ academicYear: 1, organization: 1 }) // Index for admin query, displaying internships in a give year optionally filtering by org
 @ObjectType({ description: "Internship object type" })
 export class Internship extends TimeStamps {
   @Field(() => ObjectId)

@@ -21,24 +21,16 @@ fragment Application on Intern {
 query internships(
   $after: ObjectId
   $first: Int
-  $academicYear: String
-  $user: ObjectId
-  $startDate: DateTimeISO
-  $endDate: DateTimeISO
-  $contextUserId: ObjectId
+  $filter: InternshipFilterInput
 ) {
-  internships(
-    after: $after
-    first: $first
-    academicYear: $academicYear
-    user: $user
-    startDate: $startDate
-    endDate: $endDate
-    contextUserId: $contextUserId
-  ) {
+  internships(after: $after, first: $first, filter: $filter) {
     totalCount
     academicYears {
       academicYear
+      count
+    }
+    organizations {
+      organization
       count
     }
     edges {

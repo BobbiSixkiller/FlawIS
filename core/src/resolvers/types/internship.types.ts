@@ -13,16 +13,28 @@ class AcademicYear {
   count: number;
 }
 
+@ObjectType()
+class OrganizationCount {
+  @Field()
+  organization: string;
+
+  @Field(() => Int)
+  count: number;
+}
+
 @ObjectType({
   description: "InternshipConnection type enabling cursor based pagination",
 })
 export class InternshipConnection extends CreateConnection(Internship) {
   @Field(() => [AcademicYear])
   academicYears: AcademicYear[];
+
+  @Field(() => [OrganizationCount])
+  organizations: OrganizationCount[];
 }
 
-@ArgsType()
-export class InternshipArgs extends CreateArgs(Internship) {
+@InputType()
+export class InternshipFilterInput {
   @Field(() => ObjectId, { nullable: true })
   user?: ObjectId;
 
@@ -35,8 +47,14 @@ export class InternshipArgs extends CreateArgs(Internship) {
   @Field({ nullable: true })
   academicYear?: string;
 
-  @Field(() => ObjectId, { nullable: true })
-  contextUserId?: ObjectId;
+  @Field(() => [String], { nullable: true })
+  organizations?: string[];
+}
+
+@ArgsType()
+export class InternshipArgs extends CreateArgs(Internship) {
+  @Field(() => InternshipFilterInput, { nullable: true })
+  filter?: InternshipFilterInput;
 }
 
 @ObjectType({ implements: IMutationResponse })

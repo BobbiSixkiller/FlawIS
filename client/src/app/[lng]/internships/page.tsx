@@ -1,6 +1,6 @@
 import { translate } from "@/lib/i18n";
 import { getMe } from "../(auth)/actions";
-import { Access } from "@/lib/graphql/generated/graphql";
+import { Access, InternshipFilterInput } from "@/lib/graphql/generated/graphql";
 import ListInternships from "./ListInternships";
 import { getAcademicYear } from "@/utils/helpers";
 import { getInternships } from "./actions";
@@ -11,31 +11,30 @@ import Button from "@/components/Button";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/components/Modal";
 import InternshipForm from "./InternshipForm";
+import FilterDropdown from "@/components/FilterDropdown";
 
 export default async function InternshipsHomePage({
   params,
   searchParams,
 }: {
   params: Promise<{ lng: string }>;
-  searchParams?: Promise<{ academicYear?: string }>;
+  searchParams?: Promise<{ academicYear?: string; organization?: string[] }>;
 }) {
   const { lng } = await params;
   const queryParams = await searchParams;
 
-  const { startYear, endYear } = getAcademicYear();
-  const academicYear = queryParams?.academicYear || `${startYear}/${endYear}`;
-
   const user = await getMe();
+  const { academicYear } = getAcademicYear();
 
   // If user is an organization get all internships associated with the organization,
-  // otherwise return internships for given academic year
-  const filter =
-    user.access.includes(Access.Organization) ||
-    user.access.includes(Access.Admin)
-      ? { user: user.id }
-      : { academicYear, contextUserId: user.id };
+  // otherwise return all internships for given academic year
+  const filter: InternshipFilterInput = {
+    user: user.access.includes(Access.Organization) ? user.id : undefined,
+    academicYear: queryParams?.academicYear ?? academicYear,
+    organizations: queryParams?.organization,
+  };
 
-  const initialData = await getInternships(filter);
+  const initialData = await getInternships({ filter });
 
   const addDialogId = "add-internship";
 
@@ -43,7 +42,7 @@ export default async function InternshipsHomePage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between">
+      <div className="flex flex-wrap gap-6 justify-between">
         <div>
           <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
             {t("heading")}
@@ -52,25 +51,41 @@ export default async function InternshipsHomePage({
             {t("subHeading")}
           </div>
         </div>
-        {user.access.includes(Access.Organization) ||
-        user.access.includes(Access.Admin) ? (
-          <Tooltip message={t("tooltip.new")} position="below">
-            <ModalTrigger dialogId={addDialogId}>
-              <Button size="sm">
-                <PlusIcon className="size-5 mr-2" />
-                {t("create", { ns: "common" })}
-              </Button>
-            </ModalTrigger>
-          </Tooltip>
-        ) : (
+
+        <div className="flex gap-2">
+          <FilterDropdown
+            anchor="bottom"
+            filters={[
+              {
+                label: "Inštitúcie",
+                type: "multi",
+                queryKey: "organization",
+                options: initialData.organizations.map((org) => ({
+                  label: `${org.organization} - ${org.count}`,
+                  value: org.organization,
+                })),
+              },
+            ]}
+          />
           <AcademicYearSelect
             selectedYear={academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
-        )}
+          {user.access.includes(Access.Organization) ||
+            (user.access.includes(Access.Admin) && (
+              <Tooltip message={t("tooltip.new")} position="below">
+                <ModalTrigger dialogId={addDialogId}>
+                  <Button size="sm">
+                    <PlusIcon className="size-5 mr-2" />
+                    {t("create", { ns: "common" })}
+                  </Button>
+                </ModalTrigger>
+              </Tooltip>
+            ))}
+        </div>
       </div>
 
-      <ListInternships initialData={initialData} filter={filter} />
+      <ListInternships initialData={initialData} filter={{ filter }} />
 
       <Modal dialogId={addDialogId} title={t("new")}>
         <InternshipForm dialogId={addDialogId} />

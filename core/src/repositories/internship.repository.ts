@@ -5,6 +5,8 @@ import {
   InternshipArgs,
   InternshipConnection,
 } from "../resolvers/types/internship.types";
+import { CtxUser } from "../util/types";
+import { Access } from "../entitites/User";
 
 @Service()
 export class InternshipRepository extends Repository<typeof Internship> {
@@ -12,22 +14,18 @@ export class InternshipRepository extends Repository<typeof Internship> {
     super(Internship);
   }
 
-  async paginatedInternships({
-    first = 20,
-    after,
-    endDate,
-    startDate,
-    user,
-    academicYear,
-    contextUserId,
-  }: InternshipArgs) {
+  async paginatedInternships(
+    { first = 20, after, filter }: InternshipArgs,
+    ctxUser: CtxUser | null
+  ) {
     const [connection] = await this.aggregate<InternshipConnection>([
       {
         $match: {
-          ...(user ? { user } : {}),
-          ...(endDate ? { createdAt: { $lte: endDate } } : {}),
-          ...(startDate ? { createdAt: { $gte: startDate } } : {}),
-          ...(academicYear ? { academicYear } : {}),
+          ...(filter?.user ? { user: filter.user } : {}),
+          ...(filter?.endDate ? { createdAt: { $lte: filter.endDate } } : {}),
+          ...(filter?.startDate
+            ? { createdAt: { $gte: filter.startDate } }
+            : {}),
         },
       },
       {
@@ -36,13 +34,19 @@ export class InternshipRepository extends Repository<typeof Internship> {
             {
               $match: {
                 ...(after ? { _id: { $lt: after } } : {}),
+                ...(filter?.academicYear
+                  ? { academicYear: filter.academicYear }
+                  : {}),
+                ...(filter?.organizations
+                  ? { organization: { $in: filter.organizations } }
+                  : {}),
               },
             },
-            ...(contextUserId
+            ...(ctxUser?.access.includes(Access.Student)
               ? [
                   {
                     $lookup: {
-                      from: "interns", // Collection name for Intern
+                      from: "interns",
                       let: { internshipId: "$_id" },
                       pipeline: [
                         {
@@ -50,7 +54,7 @@ export class InternshipRepository extends Repository<typeof Internship> {
                             $expr: {
                               $and: [
                                 { $eq: ["$internship", "$$internshipId"] },
-                                { $eq: ["$user._id", contextUserId] },
+                                { $eq: ["$user._id", ctxUser?.id] },
                               ],
                             },
                           },
@@ -94,6 +98,12 @@ export class InternshipRepository extends Repository<typeof Internship> {
             {
               $match: {
                 ...(after ? { _id: { $lt: after } } : {}),
+                ...(filter?.academicYear
+                  ? { academicYear: filter.academicYear }
+                  : {}),
+                ...(filter?.organizations
+                  ? { organization: { $in: filter.organizations } }
+                  : {}),
               },
             },
             { $skip: first },
@@ -101,6 +111,16 @@ export class InternshipRepository extends Repository<typeof Internship> {
           ],
           totalCount: [{ $count: "totalCount" }],
           academicYearCount: [{ $sortByCount: "$academicYear" }],
+          organizationsCount: [
+            {
+              $match: {
+                ...(filter?.academicYear
+                  ? { academicYear: filter.academicYear }
+                  : {}),
+              },
+            },
+            { $sortByCount: "$organization" },
+          ],
         },
       },
       {
@@ -113,6 +133,13 @@ export class InternshipRepository extends Repository<typeof Internship> {
               input: "$academicYearCount",
               as: "item",
               in: { academicYear: "$$item._id", count: "$$item.count" },
+            },
+          },
+          organizations: {
+            $map: {
+              input: "$organizationsCount",
+              as: "item",
+              in: { organization: "$$item._id", count: "$$item.count" },
             },
           },
           edges: {
@@ -133,6 +160,7 @@ export class InternshipRepository extends Repository<typeof Internship> {
     return (
       connection ?? {
         academicYears: [],
+        organizations: [],
         edges: [],
         totalCount: 0,
         pageInfo: { hasNextPage: false },

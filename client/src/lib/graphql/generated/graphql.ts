@@ -331,6 +331,7 @@ export type InternshipConnection = {
   __typename?: 'InternshipConnection';
   academicYears: Array<AcademicYear>;
   edges: Array<Maybe<InternshipEdge>>;
+  organizations: Array<OrganizationCount>;
   pageInfo: InternshipPageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -339,6 +340,14 @@ export type InternshipEdge = {
   __typename?: 'InternshipEdge';
   cursor: Scalars['ObjectId']['output'];
   node: Internship;
+};
+
+export type InternshipFilterInput = {
+  academicYear?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  organizations?: InputMaybe<Array<Scalars['String']['input']>>;
+  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  user?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 export type InternshipInput = {
@@ -646,6 +655,12 @@ export type MutationUpdateUserArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
+export type OrganizationCount = {
+  __typename?: 'OrganizationCount';
+  count: Scalars['Int']['output'];
+  organization: Scalars['String']['output'];
+};
+
 /** Addresses of the organizations you want to invite to FlawIS/internships */
 export type OrganizationEmails = {
   emails: Array<Scalars['String']['input']>;
@@ -755,13 +770,9 @@ export type QueryInternshipArgs = {
 
 
 export type QueryInternshipsArgs = {
-  academicYear?: InputMaybe<Scalars['String']['input']>;
   after?: InputMaybe<Scalars['ObjectId']['input']>;
-  contextUserId?: InputMaybe<Scalars['ObjectId']['input']>;
-  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  filter?: InputMaybe<InternshipFilterInput>;
   first?: Scalars['Int']['input'];
-  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  user?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 
@@ -1308,15 +1319,11 @@ export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Ar
 export type InternshipsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  academicYear?: InputMaybe<Scalars['String']['input']>;
-  user?: InputMaybe<Scalars['ObjectId']['input']>;
-  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  contextUserId?: InputMaybe<Scalars['ObjectId']['input']>;
+  filter?: InputMaybe<InternshipFilterInput>;
 }>;
 
 
-export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
+export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, organizations: Array<{ __typename?: 'OrganizationCount', organization: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
 
 export type InternshipQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -3599,19 +3606,15 @@ export const AddAttendeeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
-    query internships($after: ObjectId, $first: Int, $academicYear: String, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $contextUserId: ObjectId) {
-  internships(
-    after: $after
-    first: $first
-    academicYear: $academicYear
-    user: $user
-    startDate: $startDate
-    endDate: $endDate
-    contextUserId: $contextUserId
-  ) {
+    query internships($after: ObjectId, $first: Int, $filter: InternshipFilterInput) {
+  internships(after: $after, first: $first, filter: $filter) {
     totalCount
     academicYears {
       academicYear
+      count
+    }
+    organizations {
+      organization
       count
     }
     edges {

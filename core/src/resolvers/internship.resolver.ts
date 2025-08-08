@@ -43,9 +43,10 @@ export class InternshipResolver {
   @Authorized()
   @Query(() => InternshipConnection)
   async internships(
-    @Args() args: InternshipArgs
+    @Args() args: InternshipArgs,
+    @Ctx() { user }: Context
   ): Promise<InternshipConnection> {
-    return await this.internshipService.getInternships(args);
+    return await this.internshipService.getInternships(args, user);
   }
 
   @Authorized([Access.Admin, Access.Organization])
@@ -130,7 +131,7 @@ export class InternshipResolver {
       first: 1000,
       internship: id,
       status: user?.access.includes(Access.Organization)
-        ? [Status.Eligible, Status.Accepted, Status.Rejected]
+        ? [Status.Eligible, Status.Accepted, Status.Rejected] // This is because students have to be checked by Admin first and then reviewed by org
         : undefined,
     });
 

@@ -4,6 +4,7 @@ import {
   Popover,
   PopoverButton,
   PopoverPanel,
+  PopoverPanelProps,
   Transition,
 } from "@headlessui/react";
 import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -22,8 +23,10 @@ type FilterConfig = {
 
 export default function FilterDropdown({
   filters,
+  anchor,
 }: {
   filters: FilterConfig[];
+  anchor?: PopoverPanelProps["anchor"];
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -69,7 +72,7 @@ export default function FilterDropdown({
   }
 
   return (
-    <Popover className="relative">
+    <Popover>
       {({ open }) => (
         <>
           <PopoverButton as={Button} size="small" className="p-2">
@@ -89,8 +92,9 @@ export default function FilterDropdown({
             leaveTo="opacity-0 translate-y-1"
           >
             <PopoverPanel
+              anchor={anchor}
               className={cn([
-                "absolute z-10 p-3 w-screen max-w-[calc(100vw-3rem)] sm:max-w-sm mt-3 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white text-gray-900 overflow-y-auto h-fit max-h-48 text-sm",
+                "p-3 w-[calc(100vw-2rem)] sm:w-96 [--anchor-gap:4px] sm:[--anchor-gap:8px] mt-3 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white text-gray-900 overflow-y-auto h-fit max-h-48 text-sm",
                 "dark:bg-gray-700 dark:text-white",
               ])}
             >

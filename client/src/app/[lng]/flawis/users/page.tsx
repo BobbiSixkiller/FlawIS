@@ -65,6 +65,7 @@ export default async function Users({
       />
       <div className="flex justify-between">
         <FilterDropdown
+          anchor="bottom start"
           filters={[
             {
               label: "Access",

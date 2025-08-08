@@ -39,9 +39,15 @@ export class InternshipService {
     private readonly userService: UserService
   ) {}
 
-  async getInternships(args: InternshipArgs): Promise<InternshipConnection> {
+  async getInternships(
+    args: InternshipArgs,
+    ctxUser: CtxUser | null
+  ): Promise<InternshipConnection> {
     try {
-      return await this.internshipRepository.paginatedInternships(args);
+      return await this.internshipRepository.paginatedInternships(
+        args,
+        ctxUser
+      );
     } catch (error: any) {
       throw new Error(`Error fetching internships: ${error.message}`);
     }

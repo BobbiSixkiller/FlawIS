@@ -292,6 +292,7 @@ type Internship {
 type InternshipConnection {
   academicYears: [AcademicYear!]!
   edges: [InternshipEdge]!
+  organizations: [OrganizationCount!]!
   pageInfo: InternshipPageInfo!
   totalCount: Int!
 }
@@ -299,6 +300,14 @@ type InternshipConnection {
 type InternshipEdge {
   cursor: ObjectId!
   node: Internship!
+}
+
+input InternshipFilterInput {
+  academicYear: String
+  endDate: DateTimeISO
+  organizations: [String!]
+  startDate: DateTimeISO
+  user: ObjectId
 }
 
 input InternshipInput {
@@ -416,6 +425,11 @@ type Mutation {
 """Mongo object id scalar type"""
 scalar ObjectId
 
+type OrganizationCount {
+  count: Int!
+  organization: String!
+}
+
 """
 Addresses of the organizations you want to invite to FlawIS/internships
 """
@@ -446,7 +460,7 @@ type Query {
   intern(id: ObjectId!): Intern!
   interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: [Status!], user: ObjectId): InternConnection!
   internship(id: ObjectId!): Internship!
-  internships(academicYear: String, after: ObjectId, contextUserId: ObjectId, endDate: DateTimeISO, first: Int! = 20, startDate: DateTimeISO, user: ObjectId): InternshipConnection!
+  internships(after: ObjectId, filter: InternshipFilterInput, first: Int! = 20): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
