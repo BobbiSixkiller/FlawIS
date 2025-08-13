@@ -18,7 +18,7 @@
   },
   "admin": {
     "subject": "Pending internship applications",
-    "body": "New internship application as {organization} waiting to be reviewed."
+    "body": "New internship applications waiting to be reviewed."
   },
   "org": {
     "subject": "Pending applications at your internship",

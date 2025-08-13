@@ -15,6 +15,7 @@ class CronJobService {
         console.log("Cron job started at midnight.");
         try {
           await this.internService.notifyOrgsOfEligibleInterns();
+          await this.internService.notifyAdminsOfAppliedInterns();
         } catch (error) {
           console.error("Error in cron job:", error);
         }

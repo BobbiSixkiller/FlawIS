@@ -329,9 +329,7 @@ export class EmailService {
       process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
         : `https://${msg.hostname}`
-    }/${msg.locale}/internships/${msg.internshipId}/applications/${
-      msg.internId
-    }`;
+    }/${msg.locale}/internships`;
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -341,7 +339,6 @@ export class EmailService {
         url,
         i18nLang: msg.locale,
         name: msg.name,
-        organization: msg.organization,
       },
     });
   }

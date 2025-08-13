@@ -18,7 +18,7 @@
   },
   "admin": {
     "subject": "Nové prihlášky na stáže",
-    "body": "Bolo vytvorená nová prihláška na stáž v {organization}, ktorú je potrebné sprocesovať."
+    "body": "Boli vytvorené nové prihlášky na stáže, ktoré je potrebné sprocesovať."
   },
   "org": {
     "subject": "Nové prihlášky na vašu stáž",

@@ -71,17 +71,17 @@ export default async function InternshipsHomePage({
             selectedYear={academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
-          {user.access.includes(Access.Organization) ||
-            (user.access.includes(Access.Admin) && (
-              <Tooltip message={t("tooltip.new")} position="below">
-                <ModalTrigger dialogId={addDialogId}>
-                  <Button size="sm">
-                    <PlusIcon className="size-5 mr-2" />
-                    {t("create", { ns: "common" })}
-                  </Button>
-                </ModalTrigger>
-              </Tooltip>
-            ))}
+          {(user.access.includes(Access.Organization) ||
+            user.access.includes(Access.Admin)) && (
+            <Tooltip message={t("tooltip.new")} position="below">
+              <ModalTrigger dialogId={addDialogId}>
+                <Button size="sm">
+                  <PlusIcon className="size-5 mr-2" />
+                  {t("create", { ns: "common" })}
+                </Button>
+              </ModalTrigger>
+            </Tooltip>
+          )}
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import mongoose from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
 import { InternRepository } from "../repositories/intern.repository";
 import { CtxUser } from "../util/types";
+import { UserRepository } from "../repositories/user.repository";
 
 function toInternDTO(doc: DocumentType<Intern>) {
   const json = doc.toJSON({
@@ -38,6 +39,7 @@ export class InternService {
     private readonly internRepository: InternRepository,
     private readonly internshipService: InternshipService,
     private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService,
     private readonly minioService: MinioService
@@ -137,29 +139,6 @@ export class InternService {
           organization: internship.organization,
         }),
         "mail.internships.applied"
-      );
-
-      const admins = await this.userService.getPaginatedUsers({
-        first: 100,
-        filter: { access: [Access.Admin] },
-      });
-
-      admins.edges.forEach((edge) =>
-        this.rmqService.produceMessage(
-          JSON.stringify({
-            locale: this.i18nService.language(),
-            name: edge.node.name,
-            email: edge.node.email,
-            internshipId: newIntern.internship,
-            internId: newIntern.id,
-            organization: internship.organization,
-            hostname:
-              process.env.NODE_ENV === "production"
-                ? "flawis.flaw.uniba.sk"
-                : "flawis-staging.flaw.uniba.sk",
-          }),
-          "mail.internships.admin"
-        )
       );
 
       await session.commitTransaction();
@@ -332,18 +311,22 @@ export class InternService {
       createdAt: { $gte: startDate, $lte: endDate },
     });
     if (count > 0) {
-      console.log("Sending notifications to FlawIS admins");
-      const admins = await this.userService.getPaginatedUsers({
-        first: 100,
-        filter: { access: [Access.Admin] },
+      console.log("Sending notifications to Dominika and Matus");
+      const admins = await this.userRepository.findAll({
+        email: {
+          $in: [
+            "dominika.vesela@flaw.uniba.sk",
+            "matus.muransky@flaw.uniba.sk",
+          ],
+        },
       });
 
-      admins.edges.forEach((edge) =>
+      admins.forEach((admin) =>
         this.rmqService.produceMessage(
           JSON.stringify({
             locale: this.i18nService.language(),
-            name: edge.node.name,
-            email: edge.node.email,
+            name: admin.name,
+            email: admin.email,
             hostname:
               process.env.NODE_ENV === "production"
                 ? "flawis.flaw.uniba.sk"
