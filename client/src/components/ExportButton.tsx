@@ -6,7 +6,7 @@ import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
-export default function ExportButton() {
+export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
   const { slug } = useParams<{ slug: string }>();
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export default function ExportButton() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/conferences/${slug}/attendees/export`);
+      const response = await fetch(fetchUrl);
 
       if (!response.ok) {
         throw new Error("Failed to download the file");

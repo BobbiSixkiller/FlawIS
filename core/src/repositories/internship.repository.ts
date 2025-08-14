@@ -7,6 +7,7 @@ import {
 } from "../resolvers/types/internship.types";
 import { CtxUser } from "../util/types";
 import { Access } from "../entitites/User";
+import { getAcademicYear } from "../util/helpers";
 
 @Service()
 export class InternshipRepository extends Repository<typeof Internship> {
@@ -166,5 +167,9 @@ export class InternshipRepository extends Repository<typeof Internship> {
         pageInfo: { hasNextPage: false },
       }
     );
+  }
+
+  async internshipExport() {
+    const { academicYear } = getAcademicYear();
   }
 }

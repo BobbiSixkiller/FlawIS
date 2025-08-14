@@ -1,7 +1,10 @@
-import { stringify } from "csv-stringify";
 import { NextRequest } from "next/server";
 import { getAllAttendees } from "../actions";
-import { capitalizeFirstLetter } from "@/utils/helpers";
+import {
+  capitalizeFirstLetter,
+  createCSVResponse,
+  toCSV,
+} from "@/utils/helpers";
 
 export async function GET(
   req: NextRequest,
@@ -61,29 +64,5 @@ export async function GET(
     }
   });
 
-  const csvString = await convertToCSV(exportData);
-
-  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-  const arrayBuffer = await blob.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  return new Response(buffer, {
-    status: 200,
-    headers: {
-      "Content-Disposition": `attachment; filename="${slug}-export.csv"`,
-      "Content-Type": "text/csv",
-    },
-  });
-}
-
-function convertToCSV(data: any): Promise<string> {
-  return new Promise((resolve, reject) => {
-    stringify(data, { header: true }, (err, output) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(output);
-      }
-    });
-  });
+  return createCSVResponse(toCSV(exportData), `${slug}-attendees.csv`);
 }

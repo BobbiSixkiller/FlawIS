@@ -2,7 +2,6 @@ import { objectToFormData } from "@/components/WIzzardForm";
 import { deleteFiles } from "@/lib/minio";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { GraphQLResponse } from "./actions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -141,7 +140,7 @@ export function getAcademicYear(date = new Date()) {
   const startYear = month >= 6 ? year : year - 1;
   const endYear = startYear + 1;
 
-  const startDate = new Date(`${startYear}-09-01T00:00:00Z`);
+  const startDate = new Date(`${startYear}-07-01T00:00:00Z`);
   const endDate = new Date(`${endYear}-06-30T23:59:59Z`);
 
   const academicYear = `${startYear}/${endYear}`;
@@ -155,3 +154,25 @@ export type ServerActionResponse<T = undefined> = {
   data?: T;
   errors?: Record<string, string[]>; // or whatever your error map looks like
 };
+
+import { stringify } from "csv-stringify/sync"; // sync API is easier for route handlers
+
+export function toCSV<T extends Record<string, any>>(data: T[]): string {
+  return stringify(data, {
+    header: true,
+    quoted_string: true, // avoid issues with commas/newlines in values
+  });
+}
+
+export function createCSVResponse(
+  csvString: string,
+  filename: string
+): Response {
+  return new Response(Buffer.from(csvString), {
+    status: 200,
+    headers: {
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "Content-Type": "text/csv; charset=utf-8",
+    },
+  });
+}

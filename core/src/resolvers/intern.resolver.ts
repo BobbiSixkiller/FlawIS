@@ -44,6 +44,12 @@ export class InternResolver {
     return await this.internService.getInterns(args);
   }
 
+  @Authorized([Access.Admin])
+  @Query(() => [Intern], { nullable: "items" })
+  async internsExport() {
+    return await this.internService.getAllInternsInAcademicYear();
+  }
+
   @Authorized()
   @Mutation(() => InternMutationResponse)
   async createIntern(
@@ -134,7 +140,6 @@ export class InternResolver {
     };
   }
 
-  @Authorized()
   @FieldResolver(() => StudentReference)
   async user(@Root() { user: studentReference }: Intern) {
     try {

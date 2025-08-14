@@ -5,6 +5,7 @@ import { getAcademicYear } from "@/utils/helpers";
 import AcademicYearSelect from "../../internships/AcademicYearSelect";
 import { InternshipFilterInput } from "@/lib/graphql/generated/graphql";
 import FilterDropdown from "@/components/FilterDropdown";
+import ExportButton from "@/components/ExportButton";
 
 export default async function InternshipsPage({
   params,
@@ -56,6 +57,7 @@ export default async function InternshipsPage({
             selectedYear={queryParams?.academicYear ?? academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
+          <ExportButton fetchUrl="/internships/export" />
         </div>
       </div>
 

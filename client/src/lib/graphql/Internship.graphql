@@ -92,6 +92,19 @@ mutation deleteInternship($id: ObjectId!) {
   }
 }
 
+query internsExport {
+  internsExport {
+    user {
+      email
+      name
+      studyProgramme
+      telephone
+    }
+    organization
+    status
+  }
+}
+
 query interns(
   $after: ObjectId
   $first: Int

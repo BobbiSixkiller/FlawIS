@@ -459,6 +459,7 @@ type Query {
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
   interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: [Status!], user: ObjectId): InternConnection!
+  internsExport: [Intern]!
   internship(id: ObjectId!): Internship!
   internships(after: ObjectId, filter: InternshipFilterInput, first: Int! = 20): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!

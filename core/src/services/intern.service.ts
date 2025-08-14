@@ -344,7 +344,9 @@ export class InternService {
       await this.internRepository.internshipsWithEligibleInterns();
 
     for (const data of internshipsWithEligibleInterns) {
-      console.log(`Sending notification to ${data.internship.organization}`);
+      console.log(
+        `Sending notification to ${data.user.email} of ${data.internship.organization}`
+      );
 
       this.rmqService.produceMessage(
         JSON.stringify({
@@ -362,5 +364,13 @@ export class InternService {
         "mail.internships.org"
       );
     }
+  }
+
+  async getAllInternsInAcademicYear() {
+    const { startDate, endDate } = getAcademicYear();
+
+    return await this.internRepository.findAll({
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
   }
 }

@@ -18,6 +18,16 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Stop and remove staging containers
+        run: |
+          docker ps -a --format '{{.Names}}' | grep 'staging' | xargs -r docker rm -f
+
+      - name: Clean up unused Docker resources and staging volumes
+        run: |
+          docker system prune -af
+          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
+        continue-on-error: true
+
       - name: Copy MongoDB data from production
         run: |
           # Step 1: Run mongodump inside the production MongoDB container
@@ -26,11 +36,11 @@ jobs:
           # Step 2: Copy the backup from the production MongoDB container to the local runner
           docker cp flawis-mongo-1:/data/backup ./backup
 
-          # Step 3: Stop the staging MongoDB container
-          docker stop flawis-mongo-staging-1
+          # # Step 3: Stop the staging MongoDB container
+          # docker stop flawis-mongo-staging-1
 
-          # Step 4: Remove the staging MongoDB container (optional, only if you want a clean rebuild)
-          docker rm flawis-mongo-staging-1
+          # # Step 4: Remove the staging MongoDB container (optional, only if you want a clean rebuild)
+          # docker rm flawis-mongo-staging-1
 
           # Step 5: Start the staging MongoDB container
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
@@ -61,10 +71,11 @@ jobs:
 
           mc mirror production/ staging/
 
-      - name: Clean up unused Docker resources
+      - name: Clean up unused Docker resources and stagin volumes
         run: |
-          docker system prune --all --force
-        continue-on-error: true # Ensures that failure here doesn't block other steps
+          docker system prune -af  # safe for volumes
+          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
+        continue-on-error: true
 
       - name: Build and Deploy Staging
         env:

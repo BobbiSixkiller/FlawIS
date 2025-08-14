@@ -2,7 +2,7 @@ import ListAttendees from "./ListAttendees";
 import { getAttendees } from "./actions";
 import { getConference } from "../../actions";
 
-import ExportButton from "./ExportButton";
+import ExportButton from "../../../../../../components/ExportButton";
 import FilterDropdown from "@/components/FilterDropdown";
 import { AttendeesQueryVariables } from "@/lib/graphql/generated/graphql";
 
@@ -34,7 +34,7 @@ export default async function AttendeesPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">
-        <ExportButton />
+        <ExportButton fetchUrl={`/conferences/${slug}/attendees/export`} />
 
         <FilterDropdown
           filters={[

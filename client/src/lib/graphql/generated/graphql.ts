@@ -689,6 +689,7 @@ export type Query = {
   forgotPassword: Scalars['String']['output'];
   intern: Intern;
   interns: InternConnection;
+  internsExport: Array<Maybe<Intern>>;
   internship: Internship;
   internships: InternshipConnection;
   inviteUsers: Scalars['String']['output'];
@@ -1353,6 +1354,11 @@ export type DeleteInternshipMutationVariables = Exact<{
 
 
 export type DeleteInternshipMutation = { __typename?: 'Mutation', deleteInternship: { __typename?: 'InternshipMutationResponse', message: string, data: { __typename?: 'Internship', id: any } } };
+
+export type InternsExportQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InternsExportQuery = { __typename?: 'Query', internsExport: Array<{ __typename?: 'Intern', organization: string, status: Status, user: { __typename?: 'StudentReference', email: string, name: string, studyProgramme: StudyProgramme, telephone: string } } | null> };
 
 export type InternsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['ObjectId']['input']>;
@@ -3728,6 +3734,20 @@ export const DeleteInternshipDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<DeleteInternshipMutation, DeleteInternshipMutationVariables>;
+export const InternsExportDocument = new TypedDocumentString(`
+    query internsExport {
+  internsExport {
+    user {
+      email
+      name
+      studyProgramme
+      telephone
+    }
+    organization
+    status
+  }
+}
+    `) as unknown as TypedDocumentString<InternsExportQuery, InternsExportQueryVariables>;
 export const InternsDocument = new TypedDocumentString(`
     query interns($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $internship: ObjectId, $status: [Status!]) {
   interns(
