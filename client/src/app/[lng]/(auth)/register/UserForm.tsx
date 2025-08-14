@@ -69,7 +69,7 @@ export default function UserForm({
               ctxUser?.access.includes(Access.Student), // When creating student account on internships tenant
             then: (schema) =>
               schema.matches(
-                /^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)*uniba\.sk$/,
+                /^[a-zA-Z0-9._%+-]+@(?:([a-zA-Z0-9-]+\.)*uniba\.sk|([a-zA-Z0-9-]+\.)*student\.euba\.sk)$/,
                 {
                   message: t("isUniba", { ns: "validation" }),
                 }
