@@ -20,8 +20,8 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
     passive,
   }: AttendeeArgs) {
     const [connection] = await this.aggregate<AttendeeConnection>([
-      { $sort: { _id: -1 } },
       { $match: { "conference.slug": conferenceSlug } },
+      { $sort: { _id: -1 } },
       {
         $lookup: {
           from: "submissions",

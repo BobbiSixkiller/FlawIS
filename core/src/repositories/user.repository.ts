@@ -11,12 +11,12 @@ export class UserRepository extends Repository<typeof User> {
 
   async paginatedUsers({ first, after, filter }: UserArgs) {
     const [connection] = await this.aggregate<UserConnection>([
-      { $sort: { _id: -1 } },
       {
         $match: {
           ...(filter?.access ? { access: { $in: filter?.access } } : {}),
         },
       },
+      { $sort: { _id: -1 } },
       {
         $facet: {
           data: [
