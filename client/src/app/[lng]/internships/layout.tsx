@@ -7,6 +7,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/Dashboard";
+import MissingStudentDataDialog from "./MissingStudentDataDialog";
+import { getSubdomain } from "@/utils/actions";
 
 export async function generateMetadata(
   {
@@ -67,6 +69,8 @@ export default async function DashboardLayout({
 
   const { t } = await translate(lng, "dashboard");
 
+  const subdomain = await getSubdomain();
+
   return (
     <div>
       <Dashboard
@@ -86,6 +90,7 @@ export default async function DashboardLayout({
 
       {modal}
 
+      <MissingStudentDataDialog user={user} subdomain={subdomain} />
       <ActivateAccountDialog lng={lng} user={user} />
       <SessionPolling />
     </div>
