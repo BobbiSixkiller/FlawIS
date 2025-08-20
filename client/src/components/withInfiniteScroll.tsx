@@ -6,7 +6,6 @@ import {
   ReactNode,
   useEffect,
   useState,
-  useMemo,
 } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -23,7 +22,6 @@ export interface Edge<EdgeT> {
 export interface Connection<EdgeT> {
   edges: (Edge<EdgeT> | null)[];
   pageInfo: PageInfo;
-  totalCount: number;
 }
 
 export interface PaginationArgs {
@@ -65,7 +63,6 @@ export function withInfiniteScroll<EdgeT, FilterT>({
         setData((prevData) => ({
           edges: [...prevData.edges, ...newData.edges], // Append new edges
           pageInfo: newData.pageInfo, // Update pageInfo
-          totalCount: newData.totalCount, // Update total count
         }));
       }
 
@@ -76,11 +73,9 @@ export function withInfiniteScroll<EdgeT, FilterT>({
 
     return (
       <Container>
-        {data.edges
-          .filter((edge) => edge?.node !== undefined && edge !== null)
-          .map((edge, i) => (
-            <ListItem key={edge?.cursor || i} data={edge?.node} />
-          ))}
+        {data.edges.map((edge, i) => (
+          <ListItem key={edge?.cursor || i} data={edge?.node} />
+        ))}
         {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
       </Container>
     );

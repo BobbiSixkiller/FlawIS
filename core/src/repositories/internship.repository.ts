@@ -7,7 +7,6 @@ import {
 } from "../resolvers/types/internship.types";
 import { CtxUser } from "../util/types";
 import { Access } from "../entitites/User";
-import { getAcademicYear } from "../util/helpers";
 
 @Service()
 export class InternshipRepository extends Repository<typeof Internship> {
@@ -32,15 +31,16 @@ export class InternshipRepository extends Repository<typeof Internship> {
       {
         $facet: {
           data: [
+            { $sort: { _id: -1 } },
             {
               $match: {
-                ...(after ? { _id: { $lt: after } } : {}),
                 ...(filter?.academicYear
                   ? { academicYear: filter.academicYear }
                   : {}),
                 ...(filter?.organizations
                   ? { organization: { $in: filter.organizations } }
                   : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
               },
             },
             ...(ctxUser?.access.includes(Access.Student)
@@ -96,15 +96,16 @@ export class InternshipRepository extends Repository<typeof Internship> {
             },
           ],
           hasNextPage: [
+            { $sort: { _id: -1 } },
             {
               $match: {
-                ...(after ? { _id: { $lt: after } } : {}),
                 ...(filter?.academicYear
                   ? { academicYear: filter.academicYear }
                   : {}),
                 ...(filter?.organizations
                   ? { organization: { $in: filter.organizations } }
                   : {}),
+                ...(after ? { _id: { $lt: after } } : {}),
               },
             },
             { $skip: first },
@@ -126,6 +127,13 @@ export class InternshipRepository extends Repository<typeof Internship> {
       },
       {
         $project: {
+          edges: {
+            $map: {
+              input: "$data",
+              as: "edge",
+              in: { cursor: "$$edge.id", node: "$$edge" },
+            },
+          },
           totalCount: {
             $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
           },
@@ -143,13 +151,6 @@ export class InternshipRepository extends Repository<typeof Internship> {
               in: { organization: "$$item._id", count: "$$item.count" },
             },
           },
-          edges: {
-            $map: {
-              input: "$data",
-              as: "edge",
-              in: { cursor: "$$edge.id", node: "$$edge" },
-            },
-          },
           pageInfo: {
             hasNextPage: { $eq: [{ $size: "$hasNextPage" }, 1] },
             endCursor: { $last: "$data.id" },
@@ -160,16 +161,12 @@ export class InternshipRepository extends Repository<typeof Internship> {
 
     return (
       connection ?? {
-        academicYears: [],
-        organizations: [],
         edges: [],
         totalCount: 0,
+        academicYears: [],
+        organizations: [],
         pageInfo: { hasNextPage: false },
       }
     );
-  }
-
-  async internshipExport() {
-    const { academicYear } = getAcademicYear();
   }
 }
