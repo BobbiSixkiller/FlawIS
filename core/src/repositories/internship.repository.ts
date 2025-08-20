@@ -28,10 +28,10 @@ export class InternshipRepository extends Repository<typeof Internship> {
             : {}),
         },
       },
+      { $sort: { _id: -1 } },
       {
         $facet: {
           data: [
-            { $sort: { _id: -1 } },
             {
               $match: {
                 ...(filter?.academicYear
@@ -96,7 +96,6 @@ export class InternshipRepository extends Repository<typeof Internship> {
             },
           ],
           hasNextPage: [
-            { $sort: { _id: -1 } },
             {
               $match: {
                 ...(filter?.academicYear
