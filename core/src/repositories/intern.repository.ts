@@ -33,10 +33,10 @@ export class InternRepository extends Repository<typeof Intern> {
           ...(startDate ? { createdAt: { $gte: startDate } } : {}),
         },
       },
-      { $sort: { _id: 1 } },
       {
         $facet: {
           data: [
+            { $sort: { _id: 1 } },
             { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
             { $limit: first },
             { $addFields: { id: "$_id", "user.id": "$user._id" } },
@@ -49,6 +49,7 @@ export class InternRepository extends Repository<typeof Intern> {
             },
           ],
           hasNextPage: [
+            { $sort: { _id: 1 } },
             { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
             { $skip: first },
             { $limit: 1 }, // Check if more data exists
