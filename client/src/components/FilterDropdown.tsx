@@ -94,8 +94,8 @@ export default function FilterDropdown({
             <PopoverPanel
               anchor={anchor}
               className={cn([
-                "p-3 w-[calc(100vw-2rem)] sm:w-96 [--anchor-gap:4px] sm:[--anchor-gap:8px] mt-3 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white text-gray-900 overflow-y-auto h-fit max-h-48 text-sm",
-                "dark:bg-gray-700 dark:text-white",
+                "p-3 mx-4 sm:m-0 sm:w-96 [--anchor-gap:4px] sm:[--anchor-gap:8px] flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto !max-h-56 text-gray-900 text-sm",
+                "dark:bg-gray-800 dark:text-white",
               ])}
             >
               {filters.map((filter) => {
@@ -123,6 +123,90 @@ export default function FilterDropdown({
                   return (
                     <div key={filter.queryKey} className="pt-2">
                       <div className="font-bold text-base">{filter.label}</div>
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
+                      {filter.options.map((opt) => (
+                        <div
+                          key={`${filter.queryKey}-${opt.value}`}
+                          className="flex items-center justify-between pt-2"
+                        >
+                          {opt.label}
+                          <Toggle
+                            defaultChecked={currentMulti.includes(opt.value)}
+                            handleToggle={() =>
+                              toggleMulti(filter.queryKey, opt.value)
+                            }
+                          />
+                        </div>
+                      ))}
                       {filter.options.map((opt) => (
                         <div
                           key={`${filter.queryKey}-${opt.value}`}
