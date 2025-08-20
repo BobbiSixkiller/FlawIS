@@ -3,11 +3,11 @@ import DynamicImage from "./DynamicImage";
 
 export default function Avatar({
   name,
-  avatarUrl,
-}: Pick<UserFragment, "name" | "avatarUrl">) {
-  return avatarUrl ? (
+  avatarUrlEnv,
+}: Pick<UserFragment, "name" | "avatarUrlEnv">) {
+  return avatarUrlEnv ? (
     <DynamicImage
-      src={avatarUrl}
+      src={avatarUrlEnv}
       alt="Avatar"
       className="size-9 rounded-full"
       fill

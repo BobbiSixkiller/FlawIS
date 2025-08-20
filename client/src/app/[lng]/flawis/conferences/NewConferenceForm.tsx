@@ -8,11 +8,10 @@ import { LocalizedImageFileInput } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useValidation from "@/hooks/useValidation";
-import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { uploadToMinio } from "@/utils/helpers";
 import { ConferenceInput } from "@/lib/graphql/generated/graphql";
 import { deleteFiles } from "@/lib/minio";
-import { method } from "lodash";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 
 export default function NewConferenceForm({
   lng,

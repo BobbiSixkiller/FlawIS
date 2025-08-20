@@ -510,6 +510,7 @@ type Mutation {
   deleteTicket(slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
+  inviteUsers(input: OrganizationEmailsInput!): String!
   login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterUserInput!): UserMutationResponse!
@@ -554,7 +555,7 @@ type OrganizationCount {
 """
 Addresses of the organizations you want to invite to FlawIS/internships
 """
-input OrganizationEmails {
+input OrganizationEmailsInput {
   emails: [String!]!
 }
 
@@ -842,10 +843,10 @@ The user model entity
 type User {
   access: [Access!]!
   address: Address
-  avatarUrl: String
+  avatarUrlEnv: String
   billings: [Billing]!
   createdAt: DateTimeISO!
-  cvUrl: String
+  cvUrlEnv: String
   email: String!
   id: ObjectId!
   name: String!

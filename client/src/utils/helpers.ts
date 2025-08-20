@@ -29,6 +29,20 @@ export function displayDate(utc?: string, locale: string = "sk") {
   });
 }
 
+export function getLocalDateTime(utc: string) {
+  const date = new Date(utc);
+  date.setHours(date.getHours() + 2);
+
+  return date.toISOString().slice(0, 16);
+}
+
+export function getLocalDate(utc: string) {
+  const date = new Date(utc);
+  date.setHours(date.getHours() + 2);
+
+  return date.toISOString().split("T")[0];
+}
+
 export async function fetchFromMinio(bucketName: string, fileUrl: string) {
   try {
     // Fetch the file from the Next.js route handler

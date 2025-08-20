@@ -70,7 +70,7 @@ export default async function Dashboard({
             </>
           }
           search={sidebar}
-          avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
+          avatar={<Avatar name={user.name} avatarUrlEnv={user.avatarUrlEnv} />}
         />
 
         <Breadcrumbs

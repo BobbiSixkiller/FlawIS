@@ -14,8 +14,8 @@ export async function getConferences(vars: ConferencesQueryVariables) {
   const res = await executeGqlFetch(
     ConferencesDocument,
     vars,
-    {}
-    // { tags: ["conferences"], revalidate: 3600 }
+    {},
+    { tags: ["conferences"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -28,12 +28,12 @@ export async function getConferences(vars: ConferencesQueryVariables) {
 export async function getConference(slug: string) {
   const res = await executeGqlFetch(
     ConferenceDocument,
-    { slug }
-    // {},
-    // {
-    //   tags: [`conference:${slug}`],
-    //   revalidate: 3600,
-    // }
+    { slug },
+    {},
+    {
+      tags: [`conferences:${slug}`],
+      revalidate: 3600,
+    }
   );
 
   if (res.errors) {

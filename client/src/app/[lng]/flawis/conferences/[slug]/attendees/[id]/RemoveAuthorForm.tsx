@@ -19,7 +19,7 @@ export default function RemoveAuthor({
   author: { name: string; email: string; id: string };
   dialogId: string;
 }) {
-  const { lng, slug, id } = useParams<{
+  const { lng } = useParams<{
     lng: string;
     slug: string;
     id: string;
@@ -32,7 +32,10 @@ export default function RemoveAuthor({
 
   function handleClick() {
     startTransition(async () => {
-      const res = await removeAuthor(submission.id, author.id, { slug, id });
+      const res = await removeAuthor({
+        id: submission.id,
+        authorId: author.id,
+      });
 
       setMessage(res.message, res.success);
 

@@ -25,7 +25,10 @@ export default function MissingStudentDataDialog({
 
   useEffect(() => {
     const missingData =
-      !user?.cvUrl || !user?.studyProgramme || !user.telephone || !user.address;
+      !user?.cvUrlEnv ||
+      !user?.studyProgramme ||
+      !user.telephone ||
+      !user.address;
     const isStudent = user.verified && user.access.includes(Access.Student);
 
     if (missingData && isStudent) {

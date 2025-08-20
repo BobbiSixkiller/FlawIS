@@ -6,7 +6,7 @@ import { Service } from "typedi";
 import { User } from "../entitites/User";
 import { Mutation } from "type-graphql";
 import {
-  OrganizationEmails,
+  OrganizationEmailsInput,
   PasswordInput,
   RegisterUserInput,
   UserArgs,
@@ -138,8 +138,8 @@ export class UserResolver {
   }
 
   @Authorized("ADMIN")
-  @Query(() => String)
-  async inviteUsers(@Arg("input") { emails }: OrganizationEmails) {
+  @Mutation(() => String)
+  async inviteUsers(@Arg("input") { emails }: OrganizationEmailsInput) {
     await this.userService.sendRegistrationLinks(
       emails,
       process.env.NODE_ENV === "production"

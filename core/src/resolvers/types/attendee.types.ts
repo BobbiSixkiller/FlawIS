@@ -8,7 +8,7 @@ import {
   registerEnumType,
 } from "type-graphql";
 import { Billing } from "../../entitites/Billing";
-import { IsString } from "class-validator";
+import { IsDate, IsString } from "class-validator";
 import { AddressInput, FlawBillingInput } from "./conference.types";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import { Attendee, Invoice, InvoiceData } from "../../entitites/Attendee";
@@ -96,9 +96,11 @@ export class InvoiceDataInput implements InvoiceData {
   comment: String;
 
   @Field()
+  @IsDate()
   dueDate: Date;
 
   @Field()
+  @IsDate()
   issueDate: Date;
 
   @Field(() => Float)
@@ -111,6 +113,7 @@ export class InvoiceDataInput implements InvoiceData {
   vat: Number;
 
   @Field()
+  @IsDate()
   vatDate: Date;
 }
 

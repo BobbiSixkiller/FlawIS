@@ -75,6 +75,8 @@ export class AttendeeResolver {
     @Arg("data") data: InvoiceInput,
     @LoadResource(Attendee) attendee: DocumentType<Attendee>
   ): Promise<AttendeeMutationResponse> {
+    console.log(data.body.issueDate);
+
     attendee.invoice = data;
 
     await attendee.save();

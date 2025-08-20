@@ -23,6 +23,7 @@ export function withLocalizedInput<T extends WithLocalizedInputProps>(
   InputComponent: ComponentType<T>
 ) {
   return function WithLocalizedInputWrapper(props: T) {
+    console.log(props.errors);
     const [visible, setVisible] = useState(false);
 
     const localizedInputName = props.name.replace(
@@ -39,7 +40,7 @@ export function withLocalizedInput<T extends WithLocalizedInputProps>(
 
     const ref = useRef<HTMLDivElement>(null);
     useOnClickOutside(ref, () => {
-      if (!props.error) {
+      if (!props.error && !localizedError) {
         setVisible(false);
       }
     });
@@ -60,11 +61,6 @@ export function withLocalizedInput<T extends WithLocalizedInputProps>(
           leave="ease-in duration-200"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
-          afterEnter={() => {
-            if (localizedError) {
-              props.methods?.setFocus?.(localizedInputName);
-            }
-          }}
         >
           <div className="mt-2">
             <InputComponent

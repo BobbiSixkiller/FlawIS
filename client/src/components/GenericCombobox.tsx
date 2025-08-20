@@ -9,7 +9,7 @@ import {
   Field,
   Label,
 } from "@headlessui/react";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { last } from "lodash";
 import { Control, useController } from "react-hook-form";
@@ -146,7 +146,17 @@ export default function GenericCombobox<
     }
   }
 
-  console.log(boxRect?.left);
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+      event.key === "Backspace" &&
+      text === "" &&
+      Array.isArray(field.value)
+    ) {
+      // Prevent the default backspace behavior
+      event.preventDefault();
+      field.onChange(field.value.slice(0, -1));
+    }
+  };
 
   function renderComboboxContent() {
     return (
@@ -166,10 +176,16 @@ export default function GenericCombobox<
           ])}
         >
           {multiple &&
-            value.map((val) => (
+            value.map((val, i) => (
               <div
                 key={val.id}
-                className="flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white px-1 h-7 items-center"
+                className={cn([
+                  "flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white px-1 h-7 items-center",
+                  fieldState.error &&
+                    Array.isArray(fieldState.error) &&
+                    fieldState.error[i] &&
+                    "bg-red-300 dark:bg-red-300 text-red-500 dark:text-red-500",
+                ])}
               >
                 {getOptionLabel(val)}
                 <button
@@ -194,6 +210,7 @@ export default function GenericCombobox<
               onChange={(e) => debounced(e.target.value)}
               displayValue={() => ""}
               className="bg-transparent border-none focus:ring-0 p-0 w-full"
+              onKeyDown={handleKeyDown}
             />
             {loading ? (
               <Spinner />
@@ -277,9 +294,9 @@ export default function GenericCombobox<
 
       {fieldState.error && (
         <p className="text-sm text-red-500">
-          {Array.isArray(fieldState.error)
-            ? fieldState.error[0]?.message
-            : fieldState.error?.message}
+          {!Array.isArray(fieldState.error)
+            ? fieldState.error?.message
+            : fieldState.error.map((err) => err.message).join(" ")}
         </p>
       )}
     </Field>

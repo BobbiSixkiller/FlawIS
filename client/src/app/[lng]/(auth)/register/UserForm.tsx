@@ -52,8 +52,8 @@ export default function UserForm({
   const { yup } = useValidation();
 
   const { loading, avatar, files, errors } = usePrefillFiles({
-    avatarUrl: user?.avatarUrl,
-    cvUrl: user?.cvUrl,
+    avatarUrl: user?.avatarUrlEnv,
+    cvUrl: user?.cvUrlEnv,
   });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
@@ -220,7 +220,7 @@ export default function UserForm({
             async (val) => {
               const { error, url } = await uploadOrDelete(
                 "resumes",
-                user?.cvUrl,
+                user?.cvUrlEnv,
                 val.files[0]
               );
               if (error) {
@@ -229,7 +229,7 @@ export default function UserForm({
 
               const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
                 "avatars",
-                user?.avatarUrl,
+                user?.avatarUrlEnv,
                 val.avatar
               );
               if (avatarErr) {

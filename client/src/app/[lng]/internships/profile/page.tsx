@@ -4,7 +4,7 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
-import DynamicImage from "@/components/DynamicImage";
+import Avatar from "@/components/Avatar";
 
 export default async function Profile({
   params,
@@ -38,25 +38,7 @@ export default async function Profile({
               {t("name")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400  sm:col-span-2 sm:mt-0 flex items-center gap-2">
-              {user.avatarUrl ? (
-                <DynamicImage
-                  src={user.avatarUrl}
-                  alt="Avatar"
-                  className="size-12 rounded-full"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ objectFit: "cover" }}
-                />
-              ) : (
-                <div className="size-12 rounded-full flex justify-center items-center bg-primary-400 text-white">
-                  {user.name
-                    .split(" ")
-                    .map((n, i) => {
-                      if (i < 2) return n[0].toUpperCase();
-                    })
-                    .join("")}
-                </div>
-              )}
+              <Avatar name={user.name} avatarUrlEnv={user.avatarUrlEnv} />
               {user?.name}
             </dd>
           </div>
@@ -110,9 +92,9 @@ export default async function Profile({
                 {t("cv")}
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
-                {user?.cvUrl ? (
+                {user?.cvUrlEnv ? (
                   <Link
-                    href={`/minio?bucketName=resumes&url=${user.cvUrl}`}
+                    href={`/minio?bucketName=resumes&url=${user.cvUrlEnv}`}
                     className="text-primary-500 hover:underline"
                   >
                     CV.pdf

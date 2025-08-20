@@ -3,35 +3,36 @@
 import {
   AttendeeDocument,
   DeleteAttendeeDocument,
-  InvoiceInput,
   RemoveAuthorDocument,
+  RemoveAuthorMutationVariables,
   UpdateInvoiceDocument,
+  UpdateInvoiceMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
-import parseValidationErrors, { ErrorException } from "@/utils/parseErrors";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
-export async function removeAuthor(
-  id: string,
-  authorId: string,
-  urlParams: { slug: string; id: string }
-) {
-  try {
-    const res = await executeGqlFetch(RemoveAuthorDocument, { id, authorId });
-    if (res.errors) {
-      throw new Error(res.errors[0].message);
+export async function removeAuthor(vars: RemoveAuthorMutationVariables) {
+  return await executeGqlMutation(
+    RemoveAuthorDocument,
+    vars,
+    (data) => ({
+      message: data.removeAuthor.message,
+      data: data.removeAuthor.data,
+    }),
+    {
+      revalidatePaths: (data) => [
+        `/conferences/${data.removeAuthor.data.conference.slug}/submissions`,
+      ],
     }
-
-    revalidatePath(`/conferences/${urlParams.slug}/attendees/${urlParams.id}`);
-
-    return { success: true, message: res.data.removeAuthor.message };
-  } catch (error: any) {
-    return { success: false, message: error.message };
-  }
+  );
 }
 
 export async function getAttendee(id: string) {
-  const res = await executeGqlFetch(AttendeeDocument, { id });
+  const res = await executeGqlFetch(
+    AttendeeDocument,
+    { id },
+    {},
+    { tags: [`attendees:${id}`] }
+  );
   if (res.errors) {
     console.log(res.errors[0]);
     // return notFound();
@@ -41,34 +42,30 @@ export async function getAttendee(id: string) {
 }
 
 export async function deleteAttendee(id: string) {
-  const res = await executeGqlFetch(DeleteAttendeeDocument, {
-    id,
-  });
-  if (res.errors) {
-    console.log(res.errors[0]);
-    return { success: false, message: res.errors[0].message };
-  }
-
-  revalidateTag("attendees");
-  return { success: true, message: res.data.deleteAttendee.message };
+  return await executeGqlMutation(
+    DeleteAttendeeDocument,
+    { id },
+    (data) => ({
+      message: data.deleteAttendee.message,
+      data: data.deleteAttendee.data,
+    }),
+    { revalidateTags: () => ["attendees"] }
+  );
 }
 
-export async function updateInvoice(id: string, data: InvoiceInput) {
-  const res = await executeGqlFetch(UpdateInvoiceDocument, {
-    id,
-    data,
-  });
-  if (res.errors) {
-    const { validationErrors } = res.errors[0].extensions as ErrorException;
-
-    return {
-      success: false,
-      message: validationErrors
-        ? Object.values(parseValidationErrors(validationErrors)).join(" ")
-        : res.errors[0].message,
-    };
-  }
-
-  revalidateTag(`conference:${res.data.updateInvoice.data.user.id}`);
-  return { success: true, message: res.data.updateInvoice.message };
+export async function updateInvoice(vars: UpdateInvoiceMutationVariables) {
+  return await executeGqlMutation(
+    UpdateInvoiceDocument,
+    vars,
+    (data) => ({
+      message: data.updateInvoice.message,
+      data: data.updateInvoice.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `conferences:${data.updateInvoice.data.conference.slug}`,
+        `attendees:${vars.id}`,
+      ],
+    }
+  );
 }

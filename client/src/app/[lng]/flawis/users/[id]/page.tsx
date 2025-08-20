@@ -156,9 +156,9 @@ export default async function User({
               {t("cv")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
-              {user?.cvUrl ? (
+              {user?.cvUrlEnv ? (
                 <Link
-                  href={`/minio?bucketName=resumes&url=${user.cvUrl}`}
+                  href={`/minio?bucketName=resumes&url=${user.cvUrlEnv}`}
                   className="text-primary-500 hover:underline"
                 >
                   CV.pdf
