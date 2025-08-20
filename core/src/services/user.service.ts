@@ -99,7 +99,7 @@ export class UserService {
     const emailExists = await this.userRepository.findOne({
       email: data.email,
     });
-    if (emailExists && emailExists._id !== ctxUser?.id) {
+    if (emailExists) {
       throw new ArgumentValidationError([
         {
           // target: User, // Object that was validated.
@@ -305,6 +305,26 @@ export class UserService {
       });
       if (!doc) {
         throw new Error(this.i18nService.translate("notFound", { ns: "user" }));
+      }
+
+      const emailExists = await this.userRepository.findOne({
+        email: data.email,
+      });
+      if (emailExists && emailExists.id !== ctxUser?.id) {
+        throw new ArgumentValidationError([
+          {
+            // target: User, // Object that was validated.
+            property: "email", // Object's property that haven't pass validation.
+            value: data.email, // Value that haven't pass a validation.
+            constraints: {
+              // Constraints that failed validation with error messages.
+              emailExist: this.i18nService.translate("emailExists", {
+                ns: "user",
+              }),
+            },
+            //children?: ValidationError[], // Contains all nested validation errors of the property
+          },
+        ]);
       }
 
       // 3) assign only allowed props
