@@ -18,6 +18,8 @@ export class InternshipRepository extends Repository<typeof Internship> {
     { first = 20, after, filter }: InternshipArgs,
     ctxUser: CtxUser | null
   ) {
+    console.log(ctxUser?.access.includes(Access.Student));
+
     const [connection] = await this.aggregate<InternshipConnection>([
       {
         $match: {
@@ -55,7 +57,12 @@ export class InternshipRepository extends Repository<typeof Internship> {
                             $expr: {
                               $and: [
                                 { $eq: ["$internship", "$$internshipId"] },
-                                { $eq: ["$user._id", ctxUser?.id] },
+                                {
+                                  $eq: [
+                                    "$user._id",
+                                    { $toObjectId: ctxUser.id },
+                                  ],
+                                },
                               ],
                             },
                           },
@@ -157,6 +164,8 @@ export class InternshipRepository extends Repository<typeof Internship> {
         },
       },
     ]);
+
+    console.log(connection.edges.map((e) => e.node));
 
     return (
       connection ?? {

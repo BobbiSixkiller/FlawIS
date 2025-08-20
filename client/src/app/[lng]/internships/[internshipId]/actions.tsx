@@ -14,7 +14,7 @@ export async function getInternship(id: string) {
     InternshipDocument,
     { id },
     {},
-    { revalidate: 3600, tags: [`internship:${id}`] }
+    { revalidate: 3600, tags: [`internships:${id}`] }
   );
 
   if (res.errors) {
@@ -32,7 +32,7 @@ export async function deleteInternship(id: string) {
       message: data.deleteInternship.message,
       data: data.deleteInternship.data,
     }),
-    { revalidateTags: () => ["internships", `internship:${id}`] }
+    { revalidateTags: () => ["internships", `internships:${id}`] }
   );
 }
 
@@ -47,7 +47,7 @@ export async function deleteIntern(id: string) {
     {
       revalidateTags: (data) => [
         "internships",
-        `internship:${data.deleteIntern.data.internship}`,
+        `internships:${data.deleteIntern.data.internship}`,
       ],
     }
   );
@@ -61,7 +61,7 @@ export async function createIntern(fileUrls: string[], internshipId: string) {
       internshipId,
     },
     (data) => ({ message: data.createIntern.message }),
-    { revalidateTags: () => ["internships", `internship:${internshipId}`] }
+    { revalidateTags: () => ["internships", `internships:${internshipId}`] }
   );
 }
 
@@ -78,7 +78,7 @@ export async function changeInternFiles(id: string, fileUrls: string[]) {
     }),
     {
       revalidateTags: (data) => [
-        `internship:${data.updateInternFiles.data.internship}`,
+        `internships:${data.updateInternFiles.data.internship}`,
       ],
     }
   );
