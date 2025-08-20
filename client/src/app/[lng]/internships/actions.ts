@@ -13,9 +13,9 @@ export async function getInternships(vars: InternshipsQueryVariables) {
   //   await new Promise((resolve) => setTimeout(resolve, 5000));
   const res = await executeGqlFetch(
     InternshipsDocument,
-    vars,
-    {},
-    { tags: ["internships"], revalidate: 3600 }
+    vars
+    // {},
+    // { tags: ["internships"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -51,7 +51,7 @@ export async function updateInternship({
       data: data.updateInternship.data,
     }),
     {
-      revalidateTags: () => ["internships", `internship:${id}`],
+      revalidateTags: () => ["internships", `internships:${id}`],
     }
   );
 }

@@ -46,7 +46,7 @@ export class InternshipResolver {
     @Args() args: InternshipArgs,
     @Ctx() { user }: Context
   ): Promise<InternshipConnection> {
-    return await this.internshipService.getInternships(args, user);
+    return await this.internshipService.getInternships(args, user!);
   }
 
   @Authorized([Access.Admin, Access.Organization])
