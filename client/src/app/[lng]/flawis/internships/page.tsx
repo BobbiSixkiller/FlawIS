@@ -38,7 +38,7 @@ export default async function InternshipsPage({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <FilterDropdown
             anchor="bottom"
             filters={[
