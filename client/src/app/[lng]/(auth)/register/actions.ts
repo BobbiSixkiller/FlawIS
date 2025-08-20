@@ -65,6 +65,9 @@ export async function addUser(data: RegisterUserInput) {
 }
 
 export async function updateUser(id: string, data: UserInput) {
+  const cookieStore = await cookies();
+  const user = cookieStore.get("user")?.value || "me";
+
   return await executeGqlMutation(
     UpdateUserDocument,
     {
@@ -76,8 +79,12 @@ export async function updateUser(id: string, data: UserInput) {
       data: data.updateUser.data,
     }),
     {
-      revalidateTags: (data) => ["users", `user:${data.updateUser.data.id}`],
-      revalidatePaths: () => ["/profile"],
+      revalidateTags: (data) => [
+        "users",
+        `user:${data.updateUser.data.id}`,
+        user,
+      ],
+      revalidatePaths: () => ["/profile", "/"],
     }
   );
 }

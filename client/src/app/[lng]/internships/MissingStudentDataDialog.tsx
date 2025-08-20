@@ -21,6 +21,7 @@ export default function MissingStudentDataDialog({
   const dialogId = "missiong-student-info";
 
   const openDialog = useDialogStore((s) => s.openDialog);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
 
   useEffect(() => {
     const missingData =
@@ -29,6 +30,8 @@ export default function MissingStudentDataDialog({
 
     if (missingData && isStudent) {
       openDialog(dialogId);
+    } else {
+      closeDialog(dialogId);
     }
   }, [user]);
 
