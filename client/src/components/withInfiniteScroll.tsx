@@ -59,6 +59,7 @@ export function withInfiniteScroll<EdgeT, FilterT>({
           ...filter,
           after: data.pageInfo.endCursor, // Update with the latest cursor
         });
+        console.log(newData, filter);
 
         setData((prevData) => ({
           edges: [...prevData.edges, ...newData.edges], // Append new edges
@@ -73,9 +74,11 @@ export function withInfiniteScroll<EdgeT, FilterT>({
 
     return (
       <Container>
-        {data.edges.map((edge, i) => (
-          <ListItem key={edge?.cursor || i} data={edge?.node} />
-        ))}
+        {data.edges
+          .filter((edge) => edge?.node !== undefined && edge !== null)
+          .map((edge, i) => (
+            <ListItem key={edge?.cursor || i} data={edge?.node} />
+          ))}
         {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
       </Container>
     );
