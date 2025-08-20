@@ -26,7 +26,14 @@ export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
       // Create a temporary anchor element to trigger the download
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${slug}-export.csv`;
+
+      const disposition = response.headers.get("Content-Disposition");
+      let filename = "export.csv";
+      if (disposition && disposition.includes("filename=")) {
+        filename = disposition.split("filename=")[1].replace(/['"]/g, "");
+      }
+
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
 
