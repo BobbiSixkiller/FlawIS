@@ -17,7 +17,7 @@ export async function createTicket(vars: CreateTicketMutationVariables) {
     (data) => ({
       message: data.createTicket.message,
     }),
-    { revalidateTags: () => [`conference:${vars.slug}`] }
+    { revalidateTags: () => [`conferences:${vars.slug}`] }
   );
 }
 
@@ -28,7 +28,7 @@ export async function updateTicket(vars: UpdateTicketMutationVariables) {
     (data) => ({
       message: data.updateTicket.message,
     }),
-    { revalidateTags: () => [`conference:${vars.slug}`] }
+    { revalidateTags: () => [`conferences:${vars.slug}`] }
   );
 }
 
@@ -39,6 +39,6 @@ export async function deleteTicket(vars: DeleteTicketMutationVariables) {
     (data) => ({
       message: data.deleteTicket.message,
     }),
-    { revalidateTags: (data) => [`conference:${vars.slug}`] }
+    { revalidateTags: (data) => [`conferences:${vars.slug}`] }
   );
 }

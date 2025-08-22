@@ -4,12 +4,13 @@ import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { Control, useController, useFormContext } from "react-hook-form";
 
 export default function Ticket({
   tickets,
   setSubmission,
   submission,
+  control,
 }: {
   submission?: SubmissionFragment;
   tickets: {
@@ -20,14 +21,17 @@ export default function Ticket({
     withSubmission: boolean;
   }[];
   setSubmission: (visible: boolean) => void;
+  control: Control<any>;
 }) {
-  const { watch, setValue, getFieldState } = useFormContext();
-  const { error } = getFieldState("ticketId");
+  const { field, fieldState } = useController({
+    name: "ticketId",
+    control,
+  });
 
   useEffect(() => {
     if (submission) {
       const ticket = tickets.find((t) => t.withSubmission === true);
-      setValue("ticketId", ticket?.id);
+      field.onChange(ticket?.id);
       setSubmission(true);
     }
   }, []);
@@ -40,8 +44,8 @@ export default function Ticket({
       <RadioGroup
         aria-label="Conference Tickets"
         disabled={submission !== undefined}
-        value={watch("ticketId")}
-        onChange={(value) => setValue("ticketId", value)}
+        value={field.value}
+        onChange={field.onChange}
       >
         <div className="space-y-2">
           {tickets.map((ticket) => (
@@ -51,11 +55,11 @@ export default function Ticket({
               value={ticket.id}
               className={({ checked, focus, disabled }) =>
                 cn([
-                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-900",
+                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-700",
                   focus &&
                     "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300",
                   disabled &&
-                    "bg-slate-50 dark:bg-slate-300 text-slate-500 cursor-default",
+                    "bg-slate-50 dark:bg-slate-600 text-slate-500 cursor-default",
                   checked &&
                     "bg-primary-500 dark:bg-primary-500 text-white border-none",
                 ])
@@ -71,7 +75,7 @@ export default function Ticket({
                           className={`font-medium  ${
                             checked
                               ? "text-white"
-                              : "text-gray-900 dark:text-white"
+                              : "text-gray-900 dark:text-white/85"
                           }`}
                         >
                           {ticket.name}
@@ -102,7 +106,9 @@ export default function Ticket({
           ))}
         </div>
       </RadioGroup>
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {fieldState.error && (
+        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      )}
     </div>
   );
 }

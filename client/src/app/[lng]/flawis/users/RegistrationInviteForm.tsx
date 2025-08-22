@@ -65,7 +65,7 @@ export default function RegistrationInviteForm({
             }
           )}
         >
-          <GenericCombobox<{ id: number; val: string }>
+          <GenericCombobox<{ id: number; val: string }, string>
             placeholder="Email adresy organizacii pre staze..."
             control={methods.control}
             name="emails"
@@ -75,7 +75,7 @@ export default function RegistrationInviteForm({
             defaultOptions={[]}
             getOptionLabel={(opt) => opt.val}
             renderOption={(opt, props) => <span>{opt.val}</span>}
-            getOptionValue={(opt) => opt?.val}
+            getOptionValue={(opt) => opt?.val ?? ""}
           />
 
           <Button

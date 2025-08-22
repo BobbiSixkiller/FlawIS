@@ -61,7 +61,8 @@ export default function Select({
         <ListboxButton
           {...field}
           className={cn([
-            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:bg-gray-800 focus:ring-2 sm:text-sm/6",
+            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
+            "dark:bg-gray-800 dark:ring-gray-600 dark:disabled:bg-gray-900 dark:disabled:ring-gray-700 dark:disabled:text-slate-500 dark:text-white/85",
             multiple ? "" : "py-1.5",
             fieldState.error
               ? "ring-red-500 focus:ring-red-500 dark:ring-red-500 dark:focus:ring-red-500"

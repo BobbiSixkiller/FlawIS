@@ -159,6 +159,12 @@ export class RegisterUserInput extends UserInput {
 export class OrganizationEmailsInput {
   @Field(() => [String])
   @ArrayNotEmpty()
-  @IsEmail({}, { each: true })
+  @IsEmail(
+    {},
+    {
+      each: true,
+      message: () => "Niektora email adresa ma chybny format!",
+    }
+  )
   emails: string[];
 }

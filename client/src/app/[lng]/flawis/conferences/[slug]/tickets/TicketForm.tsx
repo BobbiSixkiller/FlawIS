@@ -106,8 +106,10 @@ export default function TicketForm({
           >
             {methods.formState.isSubmitting ? (
               <Spinner inverted />
-            ) : (
+            ) : ticket ? (
               "Aktualizovat listok"
+            ) : (
+              "Vytvorit listok"
             )}
           </Button>
         </form>

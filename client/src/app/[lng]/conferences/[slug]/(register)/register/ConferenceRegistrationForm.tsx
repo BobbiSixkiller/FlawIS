@@ -17,14 +17,13 @@ import Ticket from "./Ticket";
 import BillingInput from "./BillingInput";
 import { LocalizedTextarea } from "@/components/Textarea";
 import { Input } from "@/components/Input";
-import {
-  LocalizedMultipleInput,
-  MultipleInput,
-} from "@/components/MultipleInput";
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
 import { useMessageStore } from "@/stores/messageStore";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
+import GenericCombobox, {
+  LocalizedGenericCombobox,
+} from "@/components/GenericCombobox";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -98,7 +97,6 @@ export default function ConferenceRegistrationForm({
         );
 
         if (res.errors) {
-          console.log(res.errors);
           for (const [key, val] of Object.entries(res.errors)) {
             methods.setError(
               key as keyof (typeof methods)["formState"]["errors"],
@@ -132,9 +130,9 @@ export default function ConferenceRegistrationForm({
           }),
         })}
       >
-        {() => (
+        {(methods) => (
           <>
-            <BillingInput billings={billings} />
+            <BillingInput billings={billings} methods={methods} />
             <Input
               label={t("registration.billing.street", { ns: "conferences" })}
               name="billing.address.street"
@@ -174,6 +172,7 @@ export default function ConferenceRegistrationForm({
       >
         {(methods) => (
           <Ticket
+            control={methods.control}
             submission={submission}
             setSubmission={setSubmissionStep}
             tickets={conference.tickets.map((t) => ({
@@ -245,7 +244,8 @@ export default function ConferenceRegistrationForm({
                 })}
                 name={`submission.translations.${lng}.abstract`}
               />
-              <LocalizedMultipleInput
+              <LocalizedGenericCombobox
+                control={methods.control}
                 disabled={submission !== undefined}
                 lng={lng}
                 label={t("registration.submission.keywords.label", {
@@ -255,6 +255,12 @@ export default function ConferenceRegistrationForm({
                   ns: "conferences",
                 })}
                 name={`submission.translations.${lng}.keywords`}
+                multiple
+                allowCreateNewOptions
+                defaultOptions={[]}
+                getOptionLabel={(opt) => opt.val}
+                renderOption={(opt, props) => <span>{opt.val}</span>}
+                getOptionValue={(opt) => opt?.val}
               />
               <Select
                 control={methods.control}
@@ -267,7 +273,8 @@ export default function ConferenceRegistrationForm({
                   { name: PresentationLng.En, value: PresentationLng.En },
                 ]}
               />
-              <MultipleInput
+              <GenericCombobox<{ id: number; val: string }>
+                control={methods.control}
                 disabled={submission !== undefined}
                 label={t("registration.submission.authors.label", {
                   ns: "conferences",
@@ -276,6 +283,13 @@ export default function ConferenceRegistrationForm({
                   ns: "conferences",
                 })}
                 name="submission.authors"
+                lng={lng}
+                multiple
+                allowCreateNewOptions
+                defaultOptions={[]}
+                getOptionLabel={(opt) => opt.val}
+                renderOption={(opt, props) => <span>{opt.val}</span>}
+                getOptionValue={(opt) => opt?.val}
               />
             </>
           )}

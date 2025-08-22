@@ -46,7 +46,7 @@ export async function updateSubmission(id: string, data: SubmissionInput) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.updateSubmission.data.conference.slug}`,
+        `conferences:${data.updateSubmission.data.conference.slug}`,
       ],
     }
   );

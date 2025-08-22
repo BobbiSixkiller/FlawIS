@@ -19,11 +19,10 @@ type WithLocalizedInputProps = {
   control?: Control<any>;
 };
 
-export function withLocalizedInput<T extends WithLocalizedInputProps>(
-  InputComponent: ComponentType<T>
+export function withLocalizedInput<TProps extends WithLocalizedInputProps>(
+  InputComponent: ComponentType<TProps>
 ) {
-  return function WithLocalizedInputWrapper(props: T) {
-    console.log(props.errors);
+  return function WithLocalizedInputWrapper(props: TProps) {
     const [visible, setVisible] = useState(false);
 
     const localizedInputName = props.name.replace(

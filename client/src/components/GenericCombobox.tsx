@@ -21,6 +21,7 @@ import {
   ChevronUpIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { withLocalizedInput } from "./withLocalizedInput";
 
 export interface GenericComboboxProps<TOption, TValue = any> {
   lng: string;
@@ -31,6 +32,7 @@ export interface GenericComboboxProps<TOption, TValue = any> {
   disabled?: boolean;
   defaultOptions: TOption[];
   multiple?: boolean;
+  immediate?: boolean;
   fetchOptions?: (query: string) => Promise<TOption[]>;
   createOption?: (text: string) => Promise<TOption>;
   renderOption: (
@@ -40,6 +42,8 @@ export interface GenericComboboxProps<TOption, TValue = any> {
   getOptionLabel: (opt: TOption) => string;
   getOptionValue: (opt: TOption | null) => TValue;
   allowCreateNewOptions?: boolean;
+  onFocus?: () => void; // So withLocalizedInput HOC works
+  onClick?: () => void;
 }
 
 export default function GenericCombobox<
@@ -52,6 +56,7 @@ export default function GenericCombobox<
   placeholder,
   disabled,
   multiple,
+  immediate,
   defaultOptions,
   fetchOptions,
   createOption,
@@ -59,6 +64,7 @@ export default function GenericCombobox<
   getOptionLabel,
   getOptionValue,
   allowCreateNewOptions,
+  ...props
 }: GenericComboboxProps<TOption, TValue>) {
   const ref = useRef<HTMLDivElement>(null);
   const width = useWidth();
@@ -211,6 +217,7 @@ export default function GenericCombobox<
               displayValue={() => ""}
               className="bg-transparent border-none focus:ring-0 p-0 w-full"
               onKeyDown={handleKeyDown}
+              disabled={disabled}
             />
             {loading ? (
               <Spinner />
@@ -236,9 +243,8 @@ export default function GenericCombobox<
             top: Number(boxRect?.top) + Number(boxRect?.height),
           }}
           transition
-          // anchor="bottom start"
           className={cn([
-            "absolute mt-2 border transition duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
+            "absolute mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
             "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none",
             "dark:bg-gray-600 dark:text-white/85 dark:border-gray-700",
           ])}
@@ -266,7 +272,7 @@ export default function GenericCombobox<
   }
 
   return (
-    <Field>
+    <Field {...props}>
       {label && (
         <Label className="block mb-2 text-sm font-medium leading-6 text-gray-900 dark:text-white">
           {label}
@@ -276,6 +282,7 @@ export default function GenericCombobox<
       {multiple ? (
         <Combobox
           multiple
+          immediate={immediate}
           value={value}
           onChange={handleChange}
           onClose={() => setText("")}
@@ -284,6 +291,7 @@ export default function GenericCombobox<
         </Combobox>
       ) : (
         <Combobox
+          immediate={immediate}
           value={value[0] ?? undefined}
           onChange={handleChange}
           onClose={() => setText("")}
@@ -302,3 +310,5 @@ export default function GenericCombobox<
     </Field>
   );
 }
+
+export const LocalizedGenericCombobox = withLocalizedInput(GenericCombobox);

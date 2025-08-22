@@ -39,7 +39,7 @@ export async function addAttendee(
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.addAttendee.data.slug}`,
+        `conferences:${data.addAttendee.data.slug}`,
         "attendees",
       ],
     }
@@ -84,7 +84,7 @@ export async function acceptAuthorInvite(token: string) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.acceptAuthorInvite.data.conference.slug}`,
+        `conferences:${data.acceptAuthorInvite.data.conference.slug}`,
       ],
     },
     { token }
