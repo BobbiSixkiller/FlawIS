@@ -17,10 +17,7 @@ export default async function SectionsPage({
   params: Promise<{ lng: string; slug: string }>;
 }) {
   const { slug, lng } = await params;
-  const conference = await conferenceSections({
-    slug,
-    first: 1000,
-  });
+  const conference = await conferenceSections({ sort: [], slug, first: 1000 });
 
   const newSectionDialogId = "new-section";
 

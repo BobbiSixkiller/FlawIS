@@ -5,6 +5,13 @@ import {
   AttendeeArgs,
   AttendeeConnection,
 } from "../resolvers/types/attendee.types";
+import {
+  buildCursorFilter,
+  decodeCursor,
+  encodeCursor,
+  ensureIdSort,
+  SortField,
+} from "../resolvers/types/pagination.types";
 
 @Service()
 export class AttendeeRepository extends Repository<typeof Attendee> {
@@ -13,15 +20,39 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
   }
 
   async paginatedConferenceAttendees({
-    conferenceSlug,
     first,
     after,
-    sectionIds,
-    passive,
-  }: AttendeeArgs) {
+    filter,
+    sort,
+  }: AttendeeArgs): Promise<AttendeeConnection> {
+    // 1. Build Mongo sort object + sortFields for cursor filter
+    const sortFields: SortField[] = ensureIdSort(
+      sort.map((s) => ({
+        field: s.field as unknown as string,
+        direction: s.direction,
+      }))
+    );
+
+    const mongoSort = Object.fromEntries(
+      sortFields.map((f) => [f.field, f.direction])
+    );
+
+    // 2. Cursor filter
+    let cursorFilter = {};
+    if (after) {
+      const cursorValues = decodeCursor(after);
+      cursorFilter = buildCursorFilter(sortFields, cursorValues);
+    }
+
     const [connection] = await this.aggregate<AttendeeConnection>([
-      { $match: { "conference.slug": conferenceSlug } },
-      { $sort: { _id: -1 } },
+      {
+        $match: {
+          ...(filter?.conferenceSlug
+            ? { "conference.slug": filter.conferenceSlug }
+            : {}),
+        },
+      },
+      { $sort: mongoSort },
       {
         $lookup: {
           from: "submissions",
@@ -51,22 +82,22 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
             $cond: {
               if: {
                 $or: [
-                  { $ne: [{ $size: [sectionIds] }, 0] },
-                  { $eq: [passive, true] },
+                  { $ne: [{ $size: [filter?.sectionIds] }, 0] },
+                  { $eq: [filter?.passive, true] },
                 ],
               },
               then: {
                 $or: [
                   {
                     $and: [
-                      { $ne: [{ $size: [sectionIds] }, 0] }, // Include documents with specific submissions
+                      { $ne: [{ $size: [filter?.sectionIds] }, 0] }, // Include documents with specific submissions
                       {
                         $anyElementTrue: {
                           $map: {
                             input: "$submissions",
                             as: "nested",
                             in: {
-                              $in: ["$$nested.section", sectionIds], // Complex condition involving nested array
+                              $in: ["$$nested.section", filter?.sectionIds], // Complex condition involving nested array
                             },
                           },
                         },
@@ -75,7 +106,7 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
                   },
                   {
                     $and: [
-                      { $eq: [passive, true] }, // Include documents with empty submissions
+                      { $eq: [filter?.passive, true] }, // Include documents with empty submissions
                       { $eq: [{ $size: "$submissions" }, 0] },
                     ],
                   },
@@ -90,7 +121,7 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
         $facet: {
           data: [
             {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
+              $match: { ...cursorFilter },
             },
             { $limit: first || 20 },
             {
@@ -104,17 +135,7 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
             },
           ],
           hasNextPage: [
-            {
-              $match: {
-                $expr: {
-                  $cond: [
-                    { $eq: [after, null] },
-                    { $ne: ["$_id", null] },
-                    { $lt: ["$_id", after] },
-                  ],
-                },
-              },
-            },
+            { $match: { ...cursorFilter } },
             { $skip: first || 20 }, // skip paginated data
             { $limit: 1 }, // just to check if there's any element
           ],
@@ -143,13 +164,25 @@ export class AttendeeRepository extends Repository<typeof Attendee> {
       },
     ]);
 
-    return (
-      connection ?? {
-        edges: [],
-        totalCount: 0,
-        pageInfo: { hasNextPage: false },
-      }
-    );
+    // Now build edges with dynamic cursor generation
+    const edges = connection?.edges.map((edge: any) => {
+      const cursorFields = Object.fromEntries(
+        sortFields.map((f) => [f.field, edge.node[f.field]])
+      );
+
+      return {
+        node: edge.node,
+        cursor: encodeCursor(cursorFields),
+      };
+    });
+
+    const endCursor = edges.length ? edges[edges.length - 1].cursor : undefined;
+
+    return {
+      edges,
+      pageInfo: { ...connection.pageInfo, endCursor },
+      totalCount: connection.totalCount,
+    };
   }
 
   async textSearch(text: string, slug: string) {

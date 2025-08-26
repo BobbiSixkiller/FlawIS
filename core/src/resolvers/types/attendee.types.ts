@@ -1,5 +1,12 @@
 import { ObjectId } from "mongodb";
-import { ArgsType, Field, Float, InputType, ObjectType } from "type-graphql";
+import {
+  ArgsType,
+  Field,
+  Float,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
 import { Billing } from "../../entitites/Billing";
 import { IsString } from "class-validator";
 import { AddressInput, FlawBillingInput } from "./conference.types";
@@ -12,8 +19,18 @@ import { IMutationResponse } from "./interface.types";
 })
 export class AttendeeConnection extends CreateConnection(Attendee) {}
 
-@ArgsType()
-export class AttendeeArgs extends CreateArgs(Attendee) {
+export enum AttendeeSortableField {
+  NAME = "user.name",
+  ID = "_id",
+}
+
+registerEnumType(AttendeeSortableField, {
+  name: "AttendeeSortableField",
+  description: "Sortable enum definition for attendees query",
+});
+
+@InputType()
+export class AttendeeFilterInput {
   @Field()
   conferenceSlug: string;
 
@@ -22,6 +39,12 @@ export class AttendeeArgs extends CreateArgs(Attendee) {
 
   @Field(() => Boolean, { nullable: true })
   passive?: boolean;
+}
+
+@ArgsType()
+export class AttendeeArgs extends CreateArgs(Attendee, AttendeeSortableField) {
+  @Field(() => AttendeeFilterInput, { nullable: true })
+  filter?: AttendeeFilterInput;
 }
 
 @ObjectType({ implements: IMutationResponse })

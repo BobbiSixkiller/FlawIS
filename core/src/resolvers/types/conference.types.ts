@@ -1,4 +1,11 @@
-import { ArgsType, Field, InputType, Int, ObjectType } from "type-graphql";
+import {
+  ArgsType,
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import { IMutationResponse } from "./interface.types";
 import { Conference, ImportantDates, Ticket } from "../../entitites/Conference";
@@ -13,8 +20,20 @@ import { LocalesInput } from "./translation.types";
 })
 export class ConferenceConnection extends CreateConnection(Conference) {}
 
+export enum ConferenceSortableField {
+  ID = "_id",
+}
+
+registerEnumType(ConferenceSortableField, {
+  name: "ConferenceSortableField",
+  description: "Sortable enum definition for conferences query",
+});
+
 @ArgsType()
-export class ConferenceArgs extends CreateArgs(Conference) {}
+export class ConferenceArgs extends CreateArgs(
+  Conference,
+  ConferenceSortableField
+) {}
 
 @ObjectType({ implements: IMutationResponse })
 export class ConferenceMutationResponse extends IMutationResponse {

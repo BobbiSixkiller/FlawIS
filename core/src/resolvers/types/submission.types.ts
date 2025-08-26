@@ -1,6 +1,12 @@
 import { ArrayMinSize, IsEmail, IsMongoId, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
-import { ArgsType, Field, InputType, ObjectType } from "type-graphql";
+import {
+  ArgsType,
+  Field,
+  InputType,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
 import { LocalesInput } from "./translation.types";
 import Container from "typedi";
 import { I18nService } from "../../services/i18n.service";
@@ -17,13 +23,31 @@ export class SubmissionMutationResponse extends IMutationResponse {
 @ObjectType()
 export class SubmissionConnection extends CreateConnection(Submission) {}
 
-@ArgsType()
-export class SubmissionArgs extends CreateArgs(Submission) {
+@InputType()
+export class SubmissionFilterInput {
   @Field({ nullable: true })
   conferenceId?: ObjectId;
 
   @Field(() => [ObjectId], { nullable: true })
   sectionIds?: ObjectId[];
+}
+
+export enum SubmissionSortableField {
+  ID = "_id",
+}
+
+registerEnumType(SubmissionSortableField, {
+  name: "SubmissionSortableField",
+  description: "Sortable enum definition for submissions query",
+});
+
+@ArgsType()
+export class SubmissionArgs extends CreateArgs(
+  Submission,
+  SubmissionSortableField
+) {
+  @Field(() => SubmissionFilterInput, { nullable: true })
+  filter?: SubmissionFilterInput;
 }
 
 @InputType()

@@ -4,6 +4,7 @@ import {
   ArgsType,
   Authorized,
   ObjectType,
+  registerEnumType,
 } from "type-graphql";
 import {
   IsEmail,
@@ -23,10 +24,15 @@ import { I18nService } from "../../services/i18n.service";
 import Container from "typedi";
 import { AddressInput } from "./conference.types";
 
-@ObjectType({
-  description: "UserConnection type enabling cursor based pagination",
-})
-export class UserConnection extends CreateConnection(User) {}
+export enum UserSortableField {
+  NAME = "name",
+  ID = "_id",
+}
+
+registerEnumType(UserSortableField, {
+  name: "UserSortableField",
+  description: "Sortable enum definition for users query",
+});
 
 @InputType()
 export class UserFilterInput {
@@ -35,10 +41,15 @@ export class UserFilterInput {
 }
 
 @ArgsType()
-export class UserArgs extends CreateArgs(User) {
+export class UserArgs extends CreateArgs(User, UserSortableField) {
   @Field(() => UserFilterInput, { nullable: true })
   filter?: UserFilterInput;
 }
+
+@ObjectType({
+  description: "UserConnection type enabling cursor based pagination",
+})
+export class UserConnection extends CreateConnection(User) {}
 
 @ObjectType({ implements: IMutationResponse })
 export class UserMutationResponse extends IMutationResponse {

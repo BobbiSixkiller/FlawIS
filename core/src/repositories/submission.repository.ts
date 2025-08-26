@@ -5,6 +5,13 @@ import {
   SubmissionArgs,
   SubmissionConnection,
 } from "../resolvers/types/submission.types";
+import {
+  buildCursorFilter,
+  decodeCursor,
+  encodeCursor,
+  ensureIdSort,
+  SortField,
+} from "../resolvers/types/pagination.types";
 
 @Service()
 export class SubmissionRepository extends Repository<typeof Submission> {
@@ -15,31 +22,50 @@ export class SubmissionRepository extends Repository<typeof Submission> {
   async paginatedSubmissions({
     first,
     after,
-    conferenceId,
-    sectionIds,
-  }: SubmissionArgs) {
+    filter,
+    sort,
+  }: SubmissionArgs): Promise<SubmissionConnection> {
+    // 1. Build Mongo sort object + sortFields for cursor filter
+    const sortFields: SortField[] = ensureIdSort(
+      sort.map((s) => ({
+        field: s.field as unknown as string,
+        direction: s.direction,
+      }))
+    );
+
+    const mongoSort = Object.fromEntries(
+      sortFields.map((f) => [f.field, f.direction])
+    );
+
+    // 2. Cursor filter
+    let cursorFilter = {};
+    if (after) {
+      const cursorValues = decodeCursor(after);
+      cursorFilter = buildCursorFilter(sortFields, cursorValues);
+    }
+
     const [connection] = await this.aggregate<SubmissionConnection>([
       {
         $match: {
-          ...(conferenceId ? { conference: conferenceId } : {}),
-          ...(sectionIds && sectionIds.length > 0
-            ? { section: { $in: sectionIds } }
+          ...(filter?.conferenceId ? { conference: filter.conferenceId } : {}),
+          ...(filter?.sectionIds && filter.sectionIds.length > 0
+            ? { section: { $in: filter.sectionIds } }
             : {}),
         },
       },
-      { $sort: { _id: -1 } },
+      { $sort: mongoSort },
       {
         $facet: {
           data: [
             {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
+              $match: { ...cursorFilter },
             },
             { $limit: first || 20 },
             { $addFields: { id: "$_id" } },
           ],
           hasNextPage: [
             {
-              $match: { ...(after ? { _id: { $lt: after } } : {}) },
+              $match: { ...cursorFilter },
             },
             { $skip: first || 20 }, // skip paginated data
             { $limit: 1 }, // just to check if there's any element
@@ -67,12 +93,24 @@ export class SubmissionRepository extends Repository<typeof Submission> {
       },
     ]);
 
-    return (
-      connection ?? {
-        edges: [],
-        totalCount: 0,
-        pageInfo: { hasNextPage: false },
-      }
-    );
+    // Now build edges with dynamic cursor generation
+    const edges = connection?.edges.map((edge: any) => {
+      const cursorFields = Object.fromEntries(
+        sortFields.map((f) => [f.field, edge.node[f.field]])
+      );
+
+      return {
+        node: edge.node,
+        cursor: encodeCursor(cursorFields),
+      };
+    });
+
+    const endCursor = edges.length ? edges[edges.length - 1].cursor : undefined;
+
+    return {
+      edges,
+      pageInfo: { ...connection.pageInfo, endCursor },
+      totalCount: connection.totalCount,
+    };
   }
 }

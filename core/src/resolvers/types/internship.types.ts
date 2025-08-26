@@ -1,4 +1,11 @@
-import { ArgsType, Field, InputType, Int, ObjectType } from "type-graphql";
+import {
+  ArgsType,
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import { Intern, Internship, Status } from "../../entitites/Internship";
 import { IMutationResponse } from "./interface.types";
@@ -33,6 +40,17 @@ export class InternshipConnection extends CreateConnection(Internship) {
   organizations: OrganizationCount[];
 }
 
+export enum InternshipSortableField {
+  HAS_APPLICATION = "hasApplication",
+  CREARTED_AT = "created_at",
+  ORGANIZATION = "organization",
+}
+
+registerEnumType(InternshipSortableField, {
+  name: "InternshipSortableField",
+  description: "Sortable enum definition for interships query",
+});
+
 @InputType()
 export class InternshipFilterInput {
   @Field(() => ObjectId, { nullable: true })
@@ -52,7 +70,10 @@ export class InternshipFilterInput {
 }
 
 @ArgsType()
-export class InternshipArgs extends CreateArgs(Internship) {
+export class InternshipArgs extends CreateArgs(
+  Internship,
+  InternshipSortableField
+) {
   @Field(() => InternshipFilterInput, { nullable: true })
   filter?: InternshipFilterInput;
 }
@@ -68,8 +89,8 @@ export class InternshipMutationResponse extends IMutationResponse {
 })
 export class InternConnection extends CreateConnection(Intern) {}
 
-@ArgsType()
-export class InternArgs extends CreateArgs(Intern) {
+@InputType()
+export class InternFilterInput {
   @Field(() => ObjectId, { nullable: true })
   internship?: ObjectId;
 
@@ -84,6 +105,22 @@ export class InternArgs extends CreateArgs(Intern) {
 
   @Field(() => [Status], { nullable: true })
   status?: Status[];
+}
+
+export enum InternSortableField {
+  NAME = "user.name",
+  ID = "_id",
+}
+
+registerEnumType(InternSortableField, {
+  name: "InternSortableField",
+  description: "Sortable enum definition for interns query",
+});
+
+@ArgsType()
+export class InternArgs extends CreateArgs(Intern, InternSortableField) {
+  @Field(() => InternFilterInput, { nullable: true })
+  filter?: InternFilterInput;
 }
 
 @ObjectType({ implements: IMutationResponse })

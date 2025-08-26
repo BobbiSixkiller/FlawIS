@@ -1,5 +1,10 @@
-query users($after: ObjectId, $first: Int, $filter: UserFilterInput) {
-  users(after: $after, first: $first, filter: $filter) {
+query users(
+  $after: String
+  $first: Int
+  $filter: UserFilterInput
+  $sort: [UserSortInput]!
+) {
+  users(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor

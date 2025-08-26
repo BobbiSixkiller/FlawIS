@@ -37,19 +37,12 @@ fragment Attendee on Attendee {
 }
 
 query attendees(
-  $after: ObjectId
+  $after: String
   $first: Int
-  $conferenceSlug: String!
-  $passive: Boolean
-  $sectionIds: [ObjectId!]
+  $filter: AttendeeFilterInput
+  $sort: [AttendeeSortInput]!
 ) {
-  attendees(
-    after: $after
-    first: $first
-    conferenceSlug: $conferenceSlug
-    passive: $passive
-    sectionIds: $sectionIds
-  ) {
+  attendees(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor

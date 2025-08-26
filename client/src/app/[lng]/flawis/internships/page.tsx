@@ -3,7 +3,11 @@ import { getInternships } from "../../internships/actions";
 import ListInternships from "../../internships/ListInternships";
 import { getAcademicYear } from "@/utils/helpers";
 import AcademicYearSelect from "../../internships/AcademicYearSelect";
-import { InternshipFilterInput } from "@/lib/graphql/generated/graphql";
+import {
+  InternshipSortableField,
+  InternshipsQueryVariables,
+  SortDirection,
+} from "@/lib/graphql/generated/graphql";
 import FilterDropdown from "@/components/FilterDropdown";
 import ExportButton from "@/components/ExportButton";
 
@@ -19,12 +23,26 @@ export default async function InternshipsPage({
   const { t } = await translate(lng, "internships");
 
   const { academicYear } = getAcademicYear();
-  const filter: InternshipFilterInput = {
-    academicYear: queryParams?.academicYear ?? academicYear, // Default to current academic year
-    organizations: queryParams?.organization,
+
+  const vars: InternshipsQueryVariables = {
+    sort: [
+      {
+        field: InternshipSortableField.CreartedAt,
+        direction: SortDirection.Desc,
+      },
+      {
+        field: InternshipSortableField.Organization,
+        direction: SortDirection.Asc,
+      },
+    ],
+
+    filter: {
+      academicYear: queryParams?.academicYear ?? academicYear, // Default to current academic year
+      organizations: queryParams?.organization,
+    },
   };
 
-  const initialData = await getInternships({ filter });
+  const initialData = await getInternships(vars);
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,9 +79,7 @@ export default async function InternshipsPage({
         </div>
       </div>
 
-      {initialData && (
-        <ListInternships initialData={initialData} filter={{ filter }} />
-      )}
+      {initialData && <ListInternships initialData={initialData} vars={vars} />}
     </div>
   );
 }

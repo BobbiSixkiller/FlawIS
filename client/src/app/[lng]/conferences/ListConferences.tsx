@@ -100,16 +100,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListConferences({
   initialData,
-  filter,
+  vars,
 }: {
   initialData: Connection<ConferenceFragment & {}>;
-  filter: ConferencesQueryVariables;
+  vars: ConferencesQueryVariables;
 }) {
   const InfiniteScrollListUsers = withInfiniteScroll<
     ConferenceFragment,
     ConferencesQueryVariables
   >({
-    filter,
+    vars,
     getData: getConferences,
     initialData,
     Container,

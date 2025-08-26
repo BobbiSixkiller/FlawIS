@@ -80,8 +80,14 @@ export type AttendeeConnection = {
 
 export type AttendeeEdge = {
   __typename?: 'AttendeeEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: Attendee;
+};
+
+export type AttendeeFilterInput = {
+  conferenceSlug: Scalars['String']['input'];
+  passive?: InputMaybe<Scalars['Boolean']['input']>;
+  sectionIds?: Array<InputMaybe<Scalars['ObjectId']['input']>>;
 };
 
 /** Conference registration input type */
@@ -99,9 +105,20 @@ export type AttendeeMutationResponse = IMutationResponse & {
 
 export type AttendeePageInfo = {
   __typename?: 'AttendeePageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type AttendeeSortInput = {
+  direction: SortDirection;
+  field: AttendeeSortableField;
+};
+
+/** Sortable enum definition for attendees query */
+export enum AttendeeSortableField {
+  Id = 'ID',
+  Name = 'NAME'
+}
 
 /** Billing information */
 export type Billing = {
@@ -139,7 +156,7 @@ export type ConferenceConnection = {
 
 export type ConferenceEdge = {
   __typename?: 'ConferenceEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: Conference;
 };
 
@@ -159,9 +176,19 @@ export type ConferenceMutationResponse = IMutationResponse & {
 
 export type ConferencePageInfo = {
   __typename?: 'ConferencePageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type ConferenceSortInput = {
+  direction: SortDirection;
+  field: ConferenceSortableField;
+};
+
+/** Sortable enum definition for conferences query */
+export enum ConferenceSortableField {
+  Id = 'ID'
+}
 
 export type ConferenceTranslation = {
   __typename?: 'ConferenceTranslation';
@@ -195,19 +222,6 @@ export type Course = {
   updatedAt: Scalars['DateTimeISO']['output'];
 };
 
-export type CourseConnection = {
-  __typename?: 'CourseConnection';
-  edges: Array<Maybe<CourseEdge>>;
-  pageInfo: CoursePageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
-export type CourseEdge = {
-  __typename?: 'CourseEdge';
-  cursor: Scalars['ObjectId']['output'];
-  node: Course;
-};
-
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
   description: Scalars['String']['input'];
@@ -219,12 +233,6 @@ export type CourseMutationResponse = IMutationResponse & {
   __typename?: 'CourseMutationResponse';
   data: Course;
   message: Scalars['String']['output'];
-};
-
-export type CoursePageInfo = {
-  __typename?: 'CoursePageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
-  hasNextPage: Scalars['Boolean']['output'];
 };
 
 export type DatesInput = {
@@ -295,8 +303,16 @@ export type InternConnection = {
 
 export type InternEdge = {
   __typename?: 'InternEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: Intern;
+};
+
+export type InternFilterInput = {
+  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  internship?: InputMaybe<Scalars['ObjectId']['input']>;
+  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  status?: InputMaybe<Array<Status>>;
+  user?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 export type InternMutationResponse = IMutationResponse & {
@@ -307,9 +323,20 @@ export type InternMutationResponse = IMutationResponse & {
 
 export type InternPageInfo = {
   __typename?: 'InternPageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type InternSortInput = {
+  direction: SortDirection;
+  field: InternSortableField;
+};
+
+/** Sortable enum definition for interns query */
+export enum InternSortableField {
+  Id = 'ID',
+  Name = 'NAME'
+}
 
 /** Internship object type */
 export type Internship = {
@@ -338,7 +365,7 @@ export type InternshipConnection = {
 
 export type InternshipEdge = {
   __typename?: 'InternshipEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: Internship;
 };
 
@@ -362,9 +389,21 @@ export type InternshipMutationResponse = IMutationResponse & {
 
 export type InternshipPageInfo = {
   __typename?: 'InternshipPageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type InternshipSortInput = {
+  direction: SortDirection;
+  field: InternshipSortableField;
+};
+
+/** Sortable enum definition for interships query */
+export enum InternshipSortableField {
+  CreartedAt = 'CREARTED_AT',
+  HasApplication = 'HAS_APPLICATION',
+  Organization = 'ORGANIZATION'
+}
 
 /** Invoice entity subdocument type */
 export type Invoice = {
@@ -685,7 +724,6 @@ export type Query = {
   conference: Conference;
   conferences: ConferenceConnection;
   course: Course;
-  courses: CourseConnection;
   forgotPassword: Scalars['String']['output'];
   intern: Intern;
   interns: InternConnection;
@@ -709,11 +747,10 @@ export type QueryAttendeeArgs = {
 
 
 export type QueryAttendeesArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
-  conferenceSlug: Scalars['String']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<AttendeeFilterInput>;
   first?: Scalars['Int']['input'];
-  passive?: InputMaybe<Scalars['Boolean']['input']>;
-  sectionIds?: Array<InputMaybe<Scalars['ObjectId']['input']>>;
+  sort: Array<InputMaybe<AttendeeSortInput>>;
 };
 
 
@@ -728,19 +765,14 @@ export type QueryConferenceArgs = {
 
 
 export type QueryConferencesArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: Scalars['Int']['input'];
+  sort: Array<InputMaybe<ConferenceSortInput>>;
 };
 
 
 export type QueryCourseArgs = {
   id: Scalars['ObjectId']['input'];
-};
-
-
-export type QueryCoursesArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
-  first?: Scalars['Int']['input'];
 };
 
 
@@ -755,13 +787,10 @@ export type QueryInternArgs = {
 
 
 export type QueryInternsArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
-  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<InternFilterInput>;
   first?: Scalars['Int']['input'];
-  internship?: InputMaybe<Scalars['ObjectId']['input']>;
-  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  status?: InputMaybe<Array<Status>>;
-  user?: InputMaybe<Scalars['ObjectId']['input']>;
+  sort: Array<InputMaybe<InternSortInput>>;
 };
 
 
@@ -771,9 +800,10 @@ export type QueryInternshipArgs = {
 
 
 export type QueryInternshipsArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<InternshipFilterInput>;
   first?: Scalars['Int']['input'];
+  sort: Array<InputMaybe<InternshipSortInput>>;
 };
 
 
@@ -809,9 +839,10 @@ export type QueryUserArgs = {
 
 
 export type QueryUsersArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<UserFilterInput>;
   first?: Scalars['Int']['input'];
+  sort: Array<InputMaybe<UserSortInput>>;
 };
 
 /** New user input data */
@@ -842,10 +873,10 @@ export type Section = {
 
 /** Conference's section entity model type */
 export type SectionSubmissionsArgs = {
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
-  conferenceId?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<SubmissionFilterInput>;
   first?: Scalars['Int']['input'];
-  sectionIds?: InputMaybe<Array<Scalars['ObjectId']['input']>>;
+  sort: Array<InputMaybe<SubmissionSortInput>>;
 };
 
 /** Section input type */
@@ -876,6 +907,12 @@ export type SectionTranslations = {
   name: Scalars['String']['output'];
   topic: Scalars['String']['output'];
 };
+
+/** Ascending/descending direction of the sort field */
+export enum SortDirection {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 /** Intern status */
 export enum Status {
@@ -930,8 +967,13 @@ export type SubmissionConnection = {
 
 export type SubmissionEdge = {
   __typename?: 'SubmissionEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: Submission;
+};
+
+export type SubmissionFilterInput = {
+  conferenceId?: InputMaybe<Scalars['ObjectId']['input']>;
+  sectionIds?: InputMaybe<Array<Scalars['ObjectId']['input']>>;
 };
 
 export type SubmissionInput = {
@@ -951,9 +993,19 @@ export type SubmissionMutationResponse = IMutationResponse & {
 
 export type SubmissionPageInfo = {
   __typename?: 'SubmissionPageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type SubmissionSortInput = {
+  direction: SortDirection;
+  field: SubmissionSortableField;
+};
+
+/** Sortable enum definition for submissions query */
+export enum SubmissionSortableField {
+  Id = 'ID'
+}
 
 export type SubmissionTranslation = {
   __typename?: 'SubmissionTranslation';
@@ -1037,7 +1089,7 @@ export type UserConnection = {
 
 export type UserEdge = {
   __typename?: 'UserEdge';
-  cursor: Scalars['ObjectId']['output'];
+  cursor: Scalars['String']['output'];
   node: User;
 };
 
@@ -1067,9 +1119,20 @@ export type UserMutationResponse = IMutationResponse & {
 
 export type UserPageInfo = {
   __typename?: 'UserPageInfo';
-  endCursor?: Maybe<Scalars['ObjectId']['output']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
 };
+
+export type UserSortInput = {
+  direction: SortDirection;
+  field: UserSortableField;
+};
+
+/** Sortable enum definition for users query */
+export enum UserSortableField {
+  Id = 'ID',
+  Name = 'NAME'
+}
 
 export type UserStub = {
   __typename?: 'UserStub';
@@ -1083,15 +1146,14 @@ export type UserStubUnion = User | UserStub;
 export type AttendeeFragment = { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, address?: { __typename?: 'Address', street: string, city: string, postal: string, country: string } | null, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } | { __typename: 'UserStub', id: any, name: string, email: string }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', logoUrlEnv: string } } } };
 
 export type AttendeesQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  conferenceSlug: Scalars['String']['input'];
-  passive?: InputMaybe<Scalars['Boolean']['input']>;
-  sectionIds?: InputMaybe<Array<Scalars['ObjectId']['input']> | Scalars['ObjectId']['input']>;
+  filter?: InputMaybe<AttendeeFilterInput>;
+  sort: Array<InputMaybe<AttendeeSortInput>> | InputMaybe<AttendeeSortInput>;
 }>;
 
 
-export type AttendeesQuery = { __typename?: 'Query', attendees: { __typename?: 'AttendeeConnection', totalCount: number, edges: Array<{ __typename?: 'AttendeeEdge', cursor: any, node: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, address?: { __typename?: 'Address', street: string, city: string, postal: string, country: string } | null, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } | { __typename: 'UserStub', id: any, name: string, email: string }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', logoUrlEnv: string } } } } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type AttendeesQuery = { __typename?: 'Query', attendees: { __typename?: 'AttendeeConnection', totalCount: number, edges: Array<{ __typename?: 'AttendeeEdge', cursor: string, node: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, address?: { __typename?: 'Address', street: string, city: string, postal: string, country: string } | null, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } | { __typename: 'UserStub', id: any, name: string, email: string }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', logoUrlEnv: string } } } } } | null>, pageInfo: { __typename?: 'AttendeePageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type AttendeeQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1205,12 +1267,13 @@ export type ConferenceFragment = { __typename?: 'Conference', id: any, slug: str
 export type ConferenceRegistrationFragment = { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } };
 
 export type ConferencesQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  sort: Array<InputMaybe<ConferenceSortInput>> | InputMaybe<ConferenceSortInput>;
 }>;
 
 
-export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', totalCount: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: any, node: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type ConferencesQuery = { __typename?: 'Query', conferences: { __typename?: 'ConferenceConnection', totalCount: number, edges: Array<{ __typename?: 'ConferenceEdge', cursor: string, node: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } } | null>, pageInfo: { __typename?: 'ConferencePageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type ConferenceQueryVariables = Exact<{
   slug: Scalars['String']['input'];
@@ -1219,16 +1282,17 @@ export type ConferenceQueryVariables = Exact<{
 
 export type ConferenceQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, slug: string, createdAt: any, updatedAt: any, sections: Array<{ __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }>, tickets: Array<{ __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }>, attending?: { __typename?: 'Attendee', id: any, createdAt: any, updatedAt: any, user: { __typename: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, address?: { __typename?: 'Address', street: string, city: string, postal: string, country: string } | null, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> } | { __typename: 'UserStub', id: any, name: string, email: string }, invoice: { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } }, ticket: { __typename?: 'Ticket', id: any, online: boolean, price: number, withSubmission: boolean, translations: { __typename?: 'TicketTranslation', en: { __typename?: 'TicketTranslations', name: string, description: string }, sk: { __typename?: 'TicketTranslations', name: string, description: string } } }, submissions: Array<{ __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } }>, conference: { __typename?: 'Conference', slug: string, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', logoUrlEnv: string } } } } | null, translations: { __typename?: 'ConferenceTranslation', sk: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string }, en: { __typename?: 'ConferenceTranslations', name: string, logoUrlEnv: string } }, dates: { __typename?: 'ImportantDates', start: any, end: any, regEnd?: any | null, submissionDeadline?: any | null } } };
 
-export type SubmissionFilesFragment = { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: any, node: { __typename?: 'Submission', id: any, fileUrl?: string | null } } | null> };
+export type SubmissionFilesFragment = { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: string, node: { __typename?: 'Submission', id: any, fileUrl?: string | null } } | null> };
 
 export type ConferenceSectionsQueryVariables = Exact<{
   slug: Scalars['String']['input'];
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
+  sort: Array<InputMaybe<SubmissionSortInput>> | InputMaybe<SubmissionSortInput>;
 }>;
 
 
-export type ConferenceSectionsQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, sections: Array<{ __typename?: 'Section', id: string, submissions: { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: any, node: { __typename?: 'Submission', id: any, fileUrl?: string | null } } | null> }, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }> } };
+export type ConferenceSectionsQuery = { __typename?: 'Query', conference: { __typename?: 'Conference', id: any, sections: Array<{ __typename?: 'Section', id: string, submissions: { __typename?: 'SubmissionConnection', totalCount: number, edges: Array<{ __typename?: 'SubmissionEdge', cursor: string, node: { __typename?: 'Submission', id: any, fileUrl?: string | null } } | null> }, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } }> } };
 
 export type TextSearchConferenceQueryVariables = Exact<{
   text: Scalars['String']['input'];
@@ -1318,13 +1382,14 @@ export type CourseFragment = { __typename?: 'Course', id: any, name: string, des
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type InternshipsQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   filter?: InputMaybe<InternshipFilterInput>;
+  sort: Array<InputMaybe<InternshipSortInput>> | InputMaybe<InternshipSortInput>;
 }>;
 
 
-export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, organizations: Array<{ __typename?: 'OrganizationCount', organization: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: any, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: any | null } } };
+export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, organizations: Array<{ __typename?: 'OrganizationCount', organization: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: string, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type InternshipQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1361,17 +1426,14 @@ export type InternsExportQueryVariables = Exact<{ [key: string]: never; }>;
 export type InternsExportQuery = { __typename?: 'Query', internsExport: Array<{ __typename?: 'Intern', organization: string, status: Status, user: { __typename?: 'StudentReference', email: string, name: string, studyProgramme: StudyProgramme, telephone: string } } | null> };
 
 export type InternsQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  user?: InputMaybe<Scalars['ObjectId']['input']>;
-  startDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
-  internship?: InputMaybe<Scalars['ObjectId']['input']>;
-  status?: InputMaybe<Array<Status> | Status>;
+  filter?: InputMaybe<InternFilterInput>;
+  sort: Array<InputMaybe<InternSortInput>> | InputMaybe<InternSortInput>;
 }>;
 
 
-export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: any, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: string, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type InternQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1464,13 +1526,14 @@ export type AcceptAuthorInviteMutationVariables = Exact<{ [key: string]: never; 
 export type AcceptAuthorInviteMutation = { __typename?: 'Mutation', acceptAuthorInvite: { __typename?: 'SubmissionMutationResponse', message: string, data: { __typename?: 'Submission', id: any, presentationLng?: PresentationLng | null, fileUrl?: string | null, createdAt: any, updatedAt: any, translations: { __typename?: 'SubmissionTranslation', sk: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> }, en: { __typename?: 'SubmissionTranslationContent', name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ __typename?: 'User', id: any, name: string, email: string }>, conference: { __typename?: 'Conference', id: any, slug: string }, section: { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } } } } };
 
 export type UsersQueryVariables = Exact<{
-  after?: InputMaybe<Scalars['ObjectId']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   filter?: InputMaybe<UserFilterInput>;
+  sort: Array<InputMaybe<UserSortInput>> | InputMaybe<UserSortInput>;
 }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', totalCount: number, edges: Array<{ __typename?: 'UserEdge', cursor: any, node: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, verified: boolean, access: Array<Access>, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'UserPageInfo', endCursor?: any | null, hasNextPage: boolean } } };
+export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', totalCount: number, edges: Array<{ __typename?: 'UserEdge', cursor: string, node: { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, verified: boolean, access: Array<Access>, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'UserPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type UserQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -2026,14 +2089,8 @@ export const ApplicationFragmentDoc = new TypedDocumentString(`
   country
 }`, {"fragmentName":"Application"}) as unknown as TypedDocumentString<ApplicationFragment, unknown>;
 export const AttendeesDocument = new TypedDocumentString(`
-    query attendees($after: ObjectId, $first: Int, $conferenceSlug: String!, $passive: Boolean, $sectionIds: [ObjectId!]) {
-  attendees(
-    after: $after
-    first: $first
-    conferenceSlug: $conferenceSlug
-    passive: $passive
-    sectionIds: $sectionIds
-  ) {
+    query attendees($after: String, $first: Int, $filter: AttendeeFilterInput, $sort: [AttendeeSortInput]!) {
+  attendees(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor
@@ -3197,8 +3254,8 @@ export const ImpersonateDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<ImpersonateQuery, ImpersonateQueryVariables>;
 export const ConferencesDocument = new TypedDocumentString(`
-    query conferences($after: ObjectId, $first: Int) {
-  conferences(after: $after, first: $first) {
+    query conferences($after: String, $first: Int, $sort: [ConferenceSortInput]!) {
+  conferences(after: $after, first: $first, sort: $sort) {
     totalCount
     edges {
       cursor
@@ -3435,12 +3492,12 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<ConferenceQuery, ConferenceQueryVariables>;
 export const ConferenceSectionsDocument = new TypedDocumentString(`
-    query conferenceSections($slug: String!, $after: ObjectId, $first: Int) {
+    query conferenceSections($slug: String!, $after: String, $first: Int, $sort: [SubmissionSortInput]!) {
   conference(slug: $slug) {
     id
     sections {
       ...Section
-      submissions(first: $first, after: $after) {
+      submissions(first: $first, after: $after, sort: $sort) {
         ...SubmissionFiles
       }
     }
@@ -3612,8 +3669,8 @@ export const AddAttendeeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
-    query internships($after: ObjectId, $first: Int, $filter: InternshipFilterInput) {
-  internships(after: $after, first: $first, filter: $filter) {
+    query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
+  internships(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     academicYears {
       academicYear
@@ -3749,16 +3806,8 @@ export const InternsExportDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<InternsExportQuery, InternsExportQueryVariables>;
 export const InternsDocument = new TypedDocumentString(`
-    query interns($after: ObjectId, $first: Int, $user: ObjectId, $startDate: DateTimeISO, $endDate: DateTimeISO, $internship: ObjectId, $status: [Status!]) {
-  interns(
-    after: $after
-    first: $first
-    internship: $internship
-    user: $user
-    startDate: $startDate
-    endDate: $endDate
-    status: $status
-  ) {
+    query interns($after: String, $first: Int, $filter: InternFilterInput, $sort: [InternSortInput]!) {
+  interns(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor
@@ -4215,8 +4264,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<AcceptAuthorInviteMutation, AcceptAuthorInviteMutationVariables>;
 export const UsersDocument = new TypedDocumentString(`
-    query users($after: ObjectId, $first: Int, $filter: UserFilterInput) {
-  users(after: $after, first: $first, filter: $filter) {
+    query users($after: String, $first: Int, $filter: UserFilterInput, $sort: [UserSortInput]!) {
+  users(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor

@@ -5,7 +5,6 @@ import { CourseService } from "../services/course.service";
 import { I18nService } from "../services/i18n.service";
 import { Course } from "../entitites/Course";
 import {
-  CourseArgs,
   CourseConnection,
   CourseInput,
   CourseMutationResponse,
@@ -24,10 +23,10 @@ export class CourseResolver {
     return await this.courseService.getCourse(id);
   }
 
-  @Query(() => CourseConnection)
-  async courses(@Args() args: CourseArgs) {
-    return await this.courseService.getPaginatedCourses(args);
-  }
+  // @Query(() => CourseConnection)
+  // async courses(@Args() args: CourseArgs) {
+  //   return await this.courseService.getPaginatedCourses(args);
+  // }
 
   @Mutation(() => CourseMutationResponse)
   async createCourse(@Arg("data") data: CourseInput) {

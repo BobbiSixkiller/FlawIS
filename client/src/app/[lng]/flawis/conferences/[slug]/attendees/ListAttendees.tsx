@@ -61,16 +61,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListAttendees({
   initialData,
-  filter,
+  vars,
 }: {
   initialData: Connection<AttendeeFragment>;
-  filter: AttendeesQueryVariables;
+  vars: AttendeesQueryVariables;
 }) {
   const InfiniteScrollListAttendees = withInfiniteScroll<
     AttendeeFragment,
     AttendeesQueryVariables
   >({
-    filter,
+    vars,
     getData: getAttendees,
     initialData,
     ListItem,
