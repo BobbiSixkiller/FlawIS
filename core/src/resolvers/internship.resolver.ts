@@ -129,10 +129,13 @@ export class InternshipResolver {
   ) {
     const { totalCount } = await this.internService.getInterns({
       first: 1000,
-      internship: id,
-      status: user?.access.includes(Access.Organization)
-        ? [Status.Eligible, Status.Accepted, Status.Rejected] // This is because students have to be checked by Admin first and then reviewed by org
-        : undefined,
+      filter: {
+        internship: id,
+        status: user?.access.includes(Access.Organization)
+          ? [Status.Eligible, Status.Accepted, Status.Rejected] // This is because students have to be checked by Admin first and then reviewed by org
+          : undefined,
+      },
+      sort: [],
     });
 
     return totalCount;

@@ -58,8 +58,14 @@ type AttendeeConnection {
 }
 
 type AttendeeEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: Attendee!
+}
+
+input AttendeeFilterInput {
+  conferenceSlug: String!
+  passive: Boolean
+  sectionIds: [ObjectId]! = []
 }
 
 """Conference registration input type"""
@@ -75,8 +81,19 @@ type AttendeeMutationResponse implements IMutationResponse {
 }
 
 type AttendeePageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input AttendeeSortInput {
+  direction: SortDirection!
+  field: AttendeeSortableField!
+}
+
+"""Sortable enum definition for attendees query"""
+enum AttendeeSortableField {
+  ID
+  NAME
 }
 
 """Billing information"""
@@ -111,7 +128,7 @@ type ConferenceConnection {
 }
 
 type ConferenceEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: Conference!
 }
 
@@ -129,8 +146,18 @@ type ConferenceMutationResponse implements IMutationResponse {
 }
 
 type ConferencePageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input ConferenceSortInput {
+  direction: SortDirection!
+  field: ConferenceSortableField!
+}
+
+"""Sortable enum definition for conferences query"""
+enum ConferenceSortableField {
+  ID
 }
 
 type ConferenceTranslation {
@@ -163,17 +190,6 @@ type Course {
   updatedAt: DateTimeISO!
 }
 
-type CourseConnection {
-  edges: [CourseEdge]!
-  pageInfo: CoursePageInfo!
-  totalCount: Int!
-}
-
-type CourseEdge {
-  cursor: ObjectId!
-  node: Course!
-}
-
 input CourseInput {
   billing: FlawBillingInput
   description: String!
@@ -184,11 +200,6 @@ input CourseInput {
 type CourseMutationResponse implements IMutationResponse {
   data: Course!
   message: String!
-}
-
-type CoursePageInfo {
-  endCursor: ObjectId
-  hasNextPage: Boolean!
 }
 
 """
@@ -259,8 +270,16 @@ type InternConnection {
 }
 
 type InternEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: Intern!
+}
+
+input InternFilterInput {
+  endDate: DateTimeISO
+  internship: ObjectId
+  startDate: DateTimeISO
+  status: [Status!]
+  user: ObjectId
 }
 
 type InternMutationResponse implements IMutationResponse {
@@ -269,8 +288,19 @@ type InternMutationResponse implements IMutationResponse {
 }
 
 type InternPageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input InternSortInput {
+  direction: SortDirection!
+  field: InternSortableField!
+}
+
+"""Sortable enum definition for interns query"""
+enum InternSortableField {
+  ID
+  NAME
 }
 
 """Internship object type"""
@@ -298,7 +328,7 @@ type InternshipConnection {
 }
 
 type InternshipEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: Internship!
 }
 
@@ -320,8 +350,20 @@ type InternshipMutationResponse implements IMutationResponse {
 }
 
 type InternshipPageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input InternshipSortInput {
+  direction: SortDirection!
+  field: InternshipSortableField!
+}
+
+"""Sortable enum definition for interships query"""
+enum InternshipSortableField {
+  CREARTED_AT
+  HAS_APPLICATION
+  ORGANIZATION
 }
 
 """Invoice entity subdocument type"""
@@ -450,18 +492,17 @@ enum PresentationLng {
 
 type Query {
   attendee(id: ObjectId!): Attendee!
-  attendees(after: ObjectId, conferenceSlug: String!, first: Int! = 20, passive: Boolean, sectionIds: [ObjectId]! = []): AttendeeConnection!
+  attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
   attendeesCsvExport(slug: String!): [Attendee!]!
   conference(slug: String!): Conference!
-  conferences(after: ObjectId, first: Int! = 20): ConferenceConnection!
+  conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!
-  courses(after: ObjectId, first: Int! = 20): CourseConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
-  interns(after: ObjectId, endDate: DateTimeISO, first: Int! = 20, internship: ObjectId, startDate: DateTimeISO, status: [Status!], user: ObjectId): InternConnection!
+  interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
   internsExport: [Intern]!
   internship(id: ObjectId!): Internship!
-  internships(after: ObjectId, filter: InternshipFilterInput, first: Int! = 20): InternshipConnection!
+  internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
   inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
@@ -469,7 +510,7 @@ type Query {
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  users(after: ObjectId, filter: UserFilterInput, first: Int! = 20): UserConnection!
+  users(after: String, filter: UserFilterInput, first: Int! = 20, sort: [UserSortInput]!): UserConnection!
 }
 
 """New user input data"""
@@ -491,7 +532,7 @@ type Section {
   conference: Conference
   createdAt: DateTimeISO!
   id: ID!
-  submissions(after: ObjectId, conferenceId: ObjectId, first: Int! = 20, sectionIds: [ObjectId!]): SubmissionConnection!
+  submissions(after: String, filter: SubmissionFilterInput, first: Int! = 20, sort: [SubmissionSortInput]!): SubmissionConnection!
   translations: SectionTranslation!
   updatedAt: DateTimeISO!
 }
@@ -520,6 +561,12 @@ input SectionTranslationInput {
 type SectionTranslations {
   name: String!
   topic: String!
+}
+
+"""Ascending/descending direction of the sort field"""
+enum SortDirection {
+  ASC
+  DESC
 }
 
 """Intern status"""
@@ -572,8 +619,13 @@ type SubmissionConnection {
 }
 
 type SubmissionEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: Submission!
+}
+
+input SubmissionFilterInput {
+  conferenceId: ObjectId
+  sectionIds: [ObjectId!]
 }
 
 input SubmissionInput {
@@ -591,8 +643,18 @@ type SubmissionMutationResponse implements IMutationResponse {
 }
 
 type SubmissionPageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input SubmissionSortInput {
+  direction: SortDirection!
+  field: SubmissionSortableField!
+}
+
+"""Sortable enum definition for submissions query"""
+enum SubmissionSortableField {
+  ID
 }
 
 type SubmissionTranslation {
@@ -669,7 +731,7 @@ type UserConnection {
 }
 
 type UserEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: User!
 }
 
@@ -697,8 +759,19 @@ type UserMutationResponse implements IMutationResponse {
 }
 
 type UserPageInfo {
-  endCursor: ObjectId
+  endCursor: String
   hasNextPage: Boolean!
+}
+
+input UserSortInput {
+  direction: SortDirection!
+  field: UserSortableField!
+}
+
+"""Sortable enum definition for users query"""
+enum UserSortableField {
+  ID
+  NAME
 }
 
 type UserStub {

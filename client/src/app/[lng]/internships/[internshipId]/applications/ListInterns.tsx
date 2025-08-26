@@ -119,16 +119,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListInterns({
   initialData,
-  filter,
+  vars,
 }: {
   initialData: Connection<ApplicationFragment>;
-  filter: InternsQueryVariables;
+  vars: InternsQueryVariables;
 }) {
   const InfiniteScrollListInternships = withInfiniteScroll<
     ApplicationFragment,
     InternsQueryVariables
   >({
-    filter,
+    vars,
     getData: getInterns,
     initialData,
     ListItem,

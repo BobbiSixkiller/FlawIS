@@ -7,6 +7,7 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import NewConferenceForm from "./NewConferenceForm";
+import { ConferenceSortInput } from "@/lib/graphql/generated/graphql";
 
 export default async function Conferences({
   params,
@@ -16,7 +17,7 @@ export default async function Conferences({
   const { lng } = await params;
   const { t } = await translate(lng, "conferences");
 
-  const initialData = await getConferences({});
+  const initialData = await getConferences({ sort: [] });
 
   const newConferenceDialogId = "new-conference";
 
@@ -41,7 +42,9 @@ export default async function Conferences({
         ]}
       />
 
-      {initialData && <ListConferences initialData={initialData} filter={{}} />}
+      {initialData && (
+        <ListConferences initialData={initialData} vars={{ sort: [] }} />
+      )}
 
       <Modal title="Nova konferencia" dialogId={newConferenceDialogId}>
         <NewConferenceForm lng={lng} dialogId={newConferenceDialogId} />

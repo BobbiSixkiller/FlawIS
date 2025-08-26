@@ -111,8 +111,11 @@ export class SectionResolver {
     return await this.submissionRepository.paginatedSubmissions({
       first,
       after,
-      sectionIds: [sectionId],
-      conferenceId: conference?._id,
+      filter: {
+        sectionIds: [sectionId],
+        conferenceId: conference?._id,
+      },
+      sort: [],
     });
   }
 }

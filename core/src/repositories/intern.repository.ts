@@ -7,6 +7,13 @@ import {
 import { getAcademicYear } from "../util/helpers";
 import { User } from "../entitites/User";
 import { Repository } from "./base.repository";
+import {
+  buildCursorFilter,
+  decodeCursor,
+  encodeCursor,
+  ensureIdSort,
+  SortField,
+} from "../resolvers/types/pagination.types";
 
 @Service()
 export class InternRepository extends Repository<typeof Intern> {
@@ -17,27 +24,45 @@ export class InternRepository extends Repository<typeof Intern> {
   async paginatedInterns({
     first,
     after,
-    endDate,
-    startDate,
-    internship,
-    status,
-    user,
-  }: InternArgs) {
+    filter,
+    sort,
+  }: InternArgs): Promise<InternConnection> {
+    // 1. Build Mongo sort object + sortFields for cursor filter
+    const sortFields: SortField[] = ensureIdSort(
+      sort.map((s) => ({
+        field: s.field as unknown as string,
+        direction: s.direction,
+      }))
+    );
+
+    const mongoSort = Object.fromEntries(
+      sortFields.map((f) => [f.field, f.direction])
+    );
+
+    // 2. Cursor filter
+    let cursorFilter = {};
+    if (after) {
+      const cursorValues = decodeCursor(after);
+      cursorFilter = buildCursorFilter(sortFields, cursorValues);
+    }
+
     const [connection] = await this.aggregate<InternConnection>([
       {
         $match: {
-          ...(internship ? { internship } : {}),
-          ...(user ? { "user._id": user } : {}),
-          ...(status ? { status: { $in: status } } : {}),
-          ...(endDate ? { createdAt: { $lte: endDate } } : {}),
-          ...(startDate ? { createdAt: { $gte: startDate } } : {}),
+          ...(filter?.internship ? { internship: filter.internship } : {}),
+          ...(filter?.user ? { "user._id": filter.user } : {}),
+          ...(filter?.status ? { status: { $in: filter.status } } : {}),
+          ...(filter?.endDate ? { createdAt: { $lte: filter.endDate } } : {}),
+          ...(filter?.startDate
+            ? { createdAt: { $gte: filter.startDate } }
+            : {}),
         },
       },
-      { $sort: { _id: 1 } },
+      { $sort: mongoSort },
       {
         $facet: {
           data: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $match: { ...cursorFilter } },
             { $limit: first },
             { $addFields: { id: "$_id", "user.id": "$user._id" } },
             {
@@ -49,7 +74,7 @@ export class InternRepository extends Repository<typeof Intern> {
             },
           ],
           hasNextPage: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $match: { ...cursorFilter } },
             { $skip: first },
             { $limit: 1 }, // Check if more data exists
           ],
@@ -76,13 +101,25 @@ export class InternRepository extends Repository<typeof Intern> {
       },
     ]);
 
-    return (
-      connection ?? {
-        edges: [],
-        totalCount: 0,
-        pageInfo: { hasNextPage: false },
-      }
-    );
+    // Now build edges with dynamic cursor generation
+    const edges = connection?.edges.map((edge: any) => {
+      const cursorFields = Object.fromEntries(
+        sortFields.map((f) => [f.field, edge.node[f.field]])
+      );
+
+      return {
+        node: edge.node,
+        cursor: encodeCursor(cursorFields),
+      };
+    });
+
+    const endCursor = edges.length ? edges[edges.length - 1].cursor : undefined;
+
+    return {
+      edges,
+      pageInfo: { ...connection.pageInfo, endCursor },
+      totalCount: connection.totalCount,
+    };
   }
 
   async internshipsWithEligibleInterns(): Promise<

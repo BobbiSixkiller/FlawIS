@@ -22,6 +22,7 @@ export default async function Users({
   const queryParams = await searchParams;
 
   const vars: UsersQueryVariables = {
+    sort: [],
     filter: { access: queryParams?.access as Access[] },
   };
 
@@ -89,7 +90,7 @@ export default async function Users({
         </div>
       </div>
 
-      {initialData && <ListUsers filter={vars} initialData={initialData} />}
+      {initialData && <ListUsers vars={vars} initialData={initialData} />}
 
       <Modal title="Novy pouzivatel" dialogId={newUserDialogId}>
         <UserForm namespace="register" dialogId={newUserDialogId} />

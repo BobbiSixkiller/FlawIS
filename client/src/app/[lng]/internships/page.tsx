@@ -1,6 +1,11 @@
 import { translate } from "@/lib/i18n";
 import { getMe } from "../(auth)/actions";
-import { Access, InternshipFilterInput } from "@/lib/graphql/generated/graphql";
+import {
+  Access,
+  InternshipSortableField,
+  InternshipsQueryVariables,
+  SortDirection,
+} from "@/lib/graphql/generated/graphql";
 import ListInternships from "./ListInternships";
 import { getAcademicYear } from "@/utils/helpers";
 import { getInternships } from "./actions";
@@ -26,15 +31,28 @@ export default async function InternshipsHomePage({
   const user = await getMe();
   const { academicYear } = getAcademicYear();
 
-  // If user is an organization get all internships associated with the organization,
-  // otherwise return all internships for given academic year
-  const filter: InternshipFilterInput = {
-    user: user.access.includes(Access.Organization) ? user.id : undefined,
-    academicYear: queryParams?.academicYear ?? academicYear,
-    organizations: queryParams?.organization,
+  const vars: InternshipsQueryVariables = {
+    sort: [
+      {
+        field: InternshipSortableField.CreartedAt,
+        direction: SortDirection.Asc,
+      },
+      {
+        field: InternshipSortableField.HasApplication,
+        direction: SortDirection.Desc,
+      },
+    ],
+
+    // If user is an organization get all internships associated with the organization,
+    // otherwise return all internships for given academic year
+    filter: {
+      user: user.access.includes(Access.Organization) ? user.id : undefined,
+      academicYear: queryParams?.academicYear ?? academicYear,
+      organizations: queryParams?.organization,
+    },
   };
 
-  const initialData = await getInternships({ filter });
+  const initialData = await getInternships(vars);
 
   const addDialogId = "add-internship";
 
@@ -68,7 +86,7 @@ export default async function InternshipsHomePage({
             ]}
           />
           <AcademicYearSelect
-            selectedYear={academicYear}
+            selectedYear={queryParams?.academicYear ?? academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
           {(user.access.includes(Access.Organization) ||
@@ -85,7 +103,7 @@ export default async function InternshipsHomePage({
         </div>
       </div>
 
-      <ListInternships initialData={initialData} filter={{ filter }} />
+      <ListInternships initialData={initialData} vars={vars} />
 
       <Modal dialogId={addDialogId} title={t("new")}>
         <InternshipForm dialogId={addDialogId} />

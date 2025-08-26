@@ -2,24 +2,51 @@ import { Service } from "typedi";
 import { Repository } from "./base.repository";
 import { Course } from "../entitites/Course";
 import { CourseArgs, CourseConnection } from "../resolvers/types/course.types";
+import {
+  buildCursorFilter,
+  decodeCursor,
+  encodeCursor,
+  ensureIdSort,
+  SortField,
+} from "../resolvers/types/pagination.types";
 
 @Service()
 export class CourseRepository extends Repository<typeof Course> {
   constructor() {
     super(Course);
   }
+  // this is a WIP aggregation
+  async paginatedCourses({
+    first,
+    after,
+    sort,
+  }: CourseArgs): Promise<CourseConnection> {
+    // 1. Build Mongo sort object + sortFields for cursor filter
+    const sortFields: SortField[] = ensureIdSort(
+      sort.map((s) => ({
+        field: s.field as unknown as string,
+        direction: s.direction,
+      }))
+    );
 
-  async paginatedCourses({ first, after }: CourseArgs) {
+    const mongoSort = Object.fromEntries(
+      sortFields.map((f) => [f.field, f.direction])
+    );
+
+    // 2. Cursor filter
+    let cursorFilter = {};
+    if (after) {
+      const cursorValues = decodeCursor(after);
+      cursorFilter = buildCursorFilter(sortFields, cursorValues);
+    }
+
     const [connection] = await this.aggregate<CourseConnection>([
-      { $sort: { _id: -1 } },
+      { $sort: mongoSort },
       {
         $facet: {
-          data: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
-            { $limit: first },
-          ],
+          data: [{ $match: { ...cursorFilter } }, { $limit: first }],
           hasNextPage: [
-            { $match: { ...(after ? { _id: { $lt: after } } : {}) } },
+            { $match: { ...cursorFilter } },
             { $skip: first },
             { $limit: 1 },
           ],
@@ -28,7 +55,9 @@ export class CourseRepository extends Repository<typeof Course> {
       },
       {
         $project: {
-          totalCount: { $arrayElemAt: ["$totalCount.totalCount", 0] }, // Extract totalCount value
+          totalCount: {
+            $ifNull: [{ $arrayElemAt: ["$totalCount.totalCount", 0] }, 0],
+          },
           edges: {
             $map: {
               input: "$data",
@@ -44,12 +73,24 @@ export class CourseRepository extends Repository<typeof Course> {
       },
     ]);
 
-    return (
-      connection ?? {
-        edges: [],
-        pageInfo: { hasNextPage: false },
-        totalCount: 0,
-      }
-    );
+    // Now build edges with dynamic cursor generation
+    const edges = connection?.edges.map((edge: any) => {
+      const cursorFields = Object.fromEntries(
+        sortFields.map((f) => [f.field, edge.node[f.field]])
+      );
+
+      return {
+        node: edge.node,
+        cursor: encodeCursor(cursorFields),
+      };
+    });
+
+    const endCursor = edges.length ? edges[edges.length - 1].cursor : undefined;
+
+    return {
+      edges,
+      pageInfo: { ...connection.pageInfo, endCursor },
+      totalCount: connection.totalCount,
+    };
   }
 }

@@ -94,8 +94,8 @@ fragment ConferenceRegistration on Conference {
   }
 }
 
-query conferences($after: ObjectId, $first: Int) {
-  conferences(after: $after, first: $first) {
+query conferences($after: String, $first: Int, $sort: [ConferenceSortInput]!) {
+  conferences(after: $after, first: $first, sort: $sort) {
     totalCount
     edges {
       cursor
@@ -136,12 +136,17 @@ fragment SubmissionFiles on SubmissionConnection {
   }
 }
 
-query conferenceSections($slug: String!, $after: ObjectId, $first: Int) {
+query conferenceSections(
+  $slug: String!
+  $after: String
+  $first: Int
+  $sort: [SubmissionSortInput]!
+) {
   conference(slug: $slug) {
     id
     sections {
       ...Section
-      submissions(first: $first, after: $after) {
+      submissions(first: $first, after: $after, sort: $sort) {
         ...SubmissionFiles
       }
     }

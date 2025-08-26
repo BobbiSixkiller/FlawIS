@@ -19,11 +19,12 @@ fragment Application on Intern {
 }
 
 query internships(
-  $after: ObjectId
+  $after: String
   $first: Int
   $filter: InternshipFilterInput
+  $sort: [InternshipSortInput]!
 ) {
-  internships(after: $after, first: $first, filter: $filter) {
+  internships(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     academicYears {
       academicYear
@@ -106,23 +107,12 @@ query internsExport {
 }
 
 query interns(
-  $after: ObjectId
+  $after: String
   $first: Int
-  $user: ObjectId
-  $startDate: DateTimeISO
-  $endDate: DateTimeISO
-  $internship: ObjectId
-  $status: [Status!]
+  $filter: InternFilterInput
+  $sort: [InternSortInput]!
 ) {
-  interns(
-    after: $after
-    first: $first
-    internship: $internship
-    user: $user
-    startDate: $startDate
-    endDate: $endDate
-    status: $status
-  ) {
+  interns(after: $after, first: $first, filter: $filter, sort: $sort) {
     totalCount
     edges {
       cursor

@@ -73,16 +73,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function ListUsers({
   initialData,
-  filter,
+  vars,
 }: {
   initialData: Connection<UserData>;
-  filter: UsersQueryVariables;
+  vars: UsersQueryVariables;
 }) {
   const InfiniteScrollListUsers = withInfiniteScroll<
     UserData,
     UsersQueryVariables
   >({
-    filter,
+    vars,
     getData: getUsers,
     initialData,
     ListItem,

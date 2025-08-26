@@ -34,7 +34,6 @@ import { Attendee } from "../entitites/Attendee";
 import { Section } from "../entitites/Section";
 import { AttendeeInput } from "./types/attendee.types";
 import { VerifiedTicket } from "../util/types";
-import { User } from "../entitites/User";
 import { RmqService } from "../services/rmq.service";
 import { Repository } from "../repositories/base.repository";
 import { ConferenceRepository } from "../repositories/conference.repository";

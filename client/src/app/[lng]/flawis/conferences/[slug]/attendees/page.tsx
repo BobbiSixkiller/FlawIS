@@ -16,18 +16,21 @@ export default async function AttendeesPage({
   const { lng, slug } = await params;
   const queryParams = await searchParams;
 
-  const filter: AttendeesQueryVariables = {
-    passive: queryParams?.passive ? queryParams.passive === "true" : null,
-    conferenceSlug: slug,
-    sectionIds: queryParams?.sectionId
-      ? Array.isArray(queryParams?.sectionId)
-        ? queryParams.sectionId
-        : [queryParams.sectionId]
-      : [],
+  const vars: AttendeesQueryVariables = {
+    sort: [],
+    filter: {
+      passive: queryParams?.passive ? queryParams.passive === "true" : null,
+      conferenceSlug: slug,
+      sectionIds: queryParams?.sectionId
+        ? Array.isArray(queryParams?.sectionId)
+          ? queryParams.sectionId
+          : [queryParams.sectionId]
+        : [],
+    },
   };
 
   const [initialData, conference] = await Promise.all([
-    getAttendees(filter),
+    getAttendees(vars),
     getConference(slug),
   ]);
 
@@ -61,7 +64,7 @@ export default async function AttendeesPage({
       </div>
 
       {initialData.pageInfo.endCursor ? (
-        <ListAttendees filter={filter} initialData={initialData} />
+        <ListAttendees vars={vars} initialData={initialData} />
       ) : (
         "Ziadny"
       )}

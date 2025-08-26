@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 import { AuthChecker } from "type-graphql";
 
@@ -32,7 +33,10 @@ export function createContext({
   if (req.cookies.accessToken) {
     const token = req.cookies.accessToken.split("Bearer ")[1];
     if (token) {
-      appContext.user = verifyJwt(token);
+      const decoded: CtxUser | null = verifyJwt(token);
+      appContext.user = decoded
+        ? { ...decoded, id: new ObjectId(decoded.id) }
+        : null;
     } else
       throw new Error(
         "Authentication header format must be: 'Bearer [token]'."

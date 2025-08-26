@@ -310,7 +310,7 @@ export class UserService {
       const emailExists = await this.userRepository.findOne({
         email: data.email,
       });
-      if (emailExists && emailExists.id !== ctxUser?.id) {
+      if (emailExists && emailExists.id !== ctxUser?.id.toString()) {
         throw new ArgumentValidationError([
           {
             // target: User, // Object that was validated.
