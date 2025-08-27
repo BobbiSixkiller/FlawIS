@@ -35,66 +35,66 @@ jobs:
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop --db flawis /data/backup/flawis'
           echo "MongoDB restore completed."
 
-  # minio:
-  #   runs-on: [HyperV]
-  #   steps:
-  #     - name: Install MinIO client
-  #       run: |
-  #         if ! command -v mc &> /dev/null; then
-  #           wget https://dl.min.io/client/mc/release/linux-amd64/mc
-  #           chmod +x mc
-  #           mkdir -p $HOME/bin
-  #           mv mc $HOME/bin
-  #           echo "$HOME/bin" >> $GITHUB_PATH
-  #         fi
+  minio:
+    runs-on: [HyperV]
+    steps:
+      - name: Install MinIO client
+        run: |
+          if ! command -v mc &> /dev/null; then
+            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x mc
+            mkdir -p $HOME/bin
+            mv mc $HOME/bin
+            echo "$HOME/bin" >> $GITHUB_PATH
+          fi
 
-  #     - name: Copy Data from Production MinIO to Staging MinIO
-  #       run: |
-  #         echo "Syncing MinIO production data to staging..."
-  #         mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-  #         mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-  #         mc mirror production/ staging/
-  #         echo "MinIO sync completed."
+      - name: Copy Data from Production MinIO to Staging MinIO
+        run: |
+          echo "Syncing MinIO production data to staging..."
+          mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          mc mirror production/ staging/
+          echo "MinIO sync completed."
 
-  # deploy:
-  #   runs-on: [HyperV]
-  #   needs: [mongo, minio]
-  #   environment: staging
-  #   steps:
-  #     - name: Checkout code (if needed)
-  #       uses: actions/checkout@v4
-  #       with:
-  #         token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  deploy:
+    runs-on: [HyperV]
+    needs: [mongo, minio]
+    environment: staging
+    steps:
+      - name: Checkout code (if needed)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-  #     - name: Setting up node version
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
+      - name: Setting up node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-  #     - name: Clean up unused Docker resources
-  #       run: docker system prune --all --force
-  #       continue-on-error: true
+      - name: Clean up unused Docker resources
+        run: docker system prune --all --force
+        continue-on-error: true
 
-  #     - name: Build and Deploy Staging
-  #       env:
-  #         MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-  #         MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-  #         MINIO_USER: ${{ secrets.MINIO_USER }}
-  #         MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
-  #         MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
-  #         SECRET: ${{ secrets.SECRET }}
-  #         MAIL_HOST: ${{ secrets.MAIL_HOST }}
-  #         MAIL_PORT: ${{ secrets.MAIL_PORT }}
-  #         MAIL_USER: ${{ secrets.MAIL_USER }}
-  #         MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-  #         MAIL_FROM: ${{ vars.MAIL_FROM }}
-  #         RMQ_URI: ${{ vars.RMQ_URI }}
-  #         RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
-  #         REDIS_URI: ${{ vars.REDIS_URI }}
-  #         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-  #         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-  #         GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-  #       run: |
-  #         echo "Building and deploying staging services..."
-  #         docker-compose -f docker-compose.staging.yml up -d --build
-  #         echo "Staging deployment completed."
+      - name: Build and Deploy Staging
+        env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          MINIO_USER: ${{ secrets.MINIO_USER }}
+          MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+          MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+          SECRET: ${{ secrets.SECRET }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          RMQ_URI: ${{ vars.RMQ_URI }}
+          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
+          REDIS_URI: ${{ vars.REDIS_URI }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
+        run: |
+          echo "Building and deploying staging services..."
+          docker-compose -f docker-compose.staging.yml up -d --build
+          echo "Staging deployment completed."
