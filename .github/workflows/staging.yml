@@ -12,9 +12,6 @@ jobs:
   mongo:
     runs-on: [HyperV]
     steps:
-      - name: Show workspace
-        run: 'echo "Workspace: $PWD"'
-
       - name: Ensure backup directory exists
         run: mkdir -p ./backup
 
@@ -25,15 +22,22 @@ jobs:
           docker cp flawis-mongo-1:/data/backup ./backup
           echo "MongoDB backup saved to ./backup"
 
+      - name: Restore MongoDB to staging
+        run: |
+          echo "Restoring MongoDB backup to staging..."
+          docker stop flawis-mongo-staging-1 || true
+          docker rm flawis-mongo-staging-1 || true
+          docker-compose -f docker-compose.staging.yml up -d mongo-staging
+          docker cp ./backup flawis-mongo-staging-1:/data/backup
+          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
+          echo "MongoDB restore completed."
+
   # ----------------------------
   # Job 2: MinIO Sync
   # ----------------------------
   minio:
     runs-on: [HyperV]
     steps:
-      - name: Show workspace
-        run: 'echo "Workspace: $PWD"'
-
       - name: Install MinIO client
         run: |
           if ! command -v mc &> /dev/null; then
@@ -60,23 +64,15 @@ jobs:
     needs: [mongo, minio]
     environment: staging
     steps:
-      - name: Show workspace
-        run: 'echo "Workspace: $PWD"'
-
       - name: Checkout code (if needed)
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Restore MongoDB to staging
-        run: |
-          echo "Restoring MongoDB backup to staging..."
-          docker stop flawis-mongo-staging-1 || true
-          docker rm flawis-mongo-staging-1 || true
-          docker-compose -f docker-compose.staging.yml up -d mongo-staging
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
-          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
-          echo "MongoDB restore completed."
+      - name: Setting up node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
       - name: Clean up unused Docker resources
         run: docker system prune --all --force
