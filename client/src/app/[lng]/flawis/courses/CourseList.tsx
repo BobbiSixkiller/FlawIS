@@ -67,16 +67,16 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 
 export default function CourseList({
   initialData,
-  filter,
+  vars,
 }: {
   initialData: Connection<CourseFragment>;
-  filter: CoursesQueryVariables;
+  vars: CoursesQueryVariables;
 }) {
   const InfiniteScrollCourseList = withInfiniteScroll<
     CourseFragment,
     CoursesQueryVariables
   >({
-    filter,
+    vars,
     getData: getCourses,
     initialData,
     ListItem,

@@ -38,7 +38,7 @@ export default async function CoursesPage({
         ]}
       />
 
-      <CourseList initialData={initialData} filter={{}} />
+      <CourseList initialData={initialData} vars={{}} />
 
       <Modal dialogId={createCourseDialogId} title="Novy kurz">
         <CourseForm dialogId={createCourseDialogId} />
