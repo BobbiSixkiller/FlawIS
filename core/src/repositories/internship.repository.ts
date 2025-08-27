@@ -145,7 +145,10 @@ export class InternshipRepository extends Repository<typeof Internship> {
             },
           ],
           totalCount: [{ $count: "totalCount" }],
-          academicYearCount: [{ $sortByCount: "$academicYear" }],
+          academicYearCount: [
+            { $group: { _id: "$academicYear", count: { $sum: 1 } } },
+            { $sort: { _id: -1 } }, // sorts "2025/2026" > "2024/2025"
+          ],
           organizationsCount: [
             {
               $match: {
@@ -154,7 +157,6 @@ export class InternshipRepository extends Repository<typeof Internship> {
                   : {}),
               },
             },
-            { $sort: { organization: 1 } },
             { $sortByCount: "$organization" },
           ],
         },
