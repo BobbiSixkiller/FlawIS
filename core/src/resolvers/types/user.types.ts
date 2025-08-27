@@ -80,7 +80,7 @@ export class UserInput implements Partial<User> {
   name: string;
 
   @Field({ nullable: true })
-  @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/, {
     message: () =>
       Container.get(I18nService).translate("password", {
         ns: "validation",
@@ -131,7 +131,7 @@ export class UserInput implements Partial<User> {
 @InputType()
 export class PasswordInput implements Partial<User> {
   @Field()
-  @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/, {
     message: () =>
       Container.get(I18nService).translate("password", {
         ns: "validation",
@@ -143,7 +143,7 @@ export class PasswordInput implements Partial<User> {
 @InputType({ description: "New user input data" })
 export class RegisterUserInput extends UserInput {
   @Field()
-  @Matches(/^[a-zA-Z0-9!@#$&()\\-`.+,/\"]{8,}$/, {
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/, {
     message: () =>
       Container.get(I18nService).translate("password", {
         ns: "validation",

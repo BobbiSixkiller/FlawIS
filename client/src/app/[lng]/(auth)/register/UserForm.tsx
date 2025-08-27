@@ -85,14 +85,14 @@ export default function UserForm({
                 .transform((value) => (!value ? null : value))
                 .nullable()
                 .matches(
-                  /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\s]{6,}$/,
+                  /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
                   t("password", { ns: "validation" })
                 ),
             otherwise: (schema) =>
               schema
                 .required()
                 .matches(
-                  /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\s]{6,}$/,
+                  /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
                   t("password", { ns: "validation" })
                 ),
           }),
