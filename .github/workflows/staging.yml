@@ -6,9 +6,6 @@ on:
       - staging
 
 jobs:
-  # ----------------------------
-  # Job 1: MongoDB Backup
-  # ----------------------------
   mongo:
     runs-on: [HyperV]
     steps:
@@ -28,13 +25,10 @@ jobs:
           docker stop flawis-mongo-staging-1 || true
           docker rm flawis-mongo-staging-1 || true
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
+          docker cp ./backup/. flawis-mongo-staging-1:/data/backup
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
           echo "MongoDB restore completed."
 
-  # ----------------------------
-  # Job 2: MinIO Sync
-  # ----------------------------
   minio:
     runs-on: [HyperV]
     steps:
@@ -56,9 +50,6 @@ jobs:
           mc mirror production/ staging/
           echo "MinIO sync completed."
 
-  # ----------------------------
-  # Job 3: Deploy Staging
-  # ----------------------------
   deploy:
     runs-on: [HyperV]
     needs: [mongo, minio]
