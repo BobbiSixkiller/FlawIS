@@ -12,8 +12,9 @@ jobs:
       - name: Copy MongoDB data from production
         run: |
           echo "Starting MongoDB backup from production..."
+          mkdir -p ./backup
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
-          docker cp flawis-mongo-1:/data/backup ./backup
+          docker cp flawis-mongo-1:/data/backup/. ./backup
           echo "MongoDB backup saved to ./backup"
 
       - name: Restore MongoDB to staging
@@ -23,6 +24,7 @@ jobs:
           docker rm flawis-mongo-staging-1 || true
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
           docker cp ./backup/. flawis-mongo-staging-1:/data/backup
+          docker exec flawis-mongo-staging-1 sh -c 'mongosh --eval "db.getSiblingDB(\"flawis\").dropDatabase()"'
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
           echo "MongoDB restore completed."
 
