@@ -20,10 +20,10 @@ import { Input } from "@/components/Input";
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
 import { useMessageStore } from "@/stores/messageStore";
-import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 
 export default function ConferenceRegistrationForm({
   lng,
