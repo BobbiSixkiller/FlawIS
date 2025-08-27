@@ -25,7 +25,7 @@ jobs:
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
 
           # Step 4: Copy the backup into staging container
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
+          docker cp ./backup/. flawis-mongo-staging-1:/data/backup
 
           # Step 5: Restore 'flawis' database in staging (drop existing collections first)
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop /data/backup/flawis'
