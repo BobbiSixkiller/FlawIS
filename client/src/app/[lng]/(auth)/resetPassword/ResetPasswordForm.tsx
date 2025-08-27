@@ -30,7 +30,7 @@ export default function ResetPasswordForm({
           .trim()
           .required()
           .matches(
-            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\s]{6,}$/,
+            /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
             t("password", { ns: "validation" })
           ),
         confirmPass: yup
