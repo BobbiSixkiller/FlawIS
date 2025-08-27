@@ -9,33 +9,30 @@ jobs:
   mongo:
     runs-on: [HyperV]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Copy MongoDB data from production
         run: |
-          echo "Starting MongoDB backup of flawis db from production..."
-          # Dump only the 'flawis' database
-          docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
-
-          # Copy backup to runner
+          echo "Starting MongoDB backup from production..."
+          # Dump only the flawis database
+          docker exec flawis-mongo-1 sh -c 'mongodump --db flawis --out=/data/backup'
+          # Copy the backup to the runner
           docker cp flawis-mongo-1:/data/backup ./backup
           echo "MongoDB backup saved to ./backup"
 
       - name: Restore MongoDB to staging
         run: |
           echo "Restoring MongoDB backup to staging..."
-
-          # Stop and remove existing staging container (optional)
+          # Stop & remove staging MongoDB container if it exists
           docker stop flawis-mongo-staging-1 || true
           docker rm flawis-mongo-staging-1 || true
-
-          # Start staging Mongo container
+          # Start staging MongoDB container
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
-
-          # Copy backup into staging container
+          # Copy backup to staging container
           docker cp ./backup/. flawis-mongo-staging-1:/data/backup
-
-          # Restore only the 'flawis' database and drop existing data
-          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop /data/backup/flawis'
-
+          # Restore only the flawis database
+          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop --db flawis /data/backup/flawis'
           echo "MongoDB restore completed."
 
   # minio:
