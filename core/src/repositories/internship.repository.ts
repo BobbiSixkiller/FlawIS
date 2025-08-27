@@ -154,6 +154,7 @@ export class InternshipRepository extends Repository<typeof Internship> {
                   : {}),
               },
             },
+            { $sort: { organization: 1 } },
             { $sortByCount: "$organization" },
           ],
         },
