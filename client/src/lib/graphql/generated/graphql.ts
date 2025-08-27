@@ -4314,7 +4314,7 @@ export type DeleteUserMutation = {
 };
 
 export type InviteUsersMutationVariables = Exact<{
-  input: OrganizationEmailsInput;
+  input: OrganizationEmails;
 }>;
 
 export type InviteUsersQuery = { __typename?: "Query"; inviteUsers: string };
@@ -7438,5 +7438,5 @@ export const InviteUsersDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<
   InviteUsersQuery,
-  InviteUsersQueryVariables
+  InviteUsersMutationVariables
 >;
