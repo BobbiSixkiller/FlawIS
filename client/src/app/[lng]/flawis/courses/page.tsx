@@ -16,7 +16,7 @@ export default async function CoursesPage({
   const { lng } = await params;
   const createCourseDialogId = "create-course";
 
-  const initialData = await getCourses({});
+  const initialData = await getCourses({ sort: [] });
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,7 +38,7 @@ export default async function CoursesPage({
         ]}
       />
 
-      <CourseList initialData={initialData} vars={{}} />
+      <CourseList initialData={initialData} vars={{ sort: [] }} />
 
       <Modal dialogId={createCourseDialogId} title="Novy kurz">
         <CourseForm dialogId={createCourseDialogId} />

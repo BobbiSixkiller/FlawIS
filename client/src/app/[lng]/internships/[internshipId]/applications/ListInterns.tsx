@@ -30,9 +30,9 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
     <li className="flex sm:justify-between items-center gap-6 py-5">
       <div className="flex flex-1 flex-col sm:flex-row sm:justify-between gap-6">
         <div className="flex gap-x-4">
-          {data?.user.avatarUrlEnv ? (
+          {data?.user.avatarUrl ? (
             <DynamicImageClient
-              src={data.user.avatarUrlEnv}
+              src={data.user.avatarUrl}
               alt="Avatar"
               className="size-12 rounded-full"
               fill

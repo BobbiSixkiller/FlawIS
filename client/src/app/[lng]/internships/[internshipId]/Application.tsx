@@ -25,10 +25,10 @@ export async function Application({
 
       <div className="flex items-center flex-wrap gap-6">
         <div className="relative flex items-center gap-x-4">
-          {application.user.avatarUrlEnv ? (
+          {application.user.avatarUrl ? (
             <DynamicImage
               alt="avatar"
-              src={application.user.avatarUrlEnv}
+              src={application.user.avatarUrl}
               className="w-[60px] h-[60px] rounded-full"
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

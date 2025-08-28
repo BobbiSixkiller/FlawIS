@@ -218,7 +218,7 @@ export default function UserForm({
           className="space-y-6"
           onSubmit={methods.handleSubmit(
             async (val) => {
-              const { error, url: cvUrlEnv } = await uploadOrDelete(
+              const { error, url: cvUrl } = await uploadOrDelete(
                 "resumes",
                 user?.cvUrlEnv,
                 val.files[0]
@@ -227,8 +227,11 @@ export default function UserForm({
                 return methods.setError("files", { message: error });
               }
 
-              const { error: avatarErr, url: avatarUrlEnv } =
-                await uploadOrDelete("avatars", user?.avatarUrlEnv, val.avatar);
+              const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
+                "avatars",
+                user?.avatarUrlEnv,
+                val.avatar
+              );
               if (avatarErr) {
                 return methods.setError("avatar", { message: error });
               }
@@ -253,8 +256,8 @@ export default function UserForm({
                   password: val.password ? val.password : undefined,
                   telephone: val.telephone ? val.telephone : null,
                   studyProgramme: val.studyProgramme as StudyProgramme,
-                  cvUrlEnv,
-                  avatarUrlEnv,
+                  cvUrl,
+                  avatarUrl,
                   address: val.address ? (val.address as Address) : undefined,
                 });
               } else {
