@@ -32,10 +32,6 @@ export class Course extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Field(() => UserStub)
-  @Property({ type: () => UserStub })
-  owner: UserStub;
-
   @Field(() => UserStub, { nullable: true })
   @Property({ type: () => UserStub })
   procurer?: UserStub;

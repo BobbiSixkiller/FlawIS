@@ -17,7 +17,10 @@ import { RefDocExists } from "../../util/decorators";
 import Container from "typedi";
 import { I18nService } from "../../services/i18n.service";
 
-export enum CourseSortableField {}
+export enum CourseSortableField {
+  NAME = "name",
+  ID = "_id",
+}
 
 registerEnumType(CourseSortableField, {
   name: "CourseSortableField",
@@ -25,7 +28,10 @@ registerEnumType(CourseSortableField, {
 });
 
 @InputType()
-export class CourseFilterInput {}
+export class CourseFilterInput {
+  @Field(() => [ObjectId], { nullable: "items", defaultValue: [] })
+  categoryIds: ObjectId[];
+}
 
 @ArgsType()
 export class CourseArgs extends CreateArgs(Course, CourseSortableField) {
