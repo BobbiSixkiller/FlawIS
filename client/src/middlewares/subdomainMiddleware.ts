@@ -41,7 +41,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
       process.env.NODE_ENV === "development"
     ) {
       const newUrl = new URL(
-        `/${lng}/flawis/${paths.join("/")}${url.search}`,
+        `/${lng}/conferences/${paths.join("/")}${url.search}`,
         req.url
       ); // Rewrite the path with the subdomain
 
