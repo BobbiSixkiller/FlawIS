@@ -83,9 +83,10 @@ export async function acceptAuthorInvite(token: string) {
       data: data.acceptAuthorInvite.data,
     }),
     {
-      revalidateTags: (data) => [
-        `conferences:${data.acceptAuthorInvite.data.conference.slug}`,
-      ],
+      // this triggers error when this function is called inside rendering of register page server component
+      // revalidateTags: (data) => [
+      //   `conferences:${data.acceptAuthorInvite.data.conference.slug}`,
+      // ],
     },
     { token }
   );

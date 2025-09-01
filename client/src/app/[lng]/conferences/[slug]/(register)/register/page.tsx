@@ -29,9 +29,12 @@ export default async function RegisterPage({
   }
 
   if (conference?.attending?.ticket.withSubmission && submission && token) {
-    await acceptAuthorInvite(token);
-
-    redirect(`/${slug}`);
+    const { success, message } = await acceptAuthorInvite(token);
+    if (!success) {
+      throw new Error(message);
+    } else {
+      redirect(`/${slug}`);
+    }
   }
 
   return (

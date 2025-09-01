@@ -29,11 +29,12 @@ export async function getConference(slug: string) {
   const res = await executeGqlFetch(
     ConferenceDocument,
     { slug },
-    {},
-    {
-      tags: [`conferences:${slug}`],
-      revalidate: 3600,
-    }
+    {}
+    // commented because of error triggered by a acceptAuthorInvite called inside conference register page server component
+    // {
+    //   tags: [`conferences:${slug}`],
+    //   revalidate: 3600,
+    // }
   );
 
   if (res.errors) {
