@@ -2,5 +2,7 @@
   "ratelimit": "Akciu opakujete príliš často, skúste to prosím neskôr!",
   "400": "Neplatné vstupné údaje",
   "401": "Prístup zamietnutý!",
-  "500": "Niečo sa pokazilo. Akciu sa pokúste zopakovať neskôr!"
+  "500": "Niečo sa pokazilo. Akciu sa pokúste zopakovať neskôr!",
+  "tokenMalformed": "Platnosť tokenu vypšala. Prosím požiadajte o nový!",
+  "tokenUsed": "Token už bol použitý. Prosím zažiadajte o nový!"
 }

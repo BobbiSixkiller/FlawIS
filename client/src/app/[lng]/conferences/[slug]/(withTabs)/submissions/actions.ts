@@ -8,7 +8,6 @@ import {
   UpdateSubmissionDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
-import { cookies } from "next/headers";
 
 export async function getSubmission(id?: string) {
   if (!id) return;
@@ -22,9 +21,6 @@ export async function getSubmission(id?: string) {
 }
 
 export async function createSubmission(data: SubmissionInput) {
-  const cookieStore = await cookies();
-  const user = cookieStore.get("user")?.value;
-
   return await executeGqlMutation(
     CreateSubmissionDocument,
     { data },
@@ -32,7 +28,11 @@ export async function createSubmission(data: SubmissionInput) {
       message: data.createSubmission.message,
       data: data.createSubmission.data,
     }),
-    { revalidateTags: (data) => [`conference:${user}`] }
+    {
+      revalidateTags: (data) => [
+        `conferences:${data.createSubmission.data.conference.slug}`,
+      ],
+    }
   );
 }
 
@@ -46,23 +46,24 @@ export async function updateSubmission(id: string, data: SubmissionInput) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.updateSubmission.data.conference.slug}`,
+        `conferences:${data.updateSubmission.data.conference.slug}`,
       ],
     }
   );
 }
 
 export async function deleteSubmission(id: string) {
-  const cookieStore = await cookies();
-  const user = cookieStore.get("user")?.value;
-
-  return executeGqlMutation(
+  return await executeGqlMutation(
     DeleteSubmissionDocument,
     { id },
     (data) => ({
       message: data.deleteSubmission.message,
       data: data.deleteSubmission.data,
     }),
-    { revalidateTags: () => [`conference:${user}`] }
+    {
+      revalidateTags: (data) => [
+        `conferences:${data.deleteSubmission.data.conference.slug}`,
+      ],
+    }
   );
 }

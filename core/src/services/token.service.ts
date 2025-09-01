@@ -2,10 +2,14 @@ import { Service } from "typedi";
 import { v4 as uuidv4 } from "uuid";
 import { RedisService } from "./redis.service";
 import { signJwt, verifyJwt } from "../util/auth";
+import { I18nService } from "./i18n.service";
 
 @Service()
 export class TokenService {
-  constructor(private readonly redisService: RedisService) {}
+  constructor(
+    private readonly redisService: RedisService,
+    private readonly i18nService: I18nService
+  ) {}
 
   // Generate a one-time-use token
   async generateOneTimeToken(expiresIn: number, payload?: object) {
@@ -21,13 +25,15 @@ export class TokenService {
   async verifyOneTimeToken<T>(token: string) {
     const decoded = verifyJwt<{ tokenId: string; payload?: T }>(token);
     if (!decoded) {
-      throw new Error("Token has been malformed or expired");
+      throw new Error(
+        this.i18nService.translate("tokenMalformed", { ns: "common" })
+      );
     }
 
     // Check if the token ID is still valid in Redis
     const tokenStatus = await this.redisService.get(decoded?.tokenId);
     if (tokenStatus !== "valid") {
-      throw new Error("Token has already been used");
+      this.i18nService.translate("tokenUsed", { ns: "common" });
     }
 
     // Mark the token ID as used

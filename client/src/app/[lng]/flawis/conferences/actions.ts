@@ -16,8 +16,8 @@ export async function getConferences(vars: ConferencesQueryVariables) {
   const res = await executeGqlFetch(
     ConferencesDocument,
     vars,
-    {}
-    // { tags: ["conferences"], revalidate: 3600 }
+    {},
+    { tags: ["conferences"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -28,14 +28,13 @@ export async function getConferences(vars: ConferencesQueryVariables) {
 }
 
 export async function getConference(slug: string) {
-  //   await new Promise((resolve) => setTimeout(resolve, 5000));
-
   const res = await executeGqlFetch(
     ConferenceDocument,
-    { slug }
-    // {},
+    { slug },
+    {}
+    // commented because of error triggered by a acceptAuthorInvite called inside conference register page server component
     // {
-    //   tags: [`conference:${slug}`],
+    //   tags: [`conferences:${slug}`],
     //   revalidate: 3600,
     // }
   );
