@@ -30,6 +30,7 @@
     "label": "Deatilný popis stáže. Upravte podľa potreby pomocou rich text editora.",
     "dept": "Odbor (organizačný útvar) / Sekcia:",
     "name": "Nazov...",
+    "org": "Organizácia",
     "semesterLabel": "Stáž prebieha v semestri:",
     "semester": "Zimný, letný",
     "estimatedLength": "Predpokladané trvanie stáže:",
