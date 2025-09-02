@@ -73,7 +73,9 @@ export default function useLocalizedExtensions() {
   // StarterKit configuration with customizations
   const starterKit = StarterKit.configure({
     bold: { HTMLAttributes: { class: cn("dark:text-white/85") } },
-    heading: { HTMLAttributes: { class: cn("dark:text-white/85") } },
+    heading: {
+      HTMLAttributes: { class: cn("dark:text-white/85 font-normal") },
+    },
     paragraph: { HTMLAttributes: { class: cn("dark:text-gray-300") } },
     bulletList: {
       HTMLAttributes: {
