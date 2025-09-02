@@ -12,13 +12,14 @@ import { createInternship, updateInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useDefaultContent from "@/components/editor/useDefaultContent";
-import { useEffect } from "react";
 
 export default function InternshipForm({
   data,
   dialogId,
+  organization,
 }: {
   data?: { id: string; description: string };
+  organization: string;
   dialogId: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
@@ -35,7 +36,10 @@ export default function InternshipForm({
     defaultValues: { description: data?.description || "" },
   });
 
-  const { defaultInternshipEditorContent } = useDefaultContent(lng);
+  const { defaultInternshipEditorContent } = useDefaultContent(
+    lng,
+    organization
+  );
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
