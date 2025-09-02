@@ -1,6 +1,9 @@
 import { useTranslation } from "@/lib/i18n/client";
 
-export default function useDefaultContent(lng: string, organization?: string) {
+export default function useDefaultContent(
+  lng: string,
+  organization?: string | null
+) {
   const { t } = useTranslation(lng, ["internships", "courses"]);
 
   const defaultInternshipEditorContent = {
