@@ -19,7 +19,7 @@ export default function InternshipForm({
   organization,
 }: {
   data?: { id: string; description: string };
-  organization: string;
+  organization?: string | null;
   dialogId: string;
 }) {
   const { lng } = useParams<{ lng: string }>();

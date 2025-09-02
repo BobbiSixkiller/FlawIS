@@ -108,7 +108,7 @@ export default async function InternshipsHomePage({
       <Modal dialogId={addDialogId} title={t("new")}>
         <InternshipForm
           dialogId={addDialogId}
-          organization={user.organization ?? "Organizácia"}
+          organization={user.organization}
         />
       </Modal>
     </div>

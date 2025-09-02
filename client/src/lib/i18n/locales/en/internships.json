@@ -30,6 +30,7 @@
     "label": "A detailed description of the internship. Edit as needed using the rich text editor.",
     "dept": "Department (organizational unit) / Section:",
     "name": "Name...",
+    "org": "Organization",
     "semesterLabel": "The internship takes place in the semester:",
     "semester": "Winter, summer",
     "estimatedLength": "Estimated length of internship:",
