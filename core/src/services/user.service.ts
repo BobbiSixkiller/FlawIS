@@ -294,7 +294,7 @@ export class UserService {
     session.startTransaction();
     try {
       // 1) authorization
-      const isAdmin = ctxUser.access.includes("ADMIN" as any);
+      const isAdmin = ctxUser.access.includes(Access.Admin);
       if (!isAdmin && ctxUser.id.toString() !== id.toString()) {
         throw new Error(this.i18nService.translate("401", { ns: "common" }));
       }
@@ -310,7 +310,7 @@ export class UserService {
       const emailExists = await this.userRepository.findOne({
         email: data.email,
       });
-      if (emailExists && emailExists.id !== ctxUser?.id.toString()) {
+      if (emailExists && doc.email !== data.email) {
         throw new ArgumentValidationError([
           {
             // target: User, // Object that was validated.
