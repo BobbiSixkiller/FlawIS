@@ -17,7 +17,7 @@ import { cn } from "@/utils/helpers";
 import { SlashCommandExtension } from "./SlashCommand";
 import CommandsDropdown from "./selectors/CommandsDropdown";
 import useLocalizedExtensions from "./Extensions";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 interface EditorProps {
   initialValue?: string | JSONContent; // Use HTML or JSON as needed
