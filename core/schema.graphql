@@ -434,7 +434,7 @@ type Mutation {
   createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
-  createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
+  createSubmission(data: SubmissionInput!, ticketId: ObjectId!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
@@ -459,7 +459,7 @@ type Mutation {
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateOrgFeedback(fileUrl: String, id: ObjectId!): InternMutationResponse!
   updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
-  updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
+  updateSubmission(data: SubmissionInput!, id: ObjectId!, ticketId: ObjectId!): SubmissionMutationResponse!
   updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }

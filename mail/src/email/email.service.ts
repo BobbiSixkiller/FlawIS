@@ -177,7 +177,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.conferenceSlug}/register?submission=${
       msg.submissionId
-    }&token=${msg.token}`;
+    }&ticket=${msg.ticketId}&token=${msg.token}`;
 
     await this.mailerService.sendMail({
       to: msg.email,

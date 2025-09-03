@@ -91,6 +91,7 @@ export default async function AttendeeSubmissionsPage({
                       lng={lng}
                       submission={s}
                       sections={conference.sections}
+                      ticketId={conference.attending?.ticket.id}
                     />
                   </Modal>
                   <Modal
@@ -115,6 +116,7 @@ export default async function AttendeeSubmissionsPage({
           conferenceId={conference!.id}
           sections={conference!.sections}
           dialogId={newSubmissionDialogId}
+          ticketId={conference.attending?.ticket.id}
         />
       </Modal>
     </div>

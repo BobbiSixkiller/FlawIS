@@ -36,8 +36,8 @@ query submission($id: ObjectId!) {
   }
 }
 
-mutation createSubmission($data: SubmissionInput!) {
-  createSubmission(data: $data) {
+mutation createSubmission($data: SubmissionInput!, $ticketId: ObjectId!) {
+  createSubmission(data: $data, ticketId: $ticketId) {
     message
     data {
       ...Submission
@@ -45,8 +45,12 @@ mutation createSubmission($data: SubmissionInput!) {
   }
 }
 
-mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
-  updateSubmission(id: $id, data: $data) {
+mutation updateSubmission(
+  $id: ObjectId!
+  $data: SubmissionInput!
+  $ticketId: ObjectId!
+) {
+  updateSubmission(id: $id, data: $data, ticketId: $ticketId) {
     message
     data {
       ...Submission

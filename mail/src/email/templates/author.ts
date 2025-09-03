@@ -5,6 +5,7 @@ export interface AuthorMsg extends Msg {
   conferenceSlug: string;
   token: string;
   submissionId: string;
+  ticketId: string;
   submissionName: string;
   submissionAbstract: string;
   submissionKeywords: string[];

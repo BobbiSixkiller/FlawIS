@@ -4,16 +4,16 @@ import {
   AcceptAuthorInviteDocument,
   AddAttendeeDocument,
   AttendeeInput,
-  CreateSubmissionDocument,
-  SubmissionInput,
+  CreateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlMutation } from "@/utils/actions";
+import { createSubmission } from "../../(withTabs)/submissions/actions";
 
 export async function addAttendee(
   attendeeInput: AttendeeInput,
   submissionId: string | null,
   token: string | null,
-  submissionInput?: SubmissionInput
+  submissionInput?: CreateSubmissionMutationVariables
 ) {
   let submission;
   if (submissionInput && !submissionId) {
@@ -44,34 +44,6 @@ export async function addAttendee(
       ],
     }
   );
-}
-
-export async function createSubmission(
-  data: SubmissionInput,
-  fromAddAttendee: boolean = false
-) {
-  const res = await executeGqlMutation(
-    CreateSubmissionDocument,
-    { data },
-    (data) => ({
-      message: data.createSubmission.message,
-      data: data.createSubmission.data,
-    })
-  );
-
-  if (!res.success && res.errors && fromAddAttendee) {
-    const transformedErrors: Record<string, string> = {};
-    for (const [key, value] of Object.entries(res.errors)) {
-      transformedErrors[`submission.${key}`] = value;
-    }
-
-    return {
-      ...res,
-      errors: transformedErrors,
-    };
-  }
-
-  return res;
 }
 
 export async function acceptAuthorInvite(token: string) {
