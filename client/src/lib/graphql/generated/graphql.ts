@@ -592,7 +592,6 @@ export type MutationCreateSectionArgs = {
 
 export type MutationCreateSubmissionArgs = {
   data: SubmissionInput;
-  ticketId: Scalars['ObjectId']['input'];
 };
 
 
@@ -731,7 +730,6 @@ export type MutationUpdateSectionArgs = {
 export type MutationUpdateSubmissionArgs = {
   data: SubmissionInput;
   id: Scalars['ObjectId']['input'];
-  ticketId: Scalars['ObjectId']['input'];
 };
 
 
@@ -1564,7 +1562,6 @@ export type SubmissionQuery = { __typename?: 'Query', submission: { __typename?:
 
 export type CreateSubmissionMutationVariables = Exact<{
   data: SubmissionInput;
-  ticketId: Scalars['ObjectId']['input'];
 }>;
 
 
@@ -1573,7 +1570,6 @@ export type CreateSubmissionMutation = { __typename?: 'Mutation', createSubmissi
 export type UpdateSubmissionMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
   data: SubmissionInput;
-  ticketId: Scalars['ObjectId']['input'];
 }>;
 
 
@@ -4096,8 +4092,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<SubmissionQuery, SubmissionQueryVariables>;
 export const CreateSubmissionDocument = new TypedDocumentString(`
-    mutation createSubmission($data: SubmissionInput!, $ticketId: ObjectId!) {
-  createSubmission(data: $data, ticketId: $ticketId) {
+    mutation createSubmission($data: SubmissionInput!) {
+  createSubmission(data: $data) {
     message
     data {
       ...Submission
@@ -4153,8 +4149,8 @@ fragment Submission on Submission {
   updatedAt
 }`) as unknown as TypedDocumentString<CreateSubmissionMutation, CreateSubmissionMutationVariables>;
 export const UpdateSubmissionDocument = new TypedDocumentString(`
-    mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!, $ticketId: ObjectId!) {
-  updateSubmission(id: $id, data: $data, ticketId: $ticketId) {
+    mutation updateSubmission($id: ObjectId!, $data: SubmissionInput!) {
+  updateSubmission(id: $id, data: $data) {
     message
     data {
       ...Submission

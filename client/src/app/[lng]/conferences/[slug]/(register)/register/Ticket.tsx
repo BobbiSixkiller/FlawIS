@@ -40,10 +40,10 @@ export default function Ticket({
         <div className="space-y-2">
           {tickets.map((ticket) => (
             <Radio
+              disabled={!!submission && !ticket.withSubmission}
               onClick={() => setSubmission(ticket.withSubmission)}
               key={ticket.id}
               value={ticket.id}
-              disabled={!!submission && !ticket.withSubmission}
               className={({ checked, focus, disabled }) =>
                 cn([
                   "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-900",
