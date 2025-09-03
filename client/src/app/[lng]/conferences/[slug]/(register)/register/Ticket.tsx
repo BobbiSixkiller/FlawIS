@@ -3,8 +3,7 @@
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
-import { useEffect } from "react";
-import { Control, useController, useFormContext } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 
 export default function Ticket({
   tickets,
@@ -28,14 +27,6 @@ export default function Ticket({
     control,
   });
 
-  useEffect(() => {
-    if (submission) {
-      const ticket = tickets.find((t) => t.withSubmission === true);
-      field.onChange(ticket?.id);
-      setSubmission(true);
-    }
-  }, []);
-
   return (
     <div className="flex flex-col gap-2">
       <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
@@ -43,7 +34,6 @@ export default function Ticket({
       </label>
       <RadioGroup
         aria-label="Conference Tickets"
-        disabled={submission !== undefined}
         value={field.value}
         onChange={field.onChange}
       >
@@ -53,13 +43,14 @@ export default function Ticket({
               onClick={() => setSubmission(ticket.withSubmission)}
               key={ticket.id}
               value={ticket.id}
+              disabled={!!submission && !ticket.withSubmission}
               className={({ checked, focus, disabled }) =>
                 cn([
-                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-700",
+                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-900",
                   focus &&
                     "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300",
                   disabled &&
-                    "bg-slate-50 dark:bg-slate-600 text-slate-500 cursor-default",
+                    "bg-slate-50 dark:bg-slate-300 text-slate-500 cursor-default",
                   checked &&
                     "bg-primary-500 dark:bg-primary-500 text-white border-none",
                 ])

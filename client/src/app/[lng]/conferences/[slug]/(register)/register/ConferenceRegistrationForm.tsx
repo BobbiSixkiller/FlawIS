@@ -30,16 +30,18 @@ export default function ConferenceRegistrationForm({
   conference,
   submission,
   billings,
+  ticketId,
 }: {
   lng: string;
   conference: ConferenceQuery["conference"];
   billings: UserFragment["billings"];
   submission?: SubmissionFragment;
+  ticketId?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [submissionStep, setSubmissionStep] = useState(false);
+  const [submissionStep, setSubmissionStep] = useState(!!ticketId);
 
   const { t } = useTranslation(lng, ["validation", "conferences"]);
 
@@ -51,7 +53,7 @@ export default function ConferenceRegistrationForm({
       lng={lng}
       values={{
         conferenceId: conference.id,
-        ticketId: "",
+        ticketId,
         billing: {
           name: "",
           address: {
@@ -93,7 +95,9 @@ export default function ConferenceRegistrationForm({
           },
           searchParams.get("submission"),
           searchParams.get("token"),
-          submissionStep ? data.submission : undefined
+          submissionStep
+            ? { data: data.submission, ticketId: data.ticketId }
+            : undefined
         );
 
         if (res.errors) {

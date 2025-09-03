@@ -2,10 +2,11 @@
 
 import {
   CreateSubmissionDocument,
+  CreateSubmissionMutationVariables,
   DeleteSubmissionDocument,
   SubmissionDocument,
-  SubmissionInput,
   UpdateSubmissionDocument,
+  UpdateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
@@ -20,10 +21,13 @@ export async function getSubmission(id?: string) {
   return res.data?.submission;
 }
 
-export async function createSubmission(data: SubmissionInput) {
-  return await executeGqlMutation(
+export async function createSubmission(
+  vars: CreateSubmissionMutationVariables,
+  fromAddAttendee?: boolean
+) {
+  const res = await executeGqlMutation(
     CreateSubmissionDocument,
-    { data },
+    vars,
     (data) => ({
       message: data.createSubmission.message,
       data: data.createSubmission.data,
@@ -34,12 +38,28 @@ export async function createSubmission(data: SubmissionInput) {
       ],
     }
   );
+
+  if (!res.success && res.errors && fromAddAttendee) {
+    const transformedErrors: Record<string, string> = {};
+    for (const [key, value] of Object.entries(res.errors)) {
+      transformedErrors[`submission.${key}`] = value;
+    }
+
+    return {
+      ...res,
+      errors: transformedErrors,
+    };
+  }
+
+  return res;
 }
 
-export async function updateSubmission(id: string, data: SubmissionInput) {
+export async function updateSubmission(
+  vars: UpdateSubmissionMutationVariables
+) {
   return await executeGqlMutation(
     UpdateSubmissionDocument,
-    { id, data },
+    vars,
     (data) => ({
       message: data.updateSubmission.message,
       data: data.updateSubmission.data,

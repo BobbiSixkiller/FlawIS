@@ -12,11 +12,16 @@ export default async function RegisterPage({
   params: Promise<{ slug: string; lng: string }>;
   searchParams: Promise<{
     submission?: string;
+    ticket?: string;
     token?: string;
   }>;
 }) {
   const { lng, slug } = await params;
-  const { submission: submissionId, token } = await searchParams;
+  const {
+    submission: submissionId,
+    ticket: ticketId,
+    token,
+  } = await searchParams;
 
   const [conference, submission, user] = await Promise.all([
     getConference(slug),
@@ -24,7 +29,7 @@ export default async function RegisterPage({
     getMe(),
   ]);
 
-  if (conference?.attending && !submission) {
+  if (conference?.attending) {
     redirect(`/${slug}`);
   }
 
@@ -44,6 +49,7 @@ export default async function RegisterPage({
         conference={conference}
         submission={submission}
         billings={user!.billings}
+        ticketId={ticketId}
       />
     </div>
   );

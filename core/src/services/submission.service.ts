@@ -50,11 +50,12 @@ export class SubmissionService {
     email: string,
     ctxUser: CtxUser,
     conference: Conference,
-    submission: Submission
+    submission: Submission,
+    ticketId: ObjectId
   ) {
     const token = await this.tokenService.generateOneTimeToken(
       60 * 60 * 24 * 7,
-      { email, submissionId: submission.id }
+      { email, submissionId: submission.id, ticketId }
     );
 
     this.rmqService.produceMessage(
@@ -69,6 +70,7 @@ export class SubmissionService {
         conferenceSlug: conference?.slug,
         token,
         submissionId: submission.id,
+        ticketId,
         submissionName:
           submission.translations[this.i18nService.language() as "sk" | "en"]
             .name,
@@ -101,7 +103,8 @@ export class SubmissionService {
   async createSubmission(
     hostname: string,
     ctxUser: CtxUser,
-    data: SubmissionInput
+    data: SubmissionInput,
+    ticketId: ObjectId
   ) {
     const conference = await this.conferenceRepository.findOne({
       _id: data.conference,
@@ -167,7 +170,8 @@ export class SubmissionService {
           author,
           ctxUser,
           conference,
-          submission
+          submission,
+          ticketId
         )
       );
     }
@@ -179,7 +183,8 @@ export class SubmissionService {
     id: ObjectId,
     hostname: string,
     ctxUser: CtxUser,
-    { authors, ...data }: SubmissionInput
+    { authors, ...data }: SubmissionInput,
+    ticketId: ObjectId
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -266,7 +271,8 @@ export class SubmissionService {
             author,
             ctxUser,
             conference,
-            submission
+            submission,
+            ticketId
           )
         );
       }
@@ -322,7 +328,9 @@ export class SubmissionService {
       submissionId: string;
     }>(token);
     if (!decoded.payload || decoded.payload.email !== ctxUser.email) {
-      throw new Error("Not allowed!");
+      throw new Error(
+        this.i18nService.translate("tokenMalformed", { ns: "common" })
+      );
     }
 
     const submission = await this.submissionRepository.findOneAndUpdate(
