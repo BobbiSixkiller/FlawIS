@@ -157,10 +157,7 @@ export default function UpdateSubmissionForm({
                 presentationLng,
                 fileUrl: url,
               },
-              ticketId,
             });
-
-            console.log(state);
 
             if (state.errors) {
               for (const [key, val] of Object.entries(state.errors)) {

@@ -7,8 +7,8 @@ import { useFormContext } from "react-hook-form";
 
 export default function Ticket({
   tickets,
-  disabled,
   setSubmission,
+  submission,
 }: {
   submission?: SubmissionFragment;
   tickets: {
@@ -19,7 +19,6 @@ export default function Ticket({
     withSubmission: boolean;
   }[];
   setSubmission: (visible: boolean) => void;
-  disabled?: boolean;
 }) {
   const { watch, setValue, getFieldState } = useFormContext();
   const { error } = getFieldState("ticketId");
@@ -31,13 +30,13 @@ export default function Ticket({
       </label>
       <RadioGroup
         aria-label="Conference Tickets"
-        disabled={disabled}
         value={watch("ticketId")}
         onChange={(value) => setValue("ticketId", value)}
       >
         <div className="space-y-2">
           {tickets.map((ticket) => (
             <Radio
+              disabled={!!submission && !ticket.withSubmission}
               onClick={() => setSubmission(ticket.withSubmission)}
               key={ticket.id}
               value={ticket.id}

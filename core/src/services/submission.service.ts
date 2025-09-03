@@ -50,12 +50,11 @@ export class SubmissionService {
     email: string,
     ctxUser: CtxUser,
     conference: Conference,
-    submission: Submission,
-    ticketId: ObjectId
+    submission: Submission
   ) {
     const token = await this.tokenService.generateOneTimeToken(
       60 * 60 * 24 * 7,
-      { email, submissionId: submission.id, ticketId }
+      { email, submissionId: submission.id }
     );
 
     this.rmqService.produceMessage(
@@ -70,7 +69,6 @@ export class SubmissionService {
         conferenceSlug: conference?.slug,
         token,
         submissionId: submission.id,
-        ticketId,
         submissionName:
           submission.translations[this.i18nService.language() as "sk" | "en"]
             .name,
@@ -103,8 +101,7 @@ export class SubmissionService {
   async createSubmission(
     hostname: string,
     ctxUser: CtxUser,
-    data: SubmissionInput,
-    ticketId: ObjectId
+    data: SubmissionInput
   ) {
     const conference = await this.conferenceRepository.findOne({
       _id: data.conference,
@@ -170,8 +167,7 @@ export class SubmissionService {
           author,
           ctxUser,
           conference,
-          submission,
-          ticketId
+          submission
         )
       );
     }
@@ -183,8 +179,7 @@ export class SubmissionService {
     id: ObjectId,
     hostname: string,
     ctxUser: CtxUser,
-    { authors, ...data }: SubmissionInput,
-    ticketId: ObjectId
+    { authors, ...data }: SubmissionInput
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -271,8 +266,7 @@ export class SubmissionService {
             author,
             ctxUser,
             conference,
-            submission,
-            ticketId
+            submission
           )
         );
       }
@@ -327,12 +321,6 @@ export class SubmissionService {
       email: string;
       submissionId: string;
     }>(token);
-    console.log(
-      decoded,
-      decoded.payload?.email,
-      ctxUser.email,
-      decoded.payload?.email !== ctxUser.email
-    );
     if (!decoded.payload || decoded.payload.email !== ctxUser.email) {
       throw new Error(
         this.i18nService.translate("tokenMalformed", { ns: "common" })

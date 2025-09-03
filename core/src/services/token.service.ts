@@ -33,7 +33,9 @@ export class TokenService {
     // Check if the token ID is still valid in Redis
     const tokenStatus = await this.redisService.get(decoded?.tokenId);
     if (tokenStatus !== "valid") {
-      this.i18nService.translate("tokenUsed", { ns: "common" });
+      throw new Error(
+        this.i18nService.translate("tokenUsed", { ns: "common" })
+      );
     }
 
     // Mark the token ID as used
