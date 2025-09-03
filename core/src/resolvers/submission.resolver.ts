@@ -48,13 +48,15 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionMutationResponse)
   async createSubmission(
     @Arg("data") data: SubmissionInput,
+    @Arg("ticketId") ticketId: ObjectId,
     @Ctx() { user, req }: Context
   ) {
     const hostname = req.headers["tenant-domain"] as string;
     const submission = await this.submissionService.createSubmission(
       hostname,
       user!,
-      data
+      data,
+      ticketId
     );
 
     return {
@@ -73,6 +75,7 @@ export class SubmissionResolver {
   async updateSubmission(
     @Arg("id") id: ObjectId,
     @Arg("data") data: SubmissionInput,
+    @Arg("ticketId") ticketId: ObjectId,
     @Ctx() { user, req }: Context
   ) {
     const hostname = req.headers["tenant-domain"] as string;
@@ -80,7 +83,8 @@ export class SubmissionResolver {
       id,
       hostname,
       user!,
-      data
+      data,
+      ticketId
     );
 
     return {

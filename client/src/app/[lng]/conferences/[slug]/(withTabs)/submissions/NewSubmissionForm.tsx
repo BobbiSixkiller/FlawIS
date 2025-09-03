@@ -22,11 +22,13 @@ import { useMessageStore } from "@/stores/messageStore";
 
 export default function NewSubmissionForm({
   conferenceId,
+  ticketId,
   sections,
   lng,
   dialogId,
 }: {
   conferenceId: string;
+  ticketId: string;
   sections: SectionFragment[];
   lng: string;
   dialogId: string;
@@ -94,7 +96,7 @@ export default function NewSubmissionForm({
       <form
         className="space-y-6 w-full sm:w-96"
         onSubmit={methods.handleSubmit(async (data) => {
-          const res = await createSubmission(data);
+          const res = await createSubmission({ data, ticketId });
           if (res.errors) {
             for (const [key, val] of Object.entries(res.errors)) {
               methods.setError(

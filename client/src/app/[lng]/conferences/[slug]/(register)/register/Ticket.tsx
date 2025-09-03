@@ -3,13 +3,12 @@
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
-import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
 export default function Ticket({
   tickets,
+  disabled,
   setSubmission,
-  submission,
 }: {
   submission?: SubmissionFragment;
   tickets: {
@@ -20,17 +19,10 @@ export default function Ticket({
     withSubmission: boolean;
   }[];
   setSubmission: (visible: boolean) => void;
+  disabled?: boolean;
 }) {
   const { watch, setValue, getFieldState } = useFormContext();
   const { error } = getFieldState("ticketId");
-
-  useEffect(() => {
-    if (submission) {
-      const ticket = tickets.find((t) => t.withSubmission === true);
-      setValue("ticketId", ticket?.id);
-      setSubmission(true);
-    }
-  }, []);
 
   return (
     <div className="flex flex-col gap-2">
@@ -39,7 +31,7 @@ export default function Ticket({
       </label>
       <RadioGroup
         aria-label="Conference Tickets"
-        disabled={submission !== undefined}
+        disabled={disabled}
         value={watch("ticketId")}
         onChange={(value) => setValue("ticketId", value)}
       >

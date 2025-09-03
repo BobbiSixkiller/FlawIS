@@ -29,11 +29,13 @@ export default function UpdateSubmissionForm({
   submission,
   lng,
   dialogId,
+  ticketId,
 }: {
   lng: string;
   submission: SubmissionFragment;
   sections: SectionFragment[];
   dialogId: string;
+  ticketId: string;
 }) {
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
@@ -145,13 +147,17 @@ export default function UpdateSubmissionForm({
               return methods.setError("files", { message: error });
             }
 
-            const state = await updateSubmission(submission.id, {
-              authors,
-              conference,
-              section,
-              translations,
-              presentationLng,
-              fileUrl: url,
+            const state = await updateSubmission({
+              id: submission.id,
+              data: {
+                authors,
+                conference,
+                section,
+                translations,
+                presentationLng,
+                fileUrl: url,
+              },
+              ticketId,
             });
 
             console.log(state);
