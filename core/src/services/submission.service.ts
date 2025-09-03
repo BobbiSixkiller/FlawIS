@@ -327,6 +327,12 @@ export class SubmissionService {
       email: string;
       submissionId: string;
     }>(token);
+    console.log(
+      decoded,
+      decoded.payload?.email,
+      ctxUser.email,
+      decoded.payload?.email !== ctxUser.email
+    );
     if (!decoded.payload || decoded.payload.email !== ctxUser.email) {
       throw new Error(
         this.i18nService.translate("tokenMalformed", { ns: "common" })

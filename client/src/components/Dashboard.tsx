@@ -30,7 +30,7 @@ export default async function Dashboard({
   const theme = cookieStore.get("theme")?.value || "";
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-950">
+    <div className="flex flex-col md:flex-row min-h-screen dark:bg-gray-950 w-screen">
       <div className="hidden md:flex flex-col gap-4 p-4 bg-primary-500 dark:bg-gray-900 dark:border-r dark:border-gray-700 lg:w-full lg:max-w-xs h-screen sticky top-0">
         <Logo lng={lng} height={60} width={60} inverted />
 
