@@ -29,7 +29,7 @@ export default async function RegisterPage({
     getMe(),
   ]);
 
-  if (conference?.attending) {
+  if (conference?.attending && !submission) {
     redirect(`/${slug}`);
   }
 
@@ -38,7 +38,7 @@ export default async function RegisterPage({
     if (!success) {
       throw new Error(message);
     } else {
-      redirect(`/${slug}`);
+      redirect(`/${slug}/submissions`);
     }
   }
 
