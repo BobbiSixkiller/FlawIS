@@ -54,6 +54,18 @@ export class Course extends TimeStamps {
   @Property()
   maxAttendees: number;
 
+  @Field()
+  @Property()
+  start: Date;
+
+  @Field()
+  @Property()
+  end: Date;
+
+  @Field()
+  @Property({ default: false })
+  active: boolean;
+
   @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
   billing?: FlawBilling;
@@ -97,10 +109,6 @@ export class CourseTerm extends TimeStamps {
   @Field()
   @Property()
   end: Date;
-
-  @Field(() => Int)
-  @Property()
-  maxAttendees: number;
 
   @Field()
   createdAt: Date;
