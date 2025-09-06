@@ -2,7 +2,7 @@ import { Index, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 
 import { FlawBilling } from "./Billing";
 import { Invoice } from "./Attendee";
@@ -86,6 +86,24 @@ export class Course extends TimeStamps {
 }
 
 @ObjectType()
+class TermAttendee {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+
+  @Field(() => Float)
+  @Property()
+  hours: number;
+
+  @Field({ nullable: true })
+  @Property()
+  online?: boolean;
+}
+
+@ObjectType()
 @Index({ course: 1 })
 export class CourseTerm extends TimeStamps {
   @Field(() => ObjectId)
@@ -110,6 +128,14 @@ export class CourseTerm extends TimeStamps {
   @Property()
   end: Date;
 
+  @Field(() => Int)
+  @Property()
+  maxAttendees: number;
+
+  @Field(() => [TermAttendee])
+  @Property({ type: () => [TermAttendee], default: [] })
+  attendees: TermAttendee[];
+
   @Field()
   createdAt: Date;
   @Field()
@@ -124,7 +150,9 @@ export class CourseAttendeeUserStub extends UserStub {
 }
 
 @ObjectType()
-@Index({ "user._id": 1, term: 1, status: 1 })
+@Index({ "user._id": 1 })
+@Index({ status: 1 })
+@Index({ course: 1 })
 export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -136,12 +164,9 @@ export class CourseAttendee extends TimeStamps {
   @Property({ ref: () => Course })
   course: Ref<Course>;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  grade: string;
-
-  @Property({ ref: () => CourseTerm })
-  term?: Ref<CourseTerm>;
+  grade?: string;
 
   @Field(() => Status)
   @Property({ enum: Status, type: String, default: Status.Applied })

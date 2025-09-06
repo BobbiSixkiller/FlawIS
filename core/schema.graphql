@@ -184,18 +184,21 @@ type ConferenceTranslations {
 }
 
 type Course {
+  active: Boolean!
   billing: FlawBilling
   categories: [Category!]!
   createdAt: DateTimeISO!
 
   """String representation of HTML describing the course"""
   description: String!
+  end: DateTimeISO!
   id: ObjectId!
   isPaid: Boolean!
   maxAttendees: Int!
   name: String!
   price: Int!
   procurer: UserStub
+  start: DateTimeISO!
   updatedAt: DateTimeISO!
 }
 
