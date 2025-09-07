@@ -125,18 +125,15 @@ export default function SubmissionForm({
 
             let state;
             if (submission) {
-              state = await updateSubmission(submission?.id, {
-                ...omit(vals, "files"),
-                fileUrl: url,
+              state = await updateSubmission({
+                id: submission?.id,
+                data: { ...omit(vals, "files"), fileUrl: url },
               });
             } else {
               state = await createSubmission({
-                ...omit(vals, "files"),
-                fileUrl: url,
+                data: { ...omit(vals, "files"), fileUrl: url },
               });
             }
-
-            console.log(state);
 
             if (state.errors) {
               for (const [key, val] of Object.entries(state.errors)) {

@@ -218,17 +218,20 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: 'Course';
+  active: Scalars['Boolean']['output'];
   billing?: Maybe<FlawBilling>;
   categories: Array<Category>;
   createdAt: Scalars['DateTimeISO']['output'];
   /** String representation of HTML describing the course */
   description: Scalars['String']['output'];
+  end: Scalars['DateTimeISO']['output'];
   id: Scalars['ObjectId']['output'];
   isPaid: Scalars['Boolean']['output'];
   maxAttendees: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   price: Scalars['Int']['output'];
   procurer?: Maybe<UserStub>;
+  start: Scalars['DateTimeISO']['output'];
   updatedAt: Scalars['DateTimeISO']['output'];
 };
 
