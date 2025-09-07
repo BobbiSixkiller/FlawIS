@@ -244,7 +244,7 @@ export default function ConferenceRegistrationForm({
                 })}
                 name={`submission.translations.${lng}.abstract`}
               />
-              <LocalizedGenericCombobox
+              <LocalizedGenericCombobox<{ id: number; val: string }, string>
                 control={methods.control}
                 disabled={submission !== undefined}
                 lng={lng}
@@ -273,7 +273,7 @@ export default function ConferenceRegistrationForm({
                   { name: PresentationLng.En, value: PresentationLng.En },
                 ]}
               />
-              <GenericCombobox<{ id: number; val: string }>
+              <GenericCombobox<{ id: number; val: string }, string>
                 control={methods.control}
                 disabled={submission !== undefined}
                 label={t("registration.submission.authors.label", {
@@ -289,7 +289,7 @@ export default function ConferenceRegistrationForm({
                 defaultOptions={[]}
                 getOptionLabel={(opt) => opt.val}
                 renderOption={(opt, props) => <span>{opt.val}</span>}
-                getOptionValue={(opt) => opt?.val}
+                getOptionValue={(opt) => opt?.val ?? ""}
               />
             </>
           )}

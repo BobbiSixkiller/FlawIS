@@ -23,7 +23,9 @@ import { useMessageStore } from "@/stores/messageStore";
 import usePrefillFiles from "@/hooks/usePrefillFiles";
 import RHFormContainer from "@/components/RHFormContainer";
 import { omit } from "lodash";
-import GenericCombobox from "@/components/GenericCombobox";
+import GenericCombobox, {
+  LocalizedGenericCombobox,
+} from "@/components/GenericCombobox";
 
 export default function SubmissionForm({
   submission,
@@ -154,35 +156,6 @@ export default function SubmissionForm({
             }
           })}
         >
-          <GenericCombobox<{ id: number; val: string }>
-            // value={methods
-            //   .watch("authors")
-            //   .map((a, i) => ({ id: i, val: a, label: a }))}
-            // onChange={(val) => {
-            //   if (Array.isArray(val)) {
-            //     methods.setValue(
-            //       "authors",
-            //       val.map((v) => v.val),
-            //       { shouldValidate: true }
-            //     );
-            //   }
-            // }}
-            control={methods.control}
-            name="authors"
-            lng={lng}
-            label={t("registration.submission.authors.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.authors.placeholder", {
-              ns: "conferences",
-            })}
-            defaultOptions={[]}
-            renderOption={(opt) => <span>{opt.val}</span>}
-            getOptionLabel={(opt) => opt.val}
-            getOptionValue={(opt) => opt?.val}
-            allowCreateNewOptions
-            multiple
-          />
           <Select
             control={methods.control}
             name="section"
@@ -202,7 +175,8 @@ export default function SubmissionForm({
             label={t("registration.submission.abstract", { ns: "conferences" })}
             name={`translations.${lng}.abstract`}
           />
-          {/* <LocalizedGenericCombobox
+          <LocalizedGenericCombobox<{ id: number; val: string }>
+            control={methods.control}
             name={`translations.${lng}.keywords`}
             lng={lng}
             label={t("registration.submission.keywords.label", {
@@ -212,29 +186,12 @@ export default function SubmissionForm({
               ns: "conferences",
             })}
             defaultOptions={[]}
-            renderOption={(opt) => <span>{opt.label}</span>}
-            value={methods
-              .watch()
-              .translations[lng as "sk" | "en"].keywords?.map((keyword, i) => ({
-                id: i,
-                label: keyword,
-                val: keyword,
-              }))}
-            onChange={(val) => {
-              if (Array.isArray(val)) {
-                console.log(val);
-                methods.setValue(
-                  `translations.${lng}.keywords` as any,
-                  val.map((v) => v.val),
-                  {
-                    shouldValidate: true,
-                  }
-                );
-              }
-            }}
+            renderOption={(opt) => <span>{opt.val}</span>}
+            getOptionLabel={(opt) => opt.val}
+            getOptionValue={(opt) => opt?.val ?? ""}
             allowCreateNewOptions
             multiple
-          /> */}
+          />
           {/* <LocalizedMultipleInput
             lng={lng}
             label={t("registration.submission.keywords.label", {
@@ -255,15 +212,23 @@ export default function SubmissionForm({
               { name: PresentationLng.En, value: PresentationLng.En },
             ]}
           />
-          {/* <MultipleInput
+          <GenericCombobox<{ id: number; val: string }, string>
+            control={methods.control}
+            name="authors"
+            lng={lng}
             label={t("registration.submission.authors.label", {
               ns: "conferences",
             })}
             placeholder={t("registration.submission.authors.placeholder", {
               ns: "conferences",
             })}
-            name="authors"
-          /> */}
+            defaultOptions={[]}
+            renderOption={(opt) => <span>{opt.val}</span>}
+            getOptionLabel={(opt) => opt.val}
+            getOptionValue={(opt) => opt?.val ?? ""}
+            allowCreateNewOptions
+            multiple
+          />
           <MultipleFileUploadField
             label={t("registration.submission.file", {
               ns: "conferences",

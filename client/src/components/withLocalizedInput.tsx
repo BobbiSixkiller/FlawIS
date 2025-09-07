@@ -19,10 +19,16 @@ type WithLocalizedInputProps = {
   control?: Control<any>;
 };
 
-export function withLocalizedInput<TProps extends WithLocalizedInputProps>(
-  InputComponent: ComponentType<TProps>
-) {
-  return function WithLocalizedInputWrapper(props: TProps) {
+export function withLocalizedInput<
+  // Extra generic params (e.g., TOption, TValue)
+  // Defaulting to unknown so it works for Input/Textarea too
+  T1 = unknown,
+  T2 = unknown,
+  // Props must at least include your localization props
+  P extends WithLocalizedInputProps = WithLocalizedInputProps
+>(InputComponent: ComponentType<P>) {
+  // Preserve generics in the return type
+  function WithLocalizedInputWrapper(props: P) {
     const [visible, setVisible] = useState(false);
 
     const localizedInputName = props.name.replace(
@@ -51,20 +57,11 @@ export function withLocalizedInput<TProps extends WithLocalizedInputProps>(
           onFocus={() => setVisible(true)}
           onClick={() => setVisible(true)}
         />
-        <Transition
-          as={Fragment}
-          show={visible}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+        <Transition as={Fragment} show={visible}>
           <div className="mt-2">
             <InputComponent
               {...props}
-              error={localizedError}
+              error={localizedError as any}
               label={
                 props.lng === "sk"
                   ? `${props.label} anglicky`
@@ -77,5 +74,11 @@ export function withLocalizedInput<TProps extends WithLocalizedInputProps>(
         </Transition>
       </div>
     );
-  };
+  }
+
+  // 👇 The important part:
+  // return type is still generic in <T1, T2>
+  return WithLocalizedInputWrapper as unknown as <A = T1, B = T2>(
+    props: P
+  ) => JSX.Element;
 }

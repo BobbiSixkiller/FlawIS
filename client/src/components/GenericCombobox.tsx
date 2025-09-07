@@ -9,7 +9,7 @@ import {
   Field,
   Label,
 } from "@headlessui/react";
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { last } from "lodash";
 import { Control, useController } from "react-hook-form";
@@ -23,7 +23,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
 
-export interface GenericComboboxProps<TOption, TValue = any> {
+export interface GenericComboboxProps<TOption, TValue> {
   lng: string;
   name: string;
   control: Control<any>;
@@ -48,7 +48,7 @@ export interface GenericComboboxProps<TOption, TValue = any> {
 
 export default function GenericCombobox<
   TOption extends { id: string | number; val: any },
-  TValue = any
+  TValue
 >({
   name,
   control,
@@ -125,9 +125,23 @@ export default function GenericCombobox<
 
   // Track combobox width
   useEffect(() => {
-    if (ref.current?.getBoundingClientRect().width) {
-      setBoxRect(ref.current.getBoundingClientRect());
+    function updateRect() {
+      if (ref.current) {
+        setBoxRect(ref.current.getBoundingClientRect());
+      }
     }
+
+    updateRect();
+
+    document
+      .querySelector("#modal-scroll-container")
+      ?.addEventListener("scroll", updateRect, { passive: true });
+
+    return () => {
+      document
+        .querySelector("#modal-scroll-container")
+        ?.removeEventListener("scroll", updateRect);
+    };
   }, [width, field.value]);
 
   async function handleChange(newValue: TOption | TOption[] | null) {
@@ -168,9 +182,8 @@ export default function GenericCombobox<
     return (
       <div>
         <div
-          ref={ref}
           className={cn([
-            "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6 relative",
+            "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6",
             "dark:bg-gray-800 dark:ring-gray-600 text-gray-900 dark:text-white",
             "ring-1 focus-within:ring-2",
             fieldState.error
@@ -239,12 +252,11 @@ export default function GenericCombobox<
           style={{
             width: boxRect?.width,
             left: boxRect?.left,
-            right: boxRect?.right,
             top: Number(boxRect?.top) + Number(boxRect?.height),
           }}
           transition
           className={cn([
-            "absolute mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
+            "fixed mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
             "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none",
             "dark:bg-gray-600 dark:text-white/85 dark:border-gray-700",
           ])}
@@ -286,6 +298,7 @@ export default function GenericCombobox<
           value={value}
           onChange={handleChange}
           onClose={() => setText("")}
+          ref={ref}
         >
           {renderComboboxContent()}
         </Combobox>
