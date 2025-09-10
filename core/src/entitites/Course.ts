@@ -3,7 +3,6 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import { Field, Float, Int, ObjectType } from "type-graphql";
-
 import { FlawBilling } from "./Billing";
 import { Invoice } from "./Attendee";
 import { UserStub } from "./User";
@@ -11,13 +10,10 @@ import { Status } from "./Internship";
 
 @ObjectType({ description: "Course category" })
 export class Category {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
+  @Field(() => ObjectId) id: ObjectId;
   @Field()
   @Property()
   name: string;
-
   @Field()
   @Property()
   slug: string;
@@ -25,7 +21,6 @@ export class Category {
 
 @ObjectType()
 @Index({ "category._id": 1 })
-@Index({ owner: 1 })
 @Index({ procurer: 1 })
 @Index({ name: "text" })
 export class Course extends TimeStamps {
@@ -44,9 +39,7 @@ export class Course extends TimeStamps {
   @Property()
   name: string;
 
-  @Field({
-    description: "String representation of HTML describing the course",
-  })
+  @Field({ description: "String representation of HTML describing the course" })
   @Property()
   description: string;
 
@@ -63,8 +56,8 @@ export class Course extends TimeStamps {
   end: Date;
 
   @Field()
-  @Property({ default: false })
-  active: boolean;
+  @Property()
+  registrationEnd: Date;
 
   @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
@@ -85,29 +78,17 @@ export class Course extends TimeStamps {
   updatedAt: Date;
 }
 
-@ObjectType()
-class TermAttendee {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
-
-  @Field(() => Float)
-  @Property()
-  hours: number;
-
-  @Field({ nullable: true })
-  @Property()
-  online?: boolean;
-}
-
-@ObjectType()
+@ObjectType({
+  description:
+    "Scheduled term for a given course that when created also creates corresponding attendance records.",
+})
 @Index({ course: 1 })
 export class CourseTerm extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
+
+  @Property({ ref: () => Course })
+  course: Ref<Course>;
 
   @Field()
   @Property()
@@ -116,9 +97,6 @@ export class CourseTerm extends TimeStamps {
   @Field()
   @Property()
   description: string;
-
-  @Property({ ref: () => Course })
-  course: Ref<Course>;
 
   @Field()
   @Property()
@@ -131,10 +109,6 @@ export class CourseTerm extends TimeStamps {
   @Field(() => Int)
   @Property()
   maxAttendees: number;
-
-  @Field(() => [TermAttendee])
-  @Property({ type: () => [TermAttendee], default: [] })
-  attendees: TermAttendee[];
 
   @Field()
   createdAt: Date;
@@ -149,10 +123,10 @@ export class CourseAttendeeUserStub extends UserStub {
   organizatation: string;
 }
 
-@ObjectType()
+@ObjectType({ description: "Connects a system user with a particular course." })
+@Index({ course: 1 })
 @Index({ "user._id": 1 })
 @Index({ status: 1 })
-@Index({ course: 1 })
 export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -179,6 +153,47 @@ export class CourseAttendee extends TimeStamps {
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })
   invoice?: Invoice;
+
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
+}
+
+@ObjectType()
+export class CourseAttendeeStub {
+  @Field(() => ObjectId) id: ObjectId;
+  @Field()
+  @Property()
+  name: string;
+}
+
+@ObjectType({
+  description: "Represents individual attendance for a given course term.",
+})
+@Index({ term: 1 })
+@Index({ "attendee._id": 1 })
+export class AttendaceRecord extends TimeStamps {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Property({ ref: () => CourseTerm })
+  term: Ref<CourseTerm>;
+
+  @Field(() => CourseAttendeeStub)
+  @Property({ type: () => CourseAttendeeStub })
+  attendee: CourseAttendeeStub;
+
+  @Field(() => Float, {
+    description:
+      "Hours the person attended a given course term. Can't be more than the hours from start to end of a term.",
+  })
+  @Property()
+  hoursAttended: number;
+
+  @Field({ nullable: true })
+  @Property()
+  online?: boolean;
 
   @Field()
   createdAt: Date;

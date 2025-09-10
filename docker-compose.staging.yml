@@ -110,7 +110,6 @@ services:
       start_period: 120s
     networks:
       - staging-network
-
   redis-staging:
     image: redis:8.0.3
     restart: unless-stopped
@@ -124,16 +123,16 @@ services:
       start_period: 30s
     networks:
       - staging-network
-
   mongo-staging:
-    image: mongo:8.0
+    build:
+      context: ./mongo
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "27018:27017"
     volumes:
       - mongo_data_staging:/data/db
       - mongo_config_staging:/data/configdb
-    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh mongo-staging/test --quiet
       interval: 30s
