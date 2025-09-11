@@ -37,7 +37,7 @@ export default async function AttendeesPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">
-        <ExportButton fetchUrl={`/conferences/${slug}/attendees/export`} />
+        <ExportButton fetchUrl={`/export?type=attendees&slug=${slug}`} />
 
         <FilterDropdown
           anchor="bottom"

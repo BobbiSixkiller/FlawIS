@@ -10,18 +10,22 @@ import { Status } from "./Internship";
 
 @ObjectType({ description: "Course category" })
 export class Category {
-  @Field(() => ObjectId) id: ObjectId;
+  @Field(() => ObjectId)
+  id: ObjectId;
+
   @Field()
   @Property()
   name: string;
+
   @Field()
   @Property()
   slug: string;
 }
 
 @ObjectType()
+@Index({ registrationEnd: 1 })
+@Index({ start: 1, end: 1 })
 @Index({ "category._id": 1 })
-@Index({ procurer: 1 })
 @Index({ name: "text" })
 export class Course extends TimeStamps {
   @Field(() => ObjectId)
@@ -49,15 +53,15 @@ export class Course extends TimeStamps {
 
   @Field()
   @Property()
+  registrationEnd: Date;
+
+  @Field()
+  @Property()
   start: Date;
 
   @Field()
   @Property()
   end: Date;
-
-  @Field()
-  @Property()
-  registrationEnd: Date;
 
   @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
@@ -83,7 +87,7 @@ export class Course extends TimeStamps {
     "Scheduled term for a given course that when created also creates corresponding attendance records.",
 })
 @Index({ course: 1 })
-export class CourseTerm extends TimeStamps {
+export class CourseSession extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
@@ -162,7 +166,9 @@ export class CourseAttendee extends TimeStamps {
 
 @ObjectType()
 export class CourseAttendeeStub {
-  @Field(() => ObjectId) id: ObjectId;
+  @Field(() => ObjectId)
+  id: ObjectId;
+
   @Field()
   @Property()
   name: string;
@@ -177,8 +183,8 @@ export class AttendaceRecord extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
-  @Property({ ref: () => CourseTerm })
-  term: Ref<CourseTerm>;
+  @Property({ ref: () => CourseSession })
+  term: Ref<CourseSession>;
 
   @Field(() => CourseAttendeeStub)
   @Property({ type: () => CourseAttendeeStub })

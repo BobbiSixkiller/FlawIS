@@ -75,7 +75,7 @@ export default async function InternshipsPage({
             selectedYear={queryParams?.academicYear ?? academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
-          <ExportButton fetchUrl="/internships/export" />
+          <ExportButton fetchUrl="/export?type=interns" />
         </div>
       </div>
 

@@ -13,6 +13,7 @@ const commonPaths = [
   "/minio",
   "/google/callback",
   "/invoice",
+  "/export",
 ];
 
 export function withSubdomain(middleware: CustomMiddleware) {
