@@ -41,7 +41,7 @@ jobs:
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop --db flawis --uri="mongodb://localhost:27017" /data/backup/flawis'
           echo "MongoDB restore complete."
 
-  minio:
+    minio:
     runs-on: [HyperV]
     steps:
       - name: Install MinIO client
@@ -54,11 +54,28 @@ jobs:
             echo "$HOME/bin" >> $GITHUB_PATH
           fi
 
-      - name: Copy Data from Production MinIO to Staging MinIO
+      - name: Start staging MinIO
         run: |
+          echo "Starting staging MinIO..."
+          docker-compose -f docker-compose.staging.yml up -d minio-staging
+
+      - name: Wait for staging MinIO to be ready
+        run: |
+          echo "Waiting for staging MinIO..."
+          until curl -f http://localhost:9100/minio/health/live 2>/dev/null; do
+            echo "MinIO not ready yet..."
+            sleep 2
+          done
+          echo "Staging MinIO is ready."
+
+      - name: Sync data from production to staging
+        run: |
+          echo "Configuring MinIO aliases..."
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          echo "Syncing data from production to staging..."
           mc mirror production/ staging/
+          echo "MinIO sync completed."
 
   deploy:
     runs-on: [HyperV]
