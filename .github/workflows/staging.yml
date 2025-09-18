@@ -17,24 +17,16 @@ jobs:
 
       - name: Start staging MongoDB
         run: |
-          echo "Starting staging MongoDB..."
           docker-compose -f docker-compose.staging.yml up -d mongo-staging
 
       - name: Wait for staging MongoDB primary
         run: |
-          echo "Waiting for staging MongoDB to elect a primary..."
-          until docker exec flawis-mongo-staging-1 mongosh --quiet --eval "db.isMaster().ismaster" | grep true; do
-            echo "Still waiting..."
-            sleep 2
-          done
-          echo "Staging MongoDB is primary, proceeding."
+          until docker exec flawis-mongo-staging-1 mongosh --quiet --eval "db.isMaster().ismaster" | grep true; do sleep 2; done
 
       - name: Restore MongoDB data into staging
         run: |
-          echo "Restoring MongoDB backup into staging..."
           docker cp ./backup/flawis flawis-mongo-staging-1:/data/backup/flawis
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop --db flawis --uri="mongodb://localhost:27017" /data/backup/flawis'
-          echo "MongoDB restore complete."
 
   minio:
     runs-on: [HyperV]
@@ -51,32 +43,38 @@ jobs:
 
       - name: Copy Data from Production MinIO to Staging MinIO
         run: |
-          echo "Syncing MinIO production data to staging..."
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc mirror production/ staging/
-          echo "MinIO sync completed."
 
   deploy:
     runs-on: [HyperV]
     needs: [mongo, minio]
     environment: staging
     steps:
-      - name: Checkout code (if needed)
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Setting up node version
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Clean up unused Docker resources
-        run: docker system prune --all --force
+      - name: Stop and remove old containers
+        run: |
+          docker-compose -f docker-compose.staging.yml down
+
+      - name: Remove old images, networks, and build cache
+        run: |
+          docker container prune -f
+          docker image prune -a -f
+          docker network prune -f
+          docker builder prune -a -f
         continue-on-error: true
 
-      - name: Build and Deploy Staging
+      - name: Build and deploy staging services
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
@@ -96,6 +94,4 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
         run: |
-          echo "Building and deploying staging services..."
           docker-compose -f docker-compose.staging.yml up -d --build
-          echo "Staging deployment completed."

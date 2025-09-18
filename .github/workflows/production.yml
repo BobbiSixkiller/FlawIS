@@ -18,6 +18,18 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Stop and remove old containers
+        run: |
+          docker-compose -f docker-compose.prod.yml down
+
+      - name: Clean Docker images, networks, and build cache
+        run: |
+          docker container prune -f
+          docker image prune -a -f
+          docker network prune -f
+          docker builder prune -a -f
+        continue-on-error: true
+
       - name: Build and Deploy
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
