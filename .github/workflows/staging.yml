@@ -55,6 +55,9 @@ jobs:
           fi
 
       - name: Start staging MinIO
+        env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
           echo "Starting staging MinIO..."
           docker-compose -f docker-compose.staging.yml up -d minio-staging
