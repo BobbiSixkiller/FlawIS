@@ -22,7 +22,7 @@ export class CourseRepository extends Repository<typeof Course> {
     sort,
   }: CourseArgs): Promise<CourseConnection> {
     // 1. Build Mongo sort object + sortFields for cursor filter
-    const sortFields: SortField[] = ensureIdSort(
+    const sortFields = ensureIdSort(
       sort.map((s) => ({
         field: s.field as unknown as string,
         direction: s.direction,

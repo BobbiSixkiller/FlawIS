@@ -1,9 +1,16 @@
 import { ObjectId } from "mongodb";
-import { Category, Course, CourseAttendee } from "../../entitites/Course";
+import {
+  AttendaceRecord,
+  Category,
+  Course,
+  CourseAttendee,
+  CourseSession,
+} from "../../entitites/Course";
 import { CreateArgs, CreateConnection } from "./pagination.types";
 import {
   ArgsType,
   Field,
+  Float,
   InputType,
   Int,
   ObjectType,
@@ -12,10 +19,9 @@ import {
 import { IMutationResponse } from "./interface.types";
 import { FlawBilling } from "../../entitites/Billing";
 import { FlawBillingInput } from "./conference.types";
-import { IsInt, IsString, Min } from "class-validator";
-import { RefDocExists } from "../../util/decorators";
-import Container from "typedi";
-import { I18nService } from "../../services/i18n.service";
+import { IsInt, IsString, Min, MinDate } from "class-validator";
+import { Ref } from "@typegoose/typegoose";
+import { IsAfter } from "../../util/decorators";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -81,15 +87,15 @@ export class CourseInput implements Partial<Course> {
   @IsString()
   name: string;
 
-  @Field(() => [ObjectId])
-  @RefDocExists(Category, {
-    each: true,
-    message: () =>
-      Container.get(I18nService).translate("categoryNotFound", {
-        ns: "course",
-      }),
-  })
-  categoryIds: ObjectId[];
+  // @Field(() => [ObjectId])
+  // @RefDocExists(Category, {
+  //   each: true,
+  //   message: () =>
+  //     Container.get(I18nService).translate("categoryNotFound", {
+  //       ns: "course",
+  //     }),
+  // })
+  // categoryIds: ObjectId[];
 
   @Field()
   @IsString()
@@ -102,4 +108,29 @@ export class CourseInput implements Partial<Course> {
 
   @Field(() => FlawBillingInput, { nullable: true })
   billing?: FlawBilling;
+}
+
+@InputType()
+export class CourseSessionInput implements Partial<CourseSession> {
+  @Field(() => ObjectId)
+  course: Ref<Course>;
+
+  @Field()
+  name: string;
+
+  @Field()
+  description: string;
+
+  @Field()
+  @MinDate(new Date())
+  start: Date;
+
+  @Field()
+  @IsAfter("start")
+  end: Date;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(1)
+  maxAttendees: number;
 }

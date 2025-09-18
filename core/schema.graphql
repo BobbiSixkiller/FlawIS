@@ -184,7 +184,6 @@ type ConferenceTranslations {
 }
 
 type Course {
-  active: Boolean!
   billing: FlawBilling
   categories: [Category!]!
   createdAt: DateTimeISO!
@@ -198,6 +197,7 @@ type Course {
   name: String!
   price: Int!
   procurer: UserStub
+  registrationEnd: DateTimeISO!
   start: DateTimeISO!
   updatedAt: DateTimeISO!
 }
@@ -219,7 +219,6 @@ input CourseFilterInput {
 
 input CourseInput {
   billing: FlawBillingInput
-  categoryIds: [ObjectId!]!
   description: String!
   name: String!
   price: Int!

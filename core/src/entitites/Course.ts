@@ -123,7 +123,7 @@ export class CourseSession extends TimeStamps {
 @ObjectType()
 export class CourseAttendeeUserStub extends UserStub {
   @Field()
-  @Property()
+  @Property({ default: "N/A" })
   organizatation: string;
 }
 

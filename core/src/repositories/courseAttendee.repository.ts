@@ -11,7 +11,6 @@ import {
   decodeCursor,
   encodeCursor,
   ensureIdSort,
-  SortField,
 } from "../resolvers/types/pagination.types";
 
 @Service()
@@ -29,7 +28,7 @@ export class CourseAttendeeRepository extends Repository<
     filter,
   }: CourseAttendeeArgs): Promise<CourseAttendeeConnection> {
     // 1. Build Mongo sort object + sortFields for cursor filter
-    const sortFields: SortField[] = ensureIdSort(
+    const sortFields = ensureIdSort(
       sort.map((s) => ({
         field: s.field as unknown as string,
         direction: s.direction,
