@@ -20,15 +20,29 @@ jobs:
           echo "Starting staging MongoDB..."
           docker-compose -f docker-compose.staging.yml -p staging up -d --remove-orphans mongo-staging
 
-      - name: Wait for staging MongoDB container
+      - name: Wait for staging MongoDB to be ready
         run: |
           echo "Waiting for staging MongoDB container to exist..."
+          # Wait until the container is created
           until docker-compose -f docker-compose.staging.yml -p staging ps -q mongo-staging | grep -q .; do
             echo "Mongo container not created yet..."
             sleep 2
           done
+
           MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p staging ps -q mongo-staging)
           echo "Mongo container exists: $MONGO_CONTAINER"
+
+          echo "Initializing replica set if needed..."
+          docker exec $MONGO_CONTAINER mongosh --quiet --eval '
+            try {
+              rs.status();
+              print("Replica set already initialized")
+            } catch (e) {
+              print("Initializing replica set...");
+              rs.initiate({_id: "rs0", members: [{ _id: 0, host: "mongo-staging:27017" }]});
+            }
+          '
+
           echo "Waiting for MongoDB to become primary..."
           until docker exec $MONGO_CONTAINER mongosh --quiet --eval "db.isMaster().ismaster" | grep true; do
             echo "MongoDB not ready..."
