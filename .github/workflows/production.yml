@@ -1,10 +1,12 @@
-name: Build and Deploy to production
+name: Build and Deploy to Production
+
 on:
   push:
     branches:
       - master
+
 jobs:
-  build:
+  deploy:
     runs-on: [HyperV]
     environment: production
     steps:
@@ -13,16 +15,15 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Setting up node version
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Stop and remove old containers
-        run: |
-          docker-compose -f docker-compose.prod.yml down
+      - name: Stop and remove old production containers
+        run: docker-compose -f docker-compose.prod.yml -p production down
 
-      - name: Clean Docker images, networks, and build cache
+      - name: Clean old images, networks, build cache
         run: |
           docker container prune -f
           docker image prune -a -f
@@ -30,7 +31,7 @@ jobs:
           docker builder prune -a -f
         continue-on-error: true
 
-      - name: Build and Deploy
+      - name: Build and deploy production services
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
@@ -48,5 +49,4 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: |
-          docker-compose -f docker-compose.prod.yml up -d --build
+        run: docker-compose -f docker-compose.prod.yml -p production up -d --build

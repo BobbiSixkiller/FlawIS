@@ -11,35 +11,25 @@ jobs:
     steps:
       - name: Copy MongoDB data from production
         run: |
-          echo "Dumping production MongoDB (only flawis db)..."
+          echo "Dumping production MongoDB..."
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
           docker cp flawis-mongo-1:/data/backup ./backup
 
       - name: Start or recreate staging MongoDB
-        run: |
-          echo "Starting staging MongoDB..."
-          # Recreate the container if it exists, otherwise just start
-          docker-compose -f docker-compose.staging.yml up -d --remove-orphans mongo-staging
+        run: docker-compose -f docker-compose.staging.yml -p staging up -d --remove-orphans mongo-staging
 
       - name: Wait for staging MongoDB to be ready
         run: |
-          echo "Waiting for staging MongoDB primary..."
-          # Wait until the container is running and ready
           until docker exec flawis-mongo-staging-1 mongosh --quiet --eval "db.isMaster().ismaster" | grep true; do
             echo "Still waiting..."
             sleep 2
           done
-          echo "Staging MongoDB is ready."
 
-      - name: Prepare backup directory and restore MongoDB
+      - name: Prepare backup and restore MongoDB
         run: |
-          echo "Ensuring /data/backup exists in staging container..."
           docker exec flawis-mongo-staging-1 mkdir -p /data/backup
-          echo "Copying backup into staging container..."
           docker cp ./backup/flawis flawis-mongo-staging-1:/data/backup/flawis
-          echo "Restoring MongoDB backup..."
           docker exec flawis-mongo-staging-1 sh -c 'mongorestore --drop --db flawis --uri="mongodb://localhost:27017" /data/backup/flawis'
-          echo "MongoDB restore complete."
 
   minio:
     runs-on: [HyperV]
@@ -58,27 +48,20 @@ jobs:
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-        run: |
-          echo "Starting staging MinIO..."
-          docker-compose -f docker-compose.staging.yml up -d minio-staging
+        run: docker-compose -f docker-compose.staging.yml -p staging up -d minio-staging
 
       - name: Wait for staging MinIO to be ready
         run: |
-          echo "Waiting for staging MinIO..."
           until curl -f http://localhost:9100/minio/health/live 2>/dev/null; do
             echo "MinIO not ready yet..."
             sleep 2
           done
-          echo "Staging MinIO is ready."
 
       - name: Sync data from production to staging
         run: |
-          echo "Configuring MinIO aliases..."
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-          echo "Syncing data from production to staging..."
           mc mirror production/ staging/
-          echo "MinIO sync completed."
 
   deploy:
     runs-on: [HyperV]
@@ -95,11 +78,10 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Stop and remove old containers
-        run: |
-          docker-compose -f docker-compose.staging.yml down
+      - name: Stop and remove old staging containers
+        run: docker-compose -f docker-compose.staging.yml -p staging down
 
-      - name: Remove old images, networks, and build cache
+      - name: Clean old images, networks, build cache
         run: |
           docker container prune -f
           docker image prune -a -f
@@ -126,5 +108,4 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: |
-          docker-compose -f docker-compose.staging.yml up -d --build
+        run: docker-compose -f docker-compose.staging.yml -p staging up -d --build
