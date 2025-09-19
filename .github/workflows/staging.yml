@@ -9,26 +9,30 @@ jobs:
   mongo:
     runs-on: [HyperV]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
       - name: Copy MongoDB data from production
         run: |
           echo "Dumping production MongoDB (only flawis db)..."
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
           docker cp flawis-mongo-1:/data/backup ./backup
 
-      - name: Start or recreate staging MongoDB
-        run: |
-          echo "Starting staging MongoDB..."
-          docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --remove-orphans mongo
+      - name: Remove old staging containers
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
 
-      - name: Wait for staging MongoDB to be ready
+      - name: Start staging MongoDB
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
+
+      - name: Wait for staging MongoDB container
         run: |
           echo "Waiting for staging MongoDB container to exist..."
-          # Wait until the container is created
           until docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo | grep -q .; do
             echo "Mongo container not created yet..."
             sleep 2
           done
-
           MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Mongo container exists: $MONGO_CONTAINER"
 
@@ -78,11 +82,9 @@ jobs:
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-        run: |
-          echo "Starting staging MinIO..."
-          docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --remove-orphans minio
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d minio
 
-      - name: Wait for staging MinIO
+      - name: Wait for MinIO
         run: |
           echo "Waiting for MinIO to become ready..."
           until curl -f http://localhost:9100/minio/health/live 2>/dev/null; do
@@ -93,10 +95,8 @@ jobs:
 
       - name: Sync data from production to staging
         run: |
-          echo "Configuring MinIO aliases..."
           mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
           mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-          echo "Syncing data from production to staging..."
           mc mirror production/ staging/
           echo "MinIO sync completed."
 
@@ -115,7 +115,7 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Stop and remove old staging containers
+      - name: Stop old staging containers
         run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
 
       - name: Clean old images, networks, build cache
