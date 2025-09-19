@@ -72,12 +72,12 @@ jobs:
           docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
           echo "MongoDB restore complete."
 
-  minio:
+    minio:
     runs-on: [HyperV]
     environment: staging
     env:
-      MINIO_USER: ${{ secrets.MINIO_USER }}
-      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
     steps:
       - name: Install MinIO client
         run: |
@@ -103,10 +103,17 @@ jobs:
 
       - name: Sync data from production to staging
         run: |
-          mc alias set production http://localhost:9000 $MINIO_USER $MINIO_PASSWORD
-          mc alias set staging http://localhost:9100 $MINIO_USER $MINIO_PASSWORD
+          mc alias set production http://localhost:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+          mc alias set staging http://localhost:9100 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
           mc mirror production/ staging/
           echo "MinIO sync completed."
+
+      - name: Make buckets public (images, avatars)
+        run: |
+          mc anonymous set download staging/images
+          mc anonymous set download staging/avatars
+          echo "Buckets 'images' and 'avatars' are now public in staging."
+
 
   deploy:
     runs-on: [HyperV]
