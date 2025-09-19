@@ -72,7 +72,7 @@ jobs:
           docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
           echo "MongoDB restore complete."
 
-    minio:
+  minio:
     runs-on: [HyperV]
     environment: staging
     env:
@@ -113,7 +113,6 @@ jobs:
           mc anonymous set download staging/images
           mc anonymous set download staging/avatars
           echo "Buckets 'images' and 'avatars' are now public in staging."
-
 
   deploy:
     runs-on: [HyperV]
