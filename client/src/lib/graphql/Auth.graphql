@@ -32,8 +32,8 @@ fragment User on User {
     ...Billing
   }
   studyProgramme
-  cvUrlEnv
-  avatarUrlEnv
+  cvUrl
+  avatarUrl
 }
 
 query me {

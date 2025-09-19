@@ -36,7 +36,7 @@ export default function ApplicationForm({
   const { yup } = useValidation();
 
   const { loading, files, errors } = usePrefillFiles({
-    cvUrl: user?.cvUrlEnv && !application?.fileUrls ? user.cvUrlEnv : undefined,
+    cvUrl: user?.cvUrl && !application?.fileUrls ? user.cvUrl : undefined,
     fileUrls: application?.fileUrls,
   });
 

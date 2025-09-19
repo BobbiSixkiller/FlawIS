@@ -117,8 +117,8 @@ export class InternRepository extends Repository<typeof Intern> {
 
     return {
       edges,
-      pageInfo: { ...connection.pageInfo, endCursor },
-      totalCount: connection.totalCount,
+      totalCount: connection?.totalCount ?? 0,
+      pageInfo: { ...connection?.pageInfo, endCursor },
     };
   }
 

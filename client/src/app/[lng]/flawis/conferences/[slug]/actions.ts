@@ -28,8 +28,8 @@ export async function deleteConference(id: string) {
   );
   if (res.data) {
     await deleteFiles([
-      res.data.translations.sk.logoUrlEnv,
-      res.data.translations.sk.logoUrlEnv,
+      res.data.translations.sk.logoUrl,
+      res.data.translations.sk.logoUrl,
     ]);
   }
   return res;

@@ -20,18 +20,19 @@ export class ConferenceTranslations {
   @Property()
   name: string;
 
+  @Field()
   @Property()
   logoUrl: string;
 
-  @Field({
-    description: "Logourl transformed with regards to staging/production env",
-  })
-  get logoUrlEnv(): string {
-    if (process.env.NODE_ENV === "staging") {
-      return this.logoUrl.replace("minio", "minio-staging");
-    }
-    return this.logoUrl;
-  }
+  // @Field({
+  //   description: "Logourl transformed with regards to staging/production env",
+  // })
+  // get logoUrlEnv(): string {
+  //   if (process.env.NODE_ENV === "staging") {
+  //     return this.logoUrl.replace("minio", "minio-staging");
+  //   }
+  //   return this.logoUrl;
+  // }
 }
 
 @ObjectType()

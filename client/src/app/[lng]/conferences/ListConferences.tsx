@@ -53,7 +53,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
       <div>
         <DynamicImageClient
           alt="conference-logo"
-          src={data!.translations[lng as "sk" | "en"].logoUrlEnv}
+          src={data!.translations[lng as "sk" | "en"].logoUrl}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{ objectFit: "contain" }}

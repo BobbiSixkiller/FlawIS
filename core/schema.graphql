@@ -178,8 +178,7 @@ input ConferenceTranslationInput {
 }
 
 type ConferenceTranslations {
-  """Logourl transformed with regards to staging/production env"""
-  logoUrlEnv: String!
+  logoUrl: String!
   name: String!
 }
 
@@ -752,10 +751,10 @@ type TicketTranslations {
 type User {
   access: [Access!]!
   address: Address
-  avatarUrlEnv: String
+  avatarUrl: String
   billings: [Billing]!
   createdAt: DateTimeISO!
-  cvUrlEnv: String
+  cvUrl: String
   email: String!
   id: ObjectId!
   name: String!

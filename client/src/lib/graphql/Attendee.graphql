@@ -25,10 +25,10 @@ fragment Attendee on Attendee {
     slug
     translations {
       sk {
-        logoUrlEnv
+        logoUrl
       }
       en {
-        logoUrlEnv
+        logoUrl
       }
     }
   }

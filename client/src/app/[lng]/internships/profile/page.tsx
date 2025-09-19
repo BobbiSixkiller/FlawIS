@@ -38,7 +38,7 @@ export default async function Profile({
               {t("name")}
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400  sm:col-span-2 sm:mt-0 flex items-center gap-2">
-              <Avatar name={user.name} avatarUrlEnv={user.avatarUrlEnv} />
+              <Avatar name={user.name} avatarUrl={user.avatarUrl} />
               {user?.name}
             </dd>
           </div>
@@ -92,9 +92,9 @@ export default async function Profile({
                 {t("cv")}
               </dt>
               <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
-                {user?.cvUrlEnv ? (
+                {user?.cvUrl ? (
                   <Link
-                    href={`/minio?bucketName=resumes&url=${user.cvUrlEnv}`}
+                    href={`/minio?bucketName=resumes&url=${user.cvUrl}`}
                     className="text-primary-500 hover:underline"
                   >
                     CV.pdf

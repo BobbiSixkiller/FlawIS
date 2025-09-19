@@ -145,7 +145,7 @@ export class InternResolver {
     try {
       const user = await this.userService.getUser(studentReference.id);
 
-      return { ...studentReference, avatarUrl: user.avatarUrlEnv };
+      return { ...studentReference, avatarUrl: user.avatarUrl };
     } catch (error: any) {
       console.log(error.message);
       return studentReference;

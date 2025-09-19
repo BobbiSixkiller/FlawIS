@@ -214,10 +214,7 @@ export class InternshipRepository extends Repository<typeof Internship> {
       totalCount: connection?.totalCount ?? 0,
       academicYears: connection?.academicYears ?? [],
       organizations: connection?.organizations ?? [],
-      pageInfo: {
-        ...connection?.pageInfo,
-        endCursor,
-      },
+      pageInfo: { ...connection?.pageInfo, endCursor },
     };
   }
 }
