@@ -73,6 +73,9 @@ jobs:
 
   minio:
     runs-on: [HyperV]
+    env:
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
     steps:
       - name: Install MinIO client
         run: |
@@ -85,9 +88,6 @@ jobs:
           fi
 
       - name: Start staging MinIO
-        env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d minio
 
       - name: Wait for MinIO
