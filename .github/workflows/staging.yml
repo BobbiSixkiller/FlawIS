@@ -101,8 +101,8 @@ jobs:
 
       - name: Sync data from production to staging
         run: |
-          mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-          mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
+          mc alias set production http://localhost:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+          mc alias set staging http://localhost:9100 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
           mc mirror production/ staging/
           echo "MinIO sync completed."
 
