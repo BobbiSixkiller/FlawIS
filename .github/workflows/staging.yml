@@ -18,18 +18,18 @@ jobs:
       - name: Start or recreate staging MongoDB
         run: |
           echo "Starting staging MongoDB..."
-          docker-compose -f docker-compose.staging.yml -p staging up -d --remove-orphans mongo-staging
+          docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --remove-orphans mongo
 
       - name: Wait for staging MongoDB to be ready
         run: |
           echo "Waiting for staging MongoDB container to exist..."
           # Wait until the container is created
-          until docker-compose -f docker-compose.staging.yml -p staging ps -q mongo-staging | grep -q .; do
+          until docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo | grep -q .; do
             echo "Mongo container not created yet..."
             sleep 2
           done
 
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p staging ps -q mongo-staging)
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Mongo container exists: $MONGO_CONTAINER"
 
           echo "Initializing replica set if needed..."
@@ -39,7 +39,7 @@ jobs:
               print("Replica set already initialized")
             } catch (e) {
               print("Initializing replica set...");
-              rs.initiate({_id: "rs0", members: [{ _id: 0, host: "mongo-staging:27017" }]});
+              rs.initiate({_id: "rs0", members: [{ _id: 0, host: "mongo:27017" }]});
             }
           '
 
@@ -52,7 +52,7 @@ jobs:
 
       - name: Restore MongoDB backup
         run: |
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p staging ps -q mongo-staging)
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Ensuring /data/backup exists in staging container..."
           docker exec $MONGO_CONTAINER mkdir -p /data/backup
           echo "Copying backup into staging container..."
@@ -80,7 +80,7 @@ jobs:
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
           echo "Starting staging MinIO..."
-          docker-compose -f docker-compose.staging.yml -p staging up -d --remove-orphans minio-staging
+          docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --remove-orphans minio
 
       - name: Wait for staging MinIO
         run: |
@@ -116,7 +116,7 @@ jobs:
           node-version: "20"
 
       - name: Stop and remove old staging containers
-        run: docker-compose -f docker-compose.staging.yml -p staging down
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
 
       - name: Clean old images, networks, build cache
         run: |
@@ -145,4 +145,4 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: docker-compose -f docker-compose.staging.yml -p staging up -d --build
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --build
