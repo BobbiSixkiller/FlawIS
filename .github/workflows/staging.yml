@@ -26,18 +26,21 @@ jobs:
       - name: Start staging MongoDB
         run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
 
-      - name: Wait for staging MongoDB container
+      - name: Wait for MongoDB to be healthy
         run: |
-          echo "Waiting for staging MongoDB container to exist..."
-          until docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo | grep -q .; do
-            echo "Mongo container not created yet..."
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Waiting for MongoDB to become healthy..."
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' $MONGO_CONTAINER)" == "healthy" ]; do
+            echo "MongoDB not healthy yet..."
             sleep 2
           done
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
-          echo "Mongo container exists: $MONGO_CONTAINER"
+          echo "MongoDB is healthy: $MONGO_CONTAINER"
 
-          echo "Initializing replica set if needed..."
-          docker exec $MONGO_CONTAINER mongosh --quiet --eval '
+      - name: Initialize replica set if needed
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Checking/initializing replica set..."
+          docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval '
             try {
               rs.status();
               print("Replica set already initialized")
@@ -47,12 +50,15 @@ jobs:
             }
           '
 
+      - name: Wait for MongoDB primary
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Waiting for MongoDB to become primary..."
-          until docker exec $MONGO_CONTAINER mongosh --quiet --eval "db.isMaster().ismaster" | grep true; do
-            echo "MongoDB not ready..."
+          until docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval "db.isMaster().ismaster" | grep -q true; do
+            echo "MongoDB not primary yet..."
             sleep 2
           done
-          echo "Staging MongoDB is ready."
+          echo "MongoDB is primary."
 
       - name: Restore MongoDB backup
         run: |
@@ -62,7 +68,7 @@ jobs:
           echo "Copying backup into staging container..."
           docker cp ./backup/flawis $MONGO_CONTAINER:/data/backup/flawis
           echo "Restoring MongoDB backup..."
-          docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://localhost:27017" /data/backup/flawis'
+          docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
           echo "MongoDB restore complete."
 
   minio:
