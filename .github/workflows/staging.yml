@@ -8,6 +8,7 @@ on:
 jobs:
   mongo:
     runs-on: [HyperV]
+    environment: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,6 +74,7 @@ jobs:
 
   minio:
     runs-on: [HyperV]
+    environment: staging
     env:
       MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
       MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
