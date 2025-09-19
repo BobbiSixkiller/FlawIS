@@ -76,8 +76,8 @@ jobs:
     runs-on: [HyperV]
     environment: staging
     env:
-      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+      MINIO_USER: ${{ secrets.MINIO_USER }}
+      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
     steps:
       - name: Install MinIO client
         run: |
@@ -103,8 +103,8 @@ jobs:
 
       - name: Sync data from production to staging
         run: |
-          mc alias set production http://localhost:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
-          mc alias set staging http://localhost:9100 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+          mc alias set production http://localhost:9000 $MINIO_USER $MINIO_PASSWORD
+          mc alias set staging http://localhost:9100 $MINIO_USER $MINIO_PASSWORD
           mc mirror production/ staging/
           echo "MinIO sync completed."
 
