@@ -41,7 +41,6 @@ export function withSubdomain(middleware: CustomMiddleware) {
       subdomain === "localhost:3000" &&
       process.env.NODE_ENV === "development"
     ) {
-      console.log("SLAPE !");
       const newUrl = new URL(
         `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url
