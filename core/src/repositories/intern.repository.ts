@@ -65,13 +65,6 @@ export class InternRepository extends Repository<typeof Intern> {
             { $match: { ...cursorFilter } },
             { $limit: first },
             { $addFields: { id: "$_id", "user.id": "$user._id" } },
-            // {
-            //   $project: {
-            //     _id: 0, // drop the raw _id
-            //     "user._id": 0,
-            //     __v: 0,
-            //   },
-            // },
           ],
           hasNextPage: [
             { $match: { ...cursorFilter } },
