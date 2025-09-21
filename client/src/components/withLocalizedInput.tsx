@@ -19,55 +19,46 @@ type WithLocalizedInputProps = {
   control?: Control<any>;
 };
 
-export function withLocalizedInput<
-  // Extra generic params (e.g., TOption, TValue)
-  // Defaulting to unknown so it works for Input/Textarea too
-  T1 = unknown,
-  T2 = unknown,
-  // Props must at least include your localization props
-  P extends WithLocalizedInputProps = WithLocalizedInputProps
->(InputComponent: ComponentType<P>) {
-  // Preserve generics in the return type
-  function WithLocalizedInputWrapper(props: P) {
-    const [visible, setVisible] = useState(false);
+export function withLocalizedInput<T extends ComponentType<any>>(
+  InputComponent: T
+) {
+  type Props = React.ComponentProps<T> & WithLocalizedInputProps;
 
-    const localizedInputName = props.name.replace(
-      props.lng,
-      props.lng === "sk" ? "en" : "sk"
-    );
-    const localizedError = get(props.errors, localizedInputName)?.message;
+  function Wrapper(props: Props) {
+    const { name, lng, errors, error, label, ...rest } = props;
+    const [visible, setVisible] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    const localizedInputName = name.replace(lng, lng === "sk" ? "en" : "sk");
+    const localizedError = get(errors, localizedInputName)?.message;
 
     useEffect(() => {
-      if (props.error || localizedError) {
-        setVisible(true);
-      }
-    }, [props.error, localizedError]);
+      if (error || localizedError) setVisible(true);
+    }, [error, localizedError]);
 
-    const ref = useRef<HTMLDivElement>(null);
     useOnClickOutside(ref, () => {
-      if (!props.error && !localizedError) {
-        setVisible(false);
-      }
+      if (!error && !localizedError) setVisible(false);
     });
 
     return (
       <div ref={ref}>
         <InputComponent
-          {...props}
+          {...(rest as any)}
+          name={name}
+          lng={lng}
+          label={label}
+          error={error}
           onFocus={() => setVisible(true)}
           onClick={() => setVisible(true)}
         />
         <Transition as={Fragment} show={visible}>
           <div className="mt-2">
             <InputComponent
-              {...props}
-              error={localizedError as any}
-              label={
-                props.lng === "sk"
-                  ? `${props.label} anglicky`
-                  : `${props.label} in Slovak`
-              }
+              {...(rest as any)}
               name={localizedInputName}
+              lng={lng === "sk" ? "en" : "sk"}
+              label={lng === "sk" ? `${label} anglicky` : `${label} in Slovak`}
+              error={localizedError}
               onFocus={() => setVisible(true)}
             />
           </div>
@@ -76,9 +67,7 @@ export function withLocalizedInput<
     );
   }
 
-  // 👇 The important part:
-  // return type is still generic in <T1, T2>
-  return WithLocalizedInputWrapper as unknown as <A = T1, B = T2>(
-    props: P
-  ) => JSX.Element;
+  // 🔑 Critical: Preserve generics from the wrapped component
+  return Wrapper as unknown as (<U extends any[]>(...args: U) => JSX.Element) &
+    T;
 }

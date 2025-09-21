@@ -4,7 +4,7 @@ import Editor from "@/components/editor/Editor";
 import useDefaultContent from "@/components/editor/useDefaultContent";
 import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
-import { CourseInput } from "@/lib/graphql/generated/graphql";
+import { Category, CourseInput } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -33,7 +33,7 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
       lng={lng}
       defaultValues={{
         name: "",
-        // categoryIds: [],
+        categoryIds: [],
         description: "",
         price: 0,
         billing: {
@@ -67,52 +67,51 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
         name="Info o kurze"
         yupSchema={yup.object({
           name: yup.string().required(),
-          // description: yup.string().required(),
+          description: yup.string().required(),
           price: yup.number().required(),
-          billing: yup.object({}),
         })}
       >
-        <Input label="Nazov kurzu" name="name" />
-        {/* <GenericCombobox
-          allowCreateNewOptions
-          multiple
-          placeholder="Kategoria..."
-          renderOption={(option, props) => (
-            <p
-              className={cn([
-                props.focus &&
-                  "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full",
-                "p-2 flex justify-between items-center",
-              ])}
-            >
-              {option.label}
-              {props.selected && <CheckIcon className="size-3 stroke-2" />}
-            </p>
-          )}
-          defaultOptions={[
-            { id: 0, label: "Pravnici" },
-            { id: 1, label: "nepravnici" },
-          ]}
-          getOptionLabel={({ label }) => label}
-          onChange={(val) => {
-            if (Array.isArray(val)) {
-              console.log("ARR ", val);
-            } else {
-              console.log("SINGLE ", val);
-            }
-          }}
-        /> */}
-        <Input
-          label="Cena kurzu v centoch s DPH"
-          name="price"
-          type="number"
-          onChange={(e) => setPrice(parseInt(e.target.value))}
-        />
-        {/* <Editor
-          className="sm:w-[580px] md:w-[600px]"
-          name="description"
-          initialValue={defaultCourseEditorContent}
-        /> */}
+        {(methods) => (
+          <div className="space-y-6">
+            <Input label="Nazov kurzu" name="name" />
+            <GenericCombobox<{ id: string; val: Category }, string>
+              lng={lng}
+              label="Kategoria"
+              name="categoryIds"
+              control={methods.control}
+              allowCreateNewOptions
+              multiple
+              placeholder="Kategoria..."
+              renderOption={(option, props) => (
+                <p
+                  className={cn([
+                    props.focus &&
+                      "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full",
+                    "p-2 flex justify-between items-center",
+                  ])}
+                >
+                  {option.val.name}
+                  {props.selected && <CheckIcon className="size-3 stroke-2" />}
+                </p>
+              )}
+              defaultOptions={[]}
+              getOptionValue={(opt) => opt?.id ?? ""}
+              getOptionLabel={({ val }) => val.name}
+            />
+            <Input
+              label="Cena kurzu v centoch s DPH"
+              name="price"
+              type="number"
+              onChange={(e) => setPrice(parseInt(e.target.value))}
+            />
+            <Editor
+              control={methods.control}
+              className="sm:w-[580px] md:w-[600px]"
+              name="description"
+              initialValue={defaultCourseEditorContent}
+            />
+          </div>
+        )}
       </WizzardStep>
       {price > 0 && (
         <WizzardStep

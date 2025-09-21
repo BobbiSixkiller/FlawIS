@@ -14,7 +14,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { last } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
-import { cn } from "@/utils/helpers";
+import { cn, handleAPIErrors } from "@/utils/helpers";
 import useWidth from "@/hooks/useWidth";
 import {
   ChevronDownIcon,
@@ -22,6 +22,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
+import { GqlMutationResponse } from "@/utils/actions";
 
 export interface GenericComboboxProps<TOption, TValue> {
   lng: string;
@@ -34,7 +35,7 @@ export interface GenericComboboxProps<TOption, TValue> {
   multiple?: boolean;
   immediate?: boolean;
   fetchOptions?: (query: string) => Promise<TOption[]>;
-  createOption?: (text: string) => Promise<TOption>;
+  createOption?: (text: string) => Promise<GqlMutationResponse<TOption>>;
   renderOption: (
     option: TOption,
     props: { focus: boolean; selected: boolean }
@@ -148,18 +149,48 @@ export default function GenericCombobox<
     if (Array.isArray(newValue)) {
       // Creating a new option
       if (createOption && !last(newValue)?.id) {
-        const newOpt = await createOption(last(newValue)!.val);
-        field.onChange([
-          ...newValue.slice(0, newValue.length - 1).map(getOptionValue),
-          getOptionValue(newOpt),
-        ]);
+        setLoading(true);
+        const res = await createOption(last(newValue)!.val);
+        if (res.data) {
+          field.onChange([
+            ...newValue.slice(0, newValue.length - 1).map(getOptionValue),
+            getOptionValue(res.data),
+          ]);
+        }
+        if (!res.success) {
+          if (res.errors) {
+            handleAPIErrors(res.errors, control.setError);
+          } else {
+            control.setError(
+              name,
+              { message: res.message },
+              { shouldFocus: true }
+            );
+          }
+        }
+        setLoading(false);
       } else {
         field.onChange(newValue.map(getOptionValue));
       }
     } else {
       if (createOption && !newValue?.id) {
-        const newOpt = await createOption(newValue?.val);
-        field.onChange(getOptionValue(newOpt));
+        setLoading(true);
+        const res = await createOption(newValue?.val);
+        if (res.data) {
+          field.onChange(getOptionValue(res.data));
+        }
+        if (!res.success) {
+          if (res.errors) {
+            handleAPIErrors(res.errors, control.setError);
+          } else {
+            control.setError(
+              name,
+              { message: res.message },
+              { shouldFocus: true }
+            );
+          }
+        }
+        setLoading(false);
       } else {
         field.onChange(getOptionValue(newValue));
       }

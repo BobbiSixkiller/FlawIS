@@ -1,11 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { FormProvider, useForm } from "react-hook-form";
-import { date, number, object, string } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import Button from "@/components/Button";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { InvoiceInput } from "@/lib/graphql/generated/graphql";
 import { Input } from "@/components/Input";
 import { Textarea } from "@/components/Textarea";
@@ -64,7 +61,7 @@ export default function UpdateInvoiceForm({
         }),
         payer: yup.object({
           name: yup.string().trim().required(),
-          address: object({
+          address: yup.object({
             street: yup.string().trim().required(),
             city: yup.string().trim().required(),
             postal: yup.string().trim().required(),

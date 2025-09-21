@@ -218,6 +218,7 @@ input CourseFilterInput {
 
 input CourseInput {
   billing: FlawBillingInput
+  categoryIds: [ObjectId!]!
   description: String!
   name: String!
   price: Int!

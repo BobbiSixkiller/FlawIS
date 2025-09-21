@@ -24,6 +24,7 @@ import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
+import { handleAPIErrors } from "@/utils/helpers";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -97,13 +98,7 @@ export default function ConferenceRegistrationForm({
         );
 
         if (res.errors) {
-          for (const [key, val] of Object.entries(res.errors)) {
-            methods.setError(
-              key as keyof (typeof methods)["formState"]["errors"],
-              { message: val },
-              { shouldFocus: true }
-            );
-          }
+          handleAPIErrors(res.errors, methods.setError);
         }
 
         setMessage(res.message, res.success);
@@ -260,7 +255,7 @@ export default function ConferenceRegistrationForm({
                 defaultOptions={[]}
                 getOptionLabel={(opt) => opt.val}
                 renderOption={(opt, props) => <span>{opt.val}</span>}
-                getOptionValue={(opt) => opt?.val}
+                getOptionValue={(opt) => opt?.val ?? ""}
               />
               <Select
                 control={methods.control}

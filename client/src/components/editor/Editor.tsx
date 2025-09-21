@@ -11,7 +11,7 @@ import { LinkSelector } from "./selectors/LinkSelector";
 import { items, NodeSelector } from "./selectors/NodeSelector";
 import { TextButtons } from "./selectors/TextButtons";
 import { useDebouncedCallback } from "use-debounce";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 
 import { cn } from "@/utils/helpers";
 import { SlashCommandExtension } from "./SlashCommand";
@@ -22,6 +22,7 @@ import { useEffect } from "react";
 interface EditorProps {
   initialValue?: string | JSONContent; // Use HTML or JSON as needed
   name: string;
+  control: Control<any>;
   className?: string;
 }
 
@@ -29,8 +30,9 @@ export default function TiptapEditor({
   className,
   initialValue,
   name,
+  control,
 }: EditorProps) {
-  const { field, fieldState, formState } = useController({ name });
+  const { field, fieldState, formState } = useController({ name, control });
   const { defaultExtensions } = useLocalizedExtensions();
 
   const editor = useEditor({

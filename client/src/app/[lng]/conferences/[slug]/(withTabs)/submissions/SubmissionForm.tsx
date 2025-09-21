@@ -9,12 +9,8 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import { LocalizedTextarea } from "@/components/Textarea";
 import Select from "@/components/Select";
-import {
-  LocalizedMultipleInput,
-  MultipleInput,
-} from "@/components/MultipleInput";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import { uploadOrDelete } from "@/utils/helpers";
+import { handleAPIErrors, uploadOrDelete } from "@/utils/helpers";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
@@ -26,6 +22,7 @@ import { omit } from "lodash";
 import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
+import { withLocalizedInput } from "@/components/withLocalizedInput";
 
 export default function SubmissionForm({
   submission,
@@ -125,33 +122,25 @@ export default function SubmissionForm({
               return methods.setError("files", { message: error });
             }
 
-            let state;
+            let res;
             if (submission) {
-              state = await updateSubmission({
+              res = await updateSubmission({
                 id: submission?.id,
                 data: { ...omit(vals, "files"), fileUrl: url },
               });
             } else {
-              state = await createSubmission({
+              res = await createSubmission({
                 data: { ...omit(vals, "files"), fileUrl: url },
               });
             }
 
-            if (state.errors) {
-              for (const [key, val] of Object.entries(state.errors)) {
-                methods.setError(
-                  key as keyof (typeof methods)["formState"]["errors"],
-                  { message: val },
-                  {
-                    shouldFocus: true,
-                  }
-                );
-              }
+            if (res.errors) {
+              handleAPIErrors(res.errors, methods.setError);
             }
 
-            setMessage(state.message, state.success);
+            setMessage(res.message, res.success);
 
-            if (state.success) {
+            if (res.success) {
               closeDialog(dialogId);
             }
           })}
@@ -175,7 +164,7 @@ export default function SubmissionForm({
             label={t("registration.submission.abstract", { ns: "conferences" })}
             name={`translations.${lng}.abstract`}
           />
-          <LocalizedGenericCombobox<{ id: number; val: string }>
+          <LocalizedGenericCombobox<{ id: number; val: string }, string>
             control={methods.control}
             name={`translations.${lng}.keywords`}
             lng={lng}
@@ -192,16 +181,6 @@ export default function SubmissionForm({
             allowCreateNewOptions
             multiple
           />
-          {/* <LocalizedMultipleInput
-            lng={lng}
-            label={t("registration.submission.keywords.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.keywords.placeholder", {
-              ns: "conferences",
-            })}
-            name={`translations.${lng}.keywords`}
-          /> */}
           <Select
             control={methods.control}
             name="presentationLng"

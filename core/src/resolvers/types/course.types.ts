@@ -21,7 +21,9 @@ import { FlawBilling } from "../../entitites/Billing";
 import { FlawBillingInput } from "./conference.types";
 import { IsInt, IsString, Min, MinDate } from "class-validator";
 import { Ref } from "@typegoose/typegoose";
-import { IsAfter } from "../../util/decorators";
+import { IsAfter, RefDocExists } from "../../util/decorators";
+import Container from "typedi";
+import { I18nService } from "../../services/i18n.service";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -87,15 +89,15 @@ export class CourseInput implements Partial<Course> {
   @IsString()
   name: string;
 
-  // @Field(() => [ObjectId])
-  // @RefDocExists(Category, {
-  //   each: true,
-  //   message: () =>
-  //     Container.get(I18nService).translate("categoryNotFound", {
-  //       ns: "course",
-  //     }),
-  // })
-  // categoryIds: ObjectId[];
+  @Field(() => [ObjectId])
+  @RefDocExists(Category, {
+    each: true,
+    message: () =>
+      Container.get(I18nService).translate("categoryNotFound", {
+        ns: "course",
+      }),
+  })
+  categoryIds: ObjectId[];
 
   @Field()
   @IsString()

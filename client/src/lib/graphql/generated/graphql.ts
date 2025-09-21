@@ -253,6 +253,7 @@ export type CourseFilterInput = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
+  categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
@@ -1442,6 +1443,13 @@ export type CoursesQueryVariables = Exact<{
 
 
 export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+
+export type CourseQueryVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type CourseQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
@@ -3764,6 +3772,21 @@ export const CoursesDocument = new TypedDocumentString(`
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<CoursesQuery, CoursesQueryVariables>;
+export const CourseDocument = new TypedDocumentString(`
+    query course($id: ObjectId!) {
+  course(id: $id) {
+    ...Course
+  }
+}
+    fragment Course on Course {
+  id
+  name
+  description
+  price
+  isPaid
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CourseQuery, CourseQueryVariables>;
 export const CreateCourseDocument = new TypedDocumentString(`
     mutation createCourse($data: CourseInput!) {
   createCourse(data: $data) {

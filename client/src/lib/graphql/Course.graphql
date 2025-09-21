@@ -24,6 +24,12 @@ query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
   }
 }
 
+query course($id: ObjectId!) {
+  course(id: $id) {
+    ...Course
+  }
+}
+
 mutation createCourse($data: CourseInput!) {
   createCourse(data: $data) {
     message

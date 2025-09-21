@@ -215,6 +215,7 @@ export type ServerActionResponse<T = undefined> = {
 };
 
 import { stringify } from "csv-stringify/sync"; // sync API is easier for route handlers
+import { UseFormReturn } from "react-hook-form";
 
 export function toCSV<T extends Record<string, any>>(data: T[]): string {
   return stringify(data, {
@@ -234,4 +235,19 @@ export function createCSVResponse(
       "Content-Type": "text/csv; charset=utf-8",
     },
   });
+}
+
+export function handleAPIErrors(
+  errors: Record<string, string>,
+  setFormError: UseFormReturn<any>["setError"]
+) {
+  for (const [key, val] of Object.entries(errors)) {
+    setFormError(
+      key,
+      { message: val },
+      {
+        shouldFocus: true,
+      }
+    );
+  }
 }
