@@ -1,14 +1,14 @@
 version: "3.4"
 
 services:
-  core-staging:
+  core:
     build:
       context: ./core
       dockerfile: Dockerfile
     environment:
       NODE_ENV: staging
       SECRET: ${SECRET}
-      MONGODB_URI: "mongodb://mongo-staging:27017/flawis?replicaSet=rs0"
+      MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
       RMQ_URI: ${RMQ_URI}
       REDIS_URI: ${REDIS_URI}
@@ -19,13 +19,13 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
     depends_on:
-      minio-staging:
+      minio:
         condition: service_healthy
-      rabbitmq-staging:
+      rabbitmq:
         condition: service_healthy
-      redis-staging:
+      redis:
         condition: service_healthy
-      mongo-staging:
+      mongo:
         condition: service_healthy
     restart: unless-stopped
     ports:
@@ -33,12 +33,12 @@ services:
     networks:
       - staging-network
 
-  client-staging:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile
     environment:
-      API_URI: http://core-staging:5000/graphql
+      API_URI: http://core:5000/graphql
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
@@ -46,14 +46,14 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
     depends_on:
-      - core-staging
+      - core
     restart: unless-stopped
     ports:
       - "3001:3000"
     networks:
       - staging-network
 
-  mail-staging:
+  mail:
     build:
       context: ./mail
       dockerfile: Dockerfile
@@ -65,16 +65,16 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      RMQ_URI: amqp://rabbitmq-staging:5672
+      RMQ_URI: amqp://rabbitmq:5672
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
-      rabbitmq-staging:
+      rabbitmq:
         condition: service_healthy
     restart: unless-stopped
     networks:
       - staging-network
 
-  minio-staging:
+  minio:
     image: minio/minio:latest
     restart: unless-stopped
     ports:
@@ -95,8 +95,8 @@ services:
     networks:
       - staging-network
 
-  rabbitmq-staging:
-    image: rabbitmq
+  rabbitmq:
+    image: rabbitmq:4.1.2
     restart: unless-stopped
     ports:
       - "5673:5672"
@@ -110,9 +110,8 @@ services:
       start_period: 120s
     networks:
       - staging-network
-
-  redis-staging:
-    image: redis
+  redis:
+    image: redis:8.0.3
     restart: unless-stopped
     ports:
       - "6380:6379"
@@ -124,18 +123,18 @@ services:
       start_period: 30s
     networks:
       - staging-network
-
-  mongo-staging:
-    image: mongo:8.0
+  mongo:
+    build:
+      context: ./mongo
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "27018:27017"
     volumes:
       - mongo_data_staging:/data/db
       - mongo_config_staging:/data/configdb
-    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongo-staging/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh mongo/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3

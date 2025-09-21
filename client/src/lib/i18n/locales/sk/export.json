@@ -1,0 +1,6 @@
+{
+  "500": "Export zlyhal!",
+  "400": "Chýba 'type' query parameter!",
+  "401": "Musíte byť prihlásený na vykonanie tejto akcie!",
+  "404": "Neznámy export 'type'query parameter: {{type}}!"
+}

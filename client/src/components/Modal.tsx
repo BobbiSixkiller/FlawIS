@@ -60,7 +60,9 @@ export default function Modal({
       <Dialog
         as="div"
         className="fixed z-30 inset-0 overflow-y-auto"
+        id="modal-scroll-container"
         onClose={handleClose}
+        unmount
       >
         <TransitionChild
           enter="duration-300 ease-out"

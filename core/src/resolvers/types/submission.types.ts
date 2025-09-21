@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsEmail, IsMongoId, IsString } from "class-validator";
+import { ArrayMinSize, IsEmail, IsString } from "class-validator";
 import { ObjectId } from "mongodb";
 import {
   ArgsType,

@@ -2,38 +2,68 @@ import { Index, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
-import { Field, Int, ObjectType } from "type-graphql";
-
+import { Field, Float, Int, ObjectType } from "type-graphql";
 import { FlawBilling } from "./Billing";
 import { Invoice } from "./Attendee";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
 
-@ObjectType()
-@Index({ user: 1 })
-@Index({ name: "text" })
-export class Course extends TimeStamps {
+@ObjectType({ description: "Course category" })
+export class Category {
   @Field(() => ObjectId)
   id: ObjectId;
-
-  @Field(() => UserStub)
-  @Property({ type: () => UserStub })
-  owner: UserStub;
-
-  @Field(() => UserStub, { nullable: true })
-  @Property({ type: () => UserStub })
-  procurer?: UserStub;
 
   @Field()
   @Property()
   name: string;
 
-  @Field({
-    description: "String representation of HTML describing the course",
-  })
+  @Field()
+  @Property()
+  slug: string;
+}
+
+@ObjectType()
+@Index({ registrationEnd: 1 })
+@Index({ start: 1, end: 1 })
+@Index({ "category._id": 1 })
+@Index({ name: "text" })
+export class Course extends TimeStamps {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field(() => UserStub, { nullable: true })
+  @Property({ type: () => UserStub })
+  procurer?: UserStub;
+
+  @Field(() => [Category])
+  @Property({ type: () => [Category], default: [] })
+  categories: Category[];
+
+  @Field()
+  @Property()
+  name: string;
+
+  @Field({ description: "String representation of HTML describing the course" })
   @Property()
   description: string;
 
+  @Field(() => Int)
+  @Property()
+  maxAttendees: number;
+
+  @Field()
+  @Property()
+  registrationEnd: Date;
+
+  @Field()
+  @Property()
+  start: Date;
+
+  @Field()
+  @Property()
+  end: Date;
+
+  @Field(() => FlawBilling, { nullable: true })
   @Property({ type: () => FlawBilling, _id: false })
   billing?: FlawBilling;
 
@@ -52,9 +82,12 @@ export class Course extends TimeStamps {
   updatedAt: Date;
 }
 
-@ObjectType()
+@ObjectType({
+  description:
+    "Scheduled term for a given course that when created also creates corresponding attendance records.",
+})
 @Index({ course: 1 })
-export class CourseModule extends TimeStamps {
+export class CourseSession extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
@@ -65,30 +98,9 @@ export class CourseModule extends TimeStamps {
   @Property()
   name: string;
 
-  @Field({
-    description:
-      "String representation of HTML describing the module of the course",
-  })
+  @Field()
   @Property()
   description: string;
-
-  @Field()
-  createdAt: Date;
-  @Field()
-  updatedAt: Date;
-}
-
-@ObjectType()
-@Index({ course: 1, module: 1 })
-export class CourseTerm extends TimeStamps {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
-  @Property({ ref: () => Course })
-  course: Ref<Course>;
-
-  @Property({ ref: () => CourseModule })
-  module?: Ref<CourseModule>;
 
   @Field()
   @Property()
@@ -111,16 +123,14 @@ export class CourseTerm extends TimeStamps {
 @ObjectType()
 export class CourseAttendeeUserStub extends UserStub {
   @Field()
-  @Property()
+  @Property({ default: "N/A" })
   organizatation: string;
-
-  @Field()
-  @Property()
-  department: string;
 }
 
-@ObjectType()
-@Index({ "user._id": 1, term: 1, status: 1 })
+@ObjectType({ description: "Connects a system user with a particular course." })
+@Index({ course: 1 })
+@Index({ "user._id": 1 })
+@Index({ status: 1 })
 export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -129,8 +139,12 @@ export class CourseAttendee extends TimeStamps {
   @Property({ type: () => CourseAttendeeUserStub })
   user: CourseAttendeeUserStub;
 
-  @Property({ ref: () => CourseTerm })
-  term: Ref<CourseTerm>;
+  @Property({ ref: () => Course })
+  course: Ref<Course>;
+
+  @Field({ nullable: true })
+  @Property()
+  grade?: string;
 
   @Field(() => Status)
   @Property({ enum: Status, type: String, default: Status.Applied })
@@ -143,6 +157,49 @@ export class CourseAttendee extends TimeStamps {
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })
   invoice?: Invoice;
+
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
+}
+
+@ObjectType()
+export class CourseAttendeeStub {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  @Property()
+  name: string;
+}
+
+@ObjectType({
+  description: "Represents individual attendance for a given course term.",
+})
+@Index({ term: 1 })
+@Index({ "attendee._id": 1 })
+export class AttendaceRecord extends TimeStamps {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Property({ ref: () => CourseSession })
+  term: Ref<CourseSession>;
+
+  @Field(() => CourseAttendeeStub)
+  @Property({ type: () => CourseAttendeeStub })
+  attendee: CourseAttendeeStub;
+
+  @Field(() => Float, {
+    description:
+      "Hours the person attended a given course term. Can't be more than the hours from start to end of a term.",
+  })
+  @Property()
+  hoursAttended: number;
+
+  @Field({ nullable: true })
+  @Property()
+  online?: boolean;
 
   @Field()
   createdAt: Date;

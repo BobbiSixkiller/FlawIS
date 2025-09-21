@@ -105,6 +105,13 @@ type Billing {
   name: String!
 }
 
+"""Course category"""
+type Category {
+  id: ObjectId!
+  name: String!
+  slug: String!
+}
+
 """Conference model type"""
 type Conference {
   attendeesCount: Int!
@@ -171,27 +178,47 @@ input ConferenceTranslationInput {
 }
 
 type ConferenceTranslations {
-  """Logourl transformed with regards to staging/production env"""
-  logoUrlEnv: String!
+  logoUrl: String!
   name: String!
 }
 
 type Course {
+  billing: FlawBilling
+  categories: [Category!]!
   createdAt: DateTimeISO!
 
   """String representation of HTML describing the course"""
   description: String!
+  end: DateTimeISO!
   id: ObjectId!
   isPaid: Boolean!
+  maxAttendees: Int!
   name: String!
-  owner: UserStub!
   price: Int!
   procurer: UserStub
+  registrationEnd: DateTimeISO!
+  start: DateTimeISO!
   updatedAt: DateTimeISO!
+}
+
+type CourseConnection {
+  edges: [CourseEdge]!
+  pageInfo: CoursePageInfo!
+  totalCount: Int!
+}
+
+type CourseEdge {
+  cursor: String!
+  node: Course!
+}
+
+input CourseFilterInput {
+  categoryIds: [ObjectId]! = []
 }
 
 input CourseInput {
   billing: FlawBillingInput
+  categoryIds: [ObjectId!]!
   description: String!
   name: String!
   price: Int!
@@ -200,6 +227,22 @@ input CourseInput {
 type CourseMutationResponse implements IMutationResponse {
   data: Course!
   message: String!
+}
+
+type CoursePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input CourseSortInput {
+  direction: SortDirection!
+  field: CourseSortableField!
+}
+
+"""Sortable enum definition for courses query"""
+enum CourseSortableField {
+  ID
+  NAME
 }
 
 """
@@ -446,6 +489,7 @@ type Mutation {
   deleteTicket(slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   deleteUser(id: ObjectId!): UserMutationResponse!
   googleSignIn(authCode: String!): UserMutationResponse!
+  inviteUsers(input: OrganizationEmailsInput!): String!
   login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
   register(data: RegisterUserInput!): UserMutationResponse!
@@ -475,7 +519,7 @@ type OrganizationCount {
 """
 Addresses of the organizations you want to invite to FlawIS/internships
 """
-input OrganizationEmails {
+input OrganizationEmailsInput {
   emails: [String!]!
 }
 
@@ -497,13 +541,13 @@ type Query {
   conference(slug: String!): Conference!
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!
+  courses(after: String, filter: CourseFilterInput, first: Int! = 20, sort: [CourseSortInput]!): CourseConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
   interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
   internsExport: [Intern]!
   internship(id: ObjectId!): Internship!
   internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
-  inviteUsers(input: OrganizationEmails!): String!
   me: User!
   submission(id: ObjectId!): Submission!
   textSearchAttendee(slug: String!, text: String!): [Attendee!]!

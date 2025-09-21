@@ -67,11 +67,11 @@ fragment Conference on Conference {
   translations {
     sk {
       name
-      logoUrlEnv
+      logoUrl
     }
     en {
       name
-      logoUrlEnv
+      logoUrl
     }
   }
   dates {
@@ -172,10 +172,10 @@ mutation deleteConference($id: ObjectId!) {
       slug
       translations {
         sk {
-          logoUrlEnv
+          logoUrl
         }
         en {
-          logoUrlEnv
+          logoUrl
         }
       }
     }

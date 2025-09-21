@@ -149,11 +149,9 @@ export function CreateArgs<TNode extends object, TSortFieldEnum extends object>(
 }
 
 //generic function for creating corresponding Connection Type enabling relay style pagination
-export function CreateConnection<
-  TNode extends object,
-  TSort extends object,
-  TFilter extends object
->(TNodeClass: ClassType<TNode>) {
+export function CreateConnection<TNode extends object>(
+  TNodeClass: ClassType<TNode>
+) {
   @ObjectType(`${TNodeClass.name}Edge`)
   abstract class Edge {
     @Field(() => TNodeClass) // here we use the runtime argument

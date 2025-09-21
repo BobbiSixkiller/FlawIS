@@ -39,7 +39,7 @@ export async function addAttendee(
     }),
     {
       revalidateTags: (data) => [
-        // `conferences:${data.addAttendee.data.slug}`,
+        `conferences:${data.addAttendee.data.slug}`,
         "attendees",
       ],
     }

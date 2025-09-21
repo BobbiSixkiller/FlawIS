@@ -3,14 +3,21 @@
 import Editor from "@/components/editor/Editor";
 import useDefaultContent from "@/components/editor/useDefaultContent";
 import { Input } from "@/components/Input";
-import { WizzardForm, WizzardStep } from "@/components/WIzzardForm";
 import useValidation from "@/hooks/useValidation";
-import { CourseInput } from "@/lib/graphql/generated/graphql";
+import { Category, CourseInput } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { createCourse } from "./actions";
+import { useMessageStore } from "@/stores/messageStore";
+import { useDialogStore } from "@/stores/dialogStore";
+import GenericCombobox from "@/components/GenericCombobox";
+import { cn } from "@/utils/helpers";
+import { CheckIcon } from "@heroicons/react/24/outline";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 
-export default function CourseForm(props: { dialogId: string }) {
+export default function CourseForm({ dialogId }: { dialogId: string }) {
+  const [price, setPrice] = useState(0);
   const { lng } = useParams<{ lng: string }>();
   const { yup } = useValidation();
 
@@ -18,14 +25,15 @@ export default function CourseForm(props: { dialogId: string }) {
 
   const { defaultCourseEditorContent } = useDefaultContent(lng);
 
-  const [price, setPrice] = useState(0);
+  const setMessage = useMessageStore((s) => s.setMessage);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
 
   return (
     <WizzardForm<CourseInput>
       lng={lng}
-      values={{
-        categoryIds: [],
+      defaultValues={{
         name: "",
+        categoryIds: [],
         description: "",
         price: 0,
         billing: {
@@ -46,34 +54,69 @@ export default function CourseForm(props: { dialogId: string }) {
       }}
       onSubmitCb={async (vals) => {
         console.log(vals);
+        const res = await createCourse({ data: vals });
+
+        setMessage(res.message, res.success);
+
+        if (res.success) {
+          closeDialog(dialogId);
+        }
       }}
     >
       <WizzardStep
         name="Info o kurze"
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           name: yup.string().required(),
           description: yup.string().required(),
           price: yup.number().required(),
-          billing: yup.object({}),
         })}
       >
-        <Input label="Nazov kurzu" name="name" />
-        <Input
-          label="Cena kurzu"
-          name="price"
-          type="number"
-          onChange={(e) => setPrice(parseInt(e.target.value))}
-        />
-        <Editor
-          className="sm:w-[580px] md:w-[600px]"
-          name="description"
-          initialValue={defaultCourseEditorContent}
-        />
+        {(methods) => (
+          <div className="space-y-6">
+            <Input label="Nazov kurzu" name="name" />
+            <GenericCombobox<{ id: string; val: Category }, string>
+              lng={lng}
+              label="Kategoria"
+              name="categoryIds"
+              control={methods.control}
+              allowCreateNewOptions
+              multiple
+              placeholder="Kategoria..."
+              renderOption={(option, props) => (
+                <p
+                  className={cn([
+                    props.focus &&
+                      "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full",
+                    "p-2 flex justify-between items-center",
+                  ])}
+                >
+                  {option.val.name}
+                  {props.selected && <CheckIcon className="size-3 stroke-2" />}
+                </p>
+              )}
+              defaultOptions={[]}
+              getOptionValue={(opt) => opt?.id ?? ""}
+              getOptionLabel={({ val }) => val.name}
+            />
+            <Input
+              label="Cena kurzu v centoch s DPH"
+              name="price"
+              type="number"
+              onChange={(e) => setPrice(parseInt(e.target.value))}
+            />
+            <Editor
+              control={methods.control}
+              className="sm:w-[580px] md:w-[600px]"
+              name="description"
+              initialValue={defaultCourseEditorContent}
+            />
+          </div>
+        )}
       </WizzardStep>
       {price > 0 && (
         <WizzardStep
           name="Fakturacne udaje"
-          validationSchema={yup.object({
+          yupSchema={yup.object({
             billing: yup.object({
               name: yup.string().trim().required(),
               address: yup.object({
@@ -88,14 +131,6 @@ export default function CourseForm(props: { dialogId: string }) {
               ICO: yup.string().trim().required(),
               DIC: yup.string().trim().required(),
               ICDPH: yup.string().trim().required(),
-              stamp: yup
-                .mixed<File>() // Pass in the type of `fileUpload`
-                .test("required", t("required"), (file) => file !== undefined)
-                .test(
-                  "fileSize",
-                  "Only documents up to 2MB are permitted.",
-                  (file) => file && file.size < 2_000_000
-                ),
             }),
           })}
         >

@@ -1,6 +1,5 @@
 "use client";
 
-import { WizzardForm, WizzardStep } from "@/components/WIzzardForm";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import { useState } from "react";
@@ -18,13 +17,14 @@ import Ticket from "./Ticket";
 import BillingInput from "./BillingInput";
 import { LocalizedTextarea } from "@/components/Textarea";
 import { Input } from "@/components/Input";
-import {
-  LocalizedMultipleInput,
-  MultipleInput,
-} from "@/components/MultipleInput";
 import Select from "@/components/Select";
 import useValidation from "@/hooks/useValidation";
 import { useMessageStore } from "@/stores/messageStore";
+import GenericCombobox, {
+  LocalizedGenericCombobox,
+} from "@/components/GenericCombobox";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
+import { handleAPIErrors } from "@/utils/helpers";
 
 export default function ConferenceRegistrationForm({
   lng,
@@ -98,10 +98,7 @@ export default function ConferenceRegistrationForm({
         );
 
         if (res.errors) {
-          console.log(res.errors);
-          for (const [key, val] of Object.entries(res.errors)) {
-            methods.setError(key, { message: val }, { shouldFocus: true });
-          }
+          handleAPIErrors(res.errors, methods.setError);
         }
 
         setMessage(res.message, res.success);
@@ -113,7 +110,7 @@ export default function ConferenceRegistrationForm({
     >
       <WizzardStep
         name={t("registration.billing.info", { ns: "conferences" })}
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           billing: yup.object({
             name: yup.string().trim().required(),
             address: yup.object({
@@ -128,58 +125,65 @@ export default function ConferenceRegistrationForm({
           }),
         })}
       >
-        <BillingInput billings={billings} />
-        <Input
-          label={t("registration.billing.street", { ns: "conferences" })}
-          name="billing.address.street"
-        />
-        <Input
-          label={t("registration.billing.city", { ns: "conferences" })}
-          name="billing.address.city"
-        />
-        <Input
-          label={t("registration.billing.postal", { ns: "conferences" })}
-          name="billing.address.postal"
-        />
-        <Input
-          label={t("registration.billing.country", { ns: "conferences" })}
-          name="billing.address.country"
-        />
-        <Input
-          label={t("registration.billing.ICO", { ns: "conferences" })}
-          name="billing.ICO"
-        />
-        <Input
-          label={t("registration.billing.DIC", { ns: "conferences" })}
-          name="billing.DIC"
-        />
-        <Input
-          label={t("registration.billing.ICDPH", { ns: "conferences" })}
-          name="billing.ICDPH"
-        />
+        {(methods) => (
+          <>
+            <BillingInput billings={billings} methods={methods} />
+            <Input
+              label={t("registration.billing.street", { ns: "conferences" })}
+              name="billing.address.street"
+            />
+            <Input
+              label={t("registration.billing.city", { ns: "conferences" })}
+              name="billing.address.city"
+            />
+            <Input
+              label={t("registration.billing.postal", { ns: "conferences" })}
+              name="billing.address.postal"
+            />
+            <Input
+              label={t("registration.billing.country", { ns: "conferences" })}
+              name="billing.address.country"
+            />
+            <Input
+              label={t("registration.billing.ICO", { ns: "conferences" })}
+              name="billing.ICO"
+            />
+            <Input
+              label={t("registration.billing.DIC", { ns: "conferences" })}
+              name="billing.DIC"
+            />
+            <Input
+              label={t("registration.billing.ICDPH", { ns: "conferences" })}
+              name="billing.ICDPH"
+            />
+          </>
+        )}
       </WizzardStep>
       <WizzardStep
         name={t("registration.ticket", { ns: "conferences" })}
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           ticketId: yup.string().required(t("ticket")),
         })}
       >
-        <Ticket
-          submission={submission}
-          setSubmission={setSubmissionStep}
-          tickets={conference.tickets.map((t) => ({
-            id: t.id,
-            name: t.translations[lng as "sk" | "en"].name,
-            desc: t.translations[lng as "sk" | "en"].description,
-            price: t.price / 100,
-            withSubmission: t.withSubmission,
-          }))}
-        />
+        {(methods) => (
+          <Ticket
+            control={methods.control}
+            submission={submission}
+            setSubmission={setSubmissionStep}
+            tickets={conference.tickets.map((t) => ({
+              id: t.id,
+              name: t.translations[lng as "sk" | "en"].name,
+              desc: t.translations[lng as "sk" | "en"].description,
+              price: t.price / 100,
+              withSubmission: t.withSubmission,
+            }))}
+          />
+        )}
       </WizzardStep>
       {submissionStep && (
         <WizzardStep
           name={t("registration.submission.info", { ns: "conferences" })}
-          validationSchema={yup.object({
+          yupSchema={yup.object({
             submission: yup.object({
               section: yup.string().required(),
               authors: yup.array().of(yup.string().email()),
@@ -207,58 +211,83 @@ export default function ConferenceRegistrationForm({
             }),
           })}
         >
-          <Select
-            disabled={submission !== undefined}
-            name="submission.section"
-            label={t("registration.submission.section", { ns: "conferences" })}
-            options={conference.sections.map((s) => ({
-              name: s.translations[lng as "sk" | "en"].name,
-              value: s.id,
-            }))}
-          />
-          <LocalizedTextarea
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.name", { ns: "conferences" })}
-            name={`submission.translations.${lng}.name`}
-          />
-          <LocalizedTextarea
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.abstract", { ns: "conferences" })}
-            name={`submission.translations.${lng}.abstract`}
-          />
-          <LocalizedMultipleInput
-            disabled={submission !== undefined}
-            lng={lng}
-            label={t("registration.submission.keywords.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.keywords.placeholder", {
-              ns: "conferences",
-            })}
-            name={`submission.translations.${lng}.keywords`}
-          />
-          <Select
-            disabled={submission !== undefined}
-            name="submission.presentationLng"
-            label={t("registration.submission.lng", { ns: "conferences" })}
-            options={[
-              { name: PresentationLng.Sk, value: PresentationLng.Sk },
-              { name: PresentationLng.Cz, value: PresentationLng.Cz },
-              { name: PresentationLng.En, value: PresentationLng.En },
-            ]}
-          />
-          <MultipleInput
-            disabled={submission !== undefined}
-            label={t("registration.submission.authors.label", {
-              ns: "conferences",
-            })}
-            placeholder={t("registration.submission.authors.placeholder", {
-              ns: "conferences",
-            })}
-            name="submission.authors"
-          />
+          {(methods) => (
+            <>
+              <Select
+                control={methods.control}
+                disabled={submission !== undefined}
+                name="submission.section"
+                label={t("registration.submission.section", {
+                  ns: "conferences",
+                })}
+                options={conference.sections.map((s) => ({
+                  name: s.translations[lng as "sk" | "en"].name,
+                  value: s.id,
+                }))}
+              />
+              <LocalizedTextarea
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.name", { ns: "conferences" })}
+                name={`submission.translations.${lng}.name`}
+              />
+              <LocalizedTextarea
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.abstract", {
+                  ns: "conferences",
+                })}
+                name={`submission.translations.${lng}.abstract`}
+              />
+              <LocalizedGenericCombobox<{ id: number; val: string }, string>
+                control={methods.control}
+                disabled={submission !== undefined}
+                lng={lng}
+                label={t("registration.submission.keywords.label", {
+                  ns: "conferences",
+                })}
+                placeholder={t("registration.submission.keywords.placeholder", {
+                  ns: "conferences",
+                })}
+                name={`submission.translations.${lng}.keywords`}
+                multiple
+                allowCreateNewOptions
+                defaultOptions={[]}
+                getOptionLabel={(opt) => opt.val}
+                renderOption={(opt, props) => <span>{opt.val}</span>}
+                getOptionValue={(opt) => opt?.val ?? ""}
+              />
+              <Select
+                control={methods.control}
+                disabled={submission !== undefined}
+                name="submission.presentationLng"
+                label={t("registration.submission.lng", { ns: "conferences" })}
+                options={[
+                  { name: PresentationLng.Sk, value: PresentationLng.Sk },
+                  { name: PresentationLng.Cz, value: PresentationLng.Cz },
+                  { name: PresentationLng.En, value: PresentationLng.En },
+                ]}
+              />
+              <GenericCombobox<{ id: number; val: string }, string>
+                control={methods.control}
+                disabled={submission !== undefined}
+                label={t("registration.submission.authors.label", {
+                  ns: "conferences",
+                })}
+                placeholder={t("registration.submission.authors.placeholder", {
+                  ns: "conferences",
+                })}
+                name="submission.authors"
+                lng={lng}
+                multiple
+                allowCreateNewOptions
+                defaultOptions={[]}
+                getOptionLabel={(opt) => opt.val}
+                renderOption={(opt, props) => <span>{opt.val}</span>}
+                getOptionValue={(opt) => opt?.val ?? ""}
+              />
+            </>
+          )}
         </WizzardStep>
       )}
     </WizzardForm>

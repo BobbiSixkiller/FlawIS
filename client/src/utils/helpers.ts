@@ -1,4 +1,3 @@
-import { objectToFormData } from "@/components/WIzzardForm";
 import { deleteFiles } from "@/lib/minio";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -30,6 +29,20 @@ export function displayDate(utc?: string, locale: string = "sk") {
   });
 }
 
+export function getLocalDateTime(utc: string) {
+  const date = new Date(utc);
+  date.setHours(date.getHours() + 2);
+
+  return date.toISOString().slice(0, 16);
+}
+
+export function getLocalDate(utc: string) {
+  const date = new Date(utc);
+  date.setHours(date.getHours() + 2);
+
+  return date.toISOString().split("T")[0];
+}
+
 export async function fetchFromMinio(bucketName: string, fileUrl: string) {
   try {
     // Fetch the file from the Next.js route handler
@@ -59,6 +72,52 @@ export async function fetchFromMinio(bucketName: string, fileUrl: string) {
     console.error("Error fetching file from MinIO:", error);
     throw error; // Re-throw the error so calling code can handle it
   }
+}
+
+function objectToFormData(
+  obj: any,
+  formData: FormData = new FormData(),
+  parentKey: string = ""
+): FormData {
+  for (let key in obj) {
+    if (
+      obj.hasOwnProperty(key) &&
+      obj[key] !== null &&
+      obj[key] !== undefined
+    ) {
+      const propName = parentKey ? `${parentKey}.${key}` : key;
+
+      if (Array.isArray(obj[key])) {
+        obj[key].forEach((item: any) => {
+          if (item !== null && item !== undefined) {
+            if (item instanceof File) {
+              // Append each file under the same key
+              formData.append(propName, item);
+              console.log(`Appending file under key: ${propName}`);
+            } else if (typeof item === "object") {
+              // Recursive call for objects that are not Files
+              objectToFormData(item, formData, propName);
+            } else {
+              // Append non-object items
+              formData.append(propName, item);
+            }
+          }
+        });
+      } else if (obj[key] instanceof File) {
+        // Directly append File objects
+        formData.append(propName, obj[key]);
+        console.log(`Appending file under key: ${propName}`);
+      } else if (typeof obj[key] === "object") {
+        // Recursive call for nested objects
+        objectToFormData(obj[key], formData, propName);
+      } else {
+        // Append primitive values
+        formData.append(propName, obj[key]);
+      }
+      console.log(`Appending key: ${propName}, value: ${obj[key]}`);
+    }
+  }
+  return formData;
 }
 
 export async function uploadToMinio(
@@ -156,6 +215,7 @@ export type ServerActionResponse<T = undefined> = {
 };
 
 import { stringify } from "csv-stringify/sync"; // sync API is easier for route handlers
+import { UseFormReturn } from "react-hook-form";
 
 export function toCSV<T extends Record<string, any>>(data: T[]): string {
   return stringify(data, {
@@ -175,4 +235,19 @@ export function createCSVResponse(
       "Content-Type": "text/csv; charset=utf-8",
     },
   });
+}
+
+export function handleAPIErrors(
+  errors: Record<string, string>,
+  setFormError: UseFormReturn<any>["setError"]
+) {
+  for (const [key, val] of Object.entries(errors)) {
+    setFormError(
+      key,
+      { message: val },
+      {
+        shouldFocus: true,
+      }
+    );
+  }
 }

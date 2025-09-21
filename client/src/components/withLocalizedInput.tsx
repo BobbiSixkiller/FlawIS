@@ -2,79 +2,72 @@
 
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { Transition } from "@headlessui/react";
-import {
-  ComponentType,
-  Fragment,
-  InputHTMLAttributes,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useController } from "react-hook-form";
+import { ComponentType, Fragment, useEffect, useRef, useState } from "react";
+import { get } from "lodash";
+import { RHFmethodsProps } from "./Input";
+import { Control } from "react-hook-form";
 
-export interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+type WithLocalizedInputProps = {
   name: string;
+  lng: string;
+  disabled?: boolean;
+  errors?: Record<string, any>;
+  error?: string;
   label?: string;
-  showPassword?: boolean;
-  setShowPassword?: (val: boolean) => void;
-}
+  placeholder?: string;
+  methods?: RHFmethodsProps;
+  control?: Control<any>;
+};
 
-export function withLocalizedInput(
-  { lng, ...props }: { lng: string } & InputProps,
-  InputComponent: ComponentType<InputProps>
+export function withLocalizedInput<T extends ComponentType<any>>(
+  InputComponent: T
 ) {
-  return function WithLocalizedInputComponent() {
+  type Props = React.ComponentProps<T> & WithLocalizedInputProps;
+
+  function Wrapper(props: Props) {
+    const { name, lng, errors, error, label, ...rest } = props;
     const [visible, setVisible] = useState(false);
-    //if there is an error in the localized field make it visible
-    const { fieldState } = useController({
-      name: props.name.replace(lng, lng === "sk" ? "en" : "sk"),
-    });
+    const ref = useRef<HTMLDivElement>(null);
+
+    const localizedInputName = name.replace(lng, lng === "sk" ? "en" : "sk");
+    const localizedError = get(errors, localizedInputName)?.message;
 
     useEffect(() => {
-      if (fieldState.error) {
-        setVisible(true);
-      }
-    }, [fieldState.error]);
+      if (error || localizedError) setVisible(true);
+    }, [error, localizedError]);
 
-    const ref = useRef<HTMLDivElement>(null);
     useOnClickOutside(ref, () => {
-      if (!fieldState.error) {
-        setVisible(false);
-      }
+      if (!error && !localizedError) setVisible(false);
     });
 
     return (
       <div ref={ref}>
         <InputComponent
-          {...props}
+          {...(rest as any)}
+          name={name}
+          lng={lng}
+          label={label}
+          error={error}
           onFocus={() => setVisible(true)}
           onClick={() => setVisible(true)}
         />
-        <Transition
-          as={Fragment}
-          show={visible}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+        <Transition as={Fragment} show={visible}>
           <div className="mt-2">
             <InputComponent
-              {...props}
-              label={
-                lng === "sk"
-                  ? `${props.label} anglicky`
-                  : `${props.label} in Slovak`
-              }
-              name={props.name.replace(lng, lng === "sk" ? "en" : "sk")}
+              {...(rest as any)}
+              name={localizedInputName}
+              lng={lng === "sk" ? "en" : "sk"}
+              label={lng === "sk" ? `${label} anglicky` : `${label} in Slovak`}
+              error={localizedError}
               onFocus={() => setVisible(true)}
             />
           </div>
         </Transition>
       </div>
     );
-  };
+  }
+
+  // 🔑 Critical: Preserve generics from the wrapped component
+  return Wrapper as unknown as (<U extends any[]>(...args: U) => JSX.Element) &
+    T;
 }

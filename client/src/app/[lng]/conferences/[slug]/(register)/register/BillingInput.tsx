@@ -19,12 +19,27 @@ import {
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 
 export default function BillingInput({
   billings,
+  methods,
 }: {
   billings?: UserFragment["billings"];
+  methods: UseFormReturn<{
+    billing: {
+      ICO?: string | undefined;
+      DIC?: string | undefined;
+      ICDPH?: string | undefined;
+      name: string;
+      address: {
+        country: string;
+        street: string;
+        city: string;
+        postal: string;
+      };
+    };
+  }>;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
@@ -32,7 +47,7 @@ export default function BillingInput({
 
   const { t } = useTranslation(lng, ["conferences", "common"]);
 
-  const { watch, setValue, getFieldState, formState } = useFormContext();
+  const { watch, setValue, getFieldState, formState } = methods;
   const { error } = getFieldState("billing.name", formState);
 
   useEffect(() => {
@@ -71,8 +86,11 @@ export default function BillingInput({
         {t("registration.billing.name")}
       </label>
       <Combobox
+        immediate
         value={watch("billing")}
-        onChange={(val) => setValue("billing", val, { shouldValidate: true })}
+        onChange={(val) =>
+          val ? setValue("billing", val, { shouldValidate: true }) : null
+        }
         by={compareBillings}
       >
         <div className="relative mt-2">

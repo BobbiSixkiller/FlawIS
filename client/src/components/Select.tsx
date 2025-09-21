@@ -8,7 +8,7 @@ import {
   ListboxOption,
   ListboxOptions,
 } from "@headlessui/react";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/utils/helpers";
 
@@ -24,6 +24,7 @@ export default function Select({
   options,
   disabled = false,
   multiple = false,
+  control,
 }: {
   disabled?: boolean;
   label?: string;
@@ -31,8 +32,9 @@ export default function Select({
   name: string;
   options: Option[];
   multiple?: boolean;
+  control: Control<any>;
 }) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({ name, control });
   const selected = Array.isArray(field.value)
     ? options.filter((o) => field.value.includes(o.value))
     : options.find((o) => o.value === field.value);
@@ -59,10 +61,11 @@ export default function Select({
         <ListboxButton
           {...field}
           className={cn([
-            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 dark:ring-gray-600 dark:bg-gray-800 focus:ring-2 sm:text-sm/6",
+            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
+            "dark:bg-gray-800 dark:ring-gray-600 dark:disabled:bg-gray-900 dark:disabled:ring-gray-700 dark:disabled:text-slate-500 dark:text-white/85",
             multiple ? "" : "py-1.5",
             fieldState.error
-              ? "ring-red-500 focus:ring-red-500"
+              ? "ring-red-500 focus:ring-red-500 dark:ring-red-500 dark:focus:ring-red-500"
               : "focus:ring-primary-500 dark:focus:ring-primary-300",
           ])}
         >
@@ -95,7 +98,10 @@ export default function Select({
             <ListboxOption
               key={i}
               value={option}
-              className="data-[focus]:bg-primary-500 data-[focus]:text-white data-[selected]:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between"
+              className={cn([
+                "data-[focus]:bg-primary-500 data-[focus]:text-white data-[selected]:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between",
+                "dark:data-[focus]:bg-primary-300",
+              ])}
             >
               {option.name}
               <CheckIcon className="size-3 stroke-2 hidden group-data-[selected]:block" />

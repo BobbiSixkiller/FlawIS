@@ -1,8 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { date, object, ref } from "yup";
 import { useTranslation } from "@/lib/i18n/client";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
@@ -12,6 +10,8 @@ import { useDialogStore } from "@/stores/dialogStore";
 import { updateConferenceDates } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
+import RHFormContainer from "@/components/RHFormContainer";
+import { getLocalDateTime } from "@/utils/helpers";
 
 export default function UpdateDatesForm({
   conference,
@@ -23,28 +23,24 @@ export default function UpdateDatesForm({
   const { lng, slug } = useParams<{ lng: string; slug: string }>();
   const { t } = useTranslation(lng, "validation");
 
-  function setDefaultVal(utc: string) {
-    const date = new Date(utc);
-    date.setHours(date.getHours() + 2);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
-    return date.toISOString().slice(0, 16);
-  }
-
-  const methods = useForm({
-    defaultValues: {
-      start: setDefaultVal(conference.dates.start) as unknown as Date,
-      end: setDefaultVal(conference.dates.end) as unknown as Date,
-      regEnd: conference.dates.regEnd
-        ? (setDefaultVal(conference.dates.regEnd) as unknown as Date)
-        : null,
-      submissionDeadline: conference.dates.submissionDeadline
-        ? (setDefaultVal(
-            conference.dates.submissionDeadline
-          ) as unknown as Date)
-        : null,
-    },
-    resolver: yupResolver(
-      object({
+  return (
+    <RHFormContainer
+      defaultValues={{
+        start: getLocalDateTime(conference.dates.start) as unknown as Date,
+        end: getLocalDateTime(conference.dates.end) as unknown as Date,
+        regEnd: conference.dates.regEnd
+          ? (getLocalDateTime(conference.dates.regEnd) as unknown as Date)
+          : null,
+        submissionDeadline: conference.dates.submissionDeadline
+          ? (getLocalDateTime(
+              conference.dates.submissionDeadline
+            ) as unknown as Date)
+          : null,
+      }}
+      yupSchema={object({
         start: date().typeError(t("date")).required(t("required")),
         end: date()
           .typeError(t("date"))
@@ -55,53 +51,52 @@ export default function UpdateDatesForm({
           .default(null)
           .max(ref("start"), t("endDateInvalid")),
         submissionDeadline: date().nullable().default(null),
-      }).required()
-    ),
-  });
+      })}
+    >
+      {(methods) => (
+        <form
+          className="space-y-6 w-full sm:w-96"
+          onSubmit={methods.handleSubmit(async (data) => {
+            const res = await updateConferenceDates({ slug, data });
 
-  const closeDialog = useDialogStore((s) => s.closeDialog);
-  const setMessage = useMessageStore((s) => s.setMessage);
+            setMessage(res.message, res.success);
 
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="space-y-6 w-full sm:w-96"
-        onSubmit={methods.handleSubmit(async (data) => {
-          const res = await updateConferenceDates({ slug, data });
-
-          setMessage(res.message, res.success);
-
-          if (res.success) {
-            closeDialog(dialogId);
-          }
-        })}
-      >
-        <Input
-          type="datetime-local"
-          name="start"
-          label="Zaciatok konferencie"
-        />
-        <Input type="datetime-local" name="end" label="Koniec konferencie" />
-        <Input type="datetime-local" name="regEnd" label="Koniec registracie" />
-        <Input
-          type="datetime-local"
-          name="submissionDeadline"
-          label="Deadline odovzdania prispevkov"
-        />
-
-        <Button
-          color="primary"
-          type="submit"
-          className="w-full"
-          disabled={methods.formState.isSubmitting}
+            if (res.success) {
+              closeDialog(dialogId);
+            }
+          })}
         >
-          {methods.formState.isSubmitting ? (
-            <Spinner inverted />
-          ) : (
-            "Aktualizovat datumy"
-          )}
-        </Button>
-      </form>
-    </FormProvider>
+          <Input
+            type="datetime-local"
+            name="start"
+            label="Zaciatok konferencie"
+          />
+          <Input type="datetime-local" name="end" label="Koniec konferencie" />
+          <Input
+            type="datetime-local"
+            name="regEnd"
+            label="Koniec registracie"
+          />
+          <Input
+            type="datetime-local"
+            name="submissionDeadline"
+            label="Deadline odovzdania prispevkov"
+          />
+
+          <Button
+            color="primary"
+            type="submit"
+            className="w-full"
+            disabled={methods.formState.isSubmitting}
+          >
+            {methods.formState.isSubmitting ? (
+              <Spinner inverted />
+            ) : (
+              "Aktualizovat datumy"
+            )}
+          </Button>
+        </form>
+      )}
+    </RHFormContainer>
   );
 }

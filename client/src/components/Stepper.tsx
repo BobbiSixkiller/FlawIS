@@ -45,7 +45,7 @@ export default function Stepper({
             >
               {t("step") + " " + Number(i + 1)}
             </span>
-            <h4 className="text-base md:text-md text-gray-900 dark:text-white">
+            <h4 className="text-base md:text-md text-gray-900 dark:text-white/85">
               {s.props.name}
             </h4>
           </div>

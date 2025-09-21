@@ -65,13 +65,6 @@ export class InternRepository extends Repository<typeof Intern> {
             { $match: { ...cursorFilter } },
             { $limit: first },
             { $addFields: { id: "$_id", "user.id": "$user._id" } },
-            {
-              $project: {
-                _id: 0, // drop the raw _id
-                "user._id": 0,
-                __v: 0,
-              },
-            },
           ],
           hasNextPage: [
             { $match: { ...cursorFilter } },
@@ -117,8 +110,8 @@ export class InternRepository extends Repository<typeof Intern> {
 
     return {
       edges,
-      pageInfo: { ...connection.pageInfo, endCursor },
-      totalCount: connection.totalCount,
+      totalCount: connection?.totalCount ?? 0,
+      pageInfo: { ...connection?.pageInfo, endCursor },
     };
   }
 

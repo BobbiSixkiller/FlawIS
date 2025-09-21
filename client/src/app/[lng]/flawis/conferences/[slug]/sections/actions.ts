@@ -33,7 +33,7 @@ export async function createSection(vars: CreateSectionMutationVariables) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.createSection.data.conference?.slug}`,
+        `conferences:${data.createSection.data.conference?.slug}`,
       ],
     }
   );
@@ -49,7 +49,7 @@ export async function deleteSection(vars: DeleteSectionMutationVariables) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.deleteSection.data.conference?.slug}`,
+        `conferences:${data.deleteSection.data.conference?.slug}`,
       ],
     }
   );
@@ -65,7 +65,7 @@ export async function updateSection(vars: UpdateSectionMutationVariables) {
     }),
     {
       revalidateTags: (data) => [
-        `conference:${data.updateSection.data.conference?.slug}`,
+        `conferences:${data.updateSection.data.conference?.slug}`,
       ],
     }
   );

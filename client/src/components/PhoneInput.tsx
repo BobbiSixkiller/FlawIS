@@ -5,18 +5,22 @@ import { useController } from "react-hook-form";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { Input } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
-import { InputProps } from "./withLocalizedInput";
+import { InputProps } from "./Input";
 
-export default function PhoneInput({ label, disabled, name }: InputProps) {
+export default function PhoneInput({ label, name, control }: InputProps) {
   const { field, fieldState } = useController({
     name,
+    control,
   });
 
   const [phoneField, setPhoneField] = useState({
-    code: parsePhoneNumberFromString(field.value)?.countryCallingCode
-      ? `+${parsePhoneNumberFromString(field.value)?.countryCallingCode}`
+    code: parsePhoneNumberFromString(String(field?.value))?.countryCallingCode
+      ? `+${
+          parsePhoneNumberFromString(String(field?.value))?.countryCallingCode
+        }`
       : "+421",
-    number: parsePhoneNumberFromString(field.value)?.nationalNumber || "",
+    number:
+      parsePhoneNumberFromString(String(field?.value))?.nationalNumber || "",
   });
 
   useEffect(() => {
@@ -39,10 +43,10 @@ export default function PhoneInput({ label, disabled, name }: InputProps) {
         className={cn([
           "border-none shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 rounded-md w-full flex mt-1 focus-within:ring-2",
           "dark:bg-gray-800 dark:ring-gray-600",
-          fieldState.error
+          fieldState?.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
             : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
-          disabled &&
+          field?.disabled &&
             "disabled:bg-slate-50 disabled:text-slate-500 disabled:ring-slate-200 disabled:shadow-none",
         ])}
       >
@@ -52,7 +56,7 @@ export default function PhoneInput({ label, disabled, name }: InputProps) {
           </label>
           <select
             className="py-px pr-6 bg-transparent border-transparent focus:border-transparent focus:ring-0 sm:text-sm/6 rounded-l-lg h-7 dark:text-white dark:bg-gray-800"
-            disabled={disabled}
+            disabled={field?.disabled}
             id="code"
             name="code"
             onChange={(e) =>
@@ -95,13 +99,13 @@ export default function PhoneInput({ label, disabled, name }: InputProps) {
           </select>
         </div>
         <Input
-          disabled={disabled}
+          disabled={field?.disabled}
           type="number"
-          ref={field.ref}
+          ref={field?.ref}
           id={name}
           className="w-full h-9 sm:text-sm/6 rounded-r-lg py-1.5 text-gray-900 dark:text-white border-transparent focus:border-transparent focus:ring-0 bg-transparent"
           onBlur={() => {
-            field.onBlur();
+            field?.onBlur();
           }}
           autoComplete="off"
           value={phoneField.number}
@@ -110,8 +114,8 @@ export default function PhoneInput({ label, disabled, name }: InputProps) {
           }
         />
       </div>
-      {fieldState.error && (
-        <p className="mt-1 text-sm text-red-500">{fieldState.error.message}</p>
+      {fieldState?.error && (
+        <p className="mt-1 text-sm text-red-500">{fieldState?.error.message}</p>
       )}
     </div>
   );

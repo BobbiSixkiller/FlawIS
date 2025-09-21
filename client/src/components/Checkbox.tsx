@@ -3,16 +3,18 @@
 import { cn } from "@/utils/helpers";
 import { Checkbox, Field, Label } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 
 export default function CheckBox({
   name,
   label,
+  control,
 }: {
   name: string;
   label: any;
+  control: Control<any>;
 }) {
-  const { field, fieldState } = useController({ name });
+  const { field, fieldState } = useController({ name, control });
 
   return (
     <div>

@@ -80,7 +80,9 @@ export class ConferencerResolver {
   async createConference(
     @Arg("data") data: ConferenceInput
   ): Promise<ConferenceMutationResponse> {
+    console.log(data);
     const conference = await this.conferenceRepository.create(data);
+    console.log(conference);
 
     return {
       data: conference,
@@ -294,7 +296,7 @@ export class ConferencerResolver {
             .name,
         conferenceLogo:
           conference.translations[this.i18nService.language() as "sk" | "en"]
-            .logoUrlEnv,
+            .logoUrl,
         invoice: attendee.invoice,
       }),
       "mail.conference.invoice"

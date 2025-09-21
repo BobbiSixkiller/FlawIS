@@ -75,7 +75,7 @@ type MutationOptions<Data> = {
   revalidatePaths?: (data: Data) => string[];
 };
 
-type GqlMutationResponse<TransformedData> = {
+export type GqlMutationResponse<TransformedData> = {
   success: boolean;
   message: string;
   data?: TransformedData;

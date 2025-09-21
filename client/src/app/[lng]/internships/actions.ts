@@ -12,9 +12,9 @@ import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 export async function getInternships(vars: InternshipsQueryVariables) {
   const res = await executeGqlFetch(
     InternshipsDocument,
-    vars
-    // {},
-    // { tags: ["internships"], revalidate: 3600 }
+    vars,
+    {},
+    { tags: ["internships"], revalidate: 3600 }
   );
 
   if (res.errors) {

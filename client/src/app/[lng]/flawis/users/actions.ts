@@ -1,20 +1,20 @@
 "use server";
 
 import {
-  Access,
   InviteUsersDocument,
+  InviteUsersMutationVariables,
   TextSearchUserDocument,
   UsersDocument,
   UsersQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
 export async function getUsers(vars: UsersQueryVariables) {
   const res = await executeGqlFetch(
     UsersDocument,
-    vars
-    // {},
-    // { tags: ["users"], revalidate: 3600 }
+    vars,
+    {},
+    { tags: ["users"], revalidate: 3600 }
   );
 
   if (res.errors) {
@@ -36,12 +36,8 @@ export async function searchUser(params: { text: string }) {
   return res.data.textSearchUser || [];
 }
 
-export async function sendInvites(emails: string[]) {
-  const res = await executeGqlFetch(InviteUsersDocument, { input: { emails } });
-  if (res.errors) {
-    console.log(res.errors[0]);
-    return { success: false, message: res.errors[0].message };
-  }
-
-  return { success: true, message: res.data.inviteUsers };
+export async function sendInvites(vars: InviteUsersMutationVariables) {
+  return await executeGqlMutation(InviteUsersDocument, vars, (data) => ({
+    message: data.inviteUsers,
+  }));
 }

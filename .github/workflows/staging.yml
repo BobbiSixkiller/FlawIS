@@ -1,10 +1,12 @@
 name: Build and Deploy to Staging
+
 on:
   push:
     branches:
       - staging
+
 jobs:
-  build:
+  mongo:
     runs-on: [HyperV]
     environment: staging
     steps:
@@ -13,71 +15,132 @@ jobs:
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Setting up node version
+      - name: Copy MongoDB data from production
+        run: |
+          echo "Dumping production MongoDB (only flawis db)..."
+          docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
+          docker cp flawis-mongo-1:/data/backup ./backup
+
+      - name: Remove old staging containers
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
+
+      - name: Start staging MongoDB
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
+
+      - name: Wait for MongoDB to be healthy
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Waiting for MongoDB to become healthy..."
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' $MONGO_CONTAINER)" == "healthy" ]; do
+            echo "MongoDB not healthy yet..."
+            sleep 2
+          done
+          echo "MongoDB is healthy: $MONGO_CONTAINER"
+
+      - name: Initialize replica set if needed
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Checking/initializing replica set..."
+          docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval '
+            try {
+              rs.status();
+              print("Replica set already initialized")
+            } catch (e) {
+              print("Initializing replica set...");
+              rs.initiate({_id: "rs0", members: [{ _id: 0, host: "mongo:27017" }]});
+            }
+          '
+
+      - name: Wait for MongoDB primary
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Waiting for MongoDB to become primary..."
+          until docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval "db.isMaster().ismaster" | grep -q true; do
+            echo "MongoDB not primary yet..."
+            sleep 2
+          done
+          echo "MongoDB is primary."
+
+      - name: Restore MongoDB backup
+        run: |
+          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          echo "Ensuring /data/backup exists in staging container..."
+          docker exec $MONGO_CONTAINER mkdir -p /data/backup
+          echo "Copying backup into staging container..."
+          docker cp ./backup/flawis $MONGO_CONTAINER:/data/backup/flawis
+          echo "Restoring MongoDB backup..."
+          docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
+          echo "MongoDB restore complete."
+
+  minio:
+    runs-on: [HyperV]
+    environment: staging
+    env:
+      MINIO_USER: ${{ secrets.MINIO_USER }}
+      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+    steps:
+      - name: Install MinIO client
+        run: |
+          if ! command -v mc &> /dev/null; then
+            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x mc
+            mkdir -p $HOME/bin
+            mv mc $HOME/bin
+            echo "$HOME/bin" >> $GITHUB_PATH
+          fi
+
+      - name: Start staging MinIO
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d minio
+
+      - name: Wait for MinIO
+        run: |
+          echo "Waiting for MinIO to become ready..."
+          until curl -f http://localhost:9100/minio/health/live 2>/dev/null; do
+            echo "MinIO not ready yet..."
+            sleep 2
+          done
+          echo "Staging MinIO is ready."
+
+      - name: Sync data from production to staging
+        run: |
+          mc alias set production http://localhost:9000 $MINIO_USER $MINIO_PASSWORD
+          mc alias set staging http://localhost:9100 $MINIO_USER $MINIO_PASSWORD
+          mc mirror production/ staging/
+          echo "MinIO sync completed."
+
+      - name: Make buckets public (images, avatars)
+        run: |
+          mc anonymous set download staging/images
+          mc anonymous set download staging/avatars
+          echo "Buckets 'images' and 'avatars' are now public in staging."
+
+  deploy:
+    runs-on: [HyperV]
+    needs: [mongo, minio]
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Stop and remove staging containers
-        run: |
-          docker ps -a --format '{{.Names}}' | grep 'staging' | xargs -r docker rm -f
+      - name: Stop old staging containers
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
 
-      - name: Clean up unused Docker resources and staging volumes
+      - name: Clean old images, networks, build cache
         run: |
-          docker system prune -af
-          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
+          docker container prune -f
+          docker image prune -a -f
+          docker network prune -f
+          docker builder prune -a -f
         continue-on-error: true
 
-      - name: Copy MongoDB data from production
-        run: |
-          # Step 1: Run mongodump inside the production MongoDB container
-          docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017" --out=/data/backup'
-
-          # Step 2: Copy the backup from the production MongoDB container to the local runner
-          docker cp flawis-mongo-1:/data/backup ./backup
-
-          # # Step 3: Stop the staging MongoDB container
-          # docker stop flawis-mongo-staging-1
-
-          # # Step 4: Remove the staging MongoDB container (optional, only if you want a clean rebuild)
-          # docker rm flawis-mongo-staging-1
-
-          # Step 5: Start the staging MongoDB container
-          docker-compose -f docker-compose.staging.yml up -d mongo-staging
-
-          # Step 6: Copy the backup to the new staging MongoDB container
-          docker cp ./backup flawis-mongo-staging-1:/data/backup
-
-          # Step 7: Run mongorestore inside the staging MongoDB container
-          docker exec flawis-mongo-staging-1 sh -c 'mongorestore --uri="mongodb://localhost:27017" /data/backup'
-
-      - name: Install MinIO client (if not already installed)
-        run: |
-          if ! command -v mc &> /dev/null
-          then
-            wget https://dl.min.io/client/mc/release/linux-amd64/mc
-            chmod +x mc
-            mkdir -p $HOME/bin
-            mv mc $HOME/bin/
-            echo "$HOME/bin" >> $GITHUB_PATH
-          else
-            echo "MinIO client is already installed."
-          fi
-
-      - name: Copy Data from Production MinIO to Staging MinIO
-        run: |
-          mc alias set production http://localhost:9000 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-          mc alias set staging http://localhost:9100 ${{ secrets.MINIO_ACCESS_KEY }} ${{ secrets.MINIO_SECRET_KEY }}
-
-          mc mirror production/ staging/
-
-      - name: Clean up unused Docker resources and stagin volumes
-        run: |
-          docker system prune -af  # safe for volumes
-          docker volume ls --format '{{.Name}}' | grep 'staging' | xargs -r docker volume rm
-        continue-on-error: true
-
-      - name: Build and Deploy Staging
+      - name: Build and deploy staging services
         env:
           MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
@@ -91,10 +154,9 @@ jobs:
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ vars.MAIL_FROM }}
           RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
+          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
           REDIS_URI: ${{ vars.REDIS_URI }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: |
-          docker-compose -f docker-compose.staging.yml up -d --build
+        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --build

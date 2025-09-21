@@ -41,10 +41,12 @@ export default async function InternshipPage({
 
         <CloseButton href={`/internships`} />
       </div>
+
       <div
         className="prose"
         dangerouslySetInnerHTML={{ __html: internship.description }}
       />
+
       <Modal dialogId={updateDialogId} title={t("update")}>
         <InternshipForm dialogId={updateDialogId} data={internship} />
       </Modal>

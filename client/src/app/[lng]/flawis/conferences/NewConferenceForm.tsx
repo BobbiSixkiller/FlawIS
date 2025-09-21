@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  WizzardForm,
-  WizzardStep,
-  objectToFormData,
-} from "@/components/WIzzardForm";
 import { Input } from "@/components/Input";
 import { createConference } from "./actions";
 import { useTranslation } from "@/lib/i18n/client";
@@ -13,26 +8,10 @@ import { LocalizedImageFileInput } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useValidation from "@/hooks/useValidation";
-
-export interface ConferenceInputType {
-  slug: string;
-  dates: { start: string; end: string };
-  billing: {
-    name: string;
-    address: { street: string; city: string; postal: string; country: string };
-    variableSymbol: string;
-    ICO: string;
-    DIC: string;
-    ICDPH: string;
-    IBAN: string;
-    SWIFT: string;
-    stamp?: File;
-  };
-  translations: {
-    sk: { name: string; logo?: File };
-    en: { name: string; logo?: File };
-  };
-}
+import { uploadToMinio } from "@/utils/helpers";
+import { ConferenceInput } from "@/lib/graphql/generated/graphql";
+import { deleteFiles } from "@/lib/minio";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 
 export default function NewConferenceForm({
   lng,
@@ -48,7 +27,7 @@ export default function NewConferenceForm({
   const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
-    <WizzardForm<ConferenceInputType>
+    <WizzardForm<ConferenceInput & { logo: { sk?: File; en?: File } }>
       lng={lng}
       values={{
         slug: "",
@@ -69,46 +48,72 @@ export default function NewConferenceForm({
           SWIFT: "",
         },
         translations: {
-          sk: { name: "", logo: undefined },
-          en: { name: "", logo: undefined },
+          sk: { name: "", logoUrl: "" },
+          en: { name: "", logoUrl: "" },
         },
+        logo: { sk: undefined, en: undefined },
       }}
       onSubmitCb={async (data) => {
-        const formData = objectToFormData(data);
-        const state = await createConference(formData);
+        console.log(data);
+        const [logoUrlSk, logoUrlEn] = await Promise.all([
+          uploadToMinio("images", data.logo.sk!.name, data.logo.sk!),
+          uploadToMinio("images", data.logo.en!.name, data.logo.en!),
+        ]);
 
-        setMessage(state.message, state.success);
+        const res = await createConference({
+          data: {
+            slug: data.slug,
+            billing: data.billing,
+            dates: data.dates,
+            translations: {
+              sk: { name: data.translations.sk.name, logoUrl: logoUrlSk },
+              en: { name: data.translations.en.name, logoUrl: logoUrlEn },
+            },
+          },
+        });
 
-        if (state.success) {
+        if (!res.success) {
+          await deleteFiles([logoUrlSk, logoUrlEn]);
+        }
+
+        if (res.errors) {
+          setMessage(res.message, res.success);
+          throw res.errors;
+        }
+
+        setMessage(res.message, res.success);
+        if (res.success) {
           closeDialog(dialogId);
         }
       }}
     >
       <WizzardStep
         name="O konferencii"
-        validationSchema={yup.object({
+        yupSchema={yup.object({
+          logo: yup.object({
+            sk: yup
+              .mixed<File>() // Pass in the type of `fileUpload`
+              .test("required", t("required"), (file) => file !== undefined)
+              .test(
+                "fileSize",
+                "Only documents up to 2MB are permitted.",
+                (file) => file && file.size < 2_000_000
+              ),
+            en: yup
+              .mixed<File>() // Pass in the type of `fileUpload`
+              .test("required", t("required"), (file) => file !== undefined)
+              .test(
+                "fileSize",
+                "Only documents up to 2MB are permitted.",
+                (file) => file && file.size < 2_000_000
+              ),
+          }),
           translations: yup.object({
             sk: yup.object({
               name: yup.string().trim().required(),
-              logo: yup
-                .mixed<File>() // Pass in the type of `fileUpload`
-                .test("required", t("required"), (file) => file !== undefined)
-                .test(
-                  "fileSize",
-                  "Only documents up to 2MB are permitted.",
-                  (file) => file && file.size < 2_000_000
-                ),
             }),
             en: yup.object({
               name: yup.string().trim().required(),
-              logo: yup
-                .mixed<File>() // Pass in the type of `fileUpload`
-                .test("required", t("required"), (file) => file !== undefined)
-                .test(
-                  "fileSize",
-                  "Only documents up to 2MB are permitted.",
-                  (file) => file && file.size < 2_000_000
-                ),
             }),
           }),
           slug: yup.string().trim().required(),
@@ -121,31 +126,36 @@ export default function NewConferenceForm({
           }),
         })}
       >
-        <LocalizedTextarea
-          lng={lng}
-          label="Nazov"
-          name={`translations.${lng}.name`}
-        />
-        <LocalizedImageFileInput
-          lng={lng}
-          label="Logo"
-          name={`translations.${lng}.logo`}
-        />
-        <Input label="Slug" name="slug" />
-        <Input
-          type="datetime-local"
-          name="dates.start"
-          label="Zaciatok konferencie"
-        />
-        <Input
-          type="datetime-local"
-          name="dates.end"
-          label="Koniec konferencie"
-        />
+        {(methods) => (
+          <div className="space-y-6">
+            <LocalizedTextarea
+              lng={lng}
+              label="Nazov"
+              name={`translations.${lng}.name`}
+            />
+            <LocalizedImageFileInput
+              lng={lng}
+              label="Logo"
+              name={`logo.${lng}`}
+              control={methods.control}
+            />
+            <Input label="Slug" name="slug" />
+            <Input
+              type="datetime-local"
+              name="dates.start"
+              label="Zaciatok konferencie"
+            />
+            <Input
+              type="datetime-local"
+              name="dates.end"
+              label="Koniec konferencie"
+            />
+          </div>
+        )}
       </WizzardStep>
       <WizzardStep
         name="Fakturacne udaje"
-        validationSchema={yup.object({
+        yupSchema={yup.object({
           billing: yup.object({
             name: yup.string().trim().required(),
             address: yup.object({
@@ -163,17 +173,35 @@ export default function NewConferenceForm({
           }),
         })}
       >
-        <Input label="Meno" name="billing.name" />
-        <Input label="Ulica" name="billing.address.street" />
-        <Input label="Mesto" name="billing.address.city" />
-        <Input label="PSC" name="billing.address.postal" />
-        <Input label="Krajina" name="billing.address.country" />
-        <Input label="Variabilny" name="billing.variableSymbol" />
-        <Input label="IBAN" name="billing.IBAN" />
-        <Input label="SWIFT" name="billing.SWIFT" />
-        <Input label="ICO" name="billing.ICO" />
-        <Input label="DIC" name="billing.DIC" />
-        <Input label="ICDPH" name="billing.ICDPH" />
+        <div className="space-y-6">
+          <Input label="Meno" name="billing.name" />
+          <Input
+            label="Ulica"
+            name="billing.address.street"
+            autoComplete="address-level1"
+          />
+          <Input
+            label="Mesto"
+            name="billing.address.city"
+            autoComplete="address-level2"
+          />
+          <Input
+            label="PSC"
+            name="billing.address.postal"
+            autoComplete="postal-code"
+          />
+          <Input
+            label="Krajina"
+            name="billing.address.country"
+            autoComplete="country"
+          />
+          <Input label="Variabilny" name="billing.variableSymbol" />
+          <Input label="IBAN" name="billing.IBAN" />
+          <Input label="SWIFT" name="billing.SWIFT" />
+          <Input label="ICO" name="billing.ICO" />
+          <Input label="DIC" name="billing.DIC" />
+          <Input label="ICDPH" name="billing.ICDPH" />
+        </div>
       </WizzardStep>
     </WizzardForm>
   );

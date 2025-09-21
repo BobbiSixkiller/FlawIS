@@ -3,12 +3,13 @@
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/utils/helpers";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
-import { useFormContext } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 
 export default function Ticket({
   tickets,
   setSubmission,
   submission,
+  control,
 }: {
   submission?: SubmissionFragment;
   tickets: {
@@ -19,9 +20,12 @@ export default function Ticket({
     withSubmission: boolean;
   }[];
   setSubmission: (visible: boolean) => void;
+  control: Control<any>;
 }) {
-  const { watch, setValue, getFieldState } = useFormContext();
-  const { error } = getFieldState("ticketId");
+  const { field, fieldState } = useController({
+    name: "ticketId",
+    control,
+  });
 
   return (
     <div className="flex flex-col gap-2">
@@ -30,8 +34,8 @@ export default function Ticket({
       </label>
       <RadioGroup
         aria-label="Conference Tickets"
-        value={watch("ticketId")}
-        onChange={(value) => setValue("ticketId", value)}
+        value={field.value}
+        onChange={field.onChange}
       >
         <div className="space-y-2">
           {tickets.map((ticket) => (
@@ -62,7 +66,7 @@ export default function Ticket({
                           className={`font-medium  ${
                             checked
                               ? "text-white"
-                              : "text-gray-900 dark:text-white"
+                              : "text-gray-900 dark:text-white/85"
                           }`}
                         >
                           {ticket.name}
@@ -93,7 +97,9 @@ export default function Ticket({
           ))}
         </div>
       </RadioGroup>
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
+      {fieldState.error && (
+        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      )}
     </div>
   );
 }

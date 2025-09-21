@@ -6,10 +6,9 @@ import { translate } from "@/lib/i18n";
 import Tooltip from "@/components/Tooltip";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import NewSubmissionForm from "./NewSubmissionForm";
 import Modal from "@/components/Modal";
 import DeleteSubmissionForm from "./DeleteSubmissionForm";
-import UpdateSubmissionForm from "./UpdateSubmissionForm";
+import SubmissionForm from "./SubmissionForm";
 
 export default async function AttendeeSubmissionsPage({
   params,
@@ -86,12 +85,11 @@ export default async function AttendeeSubmissionsPage({
                     dialogId={`${updateSubmissionDialogId}-${s.id}`}
                     title={t("submission.update")}
                   >
-                    <UpdateSubmissionForm
+                    <SubmissionForm
                       dialogId={`${updateSubmissionDialogId}-${s.id}`}
                       lng={lng}
                       submission={s}
-                      sections={conference.sections}
-                      ticketId={conference.attending?.ticket.id}
+                      conference={conference}
                     />
                   </Modal>
                   <Modal
@@ -111,12 +109,10 @@ export default async function AttendeeSubmissionsPage({
       </div>
 
       <Modal dialogId={newSubmissionDialogId} title={t("submission.new")}>
-        <NewSubmissionForm
+        <SubmissionForm
           lng={lng}
-          conferenceId={conference!.id}
-          sections={conference!.sections}
           dialogId={newSubmissionDialogId}
-          ticketId={conference.attending?.ticket.id}
+          conference={conference}
         />
       </Modal>
     </div>

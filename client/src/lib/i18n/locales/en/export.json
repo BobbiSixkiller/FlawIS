@@ -1,0 +1,6 @@
+{
+  "500": "Export failed!",
+  "400": "Missing 'type' query parameter!",
+  "401": "You have to be logged in to perform this action!",
+  "404": "Unknown export type: {{type}}!"
+}
