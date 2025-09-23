@@ -36,8 +36,8 @@ export default function ApplicationForm({
   const { yup } = useValidation();
 
   const { loading, files, errors } = usePrefillFiles({
-    cvUrl: user?.cvUrl && !application?.fileUrls ? user.cvUrl : undefined,
-    fileUrls: application?.fileUrls,
+    resumes: user?.cvUrl,
+    internships: application?.fileUrls,
   });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
@@ -61,7 +61,9 @@ export default function ApplicationForm({
           .max(5, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
       })}
-      defaultValues={{ files }}
+      defaultValues={{
+        files: application?.fileUrls ? files.internships : files.resumes,
+      }}
     >
       {(methods) => (
         <form

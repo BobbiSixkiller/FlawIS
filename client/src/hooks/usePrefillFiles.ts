@@ -1,61 +1,49 @@
 import { fetchFromMinio } from "@/utils/helpers";
 import { useEffect, useState } from "react";
-import { UseFormSetError, UseFormSetValue } from "react-hook-form";
 
-export default function usePrefillFiles({
-  cvUrl,
-  avatarUrl,
-  fileUrls,
-}: {
-  cvUrl?: string | null;
-  avatarUrl?: string | null;
-  fileUrls?: string[];
-}) {
+type FileSources = Record<string, string | string[] | null | undefined>;
+
+export default function usePrefillFiles(fileSources: FileSources) {
   const [loading, setLoading] = useState(
-    cvUrl || fileUrls || avatarUrl ? true : false
+    Object.values(fileSources).some(Boolean)
   );
-  const [files, setFiles] = useState<File[]>([]);
-  const [avatar, setAvatar] = useState<File>();
-  const [errors, setErrors] = useState<Record<string, string>>();
+  const [files, setFiles] = useState<Record<string, File[]>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function fetchFiles() {
-      try {
-        const files: File[] = [];
+      const loadedFiles: Record<string, File[]> = {};
+      const collectedErrors: Record<string, string> = {};
 
-        if (cvUrl) {
-          const cv = await fetchFromMinio("resumes", cvUrl);
-          files.push(cv);
-        }
+      await Promise.all(
+        Object.entries(fileSources).map(async ([bucket, urls]) => {
+          if (!urls) return;
 
-        if (fileUrls?.length) {
-          for (const url of fileUrls) {
-            const file = await fetchFromMinio("internships", url);
-            files.push(file);
+          try {
+            const urlsArray = Array.isArray(urls) ? urls : [urls];
+            const bucketFiles: File[] = [];
+
+            for (const url of urlsArray) {
+              const file = await fetchFromMinio(bucket, url);
+              bucketFiles.push(file);
+            }
+
+            if (bucketFiles.length) {
+              loadedFiles[bucket] = bucketFiles;
+            }
+          } catch (err: any) {
+            collectedErrors[bucket] = err?.message || "Failed to fetch file(s)";
           }
-        }
+        })
+      );
 
-        if (files.length > 0) {
-          setFiles(files);
-        }
-      } catch (error: any) {
-        setErrors((prev) => ({ ...prev, files: error.message }));
-      }
-
-      try {
-        if (avatarUrl) {
-          const avatar = await fetchFromMinio("avatars", avatarUrl);
-          setAvatar(avatar);
-        }
-      } catch (error: any) {
-        setErrors((prev) => ({ ...prev, avatar: error.message }));
-      }
-
+      setFiles(loadedFiles);
+      setErrors(collectedErrors);
       setLoading(false);
     }
 
     fetchFiles();
-  }, [cvUrl, avatarUrl, fileUrls]);
+  }, [JSON.stringify(fileSources)]); // stringify to detect deep changes
 
-  return { loading, errors, files, avatar };
+  return { loading, files, errors };
 }

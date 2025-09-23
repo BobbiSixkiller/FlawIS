@@ -22,7 +22,6 @@ import { omit } from "lodash";
 import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
-import { withLocalizedInput } from "@/components/withLocalizedInput";
 
 export default function SubmissionForm({
   submission,
@@ -38,7 +37,7 @@ export default function SubmissionForm({
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
   const { files, errors, loading } = usePrefillFiles({
-    fileUrls: submission?.fileUrl ? [submission.fileUrl] : undefined,
+    [conference.slug]: submission?.fileUrl,
   });
 
   const { yup } = useValidation();
@@ -102,7 +101,7 @@ export default function SubmissionForm({
           },
         },
         authors: [],
-        files,
+        files: files[conference.slug],
         conference: conference.id,
         section: submission?.section.id,
         presentationLng: (submission?.presentationLng || "") as PresentationLng,
@@ -112,15 +111,18 @@ export default function SubmissionForm({
         <form
           className="space-y-6 w-80 sm:w-96"
           onSubmit={methods.handleSubmit(async (vals) => {
+            console.log(vals.files);
             const { error, url } = await uploadOrDelete(
               conference.slug,
               submission?.fileUrl,
-              files[0],
+              vals.files[0],
               submission?.section.translations.sk.name
             );
             if (error) {
               return methods.setError("files", { message: error });
             }
+
+            console.log(url);
 
             let res;
             if (submission) {

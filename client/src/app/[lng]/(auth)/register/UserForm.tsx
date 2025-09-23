@@ -51,9 +51,9 @@ export default function UserForm({
 
   const { yup } = useValidation();
 
-  const { loading, avatar, files, errors } = usePrefillFiles({
-    avatarUrl: user?.avatarUrl,
-    cvUrl: user?.cvUrl,
+  const { loading, files, errors } = usePrefillFiles({
+    avatars: user?.avatarUrl,
+    resumes: user?.cvUrl,
   });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
@@ -86,8 +86,8 @@ export default function UserForm({
         telephone: user?.telephone || "",
         studyProgramme: user?.studyProgramme || null,
         privacy: path === "/register" ? false : true,
-        files,
-        avatar,
+        files: files.resumes,
+        avatar: files.avatars[0],
       }}
       yupSchema={yup.object({
         name: yup.string().trim().required(),
