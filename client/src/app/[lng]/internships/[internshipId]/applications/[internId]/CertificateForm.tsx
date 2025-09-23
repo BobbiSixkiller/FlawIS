@@ -27,9 +27,7 @@ export default function CertificateForm({
   const { yup } = useValidation();
 
   const { loading, files, errors } = usePrefillFiles({
-    fileUrls: application.organizationFeedbackUrl
-      ? [application.organizationFeedbackUrl]
-      : undefined,
+    internships: application.organizationFeedbackUrl,
   });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
@@ -53,7 +51,7 @@ export default function CertificateForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
       })}
-      defaultValues={{ files }}
+      defaultValues={{ files: files.internships }}
       errors={errors}
     >
       {(methods) => (
