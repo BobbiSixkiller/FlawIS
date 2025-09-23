@@ -86,7 +86,7 @@ export default function UserForm({
         telephone: user?.telephone || "",
         studyProgramme: user?.studyProgramme || null,
         privacy: path === "/register" ? false : true,
-        files: files.resumes,
+        files: files.resumes ?? [],
         avatar: files.avatars[0],
       }}
       yupSchema={yup.object({

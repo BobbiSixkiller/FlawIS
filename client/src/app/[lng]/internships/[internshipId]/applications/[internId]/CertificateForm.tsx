@@ -51,7 +51,7 @@ export default function CertificateForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
       })}
-      defaultValues={{ files: files.internships }}
+      defaultValues={{ files: files.internships ?? [] }}
       errors={errors}
     >
       {(methods) => (

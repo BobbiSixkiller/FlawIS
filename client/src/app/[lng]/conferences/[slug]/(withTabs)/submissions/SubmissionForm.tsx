@@ -101,7 +101,7 @@ export default function SubmissionForm({
           },
         },
         authors: [],
-        files: files[conference.slug],
+        files: files[conference.slug] ?? [],
         conference: conference.id,
         section: submission?.section.id,
         presentationLng: (submission?.presentationLng || "") as PresentationLng,
