@@ -6,8 +6,38 @@ on:
       - staging
 
 jobs:
+  cleanup:
+    runs-on: [HyperV]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Clean old staging volumes
+        run: |
+          echo "Removing old staging volumes..."
+          docker volume rm \
+            flawis-staging_mongo_data_staging \
+            flawis-staging_mongo_config_staging \
+            flawis-staging_minio_storage_staging \
+            flawis-staging_rabbitmq_data_staging \
+            staging_mongo_data_staging \
+            staging_mongo_config_staging \
+            staging_minio_storage_staging \
+            staging_rabbitmq_data_staging 2>/dev/null || true
+
+      - name: Stop and remove old staging containers
+        run: |
+          docker-compose -f docker-compose.staging.yml -p flawis-staging down --rmi all || true
+          docker container prune -f
+          docker image prune -a -f
+          docker builder prune -a -f
+          docker network prune -f
+
   mongo:
     runs-on: [HyperV]
+    needs: cleanup
     environment: staging
     steps:
       - name: Checkout code
@@ -20,9 +50,6 @@ jobs:
           echo "Dumping production MongoDB (only flawis db)..."
           docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
           docker cp flawis-mongo-1:/data/backup ./backup
-
-      - name: Remove old staging containers
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
 
       - name: Start staging MongoDB
         run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
@@ -74,6 +101,7 @@ jobs:
 
   minio:
     runs-on: [HyperV]
+    needs: cleanup
     environment: staging
     env:
       MINIO_USER: ${{ secrets.MINIO_USER }}
@@ -128,17 +156,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - name: Stop old staging containers
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
-
-      - name: Clean old images, networks, build cache
-        run: |
-          docker container prune -f
-          docker image prune -a -f
-          docker network prune -f
-          docker builder prune -a -f
-        continue-on-error: true
 
       - name: Build and deploy staging services
         env:
