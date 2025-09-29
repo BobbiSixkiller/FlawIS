@@ -8,6 +8,7 @@ import {
 } from "../resolvers/types/course.types";
 import {
   AttendaceRecord,
+  Category,
   Course,
   CourseAttendeeUserStub,
   CourseSession,

@@ -1,8 +1,20 @@
 fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
   createdAt
   updatedAt
@@ -32,6 +44,24 @@ query course($id: ObjectId!) {
 
 mutation createCourse($data: CourseInput!) {
   createCourse(data: $data) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+
+mutation deleteCourse($id: ObjectId!) {
+  deleteCourse(id: $id) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+
+mutation updateCourse($id: ObjectId!, $data: CourseInput!) {
+  updateCourse(id: $id, data: $data) {
     message
     data {
       ...Course

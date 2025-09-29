@@ -10,7 +10,6 @@ import { CreateArgs, CreateConnection } from "./pagination.types";
 import {
   ArgsType,
   Field,
-  Float,
   InputType,
   Int,
   ObjectType,
@@ -21,9 +20,10 @@ import { FlawBilling } from "../../entitites/Billing";
 import { FlawBillingInput } from "./conference.types";
 import { IsInt, IsString, Min, MinDate } from "class-validator";
 import { Ref } from "@typegoose/typegoose";
-import { IsAfter, RefDocExists } from "../../util/decorators";
+import { IsAfter, IsBefore, RefDocExists } from "../../util/decorators";
 import Container from "typedi";
 import { I18nService } from "../../services/i18n.service";
+import { todayAtMidnight } from "../../util/helpers";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -98,6 +98,24 @@ export class CourseInput implements Partial<Course> {
       }),
   })
   categoryIds: ObjectId[];
+
+  @Field()
+  @MinDate(todayAtMidnight())
+  start: Date;
+
+  @Field()
+  @IsAfter("start")
+  end: Date;
+
+  @Field()
+  @IsAfter("start")
+  @IsBefore("end")
+  registrationEnd: Date;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(1)
+  maxAttendees: number;
 
   @Field()
   @IsString()

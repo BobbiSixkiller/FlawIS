@@ -6,10 +6,11 @@ import ModalTrigger from "@/components/ModalTrigger";
 import { CheckIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
-import DeleteApplicationForm from "@/app/[lng]/internships/[internshipId]/DeleteApplicationForm";
 import { translate } from "@/lib/i18n";
 import ChangeStatusForm from "./ChangeStatusForm";
 import { redirect } from "next/navigation";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import { deleteIntern } from "@/app/[lng]/internships/[internshipId]/actions";
 
 export default async function InternPage({
   params,
@@ -64,7 +65,14 @@ export default async function InternPage({
         }
       />
       <Modal dialogId={deleteDialogId} title={t("deleteIntern.title")}>
-        <DeleteApplicationForm dialogId={deleteDialogId} internId={intern.id} />
+        <ConfirmDeleteForm
+          dialogId={deleteDialogId}
+          text={`Naozaj si prajete zmazať vašu prihlášku?`}
+          action={async () => {
+            "use server";
+            return deleteIntern(intern.id);
+          }}
+        />
       </Modal>
       <Modal
         dialogId={statusDialogId(Status.Eligible)}

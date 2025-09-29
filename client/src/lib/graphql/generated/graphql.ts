@@ -255,8 +255,12 @@ export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
   categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
+  end: Scalars['DateTimeISO']['input'];
+  maxAttendees: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
+  registrationEnd: Scalars['DateTimeISO']['input'];
+  start: Scalars['DateTimeISO']['input'];
 };
 
 export type CourseMutationResponse = IMutationResponse & {
@@ -1250,7 +1254,7 @@ export type DeleteAttendeeMutation = { __typename?: 'Mutation', deleteAttendee: 
 
 export type AddressFragment = { __typename?: 'Address', street: string, city: string, postal: string, country: string };
 
-export type BillingFragment = { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } };
+export type UserBillingFragment = { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } };
 
 export type UserFragment = { __typename?: 'User', id: any, name: string, email: string, organization?: string | null, telephone?: string | null, access: Array<Access>, verified: boolean, createdAt: any, updatedAt: any, studyProgramme?: StudyProgramme | null, cvUrl?: string | null, avatarUrl?: string | null, address?: { __typename?: 'Address', street: string, city: string, postal: string, country: string } | null, billings: Array<{ __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null> };
 
@@ -1313,6 +1317,8 @@ export type ImpersonateQueryVariables = Exact<{
 export type ImpersonateQuery = { __typename?: 'Query', user: { __typename?: 'User', id: any, access: Array<Access>, token: string } };
 
 export type InvoiceFragment = { __typename?: 'Invoice', body: { __typename?: 'InvoiceData', body: string, comment: string, dueDate: any, issueDate: any, price: number, type: string, vat: number, vatDate: any }, issuer: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } }, payer: { __typename?: 'Billing', name: string, ICO?: string | null, ICDPH?: string | null, DIC?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
+
+export type FlawBillingFragment = { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } };
 
 export type SectionFragment = { __typename?: 'Section', id: string, conference?: { __typename?: 'Conference', id: any, slug: string } | null, translations: { __typename?: 'SectionTranslation', sk: { __typename?: 'SectionTranslations', name: string, topic: string }, en: { __typename?: 'SectionTranslations', name: string, topic: string } } };
 
@@ -1433,7 +1439,7 @@ export type AddAttendeeMutationVariables = Exact<{
 
 export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'ConferenceMutationResponse', message: string, data: { __typename?: 'Conference', slug: string } } };
 
-export type CourseFragment = { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any };
+export type CourseFragment = { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null };
 
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1442,21 +1448,36 @@ export type CoursesQueryVariables = Exact<{
 }>;
 
 
-export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type CourseQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type CourseQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } };
+export type CourseQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
 }>;
 
 
-export type CreateCourseMutation = { __typename?: 'Mutation', createCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any } } };
+export type CreateCourseMutation = { __typename?: 'Mutation', createCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } } };
+
+export type DeleteCourseMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type DeleteCourseMutation = { __typename?: 'Mutation', deleteCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } } };
+
+export type UpdateCourseMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  data: CourseInput;
+}>;
+
+
+export type UpdateCourseMutation = { __typename?: 'Mutation', updateCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } } };
 
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -1684,8 +1705,8 @@ export const AddressFragmentDoc = new TypedDocumentString(`
   country
 }
     `, {"fragmentName":"Address"}) as unknown as TypedDocumentString<AddressFragment, unknown>;
-export const BillingFragmentDoc = new TypedDocumentString(`
-    fragment Billing on Billing {
+export const UserBillingFragmentDoc = new TypedDocumentString(`
+    fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -1699,7 +1720,7 @@ export const BillingFragmentDoc = new TypedDocumentString(`
   city
   postal
   country
-}`, {"fragmentName":"Billing"}) as unknown as TypedDocumentString<BillingFragment, unknown>;
+}`, {"fragmentName":"UserBilling"}) as unknown as TypedDocumentString<UserBillingFragment, unknown>;
 export const UserFragmentDoc = new TypedDocumentString(`
     fragment User on User {
   id
@@ -1715,7 +1736,7 @@ export const UserFragmentDoc = new TypedDocumentString(`
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -1727,7 +1748,7 @@ export const UserFragmentDoc = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -1736,6 +1757,25 @@ fragment Billing on Billing {
   ICDPH
   DIC
 }`, {"fragmentName":"User"}) as unknown as TypedDocumentString<UserFragment, unknown>;
+export const FlawBillingFragmentDoc = new TypedDocumentString(`
+    fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}`, {"fragmentName":"FlawBilling"}) as unknown as TypedDocumentString<FlawBillingFragment, unknown>;
 export const InvoiceFragmentDoc = new TypedDocumentString(`
     fragment Invoice on Invoice {
   body {
@@ -1749,19 +1789,10 @@ export const InvoiceFragmentDoc = new TypedDocumentString(`
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
 }
     fragment Address on Address {
@@ -1770,7 +1801,7 @@ export const InvoiceFragmentDoc = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -1778,6 +1809,18 @@ fragment Billing on Billing {
   ICO
   ICDPH
   DIC
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }`, {"fragmentName":"Invoice"}) as unknown as TypedDocumentString<InvoiceFragment, unknown>;
 export const TicketFragmentDoc = new TypedDocumentString(`
     fragment Ticket on Ticket {
@@ -1909,7 +1952,7 @@ export const AttendeeFragmentDoc = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -1932,7 +1975,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -1950,20 +1993,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -2134,13 +2180,42 @@ export const CourseFragmentDoc = new TypedDocumentString(`
     fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
   createdAt
   updatedAt
 }
-    `, {"fragmentName":"Course"}) as unknown as TypedDocumentString<CourseFragment, unknown>;
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}`, {"fragmentName":"Course"}) as unknown as TypedDocumentString<CourseFragment, unknown>;
 export const ApplicationFragmentDoc = new TypedDocumentString(`
     fragment Application on Intern {
   id
@@ -2226,7 +2301,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -2249,7 +2324,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -2267,20 +2342,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -2395,7 +2473,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -2418,7 +2496,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -2436,20 +2514,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -2564,7 +2645,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -2587,7 +2668,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -2605,20 +2686,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -2755,7 +2839,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -2778,7 +2862,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -2796,20 +2880,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -2927,7 +3014,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -2950,7 +3037,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -2968,20 +3055,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -3059,7 +3149,7 @@ export const MeDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3082,7 +3172,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3104,7 +3194,7 @@ export const LoginDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3127,7 +3217,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3149,7 +3239,7 @@ export const GoogleSignInDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3172,7 +3262,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3199,7 +3289,7 @@ export const PasswordResetDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3222,7 +3312,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3244,7 +3334,7 @@ export const RegisterDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3267,7 +3357,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3294,7 +3384,7 @@ export const ActivateUserDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3317,7 +3407,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3428,7 +3518,7 @@ fragment Address on Address {
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -3451,7 +3541,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -3469,20 +3559,23 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 fragment Section on Section {
   id
@@ -3763,11 +3856,41 @@ export const CoursesDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment Course on Course {
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
   createdAt
   updatedAt
@@ -3778,11 +3901,41 @@ export const CourseDocument = new TypedDocumentString(`
     ...Course
   }
 }
-    fragment Course on Course {
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
   createdAt
   updatedAt
@@ -3796,15 +3949,141 @@ export const CreateCourseDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment Course on Course {
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<CreateCourseMutation, CreateCourseMutationVariables>;
+export const DeleteCourseDocument = new TypedDocumentString(`
+    mutation deleteCourse($id: ObjectId!) {
+  deleteCourse(id: $id) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+fragment Course on Course {
+  id
+  name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
+  description
+  price
+  billing {
+    ...FlawBilling
+  }
+  isPaid
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<DeleteCourseMutation, DeleteCourseMutationVariables>;
+export const UpdateCourseDocument = new TypedDocumentString(`
+    mutation updateCourse($id: ObjectId!, $data: CourseInput!) {
+  updateCourse(id: $id, data: $data) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+    fragment Address on Address {
+  street
+  city
+  postal
+  country
+}
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
+}
+fragment Course on Course {
+  id
+  name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
+  description
+  price
+  billing {
+    ...FlawBilling
+  }
+  isPaid
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdateCourseMutation, UpdateCourseMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {
@@ -4436,7 +4715,7 @@ export const UserDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -4459,7 +4738,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -4489,7 +4768,7 @@ export const UpdateUserDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -4512,7 +4791,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -4533,7 +4812,7 @@ export const ToggleVerifiedUserDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -4556,7 +4835,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
@@ -4577,7 +4856,7 @@ export const DeleteUserDocument = new TypedDocumentString(`
   postal
   country
 }
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -4600,7 +4879,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl

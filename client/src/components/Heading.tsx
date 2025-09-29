@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { cloneElement, ReactNode } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "@/lib/i18n/client";
 import Link from "next/link";
@@ -25,9 +25,9 @@ export default function Heading({
   const [primaryAction, ...secondaryActions] = links;
 
   return (
-    <div className="lg:flex lg:items-center lg:justify-between">
+    <div className="lg:flex lg:justify-between">
       <div className="min-w-0 flex-1">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight dark:text-white/85">
+        <h2 className="text-2xl font-bold leading-7 text-gray-900 w-full sm:text-3xl sm:tracking-tight dark:text-white/85">
           {heading}
         </h2>
         {subHeading && (
@@ -36,9 +36,9 @@ export default function Heading({
           </div>
         )}
       </div>
-      <div className="mt-5 flex items-center gap-3 lg:ml-4 lg:mt-0">
+      <div className="mt-5 flex gap-3 lg:ml-4 lg:mt-0">
         {/* Desktop buttons */}
-        <div className="hidden sm:flex gap-3 items-center">
+        <div className="hidden sm:flex gap-3 ">
           {secondaryActions?.map((item, i) => {
             if (item.type === "link") {
               return (
@@ -54,7 +54,11 @@ export default function Heading({
                   {item.icon} {item.text}
                 </Button>
               );
-            } else return item?.element;
+            } else
+              return cloneElement(item?.element, {
+                ...item.element.props,
+                key: i,
+              });
           })}
         </div>
 

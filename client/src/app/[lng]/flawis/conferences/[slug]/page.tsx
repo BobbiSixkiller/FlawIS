@@ -7,8 +7,9 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import UpdateDatesForm from "./UpdateDatesForm";
-import DeleteConferenceForm from "./DeleteConferenceForm";
 import { redirect } from "next/navigation";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import { deleteConference } from "./actions";
 
 export default async function ConferencePage({
   params,
@@ -111,9 +112,15 @@ export default async function ConferencePage({
         />
       </Modal>
       <Modal dialogId={deleteConfDialogId} title="Zmazat konferenciu">
-        <DeleteConferenceForm
+        <ConfirmDeleteForm
           dialogId={deleteConfDialogId}
-          conference={conference}
+          text={`Naozaj si prajete zmazat konferenciu: ${
+            conference.translations[lng as "sk" | "en"].name
+          } ?`}
+          action={async () => {
+            "use server";
+            return deleteConference({ id: conference.id });
+          }}
         />
       </Modal>
     </div>

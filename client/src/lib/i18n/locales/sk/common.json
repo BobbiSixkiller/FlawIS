@@ -24,5 +24,6 @@
   "city": "Mesto",
   "postal": "PSČ",
   "country": "Krajina",
-  "address": "Adresa"
+  "address": "Adresa",
+  "addOption": "Pridať: {{ value }}"
 }

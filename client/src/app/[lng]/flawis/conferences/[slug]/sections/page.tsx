@@ -1,6 +1,6 @@
 import Dropdown, { DropdownItem } from "@/components/Dropdown";
 import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { conferenceSections } from "./actions";
+import { conferenceSections, deleteSection } from "./actions";
 import {
   SectionFragment,
   SubmissionFilesFragment,
@@ -9,7 +9,7 @@ import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import SectionForm from "./SectionForm";
-import DeleteSectionForm from "./DeleteSectionForm";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 
 export default async function SectionsPage({
   params,
@@ -129,10 +129,13 @@ function Section({
       />
 
       <Modal dialogId={deleteSectionDialogId} title="Zmazat sekciu">
-        <DeleteSectionForm
+        <ConfirmDeleteForm
           dialogId={deleteSectionDialogId}
-          lng={lng}
-          section={section}
+          text="Naozaj si prajete zmazat tuto sekciu?"
+          action={async () => {
+            "use server";
+            return deleteSection({ id: section.id });
+          }}
         />
       </Modal>
       <Modal dialogId={updateSectionDialogId} title="Aktualizovat sekciu">

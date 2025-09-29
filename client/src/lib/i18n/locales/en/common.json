@@ -24,5 +24,6 @@
   "city": "City",
   "postal": "Postal",
   "country": "Country",
-  "address": "Address"
+  "address": "Address",
+  "addOption": "Add: {{ value }}"
 }

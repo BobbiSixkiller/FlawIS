@@ -5,7 +5,7 @@ fragment Address on Address {
   country
 }
 
-fragment Billing on Billing {
+fragment UserBilling on Billing {
   name
   address {
     ...Address
@@ -29,7 +29,7 @@ fragment User on User {
   createdAt
   updatedAt
   billings {
-    ...Billing
+    ...UserBilling
   }
   studyProgramme
   cvUrl
