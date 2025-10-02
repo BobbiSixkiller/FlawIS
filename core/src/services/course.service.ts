@@ -7,10 +7,9 @@ import {
   CourseSessionInput,
 } from "../resolvers/types/course.types";
 import {
-  AttendaceRecord,
-  Category,
+  AttendanceRecord,
   Course,
-  CourseAttendeeUserStub,
+  CourseAttendee,
   CourseSession,
 } from "../entitites/Course";
 import { I18nService } from "./i18n.service";
@@ -19,16 +18,13 @@ import { Service } from "typedi";
 import { CourseRepository } from "../repositories/course.repository";
 import { Repository } from "../repositories/base.repository";
 import { CourseAttendeeRepository } from "../repositories/courseAttendee.repository";
-import { CtxUser } from "../util/types";
 import { UserService } from "./user.service";
-import {
-  AttendeeBillingInput,
-  InvoiceInput,
-} from "../resolvers/types/attendee.types";
-import { Billing } from "../entitites/Billing";
+import { AttendeeBillingInput } from "../resolvers/types/attendee.types";
+import { Invoice } from "../entitites/Attendee";
+import { Status } from "../entitites/Internship";
 
-function toCourseDTO(doc: DocumentType<Course>) {
-  const obj = doc.toJSON({
+function toDTO<T>(doc: DocumentType<T>): T {
+  return doc.toJSON({
     versionKey: false,
     virtuals: false,
     transform(_doc, ret) {
@@ -36,46 +32,9 @@ function toCourseDTO(doc: DocumentType<Course>) {
         ret.id = ret._id;
         delete ret._id;
       }
-
       return ret;
     },
-  });
-
-  return obj as Course;
-}
-
-function toSessionDTO(doc: DocumentType<CourseSession>) {
-  const obj = doc.toJSON({
-    versionKey: false,
-    virtuals: false,
-    transform(_doc, ret) {
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-
-      return ret;
-    },
-  });
-
-  return obj as CourseSession;
-}
-
-function toAttendanceDTO(doc: DocumentType<AttendaceRecord>) {
-  const obj = doc.toJSON({
-    versionKey: false,
-    virtuals: false,
-    transform(_doc, ret) {
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-
-      return ret;
-    },
-  });
-
-  return obj as AttendaceRecord;
+  }) as T;
 }
 
 @Service()
@@ -85,7 +44,7 @@ export class CourseService {
     private readonly courseSessionRepository = new Repository(CourseSession),
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
-      AttendaceRecord
+      AttendanceRecord
     ),
     private readonly userService: UserService,
     private readonly i18nService: I18nService
@@ -97,7 +56,7 @@ export class CourseService {
       throw new Error(this.i18nService.translate("notFound", { ns: "course" }));
     }
 
-    return toCourseDTO(course);
+    return toDTO(course);
   }
 
   async getPaginatedCourses(args: CourseArgs) {
@@ -107,7 +66,7 @@ export class CourseService {
   async createCourse(data: CourseInput) {
     const course = await this.courseRepository.create(data);
 
-    return toCourseDTO(course);
+    return toDTO(course);
   }
 
   async updateCourse(id: ObjectId, data: CourseInput) {
@@ -117,8 +76,8 @@ export class CourseService {
     try {
       const updated = await this.courseRepository.findOneAndUpdate(
         { _id: id },
-        data,
-        session
+        { $set: data },
+        { session, new: true }
       );
       if (!updated) {
         throw new Error(
@@ -128,7 +87,7 @@ export class CourseService {
 
       await session.commitTransaction();
 
-      return toCourseDTO(updated);
+      return toDTO(updated);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -143,7 +102,7 @@ export class CourseService {
       throw new Error(this.i18nService.translate("notFound", { ns: "course" }));
     }
 
-    return toCourseDTO(deleted);
+    return toDTO(deleted);
   }
 
   async createCourseSession(data: CourseSessionInput) {
@@ -159,7 +118,7 @@ export class CourseService {
 
       await session.commitTransaction();
 
-      return toSessionDTO(courseSession);
+      return toDTO(courseSession);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -176,7 +135,7 @@ export class CourseService {
       const courseSession = await this.courseSessionRepository.findOneAndUpdate(
         { _id: id },
         { $set: { ...data } },
-        { session }
+        { session, new: true }
       );
       if (!courseSession) {
         throw new Error(
@@ -186,7 +145,7 @@ export class CourseService {
 
       await session.commitTransaction();
 
-      return toSessionDTO(courseSession);
+      return toDTO(courseSession);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -214,7 +173,7 @@ export class CourseService {
 
       await session.commitTransaction();
 
-      return toSessionDTO(courseSession);
+      return toDTO(courseSession);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -239,12 +198,15 @@ export class CourseService {
       ]);
 
       const exists = await this.courseAttendeeRepository.findOne({
-        _id: courseId,
+        course: courseId,
         "user._id": user.id,
       });
       if (exists) {
         throw new Error("You are already registered for this course!");
       }
+
+      const priceWithouTax = course.price / Number(process.env.VAT || 1.23);
+      const isFlaw = user.email.split("@")[1] === "flaw.uniba.sk";
 
       const attendee = await this.courseAttendeeRepository.create({
         course: course.id,
@@ -255,14 +217,96 @@ export class CourseService {
           organization: user.organization,
         },
         fileUrls,
-        invoice: course.isPaid
-          ? ({
-              body: {},
-              issuer: course.billing,
-              payer: billing,
-            } as InvoiceInput)
-          : undefined,
+        invoice:
+          course.isPaid && course.billing
+            ? ({
+                body: {
+                  body:
+                    "Faktura za registracny poplatok na kurz: " + course.name,
+                  comment:
+                    "Neuhradenie faktury sa povazuje za zrusenie ucasti.",
+                  type: "Faktura",
+                  price: Math.round((priceWithouTax / 100) * 100) / 100,
+                  vat: isFlaw
+                    ? 0
+                    : Math.round(
+                        ((course.price - priceWithouTax) / 100) * 100
+                      ) / 100,
+                },
+                issuer: {
+                  ...course.billing,
+                  variableSymbol:
+                    course.billing.variableSymbol +
+                    String(course.attendeesCount + 1).padStart(4, "0"),
+                },
+                payer: billing,
+              } as Invoice)
+            : undefined,
       });
+
+      await this.courseRepository.update(
+        { _id: course.id },
+        { $inc: { attendeesCount: 1 } }
+      );
+
+      await session.commitTransaction();
+
+      return toDTO(attendee);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async updateAttendeeStatus(attendeeId: ObjectId, status: Status) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
+        { _id: attendeeId },
+        { $set: { status } },
+        { session, new: true }
+      );
+      if (!attendee) {
+        throw new Error("Attendee not found!");
+      }
+
+      await session.commitTransaction();
+
+      return toDTO(attendee);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async deleteAttendee(id: ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const attendee = await this.courseAttendeeRepository.findOneAndDelete(
+        { _id: id },
+        { session }
+      );
+      if (!attendee) {
+        throw new Error("Attendee not found!");
+      }
+
+      await this.courseRepository.findOneAndUpdate(
+        { _id: attendee.course },
+        { $inc: { attendeesCount: -1 } },
+        { session, new: true }
+      );
+
+      await session.commitTransaction();
+
+      return toDTO(attendee);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -273,7 +317,7 @@ export class CourseService {
 
   async updateAttendance(
     id: ObjectId,
-    data: { online?: boolean; hoursAttended?: boolean }
+    data: { online?: boolean; hoursAttended?: number }
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -284,18 +328,38 @@ export class CourseService {
           {
             _id: id,
           },
-          { data },
-          { session }
+          { $set: data },
+          { session, new: true }
         );
       if (!attendanceRecord) {
+        throw new Error("Attendance record not found!");
+      }
+
+      const courseSession = await this.courseSessionRepository.findOne(
+        {
+          _id: attendanceRecord.session,
+        },
+        { session }
+      );
+      if (!courseSession) {
+        throw new Error("Course session not found!");
+      }
+
+      // ✅ Calculate session duration in hours
+      const durationMs =
+        new Date(courseSession.end).getTime() -
+        new Date(courseSession.start).getTime();
+      const durationHours = durationMs / (1000 * 60 * 60);
+
+      if (data.hoursAttended && data.hoursAttended > durationHours) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "course" })
+          `HoursAttended (${data.hoursAttended}) cannot exceed session duration (${durationHours} hours)`
         );
       }
 
       await session.commitTransaction();
 
-      return toAttendanceDTO(attendanceRecord);
+      return toDTO(attendanceRecord);
     } catch (error) {
       await session.abortTransaction();
       throw error;

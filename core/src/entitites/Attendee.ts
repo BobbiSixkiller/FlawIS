@@ -41,7 +41,7 @@ export class InvoiceData {
   vatDate?: Date;
 
   @Field()
-  @Property({ default: new Date().setDate(new Date().getDate() + 30) })
+  @Property({ default: new Date().setDate(new Date().getDate() + 15) })
   dueDate?: Date;
 
   @Field(() => Float)

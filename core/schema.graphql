@@ -183,6 +183,7 @@ type ConferenceTranslations {
 }
 
 type Course {
+  attendeesCount: Int!
   billing: FlawBilling
   categories: [Category!]!
   createdAt: DateTimeISO!

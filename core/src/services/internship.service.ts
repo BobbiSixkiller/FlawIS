@@ -89,7 +89,7 @@ export class InternshipService {
     try {
       const internship = await this.internshipRepository.findOneAndUpdate(
         { _id: id },
-        data,
+        { $set: data },
         { session }
       );
       if (!internship) {

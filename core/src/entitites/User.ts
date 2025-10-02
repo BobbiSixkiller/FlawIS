@@ -80,25 +80,9 @@ export class User extends TimeStamps {
   @Property()
   cvUrl?: string;
 
-  // @Field(() => String, { nullable: true })
-  // get cvUrlEnv() {
-  //   if (process.env.NODE_ENV === "staging") {
-  //     return this.cvUrl?.replace("minio", "minio-staging");
-  //   }
-  //   return this.cvUrl;
-  // }
-
   @Field(() => String, { nullable: true })
   @Property()
   avatarUrl?: string;
-
-  // @Field(() => String, { nullable: true })
-  // get avatarUrlEnv() {
-  //   if (process.env.NODE_ENV === "staging") {
-  //     return this.avatarUrl?.replace("minio", "minio-staging");
-  //   }
-  //   return this.avatarUrl;
-  // }
 
   @Field(() => StudyProgramme, { nullable: true })
   @Property({ type: Number, enum: StudyProgramme })

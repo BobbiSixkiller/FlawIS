@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb";
 import {
-  AttendaceRecord,
   Category,
   Course,
   CourseAttendee,
@@ -18,12 +17,11 @@ import {
 import { IMutationResponse } from "./interface.types";
 import { FlawBilling } from "../../entitites/Billing";
 import { FlawBillingInput } from "./conference.types";
-import { IsInt, IsString, Min, MinDate } from "class-validator";
+import { IsDate, IsInt, IsString, Min, MinDate } from "class-validator";
 import { Ref } from "@typegoose/typegoose";
 import { IsAfter, IsBefore, RefDocExists } from "../../util/decorators";
 import Container from "typedi";
 import { I18nService } from "../../services/i18n.service";
-import { todayAtMidnight } from "../../util/helpers";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -100,14 +98,16 @@ export class CourseInput implements Partial<Course> {
   categoryIds: ObjectId[];
 
   @Field()
-  @MinDate(todayAtMidnight())
+  @IsDate()
   start: Date;
 
   @Field()
+  @IsDate()
   @IsAfter("start")
   end: Date;
 
   @Field()
+  @IsDate()
   @IsAfter("start")
   @IsBefore("end")
   registrationEnd: Date;
@@ -133,6 +133,7 @@ export class CourseInput implements Partial<Course> {
 @InputType()
 export class CourseSessionInput implements Partial<CourseSession> {
   @Field(() => ObjectId)
+  @RefDocExists(Course)
   course: Ref<Course>;
 
   @Field()
@@ -143,6 +144,7 @@ export class CourseSessionInput implements Partial<CourseSession> {
 
   @Field()
   @MinDate(new Date())
+  @IsBefore("end")
   start: Date;
 
   @Field()
