@@ -14,3 +14,9 @@ export function getAcademicYear(date = new Date()) {
 
   return { startYear, endYear, startDate, endDate, academicYear };
 }
+
+export function todayAtMidnight(): Date {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}

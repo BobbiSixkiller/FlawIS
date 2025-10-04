@@ -4,9 +4,10 @@ import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
 import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
-import DeleteTicketForm from "./DeleteTicketForm";
 import { redirect } from "next/navigation";
 import TicketForm from "./TicketForm";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import { deleteTicket } from "./actions";
 
 export default async function TicketsPage({
   params,
@@ -81,10 +82,16 @@ export default async function TicketsPage({
               />
             </Modal>
             <Modal dialogId={deleteTicketDialogId(t.id)} title="Zmazat listok">
-              <DeleteTicketForm
+              <ConfirmDeleteForm
                 dialogId={deleteTicketDialogId(t.id)}
-                lng={lng}
-                ticket={t}
+                text="Naozaj si prajete zmazat formu ucasti?"
+                action={async () => {
+                  "use server";
+                  return deleteTicket({
+                    slug: conference.slug,
+                    ticketId: t.id,
+                  });
+                }}
               />
             </Modal>
           </div>

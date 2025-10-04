@@ -23,6 +23,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
 import { GqlMutationResponse } from "@/utils/actions";
+import { useTranslation } from "@/lib/i18n/client";
 
 export interface GenericComboboxProps<TOption, TValue> {
   lng: string;
@@ -51,6 +52,7 @@ export default function GenericCombobox<
   TOption extends { id: string | number; val: any },
   TValue
 >({
+  lng,
   name,
   control,
   label,
@@ -209,6 +211,8 @@ export default function GenericCombobox<
     }
   };
 
+  const { t } = useTranslation(lng, "common");
+
   function renderComboboxContent() {
     return (
       <div>
@@ -295,16 +299,16 @@ export default function GenericCombobox<
           {allowCreateNewOptions && text.length > 0 && (
             <ComboboxOption
               value={{ id: null, val: text } as unknown as TOption}
-              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 p-2 cursor-pointer"
+              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 data-[focus]:text-white p-2 cursor-pointer"
             >
-              Create &quot;{text}&quot;
+              {t("addOption", { value: text })}
             </ComboboxOption>
           )}
           {options.map((opt, i) => (
             <ComboboxOption
               key={i}
               value={opt}
-              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 p-2 cursor-pointer"
+              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 data-[focus]:text-white p-2 cursor-pointer"
             >
               {(props) => renderOption(opt, props)}
             </ComboboxOption>

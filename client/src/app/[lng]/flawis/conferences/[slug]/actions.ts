@@ -3,18 +3,19 @@
 import {
   DatesInput,
   DeleteConferenceDocument,
+  DeleteConferenceMutationVariables,
   UpdateConferenceDatesDocument,
   UpdateConferenceDatesMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles } from "@/lib/minio";
 import { executeGqlMutation } from "@/utils/actions";
 
-export async function deleteConference(id: string) {
+export async function deleteConference(
+  vars: DeleteConferenceMutationVariables
+) {
   const res = await executeGqlMutation(
     DeleteConferenceDocument,
-    {
-      id,
-    },
+    vars,
     (data) => ({
       message: data.deleteConference.message,
       data: data.deleteConference.data,

@@ -51,6 +51,10 @@ export class Course extends TimeStamps {
   @Property()
   maxAttendees: number;
 
+  @Field(() => Int)
+  @Property({ default: 0 })
+  attendeesCount: number;
+
   @Field()
   @Property()
   registrationEnd: Date;
@@ -91,6 +95,7 @@ export class CourseSession extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
+  @Field(() => ObjectId)
   @Property({ ref: () => Course })
   course: Ref<Course>;
 
@@ -124,7 +129,7 @@ export class CourseSession extends TimeStamps {
 export class CourseAttendeeUserStub extends UserStub {
   @Field()
   @Property({ default: "N/A" })
-  organizatation: string;
+  organization: string;
 }
 
 @ObjectType({ description: "Connects a system user with a particular course." })
@@ -179,12 +184,12 @@ export class CourseAttendeeStub {
 })
 @Index({ term: 1 })
 @Index({ "attendee._id": 1 })
-export class AttendaceRecord extends TimeStamps {
+export class AttendanceRecord extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
   @Property({ ref: () => CourseSession })
-  term: Ref<CourseSession>;
+  session: Ref<CourseSession>;
 
   @Field(() => CourseAttendeeStub)
   @Property({ type: () => CourseAttendeeStub })

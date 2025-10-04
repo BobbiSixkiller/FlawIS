@@ -33,7 +33,7 @@ export class SubmissionResolver {
   constructor(
     private readonly submissionService: SubmissionService,
     private readonly conferenceRepository: ConferenceRepository,
-    private readonly sectionService = new Repository(Section),
+    private readonly sectionRepository = new Repository(Section),
     private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService
   ) {}
@@ -158,7 +158,7 @@ export class SubmissionResolver {
   @Authorized()
   @FieldResolver(() => Section, { nullable: true })
   async section(@Root() { section }: Submission) {
-    return await this.sectionService.findOne({ _id: section });
+    return await this.sectionRepository.findOne({ _id: section });
   }
 
   @Authorized()

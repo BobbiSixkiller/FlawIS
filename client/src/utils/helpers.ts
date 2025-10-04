@@ -25,20 +25,12 @@ export function displayDate(utc?: string, locale: string = "sk") {
     second: "2-digit",
     hour12: false, // Use 24-hour format
     timeZoneName: "short", // Include time zone abbreviation (e.g., CET or CEST)
-    timeZone: "Europe/Bratislava", // Explicit time zone for Slovakia
   });
-}
-
-export function getLocalDateTime(utc: string) {
-  const date = new Date(utc);
-  date.setHours(date.getHours() + 2);
-
-  return date.toISOString().slice(0, 16);
 }
 
 export function getLocalDate(utc: string) {
   const date = new Date(utc);
-  date.setHours(date.getHours() + 2);
+  // date.setHours(date.getHours() + 2);
 
   return date.toISOString().split("T")[0];
 }
@@ -250,4 +242,10 @@ export function handleAPIErrors(
       }
     );
   }
+}
+
+export function todayAtMidnight(): Date {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
 }

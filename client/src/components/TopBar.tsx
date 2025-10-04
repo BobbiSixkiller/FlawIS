@@ -50,7 +50,7 @@ export default function TopBar({
     >
       <Button
         onClick={() => setVisible(true)}
-        className="md:hidden absolute left-2 p-2 w-fit"
+        className="lg:hidden sm:static sm:mr-4 absolute left-2 p-2 w-fit"
         variant="ghost"
       >
         <Bars3Icon className="size-5" />

@@ -29,11 +29,14 @@ export interface InputProps
   control?: Control<any>;
 }
 
-function formatDatetimeLocal(val: any): string {
+function formatDatetimeLocal(val: any, withTime: boolean): string {
   if (!val) return "";
   const date = val instanceof Date ? val : new Date(val);
   if (isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16); // ⏰ "2025-07-19T11:30"
+
+  return withTime
+    ? date.toISOString().slice(0, 16)
+    : date.toISOString().split("T")[0]; // ⏰ "2025-07-19T11:30" or "2025-07-19"
 }
 
 //refactor to handle number and dates
@@ -47,7 +50,10 @@ export function Input({
   ...props
 }: InputProps) {
   const field = methods?.register?.(name, {
-    valueAsDate: props.type === "datetime-local", // ✅
+    ...(props.type === "number" ? { valueAsNumber: true } : {}),
+    ...(props.type === "datetime-local" || props.type === "date"
+      ? { valueAsDate: true as unknown as false }
+      : {}),
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -55,11 +61,11 @@ export function Input({
   const val = methods?.watch(name);
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col gap-2">
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium leading-6 text-gray-900 mb-2 dark:text-white/85"
+          className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85"
         >
           {label}
         </label>
@@ -83,8 +89,8 @@ export function Input({
           {...props}
           {...field}
           value={
-            props.type === "datetime-local"
-              ? formatDatetimeLocal(val)
+            props.type === "datetime-local" || props.type === "date"
+              ? formatDatetimeLocal(val, props.type === "datetime-local")
               : val ?? ""
           }
           onChange={(e) => {

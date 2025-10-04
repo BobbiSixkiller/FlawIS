@@ -7,14 +7,14 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { getUser, toggleVerified } from "./actions";
+import { deleteUser, getUser, toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
-import DeleteUserForm from "./DeleteUserForm";
 import ImpersonateForm from "./ImpersonateForm";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 
 export default async function User({
   params,
@@ -179,7 +179,14 @@ export default async function User({
         />
       </Modal>
       <Modal title="Zmazat pouzivatela" dialogId={deleteUserDialogId}>
-        <DeleteUserForm dialogId={deleteUserDialogId} user={user} />
+        <ConfirmDeleteForm
+          dialogId={deleteUserDialogId}
+          text="Naozaj chcete zmazat tohto pouzivatela?"
+          action={async () => {
+            "use server";
+            return deleteUser(user.id);
+          }}
+        />
       </Modal>
       <Modal title="Impersonovat pouzivatela" dialogId={impersonateDialogId}>
         <ImpersonateForm lng={lng} user={user} dialogId={impersonateDialogId} />

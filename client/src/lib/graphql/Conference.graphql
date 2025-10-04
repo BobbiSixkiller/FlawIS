@@ -10,20 +10,24 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    name
-    address {
-      ...Address
-    }
-    ICO
-    ICDPH
-    DIC
-    variableSymbol
-    IBAN
-    SWIFT
+    ...FlawBilling
   }
   payer {
-    ...Billing
+    ...UserBilling
   }
+}
+
+fragment FlawBilling on FlawBilling {
+  name
+  address {
+    ...Address
+  }
+  ICO
+  ICDPH
+  DIC
+  variableSymbol
+  IBAN
+  SWIFT
 }
 
 fragment Section on Section {

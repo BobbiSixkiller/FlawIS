@@ -1,9 +1,33 @@
 fragment Course on Course {
   id
   name
+  categories {
+    id
+    name
+    slug
+  }
+  start
+  end
+  registrationEnd
+  maxAttendees
   description
   price
+  billing {
+    ...FlawBilling
+  }
   isPaid
+  createdAt
+  updatedAt
+}
+
+fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
   createdAt
   updatedAt
 }
@@ -35,6 +59,42 @@ mutation createCourse($data: CourseInput!) {
     message
     data {
       ...Course
+    }
+  }
+}
+
+mutation deleteCourse($id: ObjectId!) {
+  deleteCourse(id: $id) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+
+mutation updateCourse($id: ObjectId!, $data: CourseInput!) {
+  updateCourse(id: $id, data: $data) {
+    message
+    data {
+      ...Course
+    }
+  }
+}
+
+mutation createCourseSession($data: CourseSessionInput!) {
+  createCourseSession(data: $data) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}
+
+mutation updateCourseSession($id: ObjectId!, $data: CourseSessionInput!) {
+  updateCourseSession(id: $id, data: $data) {
+    message
+    data {
+      ...CourseSession
     }
   }
 }

@@ -9,14 +9,14 @@ import {
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter, cn } from "@/utils/helpers";
 import RemoveAuthorForm from "./RemoveAuthorForm";
-import { getAttendee } from "./actions";
+import { deleteAttendee, getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import DeleteAttendeeForm from "./DeleteAttendeeForm";
 import Modal from "@/components/Modal";
 import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 
 export default async function AttendeePage({
   params,
@@ -136,10 +136,13 @@ export default async function AttendeePage({
       )}
 
       <Modal dialogId={deleteDialogId} title="Zmazat ucastnika">
-        <DeleteAttendeeForm
+        <ConfirmDeleteForm
           dialogId={deleteDialogId}
-          lng={lng}
-          attendee={attendee}
+          text={`Naozaj si prajete zmazat ucastnika: ${attendee.user.name} ?`}
+          action={async () => {
+            "use server";
+            return deleteAttendee(attendee.id);
+          }}
         />
       </Modal>
       <Modal dialogId={impersonateDialogId} title="Impersonovat ucastnika">

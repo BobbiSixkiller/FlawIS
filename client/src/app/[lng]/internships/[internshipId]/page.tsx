@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getInternship } from "./actions";
+import { deleteIntern, deleteInternship, getInternship } from "./actions";
 import { redirect } from "next/navigation";
 import { getMe } from "../../(auth)/actions";
 import { Access, Status } from "@/lib/graphql/generated/graphql";
@@ -15,9 +15,8 @@ import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import InternshipForm from "../InternshipForm";
 import { translate } from "@/lib/i18n";
-import DeleteInternshipForm from "./DeleteInternshipForm";
-import DeleteApplicationForm from "./DeleteApplicationForm";
 import ApplicationForm from "./ApplicationForm";
+import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 
 export default async function InternshipPage({
   params,
@@ -130,15 +129,26 @@ export default async function InternshipPage({
         <InternshipForm dialogId={updateInternshipDialogId} data={internship} />
       </Modal>
       <Modal dialogId={deleteInternshipDialogId} title={t("delete.title")}>
-        <DeleteInternshipForm dialogId={deleteInternshipDialogId} />
+        <ConfirmDeleteForm
+          dialogId={deleteInternshipDialogId}
+          text={`Naozaj si prajete zmazat tuto staz ?`}
+          action={async () => {
+            "use server";
+            return deleteInternship(internship.id);
+          }}
+        />
       </Modal>
       <Modal
         dialogId={deleteApplicationDialogId}
         title={t("deleteIntern.title")}
       >
-        <DeleteApplicationForm
+        <ConfirmDeleteForm
           dialogId={deleteApplicationDialogId}
-          internId={internship.myApplication?.id}
+          text={`Naozaj si prajete zmazať vašu prihlášku?`}
+          action={async () => {
+            "use server";
+            return deleteIntern(internship.myApplication?.id);
+          }}
         />
       </Modal>
       <Modal dialogId={applicationDialogId} title={t("docs")}>

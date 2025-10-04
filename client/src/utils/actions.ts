@@ -79,7 +79,7 @@ export type GqlMutationResponse<TransformedData> = {
   success: boolean;
   message: string;
   data?: TransformedData;
-  errors?: Record<string, string>; // or whatever format you use
+  errors?: Record<string, string>;
 };
 
 export async function executeGqlMutation<Data, Variables, TransformedData>(

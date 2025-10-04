@@ -1,10 +1,13 @@
 "use client";
 
-import Editor from "@/components/editor/Editor";
 import useDefaultContent from "@/components/editor/useDefaultContent";
 import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
-import { Category, CourseInput } from "@/lib/graphql/generated/graphql";
+import {
+  Category,
+  CourseFragment,
+  CourseInput,
+} from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -12,11 +15,25 @@ import { createCourse } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import { cn } from "@/utils/helpers";
+import {
+  cn,
+  getLocalDate,
+  handleAPIErrors,
+  todayAtMidnight,
+} from "@/utils/helpers";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
+import { updateCouse } from "./[id]/actions";
+import { Textarea } from "@/components/Textarea";
+import TiptapEditor from "@/components/editor/Editor";
 
-export default function CourseForm({ dialogId }: { dialogId: string }) {
+export default function CourseForm({
+  dialogId,
+  course,
+}: {
+  dialogId: string;
+  course?: CourseFragment;
+}) {
   const [price, setPrice] = useState(0);
   const { lng } = useParams<{ lng: string }>();
   const { yup } = useValidation();
@@ -28,15 +45,21 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
   const setMessage = useMessageStore((s) => s.setMessage);
   const closeDialog = useDialogStore((s) => s.closeDialog);
 
+  const today = new Date().toUTCString();
+
   return (
     <WizzardForm<CourseInput>
       lng={lng}
       defaultValues={{
-        name: "",
-        categoryIds: [],
-        description: "",
-        price: 0,
-        billing: {
+        name: course?.name ?? "",
+        categoryIds: course?.categories.map((c) => c.id) ?? [],
+        start: getLocalDate(course?.start ?? today),
+        end: getLocalDate(course?.end ?? today),
+        registrationEnd: getLocalDate(course?.registrationEnd ?? today),
+        description: course?.description ?? "",
+        maxAttendees: course?.maxAttendees ?? 0,
+        price: course?.price ?? 0,
+        billing: course?.billing ?? {
           name: "",
           address: {
             street: "",
@@ -52,9 +75,17 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
           SWIFT: "",
         },
       }}
-      onSubmitCb={async (vals) => {
-        console.log(vals);
-        const res = await createCourse({ data: vals });
+      onSubmitCb={async (vals, methods) => {
+        let res;
+        if (course) {
+          res = await updateCouse({ id: course.id, data: vals });
+        } else {
+          res = await createCourse({ data: vals });
+        }
+
+        if (res.errors) {
+          handleAPIErrors(res.errors, methods.setError);
+        }
 
         setMessage(res.message, res.success);
 
@@ -69,12 +100,16 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
           name: yup.string().required(),
           description: yup.string().required(),
           price: yup.number().required(),
+          maxAttendees: yup.number().required().min(1),
+          start: yup.date(),
+          end: yup.date().min(yup.ref("start")),
+          registrationEnd: yup.date().min(yup.ref("start")).max(yup.ref("end")),
         })}
       >
         {(methods) => (
-          <div className="space-y-6">
-            <Input label="Nazov kurzu" name="name" />
-            <GenericCombobox<{ id: string; val: Category }, string>
+          <div className="space-y-6 max-w-2xl w-full">
+            <Textarea label="Nazov kurzu" name="name" />
+            {/* <GenericCombobox<{ id: string; val: Category }, string>
               lng={lng}
               label="Kategoria"
               name="categoryIds"
@@ -97,19 +132,35 @@ export default function CourseForm({ dialogId }: { dialogId: string }) {
               defaultOptions={[]}
               getOptionValue={(opt) => opt?.id ?? ""}
               getOptionLabel={({ val }) => val.name}
-            />
-            <Input
-              label="Cena kurzu v centoch s DPH"
-              name="price"
-              type="number"
-              onChange={(e) => setPrice(parseInt(e.target.value))}
-            />
-            <Editor
+            /> */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Input label="Zaciatok" name="start" type="date" />
+              <Input label="Koniec" name="end" type="date" />
+              <Input
+                label="Koniec registracie"
+                name="registrationEnd"
+                type="date"
+              />
+            </div>
+            <TiptapEditor
               control={methods.control}
-              className="sm:w-[580px] md:w-[600px]"
+              className="sm:w-[580px] md:w-[672px]"
               name="description"
               initialValue={defaultCourseEditorContent}
             />
+            <div className="flex gap-4">
+              <Input
+                label="Kapacita ucastnikov"
+                name="maxAttendees"
+                type="number"
+              />
+              <Input
+                label="Cena kurzu v centoch s DPH"
+                name="price"
+                type="number"
+                onChange={(e) => setPrice(parseInt(e.target.value))}
+              />
+            </div>
           </div>
         )}
       </WizzardStep>
