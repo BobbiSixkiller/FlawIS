@@ -1,15 +1,15 @@
 import { ObjectId } from "mongodb";
 import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
 import { Service } from "typedi";
-import { CourseService } from "../services/course.service";
-import { I18nService } from "../services/i18n.service";
-import { Course } from "../entitites/Course";
+import { CourseService } from "../../services/courses/course.service";
+import { I18nService } from "../../services/i18n.service";
+import { Course } from "../../entitites/Course";
 import {
   CourseArgs,
   CourseConnection,
   CourseInput,
   CourseMutationResponse,
-} from "./types/course.types";
+} from "../types/course.types";
 
 @Service()
 @Resolver(() => Course)
@@ -67,6 +67,4 @@ export class CourseResolver {
       }),
     };
   }
-
-  async createCourseSession() {}
 }

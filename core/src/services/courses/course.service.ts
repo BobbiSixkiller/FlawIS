@@ -5,23 +5,18 @@ import {
   CourseArgs,
   CourseInput,
   CourseSessionInput,
-} from "../resolvers/types/course.types";
-import {
-  AttendanceRecord,
-  Course,
-  CourseAttendee,
-  CourseSession,
-} from "../entitites/Course";
-import { I18nService } from "./i18n.service";
+} from "../../resolvers/types/course.types";
+import { AttendanceRecord, CourseSession } from "../../entitites/Course";
+import { I18nService } from "../i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
-import { CourseRepository } from "../repositories/course.repository";
-import { Repository } from "../repositories/base.repository";
-import { CourseAttendeeRepository } from "../repositories/courseAttendee.repository";
-import { UserService } from "./user.service";
-import { AttendeeBillingInput } from "../resolvers/types/attendee.types";
-import { Invoice } from "../entitites/Attendee";
-import { Status } from "../entitites/Internship";
+import { CourseRepository } from "../../repositories/course.repository";
+import { Repository } from "../../repositories/base.repository";
+import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
+import { UserService } from "../user.service";
+import { AttendeeBillingInput } from "../../resolvers/types/attendee.types";
+import { Invoice } from "../../entitites/Attendee";
+import { Status } from "../../entitites/Internship";
 
 function toDTO<T>(doc: DocumentType<T>): T {
   return doc.toJSON({
@@ -41,8 +36,8 @@ function toDTO<T>(doc: DocumentType<T>): T {
 export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
-    private readonly courseSessionRepository = new Repository(CourseSession),
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
+    private readonly courseSessionRepository = new Repository(CourseSession),
     private readonly attendanceRecordRepository = new Repository(
       AttendanceRecord
     ),

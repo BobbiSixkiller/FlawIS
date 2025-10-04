@@ -217,6 +217,7 @@ export type ConferenceTranslations = {
 
 export type Course = {
   __typename?: 'Course';
+  attendeesCount: Scalars['Int']['output'];
   billing?: Maybe<FlawBilling>;
   categories: Array<Category>;
   createdAt: Scalars['DateTimeISO']['output'];
@@ -273,6 +274,35 @@ export type CoursePageInfo = {
   __typename?: 'CoursePageInfo';
   endCursor?: Maybe<Scalars['String']['output']>;
   hasNextPage: Scalars['Boolean']['output'];
+};
+
+/** Scheduled term for a given course that when created also creates corresponding attendance records. */
+export type CourseSession = {
+  __typename?: 'CourseSession';
+  course: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
+  description: Scalars['String']['output'];
+  end: Scalars['DateTimeISO']['output'];
+  id: Scalars['ObjectId']['output'];
+  maxAttendees: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  start: Scalars['DateTimeISO']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
+};
+
+export type CourseSessionInput = {
+  course: Scalars['ObjectId']['input'];
+  description: Scalars['String']['input'];
+  end: Scalars['DateTimeISO']['input'];
+  maxAttendees: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  start: Scalars['DateTimeISO']['input'];
+};
+
+export type CourseSessionMutationResponse = IMutationResponse & {
+  __typename?: 'CourseSessionMutationResponse';
+  data: CourseSession;
+  message: Scalars['String']['output'];
 };
 
 export type CourseSortInput = {
@@ -524,6 +554,7 @@ export type Mutation = {
   changeInternStatus: InternMutationResponse;
   createConference: ConferenceMutationResponse;
   createCourse: CourseMutationResponse;
+  createCourseSession: CourseSessionMutationResponse;
   createIntern: InternMutationResponse;
   createInternship: InternshipMutationResponse;
   createSection: SectionMutationResponse;
@@ -532,6 +563,7 @@ export type Mutation = {
   deleteAttendee: AttendeeMutationResponse;
   deleteConference: ConferenceMutationResponse;
   deleteCourse: CourseMutationResponse;
+  deleteCourseSession: CourseSessionMutationResponse;
   deleteIntern: InternMutationResponse;
   deleteInternship: InternshipMutationResponse;
   deleteSection: SectionMutationResponse;
@@ -548,6 +580,7 @@ export type Mutation = {
   toggleVerifiedUser: UserMutationResponse;
   updateConferenceDates: ConferenceMutationResponse;
   updateCourse: CourseMutationResponse;
+  updateCourseSession: CourseSessionMutationResponse;
   updateInternFiles: InternMutationResponse;
   updateInternship: InternshipMutationResponse;
   updateInvoice: AttendeeMutationResponse;
@@ -577,6 +610,11 @@ export type MutationCreateConferenceArgs = {
 
 export type MutationCreateCourseArgs = {
   data: CourseInput;
+};
+
+
+export type MutationCreateCourseSessionArgs = {
+  data: CourseSessionInput;
 };
 
 
@@ -618,6 +656,11 @@ export type MutationDeleteConferenceArgs = {
 
 
 export type MutationDeleteCourseArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationDeleteCourseSessionArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
@@ -699,6 +742,12 @@ export type MutationUpdateConferenceDatesArgs = {
 
 export type MutationUpdateCourseArgs = {
   data: CourseInput;
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationUpdateCourseSessionArgs = {
+  data: CourseSessionInput;
   id: Scalars['ObjectId']['input'];
 };
 
@@ -1441,6 +1490,8 @@ export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __ty
 
 export type CourseFragment = { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null };
 
+export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, course: any, name: string, description: string, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any };
+
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1478,6 +1529,21 @@ export type UpdateCourseMutationVariables = Exact<{
 
 
 export type UpdateCourseMutation = { __typename?: 'Mutation', updateCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null } } };
+
+export type CreateCourseSessionMutationVariables = Exact<{
+  data: CourseSessionInput;
+}>;
+
+
+export type CreateCourseSessionMutation = { __typename?: 'Mutation', createCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description: string, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
+
+export type UpdateCourseSessionMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  data: CourseSessionInput;
+}>;
+
+
+export type UpdateCourseSessionMutation = { __typename?: 'Mutation', updateCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description: string, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
 
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -2216,6 +2282,19 @@ fragment FlawBilling on FlawBilling {
   IBAN
   SWIFT
 }`, {"fragmentName":"Course"}) as unknown as TypedDocumentString<CourseFragment, unknown>;
+export const CourseSessionFragmentDoc = new TypedDocumentString(`
+    fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"CourseSession"}) as unknown as TypedDocumentString<CourseSessionFragment, unknown>;
 export const ApplicationFragmentDoc = new TypedDocumentString(`
     fragment Application on Intern {
   id
@@ -4084,6 +4163,46 @@ fragment Course on Course {
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<UpdateCourseMutation, UpdateCourseMutationVariables>;
+export const CreateCourseSessionDocument = new TypedDocumentString(`
+    mutation createCourseSession($data: CourseSessionInput!) {
+  createCourseSession(data: $data) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}
+    fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<CreateCourseSessionMutation, CreateCourseSessionMutationVariables>;
+export const UpdateCourseSessionDocument = new TypedDocumentString(`
+    mutation updateCourseSession($id: ObjectId!, $data: CourseSessionInput!) {
+  updateCourseSession(id: $id, data: $data) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}
+    fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<UpdateCourseSessionMutation, UpdateCourseSessionMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {

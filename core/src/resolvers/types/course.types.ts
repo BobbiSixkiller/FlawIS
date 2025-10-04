@@ -81,6 +81,12 @@ export class CourseMutationResponse extends IMutationResponse {
   data: Course;
 }
 
+@ObjectType({ implements: IMutationResponse })
+export class CourseSessionMutationResponse extends IMutationResponse {
+  @Field(() => CourseSession)
+  data: CourseSession;
+}
+
 @InputType()
 export class CourseInput implements Partial<Course> {
   @Field()

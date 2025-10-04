@@ -95,6 +95,7 @@ export class CourseSession extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
+  @Field(() => ObjectId)
   @Property({ ref: () => Course })
   course: Ref<Course>;
 

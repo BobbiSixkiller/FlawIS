@@ -239,6 +239,35 @@ type CoursePageInfo {
   hasNextPage: Boolean!
 }
 
+"""
+Scheduled term for a given course that when created also creates corresponding attendance records.
+"""
+type CourseSession {
+  course: ObjectId!
+  createdAt: DateTimeISO!
+  description: String!
+  end: DateTimeISO!
+  id: ObjectId!
+  maxAttendees: Int!
+  name: String!
+  start: DateTimeISO!
+  updatedAt: DateTimeISO!
+}
+
+input CourseSessionInput {
+  course: ObjectId!
+  description: String!
+  end: DateTimeISO!
+  maxAttendees: Int!
+  name: String!
+  start: DateTimeISO!
+}
+
+type CourseSessionMutationResponse implements IMutationResponse {
+  data: CourseSession!
+  message: String!
+}
+
 input CourseSortInput {
   direction: SortDirection!
   field: CourseSortableField!
@@ -479,6 +508,7 @@ type Mutation {
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
+  createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
@@ -487,6 +517,7 @@ type Mutation {
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
   deleteCourse(id: ObjectId!): CourseMutationResponse!
+  deleteCourseSession(id: ObjectId!): CourseSessionMutationResponse!
   deleteIntern(id: ObjectId!): InternMutationResponse!
   deleteInternship(id: ObjectId!): InternshipMutationResponse!
   deleteSection(id: ObjectId!): SectionMutationResponse!
@@ -503,6 +534,7 @@ type Mutation {
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
+  updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!

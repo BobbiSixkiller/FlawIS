@@ -20,6 +20,18 @@ fragment Course on Course {
   updatedAt
 }
 
+fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
+  createdAt
+  updatedAt
+}
+
 query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
   courses(after: $after, first: $first, sort: $sort) {
     totalCount
@@ -65,6 +77,24 @@ mutation updateCourse($id: ObjectId!, $data: CourseInput!) {
     message
     data {
       ...Course
+    }
+  }
+}
+
+mutation createCourseSession($data: CourseSessionInput!) {
+  createCourseSession(data: $data) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}
+
+mutation updateCourseSession($id: ObjectId!, $data: CourseSessionInput!) {
+  updateCourseSession(id: $id, data: $data) {
+    message
+    data {
+      ...CourseSession
     }
   }
 }

@@ -8,6 +8,7 @@ import CourseForm from "../CourseForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { redirect } from "next/navigation";
 import CloseButton from "@/components/CloseButton";
+import CourseSessionForm from "./CourseSessionForm";
 
 export default async function CoursePage({
   params,
@@ -84,7 +85,7 @@ export default async function CoursePage({
         />
       </Modal>
       <Modal dialogId="add-course-session" title="Pridat termin">
-        Pridat terminik
+        <CourseSessionForm dialogId="add-course-session" />
       </Modal>
     </div>
   );

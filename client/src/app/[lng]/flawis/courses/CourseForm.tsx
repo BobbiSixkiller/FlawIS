@@ -1,6 +1,5 @@
 "use client";
 
-import Editor from "@/components/editor/Editor";
 import useDefaultContent from "@/components/editor/useDefaultContent";
 import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
@@ -26,6 +25,7 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
+import TiptapEditor from "@/components/editor/Editor";
 
 export default function CourseForm({
   dialogId,
@@ -142,7 +142,7 @@ export default function CourseForm({
                 type="date"
               />
             </div>
-            <Editor
+            <TiptapEditor
               control={methods.control}
               className="sm:w-[580px] md:w-[672px]"
               name="description"

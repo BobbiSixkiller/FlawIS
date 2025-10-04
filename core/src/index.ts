@@ -29,8 +29,9 @@ import { AttendeeResolver } from "./resolvers/attendee.resolver";
 import { InternshipResolver } from "./resolvers/internship.resolver";
 import { InternResolver } from "./resolvers/intern.resolver";
 import { CronJobService } from "./services/cron.service";
-import { CourseResolver } from "./resolvers/course.resolver";
+import { CourseResolver } from "./resolvers/courses/course.resolver";
 import { ErrorsMiddleware } from "./middlewares/errors.middleware";
+import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolver";
 
 env.config();
 
@@ -62,6 +63,7 @@ async function main() {
       InternshipResolver,
       InternResolver,
       CourseResolver,
+      CourseSessionResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],
