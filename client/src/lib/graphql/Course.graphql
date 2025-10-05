@@ -98,3 +98,12 @@ mutation updateCourseSession($id: ObjectId!, $data: CourseSessionInput!) {
     }
   }
 }
+
+mutation deleteCourseSession($id: ObjectId!) {
+  deleteCourseSession(id: $id) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}

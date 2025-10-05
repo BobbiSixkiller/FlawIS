@@ -1545,6 +1545,13 @@ export type UpdateCourseSessionMutationVariables = Exact<{
 
 export type UpdateCourseSessionMutation = { __typename?: 'Mutation', updateCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description: string, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
 
+export type DeleteCourseSessionMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type DeleteCourseSessionMutation = { __typename?: 'Mutation', deleteCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description: string, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
+
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type InternshipsQueryVariables = Exact<{
@@ -4203,6 +4210,26 @@ export const UpdateCourseSessionDocument = new TypedDocumentString(`
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<UpdateCourseSessionMutation, UpdateCourseSessionMutationVariables>;
+export const DeleteCourseSessionDocument = new TypedDocumentString(`
+    mutation deleteCourseSession($id: ObjectId!) {
+  deleteCourseSession(id: $id) {
+    message
+    data {
+      ...CourseSession
+    }
+  }
+}
+    fragment CourseSession on CourseSession {
+  id
+  course
+  name
+  description
+  start
+  end
+  maxAttendees
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<DeleteCourseSessionMutation, DeleteCourseSessionMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {
