@@ -3,5 +3,6 @@
   "update": "Course {{name}} has been updated.",
   "new": "Course {{name}} has been created.",
   "delete": "Course {{name}} has been deleted.",
-  "categoryNotFound": "Category not found!"
+  "categoryNotFound": "Category not found!",
+  "attendee": { "notFound": "Attendee has not been found!" }
 }

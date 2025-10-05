@@ -3,5 +3,6 @@
   "update": "Kurz {{name}} bol aktualizovaný.",
   "new": "Kurz {{name}} bol vytvorený.",
   "delete": "Kurz {{name}} bol vymazaný.",
-  "categoryNotFound": "Kategória nebola nájdená!"
+  "categoryNotFound": "Kategória nebola nájdená!",
+  "attendee": { "notFound": "Účastník nebol nájdený!" }
 }
