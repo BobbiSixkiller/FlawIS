@@ -7,13 +7,14 @@ import {
   CreateCourseSessionMutationVariables,
   DeleteCourseDocument,
   DeleteCourseMutationVariables,
+  DeleteCourseSessionDocument,
+  DeleteCourseSessionMutationVariables,
   UpdateCourseDocument,
   UpdateCourseMutationVariables,
   UpdateCourseSessionDocument,
   UpdateCourseSessionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
-import CourseForm from "../CourseForm";
 
 export async function getCourse(vars: CourseQueryVariables) {
   const res = await executeGqlFetch(CourseDocument, vars, undefined, {
@@ -96,4 +97,20 @@ export async function updateCourseSession(
   );
 }
 
-export async function deleteCourseSession(params: type) {}
+export async function deleteCourseSession(
+  vars: DeleteCourseSessionMutationVariables
+) {
+  return await executeGqlMutation(
+    DeleteCourseSessionDocument,
+    vars,
+    (data) => ({
+      message: data.deleteCourseSession.message,
+      data: data.deleteCourseSession.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `courses:${data.deleteCourseSession.data.course}`,
+      ],
+    }
+  );
+}
