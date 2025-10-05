@@ -1,21 +1,31 @@
 import { ObjectId } from "mongodb";
-import { Arg, Args, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Args,
+  FieldResolver,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from "type-graphql";
 import { Service } from "typedi";
 import { CourseService } from "../../services/courses/course.service";
 import { I18nService } from "../../services/i18n.service";
-import { Course } from "../../entitites/Course";
+import { Course, CourseAttendee } from "../../entitites/Course";
 import {
   CourseArgs,
   CourseConnection,
   CourseInput,
   CourseMutationResponse,
 } from "../types/course.types";
+import { CourseAttendeeService } from "../../services/courses/courseAttendee.service";
 
 @Service()
 @Resolver(() => Course)
 export class CourseResolver {
   constructor(
     private readonly courseService: CourseService,
+    private readonly courseAttendeeService: CourseAttendeeService,
     private readonly i18nService: I18nService
   ) {}
 
@@ -66,5 +76,15 @@ export class CourseResolver {
         name: course.name,
       }),
     };
+  }
+
+  @FieldResolver(() => CourseAttendee, { nullable: true })
+  async attending(@Root() { id }: Course) {
+    try {
+      return await this.courseAttendeeService.getCourseAttendee(id);
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 }

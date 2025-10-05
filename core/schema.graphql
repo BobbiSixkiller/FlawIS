@@ -184,6 +184,7 @@ type ConferenceTranslations {
 
 type Course {
   attendeesCount: Int!
+  attending: CourseAttendee
   billing: FlawBilling
   categories: [Category!]!
   createdAt: DateTimeISO!
@@ -200,6 +201,25 @@ type Course {
   registrationEnd: DateTimeISO!
   start: DateTimeISO!
   updatedAt: DateTimeISO!
+}
+
+"""Connects a system user with a particular course."""
+type CourseAttendee {
+  createdAt: DateTimeISO!
+  fileUrls: [String!]!
+  grade: String
+  id: ObjectId!
+  invoice: Invoice
+  status: Status!
+  updatedAt: DateTimeISO!
+  user: CourseAttendeeUserStub!
+}
+
+type CourseAttendeeUserStub {
+  email: String!
+  id: ObjectId!
+  name: String!
+  organization: String!
 }
 
 type CourseConnection {
