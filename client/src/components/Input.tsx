@@ -29,16 +29,6 @@ export interface InputProps
   control?: Control<any>;
 }
 
-function formatDatetimeLocal(val: any, withTime: boolean): string {
-  if (!val) return "";
-  const date = val instanceof Date ? val : new Date(val);
-  if (isNaN(date.getTime())) return "";
-
-  return withTime
-    ? date.toISOString().slice(0, 16)
-    : date.toISOString().split("T")[0]; // ⏰ "2025-07-19T11:30" or "2025-07-19"
-}
-
 //refactor to handle number and dates
 export function Input({
   error,
@@ -88,11 +78,6 @@ export function Input({
           }
           {...props}
           {...field}
-          value={
-            props.type === "datetime-local" || props.type === "date"
-              ? formatDatetimeLocal(val, props.type === "datetime-local")
-              : val ?? ""
-          }
           onChange={(e) => {
             if (props.onChange) {
               props.onChange(e);

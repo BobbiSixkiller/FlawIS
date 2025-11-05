@@ -15,8 +15,8 @@ import {
   ConferenceTranslation,
   Ticket,
   TicketTranslation,
-} from "../entitites/Conference";
-import { I18nService } from "../services/i18n.service";
+} from "../../entitites/Conference";
+import { I18nService } from "../../services/i18n.service";
 import {
   ConferenceArgs,
   ConferenceConnection,
@@ -24,21 +24,21 @@ import {
   ConferenceMutationResponse,
   DatesInput,
   TicketInput,
-} from "./types/conference.types";
+} from "../types/conference.types";
 import { ObjectId } from "mongodb";
-import { CheckTicket, LoadResource } from "../util/decorators";
+import { CheckTicket, LoadResource } from "../../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
 
-import { Context } from "../util/auth";
-import { Attendee } from "../entitites/Attendee";
-import { Section } from "../entitites/Section";
-import { AttendeeInput } from "./types/attendee.types";
-import { VerifiedTicket } from "../util/types";
-import { RmqService } from "../services/rmq.service";
-import { Repository } from "../repositories/base.repository";
-import { ConferenceRepository } from "../repositories/conference.repository";
-import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
-import { UserRepository } from "../repositories/user.repository";
+import { Context } from "../../util/auth";
+import { Attendee } from "../../entitites/Attendee";
+import { Section } from "../../entitites/Section";
+import { AttendeeInput } from "../types/attendee.types";
+import { VerifiedTicket } from "../../util/types";
+import { RmqService } from "../../services/rmq.service";
+import { Repository } from "../../repositories/base.repository";
+import { ConferenceRepository } from "../../repositories/conference.repository";
+import { AttendeeRepository } from "../../repositories/conferenceAttendee.repository";
+import { UserRepository } from "../../repositories/user.repository";
 
 @Service()
 @Resolver(() => Conference)

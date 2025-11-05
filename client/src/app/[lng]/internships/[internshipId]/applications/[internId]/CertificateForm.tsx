@@ -11,7 +11,6 @@ import { useParams } from "next/navigation";
 import { updateOrgFeedback } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import usePrefillFiles from "@/hooks/usePrefillFiles";
 import RHFormContainer from "@/components/RHFormContainer";
 
 export default function CertificateForm({
@@ -26,20 +25,8 @@ export default function CertificateForm({
 
   const { yup } = useValidation();
 
-  const { loading, files, errors } = usePrefillFiles({
-    internships: application.organizationFeedbackUrl,
-  });
-
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <RHFormContainer
@@ -51,8 +38,7 @@ export default function CertificateForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
       })}
-      defaultValues={{ files: files.internships ?? [] }}
-      errors={errors}
+      defaultValues={{ files: [] }}
     >
       {(methods) => (
         <form
@@ -91,6 +77,7 @@ export default function CertificateForm({
             accept={{
               "application/pdf": [".pdf"],
             }}
+            fileSources={{ internships: application.organizationFeedbackUrl }}
           />
 
           <Button type="submit" size="sm" className="w-full">

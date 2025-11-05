@@ -55,22 +55,12 @@ export default async function TicketsPage({
                 </Button>
               }
               items={[
-                {
-                  type: "custom",
-                  element: (
-                    <ModalTrigger dialogId={updateTicketDialogId(t.id)}>
-                      <Button size="sm">Aktualizovat</Button>
-                    </ModalTrigger>
-                  ),
-                },
-                {
-                  type: "custom",
-                  element: (
-                    <ModalTrigger dialogId={deleteTicketDialogId(t.id)}>
-                      <Button size="sm">Zmazat</Button>
-                    </ModalTrigger>
-                  ),
-                },
+                <ModalTrigger dialogId={updateTicketDialogId(t.id)} key={0}>
+                  <Button size="sm">Aktualizovat</Button>
+                </ModalTrigger>,
+                <ModalTrigger dialogId={deleteTicketDialogId(t.id)} key={1}>
+                  <Button size="sm">Zmazat</Button>
+                </ModalTrigger>,
               ]}
             />
 

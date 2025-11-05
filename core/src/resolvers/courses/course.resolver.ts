@@ -2,6 +2,8 @@ import { ObjectId } from "mongodb";
 import {
   Arg,
   Args,
+  Authorized,
+  Ctx,
   FieldResolver,
   Mutation,
   Query,
@@ -13,12 +15,15 @@ import { CourseService } from "../../services/courses/course.service";
 import { I18nService } from "../../services/i18n.service";
 import { Course, CourseAttendee } from "../../entitites/Course";
 import {
+  AttendanceConnection,
   CourseArgs,
   CourseConnection,
   CourseInput,
   CourseMutationResponse,
-} from "../types/course.types";
+} from "../types/course/course.types";
 import { CourseAttendeeService } from "../../services/courses/courseAttendee.service";
+import { Context } from "../../util/auth";
+import { CourseAttendeeArgs } from "../types/course/courseAttendee.types";
 
 @Service()
 @Resolver(() => Course)
@@ -78,13 +83,15 @@ export class CourseResolver {
     };
   }
 
+  @Authorized()
   @FieldResolver(() => CourseAttendee, { nullable: true })
-  async attending(@Root() { id }: Course) {
-    try {
-      return await this.courseAttendeeService.getCourseAttendee(id);
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
+  async attending(@Root() { id }: Course, @Ctx() { user }: Context) {
+    return await this.courseAttendeeService.getAttending(id, user!.id);
+  }
+
+  @Authorized()
+  @FieldResolver(() => AttendanceConnection)
+  async attendance(@Root() { id }: Course, @Args() args: CourseAttendeeArgs) {
+    return await this.courseService.attendance(args, id);
   }
 }

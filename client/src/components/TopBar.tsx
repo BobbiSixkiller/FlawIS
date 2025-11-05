@@ -16,6 +16,7 @@ import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
 import useScrolled from "@/hooks/useScrolled";
+import Link from "next/link";
 
 export default function TopBar({
   avatar,
@@ -79,24 +80,17 @@ export default function TopBar({
             </Button>
           }
           items={[
-            {
-              type: "link",
-              href: "/profile",
-              icon: <UserCircleIcon className="size-5" aria-hidden="true" />,
-              text: t("profile"),
-            },
-            {
-              type: "link",
-              href: "/logout",
-              prefetch: false,
-              icon: (
-                <ArrowLeftStartOnRectangleIcon
-                  className="size-5"
-                  aria-hidden="true"
-                />
-              ),
-              text: t("logout"),
-            },
+            <Link href="/profile" key={0}>
+              <UserCircleIcon className="size-5" aria-hidden="true" />
+              {t("profile")}
+            </Link>,
+            <Link prefetch={false} href="/logout" key={1}>
+              <ArrowLeftStartOnRectangleIcon
+                className="size-5"
+                aria-hidden="true"
+              />
+              {t("logout")}
+            </Link>,
           ]}
         />
       </div>

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
+import Link from "next/link";
 
 export default function LngSwitcher({
   authLayout,
@@ -46,8 +47,11 @@ export default function LngSwitcher({
           </Button>
         )
       }
-      items={languages.map((l) => ({
-        icon: (
+      items={languages.map((l) => (
+        <Link
+          key={l}
+          href={`/${l}${path.replace("/en", "").replace("/sk", "")}`}
+        >
           <Image
             alt="Locale-flag"
             priority
@@ -56,11 +60,9 @@ export default function LngSwitcher({
             height={20}
             className="mr-2"
           />
-        ),
-        href: `/${l}${path.replace("/en", "").replace("/sk", "")}`,
-        text: t(l),
-        type: "link",
-      }))}
+          {t(l)}
+        </Link>
+      ))}
     />
   );
 }

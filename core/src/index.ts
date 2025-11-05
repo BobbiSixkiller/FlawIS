@@ -13,7 +13,7 @@ import { ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./middlewares/typegoose.middleware";
 
 import { UserResolver } from "./resolvers/user.resolver";
-import { ConferencerResolver } from "./resolvers/conference.resolver";
+import { ConferencerResolver } from "./resolvers/conferences/conference.resolver";
 
 import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
@@ -23,15 +23,16 @@ import { I18nMiddleware } from "./middlewares/i18n.middleware";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { SectionResolver } from "./resolvers/section.resolver";
-import { SubmissionResolver } from "./resolvers/submission.resolver";
-import { AttendeeResolver } from "./resolvers/attendee.resolver";
-import { InternshipResolver } from "./resolvers/internship.resolver";
-import { InternResolver } from "./resolvers/intern.resolver";
+import { SectionResolver } from "./resolvers/conferences/section.resolver";
+import { SubmissionResolver } from "./resolvers/conferences/submission.resolver";
+import { AttendeeResolver } from "./resolvers/conferences/attendee.resolver";
+import { InternshipResolver } from "./resolvers/internships/internship.resolver";
+import { InternResolver } from "./resolvers/internships/intern.resolver";
 import { CronJobService } from "./services/cron.service";
 import { CourseResolver } from "./resolvers/courses/course.resolver";
 import { ErrorsMiddleware } from "./middlewares/errors.middleware";
 import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolver";
+import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resolver";
 
 env.config();
 
@@ -64,6 +65,7 @@ async function main() {
       InternResolver,
       CourseResolver,
       CourseSessionResolver,
+      CourseAttendeeResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],

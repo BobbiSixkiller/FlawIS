@@ -103,9 +103,9 @@ export class CourseSession extends TimeStamps {
   @Property()
   name: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  description: string;
+  description?: string;
 
   @Field()
   @Property()
@@ -130,6 +130,13 @@ export class CourseAttendeeUserStub extends UserStub {
   @Field()
   @Property({ default: "N/A" })
   organization: string;
+
+  @Field({ nullable: true })
+  @Property()
+  telephone?: string;
+
+  @Field({ nullable: true })
+  avatarUrl?: string;
 }
 
 @ObjectType({ description: "Connects a system user with a particular course." })
@@ -144,6 +151,7 @@ export class CourseAttendee extends TimeStamps {
   @Property({ type: () => CourseAttendeeUserStub })
   user: CourseAttendeeUserStub;
 
+  @Field(() => ObjectId)
   @Property({ ref: () => Course })
   course: Ref<Course>;
 

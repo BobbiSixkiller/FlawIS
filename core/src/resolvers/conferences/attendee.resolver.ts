@@ -9,23 +9,23 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Attendee, UserStubUnion } from "../entitites/Attendee";
-import { I18nService } from "../services/i18n.service";
+import { Attendee, UserStubUnion } from "../../entitites/Attendee";
+import { I18nService } from "../../services/i18n.service";
 import {
   AttendeeArgs,
   AttendeeConnection,
   AttendeeMutationResponse,
   InvoiceInput,
-} from "./types/attendee.types";
+} from "../types/attendee.types";
 import { ObjectId } from "mongodb";
-import { LoadResource } from "../util/decorators";
+import { LoadResource } from "../../util/decorators";
 import { DocumentType } from "@typegoose/typegoose";
-import { Submission } from "../entitites/Submission";
-import { Conference } from "../entitites/Conference";
-import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
-import { ConferenceRepository } from "../repositories/conference.repository";
-import { UserRepository } from "../repositories/user.repository";
-import { SubmissionRepository } from "../repositories/submission.repository";
+import { Submission } from "../../entitites/Submission";
+import { Conference } from "../../entitites/Conference";
+import { AttendeeRepository } from "../../repositories/conferenceAttendee.repository";
+import { ConferenceRepository } from "../../repositories/conference.repository";
+import { UserRepository } from "../../repositories/user.repository";
+import { SubmissionRepository } from "../../repositories/submission.repository";
 
 @Service()
 @Resolver(() => Attendee)

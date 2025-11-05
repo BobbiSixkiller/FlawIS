@@ -1,7 +1,10 @@
 import { Service } from "typedi";
 import { Repository } from "./base.repository";
 import { Course } from "../entitites/Course";
-import { CourseArgs, CourseConnection } from "../resolvers/types/course.types";
+import {
+  CourseArgs,
+  CourseConnection,
+} from "../resolvers/types/course/course.types";
 import {
   buildCursorFilter,
   decodeCursor,

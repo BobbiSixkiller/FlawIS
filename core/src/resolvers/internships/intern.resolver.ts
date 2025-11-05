@@ -10,18 +10,18 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Intern, Status, StudentReference } from "../entitites/Internship";
-import { InternService } from "../services/intern.service";
-import { I18nService } from "../services/i18n.service";
+import { Intern, Status, StudentReference } from "../../entitites/Internship";
+import { I18nService } from "../../services/i18n.service";
 import {
   InternArgs,
   InternConnection,
   InternMutationResponse,
-} from "./types/internship.types";
+} from "../types/internship.types";
 import { ObjectId } from "mongodb";
-import { Context } from "../util/auth";
-import { Access } from "../entitites/User";
-import { UserService } from "../services/user.service";
+import { Context } from "../../util/auth";
+import { Access } from "../../entitites/User";
+import { UserService } from "../../services/user.service";
+import { InternService } from "../../services/internships/intern.service";
 
 @Service()
 @Resolver(() => Intern)

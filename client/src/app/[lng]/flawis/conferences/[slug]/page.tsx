@@ -41,29 +41,19 @@ export default async function ConferencePage({
           lng={lng}
           heading={conference!.slug}
           subHeading={conference!.translations[lng as "sk" | "en"].name}
-          links={[
-            {
-              type: "custom",
-              element: (
-                <ModalTrigger key={0} dialogId={updateDatesDialogId}>
-                  <Button size="sm">
-                    <PencilIcon className="size-5" />
-                    Aktualizovat
-                  </Button>
-                </ModalTrigger>
-              ),
-            },
-            {
-              type: "custom",
-              element: (
-                <ModalTrigger key={1} dialogId={deleteConfDialogId}>
-                  <Button size="sm" variant="secondary">
-                    <TrashIcon className="size-5" />
-                    Zmazat
-                  </Button>
-                </ModalTrigger>
-              ),
-            },
+          items={[
+            <ModalTrigger key={0} dialogId={updateDatesDialogId}>
+              <Button size="sm">
+                <PencilIcon className="size-5" />
+                Aktualizovat
+              </Button>
+            </ModalTrigger>,
+            <ModalTrigger key={1} dialogId={deleteConfDialogId}>
+              <Button size="sm" variant="secondary">
+                <TrashIcon className="size-5" />
+                Zmazat
+              </Button>
+            </ModalTrigger>,
           ]}
         />
       </div>

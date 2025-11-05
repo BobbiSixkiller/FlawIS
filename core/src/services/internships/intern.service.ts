@@ -1,37 +1,19 @@
 import { Service } from "typedi";
-import { Intern, Status } from "../entitites/Internship";
-import { InternArgs } from "../resolvers/types/internship.types";
+import { Intern, Status } from "../../entitites/Internship";
+import { InternArgs } from "../../resolvers/types/internship.types";
 import { ObjectId } from "mongodb";
-import { I18nService } from "./i18n.service";
+import { I18nService } from "../i18n.service";
 import { InternshipService } from "./internship.service";
-import { getAcademicYear } from "../util/helpers";
-import { Access } from "../entitites/User";
-import { UserService } from "./user.service";
-import { RmqService, RoutingKey } from "./rmq.service";
-import { MinioService } from "./minio.service";
+import { getAcademicYear, toDTO } from "../../util/helpers";
+import { Access } from "../../entitites/User";
+import { UserService } from "../user.service";
+import { RmqService, RoutingKey } from "../rmq.service";
+import { MinioService } from "../minio.service";
 import mongoose from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
-import { InternRepository } from "../repositories/intern.repository";
-import { CtxUser } from "../util/types";
-import { UserRepository } from "../repositories/user.repository";
-
-function toInternDTO(doc: DocumentType<Intern>) {
-  const json = doc.toJSON({
-    virtuals: false,
-    versionKey: false, // drop __v
-    transform(_doc, ret) {
-      // copy _id → id and remove _id
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-
-      return ret;
-    },
-  });
-
-  return json as Intern;
-}
+import { InternRepository } from "../../repositories/intern.repository";
+import { CtxUser } from "../../util/types";
+import { UserRepository } from "../../repositories/user.repository";
 
 @Service()
 export class InternService {
@@ -55,7 +37,7 @@ export class InternService {
       throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
     }
 
-    return toInternDTO(intern);
+    return toDTO(intern);
   }
 
   async getByUserInternship(userId: ObjectId, internshipId: ObjectId) {
@@ -67,7 +49,7 @@ export class InternService {
       throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
     }
 
-    return toInternDTO(intern);
+    return toDTO(intern);
   }
 
   async createIntern(
@@ -143,7 +125,7 @@ export class InternService {
 
       await session.commitTransaction();
 
-      return toInternDTO(newIntern);
+      return toDTO(newIntern);
     } catch (err) {
       await session.abortTransaction();
       throw err;
@@ -182,7 +164,7 @@ export class InternService {
 
       await session.commitTransaction();
 
-      return toInternDTO(intern);
+      return toDTO(intern);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -215,7 +197,7 @@ export class InternService {
 
       await session.commitTransaction();
 
-      return toInternDTO(intern);
+      return toDTO(intern);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -253,7 +235,7 @@ export class InternService {
 
       await session.commitTransaction();
 
-      return toInternDTO(intern);
+      return toDTO(intern);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -293,7 +275,7 @@ export class InternService {
 
       await session.commitTransaction();
 
-      return toInternDTO(intern);
+      return toDTO(intern);
     } catch (error) {
       await session.abortTransaction();
       throw error;

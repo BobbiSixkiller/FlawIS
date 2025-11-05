@@ -8,29 +8,14 @@ import {
   MenuItems,
   Transition,
 } from "@headlessui/react";
-import Link from "next/link";
-import {
-  cloneElement,
-  Fragment,
-  isValidElement,
-  ReactElement,
-  ReactNode,
-} from "react";
+import { cloneElement, Fragment, ReactElement, ReactNode } from "react";
 
-interface CustomDropdownElementProps {
+interface DropdownElementProps {
   className?: string;
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export type DropdownItem =
-  | {
-      type: "link";
-      text: string;
-      href: string;
-      icon?: ReactNode;
-      prefetch?: boolean;
-    }
-  | { type: "custom"; element: ReactElement<CustomDropdownElementProps> };
+export type DropdownItem = ReactElement<DropdownElementProps>;
 
 interface DropdownProps {
   className?: string;
@@ -69,43 +54,18 @@ export default function Dropdown({
             <div className="p-1" key={i}>
               <MenuItem as={Fragment}>
                 {({ close, focus }) => {
-                  if (item.type === "custom" && isValidElement(item.element)) {
-                    return cloneElement(item.element, {
-                      className: cn([
-                        "flex w-full gap-2 items-center rounded-md text-sm p-2",
-                        focus &&
-                          "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
-                        item.element.props?.className,
-                      ]),
-                      onClick: (e: React.MouseEvent) => {
-                        item.element.props.onClick?.(e);
-                        close(); // close dropdown after click
-                      },
-                    });
-                  }
-
-                  if (item.type === "link") {
-                    return (
-                      <Link
-                        prefetch={item.prefetch}
-                        scroll={false}
-                        onClick={close}
-                        href={item.href}
-                        className={`${
-                          focus
-                            ? "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white"
-                            : ""
-                        } flex gap-2 items-center rounded-md text-sm p-2`}
-                      >
-                        {item.icon}
-                        {item.text}
-                      </Link>
-                    );
-                  }
-
-                  return (
-                    <div className="text-sm p-2 text-red-500">Invalid item</div>
-                  );
+                  return cloneElement(item, {
+                    className: cn([
+                      "flex w-full gap-2 items-center rounded-md text-sm p-2",
+                      focus &&
+                        "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
+                      item.props?.className,
+                    ]),
+                    onClick: (e: React.MouseEvent) => {
+                      item.props.onClick?.(e);
+                      close(); // close dropdown after click
+                    },
+                  });
                 }}
               </MenuItem>
             </div>

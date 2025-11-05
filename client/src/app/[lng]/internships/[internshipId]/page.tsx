@@ -128,6 +128,13 @@ export default async function InternshipPage({
       <Modal dialogId={updateInternshipDialogId} title={t("update")}>
         <InternshipForm dialogId={updateInternshipDialogId} data={internship} />
       </Modal>
+      <Modal dialogId={applicationDialogId} title={t("docs")}>
+        <ApplicationForm
+          dialogId={applicationDialogId}
+          user={user}
+          application={internship.myApplication}
+        />
+      </Modal>
       <Modal dialogId={deleteInternshipDialogId} title={t("delete.title")}>
         <ConfirmDeleteForm
           dialogId={deleteInternshipDialogId}
@@ -149,13 +156,6 @@ export default async function InternshipPage({
             "use server";
             return deleteIntern(internship.myApplication?.id);
           }}
-        />
-      </Modal>
-      <Modal dialogId={applicationDialogId} title={t("docs")}>
-        <ApplicationForm
-          dialogId={applicationDialogId}
-          user={user}
-          application={internship.myApplication}
         />
       </Modal>
     </div>

@@ -24,7 +24,6 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
-import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
 import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
@@ -51,33 +50,12 @@ export default function UserForm({
 
   const { yup } = useValidation();
 
-  const { loading, files, errors } = usePrefillFiles({
-    avatars: user?.avatarUrl,
-    resumes: user?.cvUrl,
-  });
-
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
   const scrollToTop = useScrollStore((s) => s.getScroll);
 
-  if (loading)
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
-
   return (
     <RHFormContainer
-      //fix this so you can init errors from prefilling files to form
-      // errors={
-      //   errors
-      //     ? {
-      //         files: { message: errors.files },
-      //         avatar: { message: errors.avatars },
-      //       }
-      //     : {}
-      // }
       defaultValues={{
         name: user?.name || "",
         email: user?.email || "",
@@ -94,9 +72,7 @@ export default function UserForm({
         telephone: user?.telephone || "",
         studyProgramme: user?.studyProgramme || null,
         privacy: path === "/register" ? false : true,
-        files: files.resumes ?? [],
-        avatar:
-          files.avatars && files.avatars.length > 0 ? files.avatars[0] : null,
+        files: [],
       }}
       yupSchema={yup.object({
         name: yup.string().trim().required(),
@@ -310,6 +286,7 @@ export default function UserForm({
         >
           {path.includes("update") && (
             <AvatarInput
+              avatarUrl={user?.avatarUrl ? user.avatarUrl : undefined}
               control={methods.control}
               name="avatar"
               label="Fotka"
@@ -397,6 +374,7 @@ export default function UserForm({
                 accept={{
                   "application/pdf": [".pdf"],
                 }}
+                fileSources={{ resumes: user?.cvUrl }}
               />
             </>
           )}

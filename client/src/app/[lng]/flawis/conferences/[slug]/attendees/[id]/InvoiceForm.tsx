@@ -12,7 +12,7 @@ import { updateInvoice } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import RHFormContainer from "@/components/RHFormContainer";
 import useValidation from "@/hooks/useValidation";
-import { getLocalDate } from "@/utils/helpers";
+import { formatDatetimeLocal } from "@/utils/helpers";
 
 export default function UpdateInvoiceForm({
   invoice,
@@ -37,9 +37,18 @@ export default function UpdateInvoiceForm({
         issuer: invoice.issuer,
         body: {
           ...invoice.body,
-          issueDate: getLocalDate(invoice.body.issueDate) as unknown as Date,
-          dueDate: getLocalDate(invoice.body.dueDate) as unknown as Date,
-          vatDate: getLocalDate(invoice.body.vatDate) as unknown as Date,
+          issueDate: formatDatetimeLocal(
+            invoice.body.issueDate,
+            false
+          ) as unknown as Date,
+          dueDate: formatDatetimeLocal(
+            invoice.body.dueDate,
+            false
+          ) as unknown as Date,
+          vatDate: formatDatetimeLocal(
+            invoice.body.vatDate,
+            false
+          ) as unknown as Date,
         },
         payer: invoice.payer,
       }}

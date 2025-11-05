@@ -27,7 +27,7 @@ export default function ImageFileInput({
       };
       reader.readAsDataURL(field.value);
     } else {
-      setPreview("/images/img-placeholder.jpg");
+      setPreview(avatarUrl ?? "/images/img-placeholder.jpg");
     }
   }, [field.value]);
 
@@ -46,6 +46,8 @@ export default function ImageFileInput({
       field.onChange(file);
     }
   };
+
+  console.log(preview);
 
   return (
     <div>

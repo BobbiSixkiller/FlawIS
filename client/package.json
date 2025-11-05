@@ -34,6 +34,7 @@
     "@tiptap/pm": "^2.11.0",
     "@tiptap/react": "^2.11.0",
     "@tiptap/starter-kit": "^2.11.0",
+    "@uidotdev/usehooks": "^2.4.1",
     "accept-language": "^3.0.18",
     "archiver": "^7.0.1",
     "clsx": "^2.1.1",

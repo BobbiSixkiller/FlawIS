@@ -38,40 +38,26 @@ export default async function User({
       <Heading
         lng={lng}
         heading={user.name}
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={0} dialogId={impersonateDialogId}>
-                <Button size="sm">
-                  <ArrowsRightLeftIcon className="size-5" />
-                  Impersonovat
-                </Button>
-              </ModalTrigger>
-            ),
-          },
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={1} dialogId={updateUserDialogId}>
-                <Button variant="secondary" size="sm">
-                  <PencilIcon className="size-5" />
-                  Aktualizovat
-                </Button>
-              </ModalTrigger>
-            ),
-          },
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={2} dialogId={deleteUserDialogId}>
-                <Button variant="secondary" size="sm">
-                  <TrashIcon className="size-5" />
-                  Zmazat
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger key={0} dialogId={impersonateDialogId}>
+            <Button size="sm">
+              <ArrowsRightLeftIcon className="size-5" />
+              Impersonovat
+            </Button>
+          </ModalTrigger>,
+          <ModalTrigger key={1} dialogId={updateUserDialogId}>
+            <Button variant="secondary" size="sm">
+              <PencilIcon className="size-5" />
+              Aktualizovat
+            </Button>
+          </ModalTrigger>,
+
+          <ModalTrigger key={2} dialogId={deleteUserDialogId}>
+            <Button variant="secondary" size="sm">
+              <TrashIcon className="size-5" />
+              Zmazat
+            </Button>
+          </ModalTrigger>,
         ]}
       />
       <div className="mt-6 border-t border-gray-100 dark:border-gray-700">

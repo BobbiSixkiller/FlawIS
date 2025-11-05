@@ -48,7 +48,7 @@ export default async function Dashboard({
 
       <div
         className={cn([
-          "flex-1 flex flex-col md:border-r",
+          "flex-1 flex flex-col md:border-r w-full lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl",
           "dark:border-gray-700",
         ])}
       >
@@ -89,7 +89,7 @@ export default async function Dashboard({
         </div>
       </div>
 
-      <div className="hidden md:flex flex-col h-screen xl:w-full xl:max-w-sm sticky top-0">
+      <div className="hidden md:flex flex-col h-screen sticky top-0">
         <Footer lng={lng} />
       </div>
 

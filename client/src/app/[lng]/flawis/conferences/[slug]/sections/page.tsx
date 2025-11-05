@@ -10,6 +10,7 @@ import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import SectionForm from "./SectionForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import Link from "next/link";
 
 export default async function SectionsPage({
   params,
@@ -65,22 +66,12 @@ function Section({
   const deleteSectionDialogId = `delete-section-${section.id}`;
 
   const dropdownItems: DropdownItem[] = [
-    {
-      type: "custom",
-      element: (
-        <ModalTrigger dialogId={updateSectionDialogId}>
-          <Button size="sm">Aktualizovat</Button>
-        </ModalTrigger>
-      ),
-    },
-    {
-      type: "custom",
-      element: (
-        <ModalTrigger dialogId={deleteSectionDialogId}>
-          <Button size="sm">Zmazat</Button>
-        </ModalTrigger>
-      ),
-    },
+    <ModalTrigger dialogId={updateSectionDialogId} key={0}>
+      <Button size="sm">Aktualizovat</Button>
+    </ModalTrigger>,
+    <ModalTrigger dialogId={deleteSectionDialogId} key={1}>
+      <Button size="sm">Zmazat</Button>
+    </ModalTrigger>,
   ];
 
   return (
@@ -111,18 +102,19 @@ function Section({
           countFiles(section.submissions) > 0
             ? [
                 ...dropdownItems,
-                {
-                  type: "link",
-                  href: `/minio?bucketName=${section.conference?.slug}${
+                <Link
+                  key={2}
+                  href={`/minio?bucketName=${section.conference?.slug}${
                     section.submissions.edges
                       .map((sub) =>
                         sub?.node.fileUrl ? `&url=${sub.node.fileUrl}` : null
                       ) // Return null for invalid entries
                       .filter(Boolean) // Filter out null values
                       .join("") // Join without adding commas
-                  }`,
-                  text: "Prispevky.zip",
-                },
+                  }`}
+                >
+                  Prispevky.zip
+                </Link>,
               ]
             : dropdownItems
         }

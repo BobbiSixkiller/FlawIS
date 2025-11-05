@@ -3,12 +3,18 @@
 import {
   CourseDocument,
   CourseQueryVariables,
+  CreateCourseAttendeeDocument,
+  CreateCourseAttendeeMutationVariables,
   CreateCourseSessionDocument,
   CreateCourseSessionMutationVariables,
+  DeleteCourseAttendeeDocument,
+  DeleteCourseAttendeeMutationVariables,
   DeleteCourseDocument,
   DeleteCourseMutationVariables,
   DeleteCourseSessionDocument,
   DeleteCourseSessionMutationVariables,
+  UpdateCourseAttendeeFilesDocument,
+  UpdateCourseAttendeeFilesMutationVariables,
   UpdateCourseDocument,
   UpdateCourseMutationVariables,
   UpdateCourseSessionDocument,
@@ -110,6 +116,60 @@ export async function deleteCourseSession(
     {
       revalidateTags: (data) => [
         `courses:${data.deleteCourseSession.data.course}`,
+      ],
+    }
+  );
+}
+
+export async function createCourseAttendee(
+  vars: CreateCourseAttendeeMutationVariables
+) {
+  return await executeGqlMutation(
+    CreateCourseAttendeeDocument,
+    vars,
+    (data) => ({
+      message: data.createCourseAttendee.message,
+      data: data.createCourseAttendee.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `courses:${data.createCourseAttendee.data.course}`,
+      ],
+    }
+  );
+}
+
+export async function updateCourseAttendeeFiles(
+  vars: UpdateCourseAttendeeFilesMutationVariables
+) {
+  return await executeGqlMutation(
+    UpdateCourseAttendeeFilesDocument,
+    vars,
+    (data) => ({
+      message: data.updateCourseAttendeeFiles.message,
+      data: data.updateCourseAttendeeFiles.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `courses:${data.updateCourseAttendeeFiles.data.course}`,
+      ],
+    }
+  );
+}
+
+export async function deleteCourseAttendee(
+  vars: DeleteCourseAttendeeMutationVariables
+) {
+  return await executeGqlMutation(
+    DeleteCourseAttendeeDocument,
+    vars,
+    (data) => ({
+      message: data.deleteCourseAttendee.message,
+      data: data.deleteCourseAttendee.data,
+    }),
+    {
+      revalidateTags: (data) => [
+        `courses:${data.deleteCourseAttendee.data.course}`,
       ],
     }
   );

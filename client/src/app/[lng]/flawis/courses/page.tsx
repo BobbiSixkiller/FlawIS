@@ -24,17 +24,12 @@ export default async function CoursesPage({
         lng={lng}
         heading="Kurzy"
         subHeading="Kurzy na falkute"
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger dialogId={createCourseDialogId}>
-                <Button size="sm">
-                  <PlusIcon className="size-5" /> Novy
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger key={0} dialogId={createCourseDialogId}>
+            <Button size="sm">
+              <PlusIcon className="size-5" /> Novy
+            </Button>
+          </ModalTrigger>,
         ]}
       />
 

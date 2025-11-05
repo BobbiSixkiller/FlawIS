@@ -11,7 +11,7 @@ import { updateConferenceDates } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import RHFormContainer from "@/components/RHFormContainer";
-import { getLocalDate } from "@/utils/helpers";
+import { formatDatetimeLocal } from "@/utils/helpers";
 
 export default function UpdateDatesForm({
   conference,
@@ -29,14 +29,21 @@ export default function UpdateDatesForm({
   return (
     <RHFormContainer
       defaultValues={{
-        start: getLocalDate(conference.dates.start) as unknown as Date,
-        end: getLocalDate(conference.dates.end) as unknown as Date,
+        start: formatDatetimeLocal(
+          conference.dates.start,
+          true
+        ) as unknown as Date,
+        end: formatDatetimeLocal(conference.dates.end, true) as unknown as Date,
         regEnd: conference.dates.regEnd
-          ? (getLocalDate(conference.dates.regEnd) as unknown as Date)
+          ? (formatDatetimeLocal(
+              conference.dates.regEnd,
+              true
+            ) as unknown as Date)
           : null,
         submissionDeadline: conference.dates.submissionDeadline
-          ? (getLocalDate(
-              conference.dates.submissionDeadline
+          ? (formatDatetimeLocal(
+              conference.dates.submissionDeadline,
+              true
             ) as unknown as Date)
           : null,
       }}

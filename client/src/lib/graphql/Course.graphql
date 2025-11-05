@@ -16,6 +16,9 @@ fragment Course on Course {
     ...FlawBilling
   }
   isPaid
+  attending {
+    ...CourseAttendee
+  }
   createdAt
   updatedAt
 }
@@ -28,6 +31,23 @@ fragment CourseSession on CourseSession {
   start
   end
   maxAttendees
+  createdAt
+  updatedAt
+}
+
+fragment CourseAttendee on CourseAttendee {
+  id
+  user {
+    id
+    name
+    email
+    telephone
+    organization
+    avatarUrl
+  }
+  fileUrls
+  course
+  status
   createdAt
   updatedAt
 }
@@ -51,6 +71,40 @@ query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
 query course($id: ObjectId!) {
   course(id: $id) {
     ...Course
+  }
+}
+
+query attendance(
+  $id: ObjectId!
+  $after: String
+  $first: Int
+  $sort: [CourseAttendeeSortInput]!
+) {
+  course(id: $id) {
+    id
+    name
+    attendance(after: $after, first: $first, sort: $sort) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          attendee {
+            ...CourseAttendee
+          }
+          attendanceRecords {
+            online
+            hoursAttended
+          }
+        }
+      }
+      sessions {
+        ...CourseSession
+      }
+    }
   }
 }
 
@@ -104,6 +158,41 @@ mutation deleteCourseSession($id: ObjectId!) {
     message
     data {
       ...CourseSession
+    }
+  }
+}
+
+mutation createCourseAttendee(
+  $courseId: ObjectId!
+  $fileUrls: [String!]!
+  $billing: AttendeeBillingInput
+) {
+  createCourseAttendee(
+    courseId: $courseId
+    fileUrls: $fileUrls
+    billing: $billing
+  ) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation updateCourseAttendeeFiles($id: ObjectId!, $fileUrls: [String!]!) {
+  updateCourseAttendeeFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation deleteCourseAttendee($id: ObjectId!) {
+  deleteCourseAttendee(id: $id) {
+    message
+    data {
+      ...CourseAttendee
     }
   }
 }

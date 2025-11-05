@@ -40,13 +40,8 @@ export default async function ConferencePage({
         lng={lng}
         heading={conference!.slug}
         subHeading={conference!.translations[lng as "sk" | "en"].name}
-        links={[
-          {
-            type: "custom",
-            element: (
-              <DownloadPDFButton lng={lng} data={conference?.attending!} />
-            ),
-          },
+        items={[
+          <DownloadPDFButton lng={lng} data={conference?.attending!} key={0} />,
         ]}
       />
       <div className="border-t border-gray-100 dark:border-gray-600">

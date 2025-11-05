@@ -30,6 +30,43 @@ input AddressInput {
   street: String!
 }
 
+"""represents one row of attendance matrix"""
+type Attendance {
+  attendanceRecords: [AttendanceRecord]!
+  attendee: CourseAttendee!
+}
+
+type AttendanceConnection {
+  edges: [AttendanceEdge]!
+  pageInfo: AttendancePageInfo!
+  sessions: [CourseSession]!
+  totalCount: Int!
+}
+
+type AttendanceEdge {
+  cursor: String!
+  node: Attendance!
+}
+
+type AttendancePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+"""Represents individual attendance for a given course term."""
+type AttendanceRecord {
+  attendee: CourseAttendeeStub!
+  createdAt: DateTimeISO!
+
+  """
+  Hours the person attended a given course term. Can't be more than the hours from start to end of a term.
+  """
+  hoursAttended: Float!
+  id: ObjectId!
+  online: Boolean
+  updatedAt: DateTimeISO!
+}
+
 """Attendee model type"""
 type Attendee {
   conference: Conference!
@@ -183,6 +220,7 @@ type ConferenceTranslations {
 }
 
 type Course {
+  attendance(after: String, first: Int! = 20, sort: [CourseAttendeeSortInput]!): AttendanceConnection!
   attendeesCount: Int!
   attending: CourseAttendee
   billing: FlawBilling
@@ -205,6 +243,7 @@ type Course {
 
 """Connects a system user with a particular course."""
 type CourseAttendee {
+  course: ObjectId!
   createdAt: DateTimeISO!
   fileUrls: [String!]!
   grade: String
@@ -215,11 +254,34 @@ type CourseAttendee {
   user: CourseAttendeeUserStub!
 }
 
+type CourseAttendeeMutationResponse implements IMutationResponse {
+  data: CourseAttendee!
+  message: String!
+}
+
+input CourseAttendeeSortInput {
+  direction: SortDirection!
+  field: CourseAttendeeSortableField!
+}
+
+"""Sortable enum definition for course attendees query"""
+enum CourseAttendeeSortableField {
+  ID
+  NAME
+}
+
+type CourseAttendeeStub {
+  id: ObjectId!
+  name: String!
+}
+
 type CourseAttendeeUserStub {
+  avatarUrl: String
   email: String!
   id: ObjectId!
   name: String!
   organization: String!
+  telephone: String
 }
 
 type CourseConnection {
@@ -265,7 +327,7 @@ Scheduled term for a given course that when created also creates corresponding a
 type CourseSession {
   course: ObjectId!
   createdAt: DateTimeISO!
-  description: String!
+  description: String
   end: DateTimeISO!
   id: ObjectId!
   maxAttendees: Int!
@@ -276,7 +338,7 @@ type CourseSession {
 
 input CourseSessionInput {
   course: ObjectId!
-  description: String!
+  description: String
   end: DateTimeISO!
   maxAttendees: Int!
   name: String!
@@ -525,9 +587,11 @@ type Mutation {
   acceptAuthorInvite: SubmissionMutationResponse!
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
+  changeCourseAttendeeStatus(id: ObjectId!, status: Status!): CourseAttendeeMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
+  createCourseAttendee(billing: AttendeeBillingInput, courseId: ObjectId!, fileUrls: [String!]!): CourseAttendeeMutationResponse!
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
@@ -537,6 +601,7 @@ type Mutation {
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
   deleteCourse(id: ObjectId!): CourseMutationResponse!
+  deleteCourseAttendee(id: ObjectId!): CourseAttendeeMutationResponse!
   deleteCourseSession(id: ObjectId!): CourseSessionMutationResponse!
   deleteIntern(id: ObjectId!): InternMutationResponse!
   deleteInternship(id: ObjectId!): InternshipMutationResponse!
@@ -554,6 +619,7 @@ type Mutation {
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
+  updateCourseAttendeeFiles(fileUrls: [String!]!, id: ObjectId!): CourseAttendeeMutationResponse!
   updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
   updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
@@ -598,6 +664,7 @@ type Query {
   conference(slug: String!): Conference!
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!
+  courseAttendee(id: ObjectId!): CourseAttendee!
   courses(after: String, filter: CourseFilterInput, first: Int! = 20, sort: [CourseSortInput]!): CourseConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!

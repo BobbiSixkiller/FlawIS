@@ -2,39 +2,28 @@ import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 
 import {
+  AttendanceConnection,
   CourseArgs,
   CourseInput,
   CourseSessionInput,
-} from "../../resolvers/types/course.types";
+} from "../../resolvers/types/course/course.types";
 import { AttendanceRecord, CourseSession } from "../../entitites/Course";
 import { I18nService } from "../i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Repository } from "../../repositories/base.repository";
-import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { UserService } from "../user.service";
-
-export function toDTO<T>(doc: DocumentType<T>): T {
-  return doc.toJSON({
-    versionKey: false,
-    virtuals: false,
-    transform(_doc, ret) {
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-      return ret;
-    },
-  }) as T;
-}
+import { toDTO } from "../../util/helpers";
+import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
+import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 
 @Service()
 export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
-    private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly courseSessionRepository = new Repository(CourseSession),
+    private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
       AttendanceRecord
     ),
@@ -225,5 +214,38 @@ export class CourseService {
     } finally {
       session.endSession();
     }
+  }
+
+  async attendance(
+    paginationArgs: CourseAttendeeArgs,
+    courseId: ObjectId
+  ): Promise<AttendanceConnection> {
+    const [sessions, attendeesConnection] = await Promise.all([
+      this.courseSessionRepository.findAll({ course: courseId }),
+      this.courseAttendeeRepository.paginatedCourseAttendees({
+        ...paginationArgs,
+        courseId,
+      }),
+    ]);
+
+    const edges = await Promise.all(
+      attendeesConnection.edges.map(async (edge) => ({
+        ...edge,
+        node: {
+          attendee: edge.node,
+          attendanceRecords: await this.attendanceRecordRepository
+            .findAll({
+              session: { $in: sessions.map((s) => s._id) },
+            })
+            .then((res) => res.map((r) => toDTO(r))),
+        },
+      }))
+    );
+
+    return {
+      ...attendeesConnection,
+      edges,
+      sessions,
+    };
   }
 }

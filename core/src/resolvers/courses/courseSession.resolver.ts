@@ -7,7 +7,7 @@ import { CourseSession } from "../../entitites/Course";
 import {
   CourseSessionInput,
   CourseSessionMutationResponse,
-} from "../types/course.types";
+} from "../types/course/course.types";
 
 @Service()
 @Resolver(() => CourseSession)

@@ -16,7 +16,6 @@ import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { createSubmission, updateSubmission } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
-import usePrefillFiles from "@/hooks/usePrefillFiles";
 import RHFormContainer from "@/components/RHFormContainer";
 import { omit } from "lodash";
 import GenericCombobox, {
@@ -36,25 +35,13 @@ export default function SubmissionForm({
 }) {
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
-  const { files, errors, loading } = usePrefillFiles({
-    [conference.slug]: submission?.fileUrl,
-  });
-
   const { yup } = useValidation();
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
-  if (loading)
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
-
   return (
     <RHFormContainer
-      errors={errors}
       yupSchema={yup.object({
         conference: yup.string().required(),
         section: yup.string().required(),
@@ -64,7 +51,6 @@ export default function SubmissionForm({
           .of(yup.mixed<File>().required())
           .required()
           .max(1, (val) => t("maxFiles", { value: val.max })),
-        fileUrl: yup.string(),
         presentationLng: yup.string<PresentationLng>().required(),
         translations: yup.object({
           sk: yup.object({
@@ -101,7 +87,7 @@ export default function SubmissionForm({
           },
         },
         authors: [],
-        files: files[conference.slug] ?? [],
+        files: [],
         conference: conference.id,
         section: submission?.section.id,
         presentationLng: (submission?.presentationLng || "") as PresentationLng,
@@ -121,8 +107,6 @@ export default function SubmissionForm({
             if (error) {
               return methods.setError("files", { message: error });
             }
-
-            console.log(url);
 
             let res;
             if (submission) {
@@ -225,6 +209,7 @@ export default function SubmissionForm({
               "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 [".docx"],
             }}
+            fileSources={{ [conference.slug]: submission?.fileUrl }}
           />
 
           <Button

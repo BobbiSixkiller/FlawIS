@@ -2,14 +2,17 @@ import { Service } from "typedi";
 import { ObjectId } from "mongodb";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { I18nService } from "../i18n.service";
-import { CourseService, toDTO } from "./course.service";
-import { CourseAttendeeArgs } from "../../resolvers/types/course.types";
+import { CourseService } from "./course.service";
 import { AttendeeBillingInput } from "../../resolvers/types/attendee.types";
 import mongoose from "mongoose";
 import { UserService } from "../user.service";
 import { Invoice } from "../../entitites/Attendee";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Status } from "../../entitites/Internship";
+import { toDTO } from "../../util/helpers";
+import { CtxUser } from "../../util/types";
+import { Access } from "../../entitites/User";
+import { MinioService } from "../minio.service";
 
 @Service()
 export class CourseAttendeeService {
@@ -18,7 +21,8 @@ export class CourseAttendeeService {
     private readonly courseService: CourseService,
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
+    private readonly minioService: MinioService
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
@@ -32,10 +36,13 @@ export class CourseAttendeeService {
     return toDTO(attendee);
   }
 
-  async getPaginatedCourseAttendees(args: CourseAttendeeArgs) {
-    return await this.courseAttendeeRepository.paginatedCourseTermAttendees(
-      args
-    );
+  async getAttending(courseId: ObjectId, ctxUserId: ObjectId) {
+    const attendee = await this.courseAttendeeRepository.findOne({
+      course: courseId,
+      "user._id": ctxUserId,
+    });
+
+    return attendee ? toDTO(attendee) : null;
   }
 
   async createCourseAttendee(
@@ -71,6 +78,7 @@ export class CourseAttendeeService {
           email: user.email,
           name: user.name,
           organization: user.organization,
+          telephone: user.telephone,
         },
         fileUrls,
         invoice:
@@ -116,6 +124,36 @@ export class CourseAttendeeService {
     }
   }
 
+  async updateFiles(fileUrls: string[], attendeeId: ObjectId, user: CtxUser) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
+        { _id: attendeeId },
+        { $set: { fileUrls } },
+        session
+      );
+      if (!attendee) {
+        throw new Error("Attendee not found!");
+      }
+      if (
+        attendee.user.id.toString() !== user.id.toString() &&
+        !user.access.includes(Access.Admin)
+      ) {
+        throw new Error("Not allowed!");
+      }
+
+      await session.commitTransaction();
+
+      return toDTO(attendee);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
   async updateAttendeeStatus(attendeeId: ObjectId, status: Status) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -141,7 +179,7 @@ export class CourseAttendeeService {
     }
   }
 
-  async deleteAttendee(id: ObjectId) {
+  async deleteAttendee(id: ObjectId, user: CtxUser) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -153,12 +191,20 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
+      if (
+        attendee.user.id.toString() !== user.id.toString() &&
+        !user.access.includes(Access.Admin)
+      ) {
+        throw new Error("Not allowed!");
+      }
 
       await this.courseRepository.findOneAndUpdate(
         { _id: attendee.course },
         { $inc: { attendeesCount: -1 } },
         { session, new: true }
       );
+
+      await this.minioService.deleteFiles(attendee.fileUrls);
 
       await session.commitTransaction();
 

@@ -10,7 +10,7 @@ import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import { createCourseSession, updateCourseSession } from "./actions";
-import { getLocalDate, handleAPIErrors } from "@/utils/helpers";
+import { formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
 import { Textarea } from "@/components/Textarea";
 import { Input } from "@/components/Input";
 import TiptapEditor from "@/components/editor/Editor";
@@ -38,7 +38,7 @@ export default function CourseSessionForm({
       yupSchema={yup.object({
         course: yup.string().required(),
         name: yup.string().required(),
-        description: yup.string().required(),
+        description: yup.string(),
         start: yup.date(),
         end: yup.date().min(yup.ref("start")),
         maxAttendees: yup.number().min(1).required(),
@@ -47,8 +47,8 @@ export default function CourseSessionForm({
         course: courseId,
         name: courseSession?.name ?? "",
         description: courseSession?.description ?? "",
-        start: getLocalDate(courseSession?.start ?? today),
-        end: getLocalDate(courseSession?.end ?? today),
+        start: formatDatetimeLocal(courseSession?.start ?? today, true),
+        end: formatDatetimeLocal(courseSession?.end ?? today, true),
         maxAttendees: courseSession?.maxAttendees ?? 0,
       }}
     >
@@ -57,6 +57,7 @@ export default function CourseSessionForm({
           className="space-y-6 max-w-2xl w-full"
           onSubmit={methods.handleSubmit(
             async (vals) => {
+              console.log(vals);
               let res;
               if (courseSession) {
                 res = await updateCourseSession({
@@ -82,8 +83,8 @@ export default function CourseSessionForm({
         >
           <Textarea label="Nazov terminu" name="name" />
           <div className="flex flex-col sm:flex-row gap-4">
-            <Input label="Zaciatok" name="start" type="date" />
-            <Input label="Koniec" name="end" type="date" />{" "}
+            <Input label="Zaciatok" name="start" type="datetime-local" />
+            <Input label="Koniec" name="end" type="datetime-local" />{" "}
             <Input type="number" label="Kapacita terminu" name="maxAttendees" />
           </div>
           <TiptapEditor
