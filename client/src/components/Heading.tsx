@@ -1,7 +1,6 @@
 import { cloneElement, ReactNode } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "@/lib/i18n/client";
-import Link from "next/link";
 import Dropdown, { DropdownItem } from "./Dropdown";
 import Button from "./Button";
 import { translate } from "@/lib/i18n";
@@ -19,6 +18,7 @@ export default async function Heading({
   items = [],
   lng,
 }: HeadingProps) {
+  // const { t } = useTranslation(lng, "common");
   const { t } = await translate(lng, "common");
 
   const [primaryAction, ...secondaryActions] = items;
@@ -38,12 +38,13 @@ export default async function Heading({
       <div className="mt-5 flex gap-3 lg:ml-4 lg:mt-0">
         {/* Desktop buttons */}
         <div className="hidden sm:flex gap-3 ">
-          {secondaryActions?.map((item, i) => {
+          {secondaryActions}
+          {/* {secondaryActions?.map((item, i) => {
             return cloneElement(item, {
               ...item.props,
               key: i,
             });
-          })}
+          })} */}
         </div>
 
         {/* Primary button */}
