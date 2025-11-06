@@ -59,7 +59,7 @@ export default function Dropdown({
                       "flex w-full gap-2 items-center rounded-md text-sm p-2",
                       focus &&
                         "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
-                      item.props?.className,
+                      // item.props?.className,
                     ]),
                     onClick: (e: React.MouseEvent) => {
                       item.props.onClick?.(e);

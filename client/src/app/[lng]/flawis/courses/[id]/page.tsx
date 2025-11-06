@@ -45,12 +45,14 @@ export default async function CoursePage({
           <CloseButton href="/courses" key={0} />,
           <ModalTrigger dialogId="delete-course" key={1}>
             <Button size="icon" className="rounded-full" variant="destructive">
-              <TrashIcon className="size-5" />
+              <TrashIcon className="size-5" />{" "}
+              <span className="sm:hidden">Zmazat</span>
             </Button>
           </ModalTrigger>,
           <ModalTrigger dialogId="edit-course" key={2}>
-            <Button size="icon" className="rounded-full" variant="default">
-              <PencilIcon className="size-5" />
+            <Button size="icon" className="rounded-full">
+              <PencilIcon className="size-5" />{" "}
+              <span className="sm:hidden">Upravit</span>
             </Button>
           </ModalTrigger>,
           <Button
@@ -58,10 +60,10 @@ export default async function CoursePage({
             as={Link}
             size="icon"
             className="rounded-full"
-            variant="default"
             href={`/courses/${id}/attendance`}
           >
             <UsersIcon className="size-5" />
+            <span className="sm:hidden">Dochadzka</span>
           </Button>,
         ]}
       />
