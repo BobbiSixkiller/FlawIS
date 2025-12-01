@@ -61,11 +61,7 @@ export default function CourseRegistrationForm({
           console.log("NEW");
           const urls = await Promise.all(
             vals.files.map((f: File) =>
-              uploadToMinio(
-                "courses",
-                `${course.attending!.user.email}/${f.name}`,
-                f
-              )
+              uploadToMinio("courses", `${user!.email}/${f.name}`, f)
             )
           );
 

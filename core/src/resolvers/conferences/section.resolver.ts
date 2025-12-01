@@ -84,7 +84,7 @@ export class SectionResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Section) section: DocumentType<Section>
   ): Promise<SectionMutationResponse> {
-    await this.sectionRepository.delete({ _id: section.id });
+    await this.sectionRepository.deleteOne({ _id: section.id });
 
     return {
       data: section,

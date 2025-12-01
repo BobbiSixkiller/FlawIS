@@ -67,6 +67,8 @@ export default function MultipleFileUploadField({
   const [files, setFiles] = useState<UploadableFile[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log(loading);
+
   useEffect(() => {
     setValue(
       name,
@@ -77,13 +79,19 @@ export default function MultipleFileUploadField({
 
   useEffect(() => {
     async function prefillFiles() {
-      if (
-        !fileSources ||
-        Object.values(fileSources).filter(Boolean).length === 0
-      )
+      if (!fileSources) {
+        console.log("SHIT");
         return setLoading(false);
+      }
 
       const loadedFiles: UploadableFile[] = [];
+
+      await new Promise((res) =>
+        setTimeout(() => {
+          console.log("TIMW OUT");
+          res("finished");
+        }, 5000)
+      );
 
       await Promise.all(
         Object.entries(fileSources).map(async ([bucket, urls]) => {
@@ -103,13 +111,15 @@ export default function MultipleFileUploadField({
         })
       );
 
+      console.log(loadedFiles);
+
       setFiles(loadedFiles);
 
       setLoading(false);
     }
 
     prefillFiles();
-  }, [JSON.stringify(fileSources), loading]);
+  }, [JSON.stringify(fileSources)]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -170,11 +180,11 @@ export default function MultipleFileUploadField({
           {
             isDragAccept,
             isDragReject: isDragReject || fieldState.error,
-            isFocused,
+            ...(!loading ? { isFocused } : {}),
           }
         )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-none`}
       >
-        <input name={name} id={name} {...getInputProps()} />
+        <input name={name} id={name} disabled={loading} {...getInputProps()} />
 
         {loading ? (
           <Spinner />

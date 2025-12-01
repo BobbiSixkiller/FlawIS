@@ -8,7 +8,8 @@ import CourseSessionForm from "../CourseSessionForm";
 import { getCourseAttendance } from "./actions";
 import { formatDatetimeLocal } from "@/utils/helpers";
 import { Status } from "@/lib/graphql/generated/graphql";
-import AttendanceTable from "./AttendanceTable";
+import { getCourse } from "../actions";
+import { AttendanceTable } from "./AttendanceTable";
 
 export default async function AttendancePage({
   params,
@@ -16,7 +17,8 @@ export default async function AttendancePage({
   params: Promise<{ lng: string; id: string }>;
 }) {
   const { id, lng } = await params;
-  const course = await getCourseAttendance({ id, sort: [] });
+  const course = await getCourse({ id });
+  const attendance = await getCourseAttendance({ id, sort: [] });
 
   return (
     <div className="space-y-6">
@@ -33,7 +35,7 @@ export default async function AttendancePage({
         ]}
       />
 
-      <AttendanceTable course={course} />
+      <AttendanceTable initialData={attendance} vars={{ id, sort: [] }} />
 
       <Modal dialogId="add-course-session" title="Pridat termin">
         <CourseSessionForm dialogId="add-course-session" />

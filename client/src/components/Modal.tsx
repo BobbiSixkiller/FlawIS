@@ -1,12 +1,11 @@
 "use client";
 
-import { Fragment, ReactNode, Suspense, useEffect } from "react";
+import { ReactNode, Suspense, useEffect } from "react";
 import {
   Dialog,
+  DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Transition,
-  TransitionChild,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
@@ -28,9 +27,11 @@ export default function Modal({
   togglerHidden = false,
   isInterceptingRoute = false,
 }: ModalProps) {
-  const openDialogs = useDialogStore((s) => s.openDialogs);
-  const closeDialog = useDialogStore((s) => s.closeDialog);
+  const router = useRouter();
+
+  const isOpen = useDialogStore((s) => s.isDialogOpen(dialogId));
   const openDialog = useDialogStore((s) => s.openDialog);
+  const closeDialog = useDialogStore((s) => s.closeDialog);
 
   useEffect(() => {
     if (isInterceptingRoute) {
@@ -38,86 +39,70 @@ export default function Modal({
     }
   }, [dialogId, isInterceptingRoute, openDialog]);
 
-  const router = useRouter();
+  const handleClose = () => {
+    // Blur whatever is currently focused inside the dialog
+    const active = document.activeElement as HTMLElement | null;
+    if (active && active.blur) active.blur();
 
-  function handleClose() {
-    if (!togglerHidden) {
-      closeDialog(dialogId);
+    closeDialog(dialogId);
+    if (isInterceptingRoute) {
+      // Let the route interceptor go back when dialog fully closed
+      router.back();
     }
-  }
+  };
 
   return (
-    <Transition
-      appear
-      show={openDialogs[dialogId] || false}
-      as={Fragment}
-      afterLeave={() => {
-        if (isInterceptingRoute) {
-          router.back();
-        }
-      }}
-    >
-      <Dialog
-        as="div"
-        className="fixed z-30 inset-0 overflow-y-auto"
-        id="modal-scroll-container"
-        onClose={handleClose}
-        unmount
-      >
-        <TransitionChild
-          enter="duration-300 ease-out"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="duration-200 ease-in"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/25" />
-        </TransitionChild>
+    <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
+      {/* Backdrop with built-in transition */}
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 bg-black/25 data-[closed]:opacity-0 transition-opacity duration-300 ease-out"
+      />
 
-        <div className="flex min-h-full items-center justify-center p-4">
-          <TransitionChild
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+      <div className="fixed inset-0 w-screen overflow-y-auto p-4">
+        <div className="flex min-h-full items-center justify-center">
+          <DialogPanel
+            transition
+            className="
+            w-full sm:w-fit sm:min-w-96
+            rounded-xl ring-1 ring-black/5
+            bg-white dark:bg-gray-700 dark:text-white
+            p-6 text-left align-middle shadow-2xl
+            transition duration-300 ease-out data-[closed]:opacity-0 data-[closed]:scale-95
+          "
           >
-            <DialogPanel className="w-full z-30 sm:w-fit sm:min-w-96 overflow-hidden rounded-xl ring-1 ring-black/5 bg-white dark:bg-gray-700 dark:text-white p-6 text-left align-middle shadow-2xl">
-              <div className="flex justify-between mb-6">
-                {title && (
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
-                  >
-                    {title}
-                  </DialogTitle>
-                )}
-                {!togglerHidden && (
-                  <button
-                    onClick={handleClose}
-                    className="hover:text-gray-500 dark:text-gray-300 focus:outline-primary-500"
-                  >
-                    <XMarkIcon className="h-5 w-5" />
-                  </button>
-                )}
-              </div>
+            <div className="flex justify-between mb-6">
+              {title && (
+                <DialogTitle
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                >
+                  {title}
+                </DialogTitle>
+              )}
 
-              <Suspense
-                fallback={
-                  <div className="flex justify-center">
-                    <Spinner />
-                  </div>
-                }
-              >
-                {children}
-              </Suspense>
-            </DialogPanel>
-          </TransitionChild>
+              {!togglerHidden && (
+                <button
+                  onClick={handleClose}
+                  className="hover:text-gray-500 dark:text-gray-300 focus:outline-primary-500"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+
+            <Suspense
+              fallback={
+                <div className="flex justify-center">
+                  <Spinner />
+                </div>
+              }
+            >
+              {children}
+            </Suspense>
+          </DialogPanel>
         </div>
-      </Dialog>
-    </Transition>
+      </div>
+    </Dialog>
   );
 }

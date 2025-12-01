@@ -7,7 +7,7 @@ import {
 } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { CreateArgs, CreateConnection } from "../pagination.types";
-import { CourseAttendee } from "../../../entitites/Course";
+import { AttendanceRecord, CourseAttendee } from "../../../entitites/Course";
 import { IMutationResponse } from "../interface.types";
 
 export enum CourseAttendeeSortableField {
@@ -35,4 +35,10 @@ export class CourseAttendeeConnection extends CreateConnection(
 export class CourseAttendeeMutationResponse extends IMutationResponse {
   @Field(() => CourseAttendee)
   data: CourseAttendee;
+}
+
+@ObjectType({ implements: IMutationResponse })
+export class AttendanceRecordMutationResponse extends IMutationResponse {
+  @Field(() => AttendanceRecord)
+  data: AttendanceRecord;
 }

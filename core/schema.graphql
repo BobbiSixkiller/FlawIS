@@ -55,7 +55,7 @@ type AttendancePageInfo {
 
 """Represents individual attendance for a given course term."""
 type AttendanceRecord {
-  attendee: CourseAttendeeStub!
+  attendee: CourseAttendee!
   createdAt: DateTimeISO!
 
   """
@@ -64,7 +64,13 @@ type AttendanceRecord {
   hoursAttended: Float!
   id: ObjectId!
   online: Boolean
+  session: CourseSession!
   updatedAt: DateTimeISO!
+}
+
+type AttendanceRecordMutationResponse implements IMutationResponse {
+  data: AttendanceRecord!
+  message: String!
 }
 
 """Attendee model type"""
@@ -268,11 +274,6 @@ input CourseAttendeeSortInput {
 enum CourseAttendeeSortableField {
   ID
   NAME
-}
-
-type CourseAttendeeStub {
-  id: ObjectId!
-  name: String!
 }
 
 type CourseAttendeeUserStub {
@@ -617,6 +618,8 @@ type Mutation {
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
+  updateAttendanceHours(hours: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
+  updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
   updateCourseAttendeeFiles(fileUrls: [String!]!, id: ObjectId!): CourseAttendeeMutationResponse!

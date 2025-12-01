@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  ComponentType,
-  LegacyRef,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { ComponentType, ReactNode, Ref, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 interface PageInfo {
@@ -19,7 +13,7 @@ export interface Edge<TEdge> {
   node: TEdge;
 }
 
-export interface Connection<TEdge> {
+export interface Connection<TEdge> extends Record<string, any> {
   edges: (Edge<TEdge> | null)[];
   pageInfo: PageInfo;
 }
@@ -34,7 +28,7 @@ interface ScrollProps<TEdge, TGqlVars> {
   vars: TGqlVars;
   getData: (vars: TGqlVars & PaginationArgs) => Promise<Connection<TEdge>>;
   ListItem: ComponentType<{ data?: TEdge }>;
-  Placeholder: ComponentType<{ cardRef?: LegacyRef<HTMLDivElement> }>;
+  Placeholder: ComponentType<{ cardRef?: Ref<HTMLDivElement> }>;
   Container: ComponentType<{ children: ReactNode }>;
   customSort?: (a: Edge<TEdge> | null, b: Edge<TEdge> | null) => number;
 }

@@ -46,7 +46,7 @@ export default function Dropdown({
           as="div"
           className={cn([
             positionSettings ? positionSettings : "mt-2 right-0",
-            "absolute min-w-max whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-10",
+            "absolute min-w-max whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-50",
             "dark:bg-gray-800 dark:text-white/85",
           ])}
         >

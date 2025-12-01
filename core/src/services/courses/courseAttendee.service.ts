@@ -13,11 +13,16 @@ import { toDTO } from "../../util/helpers";
 import { CtxUser } from "../../util/types";
 import { Access } from "../../entitites/User";
 import { MinioService } from "../minio.service";
+import { Repository } from "../../repositories/base.repository";
+import { AttendanceRecord } from "../../entitites/Course";
 
 @Service()
 export class CourseAttendeeService {
   constructor(
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
+    private readonly attendanceRecordRepository = new Repository(
+      AttendanceRecord
+    ),
     private readonly courseService: CourseService,
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
@@ -108,7 +113,7 @@ export class CourseAttendeeService {
             : undefined,
       });
 
-      await this.courseRepository.update(
+      await this.courseRepository.updateMany(
         { _id: course.id },
         { $inc: { attendeesCount: 1 } }
       );
@@ -154,6 +159,7 @@ export class CourseAttendeeService {
       session.endSession();
     }
   }
+
   async updateAttendeeStatus(attendeeId: ObjectId, status: Status) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -198,11 +204,14 @@ export class CourseAttendeeService {
         throw new Error("Not allowed!");
       }
 
-      await this.courseRepository.findOneAndUpdate(
-        { _id: attendee.course },
-        { $inc: { attendeesCount: -1 } },
-        { session, new: true }
-      );
+      await Promise.all([
+        this.courseRepository.findOneAndUpdate(
+          { _id: attendee.course },
+          { $inc: { attendeesCount: -1 } },
+          { session, new: true }
+        ),
+        this.attendanceRecordRepository.deleteMany({}),
+      ]);
 
       await this.minioService.deleteFiles(attendee.fileUrls);
 

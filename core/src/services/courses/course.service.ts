@@ -17,6 +17,7 @@ import { UserService } from "../user.service";
 import { toDTO } from "../../util/helpers";
 import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
+import { Status } from "../../entitites/Internship";
 
 @Service()
 export class CourseService {
@@ -27,7 +28,6 @@ export class CourseService {
     private readonly attendanceRecordRepository = new Repository(
       AttendanceRecord
     ),
-    private readonly userService: UserService,
     private readonly i18nService: I18nService
   ) {}
 
@@ -38,6 +38,15 @@ export class CourseService {
     }
 
     return toDTO(course);
+  }
+
+  async getSession(id: ObjectId) {
+    const session = await this.courseSessionRepository.findOne({ _id: id });
+    if (!session) {
+      throw new Error("Course session not found!");
+    }
+
+    return toDTO(session);
   }
 
   async getPaginatedCourses(args: CourseArgs) {
@@ -151,6 +160,11 @@ export class CourseService {
           this.i18nService.translate("notFound", { ns: "course" })
         );
       }
+      const res = await this.attendanceRecordRepository.deleteMany(
+        { session: id },
+        { session }
+      );
+      console.log(res);
 
       await session.commitTransaction();
 
@@ -221,7 +235,9 @@ export class CourseService {
     courseId: ObjectId
   ): Promise<AttendanceConnection> {
     const [sessions, attendeesConnection] = await Promise.all([
-      this.courseSessionRepository.findAll({ course: courseId }),
+      this.courseSessionRepository.findAll({ course: courseId }, null, {
+        sort: { _id: 1 },
+      }),
       this.courseAttendeeRepository.paginatedCourseAttendees({
         ...paginationArgs,
         courseId,
@@ -229,17 +245,51 @@ export class CourseService {
     ]);
 
     const edges = await Promise.all(
-      attendeesConnection.edges.map(async (edge) => ({
-        ...edge,
-        node: {
-          attendee: edge.node,
-          attendanceRecords: await this.attendanceRecordRepository
-            .findAll({
+      attendeesConnection.edges.map(async (edge) => {
+        if (edge.node.status !== Status.Accepted) {
+          return {
+            ...edge,
+            node: {
+              attendee: edge.node,
+              attendanceRecords: [],
+            },
+          };
+        } else {
+          const existingRecords = await this.attendanceRecordRepository.findAll(
+            {
+              attendee: edge.node.id,
               session: { $in: sessions.map((s) => s._id) },
-            })
-            .then((res) => res.map((r) => toDTO(r))),
-        },
-      }))
+            },
+            null,
+            { sort: { session: 1 } }
+          );
+
+          const attendanceRecords: AttendanceRecord[] = [];
+          for (const session of sessions) {
+            const exists = existingRecords.find(
+              (record) => record.session.toString() === session.id
+            );
+            if (exists) {
+              attendanceRecords.push(toDTO(exists));
+            } else {
+              const newRecord = await this.attendanceRecordRepository.create({
+                session: session._id,
+                attendee: edge.node.id,
+                hoursAttended: 0,
+              });
+              attendanceRecords.push(toDTO(newRecord));
+            }
+          }
+
+          return {
+            ...edge,
+            node: {
+              attendee: edge.node,
+              attendanceRecords,
+            },
+          };
+        }
+      })
     );
 
     return {

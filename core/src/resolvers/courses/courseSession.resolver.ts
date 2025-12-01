@@ -48,7 +48,7 @@ export class CourseSessionResolver {
 
   @Mutation(() => CourseSessionMutationResponse)
   async deleteCourseSession(@Arg("id") id: ObjectId) {
-    const course = await this.courseService.deleteCourse(id);
+    const course = await this.courseService.deleteCourseSession(id);
 
     return {
       data: course,

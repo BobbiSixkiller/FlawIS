@@ -15,8 +15,8 @@ import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
-import useScrolled from "@/hooks/useScrolled";
 import Link from "next/link";
+import { useWindowScroll } from "@uidotdev/usehooks";
 
 export default function TopBar({
   avatar,
@@ -31,7 +31,8 @@ export default function TopBar({
   drawerContent: ReactNode;
   logo: ReactNode;
 }) {
-  const scrolled = useScrolled();
+  const [{ y = 0 }] = useWindowScroll();
+
   const [visible, setVisible] = useState(false);
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");
@@ -44,9 +45,9 @@ export default function TopBar({
   return (
     <div
       className={cn([
-        "flex items-center p-4 border-b h-[60px] sticky top-0 z-10 bg-white",
+        "flex items-center p-4 border-b h-[60px] sticky top-0 z-20 bg-white",
         "dark:border-gray-700 dark:bg-gray-900",
-        scrolled ? "shadow-bottom" : "",
+        y ?? 0 > 0 ? "shadow-bottom" : "",
       ])}
     >
       <Button

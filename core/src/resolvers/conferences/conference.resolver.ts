@@ -101,7 +101,7 @@ export class ConferencerResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Conference) conference: DocumentType<Conference>
   ): Promise<ConferenceMutationResponse> {
-    await this.conferenceRepository.delete({ _id: conference.id });
+    await this.conferenceRepository.deleteOne({ _id: conference.id });
 
     return {
       data: conference,
@@ -245,7 +245,7 @@ export class ConferencerResolver {
     const priceWithouTax = ticket.price / Number(process.env.VAT || 1.23);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
 
-    await this.userRepository.update(
+    await this.userRepository.updateMany(
       { _id: user?.id },
       {
         $addToSet: { billings: billing },

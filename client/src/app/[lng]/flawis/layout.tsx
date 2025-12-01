@@ -114,7 +114,7 @@ export default async function DashboardLayout({
 
       {modal}
 
-      <ActivateAccountDialog lng={lng} user={user} />
+      {/* <ActivateAccountDialog lng={lng} user={user} /> */}
       <SessionPolling />
     </div>
   );

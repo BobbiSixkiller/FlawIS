@@ -170,6 +170,7 @@ export async function deleteCourseAttendee(
     {
       revalidateTags: (data) => [
         `courses:${data.deleteCourseAttendee.data.course}`,
+        `courses:${data.deleteCourseAttendee.data.course}/attendance`,
       ],
     }
   );

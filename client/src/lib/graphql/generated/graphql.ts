@@ -79,13 +79,20 @@ export type AttendancePageInfo = {
 /** Represents individual attendance for a given course term. */
 export type AttendanceRecord = {
   __typename?: 'AttendanceRecord';
-  attendee: CourseAttendeeStub;
+  attendee: CourseAttendee;
   createdAt: Scalars['DateTimeISO']['output'];
   /** Hours the person attended a given course term. Can't be more than the hours from start to end of a term. */
   hoursAttended: Scalars['Float']['output'];
   id: Scalars['ObjectId']['output'];
   online?: Maybe<Scalars['Boolean']['output']>;
+  session: CourseSession;
   updatedAt: Scalars['DateTimeISO']['output'];
+};
+
+export type AttendanceRecordMutationResponse = IMutationResponse & {
+  __typename?: 'AttendanceRecordMutationResponse';
+  data: AttendanceRecord;
+  message: Scalars['String']['output'];
 };
 
 /** Attendee model type */
@@ -313,12 +320,6 @@ export enum CourseAttendeeSortableField {
   Id = 'ID',
   Name = 'NAME'
 }
-
-export type CourseAttendeeStub = {
-  __typename?: 'CourseAttendeeStub';
-  id: Scalars['ObjectId']['output'];
-  name: Scalars['String']['output'];
-};
 
 export type CourseAttendeeUserStub = {
   __typename?: 'CourseAttendeeUserStub';
@@ -676,6 +677,8 @@ export type Mutation = {
   removeAuthor: SubmissionMutationResponse;
   resendActivationLink: Scalars['String']['output'];
   toggleVerifiedUser: UserMutationResponse;
+  updateAttendanceHours: AttendanceRecordMutationResponse;
+  updateAttendanceOnline: AttendanceRecordMutationResponse;
   updateConferenceDates: ConferenceMutationResponse;
   updateCourse: CourseMutationResponse;
   updateCourseAttendeeFiles: CourseAttendeeMutationResponse;
@@ -848,6 +851,18 @@ export type MutationRemoveAuthorArgs = {
 export type MutationToggleVerifiedUserArgs = {
   id: Scalars['ObjectId']['input'];
   verified: Scalars['Boolean']['input'];
+};
+
+
+export type MutationUpdateAttendanceHoursArgs = {
+  hours: Scalars['Float']['input'];
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationUpdateAttendanceOnlineArgs = {
+  id: Scalars['ObjectId']['input'];
+  online: Scalars['Boolean']['input'];
 };
 
 
@@ -1623,6 +1638,8 @@ export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, cou
 
 export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } };
 
+export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', online?: boolean | null, hoursAttended: number } | null> };
+
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1647,7 +1664,7 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } | null> } } };
+export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
@@ -1716,6 +1733,30 @@ export type DeleteCourseAttendeeMutationVariables = Exact<{
 
 
 export type DeleteCourseAttendeeMutation = { __typename?: 'Mutation', deleteCourseAttendee: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+
+export type ChangeCourseAttendeeStatusMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  status: Status;
+}>;
+
+
+export type ChangeCourseAttendeeStatusMutation = { __typename?: 'Mutation', changeCourseAttendeeStatus: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+
+export type UpdateAttendanceHoursMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  hours: Scalars['Float']['input'];
+}>;
+
+
+export type UpdateAttendanceHoursMutation = { __typename?: 'Mutation', updateAttendanceHours: { __typename?: 'AttendanceRecordMutationResponse', message: string, data: { __typename?: 'AttendanceRecord', hoursAttended: number, online?: boolean | null, session: { __typename?: 'CourseSession', course: any } } } };
+
+export type UpdateAttendanceOnlineMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  online: Scalars['Boolean']['input'];
+}>;
+
+
+export type UpdateAttendanceOnlineMutation = { __typename?: 'Mutation', updateAttendanceOnline: { __typename?: 'AttendanceRecordMutationResponse', message: string, data: { __typename?: 'AttendanceRecord', hoursAttended: number, online?: boolean | null, session: { __typename?: 'CourseSession', course: any } } } };
 
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -2504,6 +2545,22 @@ export const CourseSessionFragmentDoc = new TypedDocumentString(`
   updatedAt
 }
     `, {"fragmentName":"CourseSession"}) as unknown as TypedDocumentString<CourseSessionFragment, unknown>;
+export const AttendanceFragmentDoc = new TypedDocumentString(`
+    fragment Attendance on Attendance {
+  attendee {
+    id
+    fileUrls
+    user {
+      name
+    }
+    status
+  }
+  attendanceRecords {
+    online
+    hoursAttended
+  }
+}
+    `, {"fragmentName":"Attendance"}) as unknown as TypedDocumentString<AttendanceFragment, unknown>;
 export const ApplicationFragmentDoc = new TypedDocumentString(`
     fragment Application on Intern {
   id
@@ -4269,8 +4326,6 @@ fragment CourseAttendee on CourseAttendee {
 export const AttendanceDocument = new TypedDocumentString(`
     query attendance($id: ObjectId!, $after: String, $first: Int, $sort: [CourseAttendeeSortInput]!) {
   course(id: $id) {
-    id
-    name
     attendance(after: $after, first: $first, sort: $sort) {
       totalCount
       pageInfo {
@@ -4280,13 +4335,7 @@ export const AttendanceDocument = new TypedDocumentString(`
       edges {
         cursor
         node {
-          attendee {
-            ...CourseAttendee
-          }
-          attendanceRecords {
-            online
-            hoursAttended
-          }
+          ...Attendance
         }
       }
       sessions {
@@ -4306,21 +4355,19 @@ export const AttendanceDocument = new TypedDocumentString(`
   createdAt
   updatedAt
 }
-fragment CourseAttendee on CourseAttendee {
-  id
-  user {
+fragment Attendance on Attendance {
+  attendee {
     id
-    name
-    email
-    telephone
-    organization
-    avatarUrl
+    fileUrls
+    user {
+      name
+    }
+    status
   }
-  fileUrls
-  course
-  status
-  createdAt
-  updatedAt
+  attendanceRecords {
+    online
+    hoursAttended
+  }
 }`) as unknown as TypedDocumentString<AttendanceQuery, AttendanceQueryVariables>;
 export const CreateCourseDocument = new TypedDocumentString(`
     mutation createCourse($data: CourseInput!) {
@@ -4662,6 +4709,59 @@ export const DeleteCourseAttendeeDocument = new TypedDocumentString(`
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<DeleteCourseAttendeeMutation, DeleteCourseAttendeeMutationVariables>;
+export const ChangeCourseAttendeeStatusDocument = new TypedDocumentString(`
+    mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
+  changeCourseAttendeeStatus(id: $id, status: $status) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+    fragment CourseAttendee on CourseAttendee {
+  id
+  user {
+    id
+    name
+    email
+    telephone
+    organization
+    avatarUrl
+  }
+  fileUrls
+  course
+  status
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<ChangeCourseAttendeeStatusMutation, ChangeCourseAttendeeStatusMutationVariables>;
+export const UpdateAttendanceHoursDocument = new TypedDocumentString(`
+    mutation updateAttendanceHours($id: ObjectId!, $hours: Float!) {
+  updateAttendanceHours(id: $id, hours: $hours) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateAttendanceHoursMutation, UpdateAttendanceHoursMutationVariables>;
+export const UpdateAttendanceOnlineDocument = new TypedDocumentString(`
+    mutation updateAttendanceOnline($id: ObjectId!, $online: Boolean!) {
+  updateAttendanceOnline(id: $id, online: $online) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateAttendanceOnlineMutation, UpdateAttendanceOnlineMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {

@@ -177,31 +177,22 @@ export class CourseAttendee extends TimeStamps {
   updatedAt: Date;
 }
 
-@ObjectType()
-export class CourseAttendeeStub {
-  @Field(() => ObjectId)
-  id: ObjectId;
-
-  @Field()
-  @Property()
-  name: string;
-}
-
 @ObjectType({
   description: "Represents individual attendance for a given course term.",
 })
-@Index({ term: 1 })
+@Index({ session: 1 })
 @Index({ "attendee._id": 1 })
 export class AttendanceRecord extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
+  @Field(() => CourseSession)
   @Property({ ref: () => CourseSession })
   session: Ref<CourseSession>;
 
-  @Field(() => CourseAttendeeStub)
-  @Property({ type: () => CourseAttendeeStub })
-  attendee: CourseAttendeeStub;
+  @Field(() => CourseAttendee)
+  @Property({ ref: () => CourseAttendee })
+  attendee: Ref<CourseAttendee>;
 
   @Field(() => Float, {
     description:

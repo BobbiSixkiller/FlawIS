@@ -95,7 +95,7 @@ export class AttendeeResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Attendee) attendee: DocumentType<Attendee>
   ): Promise<AttendeeMutationResponse> {
-    await this.attendeeRepository.delete({ _id: attendee.id });
+    await this.attendeeRepository.deleteOne({ _id: attendee.id });
 
     return {
       data: attendee,

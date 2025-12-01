@@ -1,6 +1,5 @@
 import {
   Arg,
-  Args,
   Authorized,
   Ctx,
   FieldResolver,
@@ -14,15 +13,12 @@ import { Service } from "typedi";
 import { CourseAttendeeService } from "../../services/courses/courseAttendee.service";
 import { ObjectId } from "mongodb";
 import { Status } from "../../entitites/Internship";
-import {
-  CourseAttendeeArgs,
-  CourseAttendeeConnection,
-  CourseAttendeeMutationResponse,
-} from "../types/course/courseAttendee.types";
+import { CourseAttendeeMutationResponse } from "../types/course/courseAttendee.types";
 import { AttendeeBillingInput } from "../types/attendee.types";
 import { Context } from "../../util/auth";
 import { Access } from "../../entitites/User";
 import { UserService } from "../../services/user.service";
+import { CourseService } from "../../services/courses/course.service";
 
 @Service()
 @Resolver(() => CourseAttendee)

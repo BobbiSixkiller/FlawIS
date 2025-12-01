@@ -18,7 +18,10 @@ import CloseButton from "@/components/CloseButton";
 import Link from "next/link";
 import CourseRegistrationForm from "./CourseRegistrationForm";
 import Avatar from "@/components/Avatar";
-import { CourseAttendeeFragment } from "@/lib/graphql/generated/graphql";
+import {
+  CourseAttendeeFragment,
+  Status,
+} from "@/lib/graphql/generated/graphql";
 import { displayDate } from "@/utils/helpers";
 import { ReactNode } from "react";
 
@@ -79,16 +82,20 @@ export default async function CoursePage({
           courseAttendee={course.attending}
           controls={
             <div className="flex gap-2">
-              <ModalTrigger dialogId="delete-course-application">
-                <Button variant="destructive" size="icon">
-                  <TrashIcon className="size-5" />
-                </Button>
-              </ModalTrigger>
-              <ModalTrigger dialogId="course-application">
-                <Button size="icon">
-                  <PencilIcon className="size-5" />
-                </Button>
-              </ModalTrigger>
+              {course.attending.status === Status.Applied && (
+                <ModalTrigger dialogId="delete-course-application">
+                  <Button variant="destructive" size="icon">
+                    <TrashIcon className="size-5" />
+                  </Button>
+                </ModalTrigger>
+              )}
+              {course.attending.status !== Status.Accepted && (
+                <ModalTrigger dialogId="course-application">
+                  <Button size="icon">
+                    <PencilIcon className="size-5" />
+                  </Button>
+                </ModalTrigger>
+              )}
             </div>
           }
         />

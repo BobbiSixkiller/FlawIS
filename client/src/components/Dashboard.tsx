@@ -89,7 +89,7 @@ export default async function Dashboard({
         </div>
       </div>
 
-      <div className="hidden md:flex flex-col h-screen sticky top-0">
+      <div className="hidden md:flex flex-col xl:h-screen sticky top-0">
         <Footer lng={lng} />
       </div>
 

@@ -52,6 +52,21 @@ fragment CourseAttendee on CourseAttendee {
   updatedAt
 }
 
+fragment Attendance on Attendance {
+  attendee {
+    id
+    fileUrls
+    user {
+      name
+    }
+    status
+  }
+  attendanceRecords {
+    online
+    hoursAttended
+  }
+}
+
 query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
   courses(after: $after, first: $first, sort: $sort) {
     totalCount
@@ -81,8 +96,6 @@ query attendance(
   $sort: [CourseAttendeeSortInput]!
 ) {
   course(id: $id) {
-    id
-    name
     attendance(after: $after, first: $first, sort: $sort) {
       totalCount
       pageInfo {
@@ -92,13 +105,7 @@ query attendance(
       edges {
         cursor
         node {
-          attendee {
-            ...CourseAttendee
-          }
-          attendanceRecords {
-            online
-            hoursAttended
-          }
+          ...Attendance
         }
       }
       sessions {
@@ -193,6 +200,41 @@ mutation deleteCourseAttendee($id: ObjectId!) {
     message
     data {
       ...CourseAttendee
+    }
+  }
+}
+
+mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
+  changeCourseAttendeeStatus(id: $id, status: $status) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation updateAttendanceHours($id: ObjectId!, $hours: Float!) {
+  updateAttendanceHours(id: $id, hours: $hours) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
+    }
+  }
+}
+
+mutation updateAttendanceOnline($id: ObjectId!, $online: Boolean!) {
+  updateAttendanceOnline(id: $id, online: $online) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
     }
   }
 }
