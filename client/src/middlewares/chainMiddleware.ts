@@ -24,3 +24,5 @@ export function chain(
     return res;
   };
 }
+
+export function parseSubdomain() {}

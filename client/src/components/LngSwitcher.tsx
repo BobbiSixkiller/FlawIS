@@ -10,9 +10,10 @@ import Link from "next/link";
 
 export default function LngSwitcher({
   authLayout,
+  className,
 }: {
-  className?: string;
   authLayout?: boolean;
+  className?: string;
 }) {
   const path = usePathname();
   const { lng } = useParams<{ lng: string }>();
@@ -21,8 +22,8 @@ export default function LngSwitcher({
 
   return (
     <Dropdown
-      className="w-full"
-      positionSettings={authLayout ? "mt-2 right-0" : "inset-x-0 -top-24"}
+      anchor={{ gap: 6, to: authLayout ? "bottom end" : "top" }}
+      className={className}
       trigger={
         authLayout ? (
           <Button size="icon" variant="ghost" className="rounded-full">

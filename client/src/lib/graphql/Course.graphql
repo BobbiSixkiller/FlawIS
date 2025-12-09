@@ -62,6 +62,7 @@ fragment Attendance on Attendance {
     status
   }
   attendanceRecords {
+    id
     online
     hoursAttended
   }
@@ -213,8 +214,8 @@ mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
   }
 }
 
-mutation updateAttendanceHours($id: ObjectId!, $hours: Float!) {
-  updateAttendanceHours(id: $id, hours: $hours) {
+mutation updateAttendanceHours($id: ObjectId!, $hoursAttended: Float!) {
+  updateAttendanceHours(id: $id, hoursAttended: $hoursAttended) {
     message
     data {
       hoursAttended

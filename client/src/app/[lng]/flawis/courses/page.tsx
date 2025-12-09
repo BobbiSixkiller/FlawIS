@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
-import { translate } from "@/lib/i18n";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import CourseForm from "./CourseForm";
 import { getCourses } from "./actions";

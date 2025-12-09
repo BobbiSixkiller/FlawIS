@@ -1,0 +1,20 @@
+{
+  "link": "Prejsť na kurz",
+
+  "applied": {
+    "subject": "Prihláška na kurz – vytvorená",
+    "body": "Požiadali ste o kurz: '{course}'. Keď sa stav vašej prihlášky zmení, dostanete upozornenie."
+  },
+  "eligible": {
+    "subject": "Prihláška na kurz – potvrdená fakultou",
+    "body": "Vaša žiadosť o kurz: '{course}' bola posúdená a schválená oddelením, ktoré vybavuje kurzy na Právnickej fakulte Univerzity Komenského v Bratislave. O zmene stavu Vašej prihlášky Vás budeme informovať."
+  },
+  "accepted": {
+    "subject": "Prihláška na kurz – prijatá",
+    "body": "Blahoželáme! Vaša žiadosť o kurz: '{course}' bola prijatá. Ďalšie podrobnosti o kurzi a ďalších krokoch vám čoskoro oznámime."
+  },
+  "rejected": {
+    "subject": "Prihláška na kurz – zamietnutá",
+    "body": "S poľutovaním vám oznamujeme, že vaša žiadosť o kurz: '{course}' nebola úspešná. Ďakujeme za váš záujem a odporúčame, aby ste sa v budúcnosti prihlásili znova."
+  }
+}

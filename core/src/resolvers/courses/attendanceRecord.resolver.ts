@@ -35,7 +35,7 @@ export class AttendanceRecordResolver {
   @Mutation(() => AttendanceRecordMutationResponse)
   async updateAttendanceHours(
     @Arg("id") id: ObjectId,
-    @Arg("hours") hoursAttended: number
+    @Arg("hoursAttended") hoursAttended: number
   ): Promise<AttendanceRecordMutationResponse> {
     const res = await this.courseService.updateAttendance(id, {
       hoursAttended,

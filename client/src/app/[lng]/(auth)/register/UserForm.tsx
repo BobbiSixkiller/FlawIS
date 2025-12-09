@@ -9,7 +9,12 @@ import { Input, InputProps } from "@/components/Input";
 import CheckBox from "@/components/Checkbox";
 import PhoneInput from "@/components/PhoneInput";
 import parsePhoneNumberFromString from "libphonenumber-js";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import Select from "@/components/Select";
 import {
   Access,
@@ -53,6 +58,8 @@ export default function UserForm({
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
   const scrollToTop = useScrollStore((s) => s.getScroll);
+
+  const router = useRouter();
 
   return (
     <RHFormContainer
@@ -152,7 +159,7 @@ export default function UserForm({
             is: () =>
               subdomain?.includes("conferences") ||
               subdomain?.includes("intern") ||
-              ctxUser?.access.includes(Access.Student),
+              subdomain?.includes("courses"),
             then: (schema) =>
               schema
                 .required()
@@ -185,7 +192,9 @@ export default function UserForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required()
           .when({
-            is: () => ctxUser?.access.includes(Access.Student),
+            is: () =>
+              ctxUser?.access.includes(Access.Student) ||
+              ctxUser?.access.includes(Access.CourseAttendee),
             then: (schema) =>
               schema.min(1, (val) =>
                 t("minFiles", { value: val.min, ns: "validation" })
@@ -200,7 +209,7 @@ export default function UserForm({
     >
       {(methods) => (
         <form
-          className="space-y-6"
+          className="space-y-6 sm:w-96"
           onSubmit={methods.handleSubmit(
             async (val) => {
               const { error, url: cvUrl } = await uploadOrDelete(
@@ -279,6 +288,10 @@ export default function UserForm({
 
               if (res?.success && dialogId) {
                 closeDialog(dialogId);
+              }
+
+              if (path.includes("/profile/update")) {
+                router.back();
               }
             },
             (errors) => console.log(errors)
@@ -364,6 +377,12 @@ export default function UserForm({
                   { name: "2. magisterský", value: StudyProgramme.Master2 },
                 ]}
               />
+            </>
+          )}
+
+          {path.includes("users") ||
+            user?.access.includes(Access.Student) ||
+            (user?.access.includes(Access.CourseAttendee) && (
               <MultipleFileUploadField
                 control={methods.control}
                 setError={methods.setError}
@@ -376,8 +395,7 @@ export default function UserForm({
                 }}
                 fileSources={{ resumes: user?.cvUrl }}
               />
-            </>
-          )}
+            ))}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>

@@ -9,4 +9,4 @@ export const config = {
   ],
 };
 
-export default chain([withAuth, withLocalization, withSubdomain]);
+export default chain([withLocalization, withAuth, withSubdomain]);

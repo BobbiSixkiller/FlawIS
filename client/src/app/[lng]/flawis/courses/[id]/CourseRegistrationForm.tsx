@@ -9,7 +9,7 @@ import useValidation from "@/hooks/useValidation";
 import { CourseFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { uploadToMinio } from "@/utils/helpers";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { createCourseAttendee, updateCourseAttendeeFiles } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
@@ -18,9 +18,11 @@ import { deleteFiles } from "@/lib/minio";
 export default function CourseRegistrationForm({
   course,
   dialogId,
+  redirect,
 }: {
   course: CourseFragment;
-  dialogId: string;
+  dialogId?: string;
+  redirect?: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, ["validation", "conferences"]);
@@ -32,8 +34,11 @@ export default function CourseRegistrationForm({
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const router = useRouter();
+
   return (
     <WizzardForm
+      className="sm:w-96 mx-auto flex flex-col"
       lng={lng}
       defaultValues={{ files: [], billing: undefined }}
       onSubmitCb={async (vals, methods) => {
@@ -75,7 +80,13 @@ export default function CourseRegistrationForm({
         setMessage(res.message, res.success);
 
         if (res.success) {
-          closeDialog(dialogId);
+          if (dialogId) {
+            closeDialog(dialogId);
+          } else if (redirect) {
+            router.push(redirect);
+          } else {
+            router.back();
+          }
         }
       }}
     >

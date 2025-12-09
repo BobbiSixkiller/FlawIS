@@ -14,6 +14,7 @@ import {
   CourseAttendeeArgs,
   CourseAttendeeConnection,
 } from "../resolvers/types/course/courseAttendee.types";
+import { CtxUser } from "../util/types";
 
 @Service()
 export class CourseAttendeeRepository extends Repository<

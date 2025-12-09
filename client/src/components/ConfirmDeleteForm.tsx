@@ -50,7 +50,7 @@ export default function ConfirmDeleteForm<TData>({
         disabled={isPending}
         className="w-full"
       >
-        {isPending ? <Spinner /> : t("confirm")}
+        {isPending ? <Spinner inverted /> : t("confirm")}
       </Button>
     </form>
   );

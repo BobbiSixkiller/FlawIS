@@ -8,13 +8,14 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Spinner from "./Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 
 interface ModalProps {
   dialogId: string;
   isInterceptingRoute?: boolean;
+  redirect?: string;
   title?: string;
   togglerHidden?: boolean;
   children: ReactNode;
@@ -28,6 +29,7 @@ export default function Modal({
   isInterceptingRoute = false,
 }: ModalProps) {
   const router = useRouter();
+  const path = usePathname();
 
   const isOpen = useDialogStore((s) => s.isDialogOpen(dialogId));
   const openDialog = useDialogStore((s) => s.openDialog);
@@ -37,9 +39,16 @@ export default function Modal({
     if (isInterceptingRoute) {
       openDialog(dialogId);
     }
-  }, [dialogId, isInterceptingRoute, openDialog]);
+
+    return () => {
+      closeDialog(dialogId);
+    };
+  }, [dialogId, isInterceptingRoute, openDialog, closeDialog, path]);
 
   const handleClose = () => {
+    if (togglerHidden) {
+      return;
+    }
     // Blur whatever is currently focused inside the dialog
     const active = document.activeElement as HTMLElement | null;
     if (active && active.blur) active.blur();
@@ -47,12 +56,17 @@ export default function Modal({
     closeDialog(dialogId);
     if (isInterceptingRoute) {
       // Let the route interceptor go back when dialog fully closed
-      router.back();
+      return setTimeout(() => router.back(), 300);
     }
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
+    <Dialog
+      open={isOpen}
+      onClose={handleClose}
+      onAnimationEnd={() => console.log("ENDS")}
+      className="relative z-50"
+    >
       {/* Backdrop with built-in transition */}
       <DialogBackdrop
         transition

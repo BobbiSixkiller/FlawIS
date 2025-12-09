@@ -15,6 +15,7 @@ import { Access } from "../../entitites/User";
 import { MinioService } from "../minio.service";
 import { Repository } from "../../repositories/base.repository";
 import { AttendanceRecord } from "../../entitites/Course";
+import { RmqService, RoutingKey } from "../rmq.service";
 
 @Service()
 export class CourseAttendeeService {
@@ -27,7 +28,8 @@ export class CourseAttendeeService {
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
     private readonly i18nService: I18nService,
-    private readonly minioService: MinioService
+    private readonly minioService: MinioService,
+    private readonly rmqService: RmqService
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
@@ -51,6 +53,7 @@ export class CourseAttendeeService {
   }
 
   async createCourseAttendee(
+    hostname: string,
     courseId: ObjectId,
     userId: ObjectId,
     fileUrls: string[],
@@ -120,6 +123,18 @@ export class CourseAttendeeService {
 
       await session.commitTransaction();
 
+      this.rmqService.produceMessage(
+        JSON.stringify({
+          locale: this.i18nService.language(),
+          hostname,
+          name: user.name,
+          email: user.email,
+          courseId: course.id,
+          course: course.name,
+        }),
+        "mail.courses.applied"
+      );
+
       return toDTO(attendee);
     } catch (error) {
       await session.abortTransaction();
@@ -160,7 +175,11 @@ export class CourseAttendeeService {
     }
   }
 
-  async updateAttendeeStatus(attendeeId: ObjectId, status: Status) {
+  async updateAttendeeStatus(
+    attendeeId: ObjectId,
+    status: Status,
+    hostname: string
+  ) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -173,6 +192,28 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
+      const course = await this.courseRepository.findOne(
+        {
+          _id: attendee.course,
+        },
+        null,
+        { session }
+      );
+      if (!course) {
+        throw new Error("Course not found!");
+      }
+
+      await this.rmqService.produceMessage(
+        JSON.stringify({
+          locale: this.i18nService.language(),
+          hostname,
+          name: attendee.user.name,
+          email: attendee.user.email,
+          courseId: course.id,
+          course: course.name,
+        }),
+        `mail.courses.${status.toLowerCase()}` as RoutingKey
+      );
 
       await session.commitTransaction();
 

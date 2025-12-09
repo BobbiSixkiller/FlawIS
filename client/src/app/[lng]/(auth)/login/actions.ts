@@ -35,7 +35,7 @@ export async function login(email: string, password: string, url?: string) {
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
 
-    redirect(url ? url : "/", RedirectType.replace);
+    // redirect(url ? url : "/", RedirectType.replace);
   }
 
   return res;

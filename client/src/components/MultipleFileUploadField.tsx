@@ -67,8 +67,6 @@ export default function MultipleFileUploadField({
   const [files, setFiles] = useState<UploadableFile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  console.log(loading);
-
   useEffect(() => {
     setValue(
       name,
@@ -80,18 +78,10 @@ export default function MultipleFileUploadField({
   useEffect(() => {
     async function prefillFiles() {
       if (!fileSources) {
-        console.log("SHIT");
         return setLoading(false);
       }
 
       const loadedFiles: UploadableFile[] = [];
-
-      await new Promise((res) =>
-        setTimeout(() => {
-          console.log("TIMW OUT");
-          res("finished");
-        }, 5000)
-      );
 
       await Promise.all(
         Object.entries(fileSources).map(async ([bucket, urls]) => {
@@ -110,8 +100,6 @@ export default function MultipleFileUploadField({
           }
         })
       );
-
-      console.log(loadedFiles);
 
       setFiles(loadedFiles);
 
@@ -231,17 +219,17 @@ function SingleUploadProgress({
 }: SingleUploadProgressProps) {
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    // async function upload() {
-    //   const res = await uploadFile(file, setProgress);
-    //   onUpload(file, res.data || undefined, res.errors || []);
-    // }
+  // useEffect(() => {
+  //   async function upload() {
+  //     const res = await uploadFile(file, setProgress);
+  //     onUpload(file, res.data || undefined, res.errors || []);
+  //   }
 
-    // if (errors.length === 0 && uploadedFile === undefined) {
-    //   upload();
-    // }
-    onUpload(file, "", errors);
-  }, []);
+  //   if (errors.length === 0 && uploadedFile === undefined) {
+  //     upload();
+  //   }
+  //   onUpload(file, "", errors);
+  // }, []);
 
   function uploadFile(file: File, onProgress: (percentage: number) => void) {
     console.log("Uploading", file.name);

@@ -12,6 +12,7 @@ type AcademicYear {
 enum Access {
   Admin
   ConferenceAttendee
+  CourseAttendee
   Organization
   Student
 }
@@ -618,7 +619,7 @@ type Mutation {
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
-  updateAttendanceHours(hours: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
+  updateAttendanceHours(hoursAttended: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
   updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!

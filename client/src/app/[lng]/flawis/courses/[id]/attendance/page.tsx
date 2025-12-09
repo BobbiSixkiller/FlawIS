@@ -6,7 +6,6 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/components/Modal";
 import CourseSessionForm from "../CourseSessionForm";
 import { getCourseAttendance } from "./actions";
-import { formatDatetimeLocal } from "@/utils/helpers";
 import { Status } from "@/lib/graphql/generated/graphql";
 import { getCourse } from "../actions";
 import { AttendanceTable } from "./AttendanceTable";

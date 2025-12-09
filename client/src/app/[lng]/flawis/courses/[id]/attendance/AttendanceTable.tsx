@@ -226,8 +226,8 @@ function AttendanceRow({
                   key={i}
                   className="p-2 text-center w-[120px] min-w-[120px] max-w-[120px] flex justify-center items-center"
                 >
-                  <OnlineSwitch online={r?.online ?? false} />
-                  <HoursAttended hours={r?.hoursAttended!} />
+                  <OnlineSwitch id={r!.id} online={r?.online ?? false} />
+                  <HoursAttended id={r!.id} hoursAttended={r!.hoursAttended} />
                 </div>
               ))}
             </div>

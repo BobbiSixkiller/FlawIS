@@ -26,7 +26,7 @@ export default function ActivateAccountDialog({
   const setMessage = useMessageStore((s) => s.setMessage);
 
   useEffect(() => {
-    if (user?.verified) {
+    if (user && user?.verified) {
       closeDialog(dialogId);
     } else {
       openDialog(dialogId);

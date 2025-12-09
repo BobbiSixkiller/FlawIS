@@ -24,6 +24,7 @@ import {
 import { CourseAttendeeService } from "../../services/courses/courseAttendee.service";
 import { Context } from "../../util/auth";
 import { CourseAttendeeArgs } from "../types/course/courseAttendee.types";
+import { Access } from "../../entitites/User";
 
 @Service()
 @Resolver(() => Course)
@@ -91,7 +92,13 @@ export class CourseResolver {
 
   @Authorized()
   @FieldResolver(() => AttendanceConnection)
-  async attendance(@Root() { id }: Course, @Args() args: CourseAttendeeArgs) {
-    return await this.courseService.attendance(args, id);
+  async attendance(
+    @Root() { id }: Course,
+    @Args() args: CourseAttendeeArgs,
+    @Ctx() { user }: Context
+  ): Promise<AttendanceConnection> {
+    return user?.access.includes(Access.Admin)
+      ? await this.courseService.attendance(args, id)
+      : await this.courseService.myAttendance(id, user!);
   }
 }

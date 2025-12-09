@@ -30,6 +30,7 @@ export type AcademicYear = {
 export enum Access {
   Admin = 'Admin',
   ConferenceAttendee = 'ConferenceAttendee',
+  CourseAttendee = 'CourseAttendee',
   Organization = 'Organization',
   Student = 'Student'
 }
@@ -855,7 +856,7 @@ export type MutationToggleVerifiedUserArgs = {
 
 
 export type MutationUpdateAttendanceHoursArgs = {
-  hours: Scalars['Float']['input'];
+  hoursAttended: Scalars['Float']['input'];
   id: Scalars['ObjectId']['input'];
 };
 
@@ -1638,7 +1639,7 @@ export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, cou
 
 export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } };
 
-export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', online?: boolean | null, hoursAttended: number } | null> };
+export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
 
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1664,7 +1665,7 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } | null> } } };
+export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
@@ -1744,7 +1745,7 @@ export type ChangeCourseAttendeeStatusMutation = { __typename?: 'Mutation', chan
 
 export type UpdateAttendanceHoursMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
-  hours: Scalars['Float']['input'];
+  hoursAttended: Scalars['Float']['input'];
 }>;
 
 
@@ -2556,6 +2557,7 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
     status
   }
   attendanceRecords {
+    id
     online
     hoursAttended
   }
@@ -4365,6 +4367,7 @@ fragment Attendance on Attendance {
     status
   }
   attendanceRecords {
+    id
     online
     hoursAttended
   }
@@ -4735,8 +4738,8 @@ export const ChangeCourseAttendeeStatusDocument = new TypedDocumentString(`
   updatedAt
 }`) as unknown as TypedDocumentString<ChangeCourseAttendeeStatusMutation, ChangeCourseAttendeeStatusMutationVariables>;
 export const UpdateAttendanceHoursDocument = new TypedDocumentString(`
-    mutation updateAttendanceHours($id: ObjectId!, $hours: Float!) {
-  updateAttendanceHours(id: $id, hours: $hours) {
+    mutation updateAttendanceHours($id: ObjectId!, $hoursAttended: Float!) {
+  updateAttendanceHours(id: $id, hoursAttended: $hoursAttended) {
     message
     data {
       hoursAttended

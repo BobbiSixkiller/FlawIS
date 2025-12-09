@@ -39,11 +39,14 @@ export class CourseAttendeeResolver {
   async createCourseAttendee(
     @Arg("courseId") courseId: ObjectId,
     @Arg("fileUrls", () => [String]) fileUrls: string[],
-    @Ctx() { user }: Context,
+    @Ctx() { req, user }: Context,
     @Arg("billing", () => AttendeeBillingInput, { nullable: true })
     billing?: AttendeeBillingInput
   ): Promise<CourseAttendeeMutationResponse> {
+    const hostname = req.headers["tenant-domain"] as string;
+
     const attendee = await this.courseAttendeeService.createCourseAttendee(
+      hostname,
       courseId,
       user!.id,
       fileUrls,
@@ -73,11 +76,15 @@ export class CourseAttendeeResolver {
   @Mutation(() => CourseAttendeeMutationResponse)
   async changeCourseAttendeeStatus(
     @Arg("id") id: ObjectId,
-    @Arg("status", () => Status) status: Status
+    @Arg("status", () => Status) status: Status,
+    @Ctx() { req }: Context
   ): Promise<CourseAttendeeMutationResponse> {
+    const hostname = req.headers["tenant-domain"] as string;
+
     const attendee = await this.courseAttendeeService.updateAttendeeStatus(
       id,
-      status
+      status,
+      hostname
     );
 
     return { message: "Status ucastnika bol zmeneny!", data: attendee };

@@ -119,6 +119,9 @@ export class UserService {
     if (hostname?.includes("conferences")) {
       access.push(Access.ConferenceAttendee);
     }
+    if (hostname.includes("courses")) {
+      access.push(Access.CourseAttendee);
+    }
     if (hostname?.includes("intern")) {
       if (token && token !== "undefined") {
         await this.tokenService.verifyOneTimeToken(token);

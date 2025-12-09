@@ -31,7 +31,7 @@ export default async function Logo({
     <div
       className={cn([
         "flex gap-4 font-normal",
-        inverted || theme === "dark" ? "text-white" : "text-gray-900",
+        inverted || theme === "dark" ? "text-white/85" : "text-gray-900",
         className,
       ])}
     >

@@ -18,6 +18,8 @@ import { toDTO } from "../../util/helpers";
 import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { Status } from "../../entitites/Internship";
+import { RmqService } from "../rmq.service";
+import { CtxUser } from "../../util/types";
 
 @Service()
 export class CourseService {
@@ -164,7 +166,6 @@ export class CourseService {
         { session: id },
         { session }
       );
-      console.log(res);
 
       await session.commitTransaction();
 
@@ -201,6 +202,7 @@ export class CourseService {
         {
           _id: attendanceRecord.session,
         },
+        null,
         { session }
       );
       if (!courseSession) {
@@ -228,6 +230,94 @@ export class CourseService {
     } finally {
       session.endSession();
     }
+  }
+
+  async myAttendance(
+    courseId: ObjectId,
+    ctxUser: CtxUser
+  ): Promise<AttendanceConnection> {
+    const attendee = await this.courseAttendeeRepository.findOne({
+      course: courseId,
+      "user._id": ctxUser.id,
+    });
+
+    if (!attendee) {
+      throw new Error("You are not registered for this course.");
+    }
+
+    // 2) Load sessions for the course
+    const sessions = await this.courseSessionRepository.findAll(
+      { course: courseId },
+      null,
+      { sort: { _id: 1 } }
+    );
+
+    // If not accepted, you can still return sessions + empty records
+    if (attendee.status !== Status.Accepted) {
+      return {
+        totalCount: 1,
+        edges: [
+          {
+            cursor: attendee.id.toString(),
+            node: {
+              attendee: toDTO(attendee), // or toDTO(attendee)
+              attendanceRecords: [],
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: attendee.id.toString(),
+        },
+        sessions,
+      };
+    }
+
+    // 3) Fetch or create attendance records for this attendee like in your matrix method
+    const existingRecords = await this.attendanceRecordRepository.findAll(
+      {
+        attendee: attendee.id,
+        session: { $in: sessions.map((s) => s._id) },
+      },
+      null,
+      { sort: { session: 1 } }
+    );
+
+    const attendanceRecords: AttendanceRecord[] = [];
+    for (const session of sessions) {
+      const exists = existingRecords.find(
+        (record) => record.session.toString() === session.id
+      );
+      if (exists) {
+        attendanceRecords.push(toDTO(exists));
+      } else {
+        const newRecord = await this.attendanceRecordRepository.create({
+          session: session._id,
+          attendee: attendee.id,
+          hoursAttended: 0,
+        });
+        attendanceRecords.push(toDTO(newRecord));
+      }
+    }
+
+    // 4) Return the same connection shape, just with one edge
+    return {
+      totalCount: 1,
+      edges: [
+        {
+          cursor: attendee.id.toString(),
+          node: {
+            attendee,
+            attendanceRecords,
+          },
+        },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        endCursor: attendee.id.toString(),
+      },
+      sessions,
+    };
   }
 
   async attendance(

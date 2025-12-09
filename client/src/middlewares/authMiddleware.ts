@@ -17,7 +17,18 @@ export function withAuth(middleware: CustomMiddleware) {
     const pathWithoutLocale = url.pathname.replace(localeRegex, "");
     const token = req.cookies.get("accessToken")?.value;
 
-    if (!token && !publicPaths.some((path) => path === pathWithoutLocale)) {
+    const subdomain = url.hostname.split(".")[0];
+
+    const isCoursesPublic =
+      (subdomain.includes("courses") ||
+        process.env.NODE_ENV === "development") &&
+      (pathWithoutLocale === "/" || /^\/[^/]+$/.test(pathWithoutLocale));
+
+    const isGlobalPublic = publicPaths.some(
+      (path) => path === pathWithoutLocale
+    );
+
+    if (!token && !isGlobalPublic && !isCoursesPublic) {
       const loginUrl = new URL("/login", url.origin);
 
       if (url.pathname !== "/" && url.pathname !== "/logout") {

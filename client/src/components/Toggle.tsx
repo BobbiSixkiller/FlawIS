@@ -4,10 +4,12 @@ import { ReactNode, useState } from "react";
 import { Field, Label, Switch } from "@headlessui/react";
 import { cn } from "@/utils/helpers";
 
-const sizeVals = {
+const sizeMap = {
   regular: { container: "h-[38px] w-[74px]", btn: "h-[34px] w-[34px]" },
   small: { container: "h-[26px] w-[42px]", btn: "h-[22px] w-[22px]" },
 };
+
+type SizeType = keyof typeof sizeMap;
 
 export default function Toggle({
   label,
@@ -22,7 +24,7 @@ export default function Toggle({
   defaultChecked: boolean;
   handleToggle: () => void;
   icon?: ReactNode;
-  size?: "regular" | "small";
+  size?: SizeType;
 }) {
   const [enabled, setEnabled] = useState(defaultChecked);
 
