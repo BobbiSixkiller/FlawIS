@@ -40,7 +40,7 @@ export default function Toggle({
         }}
         className={cn([
           enabled ? "bg-primary-700" : "bg-primary-400",
-          sizeVals[size].container,
+          sizeMap[size].container,
           "relative inline-flex  shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-primary-500",
         ])}
       >
@@ -53,7 +53,7 @@ export default function Toggle({
                 ? "translate-x-9"
                 : "translate-x-4"
               : "translate-x-0",
-            sizeVals[size].btn,
+            sizeMap[size].btn,
             "pointer-events-none inline-flex transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out items-center justify-center",
           ])}
         >
