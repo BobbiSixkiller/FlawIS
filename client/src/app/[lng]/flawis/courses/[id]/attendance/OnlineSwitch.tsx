@@ -8,14 +8,17 @@ import { useMessageStore } from "@/stores/messageStore";
 export default function OnlineSwitch({
   online,
   id,
+  disabled = false,
 }: {
   online: boolean;
   id: string;
+  disabled?: boolean;
 }) {
   const setMessage = useMessageStore((s) => s.setMessage);
 
   return (
     <Toggle
+      disabled={disabled}
       size="small"
       defaultChecked={online}
       handleToggle={async () => {

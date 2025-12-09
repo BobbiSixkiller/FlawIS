@@ -82,7 +82,7 @@ function AttendanceTableContainer({
     <div
       ref={scrollRef}
       className={cn(
-        "overflow-auto max-h-[70vh] border rounded-lg text-sm w-fit max-w-full"
+        "overflow-auto max-h-[70vh] border dark:border-gray-600 rounded-lg text-sm w-fit max-w-full"
       )}
     >
       {/* This lets the inner table grow to content width */}
@@ -90,7 +90,7 @@ function AttendanceTableContainer({
         {/* Header row */}
         <div
           className={cn(
-            "sticky top-0 z-[19] grid grid-cols-[150px_auto] bg-gray-50",
+            "sticky top-0 z-[19] grid grid-cols-[150px_auto] bg-gray-50 dark:bg-gray-800",
             scrollState.vertical && "shadow-bottom"
           )}
         >
@@ -98,7 +98,7 @@ function AttendanceTableContainer({
           <div
             className={cn(
               "p-2 w-[150px] min-w-[150px] max-w-[150px] inline-flex items-center justify-center",
-              "sticky left-0 z-[19] text-nowrap bg-gray-50 border-b border-r",
+              "sticky left-0 z-[19] text-nowrap bg-gray-50 dark:bg-gray-800 border-b border-r dark:border-gray-600 dark:text-white/85",
               scrollState.horizontal &&
                 "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]"
             )}
@@ -111,7 +111,10 @@ function AttendanceTableContainer({
             {sessions.map((s) => (
               <div
                 key={s?.id}
-                className="w-[120px] min-w-[120px] max-w-[120px] p-2 text-nowrap text-sm font-medium text-gray-600 bg-gray-50 border-b border-gray-200 inline-flex items-center gap-2"
+                className={cn([
+                  "w-[120px] min-w-[120px] max-w-[120px] p-2 text-nowrap text-sm font-medium text-gray-600 bg-gray-50 border-b border-gray-200 inline-flex items-center gap-2",
+                  "dark:bg-gray-800 dark:border-gray-600 dark:text-white/85",
+                ])}
               >
                 <ModalTrigger dialogId={`session:${s?.id}`}>
                   <button className="w-full cursor-pointer text-center">
@@ -196,9 +199,11 @@ function AttendanceTableContainer({
 function AttendanceRow({
   data,
   scrollState,
+  sessions,
 }: {
   data?: AttendanceFragment;
   scrollState?: ScrollState;
+  sessions: AttendanceQuery["course"]["attendance"]["sessions"];
 }) {
   const isAccepted = data?.attendee.status === Status.Accepted;
   const enableDelete = data?.attendee.status === Status.Rejected;
@@ -207,10 +212,16 @@ function AttendanceRow({
 
   return (
     <>
-      <div className="grid grid-cols-[150px_auto] relative border-b border-gray-100">
+      <div
+        className={cn([
+          "grid grid-cols-[150px_auto] relative border-b border-gray-100",
+          "dark:border-gray-600",
+        ])}
+      >
         {/* Sticky attendee column */}
         <div
           className={cn([
+            "dark:bg-gray-800 dark:border-gray-600 dark:text-white/85",
             "w-[150px] min-w-[150px] max-w-[150px] sticky left-0 z-10 bg-white p-2 truncate border-r flex items-center justify-center",
             scrollState?.horizontal &&
               "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]",
@@ -232,20 +243,36 @@ function AttendanceRow({
         {/* Second column: either session cells or sticky "Change status!" */}
         <div className="relative">
           {isAccepted ? (
-            <div className="flex divide-x">
-              {data?.attendanceRecords.map((r, i) => (
-                <div
-                  key={i}
-                  className="p-2 text-center w-[120px] min-w-[120px] max-w-[120px] flex justify-center items-center"
-                >
-                  <OnlineSwitch id={r!.id} online={r?.online ?? false} />
-                  <HoursAttended id={r!.id} hoursAttended={r!.hoursAttended} />
-                </div>
-              ))}
+            <div className="flex divide-x dark:divide-gray-600">
+              {data?.attendanceRecords.map((r, i) => {
+                const switchDisabled =
+                  new Date(sessions[i]?.start).getMilliseconds() < Date.now();
+                return (
+                  <div
+                    key={i}
+                    className="p-2 text-center w-[120px] min-w-[120px] max-w-[120px] flex justify-center items-center"
+                  >
+                    <OnlineSwitch
+                      id={r!.id}
+                      online={r?.online ?? false}
+                      disabled={switchDisabled}
+                    />
+                    <HoursAttended
+                      id={r!.id}
+                      hoursAttended={r!.hoursAttended}
+                    />
+                  </div>
+                );
+              })}
             </div>
           ) : (
             // This stays stuck immediately to the right of the name
-            <div className="sticky left-[150px] p-2 inline-flex items-center gap-2 text-gray-600 bg-white z-10">
+            <div
+              className={cn([
+                "sticky left-[150px] p-2 inline-flex items-center gap-2 text-gray-600 bg-white z-10",
+                "dark:bg-gray-800 dark:text-white/85",
+              ])}
+            >
               <ModalTrigger dialogId={`accept-dialog:${data?.attendee.id}`}>
                 <Button
                   size="icon"
@@ -347,11 +374,20 @@ const AttendancePlaceholder = ({
 }: {
   cardRef?: React.Ref<HTMLDivElement>;
 }) => (
-  <tr ref={cardRef as any}>
-    <td colSpan={100} className="p-4 text-center text-gray-400">
-      Loading more attendees...
-    </td>
-  </tr>
+  <div
+    ref={cardRef}
+    className={cn([
+      "grid grid-cols-[150px_auto] relative border-b border-gray-100",
+      "dark:border-gray-600",
+    ])}
+  >
+    <div className="animate-pulse">
+      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded w-1/3"></div>
+    </div>
+    <div className="animate-pulse">
+      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded w-1/3"></div>
+    </div>
+  </div>
 );
 
 export function AttendanceTable({
@@ -368,7 +404,9 @@ export function AttendanceTable({
     vars,
     getData: getCourseAttendance,
     initialData,
-    ListItem: (props) => <AttendanceRow {...props} />,
+    ListItem: (props) => (
+      <AttendanceRow sessions={initialData.sessions} {...props} />
+    ),
     Container: (props) => (
       <AttendanceTableContainer sessions={initialData.sessions} {...props} />
     ),

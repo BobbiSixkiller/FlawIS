@@ -47,7 +47,7 @@ export default function HoursAttended({
         <input
           disabled={!user?.access.includes(Access.Admin)}
           type="number"
-          className="border-none text-right p-0 text-sm focus:ring-transparent w-6"
+          className="border-none text-right p-0 text-sm focus:ring-transparent w-6 bg-transparent"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={(e) => {
