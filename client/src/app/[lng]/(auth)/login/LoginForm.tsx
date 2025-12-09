@@ -38,7 +38,10 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             }
 
             if (res.success) {
-              return (window.location.href = url ? url : "/");
+              return setTimeout(
+                () => window.location.replace(url ? url : "/"),
+                300
+              );
             }
           })}
         >

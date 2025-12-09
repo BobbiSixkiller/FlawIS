@@ -5,7 +5,6 @@ import {
   AttendanceFragment,
   AttendanceQuery,
   AttendanceQueryVariables,
-  CourseSession,
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { cn, formatDatetimeLocal } from "@/utils/helpers";
@@ -76,6 +75,9 @@ function AttendanceTableContainer({
     return () => el.removeEventListener("scroll", handler);
   }, []);
 
+  const user = useUser();
+  const isAdmin = user?.access.includes(Access.Admin);
+
   return (
     <div
       ref={scrollRef}
@@ -118,15 +120,17 @@ function AttendanceTableContainer({
                     </span>
                   </button>
                 </ModalTrigger>
-                <ModalTrigger dialogId="delete-session">
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-fit w-fit p-2"
-                  >
-                    <TrashIcon className="size-3" />
-                  </Button>
-                </ModalTrigger>
+                {isAdmin && (
+                  <ModalTrigger dialogId="delete-session">
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="h-fit w-fit p-2"
+                    >
+                      <TrashIcon className="size-3" />
+                    </Button>
+                  </ModalTrigger>
+                )}
                 <Modal
                   dialogId={`session:${s?.id}`}
                   title={`${s?.name}, ${formatDatetimeLocal(s?.start, false)}`}
@@ -141,20 +145,24 @@ function AttendanceTableContainer({
                     />
                   )}
 
-                  <ModalTrigger dialogId={`session:${s?.id}-edit`}>
-                    <Button size="icon" className="mt-6">
-                      <PencilIcon className="size-5" />
-                    </Button>
-                  </ModalTrigger>
-                  <Modal
-                    dialogId={`session:${s?.id}-edit`}
-                    title="Upravit termin"
-                  >
-                    <CourseSessionForm
-                      dialogId={`session:${s?.id}-edit`}
-                      courseSession={s!}
-                    />
-                  </Modal>
+                  {isAdmin && (
+                    <>
+                      <ModalTrigger dialogId={`session:${s?.id}-edit`}>
+                        <Button size="icon" className="mt-6">
+                          <PencilIcon className="size-5" />
+                        </Button>
+                      </ModalTrigger>
+                      <Modal
+                        dialogId={`session:${s?.id}-edit`}
+                        title="Upravit termin"
+                      >
+                        <CourseSessionForm
+                          dialogId={`session:${s?.id}-edit`}
+                          courseSession={s!}
+                        />
+                      </Modal>
+                    </>
+                  )}
                 </Modal>
                 <Modal dialogId="delete-session" title="Zmazat termin">
                   <ConfirmDeleteForm
@@ -203,18 +211,22 @@ function AttendanceRow({
         {/* Sticky attendee column */}
         <div
           className={cn([
-            "w-[150px] min-w-[150px] max-w-[150px] sticky left-0 z-10 bg-white p-2 truncate border-r flex items-center",
+            "w-[150px] min-w-[150px] max-w-[150px] sticky left-0 z-10 bg-white p-2 truncate border-r flex items-center justify-center",
             scrollState?.horizontal &&
               "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]",
           ])}
         >
-          <ModalTrigger dialogId={`attendee:${data?.attendee.id}`}>
-            <button className="w-full cursor-pointer text-center">
-              <span className="hover:underline">
-                {data?.attendee.user.name}
-              </span>
-            </button>
-          </ModalTrigger>
+          {user?.access.includes(Access.Admin) ? (
+            <ModalTrigger dialogId={`attendee:${data?.attendee.id}`}>
+              <button className="w-full cursor-pointer text-center">
+                <span className="hover:underline">
+                  {data?.attendee.user.name}
+                </span>
+              </button>
+            </ModalTrigger>
+          ) : (
+            <span>{data?.attendee.user.name}</span>
+          )}
         </div>
 
         {/* Second column: either session cells or sticky "Change status!" */}

@@ -30,6 +30,8 @@ export default async function CoursesPage({
 
   const initialData = await getCourses({ sort: [] });
 
+  await new Promise((res) => setTimeout(() => res(null), 10000));
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold leading-7 text-center">Kurzy</h1>

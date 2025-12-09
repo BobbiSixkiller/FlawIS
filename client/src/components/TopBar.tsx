@@ -79,6 +79,7 @@ export default function TopBar({
 
           {avatar ? (
             <Dropdown
+              anchor={{ gap: 6, to: "bottom end" }}
               trigger={
                 <Button
                   size="icon"

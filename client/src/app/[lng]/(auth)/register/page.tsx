@@ -1,11 +1,11 @@
 import { Trans } from "react-i18next/TransWithoutContext";
-import { headers } from "next/headers";
 import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
 import { FormMessage } from "@/components/Message";
 import Link from "next/link";
+import { getSubdomain } from "@/utils/actions";
 
 export default async function Register({
   params,
@@ -18,9 +18,7 @@ export default async function Register({
   const { url } = await searchParams;
   const { t } = await translate(lng, "register");
 
-  const headerStore = await headers();
-  const host = headerStore.get("host") || ""; // Get the hostname from the request
-  const subdomain = host.split(".")[0]; // Parse the subdomain (assuming subdomain is the first part)
+  const subdomain = await getSubdomain();
 
   return (
     <div className="flex flex-col gap-4">

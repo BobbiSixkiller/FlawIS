@@ -2,7 +2,6 @@ import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { cookies, headers } from "next/headers";
 import ActivateAccountDialog from "../(auth)/ActivateAccountDialog";
-import SessionPolling from "@/components/SessionPolling";
 import { getMe } from "../(auth)/actions";
 import Logo from "@/components/Logo";
 import { cn } from "@/utils/helpers";
@@ -96,11 +95,11 @@ export default async function CoursesLayout({
               </Button>
             }
             items={[
-              <Link href="/profile" key={0}>
+              <Link href="/profile" prefetch={false} key={0}>
                 <UserCircleIcon className="size-5" aria-hidden="true" />
                 {t("profile")}
               </Link>,
-              <Link prefetch={false} href="/logout" key={1}>
+              <Link href="/logout" prefetch={false} key={1}>
                 <ArrowLeftStartOnRectangleIcon
                   className="size-5"
                   aria-hidden="true"
@@ -171,6 +170,7 @@ export default async function CoursesLayout({
           </li>
         </ul>
       </div>
+
       <Snackbar />
       {user && !user.verified && (
         <ActivateAccountDialog lng={lng} user={user} />

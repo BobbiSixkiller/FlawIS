@@ -2,10 +2,10 @@ import LoginForm from "./LoginForm";
 import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
-import { headers } from "next/headers";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/utils/helpers";
 import Link from "next/link";
+import { getSubdomain } from "@/utils/actions";
 
 export default async function LoginPage({
   params,
@@ -18,9 +18,7 @@ export default async function LoginPage({
   const { url } = await searchParams;
   const { t } = await translate(lng, "login");
 
-  const headerStore = await headers();
-  const host = headerStore.get("host") || "localhost:3000";
-  const subdomain = host.split(".")[0];
+  const subdomain = await getSubdomain();
 
   return (
     <div className="flex flex-col gap-4">

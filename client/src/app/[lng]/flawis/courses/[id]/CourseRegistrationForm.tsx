@@ -83,7 +83,7 @@ export default function CourseRegistrationForm({
           if (dialogId) {
             closeDialog(dialogId);
           } else if (redirect) {
-            router.push(redirect);
+            router.replace(redirect);
           } else {
             router.back();
           }
