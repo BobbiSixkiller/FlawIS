@@ -83,10 +83,10 @@ export default function FilterDropdown({
 
           <PopoverPanel
             transition
-            anchor={anchor}
+            anchor={anchor ?? { gap: 6, to: "bottom start" }}
             className={cn([
               "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
-              "p-3 mx-4 sm:m-0 sm:w-96 [--anchor-gap:4px] sm:[--anchor-gap:8px] flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto !max-h-56 text-gray-900 text-sm",
+              "p-3 mx-4 sm:m-0 sm:w-96 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto !max-h-56 text-gray-900 text-sm",
               "dark:bg-gray-800 dark:text-white dark:ring-gray-700",
             ])}
           >
