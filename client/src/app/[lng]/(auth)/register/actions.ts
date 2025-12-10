@@ -25,15 +25,6 @@ export async function register({
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const cookieStore = await cookies();
 
-    cookieStore.set("user", res.data.email, {
-      httpOnly: true,
-      expires, //accesstoken expires in 24 hours
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "lax",
-      path: "/", // make it available on every route
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
-    });
     cookieStore.set("accessToken", res.data.token, {
       httpOnly: true,
       expires, //accesstoken expires in 24 hours

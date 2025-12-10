@@ -32,15 +32,7 @@ export async function getGoogleAuthLink(url?: string) {
 }
 
 export async function getMe() {
-  const cookieStore = await cookies();
-  const user = cookieStore.get("user")?.value || "me";
-
-  const res = await executeGqlFetch(
-    MeDocument,
-    undefined,
-    {},
-    { revalidate: 60 * 60, tags: [user] }
-  );
+  const res = await executeGqlFetch(MeDocument);
 
   if (res.errors) {
     console.log(res.errors[0]);
@@ -63,9 +55,7 @@ export async function activate() {
       message: data.activateUser.message,
       data: data.activateUser.data,
     }),
-    {
-      revalidateTags: (data) => [data.activateUser.data.email],
-    },
+    {},
     {
       activation: token,
     }
