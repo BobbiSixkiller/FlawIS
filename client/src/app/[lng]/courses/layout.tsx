@@ -119,7 +119,7 @@ export default async function CoursesLayout({
             <ArrowRightStartOnRectangleIcon className="size-5" />
           </Button>
         )}
-        <LngSwitcher authLayout className="flex items-center" />
+        <LngSwitcher authLayout />
       </div>
       <div className="sm:max-w-md w-full p-6 sm:px-0 flex-1 py-12 flex flex-col gap-6">
         <Breadcrumbs

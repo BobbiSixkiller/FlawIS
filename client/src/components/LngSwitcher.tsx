@@ -8,13 +8,7 @@ import Dropdown from "./Dropdown";
 import Button from "./Button";
 import Link from "next/link";
 
-export default function LngSwitcher({
-  authLayout,
-  className,
-}: {
-  authLayout?: boolean;
-  className?: string;
-}) {
+export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
   const path = usePathname();
   const { lng } = useParams<{ lng: string }>();
 
@@ -23,7 +17,7 @@ export default function LngSwitcher({
   return (
     <Dropdown
       anchor={{ gap: 6, to: authLayout ? "bottom end" : "top" }}
-      className={className}
+      buttonWidth={!authLayout}
       trigger={
         authLayout ? (
           <Button size="icon" variant="ghost" className="rounded-full">

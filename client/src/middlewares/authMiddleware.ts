@@ -22,7 +22,7 @@ function getSubdomainType(host: string): SubdomainType {
   if (first.includes("intern")) return "internships";
 
   // on localhost/dev this is returned
-  return "courses";
+  return "flawis";
 }
 
 const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
