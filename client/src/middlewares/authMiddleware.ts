@@ -1,8 +1,7 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chainMiddleware";
 
-const publicPaths = [
-  "/",
+const authPaths = [
   "/login",
   "/register",
   "/forgotPassword",
@@ -12,6 +11,27 @@ const publicPaths = [
 
 const objectIdRegex = /^\/[0-9a-fA-F]{24}$/;
 
+type SubdomainType = "courses" | "flawis" | "conferences" | "internships";
+
+function getSubdomainType(host: string): SubdomainType {
+  const first = host.split(".")[0];
+
+  if (first.includes("courses")) return "courses";
+  if (first.includes("flawis")) return "flawis";
+  if (first.includes("conferences")) return "conferences";
+  if (first.includes("intern")) return "internships";
+
+  // on localhost/dev this is returned
+  return "courses";
+}
+
+const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
+  flawis: () => false,
+  conferences: () => false,
+  internships: () => false,
+  courses: (path) => path === "/" || objectIdRegex.test(path),
+};
+
 export function withAuth(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
@@ -19,18 +39,17 @@ export function withAuth(middleware: CustomMiddleware) {
     const pathWithoutLocale = url.pathname.replace(localeRegex, "");
     const token = req.cookies.get("accessToken")?.value;
 
-    const subdomain = url.hostname.split(".")[0];
+    const host = req.headers.get("host") ?? url.host;
+    const subdomainType = getSubdomainType(host);
 
-    const isCoursesPublic =
-      (subdomain.includes("courses") ||
-        process.env.NODE_ENV === "development") &&
-      (pathWithoutLocale === "/" || objectIdRegex.test(pathWithoutLocale));
+    const isAuthPath = authPaths.includes(pathWithoutLocale);
+    const isSubdomainPublic =
+      subdomainExtraPublic[subdomainType](pathWithoutLocale);
 
-    const isGlobalPublic = publicPaths.some(
-      (path) => path === pathWithoutLocale
-    );
+    const isPublic = isAuthPath || isSubdomainPublic;
 
-    if (!token && !isGlobalPublic && !isCoursesPublic) {
+    // not logged in and on protected page redirect to login
+    if (!token && !isPublic) {
       const loginUrl = new URL("/login", url.origin);
 
       if (url.pathname !== "/" && url.pathname !== "/logout") {
@@ -41,27 +60,22 @@ export function withAuth(middleware: CustomMiddleware) {
       return NextResponse.redirect(loginUrl);
     }
 
-    if (
-      token &&
-      publicPaths.some((path) => path === pathWithoutLocale) &&
-      pathWithoutLocale !== "/"
-    ) {
+    // loggedin and on auth page redirect away
+    if (token && isAuthPath) {
       let redirectTo = "/";
       const referer = req.headers.get("referer");
 
       if (referer) {
-        // Use the referer header to extract a clean target URL.
         const refererUrl = new URL(referer);
-        // In case the referer contains an encoded "url" parameter, decode it:
         const urlParam = refererUrl.searchParams.get("url");
         if (urlParam) {
           redirectTo = decodeURIComponent(urlParam);
-        } else if (!publicPaths.some((path) => path === pathWithoutLocale)) {
+        } else if (!authPaths.includes(pathWithoutLocale)) {
           redirectTo = `${refererUrl.pathname}${refererUrl.search}`;
         }
       }
-      const finalUrl = new URL(redirectTo, url.origin);
 
+      const finalUrl = new URL(redirectTo, url.origin);
       return NextResponse.redirect(finalUrl);
     }
 
