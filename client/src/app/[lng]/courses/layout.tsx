@@ -81,7 +81,7 @@ export default async function CoursesLayout({
         "dark:bg-gray-900 dark:text-white/85",
       ])}
     >
-      <div className="max-w-md w-full flex justify-end gap-2 items-center p-6 sm:p-2 h-[60px]">
+      <div className="sm:max-w-md w-full flex justify-end gap-2 items-center p-6 sm:p-2 h-[60px]">
         <ThemeToggler authLayout dark={theme === "dark"} />
         {user ? (
           <Dropdown

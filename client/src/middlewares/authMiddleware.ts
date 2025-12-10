@@ -10,6 +10,8 @@ const publicPaths = [
   "/google/callback",
 ];
 
+const objectIdRegex = /^\/[0-9a-fA-F]{24}$/;
+
 export function withAuth(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
@@ -19,13 +21,10 @@ export function withAuth(middleware: CustomMiddleware) {
 
     const subdomain = url.hostname.split(".")[0];
 
-    console.log(pathWithoutLocale);
-    console.log(/^\/[^/]+$/.test(pathWithoutLocale));
-
     const isCoursesPublic =
       (subdomain.includes("courses") ||
         process.env.NODE_ENV === "development") &&
-      (pathWithoutLocale === "/" || /^\/[^/]+$/.test(pathWithoutLocale));
+      (pathWithoutLocale === "/" || objectIdRegex.test(pathWithoutLocale));
 
     const isGlobalPublic = publicPaths.some(
       (path) => path === pathWithoutLocale
