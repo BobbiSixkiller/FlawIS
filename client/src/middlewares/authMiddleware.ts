@@ -22,7 +22,7 @@ function getSubdomainType(host: string): SubdomainType {
   if (first.includes("intern")) return "internships";
 
   // on localhost/dev this is returned
-  return "flawis";
+  return "courses";
 }
 
 const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
@@ -47,6 +47,8 @@ export function withAuth(middleware: CustomMiddleware) {
       subdomainExtraPublic[subdomainType](pathWithoutLocale);
 
     const isPublic = isAuthPath || isSubdomainPublic;
+
+    console.log("AUTH ", isPublic);
 
     // not logged in and on protected page redirect to login
     if (!token && !isPublic) {
