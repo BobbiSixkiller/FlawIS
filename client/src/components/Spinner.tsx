@@ -10,12 +10,14 @@ type SpinnerSize = keyof typeof sizeMap;
 export default function Spinner({
   inverted = false,
   size = "md",
+  className,
 }: {
   inverted?: boolean;
   size?: SpinnerSize;
+  className?: string;
 }) {
   return (
-    <div aria-label="Loading..." role="status">
+    <div aria-label="Loading..." role="status" className={className}>
       <svg
         className={cn([
           "animate-spin",

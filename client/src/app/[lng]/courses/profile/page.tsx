@@ -4,10 +4,7 @@ import { translate } from "@/lib/i18n";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import UserForm from "../../(auth)/register/UserForm";
-import { getSubdomain } from "@/utils/actions";
+import Link from "next/link";
 
 export default async function Profile({
   params,
@@ -18,9 +15,6 @@ export default async function Profile({
   const { t } = await translate(lng, "profile");
 
   const user = await getMe();
-  const subdomain = await getSubdomain();
-
-  const dialogId = "update-profile";
 
   return (
     <div className="flex flex-col gap-6">
@@ -29,12 +23,10 @@ export default async function Profile({
         subHeading={t("subheading")}
         lng={lng}
         items={[
-          <ModalTrigger key={0} dialogId={dialogId}>
-            <Button>
-              <PencilIcon className="size-5" />
-              {t("update")}
-            </Button>
-          </ModalTrigger>,
+          <Button key={0} as={Link} href={"/profile/update"}>
+            <PencilIcon className="size-5" />
+            {t("update")}
+          </Button>,
         ]}
       />
 
@@ -75,14 +67,6 @@ export default async function Profile({
           </div>
         </dl>
       </div>
-      <Modal dialogId={dialogId} title="Upravit Profil">
-        <UserForm
-          user={user}
-          namespace="profile"
-          dialogId={dialogId}
-          subdomain={subdomain}
-        />
-      </Modal>
     </div>
   );
 }

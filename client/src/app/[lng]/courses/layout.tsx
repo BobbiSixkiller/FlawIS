@@ -61,9 +61,11 @@ export async function generateMetadata(
 
 export default async function CoursesLayout({
   children,
+  modal,
   params,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
   params: Promise<{ lng: string }>;
 }) {
   const { lng } = await params;
@@ -171,6 +173,7 @@ export default async function CoursesLayout({
         </ul>
       </div>
 
+      {modal}
       <Snackbar />
       <ActivateAccountDialog lng={lng} user={user} />
     </div>

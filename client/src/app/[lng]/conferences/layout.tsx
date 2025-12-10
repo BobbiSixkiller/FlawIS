@@ -63,7 +63,7 @@ export default async function DashboardLayout({
 
   const user = await getMe();
   if (!user) {
-    redirect("/logout");
+    redirect("/login");
   }
 
   return (

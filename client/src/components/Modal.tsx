@@ -105,13 +105,7 @@ export default function Modal({
               )}
             </div>
 
-            <Suspense
-              fallback={
-                <div className="flex justify-center">
-                  <Spinner />
-                </div>
-              }
-            >
+            <Suspense fallback={<Spinner className="flex justify-center" />}>
               {children}
             </Suspense>
           </DialogPanel>
