@@ -127,7 +127,7 @@ export default async function CoursesLayout({
           separator={<ChevronRightIcon className="h-3 w-3" />}
           activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="flex justify-center flex-wrap text-sm gap-2 items-center dark:text-white/85"
-          listClasses="outline-none focus:ring-2 focus:ring-primary-500"
+          listClasses="outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-300"
           capitalizeLinks
         />
         {children}
