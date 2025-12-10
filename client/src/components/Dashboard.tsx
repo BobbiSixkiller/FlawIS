@@ -41,7 +41,7 @@ export default async function Dashboard({
         </nav>
 
         <div className="mt-auto flex gap-2 items-center">
-          <LngSwitcher c />
+          <LngSwitcher />
           <ThemeToggler dark={theme === "dark"} />
         </div>
       </div>
