@@ -19,6 +19,9 @@ export function withAuth(middleware: CustomMiddleware) {
 
     const subdomain = url.hostname.split(".")[0];
 
+    console.log(pathWithoutLocale);
+    console.log(/^\/[^/]+$/.test(pathWithoutLocale));
+
     const isCoursesPublic =
       (subdomain.includes("courses") ||
         process.env.NODE_ENV === "development") &&
