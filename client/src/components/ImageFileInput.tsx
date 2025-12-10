@@ -7,6 +7,7 @@ import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { InputProps } from "./Input";
+import { fetchFromMinio } from "@/utils/helpers";
 
 export default function ImageFileInput({
   avatarUrl,
@@ -31,6 +32,21 @@ export default function ImageFileInput({
     }
   }, [field.value]);
 
+  useEffect(() => {
+    async function initializeFromAvatar() {
+      if (!avatarUrl || field.value) return;
+
+      try {
+        const file = await fetchFromMinio("avatars", avatarUrl);
+        field.onChange(file);
+      } catch (e) {
+        console.error("Failed to convert avatar to file", e);
+      }
+    }
+
+    initializeFromAvatar();
+  }, [avatarUrl, field]);
+
   const [preview, setPreview] = useState<string>(
     avatarUrl || "/images/img-placeholder.jpg"
   );
@@ -46,8 +62,6 @@ export default function ImageFileInput({
       field.onChange(file);
     }
   };
-
-  console.log(preview);
 
   return (
     <div>

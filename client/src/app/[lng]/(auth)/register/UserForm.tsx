@@ -34,6 +34,7 @@ import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
 import { useScrollStore } from "@/stores/scrollStore";
 import RHFormContainer from "@/components/RHFormContainer";
+import { deleteFiles } from "@/lib/minio";
 
 export default function UserForm({
   user,
