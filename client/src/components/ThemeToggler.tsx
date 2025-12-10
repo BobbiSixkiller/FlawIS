@@ -9,9 +9,11 @@ import Button from "./Button";
 export default function ThemeToggler({
   dark,
   authLayout,
+  className,
 }: {
   dark: boolean;
   authLayout?: boolean;
+  className?: string;
 }) {
   useEffect(() => {
     if (dark) {
@@ -25,10 +27,7 @@ export default function ThemeToggler({
     <Button
       variant={"ghost"}
       size="icon"
-      className={cn([
-        "rounded-full p-2 text-white",
-        authLayout && "bg-primary-500 hover:bg-primary-500/90 dark:bg-white/10",
-      ])}
+      className={cn(["rounded-full p-2"])}
       onClick={() => setDarkThemeCookie(!dark)}
     >
       {dark ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />}

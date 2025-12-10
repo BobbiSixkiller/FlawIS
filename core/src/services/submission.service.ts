@@ -2,7 +2,6 @@ import { Service } from "typedi";
 import { ObjectId } from "mongodb";
 
 import { SubmissionRepository } from "../repositories/submission.repository";
-import { DocumentType } from "@typegoose/typegoose";
 import { Submission } from "../entitites/Submission";
 import { I18nService } from "./i18n.service";
 import {
@@ -17,23 +16,7 @@ import { Access } from "../entitites/User";
 import { Conference } from "../entitites/Conference";
 import { TokenService } from "./token.service";
 import { CtxUser } from "../util/types";
-
-function toSubmissionDTO(doc: DocumentType<Submission>) {
-  const obj = doc.toJSON({
-    versionKey: false,
-    virtuals: false,
-    transform(_doc, ret) {
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-
-      return ret;
-    },
-  });
-
-  return obj as Submission;
-}
+import { toDTO } from "../util/helpers";
 
 @Service()
 export class SubmissionService {
@@ -95,7 +78,7 @@ export class SubmissionService {
       );
     }
 
-    return toSubmissionDTO(submission);
+    return toDTO(submission);
   }
 
   async createSubmission(
@@ -172,7 +155,7 @@ export class SubmissionService {
       );
     }
 
-    return toSubmissionDTO(submission);
+    return toDTO(submission);
   }
 
   async updateSubmission(
@@ -273,7 +256,7 @@ export class SubmissionService {
 
       await session.commitTransaction();
 
-      return toSubmissionDTO(submission);
+      return toDTO(submission);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -307,7 +290,7 @@ export class SubmissionService {
 
       await session.commitTransaction();
 
-      return toSubmissionDTO(submission);
+      return toDTO(submission);
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -337,7 +320,7 @@ export class SubmissionService {
       );
     }
 
-    return toSubmissionDTO(submission);
+    return toDTO(submission);
   }
 
   async removeAuthor(submissionId: ObjectId, authorId: ObjectId) {
@@ -351,6 +334,6 @@ export class SubmissionService {
       );
     }
 
-    return toSubmissionDTO(submission);
+    return toDTO(submission);
   }
 }

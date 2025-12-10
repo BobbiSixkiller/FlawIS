@@ -1,0 +1,20 @@
+{
+  "link": "Go to course",
+
+  "applied": {
+    "subject": "Course application - created",
+    "body": "You have applied for a course: '{course}'. You will be notified when the status of your application changes."
+  },
+  "eligible": {
+    "subject": "Course application - reviewed by FLAW",
+    "body": "Your application for course: '{course}' has been reviewed and approved by the department that handles courses at Faculty of Law, Comenius University in Bratislava. You will be notified when the status of your application changes."
+  },
+  "accepted": {
+    "subject": "Course application - accepted",
+    "body": "Congratulations! Your application for a course: '{course}' has been accepted. Further details about the course and the next steps will be shared with you shortly."
+  },
+  "rejected": {
+    "subject": "Course application - rejected",
+    "body": "We regret to inform you that your application for a course: '{course}' has not been successful. Thank you for your interest, and we encourage you to apply again in the future."
+  }
+}

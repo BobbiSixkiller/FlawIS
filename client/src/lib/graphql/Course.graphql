@@ -16,6 +16,9 @@ fragment Course on Course {
     ...FlawBilling
   }
   isPaid
+  attending {
+    ...CourseAttendee
+  }
   createdAt
   updatedAt
 }
@@ -30,6 +33,39 @@ fragment CourseSession on CourseSession {
   maxAttendees
   createdAt
   updatedAt
+}
+
+fragment CourseAttendee on CourseAttendee {
+  id
+  user {
+    id
+    name
+    email
+    telephone
+    organization
+    avatarUrl
+  }
+  fileUrls
+  course
+  status
+  createdAt
+  updatedAt
+}
+
+fragment Attendance on Attendance {
+  attendee {
+    id
+    fileUrls
+    user {
+      name
+    }
+    status
+  }
+  attendanceRecords {
+    id
+    online
+    hoursAttended
+  }
 }
 
 query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
@@ -51,6 +87,32 @@ query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
 query course($id: ObjectId!) {
   course(id: $id) {
     ...Course
+  }
+}
+
+query attendance(
+  $id: ObjectId!
+  $after: String
+  $first: Int
+  $sort: [CourseAttendeeSortInput]!
+) {
+  course(id: $id) {
+    attendance(after: $after, first: $first, sort: $sort) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          ...Attendance
+        }
+      }
+      sessions {
+        ...CourseSession
+      }
+    }
   }
 }
 
@@ -104,6 +166,76 @@ mutation deleteCourseSession($id: ObjectId!) {
     message
     data {
       ...CourseSession
+    }
+  }
+}
+
+mutation createCourseAttendee(
+  $courseId: ObjectId!
+  $fileUrls: [String!]!
+  $billing: AttendeeBillingInput
+) {
+  createCourseAttendee(
+    courseId: $courseId
+    fileUrls: $fileUrls
+    billing: $billing
+  ) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation updateCourseAttendeeFiles($id: ObjectId!, $fileUrls: [String!]!) {
+  updateCourseAttendeeFiles(id: $id, fileUrls: $fileUrls) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation deleteCourseAttendee($id: ObjectId!) {
+  deleteCourseAttendee(id: $id) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
+  changeCourseAttendeeStatus(id: $id, status: $status) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation updateAttendanceHours($id: ObjectId!, $hoursAttended: Float!) {
+  updateAttendanceHours(id: $id, hoursAttended: $hoursAttended) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
+    }
+  }
+}
+
+mutation updateAttendanceOnline($id: ObjectId!, $online: Boolean!) {
+  updateAttendanceOnline(id: $id, online: $online) {
+    message
+    data {
+      hoursAttended
+      online
+      session {
+        course
+      }
     }
   }
 }

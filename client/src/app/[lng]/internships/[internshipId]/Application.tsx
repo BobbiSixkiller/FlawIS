@@ -1,4 +1,4 @@
-import DynamicImage from "@/components/DynamicImage";
+import Avatar from "@/components/Avatar";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
 import { displayDate } from "@/utils/helpers";
@@ -25,25 +25,10 @@ export async function Application({
 
       <div className="flex items-center flex-wrap gap-6">
         <div className="relative flex items-center gap-x-4">
-          {application.user.avatarUrl ? (
-            <DynamicImage
-              alt="avatar"
-              src={application.user.avatarUrl}
-              className="w-[60px] h-[60px] rounded-full"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              style={{ objectFit: "cover" }}
-            />
-          ) : (
-            <div className="size-12 rounded-full text-2xl flex justify-center items-center bg-primary-300 text-white/85">
-              {application.user.name
-                .split(" ")
-                .map((n, i) => {
-                  if (i < 2) return n[0].toUpperCase();
-                })
-                .join("")}
-            </div>
-          )}
+          <Avatar
+            name={application.user.name}
+            avatarUrl={application.user.avatarUrl}
+          />
           <div className="">
             <p className="font-semibold text-gray-900 dark:text-white">
               {application.user.name}

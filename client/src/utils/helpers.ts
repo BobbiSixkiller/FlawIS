@@ -28,11 +28,14 @@ export function displayDate(utc?: string, locale: string = "sk") {
   });
 }
 
-export function getLocalDate(utc: string) {
-  const date = new Date(utc);
-  // date.setHours(date.getHours() + 2);
+export function formatDatetimeLocal(val: any, withTime: boolean): string {
+  if (!val) return "";
+  const date = val instanceof Date ? val : new Date(val);
+  if (isNaN(date.getTime())) return "";
 
-  return date.toISOString().split("T")[0];
+  return withTime
+    ? date.toISOString().slice(0, 16)
+    : date.toISOString().split("T")[0]; // ⏰ "2025-07-19T11:30" or "2025-07-19"
 }
 
 export async function fetchFromMinio(bucketName: string, fileUrl: string) {

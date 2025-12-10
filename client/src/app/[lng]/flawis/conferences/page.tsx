@@ -26,18 +26,13 @@ export default async function Conferences({
         heading={t("heading")}
         subHeading={t("subheading")}
         lng={lng}
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger dialogId={newConferenceDialogId}>
-                <Button size="sm">
-                  <PlusIcon className="size-5" />
-                  Nova
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger dialogId={newConferenceDialogId} key={0}>
+            <Button size="sm">
+              <PlusIcon className="size-5" />
+              Nova
+            </Button>
+          </ModalTrigger>,
         ]}
       />
 

@@ -46,29 +46,19 @@ export default async function AttendeePage({
             ? attendee.user.organization
             : "N/A"
         }
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={0} dialogId={impersonateDialogId}>
-                <Button size="sm">
-                  <ArrowsRightLeftIcon className="size-5" />
-                  Impersonovat
-                </Button>
-              </ModalTrigger>
-            ),
-          },
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={1} dialogId={deleteDialogId}>
-                <Button size="sm" variant="secondary">
-                  <TrashIcon className="size-5" />
-                  Zmazat
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger key={0} dialogId={impersonateDialogId}>
+            <Button size="sm">
+              <ArrowsRightLeftIcon className="size-5" />
+              Impersonovat
+            </Button>
+          </ModalTrigger>,
+          <ModalTrigger key={1} dialogId={deleteDialogId}>
+            <Button size="sm" variant="secondary">
+              <TrashIcon className="size-5" />
+              Zmazat
+            </Button>
+          </ModalTrigger>,
         ]}
       />
       <div className="flex gap-2">

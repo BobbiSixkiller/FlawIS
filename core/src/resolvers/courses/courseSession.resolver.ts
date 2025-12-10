@@ -7,7 +7,7 @@ import { CourseSession } from "../../entitites/Course";
 import {
   CourseSessionInput,
   CourseSessionMutationResponse,
-} from "../types/course.types";
+} from "../types/course/course.types";
 
 @Service()
 @Resolver(() => CourseSession)
@@ -48,7 +48,7 @@ export class CourseSessionResolver {
 
   @Mutation(() => CourseSessionMutationResponse)
   async deleteCourseSession(@Arg("id") id: ObjectId) {
-    const course = await this.courseService.deleteCourse(id);
+    const course = await this.courseService.deleteCourseSession(id);
 
     return {
       data: course,

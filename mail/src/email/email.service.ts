@@ -27,6 +27,11 @@ export interface InternshipMsg extends Msg {
   count?: number;
 }
 
+export interface CourseMsg extends Msg {
+  courseId: string;
+  course: string;
+}
+
 @Injectable()
 export class EmailService {
   constructor(
@@ -364,6 +369,102 @@ export class EmailService {
         name: msg.name,
         organization: msg.organization,
         count: msg.count,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.courses.applied',
+  })
+  async sendCourseAttendeeApplied(msg: CourseMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.courseId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('course.applied.subject', { lang: msg.locale }),
+      template: 'courses/attendeeApplied',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        course: msg.course,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.courses.eligible',
+  })
+  async sendCourseAttendeeEligible(msg: CourseMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.courseId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('course.eligible.subject', { lang: msg.locale }),
+      template: 'courses/attendeeEligible',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        course: msg.course,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.courses.accepted',
+  })
+  async sendCourseAttendeeAccepted(msg: CourseMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.courseId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('course.accepted.subject', { lang: msg.locale }),
+      template: 'courses/attendeeAccepted',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        course: msg.course,
+      },
+    });
+  }
+
+  @RabbitSubscribe({
+    exchange: process.env.RMQ_EXCHANGE,
+    routingKey: 'mail.courses.rejected',
+  })
+  async sendCourseAttendeeRejected(msg: CourseMsg) {
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/${msg.courseId}`;
+
+    await this.mailerService.sendMail({
+      to: msg.email,
+      subject: this.i18n.t('course.rejected.subject', { lang: msg.locale }),
+      template: 'courses/attendeeRejected',
+      context: {
+        url,
+        i18nLang: msg.locale,
+        name: msg.name,
+        course: msg.course,
       },
     });
   }

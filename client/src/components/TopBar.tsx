@@ -4,6 +4,7 @@ import { cn } from "@/utils/helpers";
 import Breadcrumbs from "./Breadcrumbs";
 import {
   ArrowLeftStartOnRectangleIcon,
+  ArrowRightStartOnRectangleIcon,
   Bars3Icon,
   ChevronRightIcon,
   HomeIcon,
@@ -15,7 +16,8 @@ import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
-import useScrolled from "@/hooks/useScrolled";
+import Link from "next/link";
+import { useWindowScroll } from "@uidotdev/usehooks";
 
 export default function TopBar({
   avatar,
@@ -24,13 +26,14 @@ export default function TopBar({
   drawerContent,
   logo,
 }: {
-  avatar: ReactNode;
+  avatar?: ReactNode;
   search: ReactNode;
   drawerTitle: ReactNode;
   drawerContent: ReactNode;
   logo: ReactNode;
 }) {
-  const scrolled = useScrolled();
+  const [{ y = 0 }] = useWindowScroll();
+
   const [visible, setVisible] = useState(false);
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");
@@ -43,72 +46,78 @@ export default function TopBar({
   return (
     <div
       className={cn([
-        "flex items-center p-4 border-b h-[60px] sticky top-0 z-10 bg-white",
+        "bg-white sticky top-0 z-20 h-[60px] border-b",
         "dark:border-gray-700 dark:bg-gray-900",
-        scrolled ? "shadow-bottom" : "",
+        y ?? 0 > 0 ? "shadow-bottom" : "",
       ])}
     >
-      <Button
-        onClick={() => setVisible(true)}
-        className="lg:hidden sm:static sm:mr-4 absolute left-2 p-2 w-fit"
-        variant="ghost"
-      >
-        <Bars3Icon className="size-5" />
-      </Button>
+      <div className={cn(["h-full flex items-center p-4 container mx-auto"])}>
+        <Button
+          onClick={() => setVisible(true)}
+          className={cn([
+            "lg:hidden sm:static",
+            "sm:mr-4 absolute left-2 p-2 w-fit",
+          ])}
+          variant="ghost"
+        >
+          <Bars3Icon className="size-5" />
+        </Button>
 
-      <div className="mx-auto md:hidden">{logo}</div>
+        <div className={cn(["mx-auto", "md:hidden"])}>{logo}</div>
 
-      <Breadcrumbs
-        homeElement={<HomeIcon className="h-5 w-5" />}
-        separator={<ChevronRightIcon className="h-3 w-3" />}
-        activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
-        containerClasses="hidden md:flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
-        listClasses="outline-none focus:ring-2 focus:ring-primary-500"
-        capitalizeLinks
-      />
-      <div className="absolute sm:static right-4 flex md:flex-1 md:justify-end items-center gap-2">
-        {search}
-
-        <Dropdown
-          trigger={
-            <Button
-              size="icon"
-              className="rounded-full flex items-center w-fit h-fit"
-            >
-              {avatar}
-            </Button>
-          }
-          items={[
-            {
-              type: "link",
-              href: "/profile",
-              icon: <UserCircleIcon className="size-5" aria-hidden="true" />,
-              text: t("profile"),
-            },
-            {
-              type: "link",
-              href: "/logout",
-              prefetch: false,
-              icon: (
-                <ArrowLeftStartOnRectangleIcon
-                  className="size-5"
-                  aria-hidden="true"
-                />
-              ),
-              text: t("logout"),
-            },
-          ]}
+        <Breadcrumbs
+          homeElement={<HomeIcon className="h-5 w-5" />}
+          separator={<ChevronRightIcon className="h-3 w-3" />}
+          activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
+          containerClasses="hidden md:flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
+          listClasses="outline-none focus:ring-2 focus:ring-primary-500"
+          capitalizeLinks
         />
-      </div>
 
-      <Drawer
-        visible={visible}
-        setVisible={setVisible}
-        title={drawerTitle}
-        toggleStart="left"
-      >
-        {drawerContent}
-      </Drawer>
+        <div className="absolute sm:static right-4 flex md:flex-1 md:justify-end items-center gap-2">
+          {search}
+
+          {avatar ? (
+            <Dropdown
+              anchor={{ gap: 6, to: "bottom end" }}
+              trigger={
+                <Button
+                  size="icon"
+                  className="rounded-full flex items-center w-fit h-fit"
+                >
+                  {avatar}
+                </Button>
+              }
+              items={[
+                <Link href="/profile" key={0}>
+                  <UserCircleIcon className="size-5" aria-hidden="true" />
+                  {t("profile")}
+                </Link>,
+                <Link prefetch={false} href="/logout" key={1}>
+                  <ArrowLeftStartOnRectangleIcon
+                    className="size-5"
+                    aria-hidden="true"
+                  />
+                  {t("logout")}
+                </Link>,
+              ]}
+            />
+          ) : (
+            <Button as={Link} href="/login" variant="ghost" size="icon">
+              <ArrowRightStartOnRectangleIcon className="size-5" />
+            </Button>
+          )}
+        </div>
+
+        <Drawer
+          visible={visible}
+          setVisible={setVisible}
+          title={drawerTitle}
+          toggleStart="left"
+        >
+          {drawerContent}
+        </Drawer>
+      </div>
     </div>
   );
 }

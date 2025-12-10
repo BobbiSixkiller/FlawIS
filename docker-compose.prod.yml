@@ -122,14 +122,15 @@ services:
       - production-network
 
   mongo:
-    image: mongo:8.0
+    build:
+      context: ./mongo
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0"]
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh mongo/test --quiet
       interval: 30s

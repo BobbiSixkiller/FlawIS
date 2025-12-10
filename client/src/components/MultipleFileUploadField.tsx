@@ -15,6 +15,8 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import Button from "./Button";
+import { fetchFromMinio } from "@/utils/helpers";
+import Spinner from "./Spinner";
 
 const getColorClasses = ({
   isDragAccept,
@@ -48,6 +50,7 @@ export default function MultipleFileUploadField({
   maxFiles,
   maxSize,
   accept,
+  fileSources,
 }: {
   name: string;
   control: Control<any>;
@@ -57,14 +60,54 @@ export default function MultipleFileUploadField({
   maxFiles?: number;
   maxSize?: number;
   accept?: Accept;
+  fileSources?: Record<string, string | string[] | null | undefined>;
 }) {
-  const { field, fieldState } = useController({ name, control });
+  const { fieldState } = useController({ name, control });
 
   const [files, setFiles] = useState<UploadableFile[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setFiles(field.value.map((file: File) => ({ file, errors: [] })));
-  }, [field.value]);
+    setValue(
+      name,
+      files.map((f) => f.file)
+      // { shouldValidate: true }
+    );
+  }, [files, name, setValue]);
+
+  useEffect(() => {
+    async function prefillFiles() {
+      if (!fileSources) {
+        return setLoading(false);
+      }
+
+      const loadedFiles: UploadableFile[] = [];
+
+      await Promise.all(
+        Object.entries(fileSources).map(async ([bucket, urls]) => {
+          if (!urls) return;
+
+          const urlsArray = Array.isArray(urls) ? urls : [urls];
+
+          for (const url of urlsArray) {
+            try {
+              const file = await fetchFromMinio(bucket, url);
+              loadedFiles.push({ file, uploadedFile: url, errors: [] });
+            } catch (err: any) {
+              console.error(`Failed to fetch ${url}`, err);
+              setError(name, { message: `Failed to fetch ${url}` });
+            }
+          }
+        })
+      );
+
+      setFiles(loadedFiles);
+
+      setLoading(false);
+    }
+
+    prefillFiles();
+  }, [JSON.stringify(fileSources)]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -87,15 +130,17 @@ export default function MultipleFileUploadField({
   );
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
-    useDropzone({ onDrop, maxFiles, maxSize, accept });
+    useDropzone({
+      onDrop,
+      maxFiles,
+      maxSize,
+      accept,
+      disabled: loading,
+      multiple: true,
+    });
 
   async function onDelete(file: File, uploadedFile?: string) {
     setFiles((prev) => prev.filter((f) => f.file !== file));
-    setValue(
-      name,
-      field.value.filter((v: File) => v !== file),
-      { shouldValidate: true }
-    );
   }
 
   function onUpload(file: File, uploadedFile: string, errors: FileError[]) {
@@ -107,9 +152,6 @@ export default function MultipleFileUploadField({
         return f;
       })
     );
-    if (!field.value.some((v: File) => v === file)) {
-      setValue(name, [...field.value, file], { shouldValidate: true });
-    }
   }
 
   return (
@@ -126,15 +168,19 @@ export default function MultipleFileUploadField({
           {
             isDragAccept,
             isDragReject: isDragReject || fieldState.error,
-            isFocused,
+            ...(!loading ? { isFocused } : {}),
           }
         )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-none`}
       >
-        <input name={name} id={name} {...getInputProps()} />
+        <input name={name} id={name} disabled={loading} {...getInputProps()} />
 
-        <Button className="rounded-full" size="icon">
-          <PlusIcon className="stroke-2 size-5" />
-        </Button>
+        {loading ? (
+          <Spinner />
+        ) : (
+          <Button className="rounded-full" size="icon">
+            <PlusIcon className="stroke-2 size-5" />
+          </Button>
+        )}
         {/* <p className="text-xs text-center">Drag n drop</p> */}
       </div>
 
@@ -173,17 +219,17 @@ function SingleUploadProgress({
 }: SingleUploadProgressProps) {
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    // async function upload() {
-    //   const res = await uploadFile(file, setProgress);
-    //   onUpload(file, res.data || undefined, res.errors || []);
-    // }
+  // useEffect(() => {
+  //   async function upload() {
+  //     const res = await uploadFile(file, setProgress);
+  //     onUpload(file, res.data || undefined, res.errors || []);
+  //   }
 
-    // if (errors.length === 0 && uploadedFile === undefined) {
-    //   upload();
-    // }
-    onUpload(file, "", errors);
-  }, []);
+  //   if (errors.length === 0 && uploadedFile === undefined) {
+  //     upload();
+  //   }
+  //   onUpload(file, "", errors);
+  // }, []);
 
   function uploadFile(file: File, onProgress: (percentage: number) => void) {
     console.log("Uploading", file.name);

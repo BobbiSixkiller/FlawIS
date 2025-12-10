@@ -11,20 +11,20 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 
-import { Context } from "../util/auth";
+import { Context } from "../../util/auth";
 import {
   SubmissionInput,
   SubmissionMutationResponse,
-} from "./types/submission.types";
-import { Submission, SubmissionTranslation } from "../entitites/Submission";
-import { Conference } from "../entitites/Conference";
-import { Section } from "../entitites/Section";
-import { User } from "../entitites/User";
-import { I18nService } from "../services/i18n.service";
-import { Repository } from "../repositories/base.repository";
-import { ConferenceRepository } from "../repositories/conference.repository";
-import { UserRepository } from "../repositories/user.repository";
-import { SubmissionService } from "../services/submission.service";
+} from "../types/submission.types";
+import { Submission, SubmissionTranslation } from "../../entitites/Submission";
+import { Conference } from "../../entitites/Conference";
+import { Section } from "../../entitites/Section";
+import { User } from "../../entitites/User";
+import { I18nService } from "../../services/i18n.service";
+import { Repository } from "../../repositories/base.repository";
+import { ConferenceRepository } from "../../repositories/conference.repository";
+import { UserRepository } from "../../repositories/user.repository";
+import { SubmissionService } from "../../services/submission.service";
 
 // Refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()

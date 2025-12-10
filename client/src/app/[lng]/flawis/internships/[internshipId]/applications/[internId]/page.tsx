@@ -11,6 +11,7 @@ import ChangeStatusForm from "./ChangeStatusForm";
 import { redirect } from "next/navigation";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { deleteIntern } from "@/app/[lng]/internships/[internshipId]/actions";
+import { changeInternStatus } from "./actions";
 
 export default async function InternPage({
   params,
@@ -81,6 +82,13 @@ export default async function InternPage({
         <ChangeStatusForm
           dialogId={statusDialogId(Status.Eligible)}
           status={Status.Eligible}
+          action={async () => {
+            "use server";
+            return changeInternStatus({
+              id: intern.id,
+              status: Status.Eligible,
+            });
+          }}
         />
       </Modal>
       <Modal
@@ -90,6 +98,13 @@ export default async function InternPage({
         <ChangeStatusForm
           dialogId={statusDialogId(Status.Rejected)}
           status={Status.Rejected}
+          action={async () => {
+            "use server";
+            return changeInternStatus({
+              id: intern.id,
+              status: Status.Rejected,
+            });
+          }}
         />
       </Modal>
     </div>

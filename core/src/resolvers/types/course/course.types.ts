@@ -1,11 +1,12 @@
 import { ObjectId } from "mongodb";
 import {
+  AttendanceRecord,
   Category,
   Course,
   CourseAttendee,
   CourseSession,
-} from "../../entitites/Course";
-import { CreateArgs, CreateConnection } from "./pagination.types";
+} from "../../../entitites/Course";
+import { CreateArgs, CreateConnection } from "../pagination.types";
 import {
   ArgsType,
   Field,
@@ -14,14 +15,14 @@ import {
   ObjectType,
   registerEnumType,
 } from "type-graphql";
-import { IMutationResponse } from "./interface.types";
-import { FlawBilling } from "../../entitites/Billing";
-import { FlawBillingInput } from "./conference.types";
-import { IsDate, IsInt, IsString, Min, MinDate } from "class-validator";
+import { IMutationResponse } from "../interface.types";
+import { FlawBilling } from "../../../entitites/Billing";
+import { FlawBillingInput } from "../conference.types";
+import { IsDate, IsInt, IsString, Min } from "class-validator";
 import { Ref } from "@typegoose/typegoose";
-import { IsAfter, IsBefore, RefDocExists } from "../../util/decorators";
+import { IsAfter, IsBefore, RefDocExists } from "../../../util/decorators";
 import Container from "typedi";
-import { I18nService } from "../../services/i18n.service";
+import { I18nService } from "../../../services/i18n.service";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -48,43 +49,10 @@ export class CourseArgs extends CreateArgs(Course, CourseSortableField) {
 @ObjectType()
 export class CourseConnection extends CreateConnection(Course) {}
 
-export enum CourseAttendeeSortableField {}
-
-registerEnumType(CourseAttendeeSortableField, {
-  name: "CourseAttendeeSortableField",
-  description: "Sortable enum definition for course attendees query",
-});
-
-@InputType()
-export class CourseAttendeeFilterInput {
-  @Field(() => ObjectId)
-  termId: ObjectId;
-}
-
-@ArgsType()
-export class CourseAttendeeArgs extends CreateArgs(
-  Course,
-  CourseAttendeeSortableField
-) {
-  @Field(() => CourseAttendeeFilterInput, { nullable: true })
-  filter?: CourseAttendeeFilterInput;
-}
-
-@ObjectType()
-export class CourseAttendeeConnection extends CreateConnection(
-  CourseAttendee
-) {}
-
 @ObjectType({ implements: IMutationResponse })
 export class CourseMutationResponse extends IMutationResponse {
   @Field(() => Course)
   data: Course;
-}
-
-@ObjectType({ implements: IMutationResponse })
-export class CourseSessionMutationResponse extends IMutationResponse {
-  @Field(() => CourseSession)
-  data: CourseSession;
 }
 
 @InputType()
@@ -109,13 +77,11 @@ export class CourseInput implements Partial<Course> {
 
   @Field()
   @IsDate()
-  @IsAfter("start")
   end: Date;
 
   @Field()
   @IsDate()
-  @IsAfter("start")
-  @IsBefore("end")
+  @IsBefore("start")
   registrationEnd: Date;
 
   @Field(() => Int)
@@ -136,6 +102,12 @@ export class CourseInput implements Partial<Course> {
   billing?: FlawBilling;
 }
 
+@ObjectType({ implements: IMutationResponse })
+export class CourseSessionMutationResponse extends IMutationResponse {
+  @Field(() => CourseSession)
+  data: CourseSession;
+}
+
 @InputType()
 export class CourseSessionInput implements Partial<CourseSession> {
   @Field(() => ObjectId)
@@ -145,11 +117,10 @@ export class CourseSessionInput implements Partial<CourseSession> {
   @Field()
   name: string;
 
-  @Field()
-  description: string;
+  @Field({ nullable: true })
+  description?: string;
 
   @Field()
-  @MinDate(new Date())
   @IsBefore("end")
   start: Date;
 
@@ -161,4 +132,21 @@ export class CourseSessionInput implements Partial<CourseSession> {
   @IsInt()
   @Min(1)
   maxAttendees: number;
+}
+
+@ObjectType({
+  description: "represents one row of attendance matrix",
+})
+export class Attendance {
+  @Field(() => CourseAttendee)
+  attendee: CourseAttendee;
+
+  @Field(() => [AttendanceRecord], { nullable: "items" })
+  attendanceRecords: AttendanceRecord[];
+}
+
+@ObjectType()
+export class AttendanceConnection extends CreateConnection(Attendance) {
+  @Field(() => [CourseSession], { nullable: "items" })
+  sessions: CourseSession[];
 }

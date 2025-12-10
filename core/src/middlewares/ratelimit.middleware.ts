@@ -4,7 +4,7 @@ import Container from "typedi";
 import { I18nService } from "../services/i18n.service";
 import { RedisService } from "../services/redis.service";
 
-const ONE_HOUR = 60 * 60;
+const TEN_MIN = 10 * 60;
 
 export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
   (limit = 50) =>
@@ -19,7 +19,7 @@ export const RateLimit: (limit?: number) => MiddlewareFn<Context> =
         })
       );
     } else if (current === 1) {
-      await Container.get(RedisService).expire(key, ONE_HOUR);
+      await Container.get(RedisService).expire(key, TEN_MIN);
     }
 
     return next();

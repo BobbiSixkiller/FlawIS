@@ -1,10 +1,27 @@
-export default function Spinner({ inverted = false }: { inverted?: boolean }) {
+import { cn } from "@/utils/helpers";
+
+const sizeMap = {
+  sm: "size-3",
+  md: "size-6",
+} as const;
+
+type SpinnerSize = keyof typeof sizeMap;
+
+export default function Spinner({
+  inverted = false,
+  size = "md",
+}: {
+  inverted?: boolean;
+  size?: SpinnerSize;
+}) {
   return (
     <div aria-label="Loading..." role="status">
       <svg
-        className={`animate-spin w-6 h-6 ${
-          inverted ? "fill-white" : "fill-gray-900 dark:fill-white"
-        }`}
+        className={cn([
+          "animate-spin",
+          sizeMap[size],
+          inverted ? "fill-white" : "fill-gray-900 dark:fill-white",
+        ])}
         viewBox="3 3 18 18"
       >
         <path

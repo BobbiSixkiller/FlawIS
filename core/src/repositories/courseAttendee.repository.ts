@@ -1,17 +1,20 @@
 import { Service } from "typedi";
+import { ObjectId } from "mongodb";
 
 import { Repository } from "./base.repository";
 import { CourseAttendee } from "../entitites/Course";
-import {
-  CourseAttendeeArgs,
-  CourseAttendeeConnection,
-} from "../resolvers/types/course.types";
+
 import {
   buildCursorFilter,
   decodeCursor,
   encodeCursor,
   ensureIdSort,
 } from "../resolvers/types/pagination.types";
+import {
+  CourseAttendeeArgs,
+  CourseAttendeeConnection,
+} from "../resolvers/types/course/courseAttendee.types";
+import { CtxUser } from "../util/types";
 
 @Service()
 export class CourseAttendeeRepository extends Repository<
@@ -21,12 +24,14 @@ export class CourseAttendeeRepository extends Repository<
     super(CourseAttendee);
   }
 
-  async paginatedCourseTermAttendees({
+  async paginatedCourseAttendees({
     first,
     after,
     sort,
-    filter,
-  }: CourseAttendeeArgs): Promise<CourseAttendeeConnection> {
+    courseId,
+  }: CourseAttendeeArgs & {
+    courseId: ObjectId;
+  }): Promise<CourseAttendeeConnection> {
     // 1. Build Mongo sort object + sortFields for cursor filter
     const sortFields = ensureIdSort(
       sort.map((s) => ({
@@ -47,14 +52,14 @@ export class CourseAttendeeRepository extends Repository<
     }
 
     const [connection] = await this.aggregate<CourseAttendeeConnection>([
-      { $match: { ...(filter?.termId ? { term: filter?.termId } : {}) } },
+      { $match: { course: courseId } },
       { $sort: mongoSort },
       {
         $facet: {
           data: [
             { $match: { ...cursorFilter } },
             { $limit: first },
-            { $addFields: { id: "$_id" } },
+            { $addFields: { id: "$_id", "user.id": "$user._id" } },
           ],
           hasNextPage: [
             { $match: { ...cursorFilter } },

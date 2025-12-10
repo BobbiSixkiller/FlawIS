@@ -14,7 +14,11 @@ export type RoutingKey =
   | "mail.internships.accepted"
   | "mail.internships.rejected"
   | "mail.internships.admin"
-  | "mail.internships.org";
+  | "mail.internships.org"
+  | "mail.courses.applied"
+  | "mail.courses.eligible"
+  | "mail.courses.accepted"
+  | "mail.courses.rejected";
 
 const uri = process.env.RMQ_URI || "amqp://rabbitmq:5672?frameMax=131072";
 const exchange = process.env.RMQ_EXCHANGE || "FlawIS";
@@ -32,9 +36,7 @@ export class RmqService {
   private async createConnection() {
     try {
       if (!this.connection) {
-        this.connection = await amqp.connect(uri, {
-          frameMax: 131072,
-        });
+        this.connection = await amqp.connect(uri);
 
         this.connection?.on("error", (err) => {
           console.error("RMQ Error:", err);

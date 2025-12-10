@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/Button";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import {
@@ -13,10 +12,10 @@ import { uploadOrDelete } from "@/utils/helpers";
 import { useParams } from "next/navigation";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternFiles, createIntern } from "./actions";
-import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import RHFormContainer from "@/components/RHFormContainer";
+import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 
 export default function ApplicationForm({
   user,
@@ -35,24 +34,11 @@ export default function ApplicationForm({
 
   const { yup } = useValidation();
 
-  const { loading, files, errors } = usePrefillFiles({
-    resumes: user?.cvUrl,
-    internships: application?.fileUrls,
-  });
-
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
-  if (loading)
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
-
   return (
     <RHFormContainer
-      errors={errors}
       yupSchema={yup.object({
         files: yup
           .array()
@@ -61,17 +47,12 @@ export default function ApplicationForm({
           .max(5, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
       })}
-      defaultValues={{
-        files: application?.fileUrls ? files.internships : files.resumes,
-      }}
+      defaultValues={{ files: [] }}
     >
       {(methods) => (
         <form
           onSubmit={methods.handleSubmit(
             async (vals) => {
-              console.log(vals);
-              console.log(internshipId);
-
               const urls = [];
               let state;
 
@@ -139,7 +120,12 @@ export default function ApplicationForm({
             accept={{
               "application/pdf": [".pdf"],
             }}
+            fileSources={{
+              resumes: user?.cvUrl,
+              internships: application?.fileUrls,
+            }}
           />
+
           <Button
             type="submit"
             disabled={methods.formState.isSubmitting}

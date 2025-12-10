@@ -5,21 +5,21 @@ export default async function Footer({ lng }: { lng: string }) {
   const { t, i18n } = await translate(lng, "dashboard");
 
   return (
-    <div className="mt-auto bg-black dark:bg-gray-950 md:bg-transparent dark:md:bg-transparent">
+    <div className="mt-auto bg-black dark:bg-gray-950 lg:bg-transparent dark:lg:bg-transparent">
       <div className="mx-auto p-6">
-        <Logo lng={lng} height={60} width={60} inverted className="md:hidden" />
+        <Logo lng={lng} height={60} width={60} inverted className="lg:hidden" />
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 text-nowrap">
           <Logo
             lng={lng}
             width={36}
             height={36}
             notext
-            className="hidden md:block"
+            className="hidden lg:block"
           />
 
-          <ul className="pt-4 md:pt-0 text-xs dark:text-white/75 text-gray-300 md:text-gray-500 flex md:flex-col gap-2 md:gap-1">
-            <li className="hover:underline hover:text-white md:hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
+          <ul className="pt-4 lg:pt-0 text-xs dark:text-white/75 text-gray-300 lg:text-gray-500 flex lg:flex-col gap-2 lg:gap-1">
+            <li className="hover:underline hover:text-white lg:hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
               <a
                 className="focus:outline-transparent"
                 href="mailto:matus.muransky@flaw.uniba.sk"
@@ -27,7 +27,7 @@ export default async function Footer({ lng }: { lng: string }) {
                 {t("contact")}
               </a>
             </li>
-            <li className="hover:underline hover:text-white md:hover:text-primary-500 dark:hover:text-primary-300  cursor-pointer">
+            <li className="hover:underline hover:text-white lg:hover:text-primary-500 dark:hover:text-primary-300  cursor-pointer">
               <a
                 className="focus:outline-transparent"
                 target="_blank"

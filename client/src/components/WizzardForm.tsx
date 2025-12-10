@@ -31,6 +31,7 @@ interface WizzardFormProps<TVals extends Record<string, any>> {
   values?: TVals;
   onSubmitCb: (values: TVals, methods: UseFormReturn<TVals>) => Promise<void>;
   children: ReactNode;
+  className?: string;
 }
 
 export default function WizzardForm<TInputVals extends Record<string, any>>({
@@ -39,6 +40,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
   values,
   defaultValues,
   onSubmitCb,
+  className,
 }: WizzardFormProps<TInputVals>) {
   const steps = Children.toArray(children) as ReactElement<
     WizzardStepProps<TInputVals>
@@ -67,6 +69,8 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
     // Determine step index based on field names and schema
     const stepIndex = steps.findIndex((step) => {
       const keys = Object.keys(step.props.yupSchema.fields);
+      console.log(keys);
+
       return keys.some(
         (k) => firstField === k || firstField.startsWith(`${k}.`)
       );
@@ -90,7 +94,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Stepper activeIndex={step} lng={lng} steps={steps} />
       <RHFormContainer<TInputVals>
         values={values}
@@ -100,6 +104,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
       >
         {(methods) => (
           <form
+            className={className}
             onSubmit={methods.handleSubmit(
               async (vals) => {
                 try {
@@ -109,6 +114,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                     setStep(step + 1);
                   }
                 } catch (errors: any) {
+                  console.log(errors);
                   if (errors && typeof errors === "object") {
                     handleApiErrors(errors, methods);
                   }

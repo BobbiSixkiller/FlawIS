@@ -6,12 +6,14 @@ import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Dropdown from "./Dropdown";
 import Button from "./Button";
+import Link from "next/link";
 
 export default function LngSwitcher({
   authLayout,
+  className,
 }: {
-  className?: string;
   authLayout?: boolean;
+  className?: string;
 }) {
   const path = usePathname();
   const { lng } = useParams<{ lng: string }>();
@@ -20,8 +22,8 @@ export default function LngSwitcher({
 
   return (
     <Dropdown
-      className="w-full"
-      positionSettings={authLayout ? "mt-2 right-0" : "inset-x-0 -top-24"}
+      anchor={{ gap: 6, to: authLayout ? "bottom end" : "top" }}
+      className={className}
       trigger={
         authLayout ? (
           <Button size="icon" variant="ghost" className="rounded-full">
@@ -46,8 +48,11 @@ export default function LngSwitcher({
           </Button>
         )
       }
-      items={languages.map((l) => ({
-        icon: (
+      items={languages.map((l) => (
+        <Link
+          key={l}
+          href={`/${l}${path.replace("/en", "").replace("/sk", "")}`}
+        >
           <Image
             alt="Locale-flag"
             priority
@@ -56,11 +61,9 @@ export default function LngSwitcher({
             height={20}
             className="mr-2"
           />
-        ),
-        href: `/${l}${path.replace("/en", "").replace("/sk", "")}`,
-        text: t(l),
-        type: "link",
-      }))}
+          {t(l)}
+        </Link>
+      ))}
     />
   );
 }

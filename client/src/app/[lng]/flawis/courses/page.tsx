@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
-import { translate } from "@/lib/i18n";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import CourseForm from "./CourseForm";
 import { getCourses } from "./actions";
@@ -24,17 +23,12 @@ export default async function CoursesPage({
         lng={lng}
         heading="Kurzy"
         subHeading="Kurzy na falkute"
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger dialogId={createCourseDialogId}>
-                <Button size="sm">
-                  <PlusIcon className="size-5" /> Novy
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger key={0} dialogId={createCourseDialogId}>
+            <Button size="sm">
+              <PlusIcon className="size-5" /> Novy
+            </Button>
+          </ModalTrigger>,
         ]}
       />
 

@@ -39,29 +39,19 @@ export default async function Users({
         lng={lng}
         heading={t("heading")}
         subHeading="Pouzivatelia registrovani v systeme"
-        links={[
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={0} dialogId={newUserDialogId}>
-                <Button size="sm">
-                  <PlusIcon className="size-5" />
-                  Novy
-                </Button>
-              </ModalTrigger>
-            ),
-          },
-          {
-            type: "custom",
-            element: (
-              <ModalTrigger key={1} dialogId={inviteUserDialogId}>
-                <Button size="sm" variant="secondary">
-                  <BuildingLibraryIcon className="size-5" />
-                  Pozvat instituciu
-                </Button>
-              </ModalTrigger>
-            ),
-          },
+        items={[
+          <ModalTrigger key={0} dialogId={newUserDialogId}>
+            <Button size="sm">
+              <PlusIcon className="size-5" />
+              Novy
+            </Button>
+          </ModalTrigger>,
+          <ModalTrigger key={1} dialogId={inviteUserDialogId}>
+            <Button size="sm" variant="secondary">
+              <BuildingLibraryIcon className="size-5" />
+              Pozvat instituciu
+            </Button>
+          </ModalTrigger>,
         ]}
       />
       <div className="flex justify-between">

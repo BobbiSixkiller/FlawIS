@@ -9,6 +9,7 @@ import { Address, Billing } from "./Billing";
 export enum Access {
   Admin = "ADMIN",
   ConferenceAttendee = "CONFERENCE_ATTENDEE",
+  CourseAttendee = "COURSE_ATTENDEE",
   Organization = "ORGANIZATION",
   Student = "STUDENT",
 }

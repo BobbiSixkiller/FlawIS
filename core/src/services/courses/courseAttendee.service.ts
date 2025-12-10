@@ -2,23 +2,34 @@ import { Service } from "typedi";
 import { ObjectId } from "mongodb";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { I18nService } from "../i18n.service";
-import { CourseService, toDTO } from "./course.service";
-import { CourseAttendeeArgs } from "../../resolvers/types/course.types";
+import { CourseService } from "./course.service";
 import { AttendeeBillingInput } from "../../resolvers/types/attendee.types";
 import mongoose from "mongoose";
 import { UserService } from "../user.service";
 import { Invoice } from "../../entitites/Attendee";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Status } from "../../entitites/Internship";
+import { toDTO } from "../../util/helpers";
+import { CtxUser } from "../../util/types";
+import { Access } from "../../entitites/User";
+import { MinioService } from "../minio.service";
+import { Repository } from "../../repositories/base.repository";
+import { AttendanceRecord } from "../../entitites/Course";
+import { RmqService, RoutingKey } from "../rmq.service";
 
 @Service()
 export class CourseAttendeeService {
   constructor(
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
+    private readonly attendanceRecordRepository = new Repository(
+      AttendanceRecord
+    ),
     private readonly courseService: CourseService,
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
+    private readonly minioService: MinioService,
+    private readonly rmqService: RmqService
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
@@ -32,13 +43,17 @@ export class CourseAttendeeService {
     return toDTO(attendee);
   }
 
-  async getPaginatedCourseAttendees(args: CourseAttendeeArgs) {
-    return await this.courseAttendeeRepository.paginatedCourseTermAttendees(
-      args
-    );
+  async getAttending(courseId: ObjectId, ctxUserId: ObjectId) {
+    const attendee = await this.courseAttendeeRepository.findOne({
+      course: courseId,
+      "user._id": ctxUserId,
+    });
+
+    return attendee ? toDTO(attendee) : null;
   }
 
   async createCourseAttendee(
+    hostname: string,
     courseId: ObjectId,
     userId: ObjectId,
     fileUrls: string[],
@@ -71,6 +86,7 @@ export class CourseAttendeeService {
           email: user.email,
           name: user.name,
           organization: user.organization,
+          telephone: user.telephone,
         },
         fileUrls,
         invoice:
@@ -100,10 +116,53 @@ export class CourseAttendeeService {
             : undefined,
       });
 
-      await this.courseRepository.update(
+      await this.courseRepository.updateMany(
         { _id: course.id },
         { $inc: { attendeesCount: 1 } }
       );
+
+      await session.commitTransaction();
+
+      this.rmqService.produceMessage(
+        JSON.stringify({
+          locale: this.i18nService.language(),
+          hostname,
+          name: user.name,
+          email: user.email,
+          courseId: course.id,
+          course: course.name,
+        }),
+        "mail.courses.applied"
+      );
+
+      return toDTO(attendee);
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async updateFiles(fileUrls: string[], attendeeId: ObjectId, user: CtxUser) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
+        { _id: attendeeId },
+        { $set: { fileUrls } },
+        session
+      );
+      if (!attendee) {
+        throw new Error("Attendee not found!");
+      }
+      if (
+        attendee.user.id.toString() !== user.id.toString() &&
+        !user.access.includes(Access.Admin)
+      ) {
+        throw new Error("Not allowed!");
+      }
 
       await session.commitTransaction();
 
@@ -116,7 +175,11 @@ export class CourseAttendeeService {
     }
   }
 
-  async updateAttendeeStatus(attendeeId: ObjectId, status: Status) {
+  async updateAttendeeStatus(
+    attendeeId: ObjectId,
+    status: Status,
+    hostname: string
+  ) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -129,6 +192,28 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
+      const course = await this.courseRepository.findOne(
+        {
+          _id: attendee.course,
+        },
+        null,
+        { session }
+      );
+      if (!course) {
+        throw new Error("Course not found!");
+      }
+
+      await this.rmqService.produceMessage(
+        JSON.stringify({
+          locale: this.i18nService.language(),
+          hostname,
+          name: attendee.user.name,
+          email: attendee.user.email,
+          courseId: course.id,
+          course: course.name,
+        }),
+        `mail.courses.${status.toLowerCase()}` as RoutingKey
+      );
 
       await session.commitTransaction();
 
@@ -141,7 +226,7 @@ export class CourseAttendeeService {
     }
   }
 
-  async deleteAttendee(id: ObjectId) {
+  async deleteAttendee(id: ObjectId, user: CtxUser) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -153,12 +238,23 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
+      if (
+        attendee.user.id.toString() !== user.id.toString() &&
+        !user.access.includes(Access.Admin)
+      ) {
+        throw new Error("Not allowed!");
+      }
 
-      await this.courseRepository.findOneAndUpdate(
-        { _id: attendee.course },
-        { $inc: { attendeesCount: -1 } },
-        { session, new: true }
-      );
+      await Promise.all([
+        this.courseRepository.findOneAndUpdate(
+          { _id: attendee.course },
+          { $inc: { attendeesCount: -1 } },
+          { session, new: true }
+        ),
+        this.attendanceRecordRepository.deleteMany({}),
+      ]);
+
+      await this.minioService.deleteFiles(attendee.fileUrls);
 
       await session.commitTransaction();
 

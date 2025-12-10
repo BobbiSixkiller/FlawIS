@@ -67,7 +67,7 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
     return await this.dataModel.findOneAndDelete(filter, options);
   }
 
-  async update(
+  async updateMany(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
@@ -91,12 +91,22 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
     return await doc.save({ session: options?.session });
   }
 
-  async delete(
+  async deleteOne(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
-    >
+    >,
+    options?: { session?: mongoose.ClientSession }
   ) {
-    return await this.dataModel.deleteOne(filter);
+    return await this.dataModel.deleteOne(filter, options);
+  }
+
+  async deleteMany(
+    filter: mongoose.FilterQuery<
+      types.DocumentType<InstanceType<E>, types.BeAnObject>
+    >,
+    options?: { session?: mongoose.ClientSession }
+  ) {
+    return await this.dataModel.deleteMany(filter, options);
   }
 
   async countDocuments(

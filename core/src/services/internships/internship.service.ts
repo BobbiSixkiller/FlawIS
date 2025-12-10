@@ -1,35 +1,17 @@
 import { Service } from "typedi";
-import { Internship } from "../entitites/Internship";
 import { ObjectId } from "mongodb";
 import {
   InternshipArgs,
   InternshipConnection,
   InternshipInput,
-} from "../resolvers/types/internship.types";
-import { I18nService } from "./i18n.service";
-import { UserService } from "./user.service";
-import { DocumentType, mongoose } from "@typegoose/typegoose";
-import { InternshipRepository } from "../repositories/internship.repository";
-import { CtxUser } from "../util/types";
-import { Access } from "../entitites/User";
-
-function toInternshipDTO(doc: DocumentType<Internship>) {
-  const json = doc.toJSON({
-    virtuals: false,
-    versionKey: false, // drop __v
-    transform(_doc, ret) {
-      // copy _id → id and remove _id
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-
-      return ret;
-    },
-  });
-
-  return json as Internship;
-}
+} from "../../resolvers/types/internship.types";
+import { I18nService } from "../i18n.service";
+import { UserService } from "../user.service";
+import { mongoose } from "@typegoose/typegoose";
+import { InternshipRepository } from "../../repositories/internship.repository";
+import { CtxUser } from "../../util/types";
+import { Access } from "../../entitites/User";
+import { toDTO } from "../../util/helpers";
 
 @Service()
 export class InternshipService {
@@ -61,7 +43,7 @@ export class InternshipService {
       );
     }
 
-    return toInternshipDTO(internship);
+    return toDTO(internship);
   }
 
   async createInternship(data: InternshipInput, ctxUser: CtxUser) {
@@ -106,7 +88,7 @@ export class InternshipService {
       }
 
       await session.commitTransaction();
-      return toInternshipDTO(internship);
+      return toDTO(internship);
     } catch (error) {
       await session.abortTransaction();
       throw error;

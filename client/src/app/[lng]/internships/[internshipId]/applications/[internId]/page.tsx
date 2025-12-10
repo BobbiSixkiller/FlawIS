@@ -15,6 +15,7 @@ import Modal from "@/components/Modal";
 import ChangeStatusForm from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/ChangeStatusForm";
 import CertificateForm from "./CertificateForm";
 import { redirect } from "next/navigation";
+import { changeInternStatus } from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/actions";
 
 export default async function InternPage({
   params,
@@ -88,6 +89,13 @@ export default async function InternPage({
         <ChangeStatusForm
           dialogId={statusDialogId(Status.Accepted)}
           status={Status.Accepted}
+          action={async () => {
+            "use server";
+            return changeInternStatus({
+              id: intern.id,
+              status: Status.Accepted,
+            });
+          }}
         />
       </Modal>
       <Modal
@@ -97,6 +105,13 @@ export default async function InternPage({
         <ChangeStatusForm
           dialogId={statusDialogId(Status.Rejected)}
           status={Status.Rejected}
+          action={async () => {
+            "use server";
+            return changeInternStatus({
+              id: intern.id,
+              status: Status.Rejected,
+            });
+          }}
         />
       </Modal>
     </div>

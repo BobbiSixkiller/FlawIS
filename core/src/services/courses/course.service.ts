@@ -2,43 +2,34 @@ import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 
 import {
+  AttendanceConnection,
   CourseArgs,
   CourseInput,
   CourseSessionInput,
-} from "../../resolvers/types/course.types";
+} from "../../resolvers/types/course/course.types";
 import { AttendanceRecord, CourseSession } from "../../entitites/Course";
 import { I18nService } from "../i18n.service";
 import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Repository } from "../../repositories/base.repository";
-import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { UserService } from "../user.service";
-
-export function toDTO<T>(doc: DocumentType<T>): T {
-  return doc.toJSON({
-    versionKey: false,
-    virtuals: false,
-    transform(_doc, ret) {
-      if (ret._id) {
-        ret.id = ret._id;
-        delete ret._id;
-      }
-      return ret;
-    },
-  }) as T;
-}
+import { toDTO } from "../../util/helpers";
+import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
+import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
+import { Status } from "../../entitites/Internship";
+import { RmqService } from "../rmq.service";
+import { CtxUser } from "../../util/types";
 
 @Service()
 export class CourseService {
   constructor(
     private readonly courseRepository: CourseRepository,
-    private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly courseSessionRepository = new Repository(CourseSession),
+    private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
       AttendanceRecord
     ),
-    private readonly userService: UserService,
     private readonly i18nService: I18nService
   ) {}
 
@@ -49,6 +40,15 @@ export class CourseService {
     }
 
     return toDTO(course);
+  }
+
+  async getSession(id: ObjectId) {
+    const session = await this.courseSessionRepository.findOne({ _id: id });
+    if (!session) {
+      throw new Error("Course session not found!");
+    }
+
+    return toDTO(session);
   }
 
   async getPaginatedCourses(args: CourseArgs) {
@@ -162,6 +162,10 @@ export class CourseService {
           this.i18nService.translate("notFound", { ns: "course" })
         );
       }
+      const res = await this.attendanceRecordRepository.deleteMany(
+        { session: id },
+        { session }
+      );
 
       await session.commitTransaction();
 
@@ -198,6 +202,7 @@ export class CourseService {
         {
           _id: attendanceRecord.session,
         },
+        null,
         { session }
       );
       if (!courseSession) {
@@ -225,5 +230,162 @@ export class CourseService {
     } finally {
       session.endSession();
     }
+  }
+
+  async myAttendance(
+    courseId: ObjectId,
+    ctxUser: CtxUser
+  ): Promise<AttendanceConnection> {
+    const attendee = await this.courseAttendeeRepository.findOne({
+      course: courseId,
+      "user._id": ctxUser.id,
+    });
+
+    if (!attendee) {
+      throw new Error("You are not registered for this course.");
+    }
+
+    // 2) Load sessions for the course
+    const sessions = await this.courseSessionRepository.findAll(
+      { course: courseId },
+      null,
+      { sort: { _id: 1 } }
+    );
+
+    // If not accepted, you can still return sessions + empty records
+    if (attendee.status !== Status.Accepted) {
+      return {
+        totalCount: 1,
+        edges: [
+          {
+            cursor: attendee.id.toString(),
+            node: {
+              attendee: toDTO(attendee), // or toDTO(attendee)
+              attendanceRecords: [],
+            },
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: attendee.id.toString(),
+        },
+        sessions,
+      };
+    }
+
+    // 3) Fetch or create attendance records for this attendee like in your matrix method
+    const existingRecords = await this.attendanceRecordRepository.findAll(
+      {
+        attendee: attendee.id,
+        session: { $in: sessions.map((s) => s._id) },
+      },
+      null,
+      { sort: { session: 1 } }
+    );
+
+    const attendanceRecords: AttendanceRecord[] = [];
+    for (const session of sessions) {
+      const exists = existingRecords.find(
+        (record) => record.session.toString() === session.id
+      );
+      if (exists) {
+        attendanceRecords.push(toDTO(exists));
+      } else {
+        const newRecord = await this.attendanceRecordRepository.create({
+          session: session._id,
+          attendee: attendee.id,
+          hoursAttended: 0,
+        });
+        attendanceRecords.push(toDTO(newRecord));
+      }
+    }
+
+    // 4) Return the same connection shape, just with one edge
+    return {
+      totalCount: 1,
+      edges: [
+        {
+          cursor: attendee.id.toString(),
+          node: {
+            attendee,
+            attendanceRecords,
+          },
+        },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        endCursor: attendee.id.toString(),
+      },
+      sessions,
+    };
+  }
+
+  async attendance(
+    paginationArgs: CourseAttendeeArgs,
+    courseId: ObjectId
+  ): Promise<AttendanceConnection> {
+    const [sessions, attendeesConnection] = await Promise.all([
+      this.courseSessionRepository.findAll({ course: courseId }, null, {
+        sort: { _id: 1 },
+      }),
+      this.courseAttendeeRepository.paginatedCourseAttendees({
+        ...paginationArgs,
+        courseId,
+      }),
+    ]);
+
+    const edges = await Promise.all(
+      attendeesConnection.edges.map(async (edge) => {
+        if (edge.node.status !== Status.Accepted) {
+          return {
+            ...edge,
+            node: {
+              attendee: edge.node,
+              attendanceRecords: [],
+            },
+          };
+        } else {
+          const existingRecords = await this.attendanceRecordRepository.findAll(
+            {
+              attendee: edge.node.id,
+              session: { $in: sessions.map((s) => s._id) },
+            },
+            null,
+            { sort: { session: 1 } }
+          );
+
+          const attendanceRecords: AttendanceRecord[] = [];
+          for (const session of sessions) {
+            const exists = existingRecords.find(
+              (record) => record.session.toString() === session.id
+            );
+            if (exists) {
+              attendanceRecords.push(toDTO(exists));
+            } else {
+              const newRecord = await this.attendanceRecordRepository.create({
+                session: session._id,
+                attendee: edge.node.id,
+                hoursAttended: 0,
+              });
+              attendanceRecords.push(toDTO(newRecord));
+            }
+          }
+
+          return {
+            ...edge,
+            node: {
+              attendee: edge.node,
+              attendanceRecords,
+            },
+          };
+        }
+      })
+    );
+
+    return {
+      ...attendeesConnection,
+      edges,
+      sessions,
+    };
   }
 }

@@ -9,7 +9,12 @@ import { Input, InputProps } from "@/components/Input";
 import CheckBox from "@/components/Checkbox";
 import PhoneInput from "@/components/PhoneInput";
 import parsePhoneNumberFromString from "libphonenumber-js";
-import { useParams, usePathname, useSearchParams } from "next/navigation";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import Select from "@/components/Select";
 import {
   Access,
@@ -24,7 +29,6 @@ import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import AvatarInput from "@/components/ImageFileInput";
 import { mixed } from "yup";
-import usePrefillFiles from "@/hooks/usePrefillFiles";
 import { useDialogStore } from "@/stores/dialogStore";
 import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
@@ -51,33 +55,14 @@ export default function UserForm({
 
   const { yup } = useValidation();
 
-  const { loading, files, errors } = usePrefillFiles({
-    avatars: user?.avatarUrl,
-    resumes: user?.cvUrl,
-  });
-
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
   const scrollToTop = useScrollStore((s) => s.getScroll);
 
-  if (loading)
-    return (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
-    );
+  const router = useRouter();
 
   return (
     <RHFormContainer
-      //fix this so you can init errors from prefilling files to form
-      // errors={
-      //   errors
-      //     ? {
-      //         files: { message: errors.files },
-      //         avatar: { message: errors.avatars },
-      //       }
-      //     : {}
-      // }
       defaultValues={{
         name: user?.name || "",
         email: user?.email || "",
@@ -94,9 +79,7 @@ export default function UserForm({
         telephone: user?.telephone || "",
         studyProgramme: user?.studyProgramme || null,
         privacy: path === "/register" ? false : true,
-        files: files.resumes ?? [],
-        avatar:
-          files.avatars && files.avatars.length > 0 ? files.avatars[0] : null,
+        files: [],
       }}
       yupSchema={yup.object({
         name: yup.string().trim().required(),
@@ -176,7 +159,7 @@ export default function UserForm({
             is: () =>
               subdomain?.includes("conferences") ||
               subdomain?.includes("intern") ||
-              ctxUser?.access.includes(Access.Student),
+              subdomain?.includes("courses"),
             then: (schema) =>
               schema
                 .required()
@@ -209,7 +192,9 @@ export default function UserForm({
           .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required()
           .when({
-            is: () => ctxUser?.access.includes(Access.Student),
+            is: () =>
+              ctxUser?.access.includes(Access.Student) ||
+              ctxUser?.access.includes(Access.CourseAttendee),
             then: (schema) =>
               schema.min(1, (val) =>
                 t("minFiles", { value: val.min, ns: "validation" })
@@ -224,7 +209,7 @@ export default function UserForm({
     >
       {(methods) => (
         <form
-          className="space-y-6"
+          className="space-y-6 sm:w-96"
           onSubmit={methods.handleSubmit(
             async (val) => {
               const { error, url: cvUrl } = await uploadOrDelete(
@@ -248,7 +233,6 @@ export default function UserForm({
               let res;
               if (path.includes("register")) {
                 res = await register({
-                  url: searchParams.get("url")?.toString(),
                   token: searchParams.get("token")?.toString(),
                   email: val.email,
                   name: val.name,
@@ -304,12 +288,22 @@ export default function UserForm({
               if (res?.success && dialogId) {
                 closeDialog(dialogId);
               }
+
+              if (path.includes("/profile/update")) {
+                router.back();
+              }
+              if (path.includes("register")) {
+                const url = searchParams.get("url")?.toString();
+
+                window.location.replace(url ? url : "/");
+              }
             },
             (errors) => console.log(errors)
           )}
         >
           {path.includes("update") && (
             <AvatarInput
+              avatarUrl={user?.avatarUrl ? user.avatarUrl : undefined}
               control={methods.control}
               name="avatar"
               label="Fotka"
@@ -387,6 +381,12 @@ export default function UserForm({
                   { name: "2. magisterský", value: StudyProgramme.Master2 },
                 ]}
               />
+            </>
+          )}
+
+          {path.includes("users") ||
+            user?.access.includes(Access.Student) ||
+            (user?.access.includes(Access.CourseAttendee) && (
               <MultipleFileUploadField
                 control={methods.control}
                 setError={methods.setError}
@@ -397,9 +397,9 @@ export default function UserForm({
                 accept={{
                   "application/pdf": [".pdf"],
                 }}
+                fileSources={{ resumes: user?.cvUrl }}
               />
-            </>
-          )}
+            ))}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>

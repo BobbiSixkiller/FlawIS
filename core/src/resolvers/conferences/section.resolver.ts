@@ -11,17 +11,20 @@ import {
 import {
   SectionInput,
   SectionMutationResponse,
-} from "./types/conference.types";
-import { Section, SectionTranslation } from "../entitites/Section";
-import { I18nService } from "../services/i18n.service";
-import { LoadResource } from "../util/decorators";
+} from "../types/conference.types";
+import { Section, SectionTranslation } from "../../entitites/Section";
+import { I18nService } from "../../services/i18n.service";
+import { LoadResource } from "../../util/decorators";
 import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
-import { SubmissionArgs, SubmissionConnection } from "./types/submission.types";
-import { Conference } from "../entitites/Conference";
-import { ConferenceRepository } from "../repositories/conference.repository";
-import { Repository } from "../repositories/base.repository";
-import { SubmissionRepository } from "../repositories/submission.repository";
+import {
+  SubmissionArgs,
+  SubmissionConnection,
+} from "../types/submission.types";
+import { Conference } from "../../entitites/Conference";
+import { ConferenceRepository } from "../../repositories/conference.repository";
+import { Repository } from "../../repositories/base.repository";
+import { SubmissionRepository } from "../../repositories/submission.repository";
 
 @Service()
 @Resolver(() => Section)
@@ -81,7 +84,7 @@ export class SectionResolver {
     @Arg("id") _id: ObjectId,
     @LoadResource(Section) section: DocumentType<Section>
   ): Promise<SectionMutationResponse> {
-    await this.sectionRepository.delete({ _id: section.id });
+    await this.sectionRepository.deleteOne({ _id: section.id });
 
     return {
       data: section,

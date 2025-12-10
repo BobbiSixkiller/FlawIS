@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -11,6 +11,13 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value;
   const user = cookieStore.get("user")?.value;
+
+  const isRsc = searchParams.has("_rsc");
+
+  // If this is an RSC prefetch, DO NOT mutate auth state.
+  if (isRsc) {
+    return new NextResponse(null, { status: 204 });
+  }
 
   if (token) {
     cookieStore.delete({

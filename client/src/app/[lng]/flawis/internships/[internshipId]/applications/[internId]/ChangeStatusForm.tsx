@@ -3,19 +3,21 @@
 import { Status } from "@/lib/graphql/generated/graphql";
 import { useParams } from "next/navigation";
 import { useTransition } from "react";
-import { changeInternStatus } from "./actions";
 import { useTranslation } from "@/lib/i18n/client";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { GqlMutationResponse } from "@/utils/actions";
 
-export default function ChangeStatusForm({
+export default function ChangeStatusForm<TData>({
   dialogId,
   status,
+  action,
 }: {
   status: Status;
   dialogId: string;
+  action: () => Promise<GqlMutationResponse<TData>>;
 }) {
   const { internId, lng } = useParams<{ internId: string; lng: string }>();
   const [pending, startTransition] = useTransition();
@@ -25,7 +27,7 @@ export default function ChangeStatusForm({
 
   const handleClick = () =>
     startTransition(async () => {
-      const res = await changeInternStatus({ id: internId, status });
+      const res = await action();
 
       setMessage(res.message, res.success);
 

@@ -48,7 +48,6 @@ export class UserResolver {
   }
 
   @Authorized()
-  @UseMiddleware(RateLimit())
   @Query(() => User)
   async me(@Ctx() { user }: Context) {
     return await this.userService.getUser(user!.id);

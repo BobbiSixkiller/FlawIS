@@ -15,13 +15,7 @@ import { createCourse } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import {
-  cn,
-  getLocalDate,
-  handleAPIErrors,
-  todayAtMidnight,
-} from "@/utils/helpers";
-import { CheckIcon } from "@heroicons/react/24/outline";
+import { formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
@@ -53,9 +47,12 @@ export default function CourseForm({
       defaultValues={{
         name: course?.name ?? "",
         categoryIds: course?.categories.map((c) => c.id) ?? [],
-        start: getLocalDate(course?.start ?? today),
-        end: getLocalDate(course?.end ?? today),
-        registrationEnd: getLocalDate(course?.registrationEnd ?? today),
+        start: formatDatetimeLocal(course?.start ?? today, false),
+        end: formatDatetimeLocal(course?.end ?? today, false),
+        registrationEnd: formatDatetimeLocal(
+          course?.registrationEnd ?? today,
+          false
+        ),
         description: course?.description ?? "",
         maxAttendees: course?.maxAttendees ?? 0,
         price: course?.price ?? 0,
@@ -103,7 +100,7 @@ export default function CourseForm({
           maxAttendees: yup.number().required().min(1),
           start: yup.date(),
           end: yup.date().min(yup.ref("start")),
-          registrationEnd: yup.date().min(yup.ref("start")).max(yup.ref("end")),
+          registrationEnd: yup.date().max(yup.ref("start")),
         })}
       >
         {(methods) => (

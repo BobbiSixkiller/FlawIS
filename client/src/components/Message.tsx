@@ -87,7 +87,7 @@ export function Snackbar() {
       <div
         role="alert"
         className={`
-           fixed h-fit z-40 inset-x-0 bottom-0 text-center flex flex-col gap-1 p-3 border-t ${
+           fixed h-fit z-[9999] inset-x-0 bottom-0 text-center flex flex-col gap-1 p-3 border-t ${
              message.success
                ? "border-green-500 text-green-500 bg-green-200"
                : "border-red-500 text-red-500 bg-red-200"

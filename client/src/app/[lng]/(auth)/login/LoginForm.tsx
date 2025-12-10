@@ -36,6 +36,13 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             if (res) {
               setMessage(res.message, res.success);
             }
+
+            if (res.success) {
+              return setTimeout(
+                () => window.location.replace(url ? url : "/"),
+                300
+              );
+            }
           })}
         >
           <Input name="email" label="Email" autoComplete="email" />

@@ -1,3 +1,5 @@
+import { DocumentType } from "@typegoose/typegoose";
+
 export function getAcademicYear(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -19,4 +21,18 @@ export function todayAtMidnight(): Date {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   return now;
+}
+
+export function toDTO<T>(doc: DocumentType<T>): T {
+  return doc.toJSON({
+    versionKey: false,
+    virtuals: false,
+    transform(_doc, ret) {
+      if (ret._id) {
+        ret.id = ret._id;
+        delete ret._id;
+      }
+      return ret;
+    },
+  }) as T;
 }

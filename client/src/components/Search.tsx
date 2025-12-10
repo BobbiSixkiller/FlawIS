@@ -113,7 +113,7 @@ export default function SearchComponent<
           >
             <DialogPanel as={Fragment}>
               <Combobox
-                onChange={(val: TOption) => {
+                onChange={(val: TOption | null) => {
                   setText("");
                   if (val) {
                     onOptionSelect(val);
