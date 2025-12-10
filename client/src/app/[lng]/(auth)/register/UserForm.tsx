@@ -233,7 +233,6 @@ export default function UserForm({
               let res;
               if (path.includes("register")) {
                 res = await register({
-                  url: searchParams.get("url")?.toString(),
                   token: searchParams.get("token")?.toString(),
                   email: val.email,
                   name: val.name,
@@ -292,6 +291,11 @@ export default function UserForm({
 
               if (path.includes("/profile/update")) {
                 router.back();
+              }
+              if (path.includes("register")) {
+                const url = searchParams.get("url")?.toString();
+
+                window.location.replace(url ? url : "/");
               }
             },
             (errors) => console.log(errors)

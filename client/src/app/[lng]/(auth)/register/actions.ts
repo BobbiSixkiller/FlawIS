@@ -8,13 +8,11 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlMutation } from "@/utils/actions";
 import { cookies } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
 
 export async function register({
-  url,
   token,
   ...data
-}: RegisterUserInput & { url?: string; token?: string }) {
+}: RegisterUserInput & { token?: string }) {
   const res = await executeGqlMutation(
     RegisterDocument,
     { data },
@@ -45,8 +43,6 @@ export async function register({
       domain:
         process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
     });
-
-    redirect(url ? url : "/", RedirectType.replace);
   }
 
   return res;

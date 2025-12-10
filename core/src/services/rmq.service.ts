@@ -36,9 +36,7 @@ export class RmqService {
   private async createConnection() {
     try {
       if (!this.connection) {
-        this.connection = await amqp.connect(uri, {
-          frameMax: 131072,
-        });
+        this.connection = await amqp.connect(uri);
 
         this.connection?.on("error", (err) => {
           console.error("RMQ Error:", err);
