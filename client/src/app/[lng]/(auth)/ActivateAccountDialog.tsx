@@ -26,10 +26,12 @@ export default function ActivateAccountDialog({
   const setMessage = useMessageStore((s) => s.setMessage);
 
   useEffect(() => {
-    if (user && user?.verified) {
-      closeDialog(dialogId);
-    } else {
-      openDialog(dialogId);
+    if (user) {
+      if (!user.verified) {
+        openDialog(dialogId);
+      } else {
+        closeDialog(dialogId);
+      }
     }
   }, [user]);
 

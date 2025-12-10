@@ -63,7 +63,9 @@ export async function activate() {
       message: data.activateUser.message,
       data: data.activateUser.data,
     }),
-    { revalidateTags: (data) => [data.activateUser.data.email] },
+    {
+      revalidateTags: (data) => [data.activateUser.data.email],
+    },
     {
       activation: token,
     }

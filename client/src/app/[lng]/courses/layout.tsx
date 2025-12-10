@@ -172,9 +172,7 @@ export default async function CoursesLayout({
       </div>
 
       <Snackbar />
-      {user && !user.verified && (
-        <ActivateAccountDialog lng={lng} user={user} />
-      )}
+      <ActivateAccountDialog lng={lng} user={user} />
     </div>
   );
 }
