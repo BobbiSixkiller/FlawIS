@@ -34,6 +34,7 @@ import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
 import { useScrollStore } from "@/stores/scrollStore";
 import RHFormContainer from "@/components/RHFormContainer";
+import { deleteFiles } from "@/lib/minio";
 
 export default function UserForm({
   user,
@@ -384,22 +385,20 @@ export default function UserForm({
             </>
           )}
 
-          {path.includes("users") ||
-            user?.access.includes(Access.Student) ||
-            (user?.access.includes(Access.CourseAttendee) && (
-              <MultipleFileUploadField
-                control={methods.control}
-                setError={methods.setError}
-                setValue={methods.setValue}
-                label="CV.pdf"
-                name="files"
-                maxFiles={1}
-                accept={{
-                  "application/pdf": [".pdf"],
-                }}
-                fileSources={{ resumes: user?.cvUrl }}
-              />
-            ))}
+          {(path.includes("users") || path.includes("profile")) && (
+            <MultipleFileUploadField
+              control={methods.control}
+              setError={methods.setError}
+              setValue={methods.setValue}
+              label="CV.pdf"
+              name="files"
+              maxFiles={1}
+              accept={{
+                "application/pdf": [".pdf"],
+              }}
+              fileSources={{ resumes: user?.cvUrl }}
+            />
+          )}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>

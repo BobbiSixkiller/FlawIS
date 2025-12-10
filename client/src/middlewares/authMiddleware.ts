@@ -48,8 +48,6 @@ export function withAuth(middleware: CustomMiddleware) {
 
     const isPublic = isAuthPath || isSubdomainPublic;
 
-    console.log("AUTH ", isPublic);
-
     // not logged in and on protected page redirect to login
     if (!token && !isPublic) {
       const loginUrl = new URL("/login", url.origin);
