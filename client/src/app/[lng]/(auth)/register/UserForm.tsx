@@ -384,22 +384,20 @@ export default function UserForm({
             </>
           )}
 
-          {path.includes("users") ||
-            user?.access.includes(Access.Student) ||
-            (user?.access.includes(Access.CourseAttendee) && (
-              <MultipleFileUploadField
-                control={methods.control}
-                setError={methods.setError}
-                setValue={methods.setValue}
-                label="CV.pdf"
-                name="files"
-                maxFiles={1}
-                accept={{
-                  "application/pdf": [".pdf"],
-                }}
-                fileSources={{ resumes: user?.cvUrl }}
-              />
-            ))}
+          {(path.includes("users") || path.includes("profile")) && (
+            <MultipleFileUploadField
+              control={methods.control}
+              setError={methods.setError}
+              setValue={methods.setValue}
+              label="CV.pdf"
+              name="files"
+              maxFiles={1}
+              accept={{
+                "application/pdf": [".pdf"],
+              }}
+              fileSources={{ resumes: user?.cvUrl }}
+            />
+          )}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>
