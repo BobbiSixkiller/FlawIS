@@ -58,7 +58,7 @@ export default async function InternshipsPage({
 
         <div className="flex gap-2 items-center">
           <FilterDropdown
-            anchor="bottom"
+            anchor={{ gap: 6, to: "bottom" }}
             filters={[
               {
                 label: "Inštitúcie",
