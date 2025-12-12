@@ -36,7 +36,8 @@ export function withAuth(middleware: CustomMiddleware) {
   return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
     const url = req.nextUrl.clone();
     const localeRegex = /^\/(en|sk)(?=\/|$)/;
-    const pathWithoutLocale = url.pathname.replace(localeRegex, "");
+    const pathWithoutLocale = url.pathname.replace(localeRegex, "") || "/";
+
     const token = req.cookies.get("accessToken")?.value;
 
     const host = req.headers.get("host") ?? url.host;
