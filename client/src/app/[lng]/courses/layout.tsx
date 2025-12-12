@@ -80,7 +80,7 @@ export default async function CoursesLayout({
     <div
       className={cn([
         "min-h-screen flex flex-col items-center",
-        "dark:bg-gray-900 dark:text-white/85",
+        "dark:bg-gray-950 dark:text-white/85",
       ])}
     >
       <div className="sm:max-w-md w-full flex justify-end gap-2 items-center p-6 sm:p-2 h-[60px]">

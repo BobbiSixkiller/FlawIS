@@ -11,9 +11,10 @@ import {
   CourseFragment,
   CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/utils/helpers";
 import { useTranslation } from "@/lib/i18n/client";
 import { getCourses } from "./actions";
+import Card from "@/components/Card";
+import { Input } from "@/components/Input";
 
 function ListItem({ data }: { data?: CourseFragment }) {
   const path = usePathname();
@@ -21,10 +22,8 @@ function ListItem({ data }: { data?: CourseFragment }) {
   const { t } = useTranslation(lng, "internships");
 
   return (
-    <Link
-      className={cn([
-        "relative rounded-2xl border dark:border-gray-700 shadow hover:shadow-lg p-4 text-gray-900 dark:text-white text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white dark:bg-gray-700",
-      ])}
+    <Card
+      as={Link}
       href={path.includes("courses") ? `/courses/${data?.id}` : `/${data?.id}`}
     >
       <div className="flex flex-wrap justify-between">
@@ -37,7 +36,7 @@ function ListItem({ data }: { data?: CourseFragment }) {
       <p className="line-clamp-3">
         {data?.description.replace(/<[^>]*>/g, " ").trim()}
       </p>
-    </Link>
+    </Card>
   );
 }
 
