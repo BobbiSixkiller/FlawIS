@@ -418,6 +418,9 @@ type Intern {
   internship: ObjectId!
   organization: String!
   organizationFeedbackUrl: String
+
+  """Term in which the intern prefers to attend the internship"""
+  semester: Semester
   status: Status!
   updatedAt: DateTimeISO!
   user: StudentReference!
@@ -595,7 +598,7 @@ type Mutation {
   createCourse(data: CourseInput!): CourseMutationResponse!
   createCourseAttendee(billing: AttendeeBillingInput, courseId: ObjectId!, fileUrls: [String!]!): CourseAttendeeMutationResponse!
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
-  createIntern(fileUrls: [String]!, internshipId: ObjectId!): InternMutationResponse!
+  createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
@@ -625,7 +628,7 @@ type Mutation {
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
   updateCourseAttendeeFiles(fileUrls: [String!]!, id: ObjectId!): CourseAttendeeMutationResponse!
   updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
-  updateInternFiles(fileUrls: [String]!, id: ObjectId!): InternMutationResponse!
+  updateInternData(fileUrls: [String]!, id: ObjectId!, semester: Semester!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
   updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
   updateOrgFeedback(fileUrl: String, id: ObjectId!): InternMutationResponse!
@@ -733,6 +736,13 @@ input SectionTranslationInput {
 type SectionTranslations {
   name: String!
   topic: String!
+}
+
+"""Intern during summer or winter or both terms"""
+enum Semester {
+  Both
+  Summer
+  Winter
 }
 
 """Ascending/descending direction of the sort field"""

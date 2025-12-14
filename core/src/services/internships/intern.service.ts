@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { Intern, Status } from "../../entitites/Internship";
+import { Intern, Semester, Status } from "../../entitites/Internship";
 import { InternArgs } from "../../resolvers/types/internship.types";
 import { ObjectId } from "mongodb";
 import { I18nService } from "../i18n.service";
@@ -10,7 +10,6 @@ import { UserService } from "../user.service";
 import { RmqService, RoutingKey } from "../rmq.service";
 import { MinioService } from "../minio.service";
 import mongoose from "mongoose";
-import { DocumentType } from "@typegoose/typegoose";
 import { InternRepository } from "../../repositories/intern.repository";
 import { CtxUser } from "../../util/types";
 import { UserRepository } from "../../repositories/user.repository";
@@ -56,6 +55,7 @@ export class InternService {
     userId: ObjectId,
     internshipId: ObjectId,
     fileUrls: string[],
+    semester: Semester,
     hostname: string
   ): Promise<Intern> {
     const session = await mongoose.startSession();
@@ -107,6 +107,7 @@ export class InternService {
           },
           status: Status.Applied,
           fileUrls,
+          semester,
         },
         { session }
       );
@@ -173,14 +174,19 @@ export class InternService {
     }
   }
 
-  async updateFiles(fileUrls: string[], id: ObjectId, user: CtxUser) {
+  async updateInternData(
+    fileUrls: string[],
+    id: ObjectId,
+    user: CtxUser,
+    semester: Semester
+  ) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
-        { fileUrls },
+        { $set: { fileUrls, semester } },
         session
       );
       if (!intern) {

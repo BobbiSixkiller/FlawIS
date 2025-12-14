@@ -70,6 +70,7 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
       email: i?.user.email,
       phone: i?.user.telephone,
       class: i?.user.studyProgramme,
+      semester: i?.semester,
     }));
   },
 };

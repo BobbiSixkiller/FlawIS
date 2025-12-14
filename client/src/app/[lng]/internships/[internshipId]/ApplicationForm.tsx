@@ -5,17 +5,20 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import {
   ApplicationFragment,
+  Semester,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { uploadOrDelete } from "@/utils/helpers";
 import { useParams } from "next/navigation";
 import { deleteFiles } from "@/lib/minio";
-import { changeInternFiles, createIntern } from "./actions";
+import { changeInternData, createIntern } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import RHFormContainer from "@/components/RHFormContainer";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import CheckBox from "@/components/Checkbox";
+import Select from "@/components/Select";
 
 export default function ApplicationForm({
   user,
@@ -46,8 +49,12 @@ export default function ApplicationForm({
           .min(1, (val) => t("minFiles", { value: val.min, ns: "validation" }))
           .max(5, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
           .required(),
+        semester: yup.string<Semester>().required(),
       })}
-      defaultValues={{ files: [] }}
+      defaultValues={{
+        files: [],
+        semester: application?.semester ?? Semester.Winter,
+      }}
     >
       {(methods) => (
         <form
@@ -75,7 +82,11 @@ export default function ApplicationForm({
                   }
                 }
 
-                state = await changeInternFiles(application.id, urls);
+                state = await changeInternData({
+                  fileUrls: urls,
+                  id: application.id,
+                  semester: vals.semester,
+                });
               } else {
                 console.log("NEW");
 
@@ -94,7 +105,11 @@ export default function ApplicationForm({
                   }
                 }
 
-                state = await createIntern(urls, internshipId);
+                state = await createIntern({
+                  internshipId,
+                  fileUrls: urls,
+                  semester: vals.semester,
+                });
                 if (!state.success) {
                   await deleteFiles(urls);
                 }
@@ -110,6 +125,17 @@ export default function ApplicationForm({
           )}
           className="space-y-6 sm:w-96"
         >
+          <Select
+            name="semester"
+            label={"Mam zaujem stazovat v semestri"}
+            control={methods.control}
+            options={[
+              { name: "Zimny", value: Semester.Winter },
+              { name: "Letny", value: Semester.Summer },
+              { name: "Zimny aj letny", value: Semester.Both },
+            ]}
+          />
+
           <MultipleFileUploadField
             control={methods.control}
             setValue={methods.setValue}
@@ -121,11 +147,10 @@ export default function ApplicationForm({
               "application/pdf": [".pdf"],
             }}
             fileSources={{
-              resumes: user?.cvUrl,
+              resumes: !application?.fileUrls ? user?.cvUrl : undefined,
               internships: application?.fileUrls,
             }}
           />
-
           <Button
             type="submit"
             disabled={methods.formState.isSubmitting}
