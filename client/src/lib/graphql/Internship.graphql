@@ -14,6 +14,7 @@ fragment Application on Intern {
   fileUrls
   organizationFeedbackUrl
   status
+  semester
   createdAt
   updatedAt
 }
@@ -103,6 +104,7 @@ query internsExport {
     }
     organization
     status
+    semester
   }
 }
 
@@ -133,14 +135,26 @@ query intern($id: ObjectId!) {
   }
 }
 
-mutation createIntern($fileUrls: [String]!, $internshipId: ObjectId!) {
-  createIntern(fileUrls: $fileUrls, internshipId: $internshipId) {
+mutation createIntern(
+  $fileUrls: [String]!
+  $internshipId: ObjectId!
+  $semester: Semester!
+) {
+  createIntern(
+    fileUrls: $fileUrls
+    internshipId: $internshipId
+    semester: $semester
+  ) {
     message
   }
 }
 
-mutation updateInternFiles($id: ObjectId!, $fileUrls: [String]!) {
-  updateInternFiles(id: $id, fileUrls: $fileUrls) {
+mutation updateInternData(
+  $id: ObjectId!
+  $fileUrls: [String]!
+  $semester: Semester!
+) {
+  updateInternData(id: $id, fileUrls: $fileUrls, semester: $semester) {
     message
     data {
       internship

@@ -19,6 +19,17 @@ registerEnumType(Status, {
   description: "Intern status",
 });
 
+export enum Semester {
+  Summer = "SUMMER",
+  Winter = "WINTER",
+  Both = "BOTH",
+}
+
+registerEnumType(Semester, {
+  name: "Semester",
+  description: "Intern during summer or winter or both terms",
+});
+
 @ObjectType({ description: "User stub type" })
 export class StudentReference implements Partial<User> {
   @Field(() => ObjectId, { description: "User document id" })
@@ -72,6 +83,13 @@ export class Intern extends TimeStamps {
   @Field(() => Status)
   @Property({ enum: Status, type: String, default: Status.Applied })
   status: Status;
+
+  @Field(() => Semester, {
+    nullable: true,
+    description: "Term in which the intern prefers to attend the internship",
+  })
+  @Property({ type: String, enum: Semester })
+  semester?: Semester;
 
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })

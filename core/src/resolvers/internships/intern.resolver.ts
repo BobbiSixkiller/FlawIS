@@ -10,7 +10,12 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
-import { Intern, Status, StudentReference } from "../../entitites/Internship";
+import {
+  Intern,
+  Semester,
+  Status,
+  StudentReference,
+} from "../../entitites/Internship";
 import { I18nService } from "../../services/i18n.service";
 import {
   InternArgs,
@@ -55,7 +60,8 @@ export class InternResolver {
   async createIntern(
     @Ctx() { user, req }: Context,
     @Arg("internshipId") internshipId: ObjectId,
-    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
+    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[],
+    @Arg("semester", () => Semester) semester: Semester
   ): Promise<InternMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
@@ -63,6 +69,7 @@ export class InternResolver {
       user!.id,
       internshipId,
       fileUrls,
+      semester,
       hostname
     );
 
@@ -91,12 +98,18 @@ export class InternResolver {
 
   @Authorized()
   @Mutation(() => InternMutationResponse)
-  async updateInternFiles(
+  async updateInternData(
     @Ctx() { user }: Context,
     @Arg("id") id: ObjectId,
-    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[]
+    @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[],
+    @Arg("semester", () => Semester) semester: Semester
   ): Promise<InternMutationResponse> {
-    const intern = await this.internService.updateFiles(fileUrls, id, user!);
+    const intern = await this.internService.updateInternData(
+      fileUrls,
+      id,
+      user!,
+      semester
+    );
 
     return {
       message: this.i18nService.translate("internFiles", { ns: "intern" }),
