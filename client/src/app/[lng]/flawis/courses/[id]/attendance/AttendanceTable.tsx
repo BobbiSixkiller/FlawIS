@@ -269,7 +269,7 @@ function AttendanceRow({
             // This stays stuck immediately to the right of the name
             <div
               className={cn([
-                "sticky left-[150px] p-2 inline-flex items-center gap-2 text-gray-600 bg-white z-10",
+                "sticky left-[150px] w-full p-2 inline-flex items-center gap-2 text-gray-600 bg-white z-10",
                 "dark:bg-gray-800 dark:text-white/85",
               ])}
             >
