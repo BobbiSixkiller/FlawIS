@@ -115,10 +115,6 @@ export class CourseSession extends TimeStamps {
   @Property()
   end: Date;
 
-  @Field(() => Int)
-  @Property()
-  maxAttendees: number;
-
   @Field()
   createdAt: Date;
   @Field()

@@ -381,7 +381,6 @@ export type CourseSession = {
   description?: Maybe<Scalars['String']['output']>;
   end: Scalars['DateTimeISO']['output'];
   id: Scalars['ObjectId']['output'];
-  maxAttendees: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   start: Scalars['DateTimeISO']['output'];
   updatedAt: Scalars['DateTimeISO']['output'];
@@ -391,7 +390,6 @@ export type CourseSessionInput = {
   course: Scalars['ObjectId']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   end: Scalars['DateTimeISO']['input'];
-  maxAttendees: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   start: Scalars['DateTimeISO']['input'];
 };
@@ -467,7 +465,7 @@ export type Intern = {
   organization: Scalars['String']['output'];
   organizationFeedbackUrl?: Maybe<Scalars['String']['output']>;
   /** Term in which the intern prefers to attend the internship */
-  semester: Semester;
+  semester?: Maybe<Semester>;
   status: Status;
   updatedAt: Scalars['DateTimeISO']['output'];
   user: StudentReference;
@@ -1646,7 +1644,7 @@ export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __ty
 
 export type CourseFragment = { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null };
 
-export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any };
+export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any };
 
 export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } };
 
@@ -1676,7 +1674,7 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } | null> } } };
+export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
@@ -1705,7 +1703,7 @@ export type CreateCourseSessionMutationVariables = Exact<{
 }>;
 
 
-export type CreateCourseSessionMutation = { __typename?: 'Mutation', createCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
+export type CreateCourseSessionMutation = { __typename?: 'Mutation', createCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } } };
 
 export type UpdateCourseSessionMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1713,14 +1711,14 @@ export type UpdateCourseSessionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCourseSessionMutation = { __typename?: 'Mutation', updateCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
+export type UpdateCourseSessionMutation = { __typename?: 'Mutation', updateCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } } };
 
 export type DeleteCourseSessionMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteCourseSessionMutation = { __typename?: 'Mutation', deleteCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, maxAttendees: number, createdAt: any, updatedAt: any } } };
+export type DeleteCourseSessionMutation = { __typename?: 'Mutation', deleteCourseSession: { __typename?: 'CourseSessionMutationResponse', message: string, data: { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } } };
 
 export type CreateCourseAttendeeMutationVariables = Exact<{
   courseId: Scalars['ObjectId']['input'];
@@ -1770,7 +1768,7 @@ export type UpdateAttendanceOnlineMutationVariables = Exact<{
 
 export type UpdateAttendanceOnlineMutation = { __typename?: 'Mutation', updateAttendanceOnline: { __typename?: 'AttendanceRecordMutationResponse', message: string, data: { __typename?: 'AttendanceRecord', hoursAttended: number, online?: boolean | null, session: { __typename?: 'CourseSession', course: any } } } };
 
-export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester: Semester, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
+export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
 export type InternshipsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1780,14 +1778,14 @@ export type InternshipsQueryVariables = Exact<{
 }>;
 
 
-export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, organizations: Array<{ __typename?: 'OrganizationCount', organization: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: string, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester: Semester, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+export type InternshipsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', totalCount: number, academicYears: Array<{ __typename?: 'AcademicYear', academicYear: string, count: number }>, organizations: Array<{ __typename?: 'OrganizationCount', organization: string, count: number }>, edges: Array<{ __typename?: 'InternshipEdge', cursor: string, node: { __typename?: 'Internship', id: any, organization: string, description: string, applicationsCount: number, academicYear: string, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type InternshipQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, user: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester: Semester, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
+export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, user: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
 
 export type CreateInternshipMutationVariables = Exact<{
   input: InternshipInput;
@@ -1814,7 +1812,7 @@ export type DeleteInternshipMutation = { __typename?: 'Mutation', deleteInternsh
 export type InternsExportQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type InternsExportQuery = { __typename?: 'Query', internsExport: Array<{ __typename?: 'Intern', organization: string, status: Status, semester: Semester, user: { __typename?: 'StudentReference', email: string, name: string, studyProgramme: StudyProgramme, telephone: string } } | null> };
+export type InternsExportQuery = { __typename?: 'Query', internsExport: Array<{ __typename?: 'Intern', organization: string, status: Status, semester?: Semester | null, user: { __typename?: 'StudentReference', email: string, name: string, studyProgramme: StudyProgramme, telephone: string } } | null> };
 
 export type InternsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1824,14 +1822,14 @@ export type InternsQueryVariables = Exact<{
 }>;
 
 
-export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: string, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester: Semester, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
+export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: string, node: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type InternQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type InternQuery = { __typename?: 'Query', intern: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester: Semester, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } };
+export type InternQuery = { __typename?: 'Query', intern: { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } };
 
 export type CreateInternMutationVariables = Exact<{
   fileUrls: Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>;
@@ -2554,7 +2552,6 @@ export const CourseSessionFragmentDoc = new TypedDocumentString(`
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }
@@ -4367,7 +4364,6 @@ export const AttendanceDocument = new TypedDocumentString(`
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }
@@ -4603,7 +4599,6 @@ export const CreateCourseSessionDocument = new TypedDocumentString(`
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<CreateCourseSessionMutation, CreateCourseSessionMutationVariables>;
@@ -4623,7 +4618,6 @@ export const UpdateCourseSessionDocument = new TypedDocumentString(`
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<UpdateCourseSessionMutation, UpdateCourseSessionMutationVariables>;
@@ -4643,7 +4637,6 @@ export const DeleteCourseSessionDocument = new TypedDocumentString(`
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<DeleteCourseSessionMutation, DeleteCourseSessionMutationVariables>;

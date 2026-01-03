@@ -140,7 +140,6 @@ function AttendanceTableContainer({
                 >
                   <p>Zaciatok: {formatDatetimeLocal(s?.start, true)}</p>
                   <p>Koniec: {formatDatetimeLocal(s?.end, true)}</p>
-                  <p>Kapacita: {s?.maxAttendees}</p>
                   {s?.description && (
                     <div
                       className="prose"
@@ -245,17 +244,18 @@ function AttendanceRow({
           {isAccepted ? (
             <div className="flex divide-x dark:divide-gray-600">
               {data?.attendanceRecords.map((r, i) => {
-                const switchDisabled =
-                  new Date(sessions[i]?.start).getMilliseconds() < Date.now();
                 return (
                   <div
                     key={i}
-                    className="p-2 text-center w-[120px] min-w-[120px] max-w-[120px] flex justify-center items-center"
+                    className={cn([
+                      "p-2 text-center w-[120px] min-w-[120px] max-w-[120px] flex justify-center items-center",
+                      "dark:bg-gray-800 dark:text-white/85",
+                    ])}
                   >
                     <OnlineSwitch
                       id={r!.id}
                       online={r?.online ?? false}
-                      disabled={switchDisabled}
+                      disabled={new Date(sessions[i]?.start) < new Date()}
                     />
                     <HoursAttended
                       id={r!.id}

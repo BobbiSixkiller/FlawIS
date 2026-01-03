@@ -57,7 +57,6 @@ export class AttendanceRecordResolver {
 
   @FieldResolver(() => CourseSession)
   async session(@Root() record: AttendanceRecord) {
-    // delegates to service; business logic lives there
     return await this.courseService.getSession(record.session as any);
   }
 

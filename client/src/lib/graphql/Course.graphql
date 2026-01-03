@@ -30,7 +30,6 @@ fragment CourseSession on CourseSession {
   description
   start
   end
-  maxAttendees
   createdAt
   updatedAt
 }

@@ -332,7 +332,6 @@ type CourseSession {
   description: String
   end: DateTimeISO!
   id: ObjectId!
-  maxAttendees: Int!
   name: String!
   start: DateTimeISO!
   updatedAt: DateTimeISO!
@@ -342,7 +341,6 @@ input CourseSessionInput {
   course: ObjectId!
   description: String
   end: DateTimeISO!
-  maxAttendees: Int!
   name: String!
   start: DateTimeISO!
 }
