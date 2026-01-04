@@ -127,11 +127,6 @@ export class CourseSessionInput implements Partial<CourseSession> {
   @Field()
   @IsAfter("start")
   end: Date;
-
-  @Field(() => Int)
-  @IsInt()
-  @Min(1)
-  maxAttendees: number;
 }
 
 @ObjectType({

@@ -9,7 +9,6 @@ export default async function CoursesPage({
   params: Promise<{ lng: string }>;
 }) {
   const { lng } = await params;
-  const user = await getMe();
 
   const { t, i18n } = await translate(lng, "dashboard");
 

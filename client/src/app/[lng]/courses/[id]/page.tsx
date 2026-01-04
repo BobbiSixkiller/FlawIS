@@ -18,6 +18,7 @@ import Link from "next/link";
 import CourseApplication from "../../flawis/courses/[id]/CourseApplication";
 import { getMe } from "../../(auth)/actions";
 import Attendance from "./Attendance";
+import CourseRegistrationForm from "../../flawis/courses/[id]/CourseRegistrationForm";
 
 export default async function CoursePage({
   params,
@@ -30,8 +31,6 @@ export default async function CoursePage({
   if (!course) {
     return notFound();
   }
-
-  const user = await getMe();
 
   return (
     <div className="flex flex-col gap-6">
@@ -68,7 +67,7 @@ export default async function CoursePage({
               </div>
             }
           />
-          {user && <Attendance id={id} />}
+          <Attendance id={id} />
         </>
       ) : new Date() < new Date(course.registrationEnd) ? (
         <Button
@@ -93,6 +92,9 @@ export default async function CoursePage({
             return await deleteCourseAttendee({ id: course.attending?.id });
           }}
         />
+      </Modal>
+      <Modal dialogId="course-application" title="Registracia na kurz">
+        <CourseRegistrationForm course={course} dialogId="course-application" />
       </Modal>
     </div>
   );

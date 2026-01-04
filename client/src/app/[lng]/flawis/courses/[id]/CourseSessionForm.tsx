@@ -41,7 +41,6 @@ export default function CourseSessionForm({
         description: yup.string(),
         start: yup.date(),
         end: yup.date().min(yup.ref("start")),
-        maxAttendees: yup.number().min(1).required(),
       })}
       defaultValues={{
         course: courseId,
@@ -49,7 +48,6 @@ export default function CourseSessionForm({
         description: courseSession?.description ?? "",
         start: formatDatetimeLocal(courseSession?.start ?? today, true),
         end: formatDatetimeLocal(courseSession?.end ?? today, true),
-        maxAttendees: courseSession?.maxAttendees ?? 0,
       }}
     >
       {(methods) => (
@@ -85,7 +83,6 @@ export default function CourseSessionForm({
           <div className="flex flex-col sm:flex-row gap-4">
             <Input label="Zaciatok" name="start" type="datetime-local" />
             <Input label="Koniec" name="end" type="datetime-local" />{" "}
-            <Input type="number" label="Kapacita terminu" name="maxAttendees" />
           </div>
           <TiptapEditor
             control={methods.control}
@@ -98,7 +95,13 @@ export default function CourseSessionForm({
             disabled={methods.formState.isSubmitting}
             className="w-full"
           >
-            {methods.formState.isSubmitting ? <Spinner inverted /> : "Vytvorit"}
+            {methods.formState.isSubmitting ? (
+              <Spinner inverted />
+            ) : courseSession ? (
+              "Aktualizovat"
+            ) : (
+              "Vytvorit"
+            )}
           </Button>
         </form>
       )}
