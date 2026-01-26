@@ -42,8 +42,8 @@ export function withSubdomain(middleware: CustomMiddleware) {
       process.env.NODE_ENV === "development"
     ) {
       const newUrl = new URL(
-        `/${lng}/flawis/${paths.join("/")}${url.search}`,
-        req.url
+        `/${lng}/internships/${paths.join("/")}${url.search}`,
+        req.url,
       ); // Rewrite the path with the subdomain
 
       return NextResponse.rewrite(newUrl, {
@@ -54,7 +54,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
     if (subdomain.includes("flawis")) {
       const newUrl = new URL(
         `/${lng}/flawis/${paths.join("/")}${url.search}`,
-        req.url
+        req.url,
       );
 
       return NextResponse.rewrite(newUrl, {
@@ -65,7 +65,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
     if (subdomain.includes("conferences")) {
       const newUrl = new URL(
         `/${lng}/conferences/${paths.join("/")}${url.search}`,
-        req.url
+        req.url,
       );
 
       return NextResponse.rewrite(newUrl, {
@@ -76,7 +76,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
     if (subdomain.includes("intern")) {
       const newUrl = new URL(
         `/${lng}/internships/${paths.join("/")}${url.search}`,
-        req.url
+        req.url,
       );
 
       return NextResponse.rewrite(newUrl, {
@@ -87,7 +87,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
     if (subdomain.includes("courses")) {
       const newUrl = new URL(
         `/${lng}/courses/${paths.join("/")}${url.search}`,
-        req.url
+        req.url,
       );
 
       return NextResponse.rewrite(newUrl, {
