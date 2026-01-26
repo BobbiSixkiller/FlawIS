@@ -21,7 +21,7 @@ jobs:
           node-version: "20"
 
       - name: Stop and remove old production containers
-        run: docker-compose -f docker-compose.prod.yml down
+        run: docker compose -f docker-compose.prod.yml down
 
       - name: Clean old images, networks, build cache
         run: |
