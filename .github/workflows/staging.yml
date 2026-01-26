@@ -22,14 +22,14 @@ jobs:
           docker cp flawis-mongo-1:/data/backup ./backup
 
       - name: Remove old staging containers
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging down
 
       - name: Start staging MongoDB
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
 
       - name: Wait for MongoDB to be healthy
         run: |
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Waiting for MongoDB to become healthy..."
           until [ "$(docker inspect -f '{{.State.Health.Status}}' $MONGO_CONTAINER)" == "healthy" ]; do
             echo "MongoDB not healthy yet..."
@@ -39,7 +39,7 @@ jobs:
 
       - name: Initialize replica set if needed
         run: |
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Checking/initializing replica set..."
           docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval '
             try {
@@ -53,7 +53,7 @@ jobs:
 
       - name: Wait for MongoDB primary
         run: |
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Waiting for MongoDB to become primary..."
           until docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval "db.isMaster().ismaster" | grep -q true; do
             echo "MongoDB not primary yet..."
@@ -63,7 +63,7 @@ jobs:
 
       - name: Restore MongoDB backup
         run: |
-          MONGO_CONTAINER=$(docker-compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
+          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Ensuring /data/backup exists in staging container..."
           docker exec $MONGO_CONTAINER mkdir -p /data/backup
           echo "Copying backup into staging container..."
@@ -90,7 +90,7 @@ jobs:
           fi
 
       - name: Start staging MinIO
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d minio
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d minio
 
       - name: Wait for MinIO
         run: |
@@ -130,7 +130,7 @@ jobs:
           node-version: "20"
 
       - name: Stop old staging containers
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging down
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging down
 
       - name: Clean old images, networks, build cache
         run: |
@@ -159,4 +159,4 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: docker-compose -f docker-compose.staging.yml -p flawis-staging up -d --build
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d --build

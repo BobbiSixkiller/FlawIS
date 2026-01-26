@@ -98,7 +98,7 @@ export default function UserForm({
                 /^[a-zA-Z0-9._%+-]+@(?:([a-zA-Z0-9-]+\.)*uniba\.sk|([a-zA-Z0-9-]+\.)*student\.euba\.sk)$/,
                 {
                   message: t("isUniba", { ns: "validation" }),
-                }
+                },
               ),
           }),
         password: yup
@@ -112,14 +112,14 @@ export default function UserForm({
                 .nullable()
                 .matches(
                   /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
-                  t("password", { ns: "validation" })
+                  t("password", { ns: "validation" }),
                 ),
             otherwise: (schema) =>
               schema
                 .required()
                 .matches(
                   /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
-                  t("password", { ns: "validation" })
+                  t("password", { ns: "validation" }),
                 ),
           }),
         confirmPass: yup
@@ -131,9 +131,9 @@ export default function UserForm({
                   .required()
                   .oneOf(
                     [yup.ref("password")],
-                    t("confirmPass", { ns: "validation" })
+                    t("confirmPass", { ns: "validation" }),
                   )
-              : schema.transform((value) => (!value ? null : value)).nullable()
+              : schema.transform((value) => (!value ? null : value)).nullable(),
           ),
         address: yup
           .object({
@@ -171,7 +171,7 @@ export default function UserForm({
                     if (!value) return false;
                     const phoneNumber = parsePhoneNumberFromString(value);
                     return phoneNumber?.isValid() || false;
-                  }
+                  },
                 ),
             otherwise: (schema) => schema.nullable(),
           }),
@@ -198,13 +198,13 @@ export default function UserForm({
               ctxUser?.access.includes(Access.CourseAttendee),
             then: (schema) =>
               schema.min(1, (val) =>
-                t("minFiles", { value: val.min, ns: "validation" })
+                t("minFiles", { value: val.min, ns: "validation" }),
               ),
           }),
         avatar: mixed<File>()
           .nullable()
           .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
-            file ? file.size < 2_000_000 : true
+            file ? file.size < 2_000_000 : true,
           ),
       })}
     >
@@ -216,7 +216,7 @@ export default function UserForm({
               const { error, url: cvUrl } = await uploadOrDelete(
                 "resumes",
                 user?.cvUrl,
-                val.files[0]
+                val.files[0],
               );
               if (error) {
                 return methods.setError("files", { message: error });
@@ -225,7 +225,7 @@ export default function UserForm({
               const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
                 "avatars",
                 user?.avatarUrl,
-                val.avatar
+                val.avatar,
               );
               if (avatarErr) {
                 return methods.setError("avatar", { message: error });
@@ -276,7 +276,7 @@ export default function UserForm({
                     {
                       message: value,
                     },
-                    { shouldFocus: true }
+                    { shouldFocus: true },
                   );
                 }
               }
@@ -299,7 +299,7 @@ export default function UserForm({
                 window.location.replace(url ? url : "/");
               }
             },
-            (errors) => console.log(errors)
+            (errors) => console.log(errors),
           )}
         >
           {path.includes("update") && (
@@ -385,20 +385,22 @@ export default function UserForm({
             </>
           )}
 
-          {(path.includes("users") || path.includes("profile")) && (
-            <MultipleFileUploadField
-              control={methods.control}
-              setError={methods.setError}
-              setValue={methods.setValue}
-              label="CV.pdf"
-              name="files"
-              maxFiles={1}
-              accept={{
-                "application/pdf": [".pdf"],
-              }}
-              fileSources={{ resumes: user?.cvUrl }}
-            />
-          )}
+          {path.includes("users") ||
+            path.includes("profile") ||
+            (namespace === "profile" && (
+              <MultipleFileUploadField
+                control={methods.control}
+                setError={methods.setError}
+                setValue={methods.setValue}
+                label="CV.pdf"
+                name="files"
+                maxFiles={1}
+                accept={{
+                  "application/pdf": [".pdf"],
+                }}
+                fileSources={{ resumes: user?.cvUrl }}
+              />
+            ))}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>
