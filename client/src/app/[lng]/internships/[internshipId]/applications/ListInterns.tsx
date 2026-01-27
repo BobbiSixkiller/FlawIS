@@ -91,7 +91,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
 
 function Container({ children }: { children: ReactNode }) {
   return (
-    <ul role="list" className="divide-y">
+    <ul role="list" className="divide-y dark:divide-gray-600">
       {children}
     </ul>
   );
