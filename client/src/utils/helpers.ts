@@ -25,24 +25,29 @@ export function displayDate(utc?: string, locale: string = "sk") {
     second: "2-digit",
     hour12: false, // Use 24-hour format
     timeZoneName: "short", // Include time zone abbreviation (e.g., CET or CEST)
+    timeZone: "Europe/Bratislava",
   });
 }
 
 export function formatDatetimeLocal(val: any, withTime: boolean): string {
   if (!val) return "";
+
   const date = val instanceof Date ? val : new Date(val);
   if (isNaN(date.getTime())) return "";
 
+  // Convert UTC → local by compensating timezone offset
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+
   return withTime
-    ? date.toISOString().slice(0, 16)
-    : date.toISOString().split("T")[0]; // ⏰ "2025-07-19T11:30" or "2025-07-19"
+    ? localDate.toISOString().slice(0, 16) // "YYYY-MM-DDTHH:mm"
+    : localDate.toISOString().slice(0, 10); // "YYYY-MM-DD"
 }
 
 export async function fetchFromMinio(bucketName: string, fileUrl: string) {
   try {
     // Fetch the file from the Next.js route handler
     const response = await fetch(
-      `/minio?bucketName=${bucketName}&url=${fileUrl}`
+      `/minio?bucketName=${bucketName}&url=${fileUrl}`,
     );
 
     // Check if the response is OK (status code 200-299)
@@ -72,7 +77,7 @@ export async function fetchFromMinio(bucketName: string, fileUrl: string) {
 function objectToFormData(
   obj: any,
   formData: FormData = new FormData(),
-  parentKey: string = ""
+  parentKey: string = "",
 ): FormData {
   for (let key in obj) {
     if (
@@ -118,7 +123,7 @@ function objectToFormData(
 export async function uploadToMinio(
   bucketName: string,
   path: string,
-  file: File
+  file: File,
 ) {
   try {
     const formData = objectToFormData({ bucketName, path, file });
@@ -142,7 +147,7 @@ export async function uploadOrDelete(
   bucketName: string,
   fileUrl?: string | null,
   file?: File | null,
-  path?: string
+  path?: string,
 ): Promise<{ url?: string | null; error?: string }> {
   try {
     let url;
@@ -152,7 +157,7 @@ export async function uploadOrDelete(
       url = await uploadToMinio(
         bucketName,
         path ? `${path}/${file.name}` : file.name,
-        file
+        file,
       );
     }
 
@@ -174,7 +179,7 @@ export async function uploadOrDelete(
         url = await uploadToMinio(
           bucketName,
           path ? `${path}/${file.name}` : file.name,
-          file
+          file,
         );
       }
     }
@@ -221,7 +226,7 @@ export function toCSV<T extends Record<string, any>>(data: T[]): string {
 
 export function createCSVResponse(
   csvString: string,
-  filename: string
+  filename: string,
 ): Response {
   return new Response(Buffer.from(csvString), {
     status: 200,
@@ -234,7 +239,7 @@ export function createCSVResponse(
 
 export function handleAPIErrors(
   errors: Record<string, string>,
-  setFormError: UseFormReturn<any>["setError"]
+  setFormError: UseFormReturn<any>["setError"],
 ) {
   for (const [key, val] of Object.entries(errors)) {
     setFormError(
@@ -242,7 +247,7 @@ export function handleAPIErrors(
       { message: val },
       {
         shouldFocus: true,
-      }
+      },
     );
   }
 }
