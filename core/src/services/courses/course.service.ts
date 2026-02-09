@@ -13,12 +13,10 @@ import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Repository } from "../../repositories/base.repository";
-import { UserService } from "../user.service";
 import { toDTO } from "../../util/helpers";
 import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { Status } from "../../entitites/Internship";
-import { RmqService } from "../rmq.service";
 import { CtxUser } from "../../util/types";
 
 @Service()
@@ -28,9 +26,9 @@ export class CourseService {
     private readonly courseSessionRepository = new Repository(CourseSession),
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
-      AttendanceRecord
+      AttendanceRecord,
     ),
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
 
   async getCourse(id: ObjectId) {
@@ -69,11 +67,11 @@ export class CourseService {
       const updated = await this.courseRepository.findOneAndUpdate(
         { _id: id },
         { $set: data },
-        { session, new: true }
+        { session, new: true },
       );
       if (!updated) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "course" })
+          this.i18nService.translate("notFound", { ns: "course" }),
         );
       }
 
@@ -127,11 +125,11 @@ export class CourseService {
       const courseSession = await this.courseSessionRepository.findOneAndUpdate(
         { _id: id },
         { $set: { ...data } },
-        { session, new: true }
+        { session, new: true },
       );
       if (!courseSession) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "course" })
+          this.i18nService.translate("notFound", { ns: "course" }),
         );
       }
 
@@ -155,16 +153,16 @@ export class CourseService {
         {
           _id: id,
         },
-        { session }
+        { session },
       );
       if (!courseSession) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "course" })
+          this.i18nService.translate("notFound", { ns: "course" }),
         );
       }
       const res = await this.attendanceRecordRepository.deleteMany(
         { session: id },
-        { session }
+        { session },
       );
 
       await session.commitTransaction();
@@ -180,7 +178,7 @@ export class CourseService {
 
   async updateAttendance(
     id: ObjectId,
-    data: { online?: boolean; hoursAttended?: number }
+    data: { online?: boolean; hoursAttended?: number },
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -192,7 +190,7 @@ export class CourseService {
             _id: id,
           },
           { $set: data },
-          { session, new: true }
+          { session, new: true },
         );
       if (!attendanceRecord) {
         throw new Error("Attendance record not found!");
@@ -203,7 +201,7 @@ export class CourseService {
           _id: attendanceRecord.session,
         },
         null,
-        { session }
+        { session },
       );
       if (!courseSession) {
         throw new Error("Course session not found!");
@@ -217,7 +215,7 @@ export class CourseService {
 
       if (data.hoursAttended && data.hoursAttended > durationHours) {
         throw new Error(
-          `HoursAttended (${data.hoursAttended}) cannot exceed session duration (${durationHours} hours)`
+          `HoursAttended (${data.hoursAttended}) cannot exceed session duration (${durationHours} hours)`,
         );
       }
 
@@ -234,7 +232,7 @@ export class CourseService {
 
   async myAttendance(
     courseId: ObjectId,
-    ctxUser: CtxUser
+    ctxUser: CtxUser,
   ): Promise<AttendanceConnection> {
     const attendee = await this.courseAttendeeRepository.findOne({
       course: courseId,
@@ -249,7 +247,7 @@ export class CourseService {
     const sessions = await this.courseSessionRepository.findAll(
       { course: courseId },
       null,
-      { sort: { _id: 1 } }
+      { sort: { _id: 1 } },
     );
 
     // If not accepted, you can still return sessions + empty records
@@ -280,13 +278,13 @@ export class CourseService {
         session: { $in: sessions.map((s) => s._id) },
       },
       null,
-      { sort: { session: 1 } }
+      { sort: { session: 1 } },
     );
 
     const attendanceRecords: AttendanceRecord[] = [];
     for (const session of sessions) {
       const exists = existingRecords.find(
-        (record) => record.session.toString() === session.id
+        (record) => record.session.toString() === session.id,
       );
       if (exists) {
         attendanceRecords.push(toDTO(exists));
@@ -322,7 +320,7 @@ export class CourseService {
 
   async attendance(
     paginationArgs: CourseAttendeeArgs,
-    courseId: ObjectId
+    courseId: ObjectId,
   ): Promise<AttendanceConnection> {
     const [sessions, attendeesConnection] = await Promise.all([
       this.courseSessionRepository.findAll({ course: courseId }, null, {
@@ -351,13 +349,13 @@ export class CourseService {
               session: { $in: sessions.map((s) => s._id) },
             },
             null,
-            { sort: { session: 1 } }
+            { sort: { session: 1 } },
           );
 
           const attendanceRecords: AttendanceRecord[] = [];
           for (const session of sessions) {
             const exists = existingRecords.find(
-              (record) => record.session.toString() === session.id
+              (record) => record.session.toString() === session.id,
             );
             if (exists) {
               attendanceRecords.push(toDTO(exists));
@@ -379,7 +377,7 @@ export class CourseService {
             },
           };
         }
-      })
+      }),
     );
 
     return {

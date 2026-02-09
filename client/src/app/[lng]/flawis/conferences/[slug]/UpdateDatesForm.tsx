@@ -31,19 +31,19 @@ export default function UpdateDatesForm({
       defaultValues={{
         start: formatDatetimeLocal(
           conference.dates.start,
-          true
+          true,
         ) as unknown as Date,
         end: formatDatetimeLocal(conference.dates.end, true) as unknown as Date,
         regEnd: conference.dates.regEnd
           ? (formatDatetimeLocal(
               conference.dates.regEnd,
-              true
+              true,
             ) as unknown as Date)
           : null,
         submissionDeadline: conference.dates.submissionDeadline
           ? (formatDatetimeLocal(
               conference.dates.submissionDeadline,
-              true
+              true,
             ) as unknown as Date)
           : null,
       }}
