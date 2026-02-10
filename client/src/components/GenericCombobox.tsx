@@ -24,6 +24,7 @@ import {
 import { withLocalizedInput } from "./withLocalizedInput";
 import { GqlMutationResponse } from "@/utils/actions";
 import { useTranslation } from "@/lib/i18n/client";
+import { useParams } from "next/navigation";
 
 export interface GenericComboboxProps<TOption, TValue> {
   lng: string;
@@ -39,7 +40,7 @@ export interface GenericComboboxProps<TOption, TValue> {
   createOption?: (text: string) => Promise<GqlMutationResponse<TOption>>;
   renderOption: (
     option: TOption,
-    props: { focus: boolean; selected: boolean }
+    props: { focus: boolean; selected: boolean },
   ) => React.ReactElement;
   getOptionLabel: (opt: TOption) => string;
   getOptionValue: (opt: TOption | null) => TValue;
@@ -50,7 +51,7 @@ export interface GenericComboboxProps<TOption, TValue> {
 
 export default function GenericCombobox<
   TOption extends { id: string | number; val: any },
-  TValue
+  TValue,
 >({
   lng,
   name,
@@ -69,6 +70,7 @@ export default function GenericCombobox<
   allowCreateNewOptions,
   ...props
 }: GenericComboboxProps<TOption, TValue>) {
+  const { lng: uiLng } = useParams<{ lng: string }>();
   const ref = useRef<HTMLDivElement>(null);
   const width = useWidth();
   const [boxRect, setBoxRect] = useState<DOMRect>();
@@ -85,7 +87,7 @@ export default function GenericCombobox<
       return arr.map((v, i) =>
         typeof v === "object" && v !== null && "id" in v
           ? (v as TOption)
-          : ({ id: i, val: v } as TOption)
+          : ({ id: i, val: v } as TOption),
       );
     } else {
       if (!field.value) return [];
@@ -102,7 +104,7 @@ export default function GenericCombobox<
     (value: string) => {
       setText(value);
     },
-    fetchOptions ? 500 : 0
+    fetchOptions ? 500 : 0,
   );
 
   // Fetch or filter options
@@ -118,7 +120,7 @@ export default function GenericCombobox<
           text === ""
             ? defaultOptions
             : defaultOptions.filter((opt) =>
-                getOptionLabel(opt).toLowerCase().includes(text.toLowerCase())
+                getOptionLabel(opt).toLowerCase().includes(text.toLowerCase()),
               );
         setOptions(filtered);
       }
@@ -166,7 +168,7 @@ export default function GenericCombobox<
             control.setError(
               name,
               { message: res.message },
-              { shouldFocus: true }
+              { shouldFocus: true },
             );
           }
         }
@@ -188,7 +190,7 @@ export default function GenericCombobox<
             control.setError(
               name,
               { message: res.message },
-              { shouldFocus: true }
+              { shouldFocus: true },
             );
           }
         }
@@ -211,7 +213,7 @@ export default function GenericCombobox<
     }
   };
 
-  const { t } = useTranslation(lng, "common");
+  const { t } = useTranslation(uiLng, "common");
 
   function renderComboboxContent() {
     return (
@@ -249,7 +251,7 @@ export default function GenericCombobox<
                     field.onChange(
                       value
                         .filter((i) => i.id !== val.id)
-                        .map((v) => getOptionValue(v))
+                        .map((v) => getOptionValue(v)),
                     )
                   }
                 >

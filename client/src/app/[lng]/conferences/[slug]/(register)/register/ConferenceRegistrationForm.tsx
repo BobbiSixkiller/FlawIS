@@ -94,7 +94,7 @@ export default function ConferenceRegistrationForm({
           },
           searchParams.get("submission"),
           searchParams.get("token"),
-          submissionStep ? { data: data.submission } : undefined
+          submissionStep ? { data: data.submission } : undefined,
         );
 
         if (res.errors) {
