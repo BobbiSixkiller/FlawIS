@@ -16,6 +16,8 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format. */
   DateTimeISO: { input: any; output: any; }
+  /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
+  JSONObject: { input: any; output: any; }
   /** Mongo object id scalar type */
   ObjectId: { input: any; output: any; }
 };
@@ -280,6 +282,7 @@ export type Course = {
   price: Scalars['Int']['output'];
   procurer?: Maybe<UserStub>;
   registrationEnd: Scalars['DateTimeISO']['output'];
+  registrationForm: Form;
   start: Scalars['DateTimeISO']['output'];
   updatedAt: Scalars['DateTimeISO']['output'];
 };
@@ -294,9 +297,9 @@ export type CourseAttendanceArgs = {
 /** Connects a system user with a particular course. */
 export type CourseAttendee = {
   __typename?: 'CourseAttendee';
+  application: FormSubmission;
   course: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
-  fileUrls: Array<Scalars['String']['output']>;
   grade?: Maybe<Scalars['String']['output']>;
   id: Scalars['ObjectId']['output'];
   invoice?: Maybe<Invoice>;
@@ -354,6 +357,8 @@ export type CourseInput = {
   categoryIds: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   end: Scalars['DateTimeISO']['input'];
+  /** Property describing dynamic registration form of a given course */
+  formFields: Array<FormFieldInput>;
   maxAttendees: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   price: Scalars['Int']['input'];
@@ -418,6 +423,13 @@ export type DatesInput = {
   submissionDeadline?: InputMaybe<Scalars['DateTimeISO']['input']>;
 };
 
+/** Supported registration form field types */
+export enum FieldType {
+  Select = 'Select',
+  Text = 'Text',
+  Textarea = 'Textarea'
+}
+
 /** Flaw billing information */
 export type FlawBilling = {
   __typename?: 'FlawBilling';
@@ -440,6 +452,46 @@ export type FlawBillingInput = {
   address: AddressInput;
   name: Scalars['String']['input'];
   variableSymbol: Scalars['String']['input'];
+};
+
+export type Form = {
+  __typename?: 'Form';
+  course: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
+  fields: Array<FormField>;
+  id: Scalars['ObjectId']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
+  version: Scalars['Int']['output'];
+};
+
+export type FormField = {
+  __typename?: 'FormField';
+  helpText?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ObjectId']['output'];
+  label: Scalars['String']['output'];
+  placeholder?: Maybe<Scalars['String']['output']>;
+  required: Scalars['Boolean']['output'];
+  selectOptions?: Maybe<Array<SelectOption>>;
+  type: FieldType;
+};
+
+export type FormFieldInput = {
+  helpText?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ObjectId']['input']>;
+  label: Scalars['String']['input'];
+  placeholder?: InputMaybe<Scalars['String']['input']>;
+  required: Scalars['Boolean']['input'];
+  selectOptions?: InputMaybe<Array<SelectOptionInput>>;
+  type: FieldType;
+};
+
+export type FormSubmission = {
+  __typename?: 'FormSubmission';
+  answers: Scalars['JSONObject']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
+  form: Scalars['ObjectId']['output'];
+  formVersion: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
 };
 
 export type IMutationResponse = {
@@ -725,7 +777,6 @@ export type MutationCreateCourseArgs = {
 export type MutationCreateCourseAttendeeArgs = {
   billing?: InputMaybe<AttendeeBillingInput>;
   courseId: Scalars['ObjectId']['input'];
-  fileUrls: Array<Scalars['String']['input']>;
 };
 
 
@@ -881,7 +932,6 @@ export type MutationUpdateCourseArgs = {
 
 
 export type MutationUpdateCourseAttendeeFilesArgs = {
-  fileUrls: Array<Scalars['String']['input']>;
   id: Scalars['ObjectId']['input'];
 };
 
@@ -1162,6 +1212,17 @@ export type SectionTranslations = {
   __typename?: 'SectionTranslations';
   name: Scalars['String']['output'];
   topic: Scalars['String']['output'];
+};
+
+export type SelectOption = {
+  __typename?: 'SelectOption';
+  text: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+};
+
+export type SelectOptionInput = {
+  text: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 /** Intern during summer or winter or both terms */
@@ -1642,13 +1703,15 @@ export type AddAttendeeMutationVariables = Exact<{
 
 export type AddAttendeeMutation = { __typename?: 'Mutation', addAttendee: { __typename?: 'ConferenceMutationResponse', message: string, data: { __typename?: 'Conference', slug: string } } };
 
-export type CourseFragment = { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null };
+export type CourseFragment = { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null };
+
+export type FormFragment = { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> };
 
 export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any };
 
-export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } };
+export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } };
 
-export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
+export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
 
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -1657,14 +1720,14 @@ export type CoursesQueryVariables = Exact<{
 }>;
 
 
-export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
 
 export type CourseQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type CourseQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } };
+export type CourseQuery = { __typename?: 'Query', course: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } };
 
 export type AttendanceQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1674,21 +1737,21 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
 }>;
 
 
-export type CreateCourseMutation = { __typename?: 'Mutation', createCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
+export type CreateCourseMutation = { __typename?: 'Mutation', createCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
 
 export type DeleteCourseMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteCourseMutation = { __typename?: 'Mutation', deleteCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
+export type DeleteCourseMutation = { __typename?: 'Mutation', deleteCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
 
 export type UpdateCourseMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1696,7 +1759,7 @@ export type UpdateCourseMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCourseMutation = { __typename?: 'Mutation', updateCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
+export type UpdateCourseMutation = { __typename?: 'Mutation', updateCourse: { __typename?: 'CourseMutationResponse', message: string, data: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } | null } } };
 
 export type CreateCourseSessionMutationVariables = Exact<{
   data: CourseSessionInput;
@@ -1722,27 +1785,25 @@ export type DeleteCourseSessionMutation = { __typename?: 'Mutation', deleteCours
 
 export type CreateCourseAttendeeMutationVariables = Exact<{
   courseId: Scalars['ObjectId']['input'];
-  fileUrls: Array<Scalars['String']['input']> | Scalars['String']['input'];
   billing?: InputMaybe<AttendeeBillingInput>;
 }>;
 
 
-export type CreateCourseAttendeeMutation = { __typename?: 'Mutation', createCourseAttendee: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+export type CreateCourseAttendeeMutation = { __typename?: 'Mutation', createCourseAttendee: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
 
 export type UpdateCourseAttendeeFilesMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
-  fileUrls: Array<Scalars['String']['input']> | Scalars['String']['input'];
 }>;
 
 
-export type UpdateCourseAttendeeFilesMutation = { __typename?: 'Mutation', updateCourseAttendeeFiles: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+export type UpdateCourseAttendeeFilesMutation = { __typename?: 'Mutation', updateCourseAttendeeFiles: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
 
 export type DeleteCourseAttendeeMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
 }>;
 
 
-export type DeleteCourseAttendeeMutation = { __typename?: 'Mutation', deleteCourseAttendee: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+export type DeleteCourseAttendeeMutation = { __typename?: 'Mutation', deleteCourseAttendee: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
 
 export type ChangeCourseAttendeeStatusMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -1750,7 +1811,7 @@ export type ChangeCourseAttendeeStatusMutationVariables = Exact<{
 }>;
 
 
-export type ChangeCourseAttendeeStatusMutation = { __typename?: 'Mutation', changeCourseAttendeeStatus: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, fileUrls: Array<string>, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
+export type ChangeCourseAttendeeStatusMutation = { __typename?: 'Mutation', changeCourseAttendeeStatus: { __typename?: 'CourseAttendeeMutationResponse', message: string, data: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null } } } };
 
 export type UpdateAttendanceHoursMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -2467,6 +2528,27 @@ export const SubmissionFilesFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"SubmissionFiles"}) as unknown as TypedDocumentString<SubmissionFilesFragment, unknown>;
+export const FormFragmentDoc = new TypedDocumentString(`
+    fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+  }
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"Form"}) as unknown as TypedDocumentString<FormFragment, unknown>;
 export const CourseAttendeeFragmentDoc = new TypedDocumentString(`
     fragment CourseAttendee on CourseAttendee {
   id
@@ -2478,7 +2560,6 @@ export const CourseAttendeeFragmentDoc = new TypedDocumentString(`
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -2497,6 +2578,9 @@ export const CourseFragmentDoc = new TypedDocumentString(`
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -2528,6 +2612,25 @@ fragment FlawBilling on FlawBilling {
   IBAN
   SWIFT
 }
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+  }
+  createdAt
+  updatedAt
+}
 fragment CourseAttendee on CourseAttendee {
   id
   user {
@@ -2538,7 +2641,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -2560,7 +2662,6 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
     fragment Attendance on Attendance {
   attendee {
     id
-    fileUrls
     user {
       name
     }
@@ -4243,6 +4344,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -4252,6 +4356,25 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -4266,7 +4389,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4307,6 +4429,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -4316,6 +4441,25 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -4330,7 +4474,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4370,7 +4513,6 @@ export const AttendanceDocument = new TypedDocumentString(`
 fragment Attendance on Attendance {
   attendee {
     id
-    fileUrls
     user {
       name
     }
@@ -4420,6 +4562,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -4429,6 +4574,25 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -4443,7 +4607,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4487,6 +4650,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -4496,6 +4662,25 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -4510,7 +4695,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4554,6 +4738,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -4563,6 +4750,25 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -4577,7 +4783,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4641,12 +4846,8 @@ export const DeleteCourseSessionDocument = new TypedDocumentString(`
   updatedAt
 }`) as unknown as TypedDocumentString<DeleteCourseSessionMutation, DeleteCourseSessionMutationVariables>;
 export const CreateCourseAttendeeDocument = new TypedDocumentString(`
-    mutation createCourseAttendee($courseId: ObjectId!, $fileUrls: [String!]!, $billing: AttendeeBillingInput) {
-  createCourseAttendee(
-    courseId: $courseId
-    fileUrls: $fileUrls
-    billing: $billing
-  ) {
+    mutation createCourseAttendee($courseId: ObjectId!, $billing: AttendeeBillingInput) {
+  createCourseAttendee(courseId: $courseId, billing: $billing) {
     message
     data {
       ...CourseAttendee
@@ -4663,15 +4864,14 @@ export const CreateCourseAttendeeDocument = new TypedDocumentString(`
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<CreateCourseAttendeeMutation, CreateCourseAttendeeMutationVariables>;
 export const UpdateCourseAttendeeFilesDocument = new TypedDocumentString(`
-    mutation updateCourseAttendeeFiles($id: ObjectId!, $fileUrls: [String!]!) {
-  updateCourseAttendeeFiles(id: $id, fileUrls: $fileUrls) {
+    mutation updateCourseAttendeeFiles($id: ObjectId!) {
+  updateCourseAttendeeFiles(id: $id) {
     message
     data {
       ...CourseAttendee
@@ -4688,7 +4888,6 @@ export const UpdateCourseAttendeeFilesDocument = new TypedDocumentString(`
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4713,7 +4912,6 @@ export const DeleteCourseAttendeeDocument = new TypedDocumentString(`
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -4738,7 +4936,6 @@ export const ChangeCourseAttendeeStatusDocument = new TypedDocumentString(`
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt

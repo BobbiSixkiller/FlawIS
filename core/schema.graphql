@@ -244,15 +244,16 @@ type Course {
   price: Int!
   procurer: UserStub
   registrationEnd: DateTimeISO!
+  registrationForm: Form!
   start: DateTimeISO!
   updatedAt: DateTimeISO!
 }
 
 """Connects a system user with a particular course."""
 type CourseAttendee {
+  application: FormSubmission!
   course: ObjectId!
   createdAt: DateTimeISO!
-  fileUrls: [String!]!
   grade: String
   id: ObjectId!
   invoice: Invoice
@@ -306,6 +307,9 @@ input CourseInput {
   categoryIds: [ObjectId!]!
   description: String!
   end: DateTimeISO!
+
+  """Property describing dynamic registration form of a given course"""
+  formFields: [FormFieldInput!]!
   maxAttendees: Int!
   name: String!
   price: Int!
@@ -373,6 +377,13 @@ input DatesInput {
   submissionDeadline: DateTimeISO
 }
 
+"""Supported registration form field types"""
+enum FieldType {
+  Select
+  Text
+  Textarea
+}
+
 """Flaw billing information"""
 type FlawBilling {
   DIC: String!
@@ -394,6 +405,43 @@ input FlawBillingInput {
   address: AddressInput!
   name: String!
   variableSymbol: String!
+}
+
+type Form {
+  course: ObjectId!
+  createdAt: DateTimeISO!
+  fields: [FormField!]!
+  id: ObjectId!
+  updatedAt: DateTimeISO!
+  version: Int!
+}
+
+type FormField {
+  helpText: String
+  id: ObjectId!
+  label: String!
+  placeholder: String
+  required: Boolean!
+  selectOptions: [SelectOption!]
+  type: FieldType!
+}
+
+input FormFieldInput {
+  helpText: String
+  id: ObjectId
+  label: String!
+  placeholder: String
+  required: Boolean!
+  selectOptions: [SelectOptionInput!]
+  type: FieldType!
+}
+
+type FormSubmission {
+  answers: JSONObject!
+  createdAt: DateTimeISO!
+  form: ObjectId!
+  formVersion: Int!
+  updatedAt: DateTimeISO!
 }
 
 interface IMutationResponse {
@@ -564,6 +612,11 @@ input InvoiceInput {
   payer: AttendeeBillingInput!
 }
 
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
 input LocalizedConferenceInputs {
   logoUrl: String!
   name: String!
@@ -594,7 +647,7 @@ type Mutation {
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
-  createCourseAttendee(billing: AttendeeBillingInput, courseId: ObjectId!, fileUrls: [String!]!): CourseAttendeeMutationResponse!
+  createCourseAttendee(billing: AttendeeBillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
@@ -624,7 +677,6 @@ type Mutation {
   updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
-  updateCourseAttendeeFiles(fileUrls: [String!]!, id: ObjectId!): CourseAttendeeMutationResponse!
   updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
   updateInternData(fileUrls: [String]!, id: ObjectId!, semester: Semester!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
@@ -734,6 +786,16 @@ input SectionTranslationInput {
 type SectionTranslations {
   name: String!
   topic: String!
+}
+
+type SelectOption {
+  text: String!
+  value: String!
+}
+
+input SelectOptionInput {
+  text: String!
+  value: String!
 }
 
 """Intern during summer or winter or both terms"""

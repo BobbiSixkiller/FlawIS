@@ -9,6 +9,9 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
   price
@@ -18,6 +21,26 @@ fragment Course on Course {
   isPaid
   attending {
     ...CourseAttendee
+  }
+  createdAt
+  updatedAt
+}
+
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
   }
   createdAt
   updatedAt
@@ -44,7 +67,6 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
   createdAt
@@ -54,7 +76,6 @@ fragment CourseAttendee on CourseAttendee {
 fragment Attendance on Attendance {
   attendee {
     id
-    fileUrls
     user {
       name
     }
@@ -171,14 +192,9 @@ mutation deleteCourseSession($id: ObjectId!) {
 
 mutation createCourseAttendee(
   $courseId: ObjectId!
-  $fileUrls: [String!]!
   $billing: AttendeeBillingInput
 ) {
-  createCourseAttendee(
-    courseId: $courseId
-    fileUrls: $fileUrls
-    billing: $billing
-  ) {
+  createCourseAttendee(courseId: $courseId, billing: $billing) {
     message
     data {
       ...CourseAttendee
@@ -186,8 +202,8 @@ mutation createCourseAttendee(
   }
 }
 
-mutation updateCourseAttendeeFiles($id: ObjectId!, $fileUrls: [String!]!) {
-  updateCourseAttendeeFiles(id: $id, fileUrls: $fileUrls) {
+mutation updateCourseAttendeeFiles($id: ObjectId!) {
+  updateCourseAttendeeFiles(id: $id) {
     message
     data {
       ...CourseAttendee

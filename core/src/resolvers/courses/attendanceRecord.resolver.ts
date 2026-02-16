@@ -28,14 +28,14 @@ export class AttendanceRecordResolver {
   constructor(
     private readonly courseService: CourseService,
     private readonly courseAttendeeService: CourseAttendeeService,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
 
   @Authorized([Access.Admin])
   @Mutation(() => AttendanceRecordMutationResponse)
   async updateAttendanceHours(
     @Arg("id") id: ObjectId,
-    @Arg("hoursAttended") hoursAttended: number
+    @Arg("hoursAttended") hoursAttended: number,
   ): Promise<AttendanceRecordMutationResponse> {
     const res = await this.courseService.updateAttendance(id, {
       hoursAttended,
@@ -48,7 +48,7 @@ export class AttendanceRecordResolver {
   @Mutation(() => AttendanceRecordMutationResponse)
   async updateAttendanceOnline(
     @Arg("id") id: ObjectId,
-    @Arg("online") online: boolean
+    @Arg("online") online: boolean,
   ): Promise<AttendanceRecordMutationResponse> {
     const res = await this.courseService.updateAttendance(id, { online });
 
@@ -57,13 +57,13 @@ export class AttendanceRecordResolver {
 
   @FieldResolver(() => CourseSession)
   async session(@Root() record: AttendanceRecord) {
-    return await this.courseService.getSession(record.session as any);
+    return await this.courseService.getCourseSession(record.session as any);
   }
 
   @FieldResolver(() => CourseAttendee)
   async attendee(@Root() record: AttendanceRecord) {
     return await this.courseAttendeeService.getCourseAttendee(
-      record.attendee._id
+      record.attendee._id,
     );
   }
 }

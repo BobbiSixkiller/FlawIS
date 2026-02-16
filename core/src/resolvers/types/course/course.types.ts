@@ -18,11 +18,25 @@ import {
 import { IMutationResponse } from "../interface.types";
 import { FlawBilling } from "../../../entitites/Billing";
 import { FlawBillingInput } from "../conference.types";
-import { IsDate, IsInt, IsString, Min } from "class-validator";
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsDate,
+  IsInt,
+  IsString,
+  Min,
+  ValidateNested,
+} from "class-validator";
 import { Ref } from "@typegoose/typegoose";
-import { IsAfter, IsBefore, RefDocExists } from "../../../util/decorators";
+import {
+  IsAfter,
+  IsBefore,
+  RefDocExists,
+  UniqueFieldNames,
+} from "../../../util/decorators";
 import Container from "typedi";
 import { I18nService } from "../../../services/i18n.service";
+import { FormFieldInput } from "../form/form.types";
 
 export enum CourseSortableField {
   NAME = "name",
@@ -100,6 +114,16 @@ export class CourseInput implements Partial<Course> {
 
   @Field(() => FlawBillingInput, { nullable: true })
   billing?: FlawBilling;
+
+  @Field(() => [FormFieldInput], {
+    description:
+      "Property describing dynamic registration form of a given course",
+  })
+  @ValidateNested({ each: true })
+  @UniqueFieldNames({ message: "Field names must be unique" })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(20)
+  formFields: FormFieldInput[];
 }
 
 @ObjectType({ implements: IMutationResponse })

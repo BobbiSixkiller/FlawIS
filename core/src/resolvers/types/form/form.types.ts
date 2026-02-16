@@ -11,9 +11,8 @@ import {
   ValidateNested,
 } from "class-validator";
 import { ObjectId } from "mongodb";
-import { RefDocExists } from "../../../util/decorators";
-import { Course } from "../../../entitites/Course";
-import { Ref } from "@typegoose/typegoose";
+import { UniqueFieldNames } from "../../../util/decorators";
+import { JSONObject } from "../../../util/scalars";
 
 /**
  * Input option
@@ -32,10 +31,13 @@ export class SelectOptionInput {
 }
 
 /**
- * Field input (NO id)
+ * Field input with optional ID to support changing of existing fields across versions
  */
 @InputType()
 export class FormFieldInput {
+  @Field(() => ObjectId, { nullable: true })
+  id?: ObjectId;
+
   @Field(() => FieldType)
   @IsEnum(FieldType)
   type: FieldType;
@@ -71,20 +73,4 @@ export class FormFieldInput {
   @ArrayMinSize(1)
   @ArrayMaxSize(200)
   selectOptions?: SelectOptionInput[];
-}
-
-/**
- * Form creation/update input (separate)
- */
-@InputType()
-export class FormInput {
-  @Field(() => ObjectId)
-  @RefDocExists(Course)
-  courseId: Ref<Course>;
-
-  @Field(() => [FormFieldInput])
-  @ValidateNested({ each: true })
-  @ArrayMinSize(1)
-  @ArrayMaxSize(200)
-  fields: FormFieldInput[];
 }

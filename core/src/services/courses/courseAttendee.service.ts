@@ -22,21 +22,21 @@ export class CourseAttendeeService {
   constructor(
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
-      AttendanceRecord
+      AttendanceRecord,
     ),
     private readonly courseService: CourseService,
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
     private readonly i18nService: I18nService,
     private readonly minioService: MinioService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
     const attendee = await this.courseAttendeeRepository.findOne({ _id: id });
     if (!attendee) {
       throw new Error(
-        this.i18nService.translate("attendee.notFound", { ns: "course" })
+        this.i18nService.translate("attendee.notFound", { ns: "course" }),
       );
     }
 
@@ -56,8 +56,7 @@ export class CourseAttendeeService {
     hostname: string,
     courseId: ObjectId,
     userId: ObjectId,
-    fileUrls: string[],
-    billing?: AttendeeBillingInput
+    billing?: AttendeeBillingInput,
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -88,7 +87,6 @@ export class CourseAttendeeService {
           organization: user.organization,
           telephone: user.telephone,
         },
-        fileUrls,
         invoice:
           course.isPaid && course.billing
             ? ({
@@ -102,7 +100,7 @@ export class CourseAttendeeService {
                   vat: isFlaw
                     ? 0
                     : Math.round(
-                        ((course.price - priceWithouTax) / 100) * 100
+                        ((course.price - priceWithouTax) / 100) * 100,
                       ) / 100,
                 },
                 issuer: {
@@ -118,7 +116,7 @@ export class CourseAttendeeService {
 
       await this.courseRepository.updateMany(
         { _id: course.id },
-        { $inc: { attendeesCount: 1 } }
+        { $inc: { attendeesCount: 1 } },
       );
 
       await session.commitTransaction();
@@ -132,39 +130,8 @@ export class CourseAttendeeService {
           courseId: course.id,
           course: course.name,
         }),
-        "mail.courses.applied"
+        "mail.courses.applied",
       );
-
-      return toDTO(attendee);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
-  }
-
-  async updateFiles(fileUrls: string[], attendeeId: ObjectId, user: CtxUser) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
-        { _id: attendeeId },
-        { $set: { fileUrls } },
-        session
-      );
-      if (!attendee) {
-        throw new Error("Attendee not found!");
-      }
-      if (
-        attendee.user.id.toString() !== user.id.toString() &&
-        !user.access.includes(Access.Admin)
-      ) {
-        throw new Error("Not allowed!");
-      }
-
-      await session.commitTransaction();
 
       return toDTO(attendee);
     } catch (error) {
@@ -178,7 +145,7 @@ export class CourseAttendeeService {
   async updateAttendeeStatus(
     attendeeId: ObjectId,
     status: Status,
-    hostname: string
+    hostname: string,
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -187,7 +154,7 @@ export class CourseAttendeeService {
       const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
         { _id: attendeeId },
         { $set: { status } },
-        { session, new: true }
+        { session, new: true },
       );
       if (!attendee) {
         throw new Error("Attendee not found!");
@@ -197,7 +164,7 @@ export class CourseAttendeeService {
           _id: attendee.course,
         },
         null,
-        { session }
+        { session },
       );
       if (!course) {
         throw new Error("Course not found!");
@@ -212,7 +179,7 @@ export class CourseAttendeeService {
           courseId: course.id,
           course: course.name,
         }),
-        `mail.courses.${status.toLowerCase()}` as RoutingKey
+        `mail.courses.${status.toLowerCase()}` as RoutingKey,
       );
 
       await session.commitTransaction();
@@ -233,7 +200,7 @@ export class CourseAttendeeService {
     try {
       const attendee = await this.courseAttendeeRepository.findOneAndDelete(
         { _id: id },
-        { session }
+        { session },
       );
       if (!attendee) {
         throw new Error("Attendee not found!");
@@ -249,12 +216,10 @@ export class CourseAttendeeService {
         this.courseRepository.findOneAndUpdate(
           { _id: attendee.course },
           { $inc: { attendeesCount: -1 } },
-          { session, new: true }
+          { session, new: true },
         ),
         this.attendanceRecordRepository.deleteMany({}),
       ]);
-
-      await this.minioService.deleteFiles(attendee.fileUrls);
 
       await session.commitTransaction();
 

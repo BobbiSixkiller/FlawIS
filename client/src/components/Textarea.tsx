@@ -3,16 +3,16 @@
 import { cn } from "@/utils/helpers";
 import { withLocalizedInput } from "./withLocalizedInput";
 import { InputProps } from "./Input";
+import { useFormContext, useFormState } from "react-hook-form";
+import { get } from "lodash";
 
-export function Textarea({
-  name,
-  label,
-  onFocus,
-  error,
-  methods,
-  ...props
-}: InputProps) {
-  const field = methods?.register?.(name);
+export function Textarea({ name, label, onFocus, ...props }: InputProps) {
+  const { register, control } = useFormContext<any>();
+  const { errors } = useFormState({ control, name });
+
+  const field = register(name);
+
+  const error = get(errors, name)?.message?.toString();
 
   return (
     <div>

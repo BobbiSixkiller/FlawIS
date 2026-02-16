@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+import type { ClientSession } from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
 
 export function getAcademicYear(date = new Date()) {
@@ -35,4 +37,22 @@ export function toDTO<T>(doc: DocumentType<T>): T {
       return ret;
     },
   }) as T;
+}
+
+export async function withOptionalTransaction<T>(
+  session: ClientSession | undefined,
+  fn: (session: ClientSession | undefined) => Promise<T>,
+): Promise<T> {
+  if (session) return fn(session);
+
+  const newSession = await mongoose.startSession();
+  try {
+    let result!: T;
+    await newSession.withTransaction(async () => {
+      result = await fn(newSession);
+    });
+    return result;
+  } finally {
+    newSession.endSession();
+  }
 }

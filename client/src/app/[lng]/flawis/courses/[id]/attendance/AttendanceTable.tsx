@@ -82,7 +82,7 @@ function AttendanceTableContainer({
     <div
       ref={scrollRef}
       className={cn(
-        "overflow-auto max-h-[70vh] border dark:border-gray-600 rounded-lg text-sm w-fit max-w-full"
+        "overflow-auto max-h-[70vh] border dark:border-gray-600 rounded-lg text-sm w-fit max-w-full",
       )}
     >
       {/* This lets the inner table grow to content width */}
@@ -91,7 +91,7 @@ function AttendanceTableContainer({
         <div
           className={cn(
             "sticky top-0 z-[19] grid grid-cols-[150px_auto] bg-gray-50 dark:bg-gray-800",
-            scrollState.vertical && "shadow-bottom"
+            scrollState.vertical && "shadow-bottom",
           )}
         >
           {/* Sticky left header cell */}
@@ -100,7 +100,7 @@ function AttendanceTableContainer({
               "p-2 w-[150px] min-w-[150px] max-w-[150px] inline-flex items-center justify-center",
               "sticky left-0 z-[19] text-nowrap bg-gray-50 dark:bg-gray-800 border-b border-r dark:border-gray-600 dark:text-white/85",
               scrollState.horizontal &&
-                "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]"
+                "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]",
             )}
           >
             Attendee / Session
@@ -171,7 +171,7 @@ function AttendanceTableContainer({
                     dialogId="delete-session"
                     text={`Naozaj chcete zmazat termin ${formatDatetimeLocal(
                       s?.start,
-                      false
+                      false,
                     )}`}
                     action={async () =>
                       await deleteCourseSession({ id: s?.id })
@@ -313,22 +313,7 @@ function AttendanceRow({
         dialogId={`attendee:${data?.attendee.id}`}
         title={data?.attendee.user.name}
       >
-        Prilozene subory:
-        <ul className="flex flex-wrap gap-2 max-w-sm">
-          {data?.attendee.fileUrls.map((url, i) => {
-            const fileName = url.split("/").pop()?.split("-").pop() || "File";
-            return (
-              <li key={i}>
-                <Link
-                  className="text-primary-500 dark:text-primary-400 hover:underline"
-                  href={`/minio?bucketName=courses&url=${url}`}
-                >
-                  {fileName}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        Prihlaska
       </Modal>
       <Modal dialogId={`accept-dialog:${data?.attendee.id}`}>
         <ChangeStatusForm

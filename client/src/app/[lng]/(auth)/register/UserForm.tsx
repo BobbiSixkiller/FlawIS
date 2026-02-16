@@ -35,6 +35,7 @@ import { useMessageStore } from "@/stores/messageStore";
 import { useScrollStore } from "@/stores/scrollStore";
 import RHFormContainer from "@/components/RHFormContainer";
 import { deleteFiles } from "@/lib/minio";
+import { useFormContext } from "react-hook-form";
 
 export default function UserForm({
   user,
@@ -469,15 +470,15 @@ export default function UserForm({
 
 function withUnibaEmail(InputComponent: ComponentType<InputProps>) {
   return function WithUnibaEmailWrapper(props: InputProps) {
-    const { methods } = props;
-    const email = methods?.watch("email");
+    const { watch, setValue } = useFormContext();
+    const email = watch("email");
 
     const { lng } = useParams<{ lng: string }>();
     const { t } = useTranslation(lng, ["common"]);
 
     useEffect(() => {
       if (email.includes("uniba")) {
-        methods?.setValue("organization", t("flaw", { ns: "common" }), {
+        setValue("organization", t("flaw", { ns: "common" }), {
           shouldValidate: true,
         });
       }

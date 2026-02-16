@@ -35,7 +35,7 @@ export class SubmissionResolver {
     private readonly conferenceRepository: ConferenceRepository,
     private readonly sectionRepository = new Repository(Section),
     private readonly userRepository: UserRepository,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
 
   @Authorized()
@@ -48,13 +48,13 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionMutationResponse)
   async createSubmission(
     @Arg("data") data: SubmissionInput,
-    @Ctx() { user, req }: Context
+    @Ctx() { user, req }: Context,
   ) {
     const hostname = req.headers["tenant-domain"] as string;
     const submission = await this.submissionService.createSubmission(
       hostname,
       user!,
-      data
+      data,
     );
 
     return {
@@ -73,14 +73,14 @@ export class SubmissionResolver {
   async updateSubmission(
     @Arg("id") id: ObjectId,
     @Arg("data") data: SubmissionInput,
-    @Ctx() { user, req }: Context
+    @Ctx() { user, req }: Context,
   ) {
     const hostname = req.headers["tenant-domain"] as string;
     const submission = await this.submissionService.updateSubmission(
       id,
       hostname,
       user!,
-      data
+      data,
     );
 
     return {
@@ -134,7 +134,7 @@ export class SubmissionResolver {
   @Mutation(() => SubmissionMutationResponse)
   async removeAuthor(
     @Arg("id") id: ObjectId,
-    @Arg("authorId") authorId: ObjectId
+    @Arg("authorId") authorId: ObjectId,
   ): Promise<SubmissionMutationResponse> {
     const submission = await this.submissionService.removeAuthor(id, authorId);
 

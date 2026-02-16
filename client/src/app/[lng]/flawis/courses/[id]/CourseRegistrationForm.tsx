@@ -47,47 +47,21 @@ export default function CourseRegistrationForm({
 
         if (course?.attending) {
           console.log("UPDATE");
-          await deleteFiles(course.attending.fileUrls);
-          const urls = await Promise.all(
-            vals.files.map((f: File) =>
-              uploadToMinio(
-                "courses",
-                `${course.attending!.user.email}/${f.name}`,
-                f
-              )
-            )
-          );
-
-          res = await updateCourseAttendeeFiles({
-            id: course.attending.id,
-            fileUrls: urls,
-          });
         } else {
           console.log("NEW");
-          const urls = await Promise.all(
-            vals.files.map((f: File) =>
-              uploadToMinio("courses", `${user!.email}/${f.name}`, f)
-            )
-          );
-
-          res = await createCourseAttendee({
-            courseId: course.id,
-            fileUrls: urls,
-            billing: vals.billing,
-          });
         }
 
-        setMessage(res.message, res.success);
+        // setMessage(res.message, res.success);
 
-        if (res.success) {
-          if (dialogId) {
-            closeDialog(dialogId);
-          } else if (redirect) {
-            router.replace(redirect);
-          } else {
-            router.back();
-          }
-        }
+        // if (res.success) {
+        //   if (dialogId) {
+        //     closeDialog(dialogId);
+        //   } else if (redirect) {
+        //     router.replace(redirect);
+        //   } else {
+        //     router.back();
+        //   }
+        // }
       }}
     >
       {course.isPaid && (
@@ -150,31 +124,15 @@ export default function CourseRegistrationForm({
             .array()
             .of(yup.mixed<File>().required())
             .min(1, (val) =>
-              t("minFiles", { value: val.min, ns: "validation" })
+              t("minFiles", { value: val.min, ns: "validation" }),
             )
             .max(5, (val) =>
-              t("maxFiles", { value: val.max, ns: "validation" })
+              t("maxFiles", { value: val.max, ns: "validation" }),
             )
             .required(),
         })}
       >
-        {(methods) => (
-          <MultipleFileUploadField
-            control={methods.control}
-            setValue={methods.setValue}
-            setError={methods.setError}
-            label="CV, motivacny list, ine... (.pdf)"
-            name="files"
-            maxFiles={5}
-            accept={{
-              "application/pdf": [".pdf"],
-            }}
-            fileSources={{
-              courses: course.attending?.fileUrls,
-              resumes: !course.attending ? user?.cvUrl : undefined,
-            }}
-          />
-        )}
+        {(methods) => <div>DYNAMIC FORM FROM BACKEND</div>}
       </WizzardStep>
     </WizzardForm>
   );

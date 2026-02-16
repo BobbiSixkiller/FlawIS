@@ -7,6 +7,7 @@ import {
   Category,
   CourseFragment,
   CourseInput,
+  FormFieldInput,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
@@ -15,11 +16,12 @@ import { createCourse } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import { formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
+import { cn, formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
 import TiptapEditor from "@/components/editor/Editor";
+import { FieldType } from "@/lib/graphql/generated/graphql";
 
 export default function CourseForm({
   dialogId,
@@ -51,30 +53,18 @@ export default function CourseForm({
         end: formatDatetimeLocal(course?.end ?? today, false),
         registrationEnd: formatDatetimeLocal(
           course?.registrationEnd ?? today,
-          false
+          false,
         ),
         description: course?.description ?? "",
         maxAttendees: course?.maxAttendees ?? 0,
         price: course?.price ?? 0,
-        billing: course?.billing ?? {
-          name: "",
-          address: {
-            street: "",
-            city: "",
-            postal: "",
-            country: "",
-          },
-          variableSymbol: "",
-          ICO: "",
-          DIC: "",
-          ICDPH: "",
-          IBAN: "",
-          SWIFT: "",
-        },
+        billing: course?.billing,
+        formFields: course?.registrationForm.fields ?? [],
       }}
       onSubmitCb={async (vals, methods) => {
         let res;
         if (course) {
+          console.log("UPDATE ", vals);
           res = await updateCouse({ id: course.id, data: vals });
         } else {
           res = await createCourse({ data: vals });
@@ -195,6 +185,320 @@ export default function CourseForm({
           <Input label="ICDPH" name="billing.ICDPH" />
         </WizzardStep>
       )}
+      <WizzardStep
+        name="Form builder"
+        yupSchema={yup.object({
+          formFields: yup
+            .array()
+            .of(
+              yup.object({
+                id: yup.string().nullable(), // present on edit, absent on create
+                type: yup
+                  .mixed<FieldType>()
+                  .oneOf([
+                    FieldType.Text,
+                    FieldType.Textarea,
+                    FieldType.Select,
+                  ] as any)
+                  .required(),
+                label: yup.string().required(),
+                required: yup.boolean().required(),
+                placeholder: yup.string().nullable(),
+                helpText: yup.string().nullable(),
+                selectOptions: yup.mixed().when("type", {
+                  is: FieldType.Select,
+                  then: () =>
+                    yup
+                      .array()
+                      .of(
+                        yup.object({
+                          value: yup.string().required(),
+                          text: yup.string().required(),
+                        }),
+                      )
+                      .min(1)
+                      .required(),
+                  otherwise: () => yup.mixed().nullable().strip(),
+                }),
+              }),
+            )
+            .min(0)
+            .required(),
+        })}
+      >
+        {(methods) => <CourseRegistrationFormBuilder methods={methods} />}
+      </WizzardStep>
     </WizzardForm>
+  );
+}
+
+import { useFieldArray, UseFormReturn } from "react-hook-form";
+import Button from "@/components/Button";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PlusIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { Field, Label, Select } from "@headlessui/react";
+import CheckBox from "@/components/Checkbox";
+
+function CourseRegistrationFormBuilder({
+  methods,
+}: {
+  methods: UseFormReturn<any>;
+}) {
+  const { control, watch, setValue } = methods;
+
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: "formFields" as any,
+  });
+
+  console.log(watch());
+
+  const watched = watch("formFields" as any) as FormFieldInput[] | undefined;
+
+  function addField(type: FieldType) {
+    append({
+      type,
+      label: "",
+      required: false,
+      placeholder: "",
+      helpText: "",
+      selectOptions:
+        type === FieldType.Select ? [{ value: "", text: "" }] : null,
+    } as any);
+  }
+
+  return (
+    <div className="space-y-6 max-w-2xl w-full">
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" onClick={() => addField(FieldType.Text)}>
+          <PlusIcon className="size-5" /> Text
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.Textarea)}>
+          <PlusIcon className="size-5" /> Textarea
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.Select)}>
+          <PlusIcon className="size-5" /> Select
+        </Button>
+      </div>
+
+      {fields.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No registration fields yet. Add one above.
+        </p>
+      )}
+
+      <div className="space-y-4">
+        {fields.map((f, index) => {
+          const type = watched?.[index]?.type ?? (f as FormFieldInput).type;
+
+          return (
+            <div
+              key={(f as any).id ?? index}
+              className={cn([
+                "rounded-md shadow border p-4 space-y-4",
+                "dark:border-gray-800 border-2 dark:bg-gray-900",
+              ])}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-medium">
+                  Field #{index + 1}{" "}
+                  <span className="text-sm text-muted-foreground">
+                    ({type})
+                  </span>
+                </p>
+
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    disabled={index === 0}
+                    onClick={() => move(index, index - 1)}
+                  >
+                    <ChevronUpIcon className="size-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    disabled={index === fields.length - 1}
+                    onClick={() => move(index, index + 1)}
+                  >
+                    <ChevronDownIcon className="size-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => remove(index)}
+                  >
+                    <TrashIcon className="size-5" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Keep id in state if present (editing), undefined on create */}
+              {/* <input
+                type="hidden"
+                {...register(`formFields.${index}.id` as any)}
+              /> */}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input label="Label" name={`formFields.${index}.label`} />
+                <Field>
+                  <Label className="text-sm font-medium">Type</Label>
+                  <Select
+                    className={cn(
+                      "w-fit focus:outline-none focus:ring-primary-500 py-1.5 h-9 mt-2 flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
+                      "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none dark:text-white/85 focus:ring-primary-300",
+                    )}
+                    value={type}
+                    onChange={(e) => {
+                      const newType = e.target.value as FieldType;
+                      setValue(`formFields.${index}.type` as any, newType);
+
+                      if (newType === FieldType.Select) {
+                        const curr =
+                          (watch(`formFields.${index}.selectOptions` as any) as
+                            | Array<{ value: string; text: string }>
+                            | null
+                            | undefined) ?? [];
+                        if (curr.length === 0) {
+                          setValue(`formFields.${index}.selectOptions` as any, [
+                            { value: "", text: "" },
+                          ]);
+                        }
+                      } else {
+                        setValue(
+                          `formFields.${index}.selectOptions` as any,
+                          null,
+                        );
+                      }
+                    }}
+                  >
+                    <option value={FieldType.Text}>TEXT</option>
+                    <option value={FieldType.Textarea}>TEXTAREA</option>
+                    <option value={FieldType.Select}>SELECT</option>
+                  </Select>
+                </Field>
+
+                <CheckBox
+                  control={control}
+                  label={"Required"}
+                  name={`formFields.${index}.required`}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  label="Placeholder"
+                  name={`formFields.${index}.placeholder`}
+                />
+                <Input
+                  label="Help text"
+                  name={`formFields.${index}.helpText`}
+                />
+              </div>
+
+              {type === FieldType.Select && (
+                <SelectOptionsEditor methods={methods} fieldIndex={index} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SelectOptionsEditor({
+  methods,
+  fieldIndex,
+}: {
+  methods: UseFormReturn<any>;
+  fieldIndex: number;
+}) {
+  const { control } = methods;
+
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: `formFields.${fieldIndex}.selectOptions` as any,
+  });
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="font-medium">Select options</p>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => append({ value: "", text: "" } as any)}
+        >
+          + Add option
+        </Button>
+      </div>
+
+      {fields.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          Add at least one option.
+        </p>
+      )}
+
+      <div className="space-y-2">
+        {fields.map((opt, optIndex) => (
+          <div
+            key={(opt as any).id ?? optIndex}
+            className="flex gap-2 items-start"
+          >
+            <div className="flex-1">
+              <Input
+                label="Value"
+                name={`formFields.${fieldIndex}.selectOptions.${optIndex}.value`}
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                label="Text"
+                name={`formFields.${fieldIndex}.selectOptions.${optIndex}.text`}
+              />
+            </div>
+
+            <div className="flex gap-2 mt-8">
+              <Button
+                type="button"
+                disabled={optIndex === 0}
+                onClick={() => move(optIndex, optIndex - 1)}
+                variant="ghost"
+                size="icon"
+              >
+                <ChevronUpIcon className="size-3" />
+              </Button>
+              <Button
+                type="button"
+                disabled={optIndex === fields.length - 1}
+                onClick={() => move(optIndex, optIndex + 1)}
+                variant="ghost"
+                size="icon"
+              >
+                <ChevronDownIcon className="size-3" />
+              </Button>
+              <Button
+                type="button"
+                onClick={() => remove(optIndex)}
+                variant="ghost"
+                size="icon"
+              >
+                <XMarkIcon className="size-3" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

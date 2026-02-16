@@ -8,6 +8,7 @@ import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { redirect } from "next/navigation";
 import CloseButton from "@/components/CloseButton";
 import Link from "next/link";
+import CourseForm from "../CourseForm";
 
 export default async function CoursePage({
   params,
@@ -67,6 +68,9 @@ export default async function CoursePage({
             return deleteCourse({ id });
           }}
         />
+      </Modal>
+      <Modal dialogId="edit-course" title="Upravit">
+        <CourseForm dialogId={"edit-course"} course={course} />
       </Modal>
     </div>
   );

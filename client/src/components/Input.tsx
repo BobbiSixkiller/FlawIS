@@ -2,53 +2,39 @@
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
-import {
-  Control,
-  UseFormRegister,
-  UseFormSetFocus,
-  UseFormSetValue,
-  UseFormWatch,
-} from "react-hook-form";
+import { Control, useFormContext, useFormState } from "react-hook-form";
 import { cn } from "@/utils/helpers";
 import { InputHTMLAttributes, useState } from "react";
+import { get } from "lodash";
 
-export interface RHFmethodsProps {
-  register: UseFormRegister<any>;
-  setFocus: UseFormSetFocus<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
-}
-
-export interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+export interface InputProps extends InputHTMLAttributes<
+  HTMLInputElement | HTMLTextAreaElement
+> {
   name: string;
   label?: string;
-  error?: string;
-  errors?: any;
-  methods?: RHFmethodsProps;
   control?: Control<any>;
 }
 
-//refactor to handle number and dates
 export function Input({
-  error,
-  methods,
   name,
   label,
   onFocus,
   className,
   ...props
 }: InputProps) {
-  const field = methods?.register?.(name, {
+  const { register, control } = useFormContext();
+  const { errors } = useFormState({ control, name });
+
+  const field = register(name, {
     ...(props.type === "number" ? { valueAsNumber: true } : {}),
     ...(props.type === "datetime-local" || props.type === "date"
       ? { valueAsDate: true as unknown as false }
       : {}),
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const error = get(errors, name)?.message?.toString();
 
-  const val = methods?.watch(name);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="w-full flex flex-col gap-2">

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -17,6 +17,7 @@ export default function ImageFileInput({
   ...props
 }: {
   avatarUrl?: string;
+  control: Control<any>;
 } & InputProps) {
   const { field, fieldState } = useController({ name, control });
 
@@ -48,7 +49,7 @@ export default function ImageFileInput({
   }, [avatarUrl, field]);
 
   const [preview, setPreview] = useState<string>(
-    avatarUrl || "/images/img-placeholder.jpg"
+    avatarUrl || "/images/img-placeholder.jpg",
   );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
