@@ -199,6 +199,7 @@ export default function CourseForm({
                     FieldType.Text,
                     FieldType.Textarea,
                     FieldType.Select,
+                    FieldType.FileUpload,
                   ] as any)
                   .required(),
                 label: yup.string().required(),
@@ -220,6 +221,8 @@ export default function CourseForm({
                       .required(),
                   otherwise: () => yup.mixed().nullable().strip(),
                 }),
+                minFiles: yup.number().nullable(),
+                maxFiles: yup.number().nullable(),
               }),
             )
             .min(0)
@@ -269,6 +272,8 @@ function CourseRegistrationFormBuilder({
       helpText: "",
       selectOptions:
         type === FieldType.Select ? [{ value: "", text: "" }] : null,
+      minFiles: type === FieldType.FileUpload ? 1 : null,
+      maxFiles: type === FieldType.FileUpload ? 5 : null,
     } as any);
   }
 
@@ -283,6 +288,9 @@ function CourseRegistrationFormBuilder({
         </Button>
         <Button type="button" onClick={() => addField(FieldType.Select)}>
           <PlusIcon className="size-5" /> Select
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.FileUpload)}>
+          <PlusIcon className="size-5" /> File Upload
         </Button>
       </div>
 
@@ -373,17 +381,29 @@ function CourseRegistrationFormBuilder({
                             { value: "", text: "" },
                           ]);
                         }
+                        setValue(`formFields.${index}.minFiles` as any, null);
+                        setValue(`formFields.${index}.maxFiles` as any, null);
+                      } else if (newType === FieldType.FileUpload) {
+                        setValue(
+                          `formFields.${index}.selectOptions` as any,
+                          null,
+                        );
+                        setValue(`formFields.${index}.minFiles` as any, 1);
+                        setValue(`formFields.${index}.maxFiles` as any, 5);
                       } else {
                         setValue(
                           `formFields.${index}.selectOptions` as any,
                           null,
                         );
+                        setValue(`formFields.${index}.minFiles` as any, null);
+                        setValue(`formFields.${index}.maxFiles` as any, null);
                       }
                     }}
                   >
                     <option value={FieldType.Text}>TEXT</option>
                     <option value={FieldType.Textarea}>TEXTAREA</option>
                     <option value={FieldType.Select}>SELECT</option>
+                    <option value={FieldType.FileUpload}>FILE_UPLOAD</option>
                   </Select>
                 </Field>
 
@@ -395,14 +415,40 @@ function CourseRegistrationFormBuilder({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Placeholder"
-                  name={`formFields.${index}.placeholder`}
-                />
-                <Input
-                  label="Help text"
-                  name={`formFields.${index}.helpText`}
-                />
+                {type !== FieldType.FileUpload ? (
+                  <>
+                    <Input
+                      label="Placeholder"
+                      name={`formFields.${index}.placeholder`}
+                    />
+                    <Input
+                      label="Help text"
+                      name={`formFields.${index}.helpText`}
+                    />
+                  </>
+                ) : (
+                  <div className="col-span-2 flex gap-2">
+                    <div className="flex gap-2  sm:w-1/3">
+                      <Input
+                        label="Min files"
+                        name={`formFields.${index}.minFiles`}
+                        type="number"
+                        className="w-fit"
+                      />
+                      <Input
+                        label="Max files"
+                        name={`formFields.${index}.maxFiles`}
+                        type="number"
+                        className="w-fit"
+                      />
+                    </div>
+
+                    <Input
+                      label="Help text"
+                      name={`formFields.${index}.helpText`}
+                    />
+                  </div>
+                )}
               </div>
 
               {type === FieldType.Select && (

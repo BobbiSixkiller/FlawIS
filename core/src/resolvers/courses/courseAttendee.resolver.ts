@@ -15,6 +15,7 @@ import { ObjectId } from "mongodb";
 import { Status } from "../../entitites/Internship";
 import { CourseAttendeeMutationResponse } from "../types/course/courseAttendee.types";
 import { AttendeeBillingInput } from "../types/attendee.types";
+import { FormSubmissionInput } from "../types/form/form.types";
 import { Context } from "../../util/auth";
 import { Access } from "../../entitites/User";
 import { UserService } from "../../services/user.service";
@@ -37,6 +38,7 @@ export class CourseAttendeeResolver {
   @Mutation(() => CourseAttendeeMutationResponse)
   async createCourseAttendee(
     @Arg("courseId") courseId: ObjectId,
+    @Arg("application") application: FormSubmissionInput,
     @Ctx() { req, user }: Context,
     @Arg("billing", () => AttendeeBillingInput, { nullable: true })
     billing?: AttendeeBillingInput,
@@ -47,10 +49,27 @@ export class CourseAttendeeResolver {
       hostname,
       courseId,
       user!.id,
+      application,
       billing,
     );
 
     return { message: "Registracia na kurz prebehla uspesne!", data: attendee };
+  }
+
+  @Authorized()
+  @Mutation(() => CourseAttendeeMutationResponse)
+  async updateCourseAttendee(
+    @Arg("id") id: ObjectId,
+    @Arg("application") application: FormSubmissionInput,
+    @Ctx() { user }: Context,
+  ): Promise<CourseAttendeeMutationResponse> {
+    const attendee = await this.courseAttendeeService.updateCourseAttendee(
+      id,
+      application,
+      user!.id,
+    );
+
+    return { message: "Prihlaska bola aktualizovana!", data: attendee };
   }
 
   @Authorized([Access.Admin])

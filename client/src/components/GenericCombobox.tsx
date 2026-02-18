@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { last } from "lodash";
+import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
 import { cn, handleAPIErrors } from "@/utils/helpers";
@@ -36,6 +36,7 @@ export interface GenericComboboxProps<TOption, TValue> {
   defaultOptions: TOption[];
   multiple?: boolean;
   immediate?: boolean;
+  displayValue?: (val: TOption) => string;
   fetchOptions?: (query: string) => Promise<TOption[]>;
   createOption?: (text: string) => Promise<GqlMutationResponse<TOption>>;
   renderOption: (
@@ -62,6 +63,7 @@ export default function GenericCombobox<
   multiple,
   immediate,
   defaultOptions,
+  displayValue,
   fetchOptions,
   createOption,
   renderOption,
@@ -217,7 +219,7 @@ export default function GenericCombobox<
 
   function renderComboboxContent() {
     return (
-      <div>
+      <div ref={ref}>
         <div
           className={cn([
             "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6",
@@ -264,7 +266,14 @@ export default function GenericCombobox<
             <ComboboxInput
               placeholder={placeholder}
               onChange={(e) => debounced(e.target.value)}
-              displayValue={() => ""}
+              displayValue={({ val }: TOption) => {
+                console.log(val);
+                console.log(options);
+                const selected = options.find((o) =>
+                  Object.values(o.val).some((v) => isEqual(v, val)),
+                );
+                return selected?.val.text;
+              }}
               className="bg-transparent border-none focus:ring-0 p-0 w-full"
               onKeyDown={handleKeyDown}
               disabled={disabled}
@@ -334,8 +343,6 @@ export default function GenericCombobox<
           immediate={immediate}
           value={value}
           onChange={handleChange}
-          onClose={() => setText("")}
-          ref={ref}
         >
           {renderComboboxContent()}
         </Combobox>

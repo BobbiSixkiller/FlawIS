@@ -37,7 +37,7 @@ export function Input({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className={cn(["w-full flex flex-col gap-2", className])}>
       {label && (
         <label
           htmlFor={name}
@@ -55,7 +55,6 @@ export function Input({
             : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
           props.disabled &&
             "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
-          className,
         ])}
       >
         <input

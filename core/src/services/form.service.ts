@@ -36,6 +36,9 @@ function canonFieldsKeepOrder(fields: any[]) {
             .filter((o: any) => o.value || o.text)
         : null;
 
+    const minFiles = type === FieldType.FileUpload ? (f.minFiles ?? null) : null;
+    const maxFiles = type === FieldType.FileUpload ? (f.maxFiles ?? null) : null;
+
     return {
       id: oid(f.id ?? f._id), // normalize ObjectId
       name: nstr(f.name),
@@ -45,6 +48,8 @@ function canonFieldsKeepOrder(fields: any[]) {
       placeholder: nstr(f.placeholder),
       helpText: nstr(f.helpText),
       selectOptions,
+      minFiles,
+      maxFiles,
     };
   });
 }
@@ -115,9 +120,11 @@ export class FormService {
           {
             course: courseId,
             version: nextVersion,
-            fields: formFields.map(({ id, ...rest }) => ({
+            fields: formFields.map(({ id, selectOptions, minFiles, maxFiles, ...rest }) => ({
               _id: id ?? new ObjectId(),
               ...rest,
+              ...(rest.type === FieldType.Select && selectOptions ? { selectOptions } : {}),
+              ...(rest.type === FieldType.FileUpload ? { minFiles, maxFiles } : {}),
             })),
           },
           { session },

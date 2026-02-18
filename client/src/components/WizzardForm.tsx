@@ -62,17 +62,16 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
 
   function handleApiErrors(
     apiErrors: Record<string, string>,
-    methods: UseFormReturn<TInputVals>
+    methods: UseFormReturn<TInputVals>,
   ) {
     const firstField = Object.keys(apiErrors)[0];
 
     // Determine step index based on field names and schema
     const stepIndex = steps.findIndex((step) => {
       const keys = Object.keys(step.props.yupSchema.fields);
-      console.log(keys);
 
       return keys.some(
-        (k) => firstField === k || firstField.startsWith(`${k}.`)
+        (k) => firstField === k || firstField.startsWith(`${k}.`),
       );
     });
 
@@ -87,7 +86,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
           {
             message: msg,
           },
-          { shouldFocus: true }
+          { shouldFocus: true },
         );
       }
     }, 0);
@@ -120,7 +119,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                   }
                 }
               },
-              (err) => console.log(err)
+              (err) => console.log(err),
             )}
           >
             {typeof activeStep.props.children === "function"

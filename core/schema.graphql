@@ -379,6 +379,7 @@ input DatesInput {
 
 """Supported registration form field types"""
 enum FieldType {
+  FileUpload
   Select
   Text
   Textarea
@@ -420,6 +421,8 @@ type FormField {
   helpText: String
   id: ObjectId!
   label: String!
+  maxFiles: Int
+  minFiles: Int
   placeholder: String
   required: Boolean!
   selectOptions: [SelectOption!]
@@ -430,6 +433,8 @@ input FormFieldInput {
   helpText: String
   id: ObjectId
   label: String!
+  maxFiles: Int
+  minFiles: Int
   placeholder: String
   required: Boolean!
   selectOptions: [SelectOptionInput!]
@@ -442,6 +447,12 @@ type FormSubmission {
   form: ObjectId!
   formVersion: Int!
   updatedAt: DateTimeISO!
+}
+
+input FormSubmissionInput {
+  answers: JSONObject!
+  form: ObjectId!
+  formVersion: Int!
 }
 
 interface IMutationResponse {
@@ -647,7 +658,7 @@ type Mutation {
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
-  createCourseAttendee(billing: AttendeeBillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
+  createCourseAttendee(application: FormSubmissionInput!, billing: AttendeeBillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
@@ -677,6 +688,7 @@ type Mutation {
   updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
+  updateCourseAttendee(application: FormSubmissionInput!, id: ObjectId!): CourseAttendeeMutationResponse!
   updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
   updateInternData(fileUrls: [String]!, id: ObjectId!, semester: Semester!): InternMutationResponse!
   updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!

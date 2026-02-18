@@ -13,8 +13,8 @@ import {
   DeleteCourseMutationVariables,
   DeleteCourseSessionDocument,
   DeleteCourseSessionMutationVariables,
-  UpdateCourseAttendeeFilesDocument,
-  UpdateCourseAttendeeFilesMutationVariables,
+  UpdateCourseAttendeeDocument,
+  UpdateCourseAttendeeMutationVariables,
   UpdateCourseDocument,
   UpdateCourseMutationVariables,
   UpdateCourseSessionDocument,
@@ -139,19 +139,19 @@ export async function createCourseAttendee(
   );
 }
 
-export async function updateCourseAttendeeFiles(
-  vars: UpdateCourseAttendeeFilesMutationVariables
+export async function updateCourseAttendee(
+  vars: UpdateCourseAttendeeMutationVariables
 ) {
   return await executeGqlMutation(
-    UpdateCourseAttendeeFilesDocument,
+    UpdateCourseAttendeeDocument,
     vars,
     (data) => ({
-      message: data.updateCourseAttendeeFiles.message,
-      data: data.updateCourseAttendeeFiles.data,
+      message: data.updateCourseAttendee.message,
+      data: data.updateCourseAttendee.data,
     }),
     {
       revalidateTags: (data) => [
-        `courses:${data.updateCourseAttendeeFiles.data.course}`,
+        `courses:${data.updateCourseAttendee.data.course}`,
       ],
     }
   );

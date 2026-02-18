@@ -1,13 +1,16 @@
-import { Field, InputType } from "type-graphql";
+import { Field, InputType, Int } from "type-graphql";
 import { FieldType } from "../../../entitites/Form";
 import {
   ArrayMaxSize,
   ArrayMinSize,
   IsBoolean,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
+  Min,
   ValidateNested,
 } from "class-validator";
 import { ObjectId } from "mongodb";
@@ -73,4 +76,34 @@ export class FormFieldInput {
   @ArrayMinSize(1)
   @ArrayMaxSize(200)
   selectOptions?: SelectOptionInput[];
+
+  /**
+   * Only for FILE_UPLOAD. Minimum and maximum number of files.
+   */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  minFiles?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  maxFiles?: number;
+}
+
+@InputType()
+export class FormSubmissionInput {
+  @Field(() => ObjectId)
+  form: ObjectId;
+
+  @Field(() => Int)
+  @IsInt()
+  formVersion: number;
+
+  @Field(() => JSONObject)
+  answers: Record<string, string | string[]>;
 }

@@ -9,6 +9,7 @@ export enum FieldType {
   Text = "TEXT",
   Textarea = "TEXTAREA",
   Select = "SELECT",
+  FileUpload = "FILE_UPLOAD",
 }
 
 registerEnumType(FieldType, {
@@ -59,6 +60,17 @@ export class FormField {
   @Field(() => [SelectOption], { nullable: true })
   @Property({ type: () => [SelectOption], _id: false, default: undefined })
   selectOptions?: SelectOption[];
+
+  /**
+   * Only meaningful when type === FILE_UPLOAD.
+   */
+  @Field(() => Int, { nullable: true })
+  @Property()
+  minFiles?: number;
+
+  @Field(() => Int, { nullable: true })
+  @Property()
+  maxFiles?: number;
 }
 
 /**
@@ -103,7 +115,7 @@ export class FormSubmission extends TimeStamps {
 
   @Field(() => JSONObject)
   @Property({ type: () => Map })
-  answers: Map<string, string>;
+  answers: Map<string, string | string[]>;
 
   @Field()
   createdAt: Date;
