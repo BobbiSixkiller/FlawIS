@@ -109,6 +109,26 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                 try {
                   if (isLastStep()) {
                     await onSubmitCb(vals, methods);
+                    // After submit, check for errors set inside onSubmitCb
+                    // (e.g. via handleAPIErrors) and navigate to the first affected step
+                    const errors = methods.formState.errors;
+                    const errorKeys = Object.keys(errors);
+                    if (errorKeys.length > 0) {
+                      const firstErrorField = errorKeys[0];
+                      const errorStepIndex = steps.findIndex((s) => {
+                        const schemaKeys = Object.keys(
+                          s.props.yupSchema.fields,
+                        );
+                        return schemaKeys.some(
+                          (k) =>
+                            firstErrorField === k ||
+                            firstErrorField.startsWith(`${k}.`),
+                        );
+                      });
+                      if (errorStepIndex !== -1) {
+                        setStep(errorStepIndex);
+                      }
+                    }
                   } else {
                     setStep(step + 1);
                   }

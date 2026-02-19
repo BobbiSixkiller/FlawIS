@@ -14,6 +14,7 @@ fragment Course on Course {
   }
   maxAttendees
   description
+  thumbnail
   price
   billing {
     ...FlawBilling

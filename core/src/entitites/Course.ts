@@ -10,7 +10,7 @@ import { Status } from "./Internship";
 import { Form, FormSubmission } from "./Form";
 
 @ObjectType({ description: "Course category" })
-export class Category {
+export class Category extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
@@ -21,6 +21,11 @@ export class Category {
   @Field()
   @Property()
   slug: string;
+
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
 }
 
 @ObjectType()
@@ -37,7 +42,7 @@ export class Course extends TimeStamps {
   procurer?: UserStub;
 
   @Field(() => [Category])
-  @Property({ type: () => [Category], default: [] })
+  @Property({ ref: () => Category, default: [] })
   categories: Category[];
 
   @Field()
@@ -47,6 +52,10 @@ export class Course extends TimeStamps {
   @Field({ description: "String representation of HTML describing the course" })
   @Property()
   description: string;
+
+  @Field({ nullable: true })
+  @Property()
+  thumbnail?: string;
 
   @Field(() => Int)
   @Property()

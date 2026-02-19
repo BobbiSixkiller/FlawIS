@@ -16,7 +16,13 @@ import { createCourse } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import { cn, formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
+import {
+  cn,
+  formatDatetimeLocal,
+  handleAPIErrors,
+  uploadOrDelete,
+} from "@/utils/helpers";
+import ImageFileInput from "@/components/ImageFileInput";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
@@ -46,29 +52,52 @@ export default function CourseForm({
   return (
     <WizzardForm<CourseInput>
       lng={lng}
-      defaultValues={{
-        name: course?.name ?? "",
-        categoryIds: course?.categories.map((c) => c.id) ?? [],
-        start: formatDatetimeLocal(course?.start ?? today, false),
-        end: formatDatetimeLocal(course?.end ?? today, false),
-        registrationEnd: formatDatetimeLocal(
-          course?.registrationEnd ?? today,
-          false,
-        ),
-        description: course?.description ?? "",
-        maxAttendees: course?.maxAttendees ?? 0,
-        price: course?.price ?? 0,
-        billing: course?.billing,
-        formFields: course?.registrationForm.fields ?? [],
-      }}
+      defaultValues={
+        {
+          name: course?.name ?? "",
+          categoryIds: course?.categories.map((c) => c.id) ?? [],
+          start: formatDatetimeLocal(course?.start ?? today, false),
+          end: formatDatetimeLocal(course?.end ?? today, false),
+          registrationEnd: formatDatetimeLocal(
+            course?.registrationEnd ?? today,
+            false,
+          ),
+          description: course?.description ?? "",
+          maxAttendees: course?.maxAttendees ?? 0,
+          price: course?.price ?? 0,
+          billing: course?.billing,
+          formFields: course?.registrationForm.fields ?? [],
+          thumbnailFile: null,
+        } as any
+      }
       onSubmitCb={async (vals, methods) => {
+        const valsAny = vals as any;
+
+        const { url: thumbnail, error: thumbnailError } = await uploadOrDelete(
+          "images",
+          course?.thumbnail ?? null,
+          valsAny.thumbnailFile instanceof File ? valsAny.thumbnailFile : null,
+          "courses/thumbnails",
+        );
+        if (thumbnailError) {
+          methods.setError("thumbnailFile" as any, { message: thumbnailError });
+          return;
+        }
+
+        const { thumbnailFile: _, ...courseVals } = valsAny;
+        const data = {
+          ...courseVals,
+          thumbnail: thumbnail !== undefined ? thumbnail : course?.thumbnail,
+        };
+
         let res;
         if (course) {
-          console.log("UPDATE ", vals);
-          res = await updateCouse({ id: course.id, data: vals });
+          res = await updateCouse({ id: course.id, data });
         } else {
-          res = await createCourse({ data: vals });
+          res = await createCourse({ data });
         }
+
+        console.log(res.errors);
 
         if (res.errors) {
           handleAPIErrors(res.errors, methods.setError);
@@ -95,6 +124,13 @@ export default function CourseForm({
       >
         {(methods) => (
           <div className="space-y-6 max-w-2xl w-full">
+            <ImageFileInput
+              bucket="images"
+              name="thumbnailFile"
+              label="Thumbnail"
+              avatarUrl={course?.thumbnail ?? undefined}
+              control={methods.control}
+            />
             <Textarea label="Nazov kurzu" name="name" />
             {/* <GenericCombobox<{ id: string; val: Category }, string>
               lng={lng}

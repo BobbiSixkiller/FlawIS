@@ -23,6 +23,7 @@ import {
   ArrayMinSize,
   IsDate,
   IsInt,
+  IsOptional,
   IsString,
   Min,
   ValidateNested,
@@ -106,6 +107,11 @@ export class CourseInput implements Partial<Course> {
   @Field()
   @IsString()
   description: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 
   @Field(() => Int)
   @IsInt()

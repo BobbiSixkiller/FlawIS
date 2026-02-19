@@ -151,9 +151,11 @@ type Billing {
 
 """Course category"""
 type Category {
+  createdAt: DateTimeISO!
   id: ObjectId!
   name: String!
   slug: String!
+  updatedAt: DateTimeISO!
 }
 
 """Conference model type"""
@@ -246,6 +248,7 @@ type Course {
   registrationEnd: DateTimeISO!
   registrationForm: Form!
   start: DateTimeISO!
+  thumbnail: String
   updatedAt: DateTimeISO!
 }
 
@@ -315,6 +318,7 @@ input CourseInput {
   price: Int!
   registrationEnd: DateTimeISO!
   start: DateTimeISO!
+  thumbnail: String
 }
 
 type CourseMutationResponse implements IMutationResponse {

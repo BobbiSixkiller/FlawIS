@@ -6,36 +6,59 @@ import {
   Connection,
   withInfiniteScroll,
 } from "@/components/withInfiniteScroll";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   CourseFragment,
   CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
 import { getCourses } from "./actions";
 import Card from "@/components/Card";
-import { Input } from "@/components/Input";
+import DynamicImageClient from "@/components/DynamicImageClient";
 
 function ListItem({ data }: { data?: CourseFragment }) {
   const path = usePathname();
-  const { lng } = useParams<{ lng: string }>();
-  const { t } = useTranslation(lng, "internships");
 
   return (
     <Card
       as={Link}
       href={path.includes("courses") ? `/courses/${data?.id}` : `/${data?.id}`}
     >
-      <div className="flex flex-wrap justify-between">
-        <h2 className="font-medium leading-6">{data?.name}</h2>
+      <DynamicImageClient
+        fill
+        src={data?.thumbnail ?? "/images/img-placeholder.jpg"}
+        alt={data?.name ?? "thumbnail"}
+        className="relative w-full h-40 rounded-lg overflow-hidden mb-3 object-cover"
+      />
+
+      <h2 className="font-medium leading-6">{data?.name}</h2>
+
+      <div className="flex flex-wrap gap-1 mt-1">
+        {data?.categories.map((cat) => (
+          <span
+            key={String(cat.id)}
+            className="text-xs bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 rounded-full px-2 py-0.5"
+          >
+            {cat.name}
+          </span>
+        ))}
       </div>
 
-      <p className="leading-none text-gray-500 dark:text-gray-300">
-        {data?.isPaid ? data?.price : "Zadarmo"}
-      </p>
-      <p className="line-clamp-3">
-        {data?.description.replace(/<[^>]*>/g, " ").trim()}
-      </p>
+      <div className="mt-2 space-y-0.5 text-sm text-gray-500 dark:text-gray-400">
+        <p>
+          Začiatok:{" "}
+          {data?.start ? new Date(data.start).toLocaleDateString("sk") : "—"}
+        </p>
+        <p>
+          Koniec:{" "}
+          {data?.end ? new Date(data.end).toLocaleDateString("sk") : "—"}
+        </p>
+        <p>
+          Registrácia do:{" "}
+          {data?.registrationEnd
+            ? new Date(data.registrationEnd).toLocaleDateString("sk")
+            : "—"}
+        </p>
+      </div>
     </Card>
   );
 }

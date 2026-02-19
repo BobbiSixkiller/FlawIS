@@ -14,9 +14,11 @@ export default function ImageFileInput({
   label,
   name,
   control,
+  bucket = "avatars",
   ...props
 }: {
   avatarUrl?: string;
+  bucket?: string;
   control: Control<any>;
 } & InputProps) {
   const { field, fieldState } = useController({ name, control });
@@ -38,7 +40,7 @@ export default function ImageFileInput({
       if (!avatarUrl || field.value) return;
 
       try {
-        const file = await fetchFromMinio("avatars", avatarUrl);
+        const file = await fetchFromMinio(bucket, avatarUrl);
         field.onChange(file);
       } catch (e) {
         console.error("Failed to convert avatar to file", e);

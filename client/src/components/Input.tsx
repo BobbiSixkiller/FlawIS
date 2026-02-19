@@ -28,7 +28,10 @@ export function Input({
   const field = register(name, {
     ...(props.type === "number" ? { valueAsNumber: true } : {}),
     ...(props.type === "datetime-local" || props.type === "date"
-      ? { valueAsDate: true as unknown as false }
+      ? {
+          valueAsDate: true as unknown as false,
+          // value: formatDatetimeLocal(y, false),
+        }
       : {}),
   });
 
