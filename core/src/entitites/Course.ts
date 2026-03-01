@@ -43,7 +43,7 @@ export class Course extends TimeStamps {
 
   @Field(() => [Category])
   @Property({ ref: () => Category, default: [] })
-  categories: Category[];
+  categories: Ref<Category>[];
 
   @Field()
   @Property()

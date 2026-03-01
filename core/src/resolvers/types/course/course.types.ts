@@ -84,7 +84,7 @@ export class CourseInput implements Partial<Course> {
         ns: "course",
       }),
   })
-  categoryIds: ObjectId[];
+  categories: Ref<Category>[];
 
   @Field()
   @IsDate()
@@ -174,4 +174,17 @@ export class Attendance {
 export class AttendanceConnection extends CreateConnection(Attendance) {
   @Field(() => [CourseSession], { nullable: "items" })
   sessions: CourseSession[];
+}
+
+@InputType()
+export class CategoryInput {
+  @Field()
+  @IsString()
+  name: string;
+}
+
+@ObjectType({ implements: IMutationResponse })
+export class CategoryMutationResponse extends IMutationResponse {
+  @Field(() => Category)
+  data: Category;
 }

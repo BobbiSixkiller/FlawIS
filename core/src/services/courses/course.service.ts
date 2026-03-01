@@ -56,6 +56,7 @@ export class CourseService {
   async createCourse({ formFields, ...data }: CourseInput) {
     return withOptionalTransaction(undefined, async (session) => {
       const course = await this.courseRepository.create(data, { session });
+      await course.populate("categories");
       const registrationForm = await this.formService.createForm(
         formFields,
         course._id,

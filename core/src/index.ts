@@ -34,6 +34,7 @@ import { ErrorsMiddleware } from "./middlewares/errors.middleware";
 import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolver";
 import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resolver";
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
+import { CategoryResolver } from "./resolvers/courses/category.resolver";
 
 env.config();
 
@@ -68,6 +69,7 @@ async function main() {
       CourseSessionResolver,
       CourseAttendeeResolver,
       AttendanceRecordResolver,
+      CategoryResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],

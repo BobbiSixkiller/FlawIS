@@ -100,6 +100,12 @@ fragment Attendance on Attendance {
   }
 }
 
+fragment Category on Category {
+  id
+  name
+  slug
+}
+
 query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
   courses(after: $after, first: $first, sort: $sort) {
     totalCount
@@ -219,7 +225,10 @@ mutation createCourseAttendee(
   }
 }
 
-mutation updateCourseAttendee($id: ObjectId!, $application: FormSubmissionInput!) {
+mutation updateCourseAttendee(
+  $id: ObjectId!
+  $application: FormSubmissionInput!
+) {
   updateCourseAttendee(id: $id, application: $application) {
     message
     data {
@@ -268,6 +277,39 @@ mutation updateAttendanceOnline($id: ObjectId!, $online: Boolean!) {
       session {
         course
       }
+    }
+  }
+}
+
+query categories($search: String) {
+  categories(search: $search) {
+    ...Category
+  }
+}
+
+mutation createCategory($data: CategoryInput!) {
+  createCategory(data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+
+mutation updateCategory($id: ObjectId!, $data: CategoryInput!) {
+  updateCategory(id: $id, data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+
+mutation deleteCategory($id: ObjectId!) {
+  deleteCategory(id: $id) {
+    message
+    data {
+      ...Category
     }
   }
 }

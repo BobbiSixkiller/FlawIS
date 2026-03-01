@@ -158,6 +158,15 @@ type Category {
   updatedAt: DateTimeISO!
 }
 
+input CategoryInput {
+  name: String!
+}
+
+type CategoryMutationResponse implements IMutationResponse {
+  data: Category!
+  message: String!
+}
+
 """Conference model type"""
 type Conference {
   attendeesCount: Int!
@@ -307,7 +316,7 @@ input CourseFilterInput {
 
 input CourseInput {
   billing: FlawBillingInput
-  categoryIds: [ObjectId!]!
+  categories: [ObjectId!]!
   description: String!
   end: DateTimeISO!
 
@@ -660,6 +669,7 @@ type Mutation {
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
   changeCourseAttendeeStatus(id: ObjectId!, status: Status!): CourseAttendeeMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
+  createCategory(data: CategoryInput!): CategoryMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
   createCourseAttendee(application: FormSubmissionInput!, billing: AttendeeBillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
@@ -670,6 +680,7 @@ type Mutation {
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
+  deleteCategory(id: ObjectId!): CategoryMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
   deleteCourse(id: ObjectId!): CourseMutationResponse!
   deleteCourseAttendee(id: ObjectId!): CourseAttendeeMutationResponse!
@@ -690,6 +701,7 @@ type Mutation {
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateAttendanceHours(hoursAttended: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
   updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
+  updateCategory(data: CategoryInput!, id: ObjectId!): CategoryMutationResponse!
   updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
   updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
   updateCourseAttendee(application: FormSubmissionInput!, id: ObjectId!): CourseAttendeeMutationResponse!
@@ -734,6 +746,7 @@ type Query {
   attendee(id: ObjectId!): Attendee!
   attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
   attendeesCsvExport(slug: String!): [Attendee!]!
+  categories(search: String): [Category!]!
   conference(slug: String!): Conference!
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!

@@ -182,9 +182,21 @@ export type Billing = {
 /** Course category */
 export type Category = {
   __typename?: 'Category';
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['ObjectId']['output'];
   name: Scalars['String']['output'];
   slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
+};
+
+export type CategoryInput = {
+  name: Scalars['String']['input'];
+};
+
+export type CategoryMutationResponse = IMutationResponse & {
+  __typename?: 'CategoryMutationResponse';
+  data: Category;
+  message: Scalars['String']['output'];
 };
 
 /** Conference model type */
@@ -355,7 +367,7 @@ export type CourseFilterInput = {
 
 export type CourseInput = {
   billing?: InputMaybe<FlawBillingInput>;
-  categoryIds: Array<Scalars['ObjectId']['input']>;
+  categories: Array<Scalars['ObjectId']['input']>;
   description: Scalars['String']['input'];
   end: Scalars['DateTimeISO']['input'];
   /** Property describing dynamic registration form of a given course */
@@ -715,6 +727,7 @@ export type Mutation = {
   addAttendee: ConferenceMutationResponse;
   changeCourseAttendeeStatus: CourseAttendeeMutationResponse;
   changeInternStatus: InternMutationResponse;
+  createCategory: CategoryMutationResponse;
   createConference: ConferenceMutationResponse;
   createCourse: CourseMutationResponse;
   createCourseAttendee: CourseAttendeeMutationResponse;
@@ -725,6 +738,7 @@ export type Mutation = {
   createSubmission: SubmissionMutationResponse;
   createTicket: ConferenceMutationResponse;
   deleteAttendee: AttendeeMutationResponse;
+  deleteCategory: CategoryMutationResponse;
   deleteConference: ConferenceMutationResponse;
   deleteCourse: CourseMutationResponse;
   deleteCourseAttendee: CourseAttendeeMutationResponse;
@@ -745,6 +759,7 @@ export type Mutation = {
   toggleVerifiedUser: UserMutationResponse;
   updateAttendanceHours: AttendanceRecordMutationResponse;
   updateAttendanceOnline: AttendanceRecordMutationResponse;
+  updateCategory: CategoryMutationResponse;
   updateConferenceDates: ConferenceMutationResponse;
   updateCourse: CourseMutationResponse;
   updateCourseAttendee: CourseAttendeeMutationResponse;
@@ -774,6 +789,11 @@ export type MutationChangeCourseAttendeeStatusArgs = {
 export type MutationChangeInternStatusArgs = {
   id: Scalars['ObjectId']['input'];
   status: Status;
+};
+
+
+export type MutationCreateCategoryArgs = {
+  data: CategoryInput;
 };
 
 
@@ -828,6 +848,11 @@ export type MutationCreateTicketArgs = {
 
 
 export type MutationDeleteAttendeeArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationDeleteCategoryArgs = {
   id: Scalars['ObjectId']['input'];
 };
 
@@ -933,6 +958,12 @@ export type MutationUpdateAttendanceOnlineArgs = {
 };
 
 
+export type MutationUpdateCategoryArgs = {
+  data: CategoryInput;
+  id: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationUpdateConferenceDatesArgs = {
   data: DatesInput;
   slug: Scalars['String']['input'];
@@ -1033,6 +1064,7 @@ export type Query = {
   attendee: Attendee;
   attendees: AttendeeConnection;
   attendeesCsvExport: Array<Attendee>;
+  categories: Array<Category>;
   conference: Conference;
   conferences: ConferenceConnection;
   course: Course;
@@ -1069,6 +1101,11 @@ export type QueryAttendeesArgs = {
 
 export type QueryAttendeesCsvExportArgs = {
   slug: Scalars['String']['input'];
+};
+
+
+export type QueryCategoriesArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1730,6 +1767,8 @@ export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, c
 
 export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
 
+export type CategoryFragment = { __typename?: 'Category', id: any, name: string, slug: string };
+
 export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1847,6 +1886,35 @@ export type UpdateAttendanceOnlineMutationVariables = Exact<{
 
 
 export type UpdateAttendanceOnlineMutation = { __typename?: 'Mutation', updateAttendanceOnline: { __typename?: 'AttendanceRecordMutationResponse', message: string, data: { __typename?: 'AttendanceRecord', hoursAttended: number, online?: boolean | null, session: { __typename?: 'CourseSession', course: any } } } };
+
+export type CategoriesQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }> };
+
+export type CreateCategoryMutationVariables = Exact<{
+  data: CategoryInput;
+}>;
+
+
+export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'CategoryMutationResponse', message: string, data: { __typename?: 'Category', id: any, name: string, slug: string } } };
+
+export type UpdateCategoryMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+  data: CategoryInput;
+}>;
+
+
+export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'CategoryMutationResponse', message: string, data: { __typename?: 'Category', id: any, name: string, slug: string } } };
+
+export type DeleteCategoryMutationVariables = Exact<{
+  id: Scalars['ObjectId']['input'];
+}>;
+
+
+export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'CategoryMutationResponse', message: string, data: { __typename?: 'Category', id: any, name: string, slug: string } } };
 
 export type ApplicationFragment = { __typename?: 'Intern', id: any, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } };
 
@@ -2720,6 +2788,13 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
   }
 }
     `, {"fragmentName":"Attendance"}) as unknown as TypedDocumentString<AttendanceFragment, unknown>;
+export const CategoryFragmentDoc = new TypedDocumentString(`
+    fragment Category on Category {
+  id
+  name
+  slug
+}
+    `, {"fragmentName":"Category"}) as unknown as TypedDocumentString<CategoryFragment, unknown>;
 export const ApplicationFragmentDoc = new TypedDocumentString(`
     fragment Application on Intern {
   id
@@ -5106,6 +5181,59 @@ export const UpdateAttendanceOnlineDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateAttendanceOnlineMutation, UpdateAttendanceOnlineMutationVariables>;
+export const CategoriesDocument = new TypedDocumentString(`
+    query categories($search: String) {
+  categories(search: $search) {
+    ...Category
+  }
+}
+    fragment Category on Category {
+  id
+  name
+  slug
+}`) as unknown as TypedDocumentString<CategoriesQuery, CategoriesQueryVariables>;
+export const CreateCategoryDocument = new TypedDocumentString(`
+    mutation createCategory($data: CategoryInput!) {
+  createCategory(data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+    fragment Category on Category {
+  id
+  name
+  slug
+}`) as unknown as TypedDocumentString<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export const UpdateCategoryDocument = new TypedDocumentString(`
+    mutation updateCategory($id: ObjectId!, $data: CategoryInput!) {
+  updateCategory(id: $id, data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+    fragment Category on Category {
+  id
+  name
+  slug
+}`) as unknown as TypedDocumentString<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+export const DeleteCategoryDocument = new TypedDocumentString(`
+    mutation deleteCategory($id: ObjectId!) {
+  deleteCategory(id: $id) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+    fragment Category on Category {
+  id
+  name
+  slug
+}`) as unknown as TypedDocumentString<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
 export const InternshipsDocument = new TypedDocumentString(`
     query internships($after: String, $first: Int, $filter: InternshipFilterInput, $sort: [InternshipSortInput]!) {
   internships(after: $after, first: $first, filter: $filter, sort: $sort) {

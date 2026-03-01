@@ -4,7 +4,7 @@ import useDefaultContent from "@/components/editor/useDefaultContent";
 import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
 import {
-  Category,
+  CategoryFragment,
   CourseFragment,
   CourseInput,
   FormFieldInput,
@@ -12,16 +12,11 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { createCourse } from "./actions";
+import { createCourse, createCategoryAction, fetchCategories } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import {
-  cn,
-  formatDatetimeLocal,
-  handleAPIErrors,
-  uploadOrDelete,
-} from "@/utils/helpers";
+import { cn, handleAPIErrors, uploadOrDelete } from "@/utils/helpers";
 import ImageFileInput from "@/components/ImageFileInput";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";
@@ -47,36 +42,30 @@ export default function CourseForm({
   const setMessage = useMessageStore((s) => s.setMessage);
   const closeDialog = useDialogStore((s) => s.closeDialog);
 
-  const today = new Date().toUTCString();
-
   return (
-    <WizzardForm<CourseInput>
+    <WizzardForm<CourseInput & { thumbnailFile: File | null }>
       lng={lng}
-      defaultValues={
-        {
-          name: course?.name ?? "",
-          categoryIds: course?.categories.map((c) => c.id) ?? [],
-          start: formatDatetimeLocal(course?.start ?? today, false),
-          end: formatDatetimeLocal(course?.end ?? today, false),
-          registrationEnd: formatDatetimeLocal(
-            course?.registrationEnd ?? today,
-            false,
-          ),
-          description: course?.description ?? "",
-          maxAttendees: course?.maxAttendees ?? 0,
-          price: course?.price ?? 0,
-          billing: course?.billing,
-          formFields: course?.registrationForm.fields ?? [],
-          thumbnailFile: null,
-        } as any
-      }
+      defaultValues={{
+        name: course?.name ?? "",
+        categories:
+          course?.categories.map((c) => ({ id: String(c.id), val: c })) ?? [],
+        start: course?.start ? new Date(course.start) : new Date(),
+        end: course?.end ? new Date(course.end) : new Date(),
+        registrationEnd: course?.registrationEnd
+          ? new Date(course.registrationEnd)
+          : new Date(),
+        description: course?.description ?? "",
+        maxAttendees: course?.maxAttendees ?? 0,
+        price: course?.price ?? 0,
+        billing: course?.billing,
+        formFields: course?.registrationForm.fields ?? [],
+        thumbnailFile: null,
+      }}
       onSubmitCb={async (vals, methods) => {
-        const valsAny = vals as any;
-
         const { url: thumbnail, error: thumbnailError } = await uploadOrDelete(
           "images",
           course?.thumbnail ?? null,
-          valsAny.thumbnailFile instanceof File ? valsAny.thumbnailFile : null,
+          vals.thumbnailFile instanceof File ? vals.thumbnailFile : null,
           "courses/thumbnails",
         );
         if (thumbnailError) {
@@ -84,9 +73,12 @@ export default function CourseForm({
           return;
         }
 
-        const { thumbnailFile: _, ...courseVals } = valsAny;
+        const { thumbnailFile: _, ...courseVals } = vals;
         const data = {
           ...courseVals,
+          categories: (courseVals.categories as any[]).map((c: any) =>
+            typeof c === "object" && c !== null && c.val ? c.val.id : c,
+          ),
           thumbnail: thumbnail !== undefined ? thumbnail : course?.thumbnail,
         };
 
@@ -132,14 +124,39 @@ export default function CourseForm({
               control={methods.control}
             />
             <Textarea label="Nazov kurzu" name="name" />
-            {/* <GenericCombobox<{ id: string; val: Category }, string>
+            <GenericCombobox<
+              { id: string; val: CategoryFragment },
+              { id: string; val: CategoryFragment }
+            >
               lng={lng}
-              label="Kategoria"
-              name="categoryIds"
+              label="Kategórie"
+              name="categories"
               control={methods.control}
               allowCreateNewOptions
               multiple
-              placeholder="Kategoria..."
+              placeholder="Hľadaj kategóriu..."
+              defaultOptions={
+                course?.categories.map((c) => ({
+                  id: String(c.id),
+                  val: c,
+                })) ?? []
+              }
+              fetchOptions={async (query) => {
+                const cats = await fetchCategories(query);
+                return cats.map((c) => ({ id: String(c.id), val: c }));
+              }}
+              createOption={async (name) => {
+                const res = await createCategoryAction({ data: { name } });
+                if (res.success && res.data) {
+                  return {
+                    ...res,
+                    data: { id: String(res.data.id), val: res.data },
+                  };
+                }
+                return { ...res, data: undefined };
+              }}
+              getOptionValue={(opt) => opt!}
+              getOptionLabel={(opt) => opt.val.name}
               renderOption={(option, props) => (
                 <p
                   className={cn([
@@ -152,17 +169,14 @@ export default function CourseForm({
                   {props.selected && <CheckIcon className="size-3 stroke-2" />}
                 </p>
               )}
-              defaultOptions={[]}
-              getOptionValue={(opt) => opt?.id ?? ""}
-              getOptionLabel={({ val }) => val.name}
-            /> */}
+            />
             <div className="flex flex-col sm:flex-row gap-4">
-              <Input label="Zaciatok" name="start" type="date" />
-              <Input label="Koniec" name="end" type="date" />
+              <Input label="Zaciatok" name="start" type="datetime-local" />
+              <Input label="Koniec" name="end" type="datetime-local" />
               <Input
                 label="Koniec registracie"
                 name="registrationEnd"
-                type="date"
+                type="datetime-local"
               />
             </div>
             <TiptapEditor
@@ -274,6 +288,7 @@ export default function CourseForm({
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import Button from "@/components/Button";
 import {
+  CheckIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   PlusIcon,

@@ -2,8 +2,13 @@
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
-import { Control, useFormContext, useFormState } from "react-hook-form";
-import { cn } from "@/utils/helpers";
+import {
+  Control,
+  useController,
+  useFormContext,
+  useFormState,
+} from "react-hook-form";
+import { cn, formatDatetimeLocal } from "@/utils/helpers";
 import { InputHTMLAttributes, useState } from "react";
 import { get } from "lodash";
 
@@ -22,18 +27,14 @@ export function Input({
   className,
   ...props
 }: InputProps) {
-  const { register, control } = useFormContext();
+  const { control } = useFormContext();
   const { errors } = useFormState({ control, name });
 
-  const field = register(name, {
-    ...(props.type === "number" ? { valueAsNumber: true } : {}),
-    ...(props.type === "datetime-local" || props.type === "date"
-      ? {
-          valueAsDate: true as unknown as false,
-          // value: formatDatetimeLocal(y, false),
-        }
-      : {}),
-  });
+  const isDate = props.type === "datetime-local" || props.type === "date";
+
+  // useController reads the current value synchronously on every render —
+  // no subscription timing lag unlike useWatch which returns undefined on first mount.
+  const { field } = useController({ name, control });
 
   const error = get(errors, name)?.message?.toString();
 
@@ -65,12 +66,31 @@ export function Input({
             "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
           }
           {...props}
-          {...field}
+          ref={field.ref}
+          name={field.name}
+          onBlur={field.onBlur}
+          disabled={field.disabled ?? props.disabled}
+          value={
+            isDate
+              ? formatDatetimeLocal(
+                  field.value,
+                  props.type === "datetime-local",
+                )
+              : (field.value ?? "")
+          }
           onChange={(e) => {
-            if (props.onChange) {
-              props.onChange(e);
-            }
-            field?.onChange(e);
+            let val: any;
+            if (props.type === "number") val = e.target.valueAsNumber;
+            else if (isDate)
+              // valueAsDate is null for datetime-local (browser limitation),
+              // so fall back to parsing the value string as a local Date.
+              val =
+                e.target.valueAsDate ??
+                (e.target.value ? new Date(e.target.value) : null);
+            else val = e.target.value;
+
+            field.onChange(val);
+            props.onChange?.(e);
           }}
           onFocus={onFocus}
           onWheel={(e) => {

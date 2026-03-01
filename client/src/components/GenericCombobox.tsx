@@ -267,8 +267,6 @@ export default function GenericCombobox<
               placeholder={placeholder}
               onChange={(e) => debounced(e.target.value)}
               displayValue={({ val }: TOption) => {
-                console.log(val);
-                console.log(options);
                 const selected = options.find((o) =>
                   Object.values(o.val).some((v) => isEqual(v, val)),
                 );
