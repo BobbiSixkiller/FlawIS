@@ -92,6 +92,9 @@ fragment Attendance on Attendance {
       name
     }
     status
+    application {
+      ...FormSubmission
+    }
   }
   attendanceRecords {
     id

@@ -2,8 +2,6 @@
 
 import BillingInput from "@/app/[lng]/conferences/[slug]/(register)/register/BillingInput";
 import { Input } from "@/components/Input";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import { Textarea } from "@/components/Textarea";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import useUser from "@/hooks/useUser";
 import useValidation from "@/hooks/useValidation";
@@ -19,8 +17,8 @@ import { createCourseAttendee, updateCourseAttendee } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMemo } from "react";
-import GenericCombobox from "@/components/GenericCombobox";
 import { deleteFiles } from "@/lib/minio";
+import RegistrationFormFields from "./RegistrationFormFields";
 
 export default function CourseRegistrationForm({
   course,
@@ -237,100 +235,27 @@ export default function CourseRegistrationForm({
 
       <WizzardStep name="Registracny formular" yupSchema={dynamicFieldsSchema}>
         {(methods) => (
-          <div className="space-y-4">
+          <>
             {!canEdit && (
               <p className="text-sm text-amber-600 dark:text-amber-400">
                 Vasa prihlaska bola spracovana a nie je mozne ju upravovat.
               </p>
             )}
-
-            {course.registrationForm.fields.map((field) => {
-              const fieldName = `field_${field.id}`;
-
-              switch (field.type) {
-                case FieldType.Text:
-                  return (
-                    <Input
-                      key={field.id}
-                      name={fieldName}
-                      label={field.label}
-                      placeholder={field.placeholder ?? undefined}
-                      disabled={!canEdit}
-                    />
-                  );
-
-                case FieldType.Textarea:
-                  return (
-                    <Textarea
-                      key={field.id}
-                      name={fieldName}
-                      label={field.label}
-                      placeholder={field.placeholder ?? undefined}
-                      disabled={!canEdit}
-                    />
-                  );
-
-                case FieldType.Select:
-                  return (
-                    <GenericCombobox<
-                      {
-                        id: number;
-                        val: { value: string; text: string };
-                      },
-                      string
-                    >
-                      key={field.id}
-                      lng={lng}
-                      name={fieldName}
-                      label={field.label}
-                      control={methods.control}
-                      defaultOptions={
-                        field.selectOptions?.map((opt, i) => ({
-                          id: i,
-                          val: opt,
-                        })) ?? []
-                      }
-                      placeholder={field.placeholder ?? ""}
-                      immediate
-                      getOptionValue={(opt) => opt?.val.value ?? ""}
-                      getOptionLabel={(opt) => opt.val.text}
-                      renderOption={(option, props) => (
-                        <p
-                          className={
-                            props.focus
-                              ? "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full p-2"
-                              : "p-2"
-                          }
-                        >
-                          {option.val.text}
-                        </p>
-                      )}
-                      disabled={!canEdit}
-                    />
-                  );
-
-                case FieldType.FileUpload:
-                  return (
-                    <MultipleFileUploadField
-                      key={field.id}
-                      name={fieldName}
-                      label={field.label}
-                      control={methods.control}
-                      setValue={methods.setValue}
-                      setError={methods.setError}
-                      maxFiles={field.maxFiles ?? undefined}
-                      fileSources={{
-                        courses:
-                          course.attending?.application.answers[field.id],
-                      }}
-                    />
-                  );
-
-                default:
-                  return null;
+            <RegistrationFormFields
+              fields={course.registrationForm.fields}
+              canEdit={canEdit}
+              control={methods.control}
+              setValue={methods.setValue}
+              setError={methods.setError}
+              existingAnswers={
+                course.attending?.application.answers as Record<
+                  string,
+                  string | string[]
+                >
               }
-            })}
-          </div>
+              lng={lng}
+            />
+          </>
         )}
       </WizzardStep>
     </WizzardForm>

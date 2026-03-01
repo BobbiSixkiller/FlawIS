@@ -5,6 +5,7 @@ import {
   AttendanceFragment,
   AttendanceQuery,
   AttendanceQueryVariables,
+  FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { cn, formatDatetimeLocal } from "@/utils/helpers";
@@ -39,6 +40,7 @@ import useUser from "@/hooks/useUser";
 import AttendanceRecordCell from "./HoursAttended";
 import HoursAttended from "./HoursAttended";
 import OnlineSwitch from "./OnlineSwitch";
+import AttendeeApplicationView from "./AttendeeApplicationView";
 
 interface ScrollState {
   vertical: boolean;
@@ -199,10 +201,12 @@ function AttendanceRow({
   data,
   scrollState,
   sessions,
+  registrationForm,
 }: {
   data?: AttendanceFragment;
   scrollState?: ScrollState;
   sessions: AttendanceQuery["course"]["attendance"]["sessions"];
+  registrationForm: FormFragment;
 }) {
   const isAccepted = data?.attendee.status === Status.Accepted;
   const enableDelete = data?.attendee.status === Status.Rejected;
@@ -313,7 +317,13 @@ function AttendanceRow({
         dialogId={`attendee:${data?.attendee.id}`}
         title={data?.attendee.user.name}
       >
-        Prihlaska
+        {data?.attendee && (
+          <AttendeeApplicationView
+            attendee={data.attendee}
+            registrationForm={registrationForm}
+            dialogId={`attendee:${data.attendee.id}`}
+          />
+        )}
       </Modal>
       <Modal dialogId={`accept-dialog:${data?.attendee.id}`}>
         <ChangeStatusForm
@@ -378,9 +388,11 @@ const AttendancePlaceholder = ({
 export function AttendanceTable({
   initialData,
   vars,
+  registrationForm,
 }: {
   initialData: Connection<AttendanceFragment>;
   vars: AttendanceQueryVariables;
+  registrationForm: FormFragment;
 }) {
   const InfiniteScrollCourseList = withInfiniteScroll<
     AttendanceFragment,
@@ -390,7 +402,11 @@ export function AttendanceTable({
     getData: getCourseAttendance,
     initialData,
     ListItem: (props) => (
-      <AttendanceRow sessions={initialData.sessions} {...props} />
+      <AttendanceRow
+        sessions={initialData.sessions}
+        registrationForm={registrationForm}
+        {...props}
+      />
     ),
     Container: (props) => (
       <AttendanceTableContainer sessions={initialData.sessions} {...props} />

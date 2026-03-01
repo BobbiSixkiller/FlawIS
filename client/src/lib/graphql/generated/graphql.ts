@@ -1765,7 +1765,7 @@ export type CourseSessionFragment = { __typename?: 'CourseSession', id: any, cou
 
 export type CourseAttendeeFragment = { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null }, application: { __typename?: 'FormSubmission', form: any, formVersion: number, answers: any } };
 
-export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
+export type AttendanceFragment = { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string }, application: { __typename?: 'FormSubmission', form: any, formVersion: number, answers: any } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> };
 
 export type CategoryFragment = { __typename?: 'Category', id: any, name: string, slug: string };
 
@@ -1793,7 +1793,7 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
+export type AttendanceQuery = { __typename?: 'Query', course: { __typename?: 'Course', attendance: { __typename?: 'AttendanceConnection', totalCount: number, pageInfo: { __typename?: 'AttendancePageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'AttendanceEdge', cursor: string, node: { __typename?: 'Attendance', attendee: { __typename?: 'CourseAttendee', id: any, status: Status, user: { __typename?: 'CourseAttendeeUserStub', name: string }, application: { __typename?: 'FormSubmission', form: any, formVersion: number, answers: any } }, attendanceRecords: Array<{ __typename?: 'AttendanceRecord', id: any, online?: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ __typename?: 'CourseSession', id: any, course: any, name: string, description?: string | null, start: any, end: any, createdAt: any, updatedAt: any } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
@@ -2780,6 +2780,9 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
       name
     }
     status
+    application {
+      ...FormSubmission
+    }
   }
   attendanceRecords {
     id
@@ -2787,7 +2790,11 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
     hoursAttended
   }
 }
-    `, {"fragmentName":"Attendance"}) as unknown as TypedDocumentString<AttendanceFragment, unknown>;
+    fragment FormSubmission on FormSubmission {
+  form
+  formVersion
+  answers
+}`, {"fragmentName":"Attendance"}) as unknown as TypedDocumentString<AttendanceFragment, unknown>;
 export const CategoryFragmentDoc = new TypedDocumentString(`
     fragment Category on Category {
   id
@@ -4643,7 +4650,12 @@ export const AttendanceDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment CourseSession on CourseSession {
+    fragment FormSubmission on FormSubmission {
+  form
+  formVersion
+  answers
+}
+fragment CourseSession on CourseSession {
   id
   course
   name
@@ -4660,6 +4672,9 @@ fragment Attendance on Attendance {
       name
     }
     status
+    application {
+      ...FormSubmission
+    }
   }
   attendanceRecords {
     id
