@@ -13,7 +13,7 @@ import {
 import { Service } from "typedi";
 import { CourseService } from "../../services/courses/course.service";
 import { I18nService } from "../../services/i18n.service";
-import { Course, CourseAttendee } from "../../entitites/Course";
+import { Category, Course, CourseAttendee } from "../../entitites/Course";
 import {
   AttendanceConnection,
   CourseArgs,
@@ -25,6 +25,9 @@ import { CourseAttendeeService } from "../../services/courses/courseAttendee.ser
 import { Context } from "../../util/auth";
 import { CourseAttendeeArgs } from "../types/course/courseAttendee.types";
 import { Access } from "../../entitites/User";
+import { Form } from "../../entitites/Form";
+import { FormService } from "../../services/form.service";
+import { CategoryService } from "../../services/courses/category.service";
 
 @Service()
 @Resolver(() => Course)
@@ -32,7 +35,9 @@ export class CourseResolver {
   constructor(
     private readonly courseService: CourseService,
     private readonly courseAttendeeService: CourseAttendeeService,
-    private readonly i18nService: I18nService
+    private readonly formService: FormService,
+    private readonly categoryService: CategoryService,
+    private readonly i18nService: I18nService,
   ) {}
 
   @Query(() => Course)
@@ -84,6 +89,18 @@ export class CourseResolver {
     };
   }
 
+  @FieldResolver(() => Form)
+  async registrationForm(@Root() { id }: Course) {
+    return await this.formService.getLatestCourseForm(id);
+  }
+
+  @FieldResolver(() => [Category])
+  async categories(@Root() { categories }: Course) {
+    return await this.categoryService.getCategories(
+      categories.map((c) => c._id),
+    );
+  }
+
   @Authorized()
   @FieldResolver(() => CourseAttendee, { nullable: true })
   async attending(@Root() { id }: Course, @Ctx() { user }: Context) {
@@ -95,7 +112,7 @@ export class CourseResolver {
   async attendance(
     @Root() { id }: Course,
     @Args() args: CourseAttendeeArgs,
-    @Ctx() { user }: Context
+    @Ctx() { user }: Context,
   ): Promise<AttendanceConnection> {
     return user?.access.includes(Access.Admin)
       ? await this.courseService.attendance(args, id)

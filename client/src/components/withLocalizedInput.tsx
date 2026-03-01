@@ -4,23 +4,15 @@ import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { Transition } from "@headlessui/react";
 import { ComponentType, Fragment, useEffect, useRef, useState } from "react";
 import { get } from "lodash";
-import { RHFmethodsProps } from "./Input";
+import { InputProps } from "./Input";
 import { Control } from "react-hook-form";
 
 type WithLocalizedInputProps = {
-  name: string;
   lng: string;
-  disabled?: boolean;
-  errors?: Record<string, any>;
-  error?: string;
-  label?: string;
-  placeholder?: string;
-  methods?: RHFmethodsProps;
-  control?: Control<any>;
-};
+} & InputProps;
 
 export function withLocalizedInput<T extends ComponentType<any>>(
-  InputComponent: T
+  InputComponent: T,
 ) {
   type Props = React.ComponentProps<T> & WithLocalizedInputProps;
 

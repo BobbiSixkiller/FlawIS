@@ -34,7 +34,11 @@ export default async function AttendancePage({
         ]}
       />
 
-      <AttendanceTable initialData={attendance} vars={{ id, sort: [] }} />
+      <AttendanceTable
+        initialData={attendance}
+        vars={{ id, sort: [] }}
+        registrationForm={course.registrationForm}
+      />
 
       <Modal dialogId="add-course-session" title="Pridat termin">
         <CourseSessionForm dialogId="add-course-session" />

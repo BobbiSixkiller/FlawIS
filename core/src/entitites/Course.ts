@@ -7,9 +7,10 @@ import { FlawBilling } from "./Billing";
 import { Invoice } from "./Attendee";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
+import { Form, FormSubmission } from "./Form";
 
 @ObjectType({ description: "Course category" })
-export class Category {
+export class Category extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
 
@@ -20,6 +21,11 @@ export class Category {
   @Field()
   @Property()
   slug: string;
+
+  @Field()
+  createdAt: Date;
+  @Field()
+  updatedAt: Date;
 }
 
 @ObjectType()
@@ -36,8 +42,8 @@ export class Course extends TimeStamps {
   procurer?: UserStub;
 
   @Field(() => [Category])
-  @Property({ type: () => [Category], default: [] })
-  categories: Category[];
+  @Property({ ref: () => Category, default: [] })
+  categories: Ref<Category>[];
 
   @Field()
   @Property()
@@ -46,6 +52,10 @@ export class Course extends TimeStamps {
   @Field({ description: "String representation of HTML describing the course" })
   @Property()
   description: string;
+
+  @Field({ nullable: true })
+  @Property()
+  thumbnail?: string;
 
   @Field(() => Int)
   @Property()
@@ -58,6 +68,9 @@ export class Course extends TimeStamps {
   @Field()
   @Property()
   registrationEnd: Date;
+
+  @Field(() => Form)
+  registrationForm: Form;
 
   @Field()
   @Property()
@@ -159,9 +172,9 @@ export class CourseAttendee extends TimeStamps {
   @Property({ enum: Status, type: String, default: Status.Applied })
   status: Status;
 
-  @Field(() => [String])
-  @Property({ type: () => [String], default: [] })
-  fileUrls: string[];
+  @Field(() => FormSubmission)
+  @Property({ type: () => FormSubmission, _id: false })
+  application: FormSubmission;
 
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })

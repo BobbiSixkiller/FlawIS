@@ -2,18 +2,23 @@
 
 import BillingInput from "@/app/[lng]/conferences/[slug]/(register)/register/BillingInput";
 import { Input } from "@/components/Input";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import useUser from "@/hooks/useUser";
 import useValidation from "@/hooks/useValidation";
-import { CourseFragment } from "@/lib/graphql/generated/graphql";
+import {
+  CourseFragment,
+  FieldType,
+  Status,
+} from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { uploadToMinio } from "@/utils/helpers";
 import { useParams, useRouter } from "next/navigation";
-import { createCourseAttendee, updateCourseAttendeeFiles } from "./actions";
+import { createCourseAttendee, updateCourseAttendee } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
+import { useMemo } from "react";
 import { deleteFiles } from "@/lib/minio";
+import RegistrationFormFields from "./RegistrationFormFields";
 
 export default function CourseRegistrationForm({
   course,
@@ -36,44 +41,126 @@ export default function CourseRegistrationForm({
 
   const router = useRouter();
 
+  const isUpdate =
+    !!course.attending && course.attending.status === Status.Applied;
+  const canEdit =
+    !course.attending || course.attending.status === Status.Applied;
+
+  // Pre-fill existing answers when updating
+  const registrationFormDefaults = useMemo(() => {
+    if (!course.attending?.application?.answers) return {};
+
+    const answers = course.attending.application.answers as Record<
+      string,
+      string | string[]
+    >;
+    const defaults: Record<string, string | string[]> = {};
+    course.registrationForm.fields.forEach((field) => {
+      const val = answers[field.id];
+      if (val !== undefined) {
+        defaults[`field_${field.id}`] = val;
+      }
+    });
+    return defaults;
+  }, [course.attending, course.registrationForm.fields]);
+
+  // Build dynamic Yup schema from form fields
+  const dynamicFieldsSchema = useMemo(() => {
+    const shape: Record<string, any> = {};
+
+    course.registrationForm.fields.forEach((field) => {
+      const fieldName = `field_${field.id}`;
+
+      if (field.type === FieldType.FileUpload) {
+        const schema = yup
+          .array()
+          .of(yup.mixed<File>().required())
+          .min(field.minFiles ?? 1, (val) =>
+            t("minFiles", { value: val.min, ns: "validation" }),
+          )
+          .max(field.maxFiles ?? 10, (val) =>
+            t("maxFiles", { value: val.max, ns: "validation" }),
+          );
+        shape[fieldName] = field.required ? schema.required() : schema;
+      } else {
+        shape[fieldName] = field.required
+          ? yup.string().trim().required()
+          : yup.string().trim().optional();
+      }
+    });
+
+    return yup.object(shape);
+  }, [course.registrationForm.fields, yup, t]);
+
+  // Default values for file upload fields
+  const fileFieldDefaults = useMemo(() => {
+    const defaults: Record<string, File[]> = {};
+    course.registrationForm.fields
+      .filter((f) => f.type === FieldType.FileUpload)
+      .forEach((f) => {
+        defaults[`field_${f.id}`] = [];
+      });
+    return defaults;
+  }, [course.registrationForm.fields]);
+
   return (
     <WizzardForm
       className="sm:w-96 mx-auto flex flex-col"
       lng={lng}
-      defaultValues={{ files: [], billing: undefined }}
+      defaultValues={{
+        ...fileFieldDefaults,
+        ...registrationFormDefaults,
+        billing: undefined,
+      }}
       onSubmitCb={async (vals, methods) => {
-        const urls = [];
+        const answers: Record<string, string | string[]> = {};
+        const valsMap = vals as Record<string, unknown>;
+
+        // Upload files for FILE_UPLOAD fields and collect all answers
+        await Promise.all(
+          course.registrationForm.fields.map(async (field) => {
+            const fieldName = `field_${field.id}`;
+            const val = valsMap[fieldName];
+
+            if (field.type === FieldType.FileUpload) {
+              const files = (val as File[]) ?? [];
+              const newUrls = await Promise.all(
+                files.map((file) =>
+                  uploadToMinio("courses", `${user?.email}/${file.name}`, file),
+                ),
+              );
+
+              // Only delete old files after new ones are safely uploaded
+              const existingUrls =
+                course.attending?.application.answers?.[field.id];
+              if (Array.isArray(existingUrls) && existingUrls.length > 0) {
+                await deleteFiles(existingUrls);
+              }
+
+              answers[field.id] = newUrls;
+            } else {
+              answers[field.id] = (val as string) ?? "";
+            }
+          }),
+        );
+
+        const application = {
+          form: course.registrationForm.id,
+          formVersion: course.registrationForm.version,
+          answers,
+        };
+
         let res;
-
-        if (course?.attending) {
-          console.log("UPDATE");
-          await deleteFiles(course.attending.fileUrls);
-          const urls = await Promise.all(
-            vals.files.map((f: File) =>
-              uploadToMinio(
-                "courses",
-                `${course.attending!.user.email}/${f.name}`,
-                f
-              )
-            )
-          );
-
-          res = await updateCourseAttendeeFiles({
-            id: course.attending.id,
-            fileUrls: urls,
+        if (isUpdate) {
+          res = await updateCourseAttendee({
+            id: course.attending!.id,
+            application,
           });
         } else {
-          console.log("NEW");
-          const urls = await Promise.all(
-            vals.files.map((f: File) =>
-              uploadToMinio("courses", `${user!.email}/${f.name}`, f)
-            )
-          );
-
           res = await createCourseAttendee({
             courseId: course.id,
-            fileUrls: urls,
-            billing: vals.billing,
+            application,
+            billing: valsMap.billing as any,
           });
         }
 
@@ -124,7 +211,9 @@ export default function CourseRegistrationForm({
                 name="billing.address.postal"
               />
               <Input
-                label={t("registration.billing.country", { ns: "conferences" })}
+                label={t("registration.billing.country", {
+                  ns: "conferences",
+                })}
                 name="billing.address.country"
               />
               <Input
@@ -143,37 +232,30 @@ export default function CourseRegistrationForm({
           )}
         </WizzardStep>
       )}
-      <WizzardStep
-        name="Dokumenty"
-        yupSchema={yup.object({
-          files: yup
-            .array()
-            .of(yup.mixed<File>().required())
-            .min(1, (val) =>
-              t("minFiles", { value: val.min, ns: "validation" })
-            )
-            .max(5, (val) =>
-              t("maxFiles", { value: val.max, ns: "validation" })
-            )
-            .required(),
-        })}
-      >
+
+      <WizzardStep name="Registracny formular" yupSchema={dynamicFieldsSchema}>
         {(methods) => (
-          <MultipleFileUploadField
-            control={methods.control}
-            setValue={methods.setValue}
-            setError={methods.setError}
-            label="CV, motivacny list, ine... (.pdf)"
-            name="files"
-            maxFiles={5}
-            accept={{
-              "application/pdf": [".pdf"],
-            }}
-            fileSources={{
-              courses: course.attending?.fileUrls,
-              resumes: !course.attending ? user?.cvUrl : undefined,
-            }}
-          />
+          <>
+            {!canEdit && (
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                Vasa prihlaska bola spracovana a nie je mozne ju upravovat.
+              </p>
+            )}
+            <RegistrationFormFields
+              fields={course.registrationForm.fields}
+              canEdit={canEdit}
+              control={methods.control}
+              setValue={methods.setValue}
+              setError={methods.setError}
+              existingAnswers={
+                course.attending?.application.answers as Record<
+                  string,
+                  string | string[]
+                >
+              }
+              lng={lng}
+            />
+          </>
         )}
       </WizzardStep>
     </WizzardForm>

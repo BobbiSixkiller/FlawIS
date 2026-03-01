@@ -15,17 +15,17 @@ import { ObjectId } from "mongodb";
 import { Status } from "../../entitites/Internship";
 import { CourseAttendeeMutationResponse } from "../types/course/courseAttendee.types";
 import { AttendeeBillingInput } from "../types/attendee.types";
+import { FormSubmissionInput } from "../types/form/form.types";
 import { Context } from "../../util/auth";
 import { Access } from "../../entitites/User";
 import { UserService } from "../../services/user.service";
-import { CourseService } from "../../services/courses/course.service";
 
 @Service()
 @Resolver(() => CourseAttendee)
 export class CourseAttendeeResolver {
   constructor(
     private readonly courseAttendeeService: CourseAttendeeService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   @Authorized([Access.Admin])
@@ -38,10 +38,10 @@ export class CourseAttendeeResolver {
   @Mutation(() => CourseAttendeeMutationResponse)
   async createCourseAttendee(
     @Arg("courseId") courseId: ObjectId,
-    @Arg("fileUrls", () => [String]) fileUrls: string[],
+    @Arg("application") application: FormSubmissionInput,
     @Ctx() { req, user }: Context,
     @Arg("billing", () => AttendeeBillingInput, { nullable: true })
-    billing?: AttendeeBillingInput
+    billing?: AttendeeBillingInput,
   ): Promise<CourseAttendeeMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
@@ -49,8 +49,8 @@ export class CourseAttendeeResolver {
       hostname,
       courseId,
       user!.id,
-      fileUrls,
-      billing
+      application,
+      billing,
     );
 
     return { message: "Registracia na kurz prebehla uspesne!", data: attendee };
@@ -58,18 +58,18 @@ export class CourseAttendeeResolver {
 
   @Authorized()
   @Mutation(() => CourseAttendeeMutationResponse)
-  async updateCourseAttendeeFiles(
+  async updateCourseAttendee(
     @Arg("id") id: ObjectId,
-    @Arg("fileUrls", () => [String]) filesUrls: string[],
-    @Ctx() { user }: Context
+    @Arg("application") application: FormSubmissionInput,
+    @Ctx() { user }: Context,
   ): Promise<CourseAttendeeMutationResponse> {
-    const attendee = await this.courseAttendeeService.updateFiles(
-      filesUrls,
+    const attendee = await this.courseAttendeeService.updateCourseAttendee(
       id,
-      user!
+      application,
+      user!.id,
     );
 
-    return { message: "Vase dokumenty boli aktualizovane!", data: attendee };
+    return { message: "Prihlaska bola aktualizovana!", data: attendee };
   }
 
   @Authorized([Access.Admin])
@@ -77,14 +77,14 @@ export class CourseAttendeeResolver {
   async changeCourseAttendeeStatus(
     @Arg("id") id: ObjectId,
     @Arg("status", () => Status) status: Status,
-    @Ctx() { req }: Context
+    @Ctx() { req }: Context,
   ): Promise<CourseAttendeeMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
     const attendee = await this.courseAttendeeService.updateAttendeeStatus(
       id,
       status,
-      hostname
+      hostname,
     );
 
     return { message: "Status ucastnika bol zmeneny!", data: attendee };
@@ -94,7 +94,7 @@ export class CourseAttendeeResolver {
   @Mutation(() => CourseAttendeeMutationResponse)
   async deleteCourseAttendee(
     @Arg("id") id: ObjectId,
-    @Ctx() { user }: Context
+    @Ctx() { user }: Context,
   ): Promise<CourseAttendeeMutationResponse> {
     const attendee = await this.courseAttendeeService.deleteAttendee(id, user!);
 

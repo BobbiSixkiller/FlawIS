@@ -19,8 +19,8 @@ export default function DynamicImageClient({
   return (
     <div
       className={cn(
-        `relative ${loading ? "bg-slate-200 animate-pulse" : ""}`,
-        className
+        `relative ${loading ? "bg-slate-200 dark:bg-slate-500 animate-pulse" : ""}`,
+        className,
       )}
     >
       <Image
@@ -33,7 +33,7 @@ export default function DynamicImageClient({
           className,
           `transition-opacity ease-in delay-100 ${
             loading ? "opacity-0" : "opacity-100"
-          }`
+          }`,
         )}
         priority
       />

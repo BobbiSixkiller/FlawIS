@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useController } from "react-hook-form";
+import { Control, useController } from "react-hook-form";
 import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -14,9 +14,12 @@ export default function ImageFileInput({
   label,
   name,
   control,
+  bucket = "avatars",
   ...props
 }: {
   avatarUrl?: string;
+  bucket?: string;
+  control: Control<any>;
 } & InputProps) {
   const { field, fieldState } = useController({ name, control });
 
@@ -37,7 +40,7 @@ export default function ImageFileInput({
       if (!avatarUrl || field.value) return;
 
       try {
-        const file = await fetchFromMinio("avatars", avatarUrl);
+        const file = await fetchFromMinio(bucket, avatarUrl);
         field.onChange(file);
       } catch (e) {
         console.error("Failed to convert avatar to file", e);
@@ -48,7 +51,7 @@ export default function ImageFileInput({
   }, [avatarUrl, field]);
 
   const [preview, setPreview] = useState<string>(
-    avatarUrl || "/images/img-placeholder.jpg"
+    avatarUrl || "/images/img-placeholder.jpg",
   );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

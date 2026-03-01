@@ -25,5 +25,6 @@
   "postal": "PSČ",
   "country": "Krajina",
   "address": "Adresa",
-  "addOption": "Pridať: {{ value }}"
+  "addOption": "Pridať: {{ value }}",
+  "home": "Domov"
 }

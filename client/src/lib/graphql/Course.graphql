@@ -9,8 +9,12 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  registrationForm {
+    ...Form
+  }
   maxAttendees
   description
+  thumbnail
   price
   billing {
     ...FlawBilling
@@ -21,6 +25,34 @@ fragment Course on Course {
   }
   createdAt
   updatedAt
+}
+
+fragment Form on Form {
+  id
+  course
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+
+fragment FormSubmission on FormSubmission {
+  form
+  formVersion
+  answers
 }
 
 fragment CourseSession on CourseSession {
@@ -44,9 +76,11 @@ fragment CourseAttendee on CourseAttendee {
     organization
     avatarUrl
   }
-  fileUrls
   course
   status
+  application {
+    ...FormSubmission
+  }
   createdAt
   updatedAt
 }
@@ -54,17 +88,25 @@ fragment CourseAttendee on CourseAttendee {
 fragment Attendance on Attendance {
   attendee {
     id
-    fileUrls
     user {
       name
     }
     status
+    application {
+      ...FormSubmission
+    }
   }
   attendanceRecords {
     id
     online
     hoursAttended
   }
+}
+
+fragment Category on Category {
+  id
+  name
+  slug
 }
 
 query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
@@ -171,12 +213,12 @@ mutation deleteCourseSession($id: ObjectId!) {
 
 mutation createCourseAttendee(
   $courseId: ObjectId!
-  $fileUrls: [String!]!
+  $application: FormSubmissionInput!
   $billing: AttendeeBillingInput
 ) {
   createCourseAttendee(
     courseId: $courseId
-    fileUrls: $fileUrls
+    application: $application
     billing: $billing
   ) {
     message
@@ -186,8 +228,11 @@ mutation createCourseAttendee(
   }
 }
 
-mutation updateCourseAttendeeFiles($id: ObjectId!, $fileUrls: [String!]!) {
-  updateCourseAttendeeFiles(id: $id, fileUrls: $fileUrls) {
+mutation updateCourseAttendee(
+  $id: ObjectId!
+  $application: FormSubmissionInput!
+) {
+  updateCourseAttendee(id: $id, application: $application) {
     message
     data {
       ...CourseAttendee
@@ -235,6 +280,39 @@ mutation updateAttendanceOnline($id: ObjectId!, $online: Boolean!) {
       session {
         course
       }
+    }
+  }
+}
+
+query categories($search: String) {
+  categories(search: $search) {
+    ...Category
+  }
+}
+
+mutation createCategory($data: CategoryInput!) {
+  createCategory(data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+
+mutation updateCategory($id: ObjectId!, $data: CategoryInput!) {
+  updateCategory(id: $id, data: $data) {
+    message
+    data {
+      ...Category
+    }
+  }
+}
+
+mutation deleteCategory($id: ObjectId!) {
+  deleteCategory(id: $id) {
+    message
+    data {
+      ...Category
     }
   }
 }

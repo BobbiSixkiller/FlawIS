@@ -17,21 +17,9 @@ import { I18nService } from "../services/i18n.service";
 import { Conference, Ticket } from "../entitites/Conference";
 import { Attendee } from "../entitites/Attendee";
 
-@ValidatorConstraint({ name: "RefDoc", async: true })
-class RefDocValidator implements ValidatorConstraintInterface {
-  async validate(refId: string, args: ValidationArguments) {
-    const modelClass = args.constraints[0];
-    return await getModelForClass(modelClass).exists({ _id: refId });
-  }
-
-  defaultMessage(): string {
-    return "Referenced Document not found!";
-  }
-}
-
 export function RefDocExists(
   modelClass: any,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
@@ -40,14 +28,23 @@ export function RefDocExists(
       propertyName: propertyName,
       constraints: [modelClass],
       options: validationOptions,
-      validator: RefDocValidator,
+      validator: {
+        async validate(refId: string, args: ValidationArguments) {
+          const modelClass = args.constraints[0];
+          return await getModelForClass(modelClass).exists({ _id: refId });
+        },
+
+        defaultMessage(): string {
+          return "Referenced Document not found!";
+        },
+      },
     });
   };
 }
 
 export function IsAfter(
   property: string,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
@@ -77,7 +74,7 @@ export function IsAfter(
 
 export function IsBefore(
   property: string,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
@@ -105,6 +102,29 @@ export function IsBefore(
   };
 }
 
+export function UniqueFieldNames(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: "UniqueFieldNames",
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any, _args: ValidationArguments) {
+          if (!Array.isArray(value)) return false;
+
+          const names = value
+            .map((f) => (typeof f?.name === "string" ? f.name.trim() : ""))
+            .filter(Boolean);
+
+          const lower = names.map((n) => n.toLowerCase());
+          return new Set(lower).size === lower.length;
+        },
+      },
+    });
+  };
+}
+
 export function CheckTicket(): ParameterDecorator {
   return createParameterDecorator<Context>(async ({ args, context }) => {
     const conference = await getModelForClass(Conference).findOne({
@@ -114,17 +134,17 @@ export function CheckTicket(): ParameterDecorator {
       throw new Error(
         Container.get(I18nService).translate("notFound", {
           ns: "conference",
-        })
+        }),
       );
 
     const ticket = conference.tickets.find(
-      (t: Ticket) => t.id.toString() === args.data.ticketId.toString()
+      (t: Ticket) => t.id.toString() === args.data.ticketId.toString(),
     );
     if (!ticket)
       throw new Error(
         Container.get(I18nService).translate("notFound", {
           ns: "ticket",
-        })
+        }),
       );
 
     const { user } = context;
@@ -139,7 +159,7 @@ export function CheckTicket(): ParameterDecorator {
           name: user?.name,
           conference:
             conference.translations[context.locale as "sk" | "en"].name,
-        })
+        }),
       );
 
     return {
@@ -150,7 +170,7 @@ export function CheckTicket(): ParameterDecorator {
 }
 
 export function LoadResource<Type extends object>(
-  TypeClass: ClassType<Type>
+  TypeClass: ClassType<Type>,
 ): ParameterDecorator {
   return createParameterDecorator<Context>(async ({ args }) => {
     const filter = args.id ? { _id: args.id } : { slug: args.slug };
@@ -160,7 +180,7 @@ export function LoadResource<Type extends object>(
       throw new Error(
         Container.get(I18nService).translate("notFound", {
           ns: TypeClass.name.toLowerCase(),
-        })
+        }),
       );
 
     return resource;

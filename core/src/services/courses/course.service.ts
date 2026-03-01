@@ -1,6 +1,4 @@
 import { ObjectId } from "mongodb";
-import { DocumentType } from "@typegoose/typegoose";
-
 import {
   AttendanceConnection,
   CourseArgs,
@@ -13,11 +11,12 @@ import mongoose from "mongoose";
 import { Service } from "typedi";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Repository } from "../../repositories/base.repository";
-import { toDTO } from "../../util/helpers";
+import { toDTO, withOptionalTransaction } from "../../util/helpers";
 import { CourseAttendeeArgs } from "../../resolvers/types/course/courseAttendee.types";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { Status } from "../../entitites/Internship";
 import { CtxUser } from "../../util/types";
+import { FormService } from "../form.service";
 
 @Service()
 export class CourseService {
@@ -28,6 +27,7 @@ export class CourseService {
     private readonly attendanceRecordRepository = new Repository(
       AttendanceRecord,
     ),
+    private readonly formService: FormService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -40,7 +40,7 @@ export class CourseService {
     return toDTO(course);
   }
 
-  async getSession(id: ObjectId) {
+  async getCourseSession(id: ObjectId) {
     const session = await this.courseSessionRepository.findOne({ _id: id });
     if (!session) {
       throw new Error("Course session not found!");
@@ -53,17 +53,22 @@ export class CourseService {
     return await this.courseRepository.paginatedCourses(args);
   }
 
-  async createCourse(data: CourseInput) {
-    const course = await this.courseRepository.create(data);
+  async createCourse({ formFields, ...data }: CourseInput) {
+    return withOptionalTransaction(undefined, async (session) => {
+      const course = await this.courseRepository.create(data, { session });
+      await course.populate("categories");
+      const registrationForm = await this.formService.createForm(
+        formFields,
+        course._id,
+        session,
+      );
 
-    return toDTO(course);
+      return { ...toDTO(course), registrationForm };
+    });
   }
 
-  async updateCourse(id: ObjectId, data: CourseInput) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+  async updateCourse(id: ObjectId, { formFields, ...data }: CourseInput) {
+    return withOptionalTransaction(undefined, async (session) => {
       const updated = await this.courseRepository.findOneAndUpdate(
         { _id: id },
         { $set: data },
@@ -74,16 +79,14 @@ export class CourseService {
           this.i18nService.translate("notFound", { ns: "course" }),
         );
       }
+      const registrationForm = await this.formService.createForm(
+        formFields,
+        updated._id,
+        session,
+      );
 
-      await session.commitTransaction();
-
-      return toDTO(updated);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
+      return { ...toDTO(updated), registrationForm };
+    });
   }
 
   async deleteCourse(id: ObjectId) {

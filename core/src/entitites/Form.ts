@@ -3,11 +3,13 @@ import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 import { ObjectId } from "mongodb";
 import { Course } from "./Course";
+import { JSONObject } from "../util/scalars";
 
 export enum FieldType {
   Text = "TEXT",
   Textarea = "TEXTAREA",
   Select = "SELECT",
+  FileUpload = "FILE_UPLOAD",
 }
 
 registerEnumType(FieldType, {
@@ -58,6 +60,17 @@ export class FormField {
   @Field(() => [SelectOption], { nullable: true })
   @Property({ type: () => [SelectOption], _id: false, default: undefined })
   selectOptions?: SelectOption[];
+
+  /**
+   * Only meaningful when type === FILE_UPLOAD.
+   */
+  @Field(() => Int, { nullable: true })
+  @Property()
+  minFiles?: number;
+
+  @Field(() => Int, { nullable: true })
+  @Property()
+  maxFiles?: number;
 }
 
 /**
@@ -81,12 +94,31 @@ export class Form extends TimeStamps {
   version: number;
 
   @Field(() => [FormField])
-  @Property({ type: () => [FormField], _id: false, default: [] })
+  @Property({ type: () => [FormField], default: [] })
   fields: FormField[];
 
   @Field()
   createdAt: Date;
+  @Field()
+  updatedAt: Date;
+}
 
+@ObjectType()
+export class FormSubmission extends TimeStamps {
+  @Field(() => ObjectId)
+  @Property({ ref: () => Form })
+  form: ObjectId;
+
+  @Field(() => Int)
+  @Property()
+  formVersion: number;
+
+  @Field(() => JSONObject)
+  @Property({ type: () => Map })
+  answers: Map<string, string | string[]>;
+
+  @Field()
+  createdAt: Date;
   @Field()
   updatedAt: Date;
 }

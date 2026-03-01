@@ -1,19 +1,21 @@
-import { Field, InputType } from "type-graphql";
+import { Field, InputType, Int } from "type-graphql";
 import { FieldType } from "../../../entitites/Form";
 import {
   ArrayMaxSize,
   ArrayMinSize,
   IsBoolean,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
+  Min,
   ValidateNested,
 } from "class-validator";
 import { ObjectId } from "mongodb";
-import { RefDocExists } from "../../../util/decorators";
-import { Course } from "../../../entitites/Course";
-import { Ref } from "@typegoose/typegoose";
+import { UniqueFieldNames } from "../../../util/decorators";
+import { JSONObject } from "../../../util/scalars";
 
 /**
  * Input option
@@ -32,10 +34,13 @@ export class SelectOptionInput {
 }
 
 /**
- * Field input (NO id)
+ * Field input with optional ID to support changing of existing fields across versions
  */
 @InputType()
 export class FormFieldInput {
+  @Field(() => ObjectId, { nullable: true })
+  id?: ObjectId;
+
   @Field(() => FieldType)
   @IsEnum(FieldType)
   type: FieldType;
@@ -71,20 +76,34 @@ export class FormFieldInput {
   @ArrayMinSize(1)
   @ArrayMaxSize(200)
   selectOptions?: SelectOptionInput[];
+
+  /**
+   * Only for FILE_UPLOAD. Minimum and maximum number of files.
+   */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  minFiles?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(20)
+  maxFiles?: number;
 }
 
-/**
- * Form creation/update input (separate)
- */
 @InputType()
-export class FormInput {
+export class FormSubmissionInput {
   @Field(() => ObjectId)
-  @RefDocExists(Course)
-  courseId: Ref<Course>;
+  form: ObjectId;
 
-  @Field(() => [FormFieldInput])
-  @ValidateNested({ each: true })
-  @ArrayMinSize(1)
-  @ArrayMaxSize(200)
-  fields: FormFieldInput[];
+  @Field(() => Int)
+  @IsInt()
+  formVersion: number;
+
+  @Field(() => JSONObject)
+  answers: Record<string, string | string[]>;
 }

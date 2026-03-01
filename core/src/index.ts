@@ -9,7 +9,7 @@ import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHt
 import { connect } from "mongoose";
 
 import { ObjectId } from "mongodb";
-import { ObjectIdScalar } from "./util/scalars";
+import { JSONObject, ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./middlewares/typegoose.middleware";
 
 import { UserResolver } from "./resolvers/user.resolver";
@@ -34,6 +34,7 @@ import { ErrorsMiddleware } from "./middlewares/errors.middleware";
 import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolver";
 import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resolver";
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
+import { CategoryResolver } from "./resolvers/courses/category.resolver";
 
 env.config();
 
@@ -68,11 +69,15 @@ async function main() {
       CourseSessionResolver,
       CourseAttendeeResolver,
       AttendanceRecordResolver,
+      CategoryResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],
     // use ObjectId scalar mapping
-    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+    scalarsMap: [
+      { type: ObjectId, scalar: ObjectIdScalar },
+      { type: Object, scalar: JSONObject },
+    ],
     emitSchemaFile: true,
     container: Container,
     validate: true,
@@ -106,13 +111,13 @@ async function main() {
         `http://localhost:3000`,
         `http://localhost:3001`,
       ],
-    })
+    }),
   );
   app.use(cookieParser());
   app.use(
     "/graphql",
     Express.json(),
-    expressMiddleware(server, { context: async (ctx) => createContext(ctx) })
+    expressMiddleware(server, { context: async (ctx) => createContext(ctx) }),
   );
 
   await mongoDbConnect();
@@ -120,8 +125,8 @@ async function main() {
 
   httpServer.listen({ port }, () =>
     console.log(
-      `🚀 Server ready and listening at ==> http://localhost:${port}/graphql`
-    )
+      `🚀 Server ready and listening at ==> http://localhost:${port}/graphql`,
+    ),
   );
 }
 

@@ -4,54 +4,44 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
 import {
   Control,
-  UseFormRegister,
-  UseFormSetFocus,
-  UseFormSetValue,
-  UseFormWatch,
+  useController,
+  useFormContext,
+  useFormState,
 } from "react-hook-form";
-import { cn } from "@/utils/helpers";
+import { cn, formatDatetimeLocal } from "@/utils/helpers";
 import { InputHTMLAttributes, useState } from "react";
+import { get } from "lodash";
 
-export interface RHFmethodsProps {
-  register: UseFormRegister<any>;
-  setFocus: UseFormSetFocus<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
-}
-
-export interface InputProps
-  extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+export interface InputProps extends InputHTMLAttributes<
+  HTMLInputElement | HTMLTextAreaElement
+> {
   name: string;
   label?: string;
-  error?: string;
-  errors?: any;
-  methods?: RHFmethodsProps;
   control?: Control<any>;
 }
 
-//refactor to handle number and dates
 export function Input({
-  error,
-  methods,
   name,
   label,
   onFocus,
   className,
   ...props
 }: InputProps) {
-  const field = methods?.register?.(name, {
-    ...(props.type === "number" ? { valueAsNumber: true } : {}),
-    ...(props.type === "datetime-local" || props.type === "date"
-      ? { valueAsDate: true as unknown as false }
-      : {}),
-  });
+  const { control } = useFormContext();
+  const { errors } = useFormState({ control, name });
+
+  const isDate = props.type === "datetime-local" || props.type === "date";
+
+  // useController reads the current value synchronously on every render —
+  // no subscription timing lag unlike useWatch which returns undefined on first mount.
+  const { field } = useController({ name, control });
+
+  const error = get(errors, name)?.message?.toString();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const val = methods?.watch(name);
-
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className={cn(["w-full flex flex-col gap-2", className])}>
       {label && (
         <label
           htmlFor={name}
@@ -69,7 +59,6 @@ export function Input({
             : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
           props.disabled &&
             "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
-          className,
         ])}
       >
         <input
@@ -77,12 +66,31 @@ export function Input({
             "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
           }
           {...props}
-          {...field}
+          ref={field.ref}
+          name={field.name}
+          onBlur={field.onBlur}
+          disabled={field.disabled ?? props.disabled}
+          value={
+            isDate
+              ? formatDatetimeLocal(
+                  field.value,
+                  props.type === "datetime-local",
+                )
+              : (field.value ?? "")
+          }
           onChange={(e) => {
-            if (props.onChange) {
-              props.onChange(e);
-            }
-            field?.onChange(e);
+            let val: any;
+            if (props.type === "number") val = e.target.valueAsNumber;
+            else if (isDate)
+              // valueAsDate is null for datetime-local (browser limitation),
+              // so fall back to parsing the value string as a local Date.
+              val =
+                e.target.valueAsDate ??
+                (e.target.value ? new Date(e.target.value) : null);
+            else val = e.target.value;
+
+            field.onChange(val);
+            props.onChange?.(e);
           }}
           onFocus={onFocus}
           onWheel={(e) => {

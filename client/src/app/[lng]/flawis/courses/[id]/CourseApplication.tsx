@@ -67,7 +67,7 @@ export default function CourseApplication({
           <div className="flex flex-wrap gap-2">
             <p>Dokumenty</p>
             <ul className="flex flex-wrap gap-2">
-              {courseAttendee.fileUrls.map((url, i) => {
+              {/* {courseAttendee.fileUrls.map((url, i) => {
                 const fileName =
                   url.split("/").pop()?.split("-").pop() || "File";
 
@@ -84,7 +84,7 @@ export default function CourseApplication({
                     </Link>
                   </li>
                 );
-              })}
+              })} */}
               {/* {application.organizationFeedbackUrl && (
                 <li>
                   <Link

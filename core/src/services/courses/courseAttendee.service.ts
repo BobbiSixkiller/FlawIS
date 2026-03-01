@@ -9,34 +9,39 @@ import { UserService } from "../user.service";
 import { Invoice } from "../../entitites/Attendee";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Status } from "../../entitites/Internship";
-import { toDTO } from "../../util/helpers";
+import { toDTO, withOptionalTransaction } from "../../util/helpers";
 import { CtxUser } from "../../util/types";
 import { Access } from "../../entitites/User";
 import { MinioService } from "../minio.service";
 import { Repository } from "../../repositories/base.repository";
 import { AttendanceRecord } from "../../entitites/Course";
 import { RmqService, RoutingKey } from "../rmq.service";
+import { FormSubmissionInput } from "../../resolvers/types/form/form.types";
+import { FormService } from "../form.service";
+import { FieldType } from "../../entitites/Form";
+import { application } from "express";
 
 @Service()
 export class CourseAttendeeService {
   constructor(
     private readonly courseAttendeeRepository: CourseAttendeeRepository,
     private readonly attendanceRecordRepository = new Repository(
-      AttendanceRecord
+      AttendanceRecord,
     ),
     private readonly courseService: CourseService,
     private readonly courseRepository: CourseRepository,
     private readonly userService: UserService,
     private readonly i18nService: I18nService,
     private readonly minioService: MinioService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
+    private readonly formService: FormService,
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
     const attendee = await this.courseAttendeeRepository.findOne({ _id: id });
     if (!attendee) {
       throw new Error(
-        this.i18nService.translate("attendee.notFound", { ns: "course" })
+        this.i18nService.translate("attendee.notFound", { ns: "course" }),
       );
     }
 
@@ -56,8 +61,8 @@ export class CourseAttendeeService {
     hostname: string,
     courseId: ObjectId,
     userId: ObjectId,
-    fileUrls: string[],
-    billing?: AttendeeBillingInput
+    application: FormSubmissionInput,
+    billing?: AttendeeBillingInput,
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -76,6 +81,11 @@ export class CourseAttendeeService {
         throw new Error("You are already registered for this course!");
       }
 
+      const form = await this.formService.getForm(application.form);
+      if (form.course.toString() !== course.id.toString()) {
+        throw new Error("Form does not belong to this course!");
+      }
+
       const priceWithouTax = course.price / Number(process.env.VAT || 1.23);
       const isFlaw = user.email.split("@")[1] === "flaw.uniba.sk";
 
@@ -88,7 +98,11 @@ export class CourseAttendeeService {
           organization: user.organization,
           telephone: user.telephone,
         },
-        fileUrls,
+        application: {
+          form: application.form,
+          formVersion: application.formVersion,
+          answers: application.answers,
+        },
         invoice:
           course.isPaid && course.billing
             ? ({
@@ -102,7 +116,7 @@ export class CourseAttendeeService {
                   vat: isFlaw
                     ? 0
                     : Math.round(
-                        ((course.price - priceWithouTax) / 100) * 100
+                        ((course.price - priceWithouTax) / 100) * 100,
                       ) / 100,
                 },
                 issuer: {
@@ -118,7 +132,7 @@ export class CourseAttendeeService {
 
       await this.courseRepository.updateMany(
         { _id: course.id },
-        { $inc: { attendeesCount: 1 } }
+        { $inc: { attendeesCount: 1 } },
       );
 
       await session.commitTransaction();
@@ -132,7 +146,7 @@ export class CourseAttendeeService {
           courseId: course.id,
           course: course.name,
         }),
-        "mail.courses.applied"
+        "mail.courses.applied",
       );
 
       return toDTO(attendee);
@@ -144,41 +158,52 @@ export class CourseAttendeeService {
     }
   }
 
-  async updateFiles(fileUrls: string[], attendeeId: ObjectId, user: CtxUser) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
-        { _id: attendeeId },
-        { $set: { fileUrls } },
-        session
-      );
-      if (!attendee) {
-        throw new Error("Attendee not found!");
-      }
-      if (
-        attendee.user.id.toString() !== user.id.toString() &&
-        !user.access.includes(Access.Admin)
-      ) {
-        throw new Error("Not allowed!");
-      }
-
-      await session.commitTransaction();
-
-      return toDTO(attendee);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
+  async updateCourseAttendee(
+    attendeeId: ObjectId,
+    application: FormSubmissionInput,
+    userId: ObjectId,
+  ) {
+    const attendee = await this.courseAttendeeRepository.findOne({
+      _id: attendeeId,
+    });
+    if (!attendee) {
+      throw new Error("Attendee not found!");
     }
+
+    if (attendee.status !== Status.Applied) {
+      throw new Error("Cannot update application - status is not APPLIED!");
+    }
+
+    if (attendee.user.id.toString() !== userId.toString()) {
+      throw new Error("Not authorized to update this application!");
+    }
+
+    const form = await this.formService.getForm(application.form);
+    if (form.course.toString() !== attendee.course.toString()) {
+      throw new Error("Form does not belong to this course!");
+    }
+
+    const updated = await this.courseAttendeeRepository.findOneAndUpdate(
+      { _id: attendeeId },
+      {
+        $set: {
+          application: {
+            form: application.form,
+            formVersion: application.formVersion,
+            answers: application.answers,
+          },
+        },
+      },
+      { new: true },
+    );
+
+    return toDTO(updated!);
   }
 
   async updateAttendeeStatus(
     attendeeId: ObjectId,
     status: Status,
-    hostname: string
+    hostname: string,
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -187,7 +212,7 @@ export class CourseAttendeeService {
       const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
         { _id: attendeeId },
         { $set: { status } },
-        { session, new: true }
+        { session, new: true },
       );
       if (!attendee) {
         throw new Error("Attendee not found!");
@@ -197,7 +222,7 @@ export class CourseAttendeeService {
           _id: attendee.course,
         },
         null,
-        { session }
+        { session },
       );
       if (!course) {
         throw new Error("Course not found!");
@@ -212,7 +237,7 @@ export class CourseAttendeeService {
           courseId: course.id,
           course: course.name,
         }),
-        `mail.courses.${status.toLowerCase()}` as RoutingKey
+        `mail.courses.${status.toLowerCase()}` as RoutingKey,
       );
 
       await session.commitTransaction();
@@ -227,13 +252,10 @@ export class CourseAttendeeService {
   }
 
   async deleteAttendee(id: ObjectId, user: CtxUser) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
+    return withOptionalTransaction(undefined, async (session) => {
       const attendee = await this.courseAttendeeRepository.findOneAndDelete(
         { _id: id },
-        { session }
+        { session },
       );
       if (!attendee) {
         throw new Error("Attendee not found!");
@@ -245,25 +267,31 @@ export class CourseAttendeeService {
         throw new Error("Not allowed!");
       }
 
-      await Promise.all([
+      const [_, __, form] = await Promise.all([
         this.courseRepository.findOneAndUpdate(
           { _id: attendee.course },
           { $inc: { attendeesCount: -1 } },
-          { session, new: true }
+          { session, new: true },
         ),
-        this.attendanceRecordRepository.deleteMany({}),
+        this.attendanceRecordRepository.deleteMany(
+          { attendee: attendee._id },
+          { session },
+        ),
+        this.formService.getForm(attendee.application.form),
       ]);
 
-      await this.minioService.deleteFiles(attendee.fileUrls);
-
-      await session.commitTransaction();
+      const uploadField = form.fields.find(
+        (f) => f.type === FieldType.FileUpload,
+      );
+      if (uploadField) {
+        await this.minioService.deleteFiles(
+          attendee.application.answers.get(
+            uploadField.id.toString(),
+          ) as string[],
+        );
+      }
 
       return toDTO(attendee);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
+    });
   }
 }

@@ -5,6 +5,7 @@ import { Children, cloneElement, isValidElement, ReactNode } from "react";
 import {
   DefaultValues,
   FieldErrors,
+  FormProvider,
   Resolver,
   useForm,
   UseFormReturn,
@@ -41,16 +42,17 @@ export default function RHFormContainer<TVals extends Record<string, any>>({
   const { register, formState, setFocus, setValue, watch } = methods;
 
   return (
-    <div>
-      {enhanceChildren(
+    <FormProvider {...methods}>
+      {children(methods)}
+      {/* {enhanceChildren(
         children(methods),
         register,
         formState.errors,
         setFocus,
         setValue,
         watch
-      )}
-    </div>
+      )} */}
+    </FormProvider>
   );
 }
 
@@ -60,7 +62,7 @@ function enhanceChildren(
   errors: any,
   setFocus: UseFormSetFocus<any>,
   setValue: UseFormSetValue<any>,
-  watch: UseFormWatch<any>
+  watch: UseFormWatch<any>,
 ): ReactNode {
   return Children.map(children, (child) => {
     if (!isValidElement(child)) return child;
@@ -85,7 +87,7 @@ function enhanceChildren(
         errors,
         setFocus,
         setValue,
-        watch
+        watch,
       );
     }
 

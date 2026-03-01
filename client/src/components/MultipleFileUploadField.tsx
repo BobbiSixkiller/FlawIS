@@ -67,13 +67,9 @@ export default function MultipleFileUploadField({
   const [files, setFiles] = useState<UploadableFile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setValue(
-      name,
-      files.map((f) => f.file)
-      // { shouldValidate: true }
-    );
-  }, [files, name, setValue]);
+  function syncFormField(shouldValidate: boolean, files: File[]) {
+    setValue(name, files, { shouldValidate });
+  }
 
   useEffect(() => {
     async function prefillFiles() {
@@ -98,10 +94,14 @@ export default function MultipleFileUploadField({
               setError(name, { message: `Failed to fetch ${url}` });
             }
           }
-        })
+        }),
       );
 
       setFiles(loadedFiles);
+      syncFormField(
+        false,
+        loadedFiles.map((f) => f.file),
+      );
 
       setLoading(false);
     }
@@ -117,16 +117,24 @@ export default function MultipleFileUploadField({
       }));
 
       if (
-        fileRejections.some((ref) =>
-          ref.errors.some((err) => err.code === "too-many-files")
+        fileRejections.some((r) =>
+          r.errors.some((e) => e.code === "too-many-files"),
         )
       ) {
         setError(name, { message: "too-many-files" });
+        return;
       }
 
-      setFiles((curr) => [...curr, ...mappedAccepted]);
+      setFiles((curr) => {
+        const next = [...curr, ...mappedAccepted];
+        syncFormField(
+          true,
+          next.map((f) => f.file),
+        );
+        return next;
+      });
     },
-    []
+    [name, setError, syncFormField],
   );
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
@@ -139,18 +147,20 @@ export default function MultipleFileUploadField({
       multiple: true,
     });
 
-  async function onDelete(file: File, uploadedFile?: string) {
-    setFiles((prev) => prev.filter((f) => f.file !== file));
+  function onDelete(file: File) {
+    setFiles((prev) => {
+      const next = prev.filter((f) => f.file !== file);
+      syncFormField(
+        true,
+        next.map((f) => f.file),
+      );
+      return next;
+    });
   }
 
   function onUpload(file: File, uploadedFile: string, errors: FileError[]) {
     setFiles((prev) =>
-      prev.map((f) => {
-        if (f.file === file) {
-          return { ...f, uploadedFile, errors };
-        }
-        return f;
-      })
+      prev.map((f) => (f.file === file ? { ...f, uploadedFile, errors } : f)),
     );
   }
 
@@ -169,7 +179,7 @@ export default function MultipleFileUploadField({
             isDragAccept,
             isDragReject: isDragReject || fieldState.error,
             ...(!loading ? { isFocused } : {}),
-          }
+          },
         )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-none`}
       >
         <input name={name} id={name} disabled={loading} {...getInputProps()} />
