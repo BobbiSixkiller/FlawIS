@@ -11,7 +11,6 @@ import {
 import { cn, formatDatetimeLocal } from "@/utils/helpers";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
-import Link from "next/link";
 import { changeCourseAttendeeStatus, getCourseAttendance } from "./actions";
 import {
   Connection,

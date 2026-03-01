@@ -67,7 +67,7 @@ export default async function CoursePage({
               </div>
             }
           />
-          <Attendance id={id} />
+          <Attendance id={id} registrationForm={course.registrationForm} />
         </>
       ) : new Date() < new Date(course.registrationEnd) ? (
         <Button
