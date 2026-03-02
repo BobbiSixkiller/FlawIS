@@ -52,7 +52,10 @@ export class AttendanceRecordResolver {
   ): Promise<AttendanceRecordMutationResponse> {
     const res = await this.courseService.updateAttendance(id, { online });
 
-    return { message: "Forma ucasti na termine aktualizovana!", data: res };
+    return {
+      message: `Forma účasti aktualizovaná na: ${online ? "Online" : "Prezenčná"}`,
+      data: res,
+    };
   }
 
   @FieldResolver(() => CourseSession)

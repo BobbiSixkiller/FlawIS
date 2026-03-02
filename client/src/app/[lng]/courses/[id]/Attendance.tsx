@@ -12,10 +12,13 @@ export default async function Attendance({
   const attendance = await getCourseAttendance({ id, sort: [] });
 
   return attendance.edges[0]?.node.attendee.status === Status.Accepted ? (
-    <AttendanceTable
-      registrationForm={registrationForm}
-      initialData={attendance}
-      vars={{ id, sort: [] }}
-    />
+    <div className="text-sm">
+      <AttendanceTable
+        registrationForm={registrationForm}
+        initialData={attendance}
+        vars={{ id, sort: [] }}
+      />
+      * pre zmenu formy účasti stlačte switch
+    </div>
   ) : null;
 }

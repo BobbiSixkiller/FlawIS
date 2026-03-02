@@ -40,6 +40,7 @@ import AttendanceRecordCell from "./HoursAttended";
 import HoursAttended from "./HoursAttended";
 import OnlineSwitch from "./OnlineSwitch";
 import AttendeeApplicationView from "./AttendeeApplicationView";
+import Tooltip from "@/components/Tooltip";
 
 interface ScrollState {
   vertical: boolean;
@@ -255,11 +256,21 @@ function AttendanceRow({
                       "dark:bg-gray-800 dark:text-white/85",
                     ])}
                   >
-                    <OnlineSwitch
-                      id={r!.id}
-                      online={r?.online ?? false}
-                      disabled={new Date(sessions[i]?.start) < new Date()}
-                    />
+                    <Tooltip
+                      position="below"
+                      message={
+                        r?.online
+                          ? "Online forma účasti"
+                          : "Prezenčná forma účasti"
+                      }
+                    >
+                      <OnlineSwitch
+                        id={r!.id}
+                        online={r?.online ?? false}
+                        disabled={new Date(sessions[i]?.start) < new Date()}
+                      />
+                    </Tooltip>
+
                     <HoursAttended
                       id={r!.id}
                       hoursAttended={r!.hoursAttended}
