@@ -160,8 +160,7 @@ export default function UserForm({
           .when({
             is: () =>
               subdomain?.includes("conferences") ||
-              subdomain?.includes("intern") ||
-              subdomain?.includes("courses"),
+              subdomain?.includes("intern"),
             then: (schema) =>
               schema
                 .required()

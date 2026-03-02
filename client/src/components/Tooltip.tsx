@@ -45,7 +45,7 @@ export default function Tooltip({
       setTooltipPosition((prev) => ({ ...prev, top, left: left + 10 }));
       setVisible(true);
     },
-    [position, openDialogs]
+    [position, openDialogs],
   );
 
   const hideTooltipOnScroll = useCallback(() => setVisible(false), []);
@@ -106,7 +106,7 @@ export default function Tooltip({
             ref={ref}
             className={cn([
               position === "above" ? "mb-1" : "mt-1",
-              "absolute z-10 transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg whitespace-pre-wrap break-words max-w-[calc(100vw-28px)]",
+              "fixed z-[9999] transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg whitespace-pre-wrap break-words max-w-[calc(100vw-28px)]",
             ])}
             style={{
               top: tooltipPosition.top,
@@ -115,7 +115,7 @@ export default function Tooltip({
           >
             {message}
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

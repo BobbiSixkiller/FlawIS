@@ -30,21 +30,22 @@ export default async function Register({
 
       <UserForm subdomain={subdomain} namespace="register" />
 
-      {subdomain.includes("conferences") && (
-        <div>
-          <div className="relative flex py-6 items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 font-light text-sm">
-              {t("continue")}
-            </span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
+      {subdomain.includes("conferences") ||
+        (subdomain.includes("courses") && (
+          <div>
+            <div className="relative flex py-6 items-center">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="flex-shrink mx-4 font-light text-sm">
+                {t("continue")}
+              </span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
 
-          <div className="flex justify-center pt-4">
-            <GoogleSignIn />
+            <div className="flex justify-center pt-4">
+              <GoogleSignIn />
+            </div>
           </div>
-        </div>
-      )}
+        ))}
 
       <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-300">
         <Trans
