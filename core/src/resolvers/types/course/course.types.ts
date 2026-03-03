@@ -88,15 +88,17 @@ export class CourseInput implements Partial<Course> {
 
   @Field()
   @IsDate()
+  @IsBefore("end")
   start: Date;
 
   @Field()
   @IsDate()
+  @IsAfter("start")
   end: Date;
 
   @Field()
   @IsDate()
-  @IsBefore("start")
+  @IsBefore("end")
   registrationEnd: Date;
 
   @Field(() => Int)
