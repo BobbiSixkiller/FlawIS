@@ -472,14 +472,18 @@ function CourseRegistrationFormBuilder({
                       label="Placeholder"
                       name={`formFields.${index}.placeholder`}
                     />
-                    <Input
-                      label="Help text"
-                      name={`formFields.${index}.helpText`}
-                    />
+                    <div className="sm:col-span-2 space-y-2">
+                      <p className="text-sm font-medium">Help text</p>
+                      <TiptapEditor
+                        compact
+                        name={`formFields.${index}.helpText`}
+                        control={control}
+                      />
+                    </div>
                   </>
                 ) : (
-                  <div className="col-span-2 flex gap-2">
-                    <div className="flex gap-2  sm:w-1/3">
+                  <div className="col-span-2 space-y-4">
+                    <div className="flex gap-2 sm:w-1/3">
                       <Input
                         label="Min files"
                         name={`formFields.${index}.minFiles`}
@@ -493,11 +497,14 @@ function CourseRegistrationFormBuilder({
                         className="w-fit"
                       />
                     </div>
-
-                    <Input
-                      label="Help text"
-                      name={`formFields.${index}.helpText`}
-                    />
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Help text</p>
+                      <TiptapEditor
+                        compact
+                        name={`formFields.${index}.helpText`}
+                        control={control}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
