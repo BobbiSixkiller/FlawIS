@@ -111,7 +111,7 @@ export default function CourseForm({
           maxAttendees: yup.number().required().min(1),
           start: yup.date(),
           end: yup.date().min(yup.ref("start")),
-          registrationEnd: yup.date().max(yup.ref("start")),
+          registrationEnd: yup.date().max(yup.ref("end")),
         })}
       >
         {(methods) => (
