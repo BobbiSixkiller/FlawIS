@@ -31,82 +31,97 @@ export default function RegistrationFormFields({
       {fields.map((field) => {
         const fieldName = `field_${field.id}`;
 
+        const helpText = field.helpText ? (
+          <div
+            className="prose prose-sm dark:prose-invert text-muted-foreground"
+            dangerouslySetInnerHTML={{ __html: field.helpText }}
+          />
+        ) : null;
+
         switch (field.type) {
           case FieldType.Text:
             return (
-              <Input
-                key={field.id}
-                name={fieldName}
-                label={field.label}
-                placeholder={field.placeholder ?? undefined}
-                disabled={!canEdit}
-              />
+              <div key={field.id} className="space-y-2">
+                <Input
+                  name={fieldName}
+                  label={field.label}
+                  placeholder={field.placeholder ?? undefined}
+                  disabled={!canEdit}
+                />
+                {helpText}
+              </div>
             );
 
           case FieldType.Textarea:
             return (
-              <Textarea
-                key={field.id}
-                name={fieldName}
-                label={field.label}
-                placeholder={field.placeholder ?? undefined}
-                disabled={!canEdit}
-              />
+              <div key={field.id} className="space-y-2">
+                <Textarea
+                  name={fieldName}
+                  label={field.label}
+                  placeholder={field.placeholder ?? undefined}
+                  disabled={!canEdit}
+                />
+                {helpText}
+              </div>
             );
 
           case FieldType.Select:
             return (
-              <GenericCombobox<
-                {
-                  id: number;
-                  val: { value: string; text: string };
-                },
-                string
-              >
-                key={field.id}
-                lng={lng}
-                name={fieldName}
-                label={field.label}
-                control={control}
-                defaultOptions={
-                  field.selectOptions?.map((opt, i) => ({
-                    id: i,
-                    val: opt,
-                  })) ?? []
-                }
-                placeholder={field.placeholder ?? ""}
-                immediate
-                getOptionValue={(opt) => opt?.val.value ?? ""}
-                getOptionLabel={(opt) => opt.val.text}
-                renderOption={(option, props) => (
-                  <p
-                    className={
-                      props.focus
-                        ? "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full p-2"
-                        : "p-2"
-                    }
-                  >
-                    {option.val.text}
-                  </p>
-                )}
-                disabled={!canEdit}
-              />
+              <div key={field.id} className="space-y-2">
+                <GenericCombobox<
+                  {
+                    id: number;
+                    val: { value: string; text: string };
+                  },
+                  string
+                >
+                  lng={lng}
+                  name={fieldName}
+                  label={field.label}
+                  control={control}
+                  defaultOptions={
+                    field.selectOptions?.map((opt, i) => ({
+                      id: i,
+                      val: opt,
+                    })) ?? []
+                  }
+                  placeholder={field.placeholder ?? ""}
+                  immediate
+                  getOptionValue={(opt) => opt?.val.value ?? ""}
+                  getOptionLabel={(opt) => opt.val.text}
+                  renderOption={(option, props) => (
+                    <p
+                      className={
+                        props.focus
+                          ? "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full p-2"
+                          : "p-2"
+                      }
+                    >
+                      {option.val.text}
+                    </p>
+                  )}
+                  disabled={!canEdit}
+                />
+                {helpText}
+              </div>
             );
 
           case FieldType.FileUpload:
             return (
-              <MultipleFileUploadField
-                key={field.id}
-                name={fieldName}
-                label={field.label}
-                control={control}
-                setValue={setValue}
-                setError={setError}
-                maxFiles={field.maxFiles ?? undefined}
-                fileSources={{
-                  courses: existingAnswers?.[field.id],
-                }}
-              />
+              <div key={field.id} className="space-y-2">
+                <MultipleFileUploadField
+                  name={fieldName}
+                  label={field.label}
+                  control={control}
+                  setValue={setValue}
+                  setError={setError}
+                  maxFiles={field.maxFiles ?? undefined}
+                  fileSources={{
+                    courses: existingAnswers?.[field.id],
+                  }}
+                />
+                {helpText}
+              </div>
             );
 
           default:

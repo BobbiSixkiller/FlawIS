@@ -24,6 +24,7 @@ interface EditorProps {
   name: string;
   control: Control<any>;
   className?: string;
+  compact?: boolean;
 }
 
 export default function TiptapEditor({
@@ -31,6 +32,7 @@ export default function TiptapEditor({
   initialValue,
   name,
   control,
+  compact,
 }: EditorProps) {
   const { field, fieldState, formState } = useController({ name, control });
   const { defaultExtensions } = useLocalizedExtensions();
@@ -48,7 +50,8 @@ export default function TiptapEditor({
         class: cn([
           className,
           "prose prose-lg prose-headings:font-title font-default prose-a:no-underline",
-          "focus:outline-none min-h-96 p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
+          compact ? "min-h-[2rem]" : "min-h-96",
+          "focus:outline-none p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
           "dark:ring-gray-700 dark:bg-gray-800",
           fieldState.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
