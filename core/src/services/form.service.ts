@@ -26,7 +26,7 @@ function canonFieldsKeepOrder(fields: any[]) {
     // - if YES: keep as-is
     // - if NO: sort by value+text
     const selectOptions =
-      type === FieldType.Select
+      type === FieldType.Select || type === FieldType.RadioGroup
         ? (f.selectOptions ?? [])
             .map((o: any) => ({
               value: trim(toString(o?.value ?? "")),
@@ -123,7 +123,7 @@ export class FormService {
             fields: formFields.map(({ id, selectOptions, minFiles, maxFiles, ...rest }) => ({
               _id: id ?? new ObjectId(),
               ...rest,
-              ...(rest.type === FieldType.Select && selectOptions ? { selectOptions } : {}),
+              ...((rest.type === FieldType.Select || rest.type === FieldType.RadioGroup) && selectOptions ? { selectOptions } : {}),
               ...(rest.type === FieldType.FileUpload ? { minFiles, maxFiles } : {}),
             })),
           },

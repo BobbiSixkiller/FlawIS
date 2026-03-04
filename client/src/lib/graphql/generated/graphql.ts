@@ -440,6 +440,7 @@ export type DatesInput = {
 /** Supported registration form field types */
 export enum FieldType {
   FileUpload = 'FileUpload',
+  RadioGroup = 'RadioGroup',
   Select = 'Select',
   Text = 'Text',
   Textarea = 'Textarea'

@@ -51,8 +51,8 @@ export class UserService {
     private readonly googleOAuthClient = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
-    )
+      process.env.GOOGLE_REDIRECT_URI,
+    ),
   ) {}
 
   async getUser(id: ObjectId) {
@@ -75,13 +75,13 @@ export class UserService {
   async sendRegistrationLinks(emails: string[], hostname: string) {
     for await (const email of emails) {
       const token = await this.tokenService.generateOneTimeToken(
-        60 * 60 * 24 * 7
+        60 * 60 * 24 * 7,
       ); // Token valid for 7 days
       const locale = this.i18nService.language();
 
       await this.rmqService.produceMessage(
         JSON.stringify({ hostname, token, email, locale }),
-        "mail.internships.newOrg"
+        "mail.internships.newOrg",
       );
     }
   }
@@ -90,7 +90,7 @@ export class UserService {
     data: RegisterUserInput,
     hostname: string,
     ctxUser: CtxUser | null,
-    token?: string
+    token?: string,
   ) {
     const isUniba = data.email.split("@")[1].includes("uniba");
     const isAdmin = ctxUser?.access.includes(Access.Admin);
@@ -165,7 +165,7 @@ export class UserService {
           hostname,
           token: signJwt({ id: user.id }, { expiresIn: 3600 }),
         }),
-        "mail.registration"
+        "mail.registration",
       );
     }
 
@@ -203,7 +203,7 @@ export class UserService {
             name: payload.name,
             email: payload.email,
             verified: payload.email_verified,
-            access: Access.ConferenceAttendee,
+            access: [Access.ConferenceAttendee, Access.CourseAttendee],
           });
         }
         if (!user) {
@@ -231,7 +231,7 @@ export class UserService {
         hostname,
         token,
       }),
-      "mail.reset"
+      "mail.reset",
     );
 
     return this.i18nService.translate("resetLinkSent");
@@ -248,7 +248,7 @@ export class UserService {
         hostname,
         token,
       }),
-      "mail.registration"
+      "mail.registration",
     );
 
     return this.i18nService.translate("activation");
@@ -262,7 +262,7 @@ export class UserService {
 
     const activatedUser = await this.userRepository.findOneAndUpdate(
       { _id: user.id, verified: false },
-      { verified: true }
+      { verified: true },
     );
     if (!activatedUser) {
       throw new Error(this.i18nService.translate("notFound"));
@@ -291,7 +291,7 @@ export class UserService {
   async updateUser(
     ctxUser: CtxUser,
     id: ObjectId,
-    data: UserUpdateData
+    data: UserUpdateData,
   ): Promise<UserDTO> {
     const session = await mongoose.startSession();
     session.startTransaction();

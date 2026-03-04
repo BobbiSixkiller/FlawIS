@@ -14,7 +14,6 @@ import {
   ValidateNested,
 } from "class-validator";
 import { ObjectId } from "mongodb";
-import { UniqueFieldNames } from "../../../util/decorators";
 import { JSONObject } from "../../../util/scalars";
 
 /**
@@ -63,11 +62,11 @@ export class FormFieldInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  @MaxLength(500)
+  @MaxLength(5000)
   helpText?: string;
 
   /**
-   * Only for SELECT. Enforce conditional requirement in service layer,
+   * Only for SELECT and RADIO_GROUP. Enforce conditional requirement in service layer,
    * or add a custom class-validator constraint if you want.
    */
   @Field(() => [SelectOptionInput], { nullable: true })
