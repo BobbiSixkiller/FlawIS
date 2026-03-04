@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/Input";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import RadioGroupField from "@/components/RadioGroupField";
 import { Textarea } from "@/components/Textarea";
 import GenericCombobox from "@/components/GenericCombobox";
 import { FieldType, FormFragment } from "@/lib/graphql/generated/graphql";
@@ -100,6 +101,20 @@ export default function RegistrationFormFields({
                       {option.val.text}
                     </p>
                   )}
+                  disabled={!canEdit}
+                />
+                {helpText}
+              </div>
+            );
+
+          case FieldType.RadioGroup:
+            return (
+              <div key={field.id} className="space-y-2">
+                <RadioGroupField
+                  name={fieldName}
+                  label={field.label}
+                  control={control}
+                  options={field.selectOptions ?? []}
                   disabled={!canEdit}
                 />
                 {helpText}

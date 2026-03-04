@@ -393,6 +393,7 @@ input DatesInput {
 """Supported registration form field types"""
 enum FieldType {
   FileUpload
+  RadioGroup
   Select
   Text
   Textarea

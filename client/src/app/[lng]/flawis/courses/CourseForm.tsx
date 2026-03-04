@@ -322,7 +322,9 @@ function CourseRegistrationFormBuilder({
       placeholder: "",
       helpText: "",
       selectOptions:
-        type === FieldType.Select ? [{ value: "", text: "" }] : null,
+        type === FieldType.Select || type === FieldType.RadioGroup
+          ? [{ value: "", text: "" }]
+          : null,
       minFiles: type === FieldType.FileUpload ? 1 : null,
       maxFiles: type === FieldType.FileUpload ? 5 : null,
     } as any);
@@ -330,21 +332,6 @@ function CourseRegistrationFormBuilder({
 
   return (
     <div className="space-y-6 max-w-2xl w-full">
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" onClick={() => addField(FieldType.Text)}>
-          <PlusIcon className="size-5" /> Text
-        </Button>
-        <Button type="button" onClick={() => addField(FieldType.Textarea)}>
-          <PlusIcon className="size-5" /> Textarea
-        </Button>
-        <Button type="button" onClick={() => addField(FieldType.Select)}>
-          <PlusIcon className="size-5" /> Select
-        </Button>
-        <Button type="button" onClick={() => addField(FieldType.FileUpload)}>
-          <PlusIcon className="size-5" /> File Upload
-        </Button>
-      </div>
-
       {fields.length === 0 && (
         <p className="text-sm text-muted-foreground">
           No registration fields yet. Add one above.
@@ -421,7 +408,10 @@ function CourseRegistrationFormBuilder({
                       const newType = e.target.value as FieldType;
                       setValue(`formFields.${index}.type` as any, newType);
 
-                      if (newType === FieldType.Select) {
+                      if (
+                        newType === FieldType.Select ||
+                        newType === FieldType.RadioGroup
+                      ) {
                         const curr =
                           (watch(`formFields.${index}.selectOptions` as any) as
                             | Array<{ value: string; text: string }>
@@ -454,6 +444,7 @@ function CourseRegistrationFormBuilder({
                     <option value={FieldType.Text}>TEXT</option>
                     <option value={FieldType.Textarea}>TEXTAREA</option>
                     <option value={FieldType.Select}>SELECT</option>
+                    <option value={FieldType.RadioGroup}>RADIO_GROUP</option>
                     <option value={FieldType.FileUpload}>FILE_UPLOAD</option>
                   </Select>
                 </Field>
@@ -466,7 +457,7 @@ function CourseRegistrationFormBuilder({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {type !== FieldType.FileUpload ? (
+                {type !== FieldType.FileUpload && type !== FieldType.RadioGroup ? (
                   <>
                     <Input
                       label="Placeholder"
@@ -481,6 +472,15 @@ function CourseRegistrationFormBuilder({
                       />
                     </div>
                   </>
+                ) : type === FieldType.RadioGroup ? (
+                  <div className="sm:col-span-2 space-y-2">
+                    <p className="text-sm font-medium">Help text</p>
+                    <TiptapEditor
+                      compact
+                      name={`formFields.${index}.helpText`}
+                      control={control}
+                    />
+                  </div>
                 ) : (
                   <div className="col-span-2 space-y-4">
                     <div className="flex gap-2 sm:w-1/3">
@@ -509,12 +509,29 @@ function CourseRegistrationFormBuilder({
                 )}
               </div>
 
-              {type === FieldType.Select && (
+              {(type === FieldType.Select || type === FieldType.RadioGroup) && (
                 <SelectOptionsEditor methods={methods} fieldIndex={index} />
               )}
             </div>
           );
         })}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" onClick={() => addField(FieldType.Text)}>
+          <PlusIcon className="size-5" /> Text
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.Textarea)}>
+          <PlusIcon className="size-5" /> Textarea
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.Select)}>
+          <PlusIcon className="size-5" /> Select
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.RadioGroup)}>
+          <PlusIcon className="size-5" /> Radio Group
+        </Button>
+        <Button type="button" onClick={() => addField(FieldType.FileUpload)}>
+          <PlusIcon className="size-5" /> File Upload
+        </Button>
       </div>
     </div>
   );

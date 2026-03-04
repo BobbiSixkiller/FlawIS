@@ -9,6 +9,7 @@ export enum FieldType {
   Text = "TEXT",
   Textarea = "TEXTAREA",
   Select = "SELECT",
+  RadioGroup = "RADIO_GROUP",
   FileUpload = "FILE_UPLOAD",
 }
 
