@@ -81,12 +81,27 @@ export function Input({
           onChange={(e) => {
             let val: any;
             if (props.type === "number") val = e.target.valueAsNumber;
-            else if (isDate)
-              // valueAsDate is null for datetime-local (browser limitation),
-              // so fall back to parsing the value string as a local Date.
-              val =
-                e.target.valueAsDate ??
-                (e.target.value ? new Date(e.target.value) : null);
+            else if (isDate) {
+              if (props.type === "datetime-local") {
+                // new Date(string) without timezone suffix has ambiguous parsing
+                // across browsers (UTC vs local). Multi-arg constructor always
+                // uses local time, preventing the +1h shift for UTC+1 users.
+                if (e.target.value) {
+                  const [y, mo, d, h, mi] = e.target.value
+                    .split(/[-T:]/)
+                    .map(Number);
+                  val = new Date(y, mo - 1, d, h, mi);
+                } else {
+                  val = null;
+                }
+              } else {
+                // type="date": valueAsDate returns UTC midnight, which
+                // formatDatetimeLocal handles correctly via getTimezoneOffset.
+                val =
+                  e.target.valueAsDate ??
+                  (e.target.value ? new Date(e.target.value) : null);
+              }
+            }
             else val = e.target.value;
 
             field.onChange(val);
