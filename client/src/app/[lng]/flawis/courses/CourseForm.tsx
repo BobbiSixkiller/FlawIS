@@ -249,6 +249,7 @@ export default function CourseForm({
                     FieldType.Text,
                     FieldType.Textarea,
                     FieldType.Select,
+                    FieldType.RadioGroup,
                     FieldType.FileUpload,
                   ] as any)
                   .required(),
