@@ -11,10 +11,14 @@ export async function GET(
   { params }: { params: Promise<{ lng: string }> }
 ) {
   const { lng } = await params;
-  const { searchParams, host, protocol } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
   const redirectUrl = searchParams.get("url");
 
-  const dynamicRedirectUri = `${protocol}//${host}/${lng}/google/callback`;
+  const host =
+    req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost:3000";
+  const proto = req.headers.get("x-forwarded-proto") ?? "http";
+
+  const dynamicRedirectUri = `${proto}://${host}/${lng}/google/callback`;
 
   const authUrl = googleClient.generateAuthUrl({
     access_type: "offline",
