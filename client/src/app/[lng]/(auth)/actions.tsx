@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 import {
   ActivateUserDocument,
@@ -9,27 +8,7 @@ import {
   ResendActivationLinkDocument,
 } from "@/lib/graphql/generated/graphql";
 
-import { OAuth2Client } from "google-auth-library";
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
-
-const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
-
-export async function getGoogleAuthLink(url?: string) {
-  const authUrl = googleClient.generateAuthUrl({
-    access_type: "offline",
-    scope: [
-      "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/userinfo.email",
-    ],
-    state: JSON.stringify({ redirectUrl: url }),
-  });
-
-  redirect(authUrl);
-}
 
 export async function getMe() {
   const res = await executeGqlFetch(MeDocument);

@@ -12,6 +12,7 @@ const commonPaths = [
   "/activate",
   "/minio",
   "/google/callback",
+  "/google/oauth",
   "/invoice",
   "/export",
 ];
