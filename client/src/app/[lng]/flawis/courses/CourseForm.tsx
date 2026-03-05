@@ -258,7 +258,8 @@ export default function CourseForm({
                 placeholder: yup.string().nullable(),
                 helpText: yup.string().nullable(),
                 selectOptions: yup.mixed().when("type", {
-                  is: FieldType.Select,
+                  is: (val: FieldType) =>
+                    val === FieldType.Select || val === FieldType.RadioGroup,
                   then: () =>
                     yup
                       .array()
@@ -458,7 +459,8 @@ function CourseRegistrationFormBuilder({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {type !== FieldType.FileUpload && type !== FieldType.RadioGroup ? (
+                {type !== FieldType.FileUpload &&
+                type !== FieldType.RadioGroup ? (
                   <>
                     <Input
                       label="Placeholder"
