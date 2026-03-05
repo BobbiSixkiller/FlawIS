@@ -19,6 +19,8 @@ export default function RadioGroupField({
 }) {
   const { field, fieldState } = useController({ name, control });
 
+  console.log(fieldState);
+
   return (
     <Field>
       <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
@@ -28,7 +30,7 @@ export default function RadioGroupField({
         value={field.value ?? ""}
         onChange={field.onChange}
         disabled={disabled}
-        className="mt-2 space-y-2"
+        className="mt-2 space-y-3"
       >
         {options.map((opt) => (
           <Radio
@@ -46,14 +48,14 @@ export default function RadioGroupField({
             >
               <span className="size-2 rounded-full bg-white dark:bg-gray-900 hidden group-data-[checked]:block" />
             </span>
-            <Label className="text-sm font-medium text-gray-900 dark:text-white/85 cursor-pointer">
+            <span className="text-sm font-medium text-gray-900 dark:text-white/85 cursor-pointer">
               {opt.text}
-            </Label>
+            </span>
           </Radio>
         ))}
       </RadioGroup>
       {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+        <p className="text-sm text-red-500 mt-2">{fieldState.error.message}</p>
       )}
     </Field>
   );

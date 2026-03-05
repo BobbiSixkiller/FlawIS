@@ -1,19 +1,15 @@
-import Link from "next/link";
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/utils/helpers";
 
-export default function GoogleSignIn({
-  lng,
-  url,
-}: {
-  lng: string;
-  url?: string;
-}) {
-  const href = `/${lng}/google/oauth${url ? `?url=${encodeURIComponent(url)}` : ""}`;
+export default function GoogleSignIn() {
+  const searchParams = useSearchParams();
+  const url = searchParams.get("url")?.toString();
 
   return (
-    <Link
-      href={href}
-      prefetch={false}
+    <a
+      href={url ? `/google/oauth?url=${url}` : "/google/oauth"}
       className={cn([
         "text-sm rounded-md border border-gray-300 hover:border-primary-500 text-gray-900 px-3.5 py-2 w-32 flex gap-2 justify-center items-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
         "dark:border-gray-600 dark:bg-slate-800 dark:text-white/85 dark:hover:border-primary-300 dark:focus:ring-primary-300 dark:focus:ring-offset-gray-900",
@@ -45,6 +41,6 @@ export default function GoogleSignIn({
         ></path>
       </svg>
       Google
-    </Link>
+    </a>
   );
 }

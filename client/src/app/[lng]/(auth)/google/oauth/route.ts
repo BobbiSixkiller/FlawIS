@@ -19,7 +19,10 @@ export async function GET(
     req.headers.get("host") ??
     "localhost:3000";
 
-  const dynamicRedirectUri = `https://${host}/google/callback`;
+  const dynamicRedirectUri =
+    process.env.NODE_ENV === "development"
+      ? process.env.GOOGLE_REDIRECT_URI
+      : `https://${host}/google/callback`;
 
   const authUrl = googleClient.generateAuthUrl({
     access_type: "offline",
@@ -28,7 +31,7 @@ export async function GET(
       "https://www.googleapis.com/auth/userinfo.email",
     ],
     redirect_uri: dynamicRedirectUri,
-    state: JSON.stringify({ redirectUrl }),
+    state: redirectUrl ? JSON.stringify({ redirectUrl }) : undefined,
   });
 
   return NextResponse.redirect(authUrl);
