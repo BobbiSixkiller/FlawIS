@@ -183,9 +183,9 @@ export class UserService {
     return toUserDTO(user);
   }
 
-  async googleSignIn(authCode: string) {
+  async googleSignIn(authCode: string, redirectUri: string) {
     try {
-      const { tokens } = await this.googleOAuthClient.getToken(authCode);
+      const { tokens } = await this.googleOAuthClient.getToken({ code: authCode, redirect_uri: redirectUri });
       this.googleOAuthClient.setCredentials(tokens);
 
       const ticket = await this.googleOAuthClient.verifyIdToken({

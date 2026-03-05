@@ -52,8 +52,8 @@ mutation login($email: String!, $password: String!) {
   }
 }
 
-mutation googleSignIn($authCode: String!) {
-  googleSignIn(authCode: $authCode) {
+mutation googleSignIn($authCode: String!, $redirectUri: String!) {
+  googleSignIn(authCode: $authCode, redirectUri: $redirectUri) {
     message
     data {
       ...User
