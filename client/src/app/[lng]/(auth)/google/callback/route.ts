@@ -4,7 +4,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { executeGqlFetch } from "@/utils/actions";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ lng: string }> },
+) {
+  const { lng } = await params;
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
@@ -16,7 +20,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No code provided" }, { status: 400 });
   }
 
-  const res = await executeGqlFetch(GoogleSignInDocument, { authCode: code });
+  const host =
+    req.headers.get("x-forwarded-host") ??
+    req.headers.get("host") ??
+    "localhost:3000";
+  const proto = process.env.NODE_ENV === "development" ? "http" : "https";
+  const redirectUri = `${proto}://${host}/${lng}/google/callback`;
+
+  const res = await executeGqlFetch(GoogleSignInDocument, {
+    authCode: code,
+    redirectUri,
+  });
   if (res.errors) {
     return NextResponse.json({ error: res.errors }, { status: 500 });
   }

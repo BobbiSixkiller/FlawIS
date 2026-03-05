@@ -911,6 +911,7 @@ export type MutationDeleteUserArgs = {
 
 export type MutationGoogleSignInArgs = {
   authCode: Scalars['String']['input'];
+  redirectUri: Scalars['String']['input'];
 };
 
 
@@ -1590,6 +1591,7 @@ export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'Us
 
 export type GoogleSignInMutationVariables = Exact<{
   authCode: Scalars['String']['input'];
+  redirectUri: Scalars['String']['input'];
 }>;
 
 
@@ -3812,8 +3814,8 @@ fragment User on User {
   avatarUrl
 }`) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
 export const GoogleSignInDocument = new TypedDocumentString(`
-    mutation googleSignIn($authCode: String!) {
-  googleSignIn(authCode: $authCode) {
+    mutation googleSignIn($authCode: String!, $redirectUri: String!) {
+  googleSignIn(authCode: $authCode, redirectUri: $redirectUri) {
     message
     data {
       ...User

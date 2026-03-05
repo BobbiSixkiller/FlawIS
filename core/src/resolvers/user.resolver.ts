@@ -115,9 +115,10 @@ export class UserResolver {
   @Mutation(() => UserMutationResponse)
   @UseMiddleware(RateLimit())
   async googleSignIn(
-    @Arg("authCode") authCode: string
+    @Arg("authCode") authCode: string,
+    @Arg("redirectUri") redirectUri: string
   ): Promise<UserMutationResponse> {
-    const user = await this.userService.googleSignIn(authCode);
+    const user = await this.userService.googleSignIn(authCode, redirectUri);
 
     return {
       data: user,
