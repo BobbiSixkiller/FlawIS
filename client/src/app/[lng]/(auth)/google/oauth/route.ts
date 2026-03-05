@@ -3,22 +3,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 const googleClient = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
+  process.env.GOOGLE_CLIENT_SECRET,
 );
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ lng: string }> }
+  { params }: { params: Promise<{ lng: string }> },
 ) {
   const { lng } = await params;
   const { searchParams } = new URL(req.url);
   const redirectUrl = searchParams.get("url");
 
   const host =
-    req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost:3000";
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
+    req.headers.get("x-forwarded-host") ??
+    req.headers.get("host") ??
+    "localhost:3000";
 
-  const dynamicRedirectUri = `${proto}://${host}/${lng}/google/callback`;
+  const dynamicRedirectUri = `https://${host}/${lng}/google/callback`;
 
   const authUrl = googleClient.generateAuthUrl({
     access_type: "offline",
