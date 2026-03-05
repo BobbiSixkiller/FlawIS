@@ -183,7 +183,7 @@ export default function CourseForm({
               control={methods.control}
               className="sm:w-[580px] md:w-[672px]"
               name="description"
-              initialValue={defaultCourseEditorContent}
+              initialValue={course?.description || defaultCourseEditorContent}
             />
             <div className="flex gap-4">
               <Input
