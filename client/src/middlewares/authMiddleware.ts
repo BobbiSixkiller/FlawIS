@@ -7,6 +7,7 @@ const authPaths = [
   "/forgotPassword",
   "/resetPassword",
   "/google/callback",
+  "/google/oauth",
 ];
 
 const objectIdRegex = /^\/[0-9a-fA-F]{24}$/;
