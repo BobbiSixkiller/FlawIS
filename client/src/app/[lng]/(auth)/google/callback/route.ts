@@ -8,7 +8,6 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ lng: string }> },
 ) {
-  const { lng } = await params;
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
@@ -25,7 +24,7 @@ export async function GET(
     req.headers.get("host") ??
     "localhost:3000";
   const proto = process.env.NODE_ENV === "development" ? "http" : "https";
-  const redirectUri = `${proto}://${host}/${lng}/google/callback`;
+  const redirectUri = `${proto}://${host}/google/callback`;
 
   const res = await executeGqlFetch(GoogleSignInDocument, {
     authCode: code,
