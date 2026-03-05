@@ -19,7 +19,7 @@ export async function GET(
     req.headers.get("host") ??
     "localhost:3000";
 
-  const dynamicRedirectUri = `https://${host}/${lng}/google/callback`;
+  const dynamicRedirectUri = `https://${host}/google/callback`;
 
   const authUrl = googleClient.generateAuthUrl({
     access_type: "offline",
