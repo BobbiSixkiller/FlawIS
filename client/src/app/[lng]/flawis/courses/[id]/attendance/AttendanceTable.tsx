@@ -21,6 +21,7 @@ import {
   cloneElement,
   isValidElement,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -36,7 +37,6 @@ import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { deleteCourseAttendee, deleteCourseSession } from "../actions";
 import CourseSessionForm from "../CourseSessionForm";
 import useUser from "@/hooks/useUser";
-import AttendanceRecordCell from "./HoursAttended";
 import HoursAttended from "./HoursAttended";
 import OnlineSwitch from "./OnlineSwitch";
 import AttendeeApplicationView from "./AttendeeApplicationView";
@@ -404,25 +404,50 @@ export function AttendanceTable({
   vars: AttendanceQueryVariables;
   registrationForm: FormFragment;
 }) {
-  const InfiniteScrollCourseList = withInfiniteScroll<
-    AttendanceFragment,
-    AttendanceQueryVariables
-  >({
-    vars,
-    getData: getCourseAttendance,
-    initialData,
-    ListItem: (props) => (
-      <AttendanceRow
-        sessions={initialData.sessions}
-        registrationForm={registrationForm}
-        {...props}
-      />
-    ),
-    Container: (props) => (
-      <AttendanceTableContainer sessions={initialData.sessions} {...props} />
-    ),
-    Placeholder: AttendancePlaceholder,
-  });
+  const ListItem = useMemo(
+    () =>
+      function AttendanceListItem(props: { data?: AttendanceFragment }) {
+        return (
+          <AttendanceRow
+            sessions={initialData.sessions}
+            registrationForm={registrationForm}
+            {...props}
+          />
+        );
+      },
+    // initialData.sessions and registrationForm come from the server and never
+    // change after mount — stable deps keep the component type identity stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const Container = useMemo(
+    () =>
+      function AttendanceContainer(props: { children: React.ReactNode }) {
+        return (
+          <AttendanceTableContainer
+            sessions={initialData.sessions}
+            {...props}
+          />
+        );
+      },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const InfiniteScrollCourseList = useMemo(
+    () =>
+      withInfiniteScroll<AttendanceFragment, AttendanceQueryVariables>({
+        vars,
+        getData: getCourseAttendance,
+        initialData,
+        ListItem,
+        Container,
+        Placeholder: AttendancePlaceholder,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return <InfiniteScrollCourseList />;
 }
