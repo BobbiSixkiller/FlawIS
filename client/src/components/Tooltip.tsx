@@ -32,11 +32,13 @@ export default function Tooltip({
   });
   const viewportWidth = useWidth();
 
-  const { openDialogs } = useDialogStore();
+  const anyDialogOpen = useDialogStore((s) =>
+    Object.values(s.openDialogs).some((val) => val),
+  );
 
   const showTooltip = useCallback(
     (e: MouseEvent | TouchEvent) => {
-      if (Object.values(openDialogs).some((val) => val)) return;
+      if (anyDialogOpen) return;
       const rect = e.currentTarget.getBoundingClientRect();
 
       const top = position === "above" ? rect.top - 40 : rect.bottom;
@@ -45,7 +47,7 @@ export default function Tooltip({
       setTooltipPosition((prev) => ({ ...prev, top, left: left + 10 }));
       setVisible(true);
     },
-    [position, openDialogs],
+    [position, anyDialogOpen],
   );
 
   const hideTooltipOnScroll = useCallback(() => setVisible(false), []);

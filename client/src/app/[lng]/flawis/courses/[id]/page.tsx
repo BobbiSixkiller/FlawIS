@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import CloseButton from "@/components/CloseButton";
 import Link from "next/link";
 import CourseForm from "../CourseForm";
+import Spinner from "@/components/Spinner";
 
 export default async function CoursePage({
   params,
