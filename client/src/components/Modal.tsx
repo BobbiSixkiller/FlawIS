@@ -80,7 +80,7 @@ export default function Modal({
             className="
             w-full sm:w-fit sm:min-w-96
             rounded-xl ring-1 ring-black/5
-            bg-white dark:bg-gray-700 dark:text-white
+            bg-white dark:bg-gray-900 dark:text-white
             p-6 text-left align-middle shadow-2xl
             transition duration-300 ease-out data-[closed]:opacity-0 data-[closed]:scale-95
           "
