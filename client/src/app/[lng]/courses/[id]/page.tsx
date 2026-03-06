@@ -16,7 +16,6 @@ import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import Link from "next/link";
 
 import CourseApplication from "../../flawis/courses/[id]/CourseApplication";
-import { getMe } from "../../(auth)/actions";
 import Attendance from "./Attendance";
 import CourseRegistrationForm from "../../flawis/courses/[id]/CourseRegistrationForm";
 
