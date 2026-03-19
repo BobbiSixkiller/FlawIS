@@ -6,9 +6,9 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/components/Modal";
 import CourseSessionForm from "../CourseSessionForm";
 import { getCourseAttendance } from "./actions";
-import { Status } from "@/lib/graphql/generated/graphql";
 import { getCourse } from "../actions";
 import { AttendanceTable } from "./AttendanceTable";
+import ExportButton from "@/components/ExportButton";
 
 export default async function AttendancePage({
   params,
@@ -31,6 +31,10 @@ export default async function AttendancePage({
               <PlusIcon className="size-5" />
             </Button>
           </ModalTrigger>,
+          <ExportButton
+            key={2}
+            fetchUrl={`/export?type=courseAttendees&id=${id}`}
+          />,
         ]}
       />
 
