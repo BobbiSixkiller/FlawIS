@@ -1,7 +1,7 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Children, cloneElement, isValidElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import {
   DefaultValues,
   FieldErrors,
@@ -9,12 +9,8 @@ import {
   Resolver,
   useForm,
   UseFormReturn,
-  UseFormSetFocus,
-  UseFormSetValue,
-  UseFormWatch,
 } from "react-hook-form";
 import { ObjectSchema } from "yup";
-import lodash from "lodash";
 
 export default function RHFormContainer<TVals extends Record<string, any>>({
   errors,
@@ -39,58 +35,5 @@ export default function RHFormContainer<TVals extends Record<string, any>>({
     shouldUnregister,
   });
 
-  const { register, formState, setFocus, setValue, watch } = methods;
-
-  return (
-    <FormProvider {...methods}>
-      {children(methods)}
-      {/* {enhanceChildren(
-        children(methods),
-        register,
-        formState.errors,
-        setFocus,
-        setValue,
-        watch
-      )} */}
-    </FormProvider>
-  );
-}
-
-function enhanceChildren(
-  children: ReactNode,
-  register: any,
-  errors: any,
-  setFocus: UseFormSetFocus<any>,
-  setValue: UseFormSetValue<any>,
-  watch: UseFormWatch<any>,
-): ReactNode {
-  return Children.map(children, (child) => {
-    if (!isValidElement(child)) return child;
-
-    const name = child.props.name;
-    const error = name ? lodash.get(errors, name)?.message : undefined;
-
-    const isUncontrolled = name && !child.props.control;
-
-    const newProps: Record<string, any> = {
-      ...child.props,
-      ...(name && { error, errors }),
-      ...(isUncontrolled && {
-        methods: { register, setFocus, setValue, watch },
-      }), // if the component is uncontrolled add RHF methods and errors
-    };
-
-    if (child.props.children) {
-      newProps.children = enhanceChildren(
-        child.props.children,
-        register,
-        errors,
-        setFocus,
-        setValue,
-        watch,
-      );
-    }
-
-    return cloneElement(child, newProps);
-  });
+  return <FormProvider {...methods}>{children(methods)}</FormProvider>;
 }

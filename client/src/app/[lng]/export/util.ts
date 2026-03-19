@@ -1,5 +1,6 @@
 import { capitalizeFirstLetter } from "@/utils/helpers";
 import { getAllAttendees } from "../flawis/conferences/[slug]/attendees/actions";
+import { getCourseAttendance } from "../flawis/courses/[id]/attendance/actions";
 import { executeGqlFetch } from "@/utils/actions";
 import { InternsExportDocument } from "@/lib/graphql/generated/graphql";
 
@@ -58,6 +59,43 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
           file: "false",
         },
       ];
+    });
+  },
+  courseAttendees: async ({ id }) => {
+    if (!id) throw new Error("id is required");
+
+    const allAttendances: any[] = [];
+    let sessions: any[] = [];
+    let after: string | null = null;
+    let hasNextPage = true;
+
+    while (hasNextPage) {
+      const page = await getCourseAttendance({ id, sort: [], after });
+
+      if (!sessions.length) sessions = page.sessions;
+
+      for (const edge of page.edges || []) {
+        if (edge?.node) allAttendances.push(edge.node);
+      }
+
+      hasNextPage = page.pageInfo.hasNextPage;
+      after = page.pageInfo.endCursor ?? null;
+    }
+
+    return allAttendances.map((a) => {
+      const row: Record<string, string> = {
+        name: a.attendee.user.name,
+        status: a.attendee.status,
+      };
+
+      sessions.forEach((session, i) => {
+        const key = new Date(session.start).toISOString().slice(0, 10);
+        const record = a.attendanceRecords[i];
+        row[`${key}_online`] = record ? String(record.online ?? false) : "";
+        row[`${key}_hours`] = record ? String(record.hoursAttended) : "";
+      });
+
+      return row;
     });
   },
   interns: async () => {

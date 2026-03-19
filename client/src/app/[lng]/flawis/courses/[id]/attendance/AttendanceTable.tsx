@@ -404,36 +404,25 @@ export function AttendanceTable({
   vars: AttendanceQueryVariables;
   registrationForm: FormFragment;
 }) {
-  const ListItem = useMemo(
-    () =>
-      function AttendanceListItem(props: { data?: AttendanceFragment }) {
-        return (
-          <AttendanceRow
-            sessions={initialData.sessions}
-            registrationForm={registrationForm}
-            {...props}
-          />
-        );
-      },
-    // initialData.sessions and registrationForm come from the server and never
-    // change after mount — stable deps keep the component type identity stable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const Container = useMemo(
-    () =>
-      function AttendanceContainer(props: { children: React.ReactNode }) {
-        return (
-          <AttendanceTableContainer
-            sessions={initialData.sessions}
-            {...props}
-          />
-        );
-      },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+  // useState initializer runs exactly once — no stale closure risk, no lint suppression needed
+  const [{ ListItem, Container }] = useState(() => ({
+    ListItem: function AttendanceListItem(props: { data?: AttendanceFragment }) {
+      return (
+        <AttendanceRow
+          sessions={initialData.sessions}
+          registrationForm={registrationForm}
+          {...props}
+        />
+      );
+    },
+    Container: function AttendanceContainer(props: {
+      children: React.ReactNode;
+    }) {
+      return (
+        <AttendanceTableContainer sessions={initialData.sessions} {...props} />
+      );
+    },
+  }));
 
   const InfiniteScrollCourseList = useMemo(
     () =>
@@ -445,8 +434,10 @@ export function AttendanceTable({
         Container,
         Placeholder: AttendancePlaceholder,
       }),
+    // ListItem and Container are stable (useState initializer).
+    // vars/initialData come from the server and seed useState inside withInfiniteScroll — not reactive.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [ListItem, Container],
   );
 
   return <InfiniteScrollCourseList />;

@@ -10,14 +10,14 @@ export async function GET(
     params,
   }: {
     params: Promise<{ lng: string }>;
-  }
+  },
 ) {
   const { lng } = await params;
   const { t } = await translate(lng, "export");
 
   const user = await getMe();
   if (!user) {
-    return new NextResponse(t("401"), { status: 401 });
+    return NextResponse.json({ message: t("401") }, { status: 401 });
   }
 
   const url = new URL(request.url);
@@ -25,12 +25,12 @@ export async function GET(
   const queryParams = Object.fromEntries(url.searchParams.entries());
 
   if (!type) {
-    return new NextResponse(t("400"), { status: 400 });
+    return NextResponse.json({ message: t("400") }, { status: 400 });
   }
 
   const fetcher = csvExportRegistry[type];
   if (!fetcher) {
-    return new NextResponse(t("404", { type }), { status: 404 });
+    return NextResponse.json({ message: t("404", { type }) }, { status: 404 });
   }
 
   try {
@@ -39,6 +39,9 @@ export async function GET(
     return createCSVResponse(csv, `${type}-export.csv`);
   } catch (err: any) {
     console.error(err);
-    return new NextResponse(err.message || t("500"), { status: 500 });
+    return NextResponse.json(
+      { message: err.message || t("500") },
+      { status: 500 },
+    );
   }
 }

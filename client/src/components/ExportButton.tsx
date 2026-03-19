@@ -2,13 +2,13 @@
 
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
+import { useMessageStore } from "@/stores/messageStore";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 
 export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
-  const { slug } = useParams<{ slug: string }>();
   const [loading, setLoading] = useState(false);
+  const setMessage = useMessageStore((s) => s.setMessage);
 
   async function handleClick() {
     setLoading(true);
@@ -17,7 +17,8 @@ export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
       const response = await fetch(fetchUrl);
 
       if (!response.ok) {
-        throw new Error("Failed to download the file");
+        const json = await response.json();
+        throw new Error(json.message);
       }
 
       const blob = await response.blob();
@@ -40,8 +41,9 @@ export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
       // Clean up the anchor element and URL object
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading the file:", error);
+    } catch (error: any) {
+      console.log(error);
+      setMessage(error.message, false);
     } finally {
       setLoading(false);
     }
