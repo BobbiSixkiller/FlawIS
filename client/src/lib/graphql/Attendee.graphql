@@ -63,12 +63,6 @@ query attendee($id: ObjectId!) {
   }
 }
 
-query attendeesCsvExport($slug: String!) {
-  attendeesCsvExport(slug: $slug) {
-    ...Attendee
-  }
-}
-
 query textSearchAttendee($text: String!, $slug: String!) {
   textSearchAttendee(text: $text, slug: $slug) {
     id

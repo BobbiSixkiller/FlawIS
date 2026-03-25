@@ -746,7 +746,6 @@ enum PresentationLng {
 type Query {
   attendee(id: ObjectId!): Attendee!
   attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
-  attendeesCsvExport(slug: String!): [Attendee!]!
   categories(search: String): [Category!]!
   conference(slug: String!): Conference!
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
@@ -756,7 +755,6 @@ type Query {
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
   interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
-  internsExport: [Intern]!
   internship(id: ObjectId!): Internship!
   internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
   me: User!

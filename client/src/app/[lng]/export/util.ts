@@ -1,22 +1,35 @@
 import { capitalizeFirstLetter } from "@/utils/helpers";
-import { getAllAttendees } from "../flawis/conferences/[slug]/attendees/actions";
+import { getAttendees } from "../flawis/conferences/[slug]/attendees/actions";
 import { getCourseAttendance } from "../flawis/courses/[id]/attendance/actions";
-import { executeGqlFetch } from "@/utils/actions";
-import { InternsExportDocument } from "@/lib/graphql/generated/graphql";
+import { getInterns } from "../internships/[internshipId]/applications/actions";
 
 type ExportParams = Record<string, string | undefined>;
 type ExportFetcher = (params: ExportParams) => Promise<Record<string, any>[]>;
 
-//refactor this so it uses streams based on grahpql cursor based paginated query so it is scallable
-//then ditch those export queries already implemented and use only the paginated queries
-//export button will probably also need to be refactored
-
 export const csvExportRegistry: Record<string, ExportFetcher> = {
   attendees: async ({ lng, slug }) => {
     if (!lng || !slug) throw new Error("lng and slug are required");
-    const data = await getAllAttendees(slug);
 
-    return data.flatMap((attendee) => {
+    const allAttendees: any[] = [];
+    let after: string | null = null;
+    let hasNextPage = true;
+
+    while (hasNextPage) {
+      const page = await getAttendees({
+        sort: [],
+        filter: { conferenceSlug: slug },
+        after,
+      });
+
+      for (const edge of page.edges || []) {
+        if (edge?.node) allAttendees.push(edge.node);
+      }
+
+      hasNextPage = page.pageInfo.hasNextPage;
+      after = page.pageInfo.endCursor ?? null;
+    }
+
+    return allAttendees.flatMap((attendee) => {
       const base = {
         name: attendee.user.name,
         email: attendee.user.email,
@@ -31,7 +44,7 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
       };
 
       if (attendee.submissions?.length) {
-        return attendee.submissions.map((submission) => ({
+        return attendee.submissions.map((submission: any) => ({
           ...base,
           section: submission.section.translations[lng as "sk" | "en"].name,
           submission_name_sk: capitalizeFirstLetter(
@@ -99,16 +112,29 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
     });
   },
   interns: async () => {
-    const res = await executeGqlFetch(InternsExportDocument);
+    const allInterns: any[] = [];
+    let after: string | null = null;
+    let hasNextPage = true;
 
-    return res.data.internsExport.map((i) => ({
-      name: i?.user.name,
-      organization: i?.organization,
-      status: i?.status,
-      email: i?.user.email,
-      phone: i?.user.telephone,
-      class: i?.user.studyProgramme,
-      semester: i?.semester,
+    while (hasNextPage) {
+      const page = await getInterns({ sort: [], after });
+
+      for (const edge of page?.edges || []) {
+        if (edge?.node) allInterns.push(edge.node);
+      }
+
+      hasNextPage = page?.pageInfo.hasNextPage ?? false;
+      after = page?.pageInfo.endCursor ?? null;
+    }
+
+    return allInterns.map((i) => ({
+      name: i.user.name,
+      organization: i.organization,
+      status: i.status,
+      email: i.user.email,
+      phone: i.user.telephone,
+      class: i.user.studyProgramme,
+      semester: i.semester,
     }));
   },
 };
