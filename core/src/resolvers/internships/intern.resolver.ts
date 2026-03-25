@@ -34,7 +34,7 @@ export class InternResolver {
   constructor(
     private readonly internService: InternService,
     private readonly userService: UserService,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
 
   @Authorized([Access.Admin, Access.Organization])
@@ -49,19 +49,13 @@ export class InternResolver {
     return await this.internService.getInterns(args);
   }
 
-  @Authorized([Access.Admin])
-  @Query(() => [Intern], { nullable: "items" })
-  async internsExport() {
-    return await this.internService.getAllInternsInAcademicYear();
-  }
-
   @Authorized()
   @Mutation(() => InternMutationResponse)
   async createIntern(
     @Ctx() { user, req }: Context,
     @Arg("internshipId") internshipId: ObjectId,
     @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[],
-    @Arg("semester", () => Semester) semester: Semester
+    @Arg("semester", () => Semester) semester: Semester,
   ): Promise<InternMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
@@ -70,7 +64,7 @@ export class InternResolver {
       internshipId,
       fileUrls,
       semester,
-      hostname
+      hostname,
     );
 
     return {
@@ -84,7 +78,7 @@ export class InternResolver {
   async changeInternStatus(
     @Arg("id") id: ObjectId,
     @Arg("status", () => Status) status: Status,
-    @Ctx() { req }: Context
+    @Ctx() { req }: Context,
   ): Promise<InternMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
@@ -102,13 +96,13 @@ export class InternResolver {
     @Ctx() { user }: Context,
     @Arg("id") id: ObjectId,
     @Arg("fileUrls", () => [String], { nullable: "items" }) fileUrls: string[],
-    @Arg("semester", () => Semester) semester: Semester
+    @Arg("semester", () => Semester) semester: Semester,
   ): Promise<InternMutationResponse> {
     const intern = await this.internService.updateInternData(
       fileUrls,
       id,
       user!,
-      semester
+      semester,
     );
 
     return {
@@ -122,12 +116,12 @@ export class InternResolver {
   async updateOrgFeedback(
     @Ctx() { user }: Context,
     @Arg("id") id: ObjectId,
-    @Arg("fileUrl", { nullable: true }) fileUrl: string
+    @Arg("fileUrl", { nullable: true }) fileUrl: string,
   ): Promise<InternMutationResponse> {
     const intern = await this.internService.updateOrganizationFeedbackUrl(
       id,
       user!,
-      fileUrl
+      fileUrl,
     );
 
     return {
@@ -140,7 +134,7 @@ export class InternResolver {
   @Mutation(() => InternMutationResponse)
   async deleteIntern(
     @Ctx() { user }: Context,
-    @Arg("id") id: ObjectId
+    @Arg("id") id: ObjectId,
   ): Promise<InternMutationResponse> {
     const intern = await this.internService.deleteIntern(id, user!);
 

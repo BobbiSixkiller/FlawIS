@@ -11,6 +11,7 @@ fragment Application on Intern {
       ...Address
     }
   }
+  organization
   fileUrls
   organizationFeedbackUrl
   status
@@ -91,20 +92,6 @@ mutation deleteInternship($id: ObjectId!) {
     data {
       id
     }
-  }
-}
-
-query internsExport {
-  internsExport {
-    user {
-      email
-      name
-      studyProgramme
-      telephone
-    }
-    organization
-    status
-    semester
   }
 }
 

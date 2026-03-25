@@ -35,7 +35,7 @@ export class AttendeeResolver {
     private readonly conferenceRepository: ConferenceRepository,
     private readonly userRepository: UserRepository,
     private readonly submissionRepository: SubmissionRepository,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
 
   @Authorized(["ADMIN"])
@@ -45,16 +45,10 @@ export class AttendeeResolver {
   }
 
   @Authorized(["ADMIN"])
-  @Query(() => [Attendee])
-  async attendeesCsvExport(@Arg("slug") slug: string): Promise<Attendee[]> {
-    return await this.attendeeRepository.findAll({ "conference.slug": slug });
-  }
-
-  @Authorized(["ADMIN"])
   @Query(() => Attendee)
   async attendee(
     @Arg("id") _id: ObjectId,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>
+    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
   ) {
     return attendee;
   }
@@ -63,7 +57,7 @@ export class AttendeeResolver {
   @Query(() => [Attendee])
   async textSearchAttendee(
     @Arg("text") text: string,
-    @Arg("slug") slug: string
+    @Arg("slug") slug: string,
   ) {
     return await this.attendeeRepository.textSearch(text, slug);
   }
@@ -73,7 +67,7 @@ export class AttendeeResolver {
   async updateInvoice(
     @Arg("id") _id: ObjectId,
     @Arg("data") data: InvoiceInput,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>
+    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
   ): Promise<AttendeeMutationResponse> {
     console.log(data.body.issueDate);
 
@@ -93,7 +87,7 @@ export class AttendeeResolver {
   @Mutation(() => AttendeeMutationResponse)
   async deleteAttendee(
     @Arg("id") _id: ObjectId,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>
+    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
   ): Promise<AttendeeMutationResponse> {
     await this.attendeeRepository.deleteOne({ _id: attendee.id });
 
@@ -108,7 +102,7 @@ export class AttendeeResolver {
   @Authorized()
   @FieldResolver(() => UserStubUnion)
   async user(
-    @Root() { user: userStub }: Attendee
+    @Root() { user: userStub }: Attendee,
   ): Promise<typeof UserStubUnion> {
     const user = await this.userRepository.findOne({ _id: userStub.id });
     if (user) {
@@ -127,7 +121,8 @@ export class AttendeeResolver {
   @Authorized()
   @FieldResolver(() => [Submission])
   async submissions(
-    @Root() { user: { id: userId }, conference: { id: conferenceId } }: Attendee
+    @Root()
+    { user: { id: userId }, conference: { id: conferenceId } }: Attendee,
   ) {
     return await this.submissionRepository.findAll({
       conference: conferenceId,

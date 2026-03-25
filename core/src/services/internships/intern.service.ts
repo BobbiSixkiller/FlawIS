@@ -354,11 +354,4 @@ export class InternService {
     }
   }
 
-  async getAllInternsInAcademicYear() {
-    const { startDate, endDate } = getAcademicYear();
-
-    return await this.internRepository.findAll({
-      createdAt: { $gte: startDate, $lte: endDate },
-    });
-  }
 }
