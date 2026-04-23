@@ -37,10 +37,10 @@ export default function Dropdown({
       <MenuItems
         as="div"
         className={cn([
-          buttonWidth && "w-[var(--button-width)]",
-          "whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none z-50",
+          buttonWidth && "w-(--button-width)",
+          "whitespace-nowrap rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden z-50",
           "dark:bg-gray-800 dark:text-white/85",
-          "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
+          "origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
         ])}
         transition
         anchor={anchor}

@@ -6,7 +6,7 @@ import React, {
 } from "react";
 
 const buttonStyles = {
-  base: "inline-flex gap-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-300 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:pointer-events-none disabled:opacity-50",
+  base: "inline-flex gap-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-500 dark:focus-visible:ring-primary-300 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 disabled:pointer-events-none disabled:opacity-50",
   variants: {
     variant: {
       default:
@@ -18,7 +18,7 @@ const buttonStyles = {
       outline:
         "border border-primary-500 text-primary-500 hover:border-primary-700 bg-transparent",
       secondary:
-        "border text-gray-900 dark:text-white/85 dark:bg-gray-700 dark:border-none shadow",
+        "border text-gray-900 dark:text-white/85 dark:bg-gray-700 dark:border-none shadow-sm",
       ghost:
         "text-gray-900 hover:bg-black/20 bg-transparent dark:text-white/85 dark:hover:bg-white/20",
       link: "text-primary-500 underline-offset-4 hover:underline",

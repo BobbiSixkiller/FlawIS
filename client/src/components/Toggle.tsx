@@ -47,7 +47,7 @@ export default function Toggle({
             ? "bg-primary-700 dark:bg-primary-400"
             : "bg-primary-400 dark:bg-primary-300",
           sizeMap[size].container,
-          "relative inline-flex  shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-primary-500",
+          "relative inline-flex  shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden focus-visible:ring-2  focus-visible:ring-primary-500",
         ])}
       >
         <span className="sr-only">Use toggle</span>

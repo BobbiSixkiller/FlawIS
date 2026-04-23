@@ -46,7 +46,7 @@ export default function Ticket({
               value={ticket.id}
               className={({ checked, focus, disabled }) =>
                 cn([
-                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none borde bg-white dark:bg-gray-900",
+                  "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-hidden borde bg-white dark:bg-gray-900",
                   focus &&
                     "ring-2 ring-white/60 ring-offset-2 ring-offset-primary-300",
                   disabled &&

@@ -169,6 +169,14 @@ export enum AttendeeSortableField {
   Name = 'NAME'
 }
 
+export type AvailableCategory = {
+  __typename?: 'AvailableCategory';
+  count: Scalars['Int']['output'];
+  id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 /** Billing information */
 export type Billing = {
   __typename?: 'Billing';
@@ -350,6 +358,7 @@ export type CourseAttendeeUserStub = {
 
 export type CourseConnection = {
   __typename?: 'CourseConnection';
+  availableCategories: Array<AvailableCategory>;
   edges: Array<Maybe<CourseEdge>>;
   pageInfo: CoursePageInfo;
   totalCount: Scalars['Int']['output'];
@@ -1065,7 +1074,6 @@ export type Query = {
   __typename?: 'Query';
   attendee: Attendee;
   attendees: AttendeeConnection;
-  attendeesCsvExport: Array<Attendee>;
   categories: Array<Category>;
   conference: Conference;
   conferences: ConferenceConnection;
@@ -1075,7 +1083,6 @@ export type Query = {
   forgotPassword: Scalars['String']['output'];
   intern: Intern;
   interns: InternConnection;
-  internsExport: Array<Maybe<Intern>>;
   internship: Internship;
   internships: InternshipConnection;
   me: User;
@@ -1098,11 +1105,6 @@ export type QueryAttendeesArgs = {
   filter?: InputMaybe<AttendeeFilterInput>;
   first?: Scalars['Int']['input'];
   sort: Array<InputMaybe<AttendeeSortInput>>;
-};
-
-
-export type QueryAttendeesCsvExportArgs = {
-  slug: Scalars['String']['input'];
 };
 
 
@@ -1769,10 +1771,11 @@ export type CoursesQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort: Array<InputMaybe<CourseSortInput>> | InputMaybe<CourseSortInput>;
+  filter?: InputMaybe<CourseFilterInput>;
 }>;
 
 
-export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, thumbnail?: string | null, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, minFiles?: number | null, maxFiles?: number | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null }, application: { __typename?: 'FormSubmission', form: any, formVersion: number, answers: any } } | null } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null } } };
+export type CoursesQuery = { __typename?: 'Query', courses: { __typename?: 'CourseConnection', totalCount: number, edges: Array<{ __typename?: 'CourseEdge', cursor: string, node: { __typename?: 'Course', id: any, name: string, start: any, end: any, registrationEnd: any, maxAttendees: number, description: string, thumbnail?: string | null, price: number, isPaid: boolean, createdAt: any, updatedAt: any, categories: Array<{ __typename?: 'Category', id: any, name: string, slug: string }>, registrationForm: { __typename?: 'Form', id: any, course: any, version: number, createdAt: any, updatedAt: any, fields: Array<{ __typename?: 'FormField', id: any, type: FieldType, label: string, required: boolean, placeholder?: string | null, helpText?: string | null, minFiles?: number | null, maxFiles?: number | null, selectOptions?: Array<{ __typename?: 'SelectOption', value: string, text: string }> | null }> }, billing?: { __typename?: 'FlawBilling', name: string, ICO: string, ICDPH: string, DIC: string, variableSymbol: string, IBAN: string, SWIFT: string, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } | null, attending?: { __typename?: 'CourseAttendee', id: any, course: any, status: Status, createdAt: any, updatedAt: any, user: { __typename?: 'CourseAttendeeUserStub', id: any, name: string, email: string, telephone?: string | null, organization: string, avatarUrl?: string | null }, application: { __typename?: 'FormSubmission', form: any, formVersion: number, answers: any } } | null } } | null>, pageInfo: { __typename?: 'CoursePageInfo', hasNextPage: boolean, endCursor?: string | null }, availableCategories: Array<{ __typename?: 'AvailableCategory', id: any, name: string, slug: string, count: number }> } };
 
 export type CourseQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -4248,8 +4251,8 @@ export const AddAttendeeDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
 export const CoursesDocument = new TypedDocumentString(`
-    query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
-  courses(after: $after, first: $first, sort: $sort) {
+    query courses($after: String, $first: Int, $sort: [CourseSortInput]!, $filter: CourseFilterInput) {
+  courses(after: $after, first: $first, sort: $sort, filter: $filter) {
     totalCount
     edges {
       cursor
@@ -4260,6 +4263,12 @@ export const CoursesDocument = new TypedDocumentString(`
     pageInfo {
       hasNextPage
       endCursor
+    }
+    availableCategories {
+      id
+      name
+      slug
+      count
     }
   }
 }

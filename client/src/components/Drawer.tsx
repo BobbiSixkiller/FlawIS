@@ -146,7 +146,7 @@ export default function Drawer({
                       <div className="flex h-7 items-center">
                         <button
                           type="button"
-                          className="relative -m-2 p-2 hover:text-primary-700 outline-none	focus:ring-2 focus:ring-inset focus:ring-white rounded-md"
+                          className="relative -m-2 p-2 hover:text-primary-700 outline-hidden	focus:ring-2 focus:ring-inset focus:ring-white rounded-md"
                           onClick={() => setVisible(false)}
                         >
                           <span className="absolute -inset-0.5" />

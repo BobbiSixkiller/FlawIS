@@ -62,7 +62,25 @@ export class CourseArgs extends CreateArgs(Course, CourseSortableField) {
 }
 
 @ObjectType()
-export class CourseConnection extends CreateConnection(Course) {}
+export class AvailableCategory {
+  @Field(() => ObjectId)
+  id: ObjectId;
+
+  @Field()
+  name: string;
+
+  @Field()
+  slug: string;
+
+  @Field(() => Int)
+  count: number;
+}
+
+@ObjectType()
+export class CourseConnection extends CreateConnection(Course) {
+  @Field(() => [AvailableCategory])
+  availableCategories: AvailableCategory[];
+}
 
 @ObjectType({ implements: IMutationResponse })
 export class CourseMutationResponse extends IMutationResponse {

@@ -52,7 +52,7 @@ export function Input({
       )}
       <div
         className={cn([
-          "flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
+          "flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
           "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none",
           error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
@@ -120,7 +120,7 @@ export function Input({
           <button
             type="button"
             className={cn([
-              "p-2 text-gray-400 hover:text-primary-500 focus:outline-none focus:text-primary-500",
+              "p-2 text-gray-400 hover:text-primary-500 focus:outline-hidden focus:text-primary-500",
               "dark:hover:text-primary-300 dark:text-gray-600 dark:focus:text-primary-300",
             ])}
             onClick={() => {

@@ -10,7 +10,6 @@ import {
   decodeCursor,
   encodeCursor,
   ensureIdSort,
-  SortField,
 } from "../resolvers/types/pagination.types";
 
 @Service()
@@ -18,11 +17,12 @@ export class CourseRepository extends Repository<typeof Course> {
   constructor() {
     super(Course);
   }
-  // this is a WIP aggregation
+
   async paginatedCourses({
     first,
     after,
     sort,
+    filter,
   }: CourseArgs): Promise<CourseConnection> {
     // 1. Build Mongo sort object + sortFields for cursor filter
     const sortFields = ensureIdSort(
@@ -43,21 +43,42 @@ export class CourseRepository extends Repository<typeof Course> {
       cursorFilter = buildCursorFilter(sortFields, cursorValues);
     }
 
+    const categoryMatch = filter?.categoryIds?.length
+      ? { categories: { $in: filter.categoryIds } }
+      : {};
+
     const [connection] = await this.aggregate<CourseConnection>([
       { $sort: mongoSort },
       {
         $facet: {
           data: [
-            { $match: { ...cursorFilter } },
+            { $match: { ...categoryMatch, ...cursorFilter } },
             { $limit: first },
             { $addFields: { id: "$_id" } },
           ],
           hasNextPage: [
-            { $match: { ...cursorFilter } },
+            { $match: { ...categoryMatch, ...cursorFilter } },
             { $skip: first },
             { $limit: 1 },
           ],
-          totalCount: [{ $count: "totalCount" }],
+          totalCount: [
+            { $match: { ...categoryMatch } },
+            { $count: "totalCount" },
+          ],
+          availableCategories: [
+            { $unwind: "$categories" },
+            { $group: { _id: "$categories", count: { $sum: 1 } } },
+            {
+              $lookup: {
+                from: "categories",
+                localField: "_id",
+                foreignField: "_id",
+                as: "category",
+              },
+            },
+            { $unwind: "$category" },
+            { $sort: { "category.name": 1 } },
+          ],
         },
       },
       {
@@ -70,6 +91,18 @@ export class CourseRepository extends Repository<typeof Course> {
               input: "$data",
               as: "edge",
               in: { cursor: "$$edge._id", node: "$$edge" },
+            },
+          },
+          availableCategories: {
+            $map: {
+              input: "$availableCategories",
+              as: "item",
+              in: {
+                id: "$$item._id",
+                name: "$$item.category.name",
+                slug: "$$item.category.slug",
+                count: "$$item.count",
+              },
             },
           },
           pageInfo: {
@@ -98,6 +131,7 @@ export class CourseRepository extends Repository<typeof Course> {
       edges,
       pageInfo: { ...connection.pageInfo, endCursor },
       totalCount: connection.totalCount,
+      availableCategories: connection?.availableCategories ?? [],
     };
   }
 }

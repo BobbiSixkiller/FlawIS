@@ -26,13 +26,13 @@ export default function AcademicYearSelect({
         className="flex gap-2 group relative"
       >
         {selectedYear}
-        <ChevronDownIcon className="size-3 group-data-[open]:rotate-180" />
+        <ChevronDownIcon className="size-3 group-data-open:rotate-180" />
       </PopoverButton>
       <PopoverPanel
         transition
         className={cn([
-          "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
-          "[--anchor-gap:4px] sm:[--anchor-gap:8px] empty:hidden z-10 absolute max-h-44 overflow-y-auto flex flex-col mt-2 w-[var(--button-width)] text-sm p-2 rounded-lg bg-white text-gray-900 shadow-lg ring-1 ring-black/5",
+          "origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
+          "[--anchor-gap:4px] sm:[--anchor-gap:8px] empty:hidden z-10 absolute max-h-44 overflow-y-auto flex flex-col mt-2 w-(--button-width) text-sm p-2 rounded-lg bg-white text-gray-900 shadow-lg ring-1 ring-black/5",
           "dark:text-white/85 dark:bg-gray-800 dark:ring-gray-700",
         ])}
       >

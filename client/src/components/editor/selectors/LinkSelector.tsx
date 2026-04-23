@@ -59,7 +59,7 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
           ref={inputRef}
           type="text"
           placeholder={t("linkPlaceholder")}
-          className="flex-1 bg-gray-100 dark:bg-gray-700 h-8 dark:text-white text-sm rounded p-1 outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 bg-gray-100 dark:bg-gray-700 h-8 dark:text-white text-sm rounded-sm p-1 outline-hidden focus:ring-2 focus:ring-blue-500"
           defaultValue={editor.getAttributes("link").href || ""}
           onChange={(e) => setVal(e.target.value)}
         />

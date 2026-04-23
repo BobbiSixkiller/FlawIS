@@ -96,7 +96,7 @@ export default function BillingInput({
         <div className="relative mt-2">
           <div
             className={cn([
-              "flex gap-1 w-full rounded-md border-0 text-gray-900 ring-1 ring-gray-300 focus-within:ring-2 shadow-sm",
+              "flex gap-1 w-full rounded-md border-0 text-gray-900 ring-1 ring-gray-300 focus-within:ring-2 shadow-xs",
               "dark:bg-gray-800 dark:ring-gray-600 dark:text-white",
               error
                 ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
@@ -150,7 +150,7 @@ export default function BillingInput({
           >
             <ComboboxOptions
               className={cn([
-                "empty:invisible absolute mt-2 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none text-gray-900 sm:text-sm",
+                "empty:invisible absolute mt-2 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-hidden text-gray-900 sm:text-sm",
                 "dark:bg-gray-700 dark:text-white dark:ring-gray-700",
               ])}
             >

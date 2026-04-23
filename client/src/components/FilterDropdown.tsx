@@ -85,8 +85,8 @@ export default function FilterDropdown({
             transition
             anchor={anchor ?? { gap: 6, to: "bottom start" }}
             className={cn([
-              "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0",
-              "p-3 mx-4 sm:m-0 sm:w-96 flex flex-col gap-1 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto !max-h-56 text-gray-900 text-sm",
+              "origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
+              "p-3 mx-4 sm:m-0 sm:w-96 flex flex-col gap-2 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto max-h-56! text-gray-900 text-sm",
               "dark:bg-gray-800 dark:text-white dark:ring-gray-700",
             ])}
           >
@@ -96,38 +96,32 @@ export default function FilterDropdown({
 
               if (filter.type === "boolean") {
                 return (
-                  <div
+                  <Toggle
                     key={filter.queryKey}
-                    className="flex items-center justify-between"
-                  >
-                    {filter.label}
-                    <Toggle
-                      defaultChecked={
-                        searchParams.get(filter.queryKey) === "true"
-                      }
-                      handleToggle={() => toggleBoolean(filter.queryKey)}
-                    />
-                  </div>
+                    size="small"
+                    label={filter.label}
+                    defaultChecked={
+                      searchParams.get(filter.queryKey) === "true"
+                    }
+                    handleToggle={() => toggleBoolean(filter.queryKey)}
+                  />
                 );
               }
 
               if (filter.type === "multi" && filter.options) {
                 return (
-                  <div key={filter.queryKey} className="pt-2">
+                  <div key={filter.queryKey} className="pt-2 space-y-2">
                     <div className="font-bold text-base">{filter.label}</div>
                     {filter.options.map((opt) => (
-                      <div
+                      <Toggle
                         key={`${filter.queryKey}-${opt.value}`}
-                        className="flex items-center justify-between pt-2"
-                      >
-                        {opt.label}
-                        <Toggle
-                          defaultChecked={currentMulti.includes(opt.value)}
-                          handleToggle={() =>
-                            toggleMulti(filter.queryKey, opt.value)
-                          }
-                        />
-                      </div>
+                        label={opt.label}
+                        size="small"
+                        defaultChecked={currentMulti.includes(opt.value)}
+                        handleToggle={() =>
+                          toggleMulti(filter.queryKey, opt.value)
+                        }
+                      />
                     ))}
                   </div>
                 );
@@ -147,7 +141,7 @@ export default function FilterDropdown({
                               selectSingle(filter.queryKey, opt.value)
                             }
                             className={cn([
-                              "w-full text-left text-sm px-2 py-1 rounded",
+                              "w-full text-left text-sm px-2 py-1 rounded-sm",
                               isActive
                                 ? "bg-primary-500 text-white"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-600",

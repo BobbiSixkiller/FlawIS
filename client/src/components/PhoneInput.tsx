@@ -41,7 +41,7 @@ export default function PhoneInput({ label, name, control }: InputProps) {
       )}
       <div
         className={cn([
-          "border-none shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 rounded-md w-full flex mt-1 focus-within:ring-2",
+          "border-none shadow-xs ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 rounded-md w-full flex mt-1 focus-within:ring-2",
           "dark:bg-gray-800 dark:ring-gray-600",
           fieldState?.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"

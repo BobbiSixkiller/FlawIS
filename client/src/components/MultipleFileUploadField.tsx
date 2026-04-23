@@ -180,7 +180,7 @@ export default function MultipleFileUploadField({
             isDragReject: isDragReject || fieldState.error,
             ...(!loading ? { isFocused } : {}),
           },
-        )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-none`}
+        )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-hidden`}
       >
         <input name={name} id={name} disabled={loading} {...getInputProps()} />
 

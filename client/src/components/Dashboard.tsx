@@ -78,7 +78,7 @@ export default async function Dashboard({
           separator={<ChevronRightIcon className="h-3 w-3" />}
           activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="md:hidden p-4 flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
-          listClasses="outline-none focus:ring-2 focus:ring-primary-500"
+          listClasses="outline-hidden focus:ring-2 focus:ring-primary-500"
           capitalizeLinks
         />
 

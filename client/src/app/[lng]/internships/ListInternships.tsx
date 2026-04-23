@@ -27,19 +27,19 @@ interface InternshipData {
 
 const statusClasses = {
   [Status.Applied]: {
-    card: "border-primary-500 shadow shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
+    card: "border-primary-500 shadow-sm shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
     label: "text-primary-500",
   },
   [Status.Eligible]: {
-    card: "border-primary-500 shadow shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
+    card: "border-primary-500 shadow-sm shadow-primary-500 hover:shadow-lg hover:shadow-primary-500",
     label: "text-primary-500",
   },
   [Status.Accepted]: {
-    card: "border-green-500 shadow shadow-green-500 hover:shadow-lg hover:shadow-green-500",
+    card: "border-green-500 shadow-sm shadow-green-500 hover:shadow-lg hover:shadow-green-500",
     label: "text-green-500",
   },
   [Status.Rejected]: {
-    card: "border-red-500 shadow shadow-red-500 hover:shadow-lg hover:shadow-red-500",
+    card: "border-red-500 shadow-sm shadow-red-500 hover:shadow-lg hover:shadow-red-500",
     label: "text-red-500",
   },
 };
@@ -52,7 +52,7 @@ function ListItem({ data }: { data?: InternshipData }) {
   return (
     <Link
       className={cn([
-        "relative rounded-2xl border dark:border-gray-700 shadow hover:shadow-lg p-4 text-gray-900 dark:text-white text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white dark:bg-gray-700",
+        "relative rounded-2xl border dark:border-gray-700 shadow-sm hover:shadow-lg p-4 text-gray-900 dark:text-white text-sm cursor-pointer outline-hidden focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white dark:bg-gray-700",
         data?.myApplication && statusClasses[data?.myApplication?.status].card,
       ])}
       href={
@@ -87,17 +87,17 @@ function Container({ children }: { children: ReactNode }) {
 
 function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
   return (
-    <div ref={cardRef} className="rounded-2xl border p-4 shadow">
+    <div ref={cardRef} className="rounded-2xl border p-4 shadow-sm">
       <div className="animate-pulse flex space-x-4">
         <div className="rounded-full bg-slate-200 h-10 w-10"></div>
         <div className="flex-1 space-y-6 py-1">
-          <div className="h-2 bg-slate-200 rounded"></div>
+          <div className="h-2 bg-slate-200 rounded-sm"></div>
           <div className="space-y-3">
             <div className="grid grid-cols-3 gap-4">
-              <div className="h-2 bg-slate-200 rounded col-span-2"></div>
-              <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+              <div className="h-2 bg-slate-200 rounded-sm col-span-2"></div>
+              <div className="h-2 bg-slate-200 rounded-sm col-span-1"></div>
             </div>
-            <div className="h-2 bg-slate-200 rounded"></div>
+            <div className="h-2 bg-slate-200 rounded-sm"></div>
           </div>
         </div>
       </div>

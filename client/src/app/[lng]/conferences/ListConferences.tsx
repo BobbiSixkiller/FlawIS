@@ -41,7 +41,7 @@ function ListItem({ data }: { data?: ConferenceFragment }) {
   return (
     <Link
       className={cn([
-        "flex flex-col gap-1 justify-between rounded-2xl border p-4 shadow hover:shadow-lg text-gray-900 bg-white text-sm cursor-pointer focus:outline-primary-500",
+        "flex flex-col gap-1 justify-between rounded-2xl border p-4 shadow-sm hover:shadow-lg text-gray-900 bg-white text-sm cursor-pointer focus:outline-primary-500",
         "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
       ])}
       href={
@@ -86,12 +86,12 @@ function Container({ children }: { children: ReactNode }) {
 
 function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
   return (
-    <div ref={cardRef} className="rounded-2xl border p-4 shadow">
+    <div ref={cardRef} className="rounded-2xl border p-4 shadow-sm">
       <div className="animate-pulse flex flex-col space-y-4">
-        <div className="rounded bg-slate-200 h-28"></div>
+        <div className="rounded-sm bg-slate-200 h-28"></div>
         <div className="space-y-3">
-          <div className="h-2 bg-slate-200 rounded w-1/2"></div>
-          <div className="h-2 bg-slate-200 rounded"></div>
+          <div className="h-2 bg-slate-200 rounded-sm w-1/2"></div>
+          <div className="h-2 bg-slate-200 rounded-sm"></div>
         </div>
       </div>
     </div>

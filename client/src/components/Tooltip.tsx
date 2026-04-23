@@ -108,7 +108,7 @@ export default function Tooltip({
             ref={ref}
             className={cn([
               position === "above" ? "mb-1" : "mt-1",
-              "fixed z-[9999] transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg whitespace-pre-wrap break-words max-w-[calc(100vw-28px)]",
+              "fixed z-9999 transform -translate-x-1/2 transition-all ease-out duration-300 w-max p-2 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg whitespace-pre-wrap wrap-break-word max-w-[calc(100vw-28px)]",
             ])}
             style={{
               top: tooltipPosition.top,

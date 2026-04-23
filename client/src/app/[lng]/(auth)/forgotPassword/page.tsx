@@ -33,7 +33,7 @@ export default async function ForgotPassword({
                 key={"login"}
                 href="/login"
                 className={cn([
-                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
                   "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-950 dark:focus:ring-primary-300",
                 ])}
               />

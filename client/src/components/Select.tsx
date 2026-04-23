@@ -61,7 +61,7 @@ export default function Select({
         <ListboxButton
           {...field}
           className={cn([
-            "h-9 py-1 group flex items-center justify-between px-3 outline-none disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-sm rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
+            "h-9 py-1 group flex items-center justify-between px-3 outline-hidden disabled:bg-slate-50 disabled:ring-slate-200 disabled:shadow-none shadow-xs rounded-md w-full ring-1 ring-inset ring-gray-300 focus:ring-2 sm:text-sm/6",
             "dark:bg-gray-800 dark:ring-gray-600 dark:disabled:bg-gray-900 dark:disabled:ring-gray-700 dark:disabled:text-slate-500 dark:text-white/85",
             multiple ? "" : "py-1.5",
             fieldState.error
@@ -83,13 +83,13 @@ export default function Select({
               : placeholder}
           </span>
 
-          <ChevronDownIcon className="size-3 group-data-[open]:rotate-180 text-gray-300" />
+          <ChevronDownIcon className="size-3 group-data-open:rotate-180 text-gray-300" />
         </ListboxButton>
         <ListboxOptions
           anchor="bottom"
           transition
           className={cn([
-            "origin-top transition duration-200 ease-out data-[closed]:scale-95 data-[closed]:opacity-0 sm:text-sm/6 outline-none z-50 w-[var(--button-width)] [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300",
+            "origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0 sm:text-sm/6 outline-hidden z-50 w-(--button-width) [--anchor-gap:4px] sm:[--anchor-gap:8px] p-2 rounded-lg shadow-lg text-gray-900 bg-white ring-1 ring-gray-300",
             "dark:bg-gray-800 dark:text-white dark:ring-gray-800",
             fieldState.error ? "ring-red-500" : "",
           ])}
@@ -99,12 +99,12 @@ export default function Select({
               key={i}
               value={option}
               className={cn([
-                "data-[focus]:bg-primary-500 data-[focus]:text-white data-[selected]:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between",
-                "dark:data-[focus]:bg-primary-300",
+                "data-focus:bg-primary-500 data-focus:text-white data-selected:font-semibold cursor-pointer -mx-2 px-2 group flex gap-2 items-center justify-between",
+                "dark:data-focus:bg-primary-300",
               ])}
             >
               {option.name}
-              <CheckIcon className="size-3 stroke-2 hidden group-data-[selected]:block" />
+              <CheckIcon className="size-3 stroke-2 hidden group-data-selected:block" />
             </ListboxOption>
           ))}
         </ListboxOptions>
