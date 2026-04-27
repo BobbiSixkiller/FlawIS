@@ -80,19 +80,23 @@ export default async function CoursePage({
           <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
           Prihlasit sa
         </Button>
-      ) : null}
+      ) : (
+        <div className="text-center rounded-lg p-4 border border-orange-300 bg-orange-100 text-orange-500  dark:border-orange-500 dark:bg-orange-300 dark:text-orange-700">
+          Registrácia už skončila
+        </div>
+      )}
 
-      <Modal dialogId="delete-course-application" title="Zrusit registraciu">
+      <Modal dialogId="delete-course-application" title="Zrušiť registráciu">
         <ConfirmDeleteForm
           dialogId="delete-course-application"
-          text="Naozaj chcete zrusit Vasu registraciu?"
+          text="Naozaj chcete zrušiť Vašu registráciu?"
           action={async () => {
             "use server";
             return await deleteCourseAttendee({ id: course.attending?.id });
           }}
         />
       </Modal>
-      <Modal dialogId="course-application" title="Registracia na kurz">
+      <Modal dialogId="course-application" title="Registrácia na kurz">
         <CourseRegistrationForm course={course} dialogId="course-application" />
       </Modal>
     </div>
