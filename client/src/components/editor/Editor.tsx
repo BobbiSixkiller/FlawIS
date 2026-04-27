@@ -50,8 +50,8 @@ export default function TiptapEditor({
         class: cn([
           className,
           "prose prose-lg prose-headings:font-title font-default prose-a:no-underline",
-          compact ? "min-h-[2rem]" : "min-h-96",
-          "focus:outline-none p-3 shadow-sm text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
+          compact ? "min-h-8" : "min-h-96",
+          "focus:outline-hidden p-3 shadow-xs text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
           "dark:ring-gray-700 dark:bg-gray-800",
           fieldState.error
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"

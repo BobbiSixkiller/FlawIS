@@ -106,12 +106,12 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
         className={cn("gap-2 rounded-none border-none dark focus:ring-0")}
       >
         <span className="whitespace-nowrap text-sm">{t(activeItem.name)}</span>
-        <ChevronDownIcon className="size-4 group-data-[open]:rotate-180" />
+        <ChevronDownIcon className="size-4 group-data-open:rotate-180" />
       </PopoverButton>
       <PopoverPanel
         anchor="bottom start"
         className={
-          "z-50 w-48 rounded-md border bg-black border-black text-white shadow-md p-1 transition duration-200 ease-in-out [--anchor-gap:4px] sm:[--anchor-gap:8px] data-[closed]:-translate-y-1 data-[closed]:opacity-0"
+          "z-50 w-48 rounded-md border bg-black border-black text-white shadow-md p-1 transition duration-200 ease-in-out [--anchor-gap:4px] sm:[--anchor-gap:8px] data-closed:-translate-y-1 data-closed:opacity-0"
         }
       >
         {items.map((item, index) => (
@@ -120,10 +120,10 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
             onClick={() => {
               item.command(editor);
             }}
-            className="flex cursor-pointer hover:bg-white/30 items-center justify-between rounded-sm px-2 py-1 text-sm hover:bg-accent"
+            className="flex cursor-pointer hover:bg-white/30 items-center justify-between rounded-xs px-2 py-1 text-sm hover:bg-accent"
           >
             <div className="flex items-center space-x-2">
-              <div className="rounded-sm border p-1">
+              <div className="rounded-xs border p-1">
                 <item.icon className="h-5 w-5" />
               </div>
               <span>{t(item.name)}</span>

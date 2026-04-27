@@ -92,7 +92,7 @@ function AttendanceTableContainer({
         {/* Header row */}
         <div
           className={cn(
-            "sticky top-0 z-[19] grid grid-cols-[150px_auto] bg-gray-50 dark:bg-gray-800",
+            "sticky top-0 z-19 grid grid-cols-[150px_auto] bg-gray-50 dark:bg-gray-800",
             scrollState.vertical && "shadow-bottom",
           )}
         >
@@ -100,7 +100,7 @@ function AttendanceTableContainer({
           <div
             className={cn(
               "p-2 w-[150px] min-w-[150px] max-w-[150px] inline-flex items-center justify-center",
-              "sticky left-0 z-[19] text-nowrap bg-gray-50 dark:bg-gray-800 border-b border-r dark:border-gray-600 dark:text-white/85",
+              "sticky left-0 z-19 text-nowrap bg-gray-50 dark:bg-gray-800 border-b border-r dark:border-gray-600 dark:text-white/85",
               scrollState.horizontal &&
                 "shadow-[6px_0_8px_-4px_rgba(0,0,0,0.15)]",
             )}
@@ -387,10 +387,10 @@ const AttendancePlaceholder = ({
     ])}
   >
     <div className="animate-pulse">
-      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded w-1/3"></div>
+      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm w-1/3"></div>
     </div>
     <div className="animate-pulse">
-      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded w-1/3"></div>
+      <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm w-1/3"></div>
     </div>
   </div>
 );

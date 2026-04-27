@@ -35,11 +35,11 @@ export default async function LoginPage({
         subdomain === "localhost:3000") && (
         <div>
           <div className="relative flex py-6 items-center">
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-            <span className="flex-shrink mx-4 font-light text-sm dark:text-white/85">
+            <div className="grow border-t border-gray-300 dark:border-gray-600"></div>
+            <span className="shrink mx-4 font-light text-sm dark:text-white/85">
               {t("continue")}
             </span>
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div className="grow border-t border-gray-300 dark:border-gray-600"></div>
           </div>
 
           <div className="flex justify-center pt-4">
@@ -60,7 +60,7 @@ export default async function LoginPage({
                   url ? `?url=${encodeURIComponent(url)}` : ""
                 }`}
                 className={cn([
-                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
                   "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
                 ])}
               />

@@ -104,14 +104,14 @@ export default async function AuthLayout({
               <li className="hover:underline hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
                 <a
                   href="mailto:matus.muransky@flaw.uniba.sk"
-                  className="focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
+                  className="focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
                 >
                   {t("contact")}
                 </a>
               </li>
               <li className="hover:underline hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
                 <a
-                  className="focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
+                  className="focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
                   target="_blank"
                   href={
                     i18n.language === "sk"

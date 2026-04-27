@@ -70,7 +70,7 @@ export default function Modal({
       {/* Backdrop with built-in transition */}
       <DialogBackdrop
         transition
-        className="fixed inset-0 bg-black/25 data-[closed]:opacity-0 transition-opacity duration-300 ease-out"
+        className="fixed inset-0 bg-black/25 data-closed:opacity-0 transition-opacity duration-300 ease-out"
       />
 
       <div className="fixed inset-0 w-screen overflow-y-auto p-4">
@@ -82,7 +82,7 @@ export default function Modal({
             rounded-xl ring-1 ring-black/5
             bg-white dark:bg-gray-900 dark:text-white
             p-6 text-left align-middle shadow-2xl
-            transition duration-300 ease-out data-[closed]:opacity-0 data-[closed]:scale-95
+            transition duration-300 ease-out data-closed:opacity-0 data-closed:scale-95
           "
           >
             <div className="flex justify-between mb-6">

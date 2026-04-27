@@ -222,7 +222,7 @@ export default function GenericCombobox<
       <div ref={ref}>
         <div
           className={cn([
-            "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-sm sm:text-sm sm:leading-6",
+            "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-xs sm:text-sm sm:leading-6",
             "dark:bg-gray-800 dark:ring-gray-600 text-gray-900 dark:text-white",
             "ring-1 focus-within:ring-2",
             fieldState.error
@@ -301,14 +301,14 @@ export default function GenericCombobox<
           transition
           className={cn([
             "fixed mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
-            "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-none",
+            "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden",
             "dark:bg-gray-600 dark:text-white/85 dark:border-gray-700",
           ])}
         >
           {allowCreateNewOptions && text.length > 0 && (
             <ComboboxOption
               value={{ id: null, val: text } as unknown as TOption}
-              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 data-[focus]:text-white p-2 cursor-pointer"
+              className="data-focus:bg-primary-500 dark:data-focus:bg-primary-300 data-focus:text-white p-2 cursor-pointer"
             >
               {t("addOption", { value: text })}
             </ComboboxOption>
@@ -317,7 +317,7 @@ export default function GenericCombobox<
             <ComboboxOption
               key={i}
               value={opt}
-              className="data-[focus]:bg-primary-500 dark:data-[focus]:bg-primary-300 data-[focus]:text-white p-2 cursor-pointer"
+              className="data-focus:bg-primary-500 dark:data-focus:bg-primary-300 data-focus:text-white p-2 cursor-pointer"
             >
               {(props) => renderOption(opt, props)}
             </ComboboxOption>

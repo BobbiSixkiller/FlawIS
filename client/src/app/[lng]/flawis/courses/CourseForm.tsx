@@ -348,7 +348,7 @@ function CourseRegistrationFormBuilder({
             <div
               key={(f as any).id ?? index}
               className={cn([
-                "rounded-md shadow border p-4 space-y-4",
+                "rounded-md shadow-sm border p-4 space-y-4",
                 "dark:border-gray-800 border-2 dark:bg-gray-900",
               ])}
             >
@@ -402,7 +402,7 @@ function CourseRegistrationFormBuilder({
                   <Label className="text-sm font-medium">Type</Label>
                   <Select
                     className={cn(
-                      "w-fit focus:outline-none focus:ring-primary-500 py-1.5 h-9 mt-2 flex items-center rounded-md text-gray-900 shadow-sm ring-1 ring-inset focus-within:ring-2 border-none",
+                      "w-fit focus:outline-hidden focus:ring-primary-500 py-1.5 h-9 mt-2 flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
                       "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none dark:text-white/85 focus:ring-primary-300",
                     )}
                     value={type}

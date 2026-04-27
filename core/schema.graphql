@@ -140,6 +140,13 @@ enum AttendeeSortableField {
   NAME
 }
 
+type AvailableCategory {
+  count: Int!
+  id: ObjectId!
+  name: String!
+  slug: String!
+}
+
 """Billing information"""
 type Billing {
   DIC: String
@@ -300,6 +307,7 @@ type CourseAttendeeUserStub {
 }
 
 type CourseConnection {
+  availableCategories: [AvailableCategory!]!
   edges: [CourseEdge]!
   pageInfo: CoursePageInfo!
   totalCount: Int!

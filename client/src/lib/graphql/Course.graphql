@@ -109,8 +109,13 @@ fragment Category on Category {
   slug
 }
 
-query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
-  courses(after: $after, first: $first, sort: $sort) {
+query courses(
+  $after: String
+  $first: Int
+  $sort: [CourseSortInput]!
+  $filter: CourseFilterInput
+) {
+  courses(after: $after, first: $first, sort: $sort, filter: $filter) {
     totalCount
     edges {
       cursor
@@ -121,6 +126,12 @@ query courses($after: String, $first: Int, $sort: [CourseSortInput]!) {
     pageInfo {
       hasNextPage
       endCursor
+    }
+    availableCategories {
+      id
+      name
+      slug
+      count
     }
   }
 }

@@ -19,7 +19,7 @@ function Card<E extends ElementType = "div">(
   return (
     <Component
       className={cn(
-        "relative rounded-2xl border dark:border-none shadow hover:shadow-lg p-4 text-gray-900 text-sm cursor-pointer outline-none focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white",
+        "relative rounded-2xl border dark:border-none shadow-sm hover:shadow-lg p-4 text-gray-900 text-sm cursor-pointer outline-hidden focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white",
         "dark:bg-gray-800 dark:text-white/85 dark:focus:ring-primary-300 dark:focus-visible:ring-offset-gray-950",
         className
       )}

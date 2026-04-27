@@ -34,11 +34,11 @@ export default async function Register({
         (subdomain.includes("courses") && (
           <div>
             <div className="relative flex py-6 items-center">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <span className="flex-shrink mx-4 font-light text-sm">
+              <div className="grow border-t border-gray-300"></div>
+              <span className="shrink mx-4 font-light text-sm">
                 {t("continue")}
               </span>
-              <div className="flex-grow border-t border-gray-300"></div>
+              <div className="grow border-t border-gray-300"></div>
             </div>
 
             <div className="flex justify-center pt-4">
@@ -57,7 +57,7 @@ export default async function Register({
                 key={"login"}
                 href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
                 className={cn([
-                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
                   "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
                 ])}
               />

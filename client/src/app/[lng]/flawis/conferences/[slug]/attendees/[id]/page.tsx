@@ -76,7 +76,7 @@ export default async function AttendeePage({
             <div
               key={s.id}
               className={cn([
-                "rounded-2xl border p-4 shadow text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1",
+                "rounded-2xl border p-4 shadow-sm text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1",
                 "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
               ])}
             >
