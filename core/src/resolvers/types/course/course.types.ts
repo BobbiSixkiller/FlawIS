@@ -41,6 +41,7 @@ import { FormFieldInput } from "../form/form.types";
 
 export enum CourseSortableField {
   NAME = "name",
+  REGISTRATION_END = "registrationEnd",
   ID = "_id",
 }
 

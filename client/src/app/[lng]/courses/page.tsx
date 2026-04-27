@@ -3,7 +3,11 @@ import { translate } from "@/lib/i18n";
 import { getCourses } from "../flawis/courses/actions";
 import CourseList from "../flawis/courses/CourseList";
 import FilterDropdown from "@/components/FilterDropdown";
-import { CoursesQueryVariables } from "@/lib/graphql/generated/graphql";
+import {
+  CourseSortableField,
+  CoursesQueryVariables,
+  SortDirection,
+} from "@/lib/graphql/generated/graphql";
 
 export default async function CoursesPage({
   params,
@@ -24,7 +28,12 @@ export default async function CoursesPage({
     : [];
 
   const vars: CoursesQueryVariables = {
-    sort: [],
+    sort: [
+      {
+        field: CourseSortableField.RegistrationEnd,
+        direction: SortDirection.Desc,
+      },
+    ],
     filter: { categoryIds },
   };
 

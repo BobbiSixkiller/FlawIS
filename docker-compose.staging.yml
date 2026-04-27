@@ -134,10 +134,12 @@ services:
       - mongo_data_staging:/data/db
       - mongo_config_staging:/data/configdb
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongo/test --quiet
+      test: >
+        mongosh --host mongo --port 27017 --quiet
+        --eval 'db.hello().isWritablePrimary' | grep true
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 5
       start_period: 60s
     networks:
       - staging-network

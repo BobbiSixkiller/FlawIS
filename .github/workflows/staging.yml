@@ -5,92 +5,105 @@ on:
     branches:
       - staging
 
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
 jobs:
-  mongo:
+  deploy:
     runs-on: [HyperV]
     environment: staging
+    env:
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+      MINIO_USER: ${{ secrets.MINIO_USER }}
+      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+      MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+      SECRET: ${{ secrets.SECRET }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USER: ${{ secrets.MAIL_USER }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_FROM: ${{ vars.MAIL_FROM }}
+      RMQ_URI: ${{ vars.RMQ_URI }}
+      RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
+      REDIS_URI: ${{ vars.REDIS_URI }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Copy MongoDB data from production
+      - name: Show Docker disk usage before cleanup
         run: |
-          echo "Dumping production MongoDB (only flawis db)..."
-          docker exec flawis-mongo-1 sh -c 'mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
-          docker cp flawis-mongo-1:/data/backup ./backup
+          df -h
+          docker system df
 
-      - name: Remove old staging containers
+      - name: Bounded Docker cleanup
+        run: |
+          docker container prune -f
+          docker image prune -af --filter "until=168h"
+          docker builder prune -af --filter "until=168h" --keep-storage 10GB
+          docker network prune -f
+        continue-on-error: true
+
+      - name: Check disk space after cleanup
+        run: |
+          MIN_AVAILABLE_KB=$((20 * 1024 * 1024))
+          AVAILABLE_KB=$(df --output=avail / | tail -1)
+
+          if [ "$AVAILABLE_KB" -lt "$MIN_AVAILABLE_KB" ]; then
+            echo "Not enough free disk space. Need at least 20G free."
+            df -h
+            docker system df
+            exit 1
+          fi
+
+      - name: Install MinIO client
+        run: |
+          mkdir -p "$HOME/bin"
+          if [ ! -x "$HOME/bin/mc" ]; then
+            wget https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x mc
+            mv mc "$HOME/bin"
+          fi
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Dump production MongoDB
+        run: |
+          rm -rf ./backup
+          docker exec flawis-mongo-1 sh -c 'rm -rf /data/backup && mongodump --uri="mongodb://localhost:27017/flawis" --out=/data/backup'
+          docker cp flawis-mongo-1:/data/backup ./backup
+          docker exec flawis-mongo-1 rm -rf /data/backup
+
+      - name: Stop staging containers
         run: docker compose -f docker-compose.staging.yml -p flawis-staging down
 
-      - name: Start staging MongoDB
-        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d mongo
+      - name: Start staging data services
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d mongo minio
 
-      - name: Wait for MongoDB to be healthy
+      - name: Wait for MongoDB
         run: |
           MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
           echo "Waiting for MongoDB to become healthy..."
-          until [ "$(docker inspect -f '{{.State.Health.Status}}' $MONGO_CONTAINER)" == "healthy" ]; do
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' "$MONGO_CONTAINER")" = "healthy" ]; do
             echo "MongoDB not healthy yet..."
             sleep 2
           done
           echo "MongoDB is healthy: $MONGO_CONTAINER"
 
-      - name: Initialize replica set if needed
-        run: |
-          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
-          echo "Checking/initializing replica set..."
-          docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval '
-            try {
-              rs.status();
-              print("Replica set already initialized")
-            } catch (e) {
-              print("Initializing replica set...");
-              rs.initiate({_id: "rs0", members: [{ _id: 0, host: "mongo:27017" }]});
-            }
-          '
-
-      - name: Wait for MongoDB primary
-        run: |
-          MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
-          echo "Waiting for MongoDB to become primary..."
-          until docker exec $MONGO_CONTAINER mongosh --host mongo --port 27017 --quiet --eval "db.isMaster().ismaster" | grep -q true; do
-            echo "MongoDB not primary yet..."
-            sleep 2
-          done
-          echo "MongoDB is primary."
-
       - name: Restore MongoDB backup
         run: |
           MONGO_CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -q mongo)
-          echo "Ensuring /data/backup exists in staging container..."
-          docker exec $MONGO_CONTAINER mkdir -p /data/backup
-          echo "Copying backup into staging container..."
-          docker cp ./backup/flawis $MONGO_CONTAINER:/data/backup/flawis
-          echo "Restoring MongoDB backup..."
-          docker exec $MONGO_CONTAINER sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
-          echo "MongoDB restore complete."
-
-  minio:
-    runs-on: [HyperV]
-    environment: staging
-    env:
-      MINIO_USER: ${{ secrets.MINIO_USER }}
-      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
-    steps:
-      - name: Install MinIO client
-        run: |
-          if ! command -v mc &> /dev/null; then
-            wget https://dl.min.io/client/mc/release/linux-amd64/mc
-            chmod +x mc
-            mkdir -p $HOME/bin
-            mv mc $HOME/bin
-            echo "$HOME/bin" >> $GITHUB_PATH
-          fi
-
-      - name: Start staging MinIO
-        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d minio
+          docker exec "$MONGO_CONTAINER" mkdir -p /data/backup
+          docker cp ./backup/flawis "$MONGO_CONTAINER":/data/backup/flawis
+          docker exec "$MONGO_CONTAINER" sh -c 'mongorestore --drop --db flawis --uri="mongodb://mongo:27017" /data/backup/flawis'
+          docker exec "$MONGO_CONTAINER" rm -rf /data/backup
+          rm -rf ./backup
 
       - name: Wait for MinIO
         run: |
@@ -101,62 +114,33 @@ jobs:
           done
           echo "Staging MinIO is ready."
 
-      - name: Sync data from production to staging
+      - name: Sync MinIO data
         run: |
-          mc alias set production http://localhost:9000 $MINIO_USER $MINIO_PASSWORD
-          mc alias set staging http://localhost:9100 $MINIO_USER $MINIO_PASSWORD
+          mc alias set production http://localhost:9000 "$MINIO_USER" "$MINIO_PASSWORD"
+          mc alias set staging http://localhost:9100 "$MINIO_USER" "$MINIO_PASSWORD"
           mc mirror production/ staging/
-          echo "MinIO sync completed."
-
-      - name: Make buckets public (images, avatars)
-        run: |
           mc anonymous set download staging/images
           mc anonymous set download staging/avatars
-          echo "Buckets 'images' and 'avatars' are now public in staging."
 
-  deploy:
-    runs-on: [HyperV]
-    needs: [mongo, minio]
-    environment: staging
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Stop old staging containers
-        run: docker compose -f docker-compose.staging.yml -p flawis-staging down
-
-      - name: Clean old images, networks, build cache
+      - name: Check disk space before build
         run: |
-          docker container prune -f
-          docker image prune -a -f
-          docker network prune -f
-          docker builder prune -a -f
-        continue-on-error: true
+          MIN_AVAILABLE_KB=$((20 * 1024 * 1024))
+          AVAILABLE_KB=$(df --output=avail / | tail -1)
 
-      - name: Build and deploy staging services
-        env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_USER: ${{ secrets.MINIO_USER }}
-          MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
-          MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
-          SECRET: ${{ secrets.SECRET }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_USER: ${{ secrets.MAIL_USER }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ vars.MAIL_FROM }}
-          RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
-          REDIS_URI: ${{ vars.REDIS_URI }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d --build
+          if [ "$AVAILABLE_KB" -lt "$MIN_AVAILABLE_KB" ]; then
+            echo "Not enough free disk space. Need at least 20G free."
+            df -h
+            docker system df
+            exit 1
+          fi
+
+      - name: Build staging images
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging build --parallel
+
+      - name: Start staging services
+        run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d --no-build
+
+      - name: Show Docker disk usage after deploy
+        run: |
+          df -h
+          docker system df

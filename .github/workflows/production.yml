@@ -5,48 +5,73 @@ on:
     branches:
       - master
 
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: [HyperV]
     environment: production
+    env:
+      MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+      MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+      MINIO_USER: ${{ secrets.MINIO_USER }}
+      MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
+      MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
+      SECRET: ${{ secrets.SECRET }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USER: ${{ secrets.MAIL_USER }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      MAIL_FROM: ${{ vars.MAIL_FROM }}
+      RMQ_URI: ${{ vars.RMQ_URI }}
+      RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      - name: Show Docker disk usage before cleanup
+        run: |
+          df -h
+          docker system df
 
-      - name: Stop and remove old production containers
-        run: docker compose -f docker-compose.prod.yml down
-
-      - name: Clean old images, networks, build cache
+      - name: Bounded Docker cleanup
         run: |
           docker container prune -f
-          docker image prune -a -f
+          docker image prune -af --filter "until=168h"
+          docker builder prune -af --filter "until=168h" --keep-storage 10GB
           docker network prune -f
-          docker builder prune -a -f
         continue-on-error: true
 
-      - name: Build and deploy production services
-        env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          MINIO_USER: ${{ secrets.MINIO_USER }}
-          MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
-          MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
-          SECRET: ${{ secrets.SECRET }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_USER: ${{ secrets.MAIL_USER }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ vars.MAIL_FROM }}
-          RMQ_URI: ${{ vars.RMQ_URI }}
-          RMQ_EXCHANGE: ${{ vars.RMQ_EXCHANGE}}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
-        run: docker compose -f docker-compose.prod.yml up -d --build
+      - name: Check disk space after cleanup
+        run: |
+          MIN_AVAILABLE_KB=$((20 * 1024 * 1024))
+          AVAILABLE_KB=$(df --output=avail / | tail -1)
+
+          if [ "$AVAILABLE_KB" -lt "$MIN_AVAILABLE_KB" ]; then
+            echo "Not enough free disk space. Need at least 20G free."
+            df -h
+            docker system df
+            exit 1
+          fi
+
+      - name: Build production images
+        run: docker compose -f docker-compose.prod.yml build --parallel
+
+      - name: Stop production containers
+        run: docker compose -f docker-compose.prod.yml down
+
+      - name: Start production services
+        run: docker compose -f docker-compose.prod.yml up -d --no-build
+
+      - name: Show Docker disk usage after deploy
+        run: |
+          df -h
+          docker system df

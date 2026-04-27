@@ -436,7 +436,8 @@ export type CourseSortInput = {
 /** Sortable enum definition for courses query */
 export enum CourseSortableField {
   Id = 'ID',
-  Name = 'NAME'
+  Name = 'NAME',
+  RegistrationEnd = 'REGISTRATION_END'
 }
 
 export type DatesInput = {

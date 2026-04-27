@@ -384,6 +384,7 @@ input CourseSortInput {
 enum CourseSortableField {
   ID
   NAME
+  REGISTRATION_END
 }
 
 """

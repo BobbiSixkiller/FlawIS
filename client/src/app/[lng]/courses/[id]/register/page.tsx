@@ -12,7 +12,7 @@ export default async function RegisterPage({
   if (!course) {
     return notFound();
   }
-  if (course && course.attending) {
+  if (course.attending || new Date(course.registrationEnd) < new Date()) {
     return redirect(`/${id}`);
   }
 
