@@ -31,7 +31,7 @@ export default function Toggle({
   const [enabled, setEnabled] = useState(defaultChecked);
 
   return (
-    <Field as="div" className="flex gap-2 items-center space-between">
+    <Field as="div" className="w-full flex gap-2 items-center space-between">
       {label && <Label>{label}</Label>}
       <Switch
         disabled={disabled}
