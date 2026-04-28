@@ -38,7 +38,25 @@ import { EmailService } from './email.service';
                 // Extract translation parameters, such as organization
                 const params = args?.hash || {};
 
-                return i18n.translate(key, { lang, args: params });
+                try {
+                  const count = Number(params.count);
+                  const pluralKey = Number.isFinite(count)
+                    ? `${key}.${
+                        count === 0 ? 'zero' : count === 1 ? 'one' : 'other'
+                      }`
+                    : undefined;
+
+                  return i18n.translate(pluralKey || key, {
+                    lang,
+                    args: params,
+                  });
+                } catch (error) {
+                  console.error(
+                    `Failed to translate email template key "${key}"`,
+                    error,
+                  );
+                  return key;
+                }
               },
               SUM: (a, b) => a + b,
               DATE: (date, locale) => {
