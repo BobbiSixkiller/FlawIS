@@ -40,6 +40,7 @@ export default async function AttendeesPage({
         <ExportButton fetchUrl={`/export?type=attendees&slug=${slug}`} />
 
         <FilterDropdown
+          anchor={{ gap: 6, to: "bottom" }}
           filters={[
             {
               label: "Pasivny ucastnici",
