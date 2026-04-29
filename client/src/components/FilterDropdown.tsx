@@ -9,8 +9,9 @@ import {
 import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/utils/helpers";
-import Button from "@/components/Button";
+import Button, { ButtonProps } from "@/components/Button";
 import Toggle from "@/components/Toggle";
+import { Fragment } from "react";
 
 type FilterConfig = {
   label: string;
@@ -22,9 +23,13 @@ type FilterConfig = {
 export default function FilterDropdown({
   filters,
   anchor,
+  className,
+  buttonSize = "sm",
 }: {
   filters: FilterConfig[];
   anchor?: PopoverPanelProps["anchor"];
+  className?: string;
+  buttonSize?: ButtonProps["size"];
 }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -70,10 +75,14 @@ export default function FilterDropdown({
   }
 
   return (
-    <Popover>
+    <Popover as={Fragment}>
       {({ open }) => (
         <>
-          <PopoverButton as={Button} size="small" className="p-2">
+          <PopoverButton
+            as={Button}
+            size={buttonSize}
+            className={cn(["p-2", className])}
+          >
             {open ? (
               <XMarkIcon className="size-5" />
             ) : (
@@ -83,7 +92,7 @@ export default function FilterDropdown({
 
           <PopoverPanel
             transition
-            anchor={anchor ?? { gap: 6, to: "bottom start" }}
+            anchor={anchor ?? { gap: 6, to: "bottom" }}
             className={cn([
               "origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
               "p-3 mx-4 sm:m-0 sm:max-w-96! flex flex-col gap-2 rounded-lg shadow-lg ring-1 ring-black/5 bg-white overflow-auto max-h-56! text-gray-900 text-sm",

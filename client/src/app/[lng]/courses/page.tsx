@@ -41,10 +41,11 @@ export default async function CoursesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-center gap-6">
+      <div className="flex justify-center relative">
         <h1 className="text-3xl font-bold leading-7 text-center">Kurzy</h1>
         <FilterDropdown
-          anchor={{ gap: 6, to: "bottom" }}
+          className="fixed sm:absolute bottom-12 right-12 z-50 sm:right-0 sm:top-0 sm:bottom-auto"
+          anchor={{ gap: 6, to: "bottom end" }}
           filters={[
             {
               label: "Kategórie",
