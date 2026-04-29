@@ -21,7 +21,7 @@ export default async function CoursesPage({
 
   const { t, i18n } = await translate(lng, "dashboard");
 
-  const categoryIds = queryParams?.category
+  const categorySlugs = queryParams?.category
     ? Array.isArray(queryParams.category)
       ? queryParams.category
       : [queryParams.category]
@@ -34,7 +34,7 @@ export default async function CoursesPage({
         direction: SortDirection.Desc,
       },
     ],
-    filter: { categoryIds },
+    filter: { categorySlugs },
   };
 
   const initialData = await getCourses(vars);
@@ -52,7 +52,7 @@ export default async function CoursesPage({
               queryKey: "category",
               options: initialData.availableCategories.map((c) => ({
                 label: `${c.name} (${c.count})`,
-                value: String(c.id),
+                value: c.slug,
               })),
             },
           ]}

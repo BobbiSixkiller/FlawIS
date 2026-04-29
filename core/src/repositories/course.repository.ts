@@ -43,18 +43,36 @@ export class CourseRepository extends Repository<typeof Course> {
       cursorFilter = buildCursorFilter(sortFields, cursorValues);
     }
 
-    const categoryMatch = filter?.categoryIds?.length
-      ? { categories: { $in: filter.categoryIds } }
+    const categorySlugs = filter?.categorySlugs?.filter(Boolean) ?? [];
+    const categoryLookupStages = categorySlugs.length
+      ? [
+          {
+            $lookup: {
+              from: "categories",
+              localField: "categories",
+              foreignField: "_id",
+              as: "matchedCategories",
+            },
+          },
+        ]
+      : [];
+    const categoryCleanupStages = categorySlugs.length
+      ? [{ $project: { matchedCategories: 0 } }]
+      : [];
+    const categoryMatch = categorySlugs.length
+      ? { "matchedCategories.slug": { $in: categorySlugs } }
       : {};
 
     const [connection] = await this.aggregate<CourseConnection>([
       { $sort: mongoSort },
+      ...categoryLookupStages,
       {
         $facet: {
           data: [
             { $match: { ...categoryMatch, ...cursorFilter } },
             { $limit: first },
             { $addFields: { id: "$_id" } },
+            ...categoryCleanupStages,
           ],
           hasNextPage: [
             { $match: { ...categoryMatch, ...cursorFilter } },

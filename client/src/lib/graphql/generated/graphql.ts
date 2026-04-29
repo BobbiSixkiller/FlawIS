@@ -371,7 +371,7 @@ export type CourseEdge = {
 };
 
 export type CourseFilterInput = {
-  categoryIds?: Array<InputMaybe<Scalars['ObjectId']['input']>>;
+  categorySlugs?: Array<InputMaybe<Scalars['String']['input']>>;
 };
 
 export type CourseInput = {
