@@ -11,7 +11,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/utils/helpers";
 import Button, { ButtonProps } from "@/components/Button";
 import Toggle from "@/components/Toggle";
-import { Fragment } from "react";
 
 type FilterConfig = {
   label: string;
@@ -24,11 +23,13 @@ export default function FilterDropdown({
   filters,
   anchor,
   className,
+  wrapperClassName,
   buttonSize = "sm",
 }: {
   filters: FilterConfig[];
   anchor?: PopoverPanelProps["anchor"];
   className?: string;
+  wrapperClassName?: string;
   buttonSize?: ButtonProps["size"];
 }) {
   const searchParams = useSearchParams();
@@ -75,7 +76,7 @@ export default function FilterDropdown({
   }
 
   return (
-    <Popover as={Fragment}>
+    <Popover as="div" className={cn("inline-flex", wrapperClassName)}>
       {({ open }) => (
         <>
           <PopoverButton

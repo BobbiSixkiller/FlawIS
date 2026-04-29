@@ -40,27 +40,31 @@ export default async function CoursesPage({
   const initialData = await getCourses(vars);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex justify-center relative">
+    <div className="grid grid-cols-[1fr_auto] gap-y-6">
+      <div className="col-span-full row-start-1 flex items-center justify-center">
         <h1 className="text-3xl font-bold leading-7 text-center">Kurzy</h1>
-        <FilterDropdown
-          className="fixed sm:absolute bottom-12 right-12 z-50 sm:right-0 sm:top-0 sm:bottom-auto"
-          anchor={{ gap: 6, to: "bottom end" }}
-          filters={[
-            {
-              label: "Kategórie",
-              type: "multi",
-              queryKey: "category",
-              options: initialData.availableCategories.map((c) => ({
-                label: `${c.name} (${c.count})`,
-                value: c.slug,
-              })),
-            },
-          ]}
-        />
       </div>
 
-      <CourseList initialData={initialData} vars={vars} />
+      <FilterDropdown
+        wrapperClassName="fixed bottom-6 right-6 z-50 sm:sticky sm:top-4 sm:bottom-auto sm:right-auto sm:col-start-2 sm:row-start-1 sm:z-30 sm:justify-self-end sm:self-start"
+        className="p-2"
+        anchor={{ gap: 6, to: "bottom end" }}
+        filters={[
+          {
+            label: "Kategórie",
+            type: "multi",
+            queryKey: "category",
+            options: initialData.availableCategories.map((c) => ({
+              label: `${c.name} (${c.count})`,
+              value: c.slug,
+            })),
+          },
+        ]}
+      />
+
+      <div className="col-span-full row-start-2">
+        <CourseList initialData={initialData} vars={vars} />
+      </div>
     </div>
   );
 }
