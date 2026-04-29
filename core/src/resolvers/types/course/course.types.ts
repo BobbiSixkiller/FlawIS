@@ -52,8 +52,8 @@ registerEnumType(CourseSortableField, {
 
 @InputType()
 export class CourseFilterInput {
-  @Field(() => [ObjectId], { nullable: "items", defaultValue: [] })
-  categoryIds: ObjectId[];
+  @Field(() => [String], { nullable: "items", defaultValue: [] })
+  categorySlugs: string[];
 }
 
 @ArgsType()

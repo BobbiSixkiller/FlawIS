@@ -21,7 +21,7 @@ export default async function CoursesPage({
 
   const { t, i18n } = await translate(lng, "dashboard");
 
-  const categoryIds = queryParams?.category
+  const categorySlugs = queryParams?.category
     ? Array.isArray(queryParams.category)
       ? queryParams.category
       : [queryParams.category]
@@ -34,17 +34,18 @@ export default async function CoursesPage({
         direction: SortDirection.Desc,
       },
     ],
-    filter: { categoryIds },
+    filter: { categorySlugs },
   };
 
   const initialData = await getCourses(vars);
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-center gap-6">
+      <div className="flex justify-center relative">
         <h1 className="text-3xl font-bold leading-7 text-center">Kurzy</h1>
         <FilterDropdown
-          anchor={{ gap: 6, to: "bottom" }}
+          className="fixed sm:absolute bottom-12 right-12 z-50 sm:right-0 sm:top-0 sm:bottom-auto"
+          anchor={{ gap: 6, to: "bottom end" }}
           filters={[
             {
               label: "Kategórie",
@@ -52,7 +53,7 @@ export default async function CoursesPage({
               queryKey: "category",
               options: initialData.availableCategories.map((c) => ({
                 label: `${c.name} (${c.count})`,
-                value: String(c.id),
+                value: c.slug,
               })),
             },
           ]}

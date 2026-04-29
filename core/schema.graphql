@@ -319,7 +319,7 @@ type CourseEdge {
 }
 
 input CourseFilterInput {
-  categoryIds: [ObjectId]! = []
+  categorySlugs: [String]! = []
 }
 
 input CourseInput {
