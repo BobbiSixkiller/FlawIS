@@ -7,7 +7,7 @@ type ExportParams = Record<string, string | undefined>;
 type ExportFetcher = (params: ExportParams) => Promise<Record<string, any>[]>;
 
 export const csvExportRegistry: Record<string, ExportFetcher> = {
-  attendees: async ({ lng, slug }) => {
+  conferenceAttendees: async ({ lng, slug }) => {
     if (!lng || !slug) throw new Error("lng and slug are required");
 
     const allAttendees: any[] = [];

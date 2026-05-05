@@ -1,9 +1,9 @@
 {
   "heading": "Vytvoriť účet",
-  "name": "First and last name",
+  "name": "First and last name (no titles, Slovak Latin alphabet)",
   "email": "Email address",
   "phone": "Phone number",
-  "org": "Organization",
+  "org": "Organization (full institution name)",
   "password": "Password",
   "confirmPass": "Repeat password",
   "privacy": "I agree with the <privacy>privacy policy</privacy>",

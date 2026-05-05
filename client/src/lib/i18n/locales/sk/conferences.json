@@ -18,6 +18,7 @@
     "submission": {
       "lng": "Jazyk, v ktorom bude účastník prezentovať svoj príspevok",
       "info": "Príspevok",
+      "notice": "Údaje, ktoré vpíšete do registračného systému budú automaticky generované aj do programu konferencie a do certifikátov o účasti. Názov príspevku v slovenskom a anglickom jazyku nezadávať do systému všetko veľkým písmom.",
       "section": "Sekcia",
       "name": "Názov príspevku",
       "abstract": "Abstrakt",

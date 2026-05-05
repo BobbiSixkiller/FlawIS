@@ -1,9 +1,9 @@
 {
   "heading": "Vytvoriť nový účet",
-  "name": "Meno a priezvisko - bez titulov a s diakritikou",
+  "name": "Meno a priezvisko (bez titulov, slovenská latinka s diakritikou)",
   "email": "Email adresa",
   "phone": "Telefónne číslo",
-  "org": "Organizácia",
+  "org": "Organizácia (celý názov inštitúcie)",
   "password": "Heslo",
   "confirmPass": "Zopakujte heslo",
   "privacy": "Súhlasím s <privacy>podmienkami ochrany súkromia</privacy>",

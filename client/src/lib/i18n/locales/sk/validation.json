@@ -1,6 +1,9 @@
 {
   "required": "Povinné pole!",
   "email": "Nesprávny formát email adresy!",
+  "nameFormat": "Zadajte meno a priezvisko slovenskou latinkou s diakritikou.",
+  "nameTitles": "Meno a priezvisko zadajte bez titulov.",
+  "organizationFullName": "Vyplňte celý názov inštitúcie!",
   "password": "Heslo musí mať minimálne osem znakov, aspoň jedno písmeno a jedno číslo!",
   "confirmPass": "Heslá sa nezhodujú!",
   "privacy": "Musíte súhlasiť s pravidlami zachovania súkromia!",

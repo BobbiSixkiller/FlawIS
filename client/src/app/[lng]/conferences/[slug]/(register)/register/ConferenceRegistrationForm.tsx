@@ -213,6 +213,12 @@ export default function ConferenceRegistrationForm({
         >
           {(methods) => (
             <>
+              <div
+                role="note"
+                className="rounded-md border border-primary-500 bg-primary-100 p-4 text-sm text-gray-900 dark:bg-primary-800 dark:text-white/85"
+              >
+                {t("registration.submission.notice", { ns: "conferences" })}
+              </div>
               <Select
                 control={methods.control}
                 disabled={submission !== undefined}
