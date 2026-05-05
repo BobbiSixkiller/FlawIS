@@ -37,7 +37,9 @@ export default async function AttendeesPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 items-center">
-        <ExportButton fetchUrl={`/export?type=attendees&slug=${slug}`} />
+        <ExportButton
+          fetchUrl={`/export?type=conferenceAttendees&slug=${slug}`}
+        />
 
         <FilterDropdown
           anchor={{ gap: 6, to: "bottom" }}

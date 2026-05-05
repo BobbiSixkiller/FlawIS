@@ -18,6 +18,7 @@
     "submission": {
       "lng": "Language the attendee will be presenting his submission in",
       "info": "Submission",
+      "notice": "The data you enter into the registration system will also be automatically generated into the conference programme and certificates of attendance. Do not enter the submission title in Slovak and English entirely in uppercase letters.",
       "section": "Section",
       "name": "Submission name",
       "abstract": "Abstract",
