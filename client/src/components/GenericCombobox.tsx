@@ -15,7 +15,6 @@ import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
 import { cn, handleAPIErrors } from "@/utils/helpers";
-import useWidth from "@/hooks/useWidth";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -73,9 +72,8 @@ export default function GenericCombobox<
   ...props
 }: GenericComboboxProps<TOption, TValue>) {
   const { lng: uiLng } = useParams<{ lng: string }>();
-  const ref = useRef<HTMLDivElement>(null);
-  const width = useWidth();
-  const [boxRect, setBoxRect] = useState<DOMRect>();
+  const inputRowRef = useRef<HTMLDivElement>(null);
+  const [optionsWidth, setOptionsWidth] = useState<number>();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<TOption[]>(defaultOptions);
@@ -130,26 +128,32 @@ export default function GenericCombobox<
     getOrFilterOptions();
   }, [text, fetchOptions, defaultOptions, getOptionLabel]);
 
-  // Track combobox width
+  // Match the dropdown width to the input/button row while Headless UI handles positioning.
   useEffect(() => {
-    function updateRect() {
-      if (ref.current) {
-        setBoxRect(ref.current.getBoundingClientRect());
-      }
+    const inputRow = inputRowRef.current;
+    if (!inputRow) return;
+
+    function updateWidth() {
+      setOptionsWidth(inputRow.getBoundingClientRect().width);
     }
 
-    updateRect();
+    updateWidth();
 
-    document
-      .querySelector("#modal-scroll-container")
-      ?.addEventListener("scroll", updateRect, { passive: true });
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateWidth);
+
+      return () => {
+        window.removeEventListener("resize", updateWidth);
+      };
+    }
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(inputRow);
 
     return () => {
-      document
-        .querySelector("#modal-scroll-container")
-        ?.removeEventListener("scroll", updateRect);
+      observer.disconnect();
     };
-  }, [width, field.value]);
+  }, []);
 
   async function handleChange(newValue: TOption | TOption[] | null) {
     if (Array.isArray(newValue)) {
@@ -219,7 +223,7 @@ export default function GenericCombobox<
 
   function renderComboboxContent() {
     return (
-      <div ref={ref}>
+      <div>
         <div
           className={cn([
             "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-xs sm:text-sm sm:leading-6",
@@ -262,7 +266,7 @@ export default function GenericCombobox<
               </div>
             ))}
 
-          <div className="flex flex-1">
+          <div ref={inputRowRef} className="flex flex-1">
             <ComboboxInput
               placeholder={placeholder}
               onChange={(e) => debounced(e.target.value)}
@@ -293,15 +297,14 @@ export default function GenericCombobox<
         </div>
 
         <ComboboxOptions
+          anchor="bottom"
           style={{
-            width: boxRect?.width,
-            left: boxRect?.left,
-            top: Number(boxRect?.top) + Number(boxRect?.height),
+            width: optionsWidth,
           }}
           transition
           className={cn([
-            "fixed mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
-            "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden",
+            "border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0 [--anchor-gap:8px]",
+            "z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden",
             "dark:bg-gray-600 dark:text-white/85 dark:border-gray-700",
           ])}
         >
