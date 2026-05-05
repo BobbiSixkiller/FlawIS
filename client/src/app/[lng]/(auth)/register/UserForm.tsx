@@ -37,6 +37,16 @@ import RHFormContainer from "@/components/RHFormContainer";
 import { deleteFiles } from "@/lib/minio";
 import { useFormContext } from "react-hook-form";
 
+const SLOVAK_NAME_LETTERS =
+  "A-Za-zÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽáäčďéíĺľňóôŕšťúýž";
+const SLOVAK_NAME_PART =
+  `[${SLOVAK_NAME_LETTERS}]+(?:-[${SLOVAK_NAME_LETTERS}]+)*`;
+const SLOVAK_FULL_NAME_PATTERN = new RegExp(
+  `^${SLOVAK_NAME_PART}(?:\\s+${SLOVAK_NAME_PART})+$`,
+);
+const TITLE_PATTERN =
+  /(?:^|\s)(?:Bc|Mgr|Ing|JUDr|MUDr|MVDr|MDDr|PhDr|RNDr|PaedDr|PharmDr|ThDr|ThLic|doc|prof|Dr|PhD|ArtD|CSc|DrSc|MBA|LL\.?M|MSc|MA|BA)\.?(?=\s|$|,)/i;
+
 export default function UserForm({
   user,
   subdomain,
@@ -84,7 +94,23 @@ export default function UserForm({
         files: [],
       }}
       yupSchema={yup.object({
-        name: yup.string().trim().required(),
+        name: yup
+          .string()
+          .transform((value) =>
+            typeof value === "string"
+              ? value.replace(/\s+/g, " ").trim()
+              : value,
+          )
+          .required()
+          .test(
+            "without-titles",
+            t("nameTitles", { ns: "validation" }),
+            (value) => !value || !TITLE_PATTERN.test(value),
+          )
+          .matches(SLOVAK_FULL_NAME_PATTERN, {
+            message: t("nameFormat", { ns: "validation" }),
+            excludeEmptyString: true,
+          }),
         email: yup
           .string()
           .required()
@@ -153,7 +179,15 @@ export default function UserForm({
                 country: yup.string().trim().required(),
               }),
           }),
-        organization: yup.string().trim().required(),
+        organization: yup
+          .string()
+          .transform((value) =>
+            typeof value === "string"
+              ? value.replace(/\s+/g, " ").trim()
+              : value,
+          )
+          .required(t("organizationFullName", { ns: "validation" }))
+          .min(3, t("organizationFullName", { ns: "validation" })),
         telephone: yup
           .string()
           .trim()
@@ -238,14 +272,14 @@ export default function UserForm({
                   email: val.email,
                   name: val.name,
                   password: val.password as string,
-                  organization: val.organization ? val.organization : undefined,
+                  organization: val.organization,
                   telephone: val.telephone ? val.telephone : undefined,
                 });
               } else if (user) {
                 res = await updateUser(user.id, {
                   email: val.email,
                   name: val.name,
-                  organization: val.organization ? val.organization : undefined,
+                  organization: val.organization,
                   access: val.access,
                   password: val.password ? val.password : undefined,
                   telephone: val.telephone ? val.telephone : null,
