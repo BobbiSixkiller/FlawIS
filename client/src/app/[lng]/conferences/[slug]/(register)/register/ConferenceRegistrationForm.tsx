@@ -126,7 +126,7 @@ export default function ConferenceRegistrationForm({
         })}
       >
         {(methods) => (
-          <>
+          <div className="space-y-6">
             <BillingInput billings={billings} methods={methods} />
             <Input
               label={t("registration.billing.street", { ns: "conferences" })}
@@ -156,7 +156,7 @@ export default function ConferenceRegistrationForm({
               label={t("registration.billing.ICDPH", { ns: "conferences" })}
               name="billing.ICDPH"
             />
-          </>
+          </div>
         )}
       </WizzardStep>
       <WizzardStep
@@ -212,7 +212,7 @@ export default function ConferenceRegistrationForm({
           })}
         >
           {(methods) => (
-            <>
+            <div className="space-y-6">
               <div
                 role="note"
                 className="rounded-md border border-primary-500 bg-primary-100 p-4 text-sm text-gray-900 dark:bg-primary-800 dark:text-white/85"
@@ -292,7 +292,7 @@ export default function ConferenceRegistrationForm({
                 renderOption={(opt, props) => <span>{opt.val}</span>}
                 getOptionValue={(opt) => opt?.val ?? ""}
               />
-            </>
+            </div>
           )}
         </WizzardStep>
       )}

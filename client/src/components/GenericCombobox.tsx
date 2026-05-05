@@ -9,13 +9,12 @@ import {
   Field,
   Label,
 } from "@headlessui/react";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
 import { cn, handleAPIErrors } from "@/utils/helpers";
-import useWidth from "@/hooks/useWidth";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -73,9 +72,6 @@ export default function GenericCombobox<
   ...props
 }: GenericComboboxProps<TOption, TValue>) {
   const { lng: uiLng } = useParams<{ lng: string }>();
-  const ref = useRef<HTMLDivElement>(null);
-  const width = useWidth();
-  const [boxRect, setBoxRect] = useState<DOMRect>();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<TOption[]>(defaultOptions);
@@ -129,27 +125,6 @@ export default function GenericCombobox<
     }
     getOrFilterOptions();
   }, [text, fetchOptions, defaultOptions, getOptionLabel]);
-
-  // Track combobox width
-  useEffect(() => {
-    function updateRect() {
-      if (ref.current) {
-        setBoxRect(ref.current.getBoundingClientRect());
-      }
-    }
-
-    updateRect();
-
-    document
-      .querySelector("#modal-scroll-container")
-      ?.addEventListener("scroll", updateRect, { passive: true });
-
-    return () => {
-      document
-        .querySelector("#modal-scroll-container")
-        ?.removeEventListener("scroll", updateRect);
-    };
-  }, [width, field.value]);
 
   async function handleChange(newValue: TOption | TOption[] | null) {
     if (Array.isArray(newValue)) {
@@ -219,7 +194,7 @@ export default function GenericCombobox<
 
   function renderComboboxContent() {
     return (
-      <div ref={ref}>
+      <div className="relative">
         <div
           className={cn([
             "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-xs sm:text-sm sm:leading-6",
@@ -293,15 +268,10 @@ export default function GenericCombobox<
         </div>
 
         <ComboboxOptions
-          style={{
-            width: boxRect?.width,
-            left: boxRect?.left,
-            top: Number(boxRect?.top) + Number(boxRect?.height),
-          }}
           transition
           className={cn([
-            "fixed mt-2 border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
-            "top-0 z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden",
+            "absolute left-0 top-full mt-2 w-full border transition origin-top duration-200 ease-out empty:invisible data-closed:scale-95 data-closed:opacity-0",
+            "z-50 overflow-auto max-h-40 empty:invisible rounded-md bg-white text-gray-900 shadow-lg ring-1 ring-black/5 focus:outline-hidden",
             "dark:bg-gray-600 dark:text-white/85 dark:border-gray-700",
           ])}
         >
