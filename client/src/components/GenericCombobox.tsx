@@ -130,8 +130,9 @@ export default function GenericCombobox<
 
   // Match the dropdown width to the input/button row while Headless UI handles positioning.
   useEffect(() => {
-    const inputRow = inputRowRef.current;
-    if (!inputRow) return;
+    if (!inputRowRef.current) return;
+
+    const inputRow: HTMLDivElement = inputRowRef.current;
 
     function updateWidth() {
       setOptionsWidth(inputRow.getBoundingClientRect().width);
