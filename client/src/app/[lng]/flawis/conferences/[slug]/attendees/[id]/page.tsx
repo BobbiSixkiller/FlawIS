@@ -17,6 +17,10 @@ import Modal from "@/components/Modal";
 import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import { getConference } from "@/app/[lng]/flawis/conferences/actions";
+import SubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/SubmissionForm";
+import { translate } from "@/lib/i18n";
+import Tooltip from "@/components/Tooltip";
 
 export default async function AttendeePage({
   params,
@@ -28,11 +32,14 @@ export default async function AttendeePage({
   if (!attendee) {
     redirect(`/conferences/${slug}/attendees`);
   }
+  const { t } = await translate(lng, "conferences");
+  const conference = await getConference(slug);
 
   const deleteDialogId = "delete-attendee";
   const impersonateDialogId = "imperonate-attendee";
   const deleteAuthorDialogId = "delete-author";
   const updateInvoiceDialogId = "update-invoice";
+  const updateSubmissionDialogId = "update-submission";
 
   return (
     <div className="flex flex-col gap-4">
@@ -80,14 +87,32 @@ export default async function AttendeePage({
                 "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
               ])}
             >
-              <h2 className="font-medium leading-6">
-                {capitalizeFirstLetter(s.translations[lng as "sk" | "en"].name)}
-              </h2>
-              <p className="leading-none text-gray-500">
-                {s.section.translations[lng as "sk" | "en"].name}
-                <br />
-                {s.id}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h2 className="font-medium leading-6">
+                    {capitalizeFirstLetter(
+                      s.translations[lng as "sk" | "en"].name
+                    )}
+                  </h2>
+                  <p className="leading-none text-gray-500">
+                    {s.section.translations[lng as "sk" | "en"].name}
+                    <br />
+                    {s.id}
+                  </p>
+                </div>
+
+                <Tooltip message={t("editSubmission")} position="below">
+                  <ModalTrigger dialogId={`${updateSubmissionDialogId}-${s.id}`}>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label={t("editSubmission")}
+                    >
+                      <PencilIcon className="w-5 h-5" />
+                    </Button>
+                  </ModalTrigger>
+                </Tooltip>
+              </div>
               <ul className="mt-2 flex gap-1">
                 {s.authors.map((a) => (
                   <li key={a.id} className="flex gap-1">
@@ -120,6 +145,19 @@ export default async function AttendeePage({
               {attendee.ticket.withSubmission && !s.fileUrl && (
                 <p className="text-orange-500">Neodovzdal prispevok</p>
               )}
+
+              <Modal
+                dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                title={t("submission.update")}
+              >
+                <SubmissionForm
+                  dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                  lng={lng}
+                  submission={s}
+                  conference={conference}
+                  attendeeId={attendee.id}
+                />
+              </Modal>
             </div>
           ))}
         </div>

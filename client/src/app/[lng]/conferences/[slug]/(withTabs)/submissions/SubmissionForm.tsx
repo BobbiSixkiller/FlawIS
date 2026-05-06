@@ -27,11 +27,13 @@ export default function SubmissionForm({
   conference,
   lng,
   dialogId,
+  attendeeId,
 }: {
   lng: string;
   submission?: SubmissionFragment;
   conference: Pick<ConferenceQuery["conference"], "id" | "slug" | "sections">;
   dialogId: string;
+  attendeeId?: string;
 }) {
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
@@ -110,10 +112,13 @@ export default function SubmissionForm({
 
             let res;
             if (submission) {
-              res = await updateSubmission({
-                id: submission?.id,
-                data: { ...omit(vals, "files"), fileUrl: url },
-              });
+              res = await updateSubmission(
+                {
+                  id: submission.id,
+                  data: { ...omit(vals, "files"), fileUrl: url },
+                },
+                attendeeId
+              );
             } else {
               res = await createSubmission({
                 data: { ...omit(vals, "files"), fileUrl: url },

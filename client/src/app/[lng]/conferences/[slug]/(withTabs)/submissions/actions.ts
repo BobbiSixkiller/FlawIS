@@ -55,7 +55,8 @@ export async function createSubmission(
 }
 
 export async function updateSubmission(
-  vars: UpdateSubmissionMutationVariables
+  vars: UpdateSubmissionMutationVariables,
+  attendeeId?: string
 ) {
   return await executeGqlMutation(
     UpdateSubmissionDocument,
@@ -67,6 +68,7 @@ export async function updateSubmission(
     {
       revalidateTags: (data) => [
         `conferences:${data.updateSubmission.data.conference.slug}`,
+        ...(attendeeId ? [`attendees:${attendeeId}`] : []),
       ],
     }
   );
