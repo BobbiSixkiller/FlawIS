@@ -100,11 +100,15 @@ export default function SubmissionForm({
           className="space-y-6 w-80 sm:w-96"
           onSubmit={methods.handleSubmit(async (vals) => {
             console.log(vals.files);
+            const selectedSection = conference.sections.find(
+              (section) => section.id === vals.section,
+            );
+
             const { error, url } = await uploadOrDelete(
               conference.slug,
               submission?.fileUrl,
               vals.files[0],
-              submission?.section.translations.sk.name
+              selectedSection?.translations.sk.name,
             );
             if (error) {
               return methods.setError("files", { message: error });
@@ -117,7 +121,7 @@ export default function SubmissionForm({
                   id: submission.id,
                   data: { ...omit(vals, "files"), fileUrl: url },
                 },
-                attendeeId
+                attendeeId,
               );
             } else {
               res = await createSubmission({
