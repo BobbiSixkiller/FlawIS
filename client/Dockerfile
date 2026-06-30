@@ -12,6 +12,7 @@ RUN npm cache clean --force && \
 
 # Copy source code and build
 COPY . .
+ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 RUN npm run build
 
 # Production Stage
