@@ -194,13 +194,13 @@ export function getAcademicYear(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth();
 
-  // Academic year starts in September but consider summer months for creating internships
-  // or applying for internships for next academic year
-  const startYear = month >= 6 ? year : year - 1;
+  // Academic year starts in September, but internships switch to the next
+  // academic year from June so organizations can prepare listings early.
+  const startYear = month >= 5 ? year : year - 1;
   const endYear = startYear + 1;
 
-  const startDate = new Date(`${startYear}-07-01T00:00:00Z`);
-  const endDate = new Date(`${endYear}-06-30T23:59:59Z`);
+  const startDate = new Date(`${startYear}-06-01T00:00:00Z`);
+  const endDate = new Date(`${endYear}-05-31T23:59:59Z`);
 
   const academicYear = `${startYear}/${endYear}`;
 
