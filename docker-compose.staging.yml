@@ -40,6 +40,7 @@ services:
       dockerfile: Dockerfile
     environment:
       API_URI: http://core:5000/graphql
+      REACH_WEBHOOK_UPSTREAM_URL: http://core:5000/integrations/reach/webhooks
       MINIO_ACCESS_KEY: ${MINIO_USER}
       MINIO_SECRET_KEY: ${MINIO_PASSWORD}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}

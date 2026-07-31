@@ -34,6 +34,8 @@ services:
     command: npm run dev
     env_file:
       - ./.env
+    environment:
+      REACH_WEBHOOK_UPSTREAM_URL: http://core:5000/integrations/reach/webhooks
     depends_on:
       - core
     volumes:

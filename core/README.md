@@ -14,12 +14,15 @@ REACH_WEBHOOK_SECRET=
 Use `https://api.reach360.com` for a US Reach tenant. Generate the API key in
 Reach under **Manage → Settings → Manage API Keys**.
 
-Create a Reach webhook for the `user.created` event whose target is:
+The Next.js application exposes the public webhook target:
 
 ```text
-https://<core-host>/integrations/reach/webhooks
+https://<frontend-host>/api/integrations/reach/webhooks
 ```
 
-Set its `sharedSecret` to the same value as `REACH_WEBHOOK_SECRET`. Course
-configuration requires the published Reach course ID and the learner-facing
-direct link copied from the Reach **Learn** tab.
+It forwards the raw request body and signature to the internal core endpoint at
+`/integrations/reach/webhooks`. Create a Reach webhook for the `user.created`
+event and set its `sharedSecret` to the same value as
+`REACH_WEBHOOK_SECRET`. Course configuration requires the published Reach
+course ID and the learner-facing direct link copied from the Reach **Learn**
+tab.
