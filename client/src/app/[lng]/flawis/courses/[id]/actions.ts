@@ -3,6 +3,8 @@
 import {
   CourseDocument,
   CourseQueryVariables,
+  CourseReachConfigDocument,
+  CourseReachConfigQueryVariables,
   CreateCourseAttendeeDocument,
   CreateCourseAttendeeMutationVariables,
   CreateCourseSessionDocument,
@@ -33,6 +35,23 @@ export async function getCourse(vars: CourseQueryVariables) {
   return res.data?.course;
 }
 
+export async function getCourseReachConfig(
+  vars: CourseReachConfigQueryVariables,
+) {
+  const res = await executeGqlFetch(
+    CourseReachConfigDocument,
+    vars,
+    undefined,
+    {
+      tags: [`courses:${vars.courseId}:reach-config`],
+    },
+  );
+  if (res.errors) {
+    console.log(res.errors[0].message);
+  }
+  return res.data?.courseReachConfig ?? null;
+}
+
 export async function updateCouse(vars: UpdateCourseMutationVariables) {
   return await executeGqlMutation(
     UpdateCourseDocument,
@@ -44,6 +63,7 @@ export async function updateCouse(vars: UpdateCourseMutationVariables) {
     {
       revalidateTags: (data) => [
         `courses:${data.updateCourse.data.id}`,
+        `courses:${data.updateCourse.data.id}:reach-config`,
         "courses",
       ],
     }

@@ -8,7 +8,11 @@ import {
   Resolver,
   Root,
 } from "type-graphql";
-import { CourseAttendee, CourseAttendeeUserStub } from "../../entitites/Course";
+import {
+  CourseAttendee,
+  CourseAttendeeUserStub,
+  ElearningProvisioningStatus,
+} from "../../entitites/Course";
 import { Service } from "typedi";
 import { CourseAttendeeService } from "../../services/courses/courseAttendee.service";
 import { ObjectId } from "mongodb";
@@ -99,6 +103,34 @@ export class CourseAttendeeResolver {
     const attendee = await this.courseAttendeeService.deleteAttendee(id, user!);
 
     return { message: "Ucastnik kurzu bol vymazaný!", data: attendee };
+  }
+
+  @Authorized([Access.Admin])
+  @Mutation(() => CourseAttendeeMutationResponse)
+  async syncCourseElearningAccess(@Arg("attendeeId") attendeeId: ObjectId) {
+    const attendee =
+      await this.courseAttendeeService.syncElearningAccess(attendeeId);
+    if (
+      attendee.reachEnrollment?.status ===
+      ElearningProvisioningStatus.SyncFailed
+    ) {
+      throw new Error("Synchronizácia s Reach 360 zlyhala.");
+    }
+    return {
+      message: "Prístup k e-learningu bol synchronizovaný.",
+      data: attendee,
+    };
+  }
+
+  @FieldResolver(() => ElearningProvisioningStatus, { nullable: true })
+  elearningStatus(@Root() { reachEnrollment }: CourseAttendee) {
+    return reachEnrollment?.status ?? null;
+  }
+
+  @Authorized([Access.Admin])
+  @FieldResolver(() => String, { nullable: true })
+  elearningErrorCode(@Root() { reachEnrollment }: CourseAttendee) {
+    return reachEnrollment?.lastErrorCode ?? null;
   }
 
   @FieldResolver(() => CourseAttendeeUserStub)

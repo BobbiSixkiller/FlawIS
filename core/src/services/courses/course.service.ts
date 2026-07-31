@@ -17,6 +17,29 @@ import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repo
 import { Status } from "../../entitites/Internship";
 import { CtxUser } from "../../util/types";
 import { FormService } from "../form.service";
+import { Reach360Service } from "../reach360.service";
+
+function reachConfigChanged(
+  current:
+    | {
+        courseId: string;
+        launchUrl: string;
+      }
+    | null
+    | undefined,
+  next:
+    | {
+        courseId: string;
+        launchUrl: string;
+      }
+    | null
+    | undefined,
+) {
+  return (
+    current?.courseId !== next?.courseId ||
+    current?.launchUrl !== next?.launchUrl
+  );
+}
 
 @Service()
 export class CourseService {
@@ -29,6 +52,7 @@ export class CourseService {
     ),
     private readonly formService: FormService,
     private readonly i18nService: I18nService,
+    private readonly reach360Service: Reach360Service,
   ) {}
 
   async getCourse(id: ObjectId) {
@@ -53,9 +77,19 @@ export class CourseService {
     return await this.courseRepository.paginatedCourses(args);
   }
 
-  async createCourse({ formFields, ...data }: CourseInput) {
+  async createCourse({ formFields, reachCourse, ...data }: CourseInput) {
+    if (reachCourse) {
+      await this.reach360Service.validateCourse(reachCourse.courseId);
+    }
+
     return withOptionalTransaction(undefined, async (session) => {
-      const course = await this.courseRepository.create(data, { session });
+      const course = await this.courseRepository.create(
+        {
+          ...data,
+          ...(reachCourse ? { reachCourse } : {}),
+        },
+        { session },
+      );
       await course.populate("categories");
       const registrationForm = await this.formService.createForm(
         formFields,
@@ -67,11 +101,45 @@ export class CourseService {
     });
   }
 
-  async updateCourse(id: ObjectId, { formFields, ...data }: CourseInput) {
+  async updateCourse(
+    id: ObjectId,
+    { formFields, reachCourse, ...data }: CourseInput,
+  ) {
+    const current = await this.courseRepository.findOne({ _id: id });
+    if (!current) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "course" }),
+      );
+    }
+
+    const didReachConfigChange = reachConfigChanged(
+      current.reachCourse,
+      reachCourse,
+    );
+    if (didReachConfigChange) {
+      const acceptedAttendee = await this.courseAttendeeRepository.exists({
+        course: id,
+        status: Status.Accepted,
+      });
+      if (acceptedAttendee) {
+        throw new Error(
+          "Reach 360 configuration cannot be changed after attendees have been accepted.",
+        );
+      }
+      if (reachCourse) {
+        await this.reach360Service.validateCourse(reachCourse.courseId);
+      }
+    }
+
     return withOptionalTransaction(undefined, async (session) => {
       const updated = await this.courseRepository.findOneAndUpdate(
         { _id: id },
-        { $set: data },
+        {
+          $set: {
+            ...data,
+            reachCourse: reachCourse ?? null,
+          },
+        },
         { session, new: true },
       );
       if (!updated) {

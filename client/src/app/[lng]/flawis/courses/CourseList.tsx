@@ -33,6 +33,11 @@ function ListItem({ data }: { data?: CourseFragment }) {
       <h2 className="font-medium leading-6">{data?.name}</h2>
 
       <div className="flex flex-wrap gap-1 mt-1">
+        {data?.hasElearning && (
+          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-900 dark:text-green-300">
+            E-learning
+          </span>
+        )}
         {data?.categories.map((cat) => (
           <span
             key={String(cat.id)}

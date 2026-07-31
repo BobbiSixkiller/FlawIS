@@ -1,5 +1,5 @@
 overwrite: true
-schema: "http://localhost:5001/graphql"
+schema: "../core/schema.graphql"
 documents: "**/*.{gql,graphql}"
 generates:
   src/lib/graphql/generated/:

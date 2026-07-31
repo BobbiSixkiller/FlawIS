@@ -93,6 +93,9 @@ export class User extends TimeStamps {
   @Property({ default: false })
   verified: boolean;
 
+  @Property()
+  reachUserId?: string;
+
   @Field()
   createdAt: Date;
   @Field()

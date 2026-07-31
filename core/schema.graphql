@@ -254,7 +254,9 @@ type Course {
 
   """String representation of HTML describing the course"""
   description: String!
+  elearningAccess: ElearningAccess
   end: DateTimeISO!
+  hasElearning: Boolean!
   id: ObjectId!
   isPaid: Boolean!
   maxAttendees: Int!
@@ -273,6 +275,8 @@ type CourseAttendee {
   application: FormSubmission!
   course: ObjectId!
   createdAt: DateTimeISO!
+  elearningErrorCode: String
+  elearningStatus: ElearningProvisioningStatus
   grade: String
   id: ObjectId!
   invoice: Invoice
@@ -333,6 +337,7 @@ input CourseInput {
   maxAttendees: Int!
   name: String!
   price: Int!
+  reachCourse: ReachCourseConfigInput
   registrationEnd: DateTimeISO!
   start: DateTimeISO!
   thumbnail: String
@@ -397,6 +402,19 @@ input DatesInput {
   regEnd: DateTimeISO
   start: DateTimeISO!
   submissionDeadline: DateTimeISO
+}
+
+type ElearningAccess {
+  launchUrl: String
+  status: ElearningProvisioningStatus!
+}
+
+"""Current synchronization state of a Reach 360 enrollment."""
+enum ElearningProvisioningStatus {
+  Enrolled
+  PendingInvitation
+  Revoked
+  SyncFailed
 }
 
 """Supported registration form field types"""
@@ -708,6 +726,7 @@ type Mutation {
   register(data: RegisterUserInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
+  syncCourseElearningAccess(attendeeId: ObjectId!): CourseAttendeeMutationResponse!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateAttendanceHours(hoursAttended: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
   updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
@@ -760,6 +779,7 @@ type Query {
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!
   courseAttendee(id: ObjectId!): CourseAttendee!
+  courseReachConfig(courseId: ObjectId!): ReachCourseConfig
   courses(after: String, filter: CourseFilterInput, first: Int! = 20, sort: [CourseSortInput]!): CourseConnection!
   forgotPassword(email: String!): String!
   intern(id: ObjectId!): Intern!
@@ -773,6 +793,16 @@ type Query {
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
   users(after: String, filter: UserFilterInput, first: Int! = 20, sort: [UserSortInput]!): UserConnection!
+}
+
+type ReachCourseConfig {
+  courseId: String!
+  launchUrl: String!
+}
+
+input ReachCourseConfigInput {
+  courseId: String!
+  launchUrl: String!
 }
 
 """New user input data"""

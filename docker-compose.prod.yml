@@ -15,6 +15,9 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      REACH_API_BASE_URL: ${REACH_API_BASE_URL:-https://api.reach360.eu}
+      REACH_API_KEY: ${REACH_API_KEY:?REACH_API_KEY is required}
+      REACH_WEBHOOK_SECRET: ${REACH_WEBHOOK_SECRET:?REACH_WEBHOOK_SECRET is required}
     depends_on:
       minio:
         condition: service_healthy

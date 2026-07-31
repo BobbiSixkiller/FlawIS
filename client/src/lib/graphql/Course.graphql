@@ -20,6 +20,7 @@ fragment Course on Course {
     ...FlawBilling
   }
   isPaid
+  hasElearning
   attending {
     ...CourseAttendee
   }
@@ -78,6 +79,7 @@ fragment CourseAttendee on CourseAttendee {
   }
   course
   status
+  elearningStatus
   application {
     ...FormSubmission
   }
@@ -92,6 +94,8 @@ fragment Attendance on Attendance {
       name
     }
     status
+    elearningStatus
+    elearningErrorCode
     application {
       ...FormSubmission
     }
@@ -139,6 +143,17 @@ query courses(
 query course($id: ObjectId!) {
   course(id: $id) {
     ...Course
+    elearningAccess {
+      status
+      launchUrl
+    }
+  }
+}
+
+query courseReachConfig($courseId: ObjectId!) {
+  courseReachConfig(courseId: $courseId) {
+    courseId
+    launchUrl
   }
 }
 
@@ -262,6 +277,15 @@ mutation deleteCourseAttendee($id: ObjectId!) {
 
 mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
   changeCourseAttendeeStatus(id: $id, status: $status) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation syncCourseElearningAccess($attendeeId: ObjectId!) {
+  syncCourseElearningAccess(attendeeId: $attendeeId) {
     message
     data {
       ...CourseAttendee

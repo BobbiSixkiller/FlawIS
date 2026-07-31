@@ -35,6 +35,7 @@ import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolve
 import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resolver";
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
 import { CategoryResolver } from "./resolvers/courses/category.resolver";
+import { registerReach360Webhook } from "./routes/reach360Webhook";
 
 env.config();
 
@@ -114,6 +115,7 @@ async function main() {
     }),
   );
   app.use(cookieParser());
+  registerReach360Webhook(app);
   app.use(
     "/graphql",
     Express.json(),

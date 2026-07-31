@@ -14,12 +14,15 @@ import { CtxUser } from "../../util/types";
 import { Access } from "../../entitites/User";
 import { MinioService } from "../minio.service";
 import { Repository } from "../../repositories/base.repository";
-import { AttendanceRecord } from "../../entitites/Course";
+import {
+  AttendanceRecord,
+  ElearningProvisioningStatus,
+} from "../../entitites/Course";
 import { RmqService, RoutingKey } from "../rmq.service";
 import { FormSubmissionInput } from "../../resolvers/types/form/form.types";
 import { FormService } from "../form.service";
 import { FieldType } from "../../entitites/Form";
-import { application } from "express";
+import { Reach360Service } from "../reach360.service";
 
 @Service()
 export class CourseAttendeeService {
@@ -35,6 +38,7 @@ export class CourseAttendeeService {
     private readonly minioService: MinioService,
     private readonly rmqService: RmqService,
     private readonly formService: FormService,
+    private readonly reach360Service: Reach360Service,
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
@@ -208,6 +212,8 @@ export class CourseAttendeeService {
     const session = await mongoose.startSession();
     session.startTransaction();
 
+    let shouldSyncElearning = false;
+
     try {
       const attendee = await this.courseAttendeeRepository.findOneAndUpdate(
         { _id: attendeeId },
@@ -227,6 +233,8 @@ export class CourseAttendeeService {
       if (!course) {
         throw new Error("Course not found!");
       }
+      shouldSyncElearning =
+        status === Status.Accepted || Boolean(attendee.reachEnrollment);
 
       await this.rmqService.produceMessage(
         JSON.stringify({
@@ -242,16 +250,46 @@ export class CourseAttendeeService {
 
       await session.commitTransaction();
 
-      return toDTO(attendee);
     } catch (error) {
       await session.abortTransaction();
       throw error;
     } finally {
       session.endSession();
     }
+
+    const attendee = shouldSyncElearning
+      ? await this.reach360Service.syncAttendee(attendeeId)
+      : await this.courseAttendeeRepository.findOne({ _id: attendeeId });
+    if (!attendee) {
+      throw new Error("Attendee not found!");
+    }
+    return toDTO(attendee);
   }
 
   async deleteAttendee(id: ObjectId, user: CtxUser) {
+    const existing = await this.courseAttendeeRepository.findOne({ _id: id });
+    if (!existing) {
+      throw new Error("Attendee not found!");
+    }
+    if (
+      existing.user.id.toString() !== user.id.toString() &&
+      !user.access.includes(Access.Admin)
+    ) {
+      throw new Error("Not allowed!");
+    }
+
+    if (existing.reachEnrollment) {
+      const synced = await this.reach360Service.syncAttendee(id, false);
+      if (
+        synced.reachEnrollment?.status ===
+        ElearningProvisioningStatus.SyncFailed
+      ) {
+        throw new Error(
+          "Reach 360 access could not be revoked. Retry before deleting the attendee.",
+        );
+      }
+    }
+
     return withOptionalTransaction(undefined, async (session) => {
       const attendee = await this.courseAttendeeRepository.findOneAndDelete(
         { _id: id },
@@ -260,13 +298,6 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
-      if (
-        attendee.user.id.toString() !== user.id.toString() &&
-        !user.access.includes(Access.Admin)
-      ) {
-        throw new Error("Not allowed!");
-      }
-
       const [_, __, form] = await Promise.all([
         this.courseRepository.findOneAndUpdate(
           { _id: attendee.course },
@@ -293,5 +324,10 @@ export class CourseAttendeeService {
 
       return toDTO(attendee);
     });
+  }
+
+  async syncElearningAccess(attendeeId: ObjectId) {
+    const attendee = await this.reach360Service.syncAttendee(attendeeId);
+    return toDTO(attendee);
   }
 }

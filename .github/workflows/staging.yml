@@ -31,6 +31,9 @@ jobs:
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       GOOGLE_REDIRECT_URI: ${{ vars.GOOGLE_REDIRECT_URI }}
+      REACH_API_BASE_URL: ${{ vars.REACH_API_BASE_URL || 'https://api.reach360.eu' }}
+      REACH_API_KEY: ${{ secrets.REACH_API_KEY }}
+      REACH_WEBHOOK_SECRET: ${{ secrets.REACH_WEBHOOK_SECRET }}
 
     steps:
       - name: Checkout code
