@@ -2,7 +2,14 @@
 
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { Transition } from "@headlessui/react";
-import { ComponentType, Fragment, useEffect, useRef, useState } from "react";
+import {
+  ComponentType,
+  Fragment,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { get } from "lodash";
 import { InputProps } from "./Input";
 import { Control } from "react-hook-form";
@@ -60,6 +67,6 @@ export function withLocalizedInput<T extends ComponentType<any>>(
   }
 
   // 🔑 Critical: Preserve generics from the wrapped component
-  return Wrapper as unknown as (<U extends any[]>(...args: U) => JSX.Element) &
+  return Wrapper as unknown as (<U extends any[]>(...args: U) => ReactElement) &
     T;
 }

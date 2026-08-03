@@ -21,7 +21,7 @@ export default function ScrollWrapper({
     setScroll(id, () => ref.current?.scrollTo({ top: 0, behavior: "smooth" }));
 
     return () => clearScroll(id);
-  }, [id]);
+  }, [clearScroll, id, setScroll]);
 
   return (
     <div ref={ref} className={cn(["overflow-auto h-full w-full", className])}>

@@ -68,26 +68,19 @@ export default function Tooltip({
     const overflowRight = rect.right > viewportWidth;
     const overflowLeft = rect.left < 0;
 
-    let newLeft = tooltipPosition.left;
-    let newTop =
-      rect.height > 40 && position === "above"
-        ? tooltipPosition.top - (rect.height - 40 + 4)
-        : tooltipPosition.top;
-
-    if (overflowRight) {
-      newLeft -= rect.right - viewportWidth + margin;
-    } else if (overflowLeft) {
-      newLeft += Math.abs(rect.left) + margin;
-    } else {
-      newLeft -= 10;
-    }
-
     setTooltipPosition((prev) => ({
       ...prev,
-      top: newTop,
-      left: newLeft,
+      top:
+        rect.height > 40 && position === "above"
+          ? prev.top - (rect.height - 40 + 4)
+          : prev.top,
+      left: overflowRight
+        ? prev.left - (rect.right - viewportWidth + margin)
+        : overflowLeft
+          ? prev.left + Math.abs(rect.left) + margin
+          : prev.left - 10,
     }));
-  }, [visible, ref, viewportWidth]);
+  }, [position, viewportWidth, visible]);
 
   return (
     <div

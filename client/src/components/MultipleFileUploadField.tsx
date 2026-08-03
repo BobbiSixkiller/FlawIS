@@ -67,20 +67,31 @@ export default function MultipleFileUploadField({
   const [files, setFiles] = useState<UploadableFile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  function syncFormField(shouldValidate: boolean, files: File[]) {
-    setValue(name, files, { shouldValidate });
-  }
+  const syncFormField = useCallback(
+    (shouldValidate: boolean, nextFiles: File[]) => {
+      setValue(name, nextFiles, { shouldValidate });
+    },
+    [name, setValue],
+  );
+
+  const serializedFileSources = JSON.stringify(fileSources);
 
   useEffect(() => {
     async function prefillFiles() {
-      if (!fileSources) {
+      const currentFileSources = serializedFileSources
+        ? (JSON.parse(serializedFileSources) as NonNullable<
+            typeof fileSources
+          >)
+        : undefined;
+
+      if (!currentFileSources) {
         return setLoading(false);
       }
 
       const loadedFiles: UploadableFile[] = [];
 
       await Promise.all(
-        Object.entries(fileSources).map(async ([bucket, urls]) => {
+        Object.entries(currentFileSources).map(async ([bucket, urls]) => {
           if (!urls) return;
 
           const urlsArray = Array.isArray(urls) ? urls : [urls];
@@ -106,8 +117,8 @@ export default function MultipleFileUploadField({
       setLoading(false);
     }
 
-    prefillFiles();
-  }, [JSON.stringify(fileSources)]);
+    void prefillFiles();
+  }, [name, serializedFileSources, setError, syncFormField]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {

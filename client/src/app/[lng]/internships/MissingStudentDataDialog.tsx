@@ -33,7 +33,7 @@ export default function MissingStudentDataDialog({
     } else {
       closeDialog(dialogId);
     }
-  }, [user]);
+  }, [closeDialog, openDialog, user]);
 
   return (
     <Modal title={t("heading")} dialogId={dialogId} togglerHidden>

@@ -67,6 +67,7 @@ export default async function InvoiceDoc({
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image is not an HTML image. */}
           <Image
             src={data.conference.translations[lng as "sk" | "en"].logoUrl}
             style={{ maxHeight: "100px", maxWidth: "300px" }}
@@ -297,6 +298,7 @@ export default async function InvoiceDoc({
         </View>
         <Text style={{ textAlign: "center" }}>{data.invoice.body.body}</Text>
         <Text style={{ textAlign: "center" }}>{data.invoice.body.comment}</Text>
+        {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image is not an HTML image. */}
         <Image
           src={"http://client:3000/images/peciatka.jpeg"}
           style={{

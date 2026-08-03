@@ -5,7 +5,7 @@ import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { cookies, headers } from "next/headers";
 import parseValidationErrors, { ValidationErrors } from "./parseErrors";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
 export async function setDarkThemeCookie(val: boolean) {
   const cookieStore = await cookies();
@@ -113,7 +113,7 @@ export async function executeGqlMutation<Data, Variables, TransformedData>(
   // Optional cache revalidation
   if (options?.revalidateTags) {
     for (const tag of options.revalidateTags(res.data)) {
-      revalidateTag(tag);
+      updateTag(tag);
     }
   }
 

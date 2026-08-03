@@ -42,7 +42,7 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
         }
       });
     };
-  }, [editor]);
+  }, [editor, storage.visible]);
 
   if (!state.visible || !editor) return null;
 

@@ -22,16 +22,15 @@ export default function ImageFileInput({
   control: Control<any>;
 } & InputProps) {
   const { field, fieldState } = useController({ name, control });
+  const [filePreview, setFilePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (field.value) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        setFilePreview(reader.result as string);
       };
       reader.readAsDataURL(field.value);
-    } else {
-      setPreview(avatarUrl ?? "/images/img-placeholder.jpg");
     }
   }, [field.value]);
 
@@ -48,18 +47,14 @@ export default function ImageFileInput({
     }
 
     initializeFromAvatar();
-  }, [avatarUrl, field]);
-
-  const [preview, setPreview] = useState<string>(
-    avatarUrl || "/images/img-placeholder.jpg",
-  );
+  }, [avatarUrl, bucket, field]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        setFilePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
       field.onChange(file);
@@ -71,7 +66,11 @@ export default function ImageFileInput({
       <div className="flex gap-4 items-center">
         <div className="size-16 rounded-full relative">
           <Image
-            src={preview}
+            src={
+              field.value && filePreview
+                ? filePreview
+                : (avatarUrl ?? "/images/img-placeholder.jpg")
+            }
             alt="Picture of the property"
             fill
             style={{ objectFit: "cover" }}

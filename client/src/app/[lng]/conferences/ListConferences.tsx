@@ -3,7 +3,7 @@
 import Link from "next/link";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import { useParams, usePathname } from "next/navigation";
@@ -105,17 +105,14 @@ export default function ListConferences({
   initialData: Connection<ConferenceFragment & {}>;
   vars: ConferencesQueryVariables;
 }) {
-  const InfiniteScrollListUsers = withInfiniteScroll<
-    ConferenceFragment,
-    ConferencesQueryVariables
-  >({
-    vars,
-    getData: getConferences,
-    initialData,
-    Container,
-    ListItem,
-    Placeholder,
-  });
-
-  return <InfiniteScrollListUsers />;
+  return (
+    <InfiniteScroll<ConferenceFragment, ConferencesQueryVariables>
+      vars={vars}
+      getData={getConferences}
+      initialData={initialData}
+      Container={Container}
+      ListItem={ListItem}
+      Placeholder={Placeholder}
+    />
+  );
 }

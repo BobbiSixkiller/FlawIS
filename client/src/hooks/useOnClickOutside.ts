@@ -3,7 +3,7 @@ import { RefObject, useEffect, useState } from "react";
 type Event = MouseEvent | TouchEvent;
 
 export default function useOnClickOutside<T extends HTMLElement = HTMLElement>(
-  ref: RefObject<T>,
+  ref: RefObject<T | null>,
   handler: (event: Event) => void
 ) {
   const [click, setClick] = useState(false);

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { usePathname } from "next/navigation";
 import {
@@ -14,6 +14,17 @@ import {
 import { getCourses } from "./actions";
 import Card from "@/components/Card";
 import DynamicImageClient from "@/components/DynamicImageClient";
+
+const courseDateFormatter = new Intl.DateTimeFormat("sk", {
+  day: "numeric",
+  month: "numeric",
+  year: "numeric",
+  timeZone: "Europe/Bratislava",
+});
+
+function formatCourseDate(value: CourseFragment["start"]) {
+  return courseDateFormatter.format(new Date(value));
+}
 
 function ListItem({ data }: { data?: CourseFragment }) {
   const path = usePathname();
@@ -25,6 +36,7 @@ function ListItem({ data }: { data?: CourseFragment }) {
     >
       <DynamicImageClient
         fill
+        sizes="(max-width: 1024px) calc(100vw - 4rem), (max-width: 1536px) 46rem, 54rem"
         src={data?.thumbnail ?? "/images/img-placeholder.jpg"}
         alt={data?.name ?? "thumbnail"}
         className="relative w-full h-40 rounded-lg overflow-hidden mb-3 object-cover"
@@ -51,16 +63,16 @@ function ListItem({ data }: { data?: CourseFragment }) {
       <div className="mt-2 space-y-0.5 text-sm text-gray-500 dark:text-gray-400">
         <p>
           Začiatok:{" "}
-          {data?.start ? new Date(data.start).toLocaleDateString("sk") : "—"}
+          {data?.start ? formatCourseDate(data.start) : "—"}
         </p>
         <p>
           Koniec:{" "}
-          {data?.end ? new Date(data.end).toLocaleDateString("sk") : "—"}
+          {data?.end ? formatCourseDate(data.end) : "—"}
         </p>
         <p>
           Registrácia do:{" "}
           {data?.registrationEnd
-            ? new Date(data.registrationEnd).toLocaleDateString("sk")
+            ? formatCourseDate(data.registrationEnd)
             : "—"}
         </p>
       </div>
@@ -99,17 +111,14 @@ export default function CourseList({
   initialData: Connection<CourseFragment>;
   vars: CoursesQueryVariables;
 }) {
-  const InfiniteScrollCourseList = withInfiniteScroll<
-    CourseFragment,
-    CoursesQueryVariables
-  >({
-    vars,
-    getData: getCourses,
-    initialData,
-    ListItem,
-    Container,
-    Placeholder,
-  });
-
-  return <InfiniteScrollCourseList />;
+  return (
+    <InfiniteScroll<CourseFragment, CoursesQueryVariables>
+      vars={vars}
+      getData={getCourses}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={Placeholder}
+    />
+  );
 }

@@ -13,7 +13,7 @@ RUN npm cache clean --force && \
 # Copy source code and build
 COPY . .
 ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
-RUN npm run build
+RUN npm run lint && npm run typecheck && npm run build
 
 # Production Stage
 FROM node:24-alpine AS production

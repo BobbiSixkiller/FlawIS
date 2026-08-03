@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
 import { useParams, usePathname } from "next/navigation";
@@ -112,17 +112,14 @@ export default function ListInternships({
   initialData: Connection<InternshipData>;
   vars: InternshipsQueryVariables;
 }) {
-  const InfiniteScrollListInternships = withInfiniteScroll<
-    InternshipData,
-    InternshipsQueryVariables
-  >({
-    vars,
-    getData: getInternships,
-    initialData,
-    ListItem,
-    Container,
-    Placeholder,
-  });
-
-  return <InfiniteScrollListInternships />;
+  return (
+    <InfiniteScroll<InternshipData, InternshipsQueryVariables>
+      vars={vars}
+      getData={getInternships}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={Placeholder}
+    />
+  );
 }

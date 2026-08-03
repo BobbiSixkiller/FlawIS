@@ -4,12 +4,12 @@ import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/utils/helpers";
 import { ReactElement } from "react";
 
-export default function Stepper({
+export default function Stepper<TStepProps extends { name: string }>({
   steps,
   activeIndex,
   lng,
 }: {
-  steps: ReactElement[];
+  steps: ReactElement<TStepProps>[];
   activeIndex: number;
   lng: string;
 }) {

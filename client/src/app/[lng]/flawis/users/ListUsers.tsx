@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getUsers } from "./actions";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import {
@@ -78,17 +78,14 @@ export default function ListUsers({
   initialData: Connection<UserData>;
   vars: UsersQueryVariables;
 }) {
-  const InfiniteScrollListUsers = withInfiniteScroll<
-    UserData,
-    UsersQueryVariables
-  >({
-    vars,
-    getData: getUsers,
-    initialData,
-    ListItem,
-    Container,
-    Placeholder,
-  });
-
-  return <InfiniteScrollListUsers />;
+  return (
+    <InfiniteScroll<UserData, UsersQueryVariables>
+      vars={vars}
+      getData={getUsers}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={Placeholder}
+    />
+  );
 }

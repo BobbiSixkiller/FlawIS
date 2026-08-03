@@ -10,7 +10,7 @@ import {
   HomeIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import Drawer from "./Drawer";
 import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
@@ -34,14 +34,14 @@ export default function TopBar({
 }) {
   const [{ y = 0 }] = useWindowScroll();
 
-  const [visible, setVisible] = useState(false);
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");
   const path = usePathname();
+  const [drawerState, setDrawerState] = useState({ path, visible: false });
 
-  useEffect(() => {
-    setVisible(false);
-  }, [path]);
+  if (drawerState.path !== path) {
+    setDrawerState({ path, visible: false });
+  }
 
   return (
     <div
@@ -53,7 +53,7 @@ export default function TopBar({
     >
       <div className={cn(["h-full flex items-center p-4 container mx-auto"])}>
         <Button
-          onClick={() => setVisible(true)}
+          onClick={() => setDrawerState({ path, visible: true })}
           className={cn([
             "lg:hidden sm:static",
             "sm:mr-4 absolute left-2 p-2 w-fit",
@@ -110,8 +110,10 @@ export default function TopBar({
         </div>
 
         <Drawer
-          visible={visible}
-          setVisible={setVisible}
+          visible={drawerState.visible}
+          setVisible={(nextVisible) =>
+            setDrawerState({ path, visible: nextVisible })
+          }
           title={drawerTitle}
           toggleStart="left"
         >

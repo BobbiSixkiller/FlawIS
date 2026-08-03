@@ -19,14 +19,13 @@ import {
 } from "./actions";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import {
   Children,
   cloneElement,
   isValidElement,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -194,10 +193,10 @@ function AttendanceTableContainer({
 
         {/* Body rows */}
         {Children.map(children, (child) => {
-          if (!isValidElement(child)) {
+          if (!isValidElement<{ scrollState?: ScrollState }>(child)) {
             return child;
           }
-          return cloneElement(child, { ...child.props, scrollState });
+          return cloneElement(child, { scrollState });
         })}
       </div>
     </div>
@@ -468,21 +467,14 @@ export function AttendanceTable({
     },
   }));
 
-  const InfiniteScrollCourseList = useMemo(
-    () =>
-      withInfiniteScroll<AttendanceFragment, AttendanceQueryVariables>({
-        vars,
-        getData: getCourseAttendance,
-        initialData,
-        ListItem,
-        Container,
-        Placeholder: AttendancePlaceholder,
-      }),
-    // ListItem and Container are stable (useState initializer).
-    // vars/initialData come from the server and seed useState inside withInfiniteScroll — not reactive.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ListItem, Container],
+  return (
+    <InfiniteScroll<AttendanceFragment, AttendanceQueryVariables>
+      vars={vars}
+      getData={getCourseAttendance}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={AttendancePlaceholder}
+    />
   );
-
-  return <InfiniteScrollCourseList />;
 }

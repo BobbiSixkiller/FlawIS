@@ -1,30 +1,38 @@
 "use client";
 
 import { useDialogStore } from "@/stores/dialogStore";
-import { cloneElement, forwardRef, ReactElement, Ref } from "react";
+import {
+  cloneElement,
+  MouseEvent as ReactMouseEvent,
+  MouseEventHandler,
+  ReactElement,
+} from "react";
+
+interface TriggerChildProps {
+  className?: string;
+  onClick?: MouseEventHandler<HTMLElement>;
+}
 
 interface ModalTriggerProps {
-  children: ReactElement;
+  children: ReactElement<TriggerChildProps>;
   dialogId: string;
-  onClick?: (e: any) => void;
+  onClick?: MouseEventHandler<HTMLElement>;
   className?: string;
 }
 
-function ModalTrigger(
-  { children, dialogId, ...props }: ModalTriggerProps,
-  ref: Ref<HTMLElement>
-) {
+export default function ModalTrigger({
+  children,
+  dialogId,
+  ...props
+}: ModalTriggerProps) {
   const { openDialog } = useDialogStore();
 
   return cloneElement(children, {
     ...props,
-    onClick: (e: any) => {
-      props.onClick?.(e); // from ModalTrigger usage
-      children.props.onClick?.(e); // original child
+    onClick: (event: ReactMouseEvent<HTMLElement>) => {
+      props.onClick?.(event);
+      children.props.onClick?.(event);
       openDialog(dialogId);
     },
-    ref,
   });
 }
-
-export default forwardRef<HTMLElement, ModalTriggerProps>(ModalTrigger);
