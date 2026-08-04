@@ -5,11 +5,11 @@ import {
   prop as Property,
 } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
-import { createUnionType, Field, Float, ObjectType } from "type-graphql";
+import { createUnionType, Field, ObjectType } from "type-graphql";
 import { ObjectId } from "mongodb";
 
-import { Billing, FlawBilling } from "./Billing";
 import { Conference, Ticket } from "./Conference";
+import { Invoice } from "./Invoice";
 import { Submission } from "./Submission";
 import { User, UserStub } from "./User";
 
@@ -26,56 +26,6 @@ export const UserStubUnion = createUnionType({
   },
 });
 
-@ObjectType({ description: "The body of an invoice" })
-export class InvoiceData {
-  @Field()
-  @Property({ default: "Faktúra" })
-  type?: String;
-
-  @Field()
-  @Property({ default: Date.now() })
-  issueDate?: Date;
-
-  @Field()
-  @Property({ default: Date.now() })
-  vatDate?: Date;
-
-  @Field()
-  @Property({ default: new Date().setDate(new Date().getDate() + 15) })
-  dueDate?: Date;
-
-  @Field(() => Float)
-  @Property()
-  price: Number;
-
-  @Field(() => Float)
-  @Property()
-  vat: Number;
-
-  @Field()
-  @Property()
-  body: String;
-
-  @Field()
-  @Property()
-  comment: String;
-}
-
-@ObjectType({ description: "Invoice entity subdocument type" })
-export class Invoice {
-  @Field(() => Billing)
-  @Property({ type: () => Billing, _id: false })
-  payer: Billing;
-
-  @Field(() => FlawBilling)
-  @Property({ type: () => FlawBilling, _id: false })
-  issuer: FlawBilling;
-
-  @Field(() => InvoiceData)
-  @Property({ type: () => InvoiceData, _id: false })
-  body: InvoiceData;
-}
-
 @ObjectType()
 export class AttendeeConference {
   @Field()
@@ -90,7 +40,8 @@ export class AttendeeConference {
   if (this.isNew) {
     await getModelForClass(Conference).updateOne(
       { slug: this.conference.slug },
-      { $inc: { attendeesCount: 1 } }
+      { $inc: { attendeesCount: 1 } },
+      { session: this.$session() ?? undefined },
     );
   }
 })
@@ -123,6 +74,7 @@ export class AttendeeConference {
 @Index({ "user.name": "text", "user.email": "text" })
 @Index({ "conference.slug": 1, _id: -1 }) //attendees query
 @Index({ "user._id": 1, "conference.slug": 1 }) //attendee query
+@Index({ "invoice.issuer.variableSymbol": 1 }, { sparse: true })
 export class Attendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -139,10 +91,13 @@ export class Attendee extends TimeStamps {
   @Property({ type: () => Ticket })
   ticket: Ticket;
 
-  //invoice subdoc added so individual invoice customization is possible
+  // Legacy invoices remain readable while new records reference Invoice.
   @Field(() => Invoice)
   @Property({ type: () => Invoice, _id: false })
-  invoice: Invoice;
+  invoice?: Invoice;
+
+  @Property()
+  invoiceId?: ObjectId;
 
   @Field(() => [Submission])
   submissions: Submission[];

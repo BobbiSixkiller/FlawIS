@@ -3,8 +3,9 @@ import Heading from "@/components/Heading";
 import { displayDate } from "@/utils/helpers";
 import DynamicImage from "@/components/DynamicImage";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import DownloadPDFButton from "@/app/[lng]/flawis/conferences/[slug]/attendees/[id]/DownloadPDFButton";
+import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
 import { translate } from "@/lib/i18n";
+import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
 
 export default async function ConferencePage({
   params,
@@ -41,7 +42,12 @@ export default async function ConferencePage({
         heading={conference!.slug}
         subHeading={conference!.translations[lng as "sk" | "en"].name}
         items={[
-          <DownloadPDFButton lng={lng} data={conference?.attending!} key={0} />,
+          <DownloadInvoiceButton
+            attendeeId={conference!.attending!.id}
+            key={0}
+            lng={lng}
+            ownerType={InvoiceOwnerType.ConferenceAttendee}
+          />,
         ]}
       />
       <div className="border-t border-gray-100 dark:border-gray-600">

@@ -18,6 +18,7 @@ import { Status } from "../../entitites/Internship";
 import { CtxUser } from "../../util/types";
 import { FormService } from "../form.service";
 import { Reach360Service } from "../reach360.service";
+import { assertInvoiceIssuerBilling } from "../../entitites/Billing";
 
 function reachConfigChanged(
   current:
@@ -82,10 +83,16 @@ export class CourseService {
       await this.reach360Service.validateCourse(reachCourse.courseId);
     }
 
+    if (data.price > 0 && !data.billing) {
+      throw new Error("Paid courses require issuer billing information.");
+    }
+    if (data.price > 0) assertInvoiceIssuerBilling(data.billing);
+
     return withOptionalTransaction(undefined, async (session) => {
       const course = await this.courseRepository.create(
         {
           ...data,
+          billing: data.price > 0 ? data.billing : null,
           ...(reachCourse ? { reachCourse } : {}),
         },
         { session },
@@ -112,6 +119,11 @@ export class CourseService {
       );
     }
 
+    if (data.price > 0 && !data.billing) {
+      throw new Error("Paid courses require issuer billing information.");
+    }
+    if (data.price > 0) assertInvoiceIssuerBilling(data.billing);
+
     const didReachConfigChange = reachConfigChanged(
       current.reachCourse,
       reachCourse,
@@ -137,6 +149,7 @@ export class CourseService {
         {
           $set: {
             ...data,
+            billing: data.price > 0 ? data.billing : null,
             reachCourse: reachCourse ?? null,
           },
         },

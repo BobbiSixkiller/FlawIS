@@ -22,7 +22,7 @@ import { CreateArgs, CreateConnection } from "./pagination.types";
 import { IMutationResponse } from "./interface.types";
 import { I18nService } from "../../services/i18n.service";
 import Container from "typedi";
-import { AddressInput } from "./conference.types";
+import { AddressInput } from "./billing.types";
 
 export enum UserSortableField {
   NAME = "name",

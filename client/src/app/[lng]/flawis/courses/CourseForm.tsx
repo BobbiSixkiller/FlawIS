@@ -34,7 +34,7 @@ export default function CourseForm({
   course?: CourseFragment;
   reachCourseConfig?: ReachCourseConfigInput | null;
 }) {
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(course?.price ?? 0);
   const { lng } = useParams<{ lng: string }>();
   const { yup } = useValidation();
 
@@ -93,6 +93,7 @@ export default function CourseForm({
         } = vals;
         const data = {
           ...courseVals,
+          billing: courseVals.price > 0 ? courseVals.billing : null,
           reachCourse: hasElearning ? courseVals.reachCourse : null,
           categories: (courseVals.categories as any[]).map((c: any) =>
             typeof c === "object" && c !== null && c.val ? c.val.id : c,
@@ -213,7 +214,11 @@ export default function CourseForm({
                 label="Cena kurzu v centoch s DPH"
                 name="price"
                 type="number"
-                onChange={(e) => setPrice(parseInt(e.target.value))}
+                onChange={(event) => {
+                  const value = (event.target as HTMLInputElement)
+                    .valueAsNumber;
+                  setPrice(Number.isFinite(value) ? value : 0);
+                }}
               />
             </div>
           </div>

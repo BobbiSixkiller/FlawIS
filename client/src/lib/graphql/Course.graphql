@@ -17,7 +17,7 @@ fragment Course on Course {
   thumbnail
   price
   billing {
-    ...FlawBilling
+    ...InvoiceBilling
   }
   isPaid
   hasElearning
@@ -69,6 +69,7 @@ fragment CourseSession on CourseSession {
 
 fragment CourseAttendee on CourseAttendee {
   id
+  hasInvoice
   user {
     id
     name
@@ -240,7 +241,7 @@ mutation deleteCourseSession($id: ObjectId!) {
 mutation createCourseAttendee(
   $courseId: ObjectId!
   $application: FormSubmissionInput!
-  $billing: AttendeeBillingInput
+  $billing: BillingInput
 ) {
   createCourseAttendee(
     courseId: $courseId

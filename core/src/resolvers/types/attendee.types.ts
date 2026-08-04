@@ -7,11 +7,11 @@ import {
   ObjectType,
   registerEnumType,
 } from "type-graphql";
-import { Billing } from "../../entitites/Billing";
 import { IsDate, IsString } from "class-validator";
-import { AddressInput, FlawBillingInput } from "./conference.types";
+import { BillingInput } from "./billing.types";
 import { CreateArgs, CreateConnection } from "./pagination.types";
-import { Attendee, Invoice, InvoiceData } from "../../entitites/Attendee";
+import { Attendee } from "../../entitites/Attendee";
+import { Invoice, InvoiceData } from "../../entitites/Invoice";
 import { IMutationResponse } from "./interface.types";
 
 @ObjectType({
@@ -23,6 +23,16 @@ export enum AttendeeSortableField {
   NAME = "user.name",
   ID = "_id",
 }
+
+export enum InvoiceOwnerType {
+  CONFERENCE_ATTENDEE = "CONFERENCE_ATTENDEE",
+  COURSE_ATTENDEE = "COURSE_ATTENDEE",
+}
+
+registerEnumType(InvoiceOwnerType, {
+  name: "InvoiceOwnerType",
+  description: "The registration type that owns an invoice.",
+});
 
 registerEnumType(AttendeeSortableField, {
   name: "AttendeeSortableField",
@@ -53,28 +63,6 @@ export class AttendeeMutationResponse extends IMutationResponse {
   data: Attendee;
 }
 
-@InputType()
-export class AttendeeBillingInput implements Billing {
-  @Field()
-  @IsString()
-  name: string;
-
-  @Field(() => AddressInput)
-  address: AddressInput;
-
-  @Field({ nullable: true })
-  @IsString()
-  DIC?: string;
-
-  @Field({ nullable: true })
-  @IsString()
-  ICDPH?: string;
-
-  @Field({ nullable: true })
-  @IsString()
-  ICO?: string;
-}
-
 @InputType({ description: "Conference registration input type" })
 export class AttendeeInput {
   @Field()
@@ -83,17 +71,17 @@ export class AttendeeInput {
   @Field()
   ticketId: ObjectId;
 
-  @Field(() => AttendeeBillingInput)
-  billing: AttendeeBillingInput;
+  @Field(() => BillingInput)
+  billing: BillingInput;
 }
 
 @InputType()
 export class InvoiceDataInput implements InvoiceData {
   @Field()
-  body: String;
+  body: string;
 
   @Field()
-  comment: String;
+  comment: string;
 
   @Field()
   @IsDate()
@@ -104,13 +92,13 @@ export class InvoiceDataInput implements InvoiceData {
   issueDate: Date;
 
   @Field(() => Float)
-  price: Number;
+  price: number;
 
   @Field()
-  type: String;
+  type: string;
 
   @Field(() => Float)
-  vat: Number;
+  vat: number;
 
   @Field()
   @IsDate()
@@ -122,9 +110,9 @@ export class InvoiceInput implements Invoice {
   @Field(() => InvoiceDataInput)
   body: InvoiceDataInput;
 
-  @Field(() => FlawBillingInput)
-  issuer: FlawBillingInput;
+  @Field(() => BillingInput)
+  issuer: BillingInput;
 
-  @Field(() => AttendeeBillingInput)
-  payer: AttendeeBillingInput;
+  @Field(() => BillingInput)
+  payer: BillingInput;
 }

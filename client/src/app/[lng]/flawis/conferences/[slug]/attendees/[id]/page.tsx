@@ -1,5 +1,6 @@
 import Heading from "@/components/Heading";
-import DownloadPDFButton from "./DownloadPDFButton";
+import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
+import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
 import {
   ArrowsRightLeftIcon,
   PencilIcon,
@@ -69,7 +70,11 @@ export default async function AttendeePage({
         ]}
       />
       <div className="flex gap-2">
-        <DownloadPDFButton lng={lng} data={attendee} />
+        <DownloadInvoiceButton
+          attendeeId={attendee.id}
+          lng={lng}
+          ownerType={InvoiceOwnerType.ConferenceAttendee}
+        />
 
         <ModalTrigger dialogId={updateInvoiceDialogId}>
           <Button size="icon" variant="ghost">

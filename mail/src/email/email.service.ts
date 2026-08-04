@@ -2,13 +2,8 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
-import { InvoiceMsg } from './templates/invoice';
+import { Invoice, InvoiceMsg } from './templates/invoice';
 import { AuthorMsg } from './templates/author';
-
-import Handlebars from 'handlebars';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import puppeteer from 'puppeteer';
 
 export interface Msg {
   locale: 'en' | 'sk';
@@ -30,6 +25,7 @@ export interface InternshipMsg extends Msg {
 export interface CourseMsg extends Msg {
   courseId: string;
   course: string;
+  invoice?: Invoice;
 }
 
 @Injectable()
@@ -39,41 +35,38 @@ export class EmailService {
     private i18n: I18nService,
   ) {}
 
-  private async createPDF(
-    data: Record<string, any>,
-    templateName: string,
-  ): Promise<Buffer> {
-    try {
-      const templatePath = join(
-        __dirname,
-        '..',
-        'email/templates',
-        templateName,
-      );
-      const template = Handlebars.compile(readFileSync(templatePath, 'utf-8'));
-      const html = template(data);
-
-      const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-gpu', '--disable-setuid-sandbox'],
-        executablePath: '/usr/bin/chromium-browser',
-        headless: true,
-        timeout: 60000, // Increase to 60 seconds
-      });
-      const page = await browser.newPage();
-
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-      });
-
-      await browser.close();
-
-      return pdfBuffer;
-    } catch (error) {
-      console.log(error);
+  private async renderInvoice(invoice: Invoice, locale: Msg['locale']) {
+    const secret =
+      process.env.INVOICE_RENDER_SECRET || process.env.SECRET || '';
+    if (!secret) {
+      throw new Error('INVOICE_RENDER_SECRET is not configured.');
     }
+
+    const baseUrl = process.env.CLIENT_INTERNAL_URL || 'http://client:3000';
+    const response = await fetch(`${baseUrl}/api/internal/invoices/render`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-invoice-render-secret': secret,
+      },
+      body: JSON.stringify({ invoice, locale }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Invoice renderer failed with status ${response.status}: ${await response.text()}`,
+      );
+    }
+
+    return Buffer.from(await response.arrayBuffer());
+  }
+
+  private invoiceFilename(invoice: Invoice) {
+    const number = (invoice.issuer.variableSymbol || '').replace(
+      /[^a-zA-Z0-9_-]/g,
+      '-',
+    );
+    return `invoice-${number || 'document'}.pdf`;
   }
 
   @RabbitSubscribe({
@@ -135,21 +128,7 @@ export class EmailService {
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
-    // console.log();
-    // const stamp = readFileSync(
-    //   join(__dirname, '../../', 'assets/peciatka.jpeg'),
-    // );
-    const pdfBuffer = await this.createPDF(
-      {
-        name: msg.name,
-        i18nLang: msg.locale,
-        conferenceLogo: msg.conferenceLogo,
-        conferenceName: msg.conferenceName,
-        invoice: msg.invoice,
-        // stamp,
-      },
-      'invoice.hbs',
-    );
+    const pdfBuffer = await this.renderInvoice(msg.invoice, msg.locale);
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -167,7 +146,12 @@ export class EmailService {
         conferenceName: msg.conferenceName,
         invoice: msg.invoice,
       },
-      attachments: [{ filename: 'invoice.pdf', content: pdfBuffer }],
+      attachments: [
+        {
+          filename: this.invoiceFilename(msg.invoice),
+          content: pdfBuffer,
+        },
+      ],
     });
   }
 
@@ -384,6 +368,13 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.courseId}`;
 
+    const attachment = msg.invoice
+      ? {
+          filename: this.invoiceFilename(msg.invoice),
+          content: await this.renderInvoice(msg.invoice, msg.locale),
+        }
+      : undefined;
+
     await this.mailerService.sendMail({
       to: msg.email,
       subject: this.i18n.t('course.applied.subject', { lang: msg.locale }),
@@ -394,6 +385,7 @@ export class EmailService {
         name: msg.name,
         course: msg.course,
       },
+      attachments: attachment ? [attachment] : undefined,
     });
   }
 

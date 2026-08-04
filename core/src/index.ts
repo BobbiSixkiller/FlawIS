@@ -36,6 +36,7 @@ import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resol
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
 import { CategoryResolver } from "./resolvers/courses/category.resolver";
 import { registerReach360Webhook } from "./routes/reach360Webhook";
+import { InvoiceResolver } from "./resolvers/invoice.resolver";
 
 env.config();
 
@@ -71,6 +72,7 @@ async function main() {
       CourseAttendeeResolver,
       AttendanceRecordResolver,
       CategoryResolver,
+      InvoiceResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],

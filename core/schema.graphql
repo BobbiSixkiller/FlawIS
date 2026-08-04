@@ -86,14 +86,6 @@ type Attendee {
   user: UserStubUnion!
 }
 
-input AttendeeBillingInput {
-  DIC: String
-  ICDPH: String
-  ICO: String
-  address: AddressInput!
-  name: String!
-}
-
 """AttendeeConnection type enabling cursor based pagination"""
 type AttendeeConnection {
   edges: [AttendeeEdge]!
@@ -114,7 +106,7 @@ input AttendeeFilterInput {
 
 """Conference registration input type"""
 input AttendeeInput {
-  billing: AttendeeBillingInput!
+  billing: BillingInput!
   conferenceId: ObjectId!
   ticketId: ObjectId!
 }
@@ -150,10 +142,24 @@ type AvailableCategory {
 """Billing information"""
 type Billing {
   DIC: String
+  IBAN: String
   ICDPH: String
   ICO: String
+  SWIFT: String
   address: Address!
   name: String!
+  variableSymbol: String
+}
+
+input BillingInput {
+  DIC: String
+  IBAN: String
+  ICDPH: String
+  ICO: String
+  SWIFT: String
+  address: AddressInput!
+  name: String!
+  variableSymbol: String
 }
 
 """Course category"""
@@ -178,7 +184,7 @@ type CategoryMutationResponse implements IMutationResponse {
 type Conference {
   attendeesCount: Int!
   attending: Attendee
-  billing: FlawBilling!
+  billing: Billing!
   createdAt: DateTimeISO!
   dates: ImportantDates!
   id: ObjectId!
@@ -203,7 +209,7 @@ type ConferenceEdge {
 
 """Conference input type"""
 input ConferenceInput {
-  billing: FlawBillingInput!
+  billing: BillingInput!
   dates: DatesInput!
   slug: String!
   translations: ConferenceTranslationInput!
@@ -248,7 +254,7 @@ type Course {
   attendance(after: String, first: Int! = 20, sort: [CourseAttendeeSortInput]!): AttendanceConnection!
   attendeesCount: Int!
   attending: CourseAttendee
-  billing: FlawBilling
+  billing: Billing
   categories: [Category!]!
   createdAt: DateTimeISO!
 
@@ -278,6 +284,7 @@ type CourseAttendee {
   elearningErrorCode: String
   elearningStatus: ElearningProvisioningStatus
   grade: String
+  hasInvoice: Boolean!
   id: ObjectId!
   invoice: Invoice
   status: Status!
@@ -327,7 +334,7 @@ input CourseFilterInput {
 }
 
 input CourseInput {
-  billing: FlawBillingInput
+  billing: BillingInput
   categories: [ObjectId!]!
   description: String!
   end: DateTimeISO!
@@ -424,29 +431,6 @@ enum FieldType {
   Select
   Text
   Textarea
-}
-
-"""Flaw billing information"""
-type FlawBilling {
-  DIC: String!
-  IBAN: String!
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String!
-  address: Address!
-  name: String!
-  variableSymbol: String!
-}
-
-input FlawBillingInput {
-  DIC: String!
-  IBAN: String!
-  ICDPH: String!
-  ICO: String!
-  SWIFT: String!
-  address: AddressInput!
-  name: String!
-  variableSymbol: String!
 }
 
 type Form {
@@ -631,7 +615,7 @@ enum InternshipSortableField {
 """Invoice entity subdocument type"""
 type Invoice {
   body: InvoiceData!
-  issuer: FlawBilling!
+  issuer: Billing!
   payer: Billing!
 }
 
@@ -647,6 +631,12 @@ type InvoiceData {
   vatDate: DateTimeISO!
 }
 
+"""The registration type that owns an invoice."""
+enum InvoiceOwnerType {
+  CONFERENCE_ATTENDEE
+  COURSE_ATTENDEE
+}
+
 input InvoiceDataInput {
   body: String!
   comment: String!
@@ -660,8 +650,8 @@ input InvoiceDataInput {
 
 input InvoiceInput {
   body: InvoiceDataInput!
-  issuer: FlawBillingInput!
-  payer: AttendeeBillingInput!
+  issuer: BillingInput!
+  payer: BillingInput!
 }
 
 """
@@ -700,7 +690,7 @@ type Mutation {
   createCategory(data: CategoryInput!): CategoryMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
-  createCourseAttendee(application: FormSubmissionInput!, billing: AttendeeBillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
+  createCourseAttendee(application: FormSubmissionInput!, billing: BillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
@@ -786,6 +776,7 @@ type Query {
   interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
   internship(id: ObjectId!): Internship!
   internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
+  invoice(attendeeId: ObjectId!, ownerType: InvoiceOwnerType!): Invoice
   me: User!
   submission(id: ObjectId!): Submission!
   textSearchAttendee(slug: String!, text: String!): [Attendee!]!

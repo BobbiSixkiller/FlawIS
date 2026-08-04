@@ -3,10 +3,10 @@ import { ObjectId } from "mongodb";
 import { CourseAttendeeRepository } from "../../repositories/courseAttendee.repository";
 import { I18nService } from "../i18n.service";
 import { CourseService } from "./course.service";
-import { AttendeeBillingInput } from "../../resolvers/types/attendee.types";
+import { InvoiceOwnerType } from "../../resolvers/types/attendee.types";
+import { Billing } from "../../entitites/Billing";
 import mongoose from "mongoose";
 import { UserService } from "../user.service";
-import { Invoice } from "../../entitites/Attendee";
 import { CourseRepository } from "../../repositories/course.repository";
 import { Status } from "../../entitites/Internship";
 import { toDTO, withOptionalTransaction } from "../../util/helpers";
@@ -23,6 +23,8 @@ import { FormSubmissionInput } from "../../resolvers/types/form/form.types";
 import { FormService } from "../form.service";
 import { FieldType } from "../../entitites/Form";
 import { Reach360Service } from "../reach360.service";
+import { InvoiceService } from "../invoice.service";
+import { isDuplicateInvoiceNumberError } from "../../repositories/invoice.repository";
 
 @Service()
 export class CourseAttendeeService {
@@ -39,6 +41,7 @@ export class CourseAttendeeService {
     private readonly rmqService: RmqService,
     private readonly formService: FormService,
     private readonly reach360Service: Reach360Service,
+    private readonly invoiceService: InvoiceService,
   ) {}
 
   async getCourseAttendee(id: ObjectId) {
@@ -66,100 +69,105 @@ export class CourseAttendeeService {
     courseId: ObjectId,
     userId: ObjectId,
     application: FormSubmissionInput,
-    billing?: AttendeeBillingInput,
+    billing?: Billing,
   ) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const [course, user] = await Promise.all([
+      this.courseService.getCourse(courseId),
+      this.userService.getUser(userId),
+    ]);
 
-    try {
-      const [course, user] = await Promise.all([
-        this.courseService.getCourse(courseId),
-        this.userService.getUser(userId),
-      ]);
-
-      const exists = await this.courseAttendeeRepository.findOne({
-        course: courseId,
-        "user._id": user.id,
-      });
-      if (exists) {
-        throw new Error("You are already registered for this course!");
-      }
-
-      const form = await this.formService.getForm(application.form);
-      if (form.course.toString() !== course.id.toString()) {
-        throw new Error("Form does not belong to this course!");
-      }
-
-      const priceWithouTax = course.price / Number(process.env.VAT || 1.23);
-      const isFlaw = user.email.split("@")[1] === "flaw.uniba.sk";
-
-      const attendee = await this.courseAttendeeRepository.create({
-        course: course.id,
-        user: {
-          _id: user.id,
-          email: user.email,
-          name: user.name,
-          organization: user.organization,
-          telephone: user.telephone,
-        },
-        application: {
-          form: application.form,
-          formVersion: application.formVersion,
-          answers: application.answers,
-        },
-        invoice:
-          course.isPaid && course.billing
-            ? ({
-                body: {
-                  body:
-                    "Faktura za registracny poplatok na kurz: " + course.name,
-                  comment:
-                    "Neuhradenie faktury sa povazuje za zrusenie ucasti.",
-                  type: "Faktura",
-                  price: Math.round((priceWithouTax / 100) * 100) / 100,
-                  vat: isFlaw
-                    ? 0
-                    : Math.round(
-                        ((course.price - priceWithouTax) / 100) * 100,
-                      ) / 100,
-                },
-                issuer: {
-                  ...course.billing,
-                  variableSymbol:
-                    course.billing.variableSymbol +
-                    String(course.attendeesCount + 1).padStart(4, "0"),
-                },
-                payer: billing,
-              } as Invoice)
-            : undefined,
-      });
-
-      await this.courseRepository.updateMany(
-        { _id: course.id },
-        { $inc: { attendeesCount: 1 } },
-      );
-
-      await session.commitTransaction();
-
-      this.rmqService.produceMessage(
-        JSON.stringify({
-          locale: this.i18nService.language(),
-          hostname,
-          name: user.name,
-          email: user.email,
-          courseId: course.id,
-          course: course.name,
-        }),
-        "mail.courses.applied",
-      );
-
-      return toDTO(attendee);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
+    const exists = await this.courseAttendeeRepository.findOne({
+      course: courseId,
+      "user._id": user.id,
+    });
+    if (exists) {
+      throw new Error("You are already registered for this course!");
     }
+
+    const form = await this.formService.getForm(application.form);
+    if (form.course.toString() !== course.id.toString()) {
+      throw new Error("Form does not belong to this course!");
+    }
+
+    if (course.isPaid && (!course.billing || !billing)) {
+      throw new Error(
+        "Paid course registrations require issuer and payer billing information.",
+      );
+    }
+
+    const attendeeId = new ObjectId();
+    const { attendee, invoice } = await withOptionalTransaction(
+      undefined,
+      async (session) => {
+        const invoice = course.isPaid
+          ? await this.invoiceService.createInvoice({
+              attendeeId,
+              body: this.i18nService.translate("invoice.body", {
+                ns: "course",
+                name: course.name,
+              }),
+              comment: this.i18nService.translate("invoice.comment", {
+                ns: "course",
+              }),
+              grossPriceCents: course.price,
+              issuer: course.billing!,
+              ownerType: InvoiceOwnerType.COURSE_ATTENDEE,
+              payer: billing!,
+              payerEmail: user.email,
+              session,
+              type: this.i18nService.translate("invoice.type", {
+                ns: "course",
+              }),
+              userId: user.id,
+            })
+          : undefined;
+
+        const attendee = await this.courseAttendeeRepository.create(
+          {
+            _id: attendeeId,
+            course: course.id,
+            user: {
+              _id: user.id,
+              email: user.email,
+              name: user.name,
+              organization: user.organization,
+              telephone: user.telephone,
+            },
+            application: {
+              form: application.form,
+              formVersion: application.formVersion,
+              answers: application.answers,
+            },
+            invoiceId: invoice?._id,
+          },
+          { session },
+        );
+
+        await this.courseRepository.updateMany(
+          { _id: course.id },
+          { $inc: { attendeesCount: 1 } },
+          { session },
+        );
+
+        return { attendee, invoice };
+      },
+      isDuplicateInvoiceNumberError,
+    );
+
+    this.rmqService.produceMessage(
+      JSON.stringify({
+        locale: this.i18nService.language(),
+        hostname,
+        name: user.name,
+        email: user.email,
+        courseId: course.id,
+        course: course.name,
+        invoice: invoice ? this.invoiceService.toInvoice(invoice) : undefined,
+      }),
+      "mail.courses.applied",
+    );
+
+    return toDTO(attendee);
   }
 
   async updateCourseAttendee(

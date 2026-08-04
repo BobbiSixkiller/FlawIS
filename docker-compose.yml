@@ -54,6 +54,8 @@ services:
       - ./.env
     command: npm run start:dev
     depends_on:
+      client:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
     volumes:

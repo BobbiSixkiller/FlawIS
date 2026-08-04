@@ -5,6 +5,7 @@ import {
 } from "../../flawis/courses/[id]/actions";
 import {
   ElearningProvisioningStatus,
+  InvoiceOwnerType,
   Status,
 } from "@/lib/graphql/generated/graphql";
 import ModalTrigger from "@/components/ModalTrigger";
@@ -23,6 +24,7 @@ import Link from "next/link";
 import CourseApplication from "../../flawis/courses/[id]/CourseApplication";
 import Attendance from "./Attendance";
 import CourseRegistrationForm from "../../flawis/courses/[id]/CourseRegistrationForm";
+import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
 
 export default async function CoursePage({
   params,
@@ -53,7 +55,14 @@ export default async function CoursePage({
             lng={lng}
             courseAttendee={course.attending}
             controls={
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {course.attending.hasInvoice && (
+                  <DownloadInvoiceButton
+                    attendeeId={course.attending.id}
+                    lng={lng}
+                    ownerType={InvoiceOwnerType.CourseAttendee}
+                  />
+                )}
                 {course.attending.status === Status.Applied && (
                   <ModalTrigger dialogId="delete-course-application">
                     <Button variant="destructive" size="icon">

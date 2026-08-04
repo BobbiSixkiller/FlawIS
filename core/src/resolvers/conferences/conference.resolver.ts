@@ -32,13 +32,17 @@ import { DocumentType } from "@typegoose/typegoose";
 import { Context } from "../../util/auth";
 import { Attendee } from "../../entitites/Attendee";
 import { Section } from "../../entitites/Section";
-import { AttendeeInput } from "../types/attendee.types";
+import { AttendeeInput, InvoiceOwnerType } from "../types/attendee.types";
 import { VerifiedTicket } from "../../util/types";
 import { RmqService } from "../../services/rmq.service";
 import { Repository } from "../../repositories/base.repository";
 import { ConferenceRepository } from "../../repositories/conference.repository";
 import { AttendeeRepository } from "../../repositories/conferenceAttendee.repository";
 import { UserRepository } from "../../repositories/user.repository";
+import { InvoiceService } from "../../services/invoice.service";
+import { withOptionalTransaction } from "../../util/helpers";
+import { isDuplicateInvoiceNumberError } from "../../repositories/invoice.repository";
+import { assertInvoiceIssuerBilling } from "../../entitites/Billing";
 
 @Service()
 @Resolver(() => Conference)
@@ -49,7 +53,8 @@ export class ConferencerResolver {
     private readonly attendeeRepository: AttendeeRepository,
     private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService,
-    private readonly rmqService: RmqService
+    private readonly rmqService: RmqService,
+    private readonly invoiceService: InvoiceService,
   ) {}
 
   @Authorized()
@@ -80,9 +85,8 @@ export class ConferencerResolver {
   async createConference(
     @Arg("data") data: ConferenceInput
   ): Promise<ConferenceMutationResponse> {
-    console.log(data);
+    assertInvoiceIssuerBilling(data.billing);
     const conference = await this.conferenceRepository.create(data);
-    console.log(conference);
 
     return {
       data: conference,
@@ -240,39 +244,15 @@ export class ConferencerResolver {
     @Arg("data")
     { billing }: AttendeeInput,
     @CheckTicket() { ticket, conference }: VerifiedTicket,
-    @Ctx() { user, locale }: Context
+    @Ctx() { user, locale }: Context,
   ): Promise<ConferenceMutationResponse> {
-    const priceWithouTax = ticket.price / Number(process.env.VAT || 1.23);
     const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
-
-    await this.userRepository.updateMany(
-      { _id: user?.id },
-      {
-        $addToSet: { billings: billing },
-      },
-      { upsert: true }
-    );
-
-    const attendee = await this.attendeeRepository.create({
-      conference: { _id: conference.id, slug: conference.slug },
-      user: { _id: user?.id, name: user?.name, email: user?.email },
-      ticket,
-      invoice: {
-        issuer: {
-          ...conference.billing,
-          variableSymbol:
-            conference.billing.variableSymbol +
-            String(conference.attendeesCount + 1).padStart(4, "0"),
-        },
-        payer: {
-          ...billing,
-          name: isFlaw ? `${user.name}, ${billing.name}` : billing.name,
-        },
-        body: {
-          price: Math.round((priceWithouTax / 100) * 100) / 100,
-          vat: isFlaw
-            ? 0
-            : Math.round(((ticket.price - priceWithouTax) / 100) * 100) / 100,
+    const attendeeId = new ObjectId();
+    const invoice = await withOptionalTransaction(
+      undefined,
+      async (session) => {
+        const invoice = await this.invoiceService.createInvoice({
+          attendeeId,
           body: this.i18nService.translate("invoiceBody", {
             ns: "conference",
             name: user?.name,
@@ -280,11 +260,45 @@ export class ConferencerResolver {
           comment: this.i18nService.translate("invoiceComment", {
             ns: "conference",
           }),
-        },
-      },
-    });
+          grossPriceCents: ticket.price,
+          issuer: conference.billing,
+          ownerType: InvoiceOwnerType.CONFERENCE_ATTENDEE,
+          payer: {
+            ...billing,
+            name: isFlaw ? `${user!.name}, ${billing.name}` : billing.name,
+          },
+          payerEmail: user!.email,
+          session,
+          type: this.i18nService.translate("invoiceType", {
+            ns: "conference",
+          }),
+          userId: user!.id,
+        });
 
-    console.log({ ...conference, attending: attendee });
+        await this.userRepository.updateMany(
+          { _id: user?.id },
+          {
+            $addToSet: { billings: billing },
+          },
+          { upsert: true, session },
+        );
+
+        await this.attendeeRepository.create(
+          {
+            _id: attendeeId,
+            conference: { _id: conference.id, slug: conference.slug },
+            user: { _id: user?.id, name: user?.name, email: user?.email },
+            ticket,
+            invoiceId: invoice._id,
+          },
+          { session },
+        );
+
+        return invoice;
+      },
+      isDuplicateInvoiceNumberError,
+    );
+    const invoiceData = this.invoiceService.toInvoice(invoice);
 
     this.rmqService.produceMessage(
       JSON.stringify({
@@ -297,7 +311,7 @@ export class ConferencerResolver {
         conferenceLogo:
           conference.translations[this.i18nService.language() as "sk" | "en"]
             .logoUrl,
-        invoice: attendee.invoice,
+        invoice: invoiceData,
       }),
       "mail.conference.invoice"
     );

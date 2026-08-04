@@ -20,6 +20,7 @@ jobs:
       MINIO_PASSWORD: ${{ secrets.MINIO_PASSWORD }}
       MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT }}
       SECRET: ${{ secrets.SECRET }}
+      INVOICE_RENDER_SECRET: ${{ secrets.INVOICE_RENDER_SECRET }}
       MAIL_HOST: ${{ secrets.MAIL_HOST }}
       MAIL_PORT: ${{ secrets.MAIL_PORT }}
       MAIL_USER: ${{ secrets.MAIL_USER }}

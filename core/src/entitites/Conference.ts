@@ -12,7 +12,7 @@ import Container from "typedi";
 import { I18nService } from "../services/i18n.service";
 import { LocalesType } from "../resolvers/types/translation.types";
 import { Attendee } from "./Attendee";
-import { FlawBilling } from "./Billing";
+import { Billing } from "./Billing";
 
 @ObjectType()
 export class ConferenceTranslations {
@@ -172,9 +172,9 @@ export class Conference extends TimeStamps {
   @Property({ _id: false })
   translations: ConferenceTranslation;
 
-  @Field(() => FlawBilling)
-  @Property({ type: () => FlawBilling, _id: false })
-  billing: FlawBilling;
+  @Field(() => Billing)
+  @Property({ type: () => Billing, _id: false })
+  billing: Billing;
 
   @Field(() => ImportantDates)
   @Property({ type: () => ImportantDates, _id: false })

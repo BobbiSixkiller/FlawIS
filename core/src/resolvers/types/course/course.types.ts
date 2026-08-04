@@ -17,8 +17,8 @@ import {
   registerEnumType,
 } from "type-graphql";
 import { IMutationResponse } from "../interface.types";
-import { FlawBilling } from "../../../entitites/Billing";
-import { FlawBillingInput } from "../conference.types";
+import { Billing } from "../../../entitites/Billing";
+import { BillingInput } from "../billing.types";
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -157,8 +157,8 @@ export class CourseInput implements Partial<Course> {
   @Min(0)
   price: number;
 
-  @Field(() => FlawBillingInput, { nullable: true })
-  billing?: FlawBilling;
+  @Field(() => BillingInput, { nullable: true })
+  billing?: Billing;
 
   @Field(() => [FormFieldInput], {
     description:

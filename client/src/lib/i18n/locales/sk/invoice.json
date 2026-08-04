@@ -1,7 +1,13 @@
 {
   "download": "Stiahnuť faktúru",
   "loading": "Sťahujem...",
+  "downloadError": "Faktúru sa nepodarilo stiahnuť.",
   "subject": "Faktúra",
+  "documentNumber": "Číslo dokladu",
+  "paymentDetails": "Platobné údaje",
+  "netPrice": "Cena bez DPH",
+  "note": "Poznámka",
+  "page": "Strana",
   "invoice": {
     "issuer": "Vydal",
     "payer": "Platca",
@@ -22,7 +28,7 @@
     "dueDate": "Dátum splatnosti",
     "vatDate": "Dátum zdaniteľného plnenia"
   },
-  "fee": "Konferenčný poplatok",
+  "fee": "Registračný poplatok",
   "sum": "Spolu",
   "item": "Položka",
   "price": "Cena",

@@ -9,8 +9,8 @@ import {
   ObjectType,
   registerEnumType,
 } from "type-graphql";
-import { FlawBilling } from "./Billing";
-import { Invoice } from "./Attendee";
+import { Billing } from "./Billing";
+import { Invoice } from "./Invoice";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
 import { Form, FormSubmission } from "./Form";
@@ -132,9 +132,9 @@ export class Course extends TimeStamps {
   @Property()
   end: Date;
 
-  @Field(() => FlawBilling, { nullable: true })
-  @Property({ type: () => FlawBilling, _id: false })
-  billing?: FlawBilling;
+  @Field(() => Billing, { nullable: true })
+  @Property({ type: () => Billing, _id: false })
+  billing?: Billing;
 
   @Field(() => Int)
   @Property()
@@ -213,6 +213,7 @@ export class CourseAttendeeUserStub extends UserStub {
 @Index({ course: 1 })
 @Index({ "user._id": 1 })
 @Index({ status: 1 })
+@Index({ "invoice.issuer.variableSymbol": 1 }, { sparse: true })
 export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -240,6 +241,12 @@ export class CourseAttendee extends TimeStamps {
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => Invoice, _id: false })
   invoice?: Invoice;
+
+  @Property()
+  invoiceId?: ObjectId;
+
+  @Field()
+  hasInvoice: boolean;
 
   @Property({ type: () => ReachEnrollment, _id: false })
   reachEnrollment?: ReachEnrollment;

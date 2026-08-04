@@ -10,14 +10,14 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    ...FlawBilling
+    ...InvoiceBilling
   }
   payer {
     ...UserBilling
   }
 }
 
-fragment FlawBilling on FlawBilling {
+fragment InvoiceBilling on Billing {
   name
   address {
     ...Address

@@ -14,6 +14,10 @@ import RHFormContainer from "@/components/RHFormContainer";
 import useValidation from "@/hooks/useValidation";
 import { formatDatetimeLocal } from "@/utils/helpers";
 
+function withoutNull(value: string | null | undefined) {
+  return value ?? undefined;
+}
+
 export default function UpdateInvoiceForm({
   invoice,
   lng,
@@ -34,7 +38,15 @@ export default function UpdateInvoiceForm({
   return (
     <RHFormContainer
       defaultValues={{
-        issuer: invoice.issuer,
+        issuer: {
+          ...invoice.issuer,
+          DIC: withoutNull(invoice.issuer.DIC),
+          IBAN: withoutNull(invoice.issuer.IBAN),
+          ICDPH: withoutNull(invoice.issuer.ICDPH),
+          ICO: withoutNull(invoice.issuer.ICO),
+          SWIFT: withoutNull(invoice.issuer.SWIFT),
+          variableSymbol: withoutNull(invoice.issuer.variableSymbol),
+        },
         body: {
           ...invoice.body,
           issueDate: formatDatetimeLocal(
@@ -50,7 +62,12 @@ export default function UpdateInvoiceForm({
             false
           ) as unknown as Date,
         },
-        payer: invoice.payer,
+        payer: {
+          ...invoice.payer,
+          DIC: withoutNull(invoice.payer.DIC),
+          ICDPH: withoutNull(invoice.payer.ICDPH),
+          ICO: withoutNull(invoice.payer.ICO),
+        },
       }}
       yupSchema={yup.object({
         issuer: yup.object({
@@ -62,11 +79,11 @@ export default function UpdateInvoiceForm({
             country: yup.string().trim().required(),
           }),
           variableSymbol: yup.string().trim().required(),
-          IBAN: yup.string().trim().required(),
-          SWIFT: yup.string().trim().required(),
-          ICO: yup.string().trim().required(),
-          DIC: yup.string().trim().required(),
-          ICDPH: yup.string().trim().required(),
+          IBAN: yup.string().trim().nullable(),
+          SWIFT: yup.string().trim().nullable(),
+          ICO: yup.string().trim().nullable(),
+          DIC: yup.string().trim().nullable(),
+          ICDPH: yup.string().trim().nullable(),
         }),
         payer: yup.object({
           name: yup.string().trim().required(),

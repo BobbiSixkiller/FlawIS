@@ -10,12 +10,14 @@ import {
 } from "type-graphql";
 import { Service } from "typedi";
 import { Attendee, UserStubUnion } from "../../entitites/Attendee";
+import { Invoice } from "../../entitites/Invoice";
 import { I18nService } from "../../services/i18n.service";
 import {
   AttendeeArgs,
   AttendeeConnection,
   AttendeeMutationResponse,
   InvoiceInput,
+  InvoiceOwnerType,
 } from "../types/attendee.types";
 import { ObjectId } from "mongodb";
 import { LoadResource } from "../../util/decorators";
@@ -26,6 +28,7 @@ import { AttendeeRepository } from "../../repositories/conferenceAttendee.reposi
 import { ConferenceRepository } from "../../repositories/conference.repository";
 import { UserRepository } from "../../repositories/user.repository";
 import { SubmissionRepository } from "../../repositories/submission.repository";
+import { InvoiceService } from "../../services/invoice.service";
 
 @Service()
 @Resolver(() => Attendee)
@@ -36,6 +39,7 @@ export class AttendeeResolver {
     private readonly userRepository: UserRepository,
     private readonly submissionRepository: SubmissionRepository,
     private readonly i18nService: I18nService,
+    private readonly invoiceService: InvoiceService,
   ) {}
 
   @Authorized(["ADMIN"])
@@ -69,11 +73,16 @@ export class AttendeeResolver {
     @Arg("data") data: InvoiceInput,
     @LoadResource(Attendee) attendee: DocumentType<Attendee>,
   ): Promise<AttendeeMutationResponse> {
-    console.log(data.body.issueDate);
-
-    attendee.invoice = data;
-
-    await attendee.save();
+    const result = await this.invoiceService.updateInvoice(
+      InvoiceOwnerType.CONFERENCE_ATTENDEE,
+      attendee.id,
+      data,
+      attendee.invoice,
+    );
+    if (!result.stored) {
+      attendee.invoice = result.invoice;
+      await attendee.save();
+    }
 
     return {
       message: this.i18nService.translate("updateInvoice", {
@@ -81,6 +90,16 @@ export class AttendeeResolver {
       }),
       data: attendee,
     };
+  }
+
+  @Authorized()
+  @FieldResolver(() => Invoice)
+  invoice(@Root() attendee: Attendee) {
+    return this.invoiceService.getInvoice(
+      InvoiceOwnerType.CONFERENCE_ATTENDEE,
+      attendee.id,
+      attendee.invoice,
+    );
   }
 
   @Authorized(["ADMIN"])

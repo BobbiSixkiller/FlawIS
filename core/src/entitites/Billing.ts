@@ -41,31 +41,26 @@ export class Billing {
   @Field({ nullable: true })
   @Property()
   ICDPH?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  IBAN?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  SWIFT?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  variableSymbol?: string;
 }
 
-@ObjectType({ description: "Flaw billing information" })
-export class FlawBilling extends Billing {
-  @Field()
-  @Property()
-  variableSymbol: string;
+export type InvoiceIssuerBilling = Billing & { variableSymbol: string };
 
-  @Field()
-  @Property()
-  ICO: string;
-
-  @Field()
-  @Property()
-  DIC: string;
-
-  @Field()
-  @Property()
-  ICDPH: string;
-
-  @Field()
-  @Property()
-  IBAN: string;
-
-  @Field()
-  @Property()
-  SWIFT: string;
+export function assertInvoiceIssuerBilling(
+  billing: Billing | null | undefined,
+): asserts billing is InvoiceIssuerBilling {
+  if (!billing?.variableSymbol?.trim()) {
+    throw new Error("Invoice issuer billing requires a variable symbol.");
+  }
 }
