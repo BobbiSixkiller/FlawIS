@@ -6,7 +6,7 @@ import { Service } from "typedi";
 import { Invoice } from "../entitites/Invoice";
 import {
   Billing,
-  assertInvoiceIssuerBilling,
+  getInvoiceVariableSymbolPrefix,
 } from "../entitites/Billing";
 import { Access } from "../entitites/User";
 import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
@@ -92,8 +92,7 @@ export class InvoiceService {
       vat: vatCents / 100,
     };
 
-    assertInvoiceIssuerBilling(issuer);
-    const prefix = this.validatePrefix(issuer.variableSymbol);
+    const prefix = getInvoiceVariableSymbolPrefix(issuer);
     let minimumSequence = await this.maximumSequence(prefix);
 
     while (true) {
@@ -216,21 +215,6 @@ export class InvoiceService {
       issuer: record.issuer,
       payer: record.payer,
     };
-  }
-
-  private validatePrefix(rawPrefix: string) {
-    const prefix = rawPrefix.trim();
-    if (!/^\d+$/.test(prefix)) {
-      throw new Error("Invoice variable-symbol prefix must be numeric.");
-    }
-    if (prefix.length > VARIABLE_SYMBOL_MAX_LENGTH - MINIMUM_SEQUENCE_DIGITS) {
-      throw new Error(
-        `Invoice variable-symbol prefix must contain at most ${
-          VARIABLE_SYMBOL_MAX_LENGTH - MINIMUM_SEQUENCE_DIGITS
-        } digits.`,
-      );
-    }
-    return prefix;
   }
 
   private formatVariableSymbol(prefix: string, sequence: number) {

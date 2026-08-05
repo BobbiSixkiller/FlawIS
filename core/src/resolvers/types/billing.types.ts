@@ -1,4 +1,9 @@
-import { IsOptional, IsString } from "class-validator";
+import {
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+} from "class-validator";
 import { Field, InputType } from "type-graphql";
 
 import { Address, Billing } from "../../entitites/Billing";
@@ -59,5 +64,9 @@ export class BillingInput implements Billing {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
+  @Matches(/^\d+$/, {
+    message: "variableSymbol must contain only numeric digits",
+  })
+  @MaxLength(10)
   variableSymbol?: string;
 }

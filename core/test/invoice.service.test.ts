@@ -246,6 +246,12 @@ test("rejects invalid prefixes and changes to issued invoice numbers", async () 
     }),
     /prefix must be numeric/i,
   );
+  await assert.rejects(
+    createInvoice(service, {
+      issuer: { ...issuer, variableSymbol: "1234567" },
+    }),
+    /at most 6 digits/i,
+  );
 
   const invoice = await createInvoice(service);
   assert.throws(

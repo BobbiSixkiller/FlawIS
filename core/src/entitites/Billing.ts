@@ -57,10 +57,28 @@ export class Billing {
 
 export type InvoiceIssuerBilling = Billing & { variableSymbol: string };
 
+export const INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH = 6;
+
+export function getInvoiceVariableSymbolPrefix(
+  billing: Billing | null | undefined,
+) {
+  const prefix = billing?.variableSymbol?.trim();
+  if (!prefix) {
+    throw new Error("Invoice issuer billing requires a variable symbol.");
+  }
+  if (!/^\d+$/.test(prefix)) {
+    throw new Error("Invoice variable-symbol prefix must be numeric.");
+  }
+  if (prefix.length > INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH) {
+    throw new Error(
+      `Invoice variable-symbol prefix must contain at most ${INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH} digits.`,
+    );
+  }
+  return prefix;
+}
+
 export function assertInvoiceIssuerBilling(
   billing: Billing | null | undefined,
 ): asserts billing is InvoiceIssuerBilling {
-  if (!billing?.variableSymbol?.trim()) {
-    throw new Error("Invoice issuer billing requires a variable symbol.");
-  }
+  getInvoiceVariableSymbolPrefix(billing);
 }

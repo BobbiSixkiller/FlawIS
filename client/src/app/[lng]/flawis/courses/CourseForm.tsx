@@ -24,6 +24,11 @@ import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
 import TiptapEditor from "@/components/editor/Editor";
 import { FieldType } from "@/lib/graphql/generated/graphql";
+import {
+  normalizeVariableSymbolPrefix,
+  VARIABLE_SYMBOL_PREFIX_MAX_LENGTH,
+  VARIABLE_SYMBOL_PREFIX_PATTERN,
+} from "@/lib/invoice/validation";
 
 export default function CourseForm({
   dialogId,
@@ -284,7 +289,11 @@ export default function CourseForm({
                 postal: yup.string().trim().required(),
                 country: yup.string().trim().required(),
               }),
-              variableSymbol: yup.string().trim().required(),
+              variableSymbol: yup
+                .string()
+                .trim()
+                .matches(VARIABLE_SYMBOL_PREFIX_PATTERN, t("variableSymbol"))
+                .required(),
               IBAN: yup.string().trim().required(),
               SWIFT: yup.string().trim().required(),
               ICO: yup.string().trim().required(),
@@ -298,7 +307,14 @@ export default function CourseForm({
           <Input label="Mesto" name="billing.address.city" />
           <Input label="PSC" name="billing.address.postal" />
           <Input label="Krajina" name="billing.address.country" />
-          <Input label="Variabilny" name="billing.variableSymbol" />
+          <Input
+            label="Variabilny"
+            name="billing.variableSymbol"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={VARIABLE_SYMBOL_PREFIX_MAX_LENGTH}
+            normalizeValue={normalizeVariableSymbolPrefix}
+          />
           <Input label="IBAN" name="billing.IBAN" />
           <Input label="SWIFT" name="billing.SWIFT" />
           <Input label="ICO" name="billing.ICO" />

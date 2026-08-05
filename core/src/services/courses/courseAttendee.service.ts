@@ -89,7 +89,8 @@ export class CourseAttendeeService {
       throw new Error("Form does not belong to this course!");
     }
 
-    if (course.isPaid && (!course.billing || !billing)) {
+    const isPaid = course.price > 0;
+    if (isPaid && (!course.billing || !billing)) {
       throw new Error(
         "Paid course registrations require issuer and payer billing information.",
       );
@@ -99,7 +100,7 @@ export class CourseAttendeeService {
     const { attendee, invoice } = await withOptionalTransaction(
       undefined,
       async (session) => {
-        const invoice = course.isPaid
+        const invoice = isPaid
           ? await this.invoiceService.createInvoice({
               attendeeId,
               body: this.i18nService.translate("invoice.body", {

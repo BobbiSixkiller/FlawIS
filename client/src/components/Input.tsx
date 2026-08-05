@@ -18,6 +18,7 @@ export interface InputProps extends InputHTMLAttributes<
   name: string;
   label?: string;
   control?: Control<any>;
+  normalizeValue?: (value: string) => string;
 }
 
 export function Input({
@@ -25,6 +26,7 @@ export function Input({
   label,
   onFocus,
   className,
+  normalizeValue,
   ...props
 }: InputProps) {
   const { control } = useFormContext();
@@ -110,7 +112,11 @@ export function Input({
                   (e.target.value ? new Date(e.target.value) : null);
               }
             }
-            else val = e.target.value;
+            else {
+              val = normalizeValue
+                ? normalizeValue(e.target.value)
+                : e.target.value;
+            }
 
             onFieldChange(val);
             props.onChange?.(e);

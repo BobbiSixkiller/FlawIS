@@ -46,7 +46,6 @@ function fixture(price: number) {
     id: courseId,
     name: "Contract law",
     price,
-    isPaid: price > 0,
     billing: price > 0 ? issuer : undefined,
     attendeesCount: 0,
   };
