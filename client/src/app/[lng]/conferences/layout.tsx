@@ -1,6 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies, headers } from "next/headers";
 
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import ParticipantTenantShell from "@/components/ParticipantTenantShell";
@@ -51,15 +50,18 @@ export default async function ConferencesLayout({
   modal: React.ReactNode;
   params: Promise<{ lng: string }>;
 }) {
-  const [{ lng }, user] = await Promise.all([params, getMe()]);
-  if (!user) redirect("/login");
+  const cookieStore = await cookies();
+  const [{ lng }, user] = await Promise.all([
+    params,
+    cookieStore.has("accessToken") ? getMe() : null,
+  ]);
 
   return (
     <ParticipantTenantShell
       lng={lng}
       user={user}
       modal={modal}
-      sessionPolling
+      sessionPolling={Boolean(user)}
     >
       {children}
     </ParticipantTenantShell>

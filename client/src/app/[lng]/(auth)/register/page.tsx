@@ -30,8 +30,8 @@ export default async function Register({
 
       <UserForm subdomain={subdomain} namespace="register" />
 
-      {subdomain.includes("conferences") ||
-        (subdomain.includes("courses") && (
+      {(subdomain.includes("conferences") ||
+        subdomain.includes("courses")) && (
           <div>
             <div className="relative flex py-6 items-center">
               <div className="grow border-t border-gray-300"></div>
@@ -45,7 +45,7 @@ export default async function Register({
               <GoogleSignIn />
             </div>
           </div>
-        ))}
+        )}
 
       <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-300">
         <Trans

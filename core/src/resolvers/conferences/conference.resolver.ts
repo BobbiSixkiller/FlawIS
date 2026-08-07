@@ -43,7 +43,6 @@ export class ConferenceResolver {
     private readonly i18nService: I18nService,
   ) {}
 
-  @Authorized()
   @Query(() => ConferenceConnection)
   async conferences(
     @Args() args: ConferenceArgs,
