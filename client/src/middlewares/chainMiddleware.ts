@@ -1,28 +1,30 @@
-import { NextMiddlewareResult } from "next/dist/server/web/types";
-import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import type { NextProxy } from "next/server";
+import { NextResponse } from "next/server";
 
 export type CustomMiddleware = (
-  req: NextRequest,
-  event: NextFetchEvent,
-  res: NextResponse
-) => NextMiddlewareResult | Promise<NextMiddlewareResult>;
+  req: Parameters<NextProxy>[0],
+  event: Parameters<NextProxy>[1],
+  res?: NextResponse
+) => ReturnType<NextProxy>;
 
 type MiddlewareFactory = (middleware: CustomMiddleware) => CustomMiddleware;
 
-export function chain(
+function compose(
   functions: MiddlewareFactory[],
   index = 0
 ): CustomMiddleware {
   const current = functions[index];
 
   if (current) {
-    const next = chain(functions, index + 1);
+    const next = compose(functions, index + 1);
     return current(next);
   }
 
-  return (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
-    return res;
-  };
+  return (_req, _event, res) => res;
 }
 
-export function parseSubdomain() {}
+export function chain(functions: MiddlewareFactory[]): NextProxy {
+  const composed = compose(functions);
+
+  return (req, event) => composed(req, event);
+}

@@ -5,7 +5,7 @@ import ModalTrigger from "@/components/ModalTrigger";
 import { PlusIcon, TagIcon } from "@heroicons/react/24/outline";
 import CourseForm from "./CourseForm";
 import { getCourses } from "./actions";
-import CourseList from "./CourseList";
+import OfferingList from "@/components/OfferingList";
 import Link from "next/link";
 
 export default async function CoursesPage({
@@ -36,7 +36,13 @@ export default async function CoursesPage({
         ]}
       />
 
-      <CourseList initialData={initialData} vars={{ sort: [] }} />
+      <OfferingList
+        kind="course"
+        initialData={initialData}
+        vars={{ sort: [] }}
+        hrefBase="/courses"
+        lng={lng}
+      />
 
       <Modal dialogId={createCourseDialogId} title="Novy kurz">
         <CourseForm dialogId={createCourseDialogId} />

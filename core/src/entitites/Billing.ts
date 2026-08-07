@@ -41,31 +41,44 @@ export class Billing {
   @Field({ nullable: true })
   @Property()
   ICDPH?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  IBAN?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  SWIFT?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  variableSymbol?: string;
 }
 
-@ObjectType({ description: "Flaw billing information" })
-export class FlawBilling extends Billing {
-  @Field()
-  @Property()
-  variableSymbol: string;
+export type InvoiceIssuerBilling = Billing & { variableSymbol: string };
 
-  @Field()
-  @Property()
-  ICO: string;
+export const INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH = 6;
 
-  @Field()
-  @Property()
-  DIC: string;
+export function getInvoiceVariableSymbolPrefix(
+  billing: Billing | null | undefined,
+) {
+  const prefix = billing?.variableSymbol?.trim();
+  if (!prefix) {
+    throw new Error("Invoice issuer billing requires a variable symbol.");
+  }
+  if (!/^\d+$/.test(prefix)) {
+    throw new Error("Invoice variable-symbol prefix must be numeric.");
+  }
+  if (prefix.length > INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH) {
+    throw new Error(
+      `Invoice variable-symbol prefix must contain at most ${INVOICE_VARIABLE_SYMBOL_PREFIX_MAX_LENGTH} digits.`,
+    );
+  }
+  return prefix;
+}
 
-  @Field()
-  @Property()
-  ICDPH: string;
-
-  @Field()
-  @Property()
-  IBAN: string;
-
-  @Field()
-  @Property()
-  SWIFT: string;
+export function assertInvoiceIssuerBilling(
+  billing: Billing | null | undefined,
+): asserts billing is InvoiceIssuerBilling {
+  getInvoiceVariableSymbolPrefix(billing);
 }

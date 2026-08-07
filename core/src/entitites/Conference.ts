@@ -1,18 +1,11 @@
-import { ArgumentValidationError, Field, Int, ObjectType } from "type-graphql";
-import {
-  getModelForClass,
-  Index,
-  pre,
-  prop as Property,
-} from "@typegoose/typegoose";
+import { Field, Int, ObjectType } from "type-graphql";
+import { Index, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 
 import { ObjectId } from "mongodb";
-import Container from "typedi";
-import { I18nService } from "../services/i18n.service";
 import { LocalesType } from "../resolvers/types/translation.types";
 import { Attendee } from "./Attendee";
-import { FlawBilling } from "./Billing";
+import { Billing } from "./Billing";
 
 @ObjectType()
 export class ConferenceTranslations {
@@ -85,80 +78,13 @@ export class Ticket {
   online: boolean;
 }
 
-@pre<Conference>("save", async function () {
-  if (this.isNew || this.isModified("translations.sk.name")) {
-    const conferenceExists = await getModelForClass(Conference)
-      .findOne({ "translations.sk.name": this.translations.sk.name })
-      .exec();
-    if (conferenceExists && conferenceExists.id !== this.id) {
-      throw new ArgumentValidationError([
-        {
-          target: Conference, // Object that was validated.
-          property: "translations.sk.name", // Object's property that haven't pass validation.
-          value: conferenceExists.translations.sk.name, // Value that haven't pass a validation
-          constraints: {
-            // Constraints that failed validation with error messages.
-            name: Container.get(I18nService).translate("nameExists", {
-              ns: "conference",
-              name: conferenceExists.translations.sk.name,
-            }),
-          },
-          //children?: ValidationError[], // Contains all nested validation errors of the property
-        },
-      ]);
-    }
-  }
-  if (this.isNew || this.isModified("translations.en.name")) {
-    const conferenceExists = await getModelForClass(Conference)
-      .findOne({ "translations.en.name": this.translations.en.name })
-      .exec();
-    if (conferenceExists && conferenceExists.id !== this.id) {
-      throw new ArgumentValidationError([
-        {
-          target: Conference, // Object that was validated.
-          property: "translations.en.name", // Object's property that haven't pass validation.
-          value: conferenceExists.translations.en.name, // Value that haven't pass a validation
-          constraints: {
-            // Constraints that failed validation with error messages.
-            name: Container.get(I18nService).translate("nameExists", {
-              ns: "conference",
-              name: conferenceExists.translations.en.name,
-            }),
-          },
-          //children?: ValidationError[], // Contains all nested validation errors of the property
-        },
-      ]);
-    }
-  }
-
-  if (this.isNew || this.isModified("slug")) {
-    const conferenceExists = await getModelForClass(Conference)
-      .findOne({ slug: this.slug })
-      .exec();
-    if (conferenceExists) {
-      throw new ArgumentValidationError([
-        {
-          target: Conference, // Object that was validated.
-          property: "slug", // Object's property that haven't pass validation.
-          value: this.slug, // Value that haven't pass a validation.
-          constraints: {
-            // Constraints that failed validation with error messages.
-            slug: Container.get(I18nService).translate("slugExists", {
-              ns: "conference",
-              slug: this.slug,
-            }),
-          },
-          //children?: ValidationError[], // Contains all nested validation errors of the property
-        },
-      ]);
-    }
-  }
-})
 @Index({
   slug: "text",
   "translations.sk.name": "text",
   "translations.en.name": "text",
 })
+@Index({ "translations.sk.name": 1 }, { unique: true })
+@Index({ "translations.en.name": 1 }, { unique: true })
 @ObjectType({ description: "Conference model type" })
 export class Conference extends TimeStamps {
   @Field(() => ObjectId)
@@ -172,9 +98,9 @@ export class Conference extends TimeStamps {
   @Property({ _id: false })
   translations: ConferenceTranslation;
 
-  @Field(() => FlawBilling)
-  @Property({ type: () => FlawBilling, _id: false })
-  billing: FlawBilling;
+  @Field(() => Billing)
+  @Property({ type: () => Billing, _id: false })
+  billing: Billing;
 
   @Field(() => ImportantDates)
   @Property({ type: () => ImportantDates, _id: false })
@@ -185,7 +111,6 @@ export class Conference extends TimeStamps {
   tickets: Ticket[];
 
   @Field(() => Int)
-  @Property({ default: 0 })
   attendeesCount: number;
 
   @Field(() => Attendee, { nullable: true })

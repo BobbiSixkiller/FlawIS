@@ -33,7 +33,7 @@ export default function ActivateAccountDialog({
         closeDialog(dialogId);
       }
     }
-  }, [user]);
+  }, [closeDialog, openDialog, user]);
 
   useEffect(() => {
     async function activateCb() {
@@ -44,7 +44,7 @@ export default function ActivateAccountDialog({
     }
 
     activateCb();
-  }, []);
+  }, [setMessage]);
 
   const [isPending, startTransition] = useTransition();
 

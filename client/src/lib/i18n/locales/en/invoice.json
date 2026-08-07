@@ -1,7 +1,13 @@
 {
   "download": "Download invoice",
   "loading": "Downloading...",
+  "downloadError": "The invoice could not be downloaded.",
   "subject": "Invoice",
+  "documentNumber": "Document number",
+  "paymentDetails": "Payment details",
+  "netPrice": "Net price",
+  "note": "Note",
+  "page": "Page",
   "invoice": {
     "issuer": "Issued by",
     "payer": "Payer",
@@ -22,7 +28,7 @@
     "dueDate": "Due Date",
     "vatDate": "VAT Date"
   },
-  "fee": "Conference Fee",
+  "fee": "Registration fee",
   "sum": "Sum",
   "item": "Item",
   "price": "Price",

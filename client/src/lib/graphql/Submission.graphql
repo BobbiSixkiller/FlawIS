@@ -36,6 +36,12 @@ query submission($id: ObjectId!) {
   }
 }
 
+query submissionInvite($token: String!) {
+  submissionInvite(token: $token) {
+    ...Submission
+  }
+}
+
 mutation createSubmission($data: SubmissionInput!) {
   createSubmission(data: $data) {
     message

@@ -5,6 +5,7 @@ import {
   Course,
   CourseAttendee,
   CourseSession,
+  ReachCourseConfig,
 } from "../../../entitites/Course";
 import { CreateArgs, CreateConnection } from "../pagination.types";
 import {
@@ -16,15 +17,17 @@ import {
   registerEnumType,
 } from "type-graphql";
 import { IMutationResponse } from "../interface.types";
-import { FlawBilling } from "../../../entitites/Billing";
-import { FlawBillingInput } from "../conference.types";
+import { Billing } from "../../../entitites/Billing";
+import { BillingInput } from "../billing.types";
 import {
   ArrayMaxSize,
   ArrayMinSize,
   IsDate,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
   Min,
   ValidateNested,
 } from "class-validator";
@@ -90,6 +93,21 @@ export class CourseMutationResponse extends IMutationResponse {
 }
 
 @InputType()
+export class ReachCourseConfigInput implements ReachCourseConfig {
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  courseId: string;
+
+  @Field()
+  @IsUrl({
+    protocols: ["https"],
+    require_protocol: true,
+  })
+  launchUrl: string;
+}
+
+@InputType()
 export class CourseInput implements Partial<Course> {
   @Field()
   @IsString()
@@ -139,8 +157,8 @@ export class CourseInput implements Partial<Course> {
   @Min(0)
   price: number;
 
-  @Field(() => FlawBillingInput, { nullable: true })
-  billing?: FlawBilling;
+  @Field(() => BillingInput, { nullable: true })
+  billing?: Billing;
 
   @Field(() => [FormFieldInput], {
     description:
@@ -151,6 +169,11 @@ export class CourseInput implements Partial<Course> {
   @ArrayMinSize(1)
   @ArrayMaxSize(20)
   formFields: FormFieldInput[];
+
+  @Field(() => ReachCourseConfigInput, { nullable: true })
+  @IsOptional()
+  @ValidateNested()
+  reachCourse?: ReachCourseConfigInput;
 }
 
 @ObjectType({ implements: IMutationResponse })

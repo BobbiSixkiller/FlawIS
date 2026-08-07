@@ -3,11 +3,17 @@ import {
   deleteCourseAttendee,
   getCourse,
 } from "../../flawis/courses/[id]/actions";
-import { Status } from "@/lib/graphql/generated/graphql";
+import {
+  ElearningProvisioningStatus,
+  InvoiceOwnerType,
+  Status,
+} from "@/lib/graphql/generated/graphql";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import {
   InboxArrowDownIcon,
+  AcademicCapIcon,
+  EnvelopeIcon,
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -18,6 +24,7 @@ import Link from "next/link";
 import CourseApplication from "../../flawis/courses/[id]/CourseApplication";
 import Attendance from "./Attendance";
 import CourseRegistrationForm from "../../flawis/courses/[id]/CourseRegistrationForm";
+import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
 
 export default async function CoursePage({
   params,
@@ -48,7 +55,14 @@ export default async function CoursePage({
             lng={lng}
             courseAttendee={course.attending}
             controls={
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {course.attending.hasInvoice && (
+                  <DownloadInvoiceButton
+                    attendeeId={course.attending.id}
+                    lng={lng}
+                    ownerType={InvoiceOwnerType.CourseAttendee}
+                  />
+                )}
                 {course.attending.status === Status.Applied && (
                   <ModalTrigger dialogId="delete-course-application">
                     <Button variant="destructive" size="icon">
@@ -66,6 +80,39 @@ export default async function CoursePage({
               </div>
             }
           />
+          {course.elearningAccess?.status ===
+            ElearningProvisioningStatus.Enrolled &&
+            course.elearningAccess.launchUrl && (
+              <div className="rounded-lg border border-green-300 bg-green-50 p-4 dark:border-green-700 dark:bg-green-950">
+                <h2 className="mb-3 text-lg font-semibold">E-learning</h2>
+                <Button
+                  as="a"
+                  href={course.elearningAccess.launchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  variant="positive"
+                >
+                  <AcademicCapIcon className="size-5" />
+                  Otvoriť e-learning
+                </Button>
+              </div>
+            )}
+          {course.elearningAccess?.status ===
+            ElearningProvisioningStatus.PendingInvitation && (
+              <div className="rounded-lg border border-orange-300 bg-orange-50 p-4 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-200">
+                <p className="flex items-center gap-2 font-medium">
+                  <EnvelopeIcon className="size-5" />
+                  Skontrolujte si e-mail a prijmite pozvánku do Reach 360.
+                </p>
+              </div>
+            )}
+          {course.elearningAccess?.status ===
+            ElearningProvisioningStatus.SyncFailed && (
+              <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700 dark:border-red-700 dark:bg-red-950 dark:text-red-200">
+                E-learningový prístup sa nepodarilo pripraviť. Kontaktujte
+                správcu kurzu.
+              </div>
+            )}
           <Attendance id={id} registrationForm={course.registrationForm} />
         </>
       ) : new Date() < new Date(course.registrationEnd) ? (

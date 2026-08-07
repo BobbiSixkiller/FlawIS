@@ -10,14 +10,14 @@ fragment Invoice on Invoice {
     vatDate
   }
   issuer {
-    ...FlawBilling
+    ...InvoiceBilling
   }
   payer {
     ...UserBilling
   }
 }
 
-fragment FlawBilling on FlawBilling {
+fragment InvoiceBilling on Billing {
   name
   address {
     ...Address
@@ -65,7 +65,7 @@ fragment Ticket on Ticket {
   }
 }
 
-fragment Conference on Conference {
+fragment ConferenceListItem on Conference {
   id
   slug
   translations {
@@ -84,6 +84,10 @@ fragment Conference on Conference {
     regEnd
     submissionDeadline
   }
+}
+
+fragment Conference on Conference {
+  ...ConferenceListItem
   createdAt
   updatedAt
 }
@@ -104,7 +108,7 @@ query conferences($after: String, $first: Int, $sort: [ConferenceSortInput]!) {
     edges {
       cursor
       node {
-        ...Conference
+        ...ConferenceListItem
       }
     }
     pageInfo {
@@ -124,7 +128,14 @@ query conference($slug: String!) {
       ...Ticket
     }
     attending {
-      ...Attendee
+      id
+      hasInvoice
+      ticket {
+        ...Ticket
+      }
+      submissions {
+        ...Submission
+      }
     }
   }
 }

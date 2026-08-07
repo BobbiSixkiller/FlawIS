@@ -39,6 +39,35 @@
     "delete": "Zmazať príspevok",
     "submissions": "Príspevky"
   },
+  "workspace": {
+    "status": {
+      "upcoming": "Pripravuje sa",
+      "ongoing": "Práve prebieha",
+      "ended": "Ukončená"
+    },
+    "registered": "Ste zaregistrovaný",
+    "importantDates": "Dôležité termíny",
+    "participation": "Vaša účasť",
+    "online": "Online účasť",
+    "inPerson": "Prezenčná účasť",
+    "registrationOpen": "Registrácia je otvorená",
+    "registrationOpenDescription": "Vyberte si formu účasti a dokončite registráciu na konferenciu.",
+    "registrationClosed": "Registrácia bola ukončená",
+    "registrationClosedDescription": "Na túto konferenciu sa už nie je možné zaregistrovať.",
+    "register": "Zaregistrovať sa",
+    "mySubmissions": "Moje príspevky",
+    "submissionsEditable": "Príspevky môžete pridávať a upravovať do termínu odovzdania.",
+    "submissionsReadOnly": "Termín odovzdania uplynul. Príspevky sú dostupné iba na čítanie.",
+    "addSubmission": "Pridať",
+    "editSubmission": "Upraviť príspevok",
+    "deleteSubmission": "Zmazať príspevok",
+    "authors": "Autori",
+    "presentationLanguage": "Jazyk prezentácie",
+    "downloadFile": "Stiahnuť súbor",
+    "fileMissing": "Súbor príspevku zatiaľ nebol nahraný.",
+    "noSubmissionsEditable": "Zatiaľ nemáte žiadny príspevok. Môžete pridať prvý.",
+    "noSubmissions": "Nemáte žiadne príspevky."
+  },
   "conference": {
     "start": "Začiatok",
     "end": "Koniec",

@@ -3,7 +3,7 @@
 import { LegacyRef, ReactNode } from "react";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInterns } from "./actions";
 import {
@@ -124,17 +124,14 @@ export default function ListInterns({
   initialData: Connection<ApplicationFragment>;
   vars: InternsQueryVariables;
 }) {
-  const InfiniteScrollListInternships = withInfiniteScroll<
-    ApplicationFragment,
-    InternsQueryVariables
-  >({
-    vars,
-    getData: getInterns,
-    initialData,
-    ListItem,
-    Container,
-    Placeholder,
-  });
-
-  return <InfiniteScrollListInternships />;
+  return (
+    <InfiniteScroll<ApplicationFragment, InternsQueryVariables>
+      vars={vars}
+      getData={getInterns}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={Placeholder}
+    />
+  );
 }

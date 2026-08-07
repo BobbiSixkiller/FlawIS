@@ -1,4 +1,5 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
+import { isSubdomainPublicPath } from "@/lib/authRoutes";
 import { CustomMiddleware } from "./chainMiddleware";
 
 const authPaths = [
@@ -10,31 +11,12 @@ const authPaths = [
   "/google/oauth",
 ];
 
-const objectIdRegex = /^\/[0-9a-fA-F]{24}$/;
-
-type SubdomainType = "courses" | "flawis" | "conferences" | "internships";
-
-function getSubdomainType(host: string): SubdomainType {
-  const first = host.split(".")[0];
-
-  if (first.includes("courses")) return "courses";
-  if (first.includes("flawis")) return "flawis";
-  if (first.includes("conferences")) return "conferences";
-  if (first.includes("intern")) return "internships";
-
-  // on localhost/dev this is returned
-  return "courses";
-}
-
-const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
-  flawis: () => false,
-  conferences: () => false,
-  internships: () => false,
-  courses: (path) => path === "/" || objectIdRegex.test(path),
-};
-
 export function withAuth(middleware: CustomMiddleware) {
-  return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
+  return async (
+    req: NextRequest,
+    event: NextFetchEvent,
+    res?: NextResponse
+  ) => {
     const url = req.nextUrl.clone();
     const localeRegex = /^\/(en|sk)(?=\/|$)/;
     const pathWithoutLocale = url.pathname.replace(localeRegex, "") || "/";
@@ -42,11 +24,9 @@ export function withAuth(middleware: CustomMiddleware) {
     const token = req.cookies.get("accessToken")?.value;
 
     const host = req.headers.get("host") ?? url.host;
-    const subdomainType = getSubdomainType(host);
 
     const isAuthPath = authPaths.includes(pathWithoutLocale);
-    const isSubdomainPublic =
-      subdomainExtraPublic[subdomainType](pathWithoutLocale);
+    const isSubdomainPublic = isSubdomainPublicPath(host, pathWithoutLocale);
 
     const isPublic = isAuthPath || isSubdomainPublic;
 

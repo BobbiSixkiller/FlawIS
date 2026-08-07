@@ -1,5 +1,3 @@
-import withPlaiceholder from "@plaiceholder/next";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: "standalone",
@@ -11,6 +9,8 @@ const nextConfig = {
     },
   },
   images: {
+    dangerouslyAllowLocalIP: true,
+    minimumCacheTTL: 60,
     remotePatterns: [
       {
         protocol: "http",
@@ -40,4 +40,4 @@ const nextConfig = {
   },
 };
 
-export default withPlaiceholder(nextConfig);
+export default nextConfig;

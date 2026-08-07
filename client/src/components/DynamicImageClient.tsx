@@ -35,7 +35,6 @@ export default function DynamicImageClient({
             loading ? "opacity-0" : "opacity-100"
           }`,
         )}
-        priority
       />
     </div>
   );

@@ -8,7 +8,7 @@ import { useEffect, useState, useRef } from "react";
 //implement nextjs intercepting route with modal and move this logic to main page of the dashboard group
 export default function SessionPolling() {
   const isPageVisible = usePageVisibility();
-  const timerIdRef = useRef<any>(null);
+  const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
   const router = useRouter();
   const path = usePathname();
@@ -33,7 +33,7 @@ export default function SessionPolling() {
     };
 
     const stopPolling = () => {
-      clearInterval(timerIdRef.current);
+      if (timerIdRef.current) clearInterval(timerIdRef.current);
     };
 
     if (isPageVisible && isPollingEnabled) {
@@ -45,7 +45,7 @@ export default function SessionPolling() {
     return () => {
       stopPolling();
     };
-  }, [isPageVisible, isPollingEnabled]);
+  }, [isPageVisible, isPollingEnabled, path, router]);
 
   return null;
 }

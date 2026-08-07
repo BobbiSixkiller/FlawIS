@@ -2,7 +2,7 @@ import { getMe } from "@/app/[lng]/(auth)/actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import { getSubmission } from "../../(withTabs)/submissions/actions";
+import { getSubmissionInvite } from "../../(withTabs)/submissions/actions";
 import { acceptAuthorInvite } from "./actions";
 
 export default async function RegisterPage({
@@ -16,11 +16,11 @@ export default async function RegisterPage({
   }>;
 }) {
   const { lng, slug } = await params;
-  const { submission: submissionId, token } = await searchParams;
+  const { token } = await searchParams;
 
   const [conference, submission, user] = await Promise.all([
     getConference(slug),
-    getSubmission(submissionId),
+    getSubmissionInvite(token),
     getMe(),
   ]);
 

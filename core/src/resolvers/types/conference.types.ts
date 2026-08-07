@@ -10,10 +10,10 @@ import { CreateArgs, CreateConnection } from "./pagination.types";
 import { IMutationResponse } from "./interface.types";
 import { Conference, ImportantDates, Ticket } from "../../entitites/Conference";
 import { IsBoolean, IsDate, IsString, Min } from "class-validator";
-import { Address, Billing, FlawBilling } from "../../entitites/Billing";
 import { Section } from "../../entitites/Section";
 import { ObjectId } from "mongodb";
 import { LocalesInput } from "./translation.types";
+import { BillingInput } from "./billing.types";
 
 @ObjectType({
   description: "ConferenceConnection type enabling cursor based pagination",
@@ -45,59 +45,6 @@ export class ConferenceMutationResponse extends IMutationResponse {
 export class SectionMutationResponse extends IMutationResponse {
   @Field(() => Section)
   data: Section;
-}
-
-@InputType()
-export class AddressInput implements Address {
-  @Field()
-  @IsString()
-  street: string;
-
-  @Field()
-  @IsString()
-  city: string;
-
-  @Field()
-  @IsString()
-  postal: string;
-
-  @Field()
-  @IsString()
-  country: string;
-}
-
-@InputType()
-export class FlawBillingInput implements FlawBilling {
-  @Field()
-  @IsString()
-  name: string;
-
-  @Field(() => AddressInput)
-  address: AddressInput;
-
-  @Field()
-  @IsString()
-  DIC: string;
-
-  @Field()
-  @IsString()
-  ICDPH: string;
-
-  @Field()
-  @IsString()
-  ICO: string;
-
-  @Field()
-  @IsString()
-  IBAN: string;
-
-  @Field()
-  @IsString()
-  SWIFT: string;
-
-  @Field()
-  @IsString()
-  variableSymbol: string;
 }
 
 @InputType()
@@ -172,8 +119,8 @@ export class ConferenceInput {
   @IsString()
   slug: string;
 
-  @Field(() => FlawBillingInput)
-  billing: FlawBillingInput;
+  @Field(() => BillingInput)
+  billing: BillingInput;
 
   @Field(() => DatesInput)
   dates: DatesInput;

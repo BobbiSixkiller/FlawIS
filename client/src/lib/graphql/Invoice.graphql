@@ -1,0 +1,5 @@
+query invoice($ownerType: InvoiceOwnerType!, $attendeeId: ObjectId!) {
+  invoice(ownerType: $ownerType, attendeeId: $attendeeId) {
+    ...Invoice
+  }
+}

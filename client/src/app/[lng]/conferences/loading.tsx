@@ -1,35 +1,13 @@
+import OfferingListSkeleton from "@/components/OfferingListSkeleton";
+
 export default function Loading() {
   return (
-    <div>
-      <div className="animate-pulse">
-        <div className="flex justify-between">
-          <div className="h-4 bg-slate-200 dark:bg-slate-500 rounded-sm w-1/3"></div>
-          <div className="rounded-md bg-slate-200 dark:bg-slate-500 h-9 w-20"></div>
-        </div>
-        <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm w-1/2"></div>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <div className="h-7 w-40 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+        <div className="h-3 w-64 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
       </div>
-      <div className="mt-6 flex flex-col gap-4">
-        {[...new Array(6)].map((i, index) => (
-          <div
-            key={index}
-            className="rounded-2xl border dark:border-slate-500 p-4 shadow-sm"
-          >
-            <div className="animate-pulse flex space-x-4">
-              <div className="rounded-full bg-slate-200 dark:bg-slate-500 h-10 w-10"></div>
-              <div className="flex-1 space-y-6 py-1">
-                <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm"></div>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm col-span-2"></div>
-                    <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm col-span-1"></div>
-                  </div>
-                  <div className="h-2 bg-slate-200 dark:bg-slate-500 rounded-sm"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <OfferingListSkeleton />
     </div>
   );
 }

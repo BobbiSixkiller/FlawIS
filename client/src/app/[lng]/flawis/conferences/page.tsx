@@ -2,7 +2,7 @@ import Heading from "@/components/Heading";
 import { getConferences } from "./actions";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { translate } from "@/lib/i18n";
-import ListConferences from "../../conferences/ListConferences";
+import OfferingList from "@/components/OfferingList";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
@@ -37,7 +37,13 @@ export default async function Conferences({
       />
 
       {initialData && (
-        <ListConferences initialData={initialData} vars={{ sort: [] }} />
+        <OfferingList
+          kind="conference"
+          initialData={initialData}
+          vars={{ sort: [] }}
+          hrefBase="/conferences"
+          lng={lng}
+        />
       )}
 
       <Modal title="Nova konferencia" dialogId={newConferenceDialogId}>

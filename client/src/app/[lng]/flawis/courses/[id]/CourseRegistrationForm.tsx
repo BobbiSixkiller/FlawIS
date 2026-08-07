@@ -177,7 +177,7 @@ export default function CourseRegistrationForm({
         }
       }}
     >
-      {course.isPaid && (
+      {course.price > 0 && (
         <WizzardStep
           name={t("registration.billing.info", { ns: "conferences" })}
           yupSchema={yup.object({

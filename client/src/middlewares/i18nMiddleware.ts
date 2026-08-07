@@ -6,7 +6,11 @@ import { CustomMiddleware } from "./chainMiddleware";
 acceptLanguage.languages(languages);
 
 export function withLocalization(middleware: CustomMiddleware) {
-  return (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
+  return (
+    req: NextRequest,
+    event: NextFetchEvent,
+    res?: NextResponse
+  ) => {
     const url = req.nextUrl.clone();
     const domain =
       process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk";

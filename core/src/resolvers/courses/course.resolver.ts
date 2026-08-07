@@ -13,7 +13,13 @@ import {
 import { Service } from "typedi";
 import { CourseService } from "../../services/courses/course.service";
 import { I18nService } from "../../services/i18n.service";
-import { Category, Course, CourseAttendee } from "../../entitites/Course";
+import {
+  Category,
+  Course,
+  CourseAttendee,
+  ElearningAccess,
+  ReachCourseConfig,
+} from "../../entitites/Course";
 import {
   AttendanceConnection,
   CourseArgs,
@@ -28,6 +34,7 @@ import { Access } from "../../entitites/User";
 import { Form } from "../../entitites/Form";
 import { FormService } from "../../services/form.service";
 import { CategoryService } from "../../services/courses/category.service";
+import { Reach360Service } from "../../services/reach360.service";
 
 @Service()
 @Resolver(() => Course)
@@ -38,6 +45,7 @@ export class CourseResolver {
     private readonly formService: FormService,
     private readonly categoryService: CategoryService,
     private readonly i18nService: I18nService,
+    private readonly reach360Service: Reach360Service,
   ) {}
 
   @Query(() => Course)
@@ -50,6 +58,13 @@ export class CourseResolver {
     return await this.courseService.getPaginatedCourses(args);
   }
 
+  @Authorized([Access.Admin])
+  @Query(() => ReachCourseConfig, { nullable: true })
+  async courseReachConfig(@Arg("courseId") courseId: ObjectId) {
+    return await this.reach360Service.getCourseConfig(courseId);
+  }
+
+  @Authorized([Access.Admin])
   @Mutation(() => CourseMutationResponse)
   async createCourse(@Arg("data") data: CourseInput) {
     const course = await this.courseService.createCourse(data);
@@ -63,6 +78,7 @@ export class CourseResolver {
     };
   }
 
+  @Authorized([Access.Admin])
   @Mutation(() => CourseMutationResponse)
   async updateCourse(@Arg("id") id: ObjectId, @Arg("data") data: CourseInput) {
     const course = await this.courseService.updateCourse(id, data);
@@ -76,6 +92,7 @@ export class CourseResolver {
     };
   }
 
+  @Authorized([Access.Admin])
   @Mutation(() => CourseMutationResponse)
   async deleteCourse(@Arg("id") id: ObjectId) {
     const course = await this.courseService.deleteCourse(id);
@@ -99,6 +116,20 @@ export class CourseResolver {
     return await this.categoryService.getCategories(
       categories.map((c) => c._id),
     );
+  }
+
+  @FieldResolver(() => Boolean)
+  hasElearning(@Root() { reachCourse }: Course) {
+    return Boolean(reachCourse?.courseId);
+  }
+
+  @Authorized()
+  @FieldResolver(() => ElearningAccess, { nullable: true })
+  async elearningAccess(
+    @Root() { id }: Course,
+    @Ctx() { user }: Context,
+  ) {
+    return await this.reach360Service.getElearningAccess(id, user!.id);
   }
 
   @Authorized()

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getAttendees } from "./actions";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import {
@@ -66,17 +66,14 @@ export default function ListAttendees({
   initialData: Connection<AttendeeFragment>;
   vars: AttendeesQueryVariables;
 }) {
-  const InfiniteScrollListAttendees = withInfiniteScroll<
-    AttendeeFragment,
-    AttendeesQueryVariables
-  >({
-    vars,
-    getData: getAttendees,
-    initialData,
-    ListItem,
-    Container,
-    Placeholder,
-  });
-
-  return <InfiniteScrollListAttendees />;
+  return (
+    <InfiniteScroll<AttendeeFragment, AttendeesQueryVariables>
+      vars={vars}
+      getData={getAttendees}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={Placeholder}
+    />
+  );
 }

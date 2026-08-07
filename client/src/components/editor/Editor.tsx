@@ -69,7 +69,7 @@ export default function TiptapEditor({
     ) {
       editor.commands.focus();
     }
-  }, [formState, editor]);
+  }, [editor, fieldState.error, formState]);
 
   const debouncedUpdates = useDebouncedCallback((editor: Editor) => {
     if (editor) {

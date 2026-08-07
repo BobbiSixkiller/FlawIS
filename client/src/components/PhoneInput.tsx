@@ -12,6 +12,7 @@ export default function PhoneInput({ label, name, control }: InputProps) {
     name,
     control,
   });
+  const onFieldChange = field.onChange;
 
   const [phoneField, setPhoneField] = useState({
     code: parsePhoneNumberFromString(String(field?.value))?.countryCallingCode
@@ -25,9 +26,9 @@ export default function PhoneInput({ label, name, control }: InputProps) {
 
   useEffect(() => {
     if (phoneField.code && phoneField.number) {
-      field.onChange(Object.values(phoneField).join().replace(",", ""));
-    } else field.onChange();
-  }, [phoneField]);
+      onFieldChange(Object.values(phoneField).join().replace(",", ""));
+    } else onFieldChange();
+  }, [onFieldChange, phoneField]);
 
   return (
     <div>

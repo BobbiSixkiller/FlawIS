@@ -13,7 +13,7 @@ import { JSONObject, ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./middlewares/typegoose.middleware";
 
 import { UserResolver } from "./resolvers/user.resolver";
-import { ConferencerResolver } from "./resolvers/conferences/conference.resolver";
+import { ConferenceResolver } from "./resolvers/conferences/conference.resolver";
 
 import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
@@ -35,6 +35,8 @@ import { CourseSessionResolver } from "./resolvers/courses/courseSession.resolve
 import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resolver";
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
 import { CategoryResolver } from "./resolvers/courses/category.resolver";
+import { registerReach360Webhook } from "./routes/reach360Webhook";
+import { InvoiceResolver } from "./resolvers/invoice.resolver";
 
 env.config();
 
@@ -59,7 +61,7 @@ async function main() {
   const schema = await buildSchema({
     resolvers: [
       UserResolver,
-      ConferencerResolver,
+      ConferenceResolver,
       SectionResolver,
       SubmissionResolver,
       AttendeeResolver,
@@ -70,6 +72,7 @@ async function main() {
       CourseAttendeeResolver,
       AttendanceRecordResolver,
       CategoryResolver,
+      InvoiceResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],
@@ -114,6 +117,7 @@ async function main() {
     }),
   );
   app.use(cookieParser());
+  registerReach360Webhook(app);
   app.use(
     "/graphql",
     Express.json(),

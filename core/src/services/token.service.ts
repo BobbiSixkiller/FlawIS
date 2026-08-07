@@ -21,8 +21,7 @@ export class TokenService {
     return token;
   }
 
-  // Verify a one-time-use token
-  async verifyOneTimeToken<T>(token: string) {
+  async inspectOneTimeToken<T>(token: string) {
     const decoded = verifyJwt<{ tokenId: string; payload?: T }>(token);
     if (!decoded) {
       throw new Error(
@@ -37,6 +36,13 @@ export class TokenService {
         this.i18nService.translate("tokenUsed", { ns: "common" })
       );
     }
+
+    return decoded;
+  }
+
+  // Verify and consume a one-time-use token.
+  async verifyOneTimeToken<T>(token: string) {
+    const decoded = await this.inspectOneTimeToken<T>(token);
 
     // Mark the token ID as used
     await this.redisService.delete(decoded.tokenId);

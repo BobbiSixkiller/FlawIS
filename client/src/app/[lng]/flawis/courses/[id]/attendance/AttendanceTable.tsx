@@ -5,29 +5,34 @@ import {
   AttendanceFragment,
   AttendanceQuery,
   AttendanceQueryVariables,
+  ElearningProvisioningStatus,
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { cn, formatDatetimeLocal } from "@/utils/helpers";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
-import { changeCourseAttendeeStatus, getCourseAttendance } from "./actions";
+import {
+  changeCourseAttendeeStatus,
+  getCourseAttendance,
+  syncCourseElearningAccess,
+} from "./actions";
 import {
   Connection,
-  withInfiniteScroll,
+  InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import {
   Children,
   cloneElement,
   isValidElement,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import Button from "@/components/Button";
 import {
   CheckIcon,
+  ArrowPathIcon,
   PencilIcon,
   TrashIcon,
   XMarkIcon,
@@ -41,6 +46,7 @@ import HoursAttended from "./HoursAttended";
 import OnlineSwitch from "./OnlineSwitch";
 import AttendeeApplicationView from "./AttendeeApplicationView";
 import Tooltip from "@/components/Tooltip";
+import { useMessageStore } from "@/stores/messageStore";
 
 interface ScrollState {
   vertical: boolean;
@@ -187,10 +193,10 @@ function AttendanceTableContainer({
 
         {/* Body rows */}
         {Children.map(children, (child) => {
-          if (!isValidElement(child)) {
+          if (!isValidElement<{ scrollState?: ScrollState }>(child)) {
             return child;
           }
-          return cloneElement(child, { ...child.props, scrollState });
+          return cloneElement(child, { scrollState });
         })}
       </div>
     </div>
@@ -212,6 +218,8 @@ function AttendanceRow({
   const enableDelete = data?.attendee.status === Status.Rejected;
 
   const user = useUser();
+  const setMessage = useMessageStore((state) => state.setMessage);
+  const [syncingElearning, setSyncingElearning] = useState(false);
 
   return (
     <>
@@ -231,13 +239,48 @@ function AttendanceRow({
           ])}
         >
           {user?.access.includes(Access.Admin) ? (
-            <ModalTrigger dialogId={`attendee:${data?.attendee.id}`}>
-              <button className="w-full cursor-pointer text-center">
-                <span className="hover:underline">
-                  {data?.attendee.user.name}
-                </span>
-              </button>
-            </ModalTrigger>
+            <div className="flex w-full items-center gap-1">
+              <ModalTrigger dialogId={`attendee:${data?.attendee.id}`}>
+                <button className="min-w-0 flex-1 cursor-pointer truncate text-center">
+                  <span className="hover:underline">
+                    {data?.attendee.user.name}
+                  </span>
+                </button>
+              </ModalTrigger>
+              {data?.attendee.elearningStatus ===
+                ElearningProvisioningStatus.SyncFailed && (
+                <Tooltip
+                  position="below"
+                  message={`Znova synchronizovať prístup k Reach 360${
+                    data.attendee.elearningErrorCode
+                      ? ` (${data.attendee.elearningErrorCode})`
+                      : ""
+                  }`}
+                >
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="size-7 shrink-0"
+                    disabled={syncingElearning}
+                    onClick={async () => {
+                      setSyncingElearning(true);
+                      const result = await syncCourseElearningAccess({
+                        attendeeId: data.attendee.id,
+                      });
+                      setMessage(result.message, result.success);
+                      setSyncingElearning(false);
+                    }}
+                  >
+                    <ArrowPathIcon
+                      className={cn([
+                        "size-4",
+                        syncingElearning && "animate-spin",
+                      ])}
+                    />
+                  </Button>
+                </Tooltip>
+              )}
+            </div>
           ) : (
             <span>{data?.attendee.user.name}</span>
           )}
@@ -424,21 +467,14 @@ export function AttendanceTable({
     },
   }));
 
-  const InfiniteScrollCourseList = useMemo(
-    () =>
-      withInfiniteScroll<AttendanceFragment, AttendanceQueryVariables>({
-        vars,
-        getData: getCourseAttendance,
-        initialData,
-        ListItem,
-        Container,
-        Placeholder: AttendancePlaceholder,
-      }),
-    // ListItem and Container are stable (useState initializer).
-    // vars/initialData come from the server and seed useState inside withInfiniteScroll — not reactive.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ListItem, Container],
+  return (
+    <InfiniteScroll<AttendanceFragment, AttendanceQueryVariables>
+      vars={vars}
+      getData={getCourseAttendance}
+      initialData={initialData}
+      ListItem={ListItem}
+      Container={Container}
+      Placeholder={AttendancePlaceholder}
+    />
   );
-
-  return <InfiniteScrollCourseList />;
 }

@@ -42,16 +42,23 @@ export function toDTO<T>(doc: DocumentType<T>): T {
 export async function withOptionalTransaction<T>(
   session: ClientSession | undefined,
   fn: (session: ClientSession | undefined) => Promise<T>,
+  retryOn?: (error: unknown) => boolean,
 ): Promise<T> {
   if (session) return fn(session);
 
   const newSession = await mongoose.startSession();
   try {
-    let result!: T;
-    await newSession.withTransaction(async () => {
-      result = await fn(newSession);
-    });
-    return result;
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        let result!: T;
+        await newSession.withTransaction(async () => {
+          result = await fn(newSession);
+        });
+        return result;
+      } catch (error) {
+        if (attempt >= 4 || !retryOn?.(error)) throw error;
+      }
+    }
   } finally {
     newSession.endSession();
   }

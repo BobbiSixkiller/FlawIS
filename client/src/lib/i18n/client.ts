@@ -1,7 +1,7 @@
 "use client";
 
 import i18next from "i18next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   initReactI18next,
   useTranslation as useTranslationOrg,
@@ -40,21 +40,15 @@ export function useTranslation(
 ) {
   const ret = useTranslationOrg(ns, options);
   const { i18n } = ret;
+
+  useEffect(() => {
+    if (runsOnServerSide || !lng || i18n.resolvedLanguage === lng) return;
+    void i18n.changeLanguage(lng);
+  }, [lng, i18n]);
+
   if (runsOnServerSide && lng && i18n.resolvedLanguage !== lng) {
-    i18n.changeLanguage(lng);
-  } else {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [activeLng, setActiveLng] = useState(i18n.resolvedLanguage);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (activeLng === i18n.resolvedLanguage) return;
-      setActiveLng(i18n.resolvedLanguage);
-    }, [activeLng, i18n.resolvedLanguage]);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (!lng || i18n.resolvedLanguage === lng) return;
-      i18n.changeLanguage(lng);
-    }, [lng, i18n]);
+    void i18n.changeLanguage(lng);
   }
+
   return ret;
 }

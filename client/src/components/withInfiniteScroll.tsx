@@ -1,6 +1,13 @@
 "use client";
 
-import { ComponentType, ReactNode, Ref, useEffect, useState } from "react";
+import {
+  ComponentType,
+  Fragment,
+  ReactNode,
+  Ref,
+  useEffect,
+  useState,
+} from "react";
 import { useInView } from "react-intersection-observer";
 
 interface PageInfo {
@@ -23,17 +30,19 @@ export interface PaginationArgs {
   first?: number;
 }
 
-interface ScrollProps<TEdge, TGqlVars> {
+interface InfiniteScrollProps<TEdge, TGqlVars> {
   initialData: Connection<TEdge>;
   vars: TGqlVars;
   getData: (vars: TGqlVars & PaginationArgs) => Promise<Connection<TEdge>>;
-  ListItem: ComponentType<{ data?: TEdge }>;
+  ListItem?: ComponentType<{ data?: TEdge }>;
+  renderItem?: (data?: TEdge) => ReactNode;
   Placeholder: ComponentType<{ cardRef?: Ref<HTMLDivElement> }>;
   Container: ComponentType<{ children: ReactNode }>;
+  Empty?: ReactNode;
   customSort?: (a: Edge<TEdge> | null, b: Edge<TEdge> | null) => number;
 }
 
-export function withInfiniteScroll<TEdge, TGqlVars>({
+export function InfiniteScroll<TEdge, TGqlVars>({
   Container,
   ListItem,
   vars,
@@ -41,43 +50,53 @@ export function withInfiniteScroll<TEdge, TGqlVars>({
   Placeholder,
   initialData,
   customSort,
-}: ScrollProps<TEdge, TGqlVars>) {
-  return function WithInfiniteScrollComponent() {
-    const [data, setData] = useState(initialData);
-    const { ref, inView } = useInView();
+  renderItem,
+  Empty,
+}: InfiniteScrollProps<TEdge, TGqlVars>) {
+  const [data, setData] = useState(initialData);
+  const { ref, inView } = useInView();
 
-    // Memoize the vars object to avoid unnecessary re-renders
-    const varsStr = JSON.stringify(vars);
+  useEffect(() => {
+    if (!inView || !data.pageInfo.hasNextPage) return;
 
-    useEffect(() => {
-      async function getMore() {
-        const newData = await getData({
-          ...vars,
-          after: data.pageInfo.endCursor, // Update with the latest cursor
-        });
+    let cancelled = false;
 
-        setData((prevData) => {
-          const edges = [...prevData.edges, ...newData.edges]; // Append new edges
+    async function getMore() {
+      const newData = await getData({
+        ...vars,
+        after: data.pageInfo.endCursor,
+      });
 
-          return {
-            edges: customSort ? edges.sort(customSort) : edges,
-            pageInfo: newData.pageInfo, // Update pageInfo
-          };
-        });
-      }
+      if (cancelled) return;
 
-      if (inView && data.pageInfo.hasNextPage) {
-        getMore();
-      }
-    }, [inView, data, varsStr]);
+      setData((previousData) => {
+        const edges = [...previousData.edges, ...newData.edges];
 
-    return (
-      <Container>
-        {data.edges.map((edge) => (
+        return {
+          edges: customSort ? edges.sort(customSort) : edges,
+          pageInfo: newData.pageInfo,
+        };
+      });
+    }
+
+    void getMore();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customSort, data.pageInfo, getData, inView, vars]);
+
+  return (
+    <Container>
+      {data.edges.length === 0 && Empty ? Empty : null}
+      {data.edges.map((edge) =>
+        renderItem ? (
+          <Fragment key={edge?.cursor}>{renderItem(edge?.node)}</Fragment>
+        ) : ListItem ? (
           <ListItem key={edge?.cursor} data={edge?.node} />
-        ))}
-        {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
-      </Container>
-    );
-  };
+        ) : null,
+      )}
+      {data.pageInfo.hasNextPage && <Placeholder cardRef={ref} />}
+    </Container>
+  );
 }

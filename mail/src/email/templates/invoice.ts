@@ -1,25 +1,31 @@
 import { Msg } from '../email.service';
 
-interface Address {
+export interface Address {
   street: string;
   city: string;
   postal: string;
   country: string;
 }
 
-interface Billing {
+export interface Billing {
   name: string;
   address: Address;
+  ICO?: string;
+  DIC?: string;
+  ICDPH?: string;
+}
+
+export interface InvoiceIssuer extends Billing {
   ICO: string;
   DIC: string;
   ICDPH: string;
-  variableSymbol?: string;
-  IBAN?: string;
-  SWIFT?: string;
-  stampUrl?: string;
+  variableSymbol: string;
+  IBAN: string;
+  SWIFT: string;
 }
 
-interface InvoiceBody {
+export interface InvoiceBody {
+  type: string;
   issueDate: Date;
   vatDate: Date;
   dueDate: Date;
@@ -29,9 +35,9 @@ interface InvoiceBody {
   comment: string;
 }
 
-interface Invoice {
+export interface Invoice {
   payer: Billing;
-  issuer: Billing;
+  issuer: InvoiceIssuer;
   body: InvoiceBody;
 }
 

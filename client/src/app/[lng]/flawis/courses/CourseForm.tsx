@@ -8,6 +8,7 @@ import {
   CourseFragment,
   CourseInput,
   FormFieldInput,
+  ReachCourseConfigInput,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
@@ -23,15 +24,22 @@ import { updateCouse } from "./[id]/actions";
 import { Textarea } from "@/components/Textarea";
 import TiptapEditor from "@/components/editor/Editor";
 import { FieldType } from "@/lib/graphql/generated/graphql";
+import {
+  normalizeVariableSymbolPrefix,
+  VARIABLE_SYMBOL_PREFIX_MAX_LENGTH,
+  VARIABLE_SYMBOL_PREFIX_PATTERN,
+} from "@/lib/invoice/validation";
 
 export default function CourseForm({
   dialogId,
   course,
+  reachCourseConfig,
 }: {
   dialogId: string;
   course?: CourseFragment;
+  reachCourseConfig?: ReachCourseConfigInput | null;
 }) {
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(course?.price ?? 0);
   const { lng } = useParams<{ lng: string }>();
   const { yup } = useValidation();
 
@@ -43,7 +51,12 @@ export default function CourseForm({
   const closeDialog = useDialogStore((s) => s.closeDialog);
 
   return (
-    <WizzardForm<CourseInput & { thumbnailFile: File | null }>
+    <WizzardForm<
+      CourseInput & {
+        thumbnailFile: File | null;
+        hasElearning: boolean;
+      }
+    >
       lng={lng}
       defaultValues={{
         name: course?.name ?? "",
@@ -60,6 +73,11 @@ export default function CourseForm({
         billing: course?.billing,
         formFields: course?.registrationForm.fields ?? [],
         thumbnailFile: null,
+        hasElearning: Boolean(reachCourseConfig),
+        reachCourse: reachCourseConfig ?? {
+          courseId: "",
+          launchUrl: "",
+        },
       }}
       onSubmitCb={async (vals, methods) => {
         const { url: thumbnail, error: thumbnailError } = await uploadOrDelete(
@@ -73,9 +91,15 @@ export default function CourseForm({
           return;
         }
 
-        const { thumbnailFile: _, ...courseVals } = vals;
+        const {
+          thumbnailFile: _,
+          hasElearning,
+          ...courseVals
+        } = vals;
         const data = {
           ...courseVals,
+          billing: courseVals.price > 0 ? courseVals.billing : null,
+          reachCourse: hasElearning ? courseVals.reachCourse : null,
           categories: (courseVals.categories as any[]).map((c: any) =>
             typeof c === "object" && c !== null && c.val ? c.val.id : c,
           ),
@@ -195,11 +219,63 @@ export default function CourseForm({
                 label="Cena kurzu v centoch s DPH"
                 name="price"
                 type="number"
-                onChange={(e) => setPrice(parseInt(e.target.value))}
+                onChange={(event) => {
+                  const value = (event.target as HTMLInputElement)
+                    .valueAsNumber;
+                  setPrice(Number.isFinite(value) ? value : 0);
+                }}
               />
             </div>
           </div>
         )}
+      </WizzardStep>
+      <WizzardStep
+        name="E-learning"
+        yupSchema={yup.object({
+          hasElearning: yup.boolean().required(),
+          reachCourse: yup.mixed().when("hasElearning", {
+            is: true,
+            then: () =>
+              yup
+                .object({
+                  courseId: yup.string().trim().required(),
+                  launchUrl: yup.string().trim().url().required(),
+                })
+                .required(),
+            otherwise: () => yup.mixed().nullable(),
+          }),
+        })}
+      >
+        {(methods) => {
+          const hasElearning = methods.watch("hasElearning");
+
+          return (
+            <div className="space-y-6 max-w-2xl w-full">
+              <CheckBox
+                control={methods.control}
+                label="Kurz obsahuje e-learning v Reach 360"
+                name="hasElearning"
+              />
+
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Použite ID publikovaného kurzu a odkaz skopírovaný z karty
+                Learn v Reach 360. API URL kurzu nie je odkaz pre účastníkov.
+              </p>
+
+              <Input
+                label="Reach 360 course ID"
+                name="reachCourse.courseId"
+                disabled={!hasElearning}
+              />
+              <Input
+                label="Odkaz na spustenie e-learningu"
+                name="reachCourse.launchUrl"
+                type="url"
+                disabled={!hasElearning}
+              />
+            </div>
+          );
+        }}
       </WizzardStep>
       {price > 0 && (
         <WizzardStep
@@ -213,7 +289,11 @@ export default function CourseForm({
                 postal: yup.string().trim().required(),
                 country: yup.string().trim().required(),
               }),
-              variableSymbol: yup.string().trim().required(),
+              variableSymbol: yup
+                .string()
+                .trim()
+                .matches(VARIABLE_SYMBOL_PREFIX_PATTERN, t("variableSymbol"))
+                .required(),
               IBAN: yup.string().trim().required(),
               SWIFT: yup.string().trim().required(),
               ICO: yup.string().trim().required(),
@@ -227,7 +307,14 @@ export default function CourseForm({
           <Input label="Mesto" name="billing.address.city" />
           <Input label="PSC" name="billing.address.postal" />
           <Input label="Krajina" name="billing.address.country" />
-          <Input label="Variabilny" name="billing.variableSymbol" />
+          <Input
+            label="Variabilny"
+            name="billing.variableSymbol"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={VARIABLE_SYMBOL_PREFIX_MAX_LENGTH}
+            normalizeValue={normalizeVariableSymbolPrefix}
+          />
           <Input label="IBAN" name="billing.IBAN" />
           <Input label="SWIFT" name="billing.SWIFT" />
           <Input label="ICO" name="billing.ICO" />

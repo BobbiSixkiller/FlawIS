@@ -18,7 +18,11 @@ const commonPaths = [
 ];
 
 export function withSubdomain(middleware: CustomMiddleware) {
-  return async (req: NextRequest, event: NextFetchEvent, res: NextResponse) => {
+  return async (
+    req: NextRequest,
+    event: NextFetchEvent,
+    res?: NextResponse
+  ) => {
     const url = req.nextUrl.clone();
 
     const localeRegex = /^\/(en|sk)(?=\/|$)/;

@@ -18,6 +18,7 @@ export interface InputProps extends InputHTMLAttributes<
   name: string;
   label?: string;
   control?: Control<any>;
+  normalizeValue?: (value: string) => string;
 }
 
 export function Input({
@@ -25,6 +26,7 @@ export function Input({
   label,
   onFocus,
   className,
+  normalizeValue,
   ...props
 }: InputProps) {
   const { control } = useFormContext();
@@ -34,7 +36,15 @@ export function Input({
 
   // useController reads the current value synchronously on every render —
   // no subscription timing lag unlike useWatch which returns undefined on first mount.
-  const { field } = useController({ name, control });
+  const { field: controlledField } = useController({ name, control });
+  const {
+    ref: inputRef,
+    name: fieldName,
+    onBlur: onFieldBlur,
+    disabled: fieldDisabled,
+    value: fieldValue,
+    onChange: onFieldChange,
+  } = controlledField;
 
   const error = get(errors, name)?.message?.toString();
 
@@ -66,17 +76,17 @@ export function Input({
             "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
           }
           {...props}
-          ref={field.ref}
-          name={field.name}
-          onBlur={field.onBlur}
-          disabled={field.disabled ?? props.disabled}
+          ref={inputRef}
+          name={fieldName}
+          onBlur={onFieldBlur}
+          disabled={fieldDisabled ?? props.disabled}
           value={
             isDate
               ? formatDatetimeLocal(
-                  field.value,
+                  fieldValue,
                   props.type === "datetime-local",
                 )
-              : (field.value ?? "")
+              : (fieldValue ?? "")
           }
           onChange={(e) => {
             let val: any;
@@ -102,9 +112,13 @@ export function Input({
                   (e.target.value ? new Date(e.target.value) : null);
               }
             }
-            else val = e.target.value;
+            else {
+              val = normalizeValue
+                ? normalizeValue(e.target.value)
+                : e.target.value;
+            }
 
-            field.onChange(val);
+            onFieldChange(val);
             props.onChange?.(e);
           }}
           onFocus={onFocus}

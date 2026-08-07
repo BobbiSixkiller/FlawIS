@@ -2,12 +2,64 @@ import { Index, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
-import { Field, Float, Int, ObjectType } from "type-graphql";
-import { FlawBilling } from "./Billing";
-import { Invoice } from "./Attendee";
+import {
+  Field,
+  Float,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from "type-graphql";
+import { Billing } from "./Billing";
+import { Invoice, LegacyInvoiceSnapshot } from "./Invoice";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
 import { Form, FormSubmission } from "./Form";
+
+export enum ElearningProvisioningStatus {
+  PendingInvitation = "PENDING_INVITATION",
+  Enrolled = "ENROLLED",
+  Revoked = "REVOKED",
+  SyncFailed = "SYNC_FAILED",
+}
+
+registerEnumType(ElearningProvisioningStatus, {
+  name: "ElearningProvisioningStatus",
+  description: "Current synchronization state of a Reach 360 enrollment.",
+});
+
+@ObjectType()
+export class ReachCourseConfig {
+  @Field()
+  @Property()
+  courseId: string;
+
+  @Field()
+  @Property()
+  launchUrl: string;
+}
+
+export class ReachEnrollment {
+  @Property()
+  courseId: string;
+
+  @Property({ enum: ElearningProvisioningStatus, type: String })
+  status: ElearningProvisioningStatus;
+
+  @Property()
+  lastErrorCode?: string;
+
+  @Property()
+  syncedAt: Date;
+}
+
+@ObjectType()
+export class ElearningAccess {
+  @Field(() => ElearningProvisioningStatus)
+  status: ElearningProvisioningStatus;
+
+  @Field({ nullable: true })
+  launchUrl?: string;
+}
 
 @ObjectType({ description: "Course category" })
 export class Category extends TimeStamps {
@@ -80,9 +132,9 @@ export class Course extends TimeStamps {
   @Property()
   end: Date;
 
-  @Field(() => FlawBilling, { nullable: true })
-  @Property({ type: () => FlawBilling, _id: false })
-  billing?: FlawBilling;
+  @Field(() => Billing, { nullable: true })
+  @Property({ type: () => Billing, _id: false })
+  billing?: Billing;
 
   @Field(() => Int)
   @Property()
@@ -92,6 +144,15 @@ export class Course extends TimeStamps {
   get isPaid(): boolean {
     return this.price > 0;
   }
+
+  @Property({ type: () => ReachCourseConfig, _id: false })
+  reachCourse?: ReachCourseConfig;
+
+  @Field()
+  hasElearning: boolean;
+
+  @Field(() => ElearningAccess, { nullable: true })
+  elearningAccess?: ElearningAccess;
 
   @Field()
   createdAt: Date;
@@ -152,6 +213,7 @@ export class CourseAttendeeUserStub extends UserStub {
 @Index({ course: 1 })
 @Index({ "user._id": 1 })
 @Index({ status: 1 })
+@Index({ "invoice.issuer.variableSymbol": 1 }, { sparse: true })
 export class CourseAttendee extends TimeStamps {
   @Field(() => ObjectId)
   id: ObjectId;
@@ -177,8 +239,23 @@ export class CourseAttendee extends TimeStamps {
   application: FormSubmission;
 
   @Field(() => Invoice, { nullable: true })
-  @Property({ type: () => Invoice, _id: false })
+  @Property({ type: () => LegacyInvoiceSnapshot, _id: false })
   invoice?: Invoice;
+
+  @Property()
+  invoiceId?: ObjectId;
+
+  @Field()
+  hasInvoice: boolean;
+
+  @Property({ type: () => ReachEnrollment, _id: false })
+  reachEnrollment?: ReachEnrollment;
+
+  @Field(() => ElearningProvisioningStatus, { nullable: true })
+  elearningStatus?: ElearningProvisioningStatus;
+
+  @Field({ nullable: true })
+  elearningErrorCode?: string;
 
   @Field()
   createdAt: Date;

@@ -7,31 +7,20 @@ import {
   CreateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlMutation } from "@/utils/actions";
-import { createSubmission } from "../../(withTabs)/submissions/actions";
 
 export async function addAttendee(
   attendeeInput: AttendeeInput,
-  submissionId: string | null,
   token: string | null,
   submissionInput?: CreateSubmissionMutationVariables
 ) {
-  let submission;
-  if (submissionInput && !submissionId) {
-    submission = await createSubmission(submissionInput, true);
-    if (!submission.success) {
-      return submission;
-    }
-  } else if (submissionInput && submissionId && token) {
-    submission = await acceptAuthorInvite(token);
-    if (!submission.success) {
-      return submission;
-    }
-  }
-
-  return await executeGqlMutation(
+  const registration = await executeGqlMutation(
     AddAttendeeDocument,
     {
-      data: attendeeInput,
+      data: {
+        ...attendeeInput,
+        initialSubmission:
+          submissionInput && !token ? submissionInput.data : undefined,
+      },
     },
     (data) => ({
       message: data.addAttendee.message,
@@ -42,8 +31,39 @@ export async function addAttendee(
         `conferences:${data.addAttendee.data.slug}`,
         "attendees",
       ],
-    }
+    },
   );
+
+  if (!registration.success) {
+    if (submissionInput && registration.errors) {
+      const submissionFields = new Set([
+        "authors",
+        "conference",
+        "fileUrl",
+        "presentationLng",
+        "section",
+        "translations",
+      ]);
+      registration.errors = Object.fromEntries(
+        Object.entries(registration.errors).map(([key, value]) => {
+          const root = key.split(".")[0];
+          return submissionFields.has(root)
+            ? [`submission.${key}`, value]
+            : [key, value];
+        }),
+      );
+    }
+    return registration;
+  }
+
+  if (submissionInput && !token) {
+    return registration;
+  } else if (submissionInput && token) {
+    const invitation = await acceptAuthorInvite(token);
+    if (!invitation.success) return invitation;
+  }
+
+  return registration;
 }
 
 export async function acceptAuthorInvite(token: string) {

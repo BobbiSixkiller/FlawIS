@@ -515,7 +515,7 @@ function withUnibaEmail(InputComponent: ComponentType<InputProps>) {
           shouldValidate: true,
         });
       }
-    }, [email, lng, t]);
+    }, [email, lng, setValue, t]);
 
     return <InputComponent {...props} />;
   };

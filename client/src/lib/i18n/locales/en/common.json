@@ -26,5 +26,11 @@
   "country": "Country",
   "address": "Address",
   "addOption": "Add: {{ value }}",
-  "home": "Home"
+  "home": "Home",
+  "offering": {
+    "start": "Starts",
+    "end": "Ends",
+    "registrationEnd": "Register by",
+    "empty": "There are no events available right now."
+  }
 }

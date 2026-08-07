@@ -8,7 +8,7 @@ import {
   UserDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch } from "@/utils/actions";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -38,9 +38,9 @@ export async function toggleVerified(id: string, verified: boolean) {
     return { success: false, message: res.errors[0].message };
   }
 
-  revalidateTag("users");
-  revalidateTag(`user:${id}`);
-  revalidateTag(res.data.toggleVerifiedUser.data.id);
+  updateTag("users");
+  updateTag(`user:${id}`);
+  updateTag(res.data.toggleVerifiedUser.data.id);
   return { success: true, message: res.data.toggleVerifiedUser.message };
 }
 
@@ -53,8 +53,8 @@ export async function deleteUser(id: string) {
       throw new Error(res.errors[0].message);
     }
 
-    revalidateTag("users");
-    revalidateTag(`user:${id}`);
+    updateTag("users");
+    updateTag(`user:${id}`);
     return { success: true, message: res.data.deleteUser.message };
   } catch (error: any) {
     return { success: false, message: error.message };

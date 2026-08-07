@@ -5,6 +5,8 @@ import {
   AttendanceQueryVariables,
   ChangeCourseAttendeeStatusDocument,
   ChangeCourseAttendeeStatusMutationVariables,
+  SyncCourseElearningAccessDocument,
+  SyncCourseElearningAccessMutationVariables,
   UpdateAttendanceHoursDocument,
   UpdateAttendanceHoursMutationVariables,
   UpdateAttendanceOnlineDocument,
@@ -37,6 +39,24 @@ export async function changeCourseAttendeeStatus(
         `/courses/${data.changeCourseAttendeeStatus.data.course}/attendance`,
       ],
     }
+  );
+}
+
+export async function syncCourseElearningAccess(
+  vars: SyncCourseElearningAccessMutationVariables,
+) {
+  return await executeGqlMutation(
+    SyncCourseElearningAccessDocument,
+    vars,
+    (data) => ({
+      message: data.syncCourseElearningAccess.message,
+      data: data.syncCourseElearningAccess.data,
+    }),
+    {
+      revalidatePaths: (data) => [
+        `/courses/${data.syncCourseElearningAccess.data.course}/attendance`,
+      ],
+    },
   );
 }
 

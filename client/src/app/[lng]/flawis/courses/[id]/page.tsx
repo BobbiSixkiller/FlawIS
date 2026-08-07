@@ -1,5 +1,9 @@
 import Heading from "@/components/Heading";
-import { deleteCourse, getCourse } from "./actions";
+import {
+  deleteCourse,
+  getCourse,
+  getCourseReachConfig,
+} from "./actions";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import { PencilIcon, TrashIcon, UsersIcon } from "@heroicons/react/24/outline";
@@ -18,7 +22,10 @@ export default async function CoursePage({
 }) {
   const { id, lng } = await params;
 
-  const course = await getCourse({ id });
+  const [course, reachCourseConfig] = await Promise.all([
+    getCourse({ id }),
+    getCourseReachConfig({ courseId: id }),
+  ]);
   if (!course) {
     redirect("/courses");
   }
@@ -71,7 +78,11 @@ export default async function CoursePage({
         />
       </Modal>
       <Modal dialogId="edit-course" title="Upravit">
-        <CourseForm dialogId={"edit-course"} course={course} />
+        <CourseForm
+          dialogId={"edit-course"}
+          course={course}
+          reachCourseConfig={reachCourseConfig}
+        />
       </Modal>
     </div>
   );

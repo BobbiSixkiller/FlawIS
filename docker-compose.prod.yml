@@ -15,6 +15,9 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      REACH_API_BASE_URL: ${REACH_API_BASE_URL:-https://api.reach360.eu}
+      REACH_API_KEY: ${REACH_API_KEY:?REACH_API_KEY is required}
+      REACH_WEBHOOK_SECRET: ${REACH_WEBHOOK_SECRET:?REACH_WEBHOOK_SECRET is required}
     depends_on:
       minio:
         condition: service_healthy
@@ -37,6 +40,9 @@ services:
       args:
         NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:?NEXT_SERVER_ACTIONS_ENCRYPTION_KEY is required}
     environment:
+      SECRET: ${SECRET}
+      INVOICE_RENDER_SECRET: ${INVOICE_RENDER_SECRET:-}
+      REACH_WEBHOOK_UPSTREAM_URL: http://core:5000/integrations/reach/webhooks
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT}
@@ -59,12 +65,16 @@ services:
     environment:
       NODE_ENV: production
       SECRET: ${SECRET}
+      INVOICE_RENDER_SECRET: ${INVOICE_RENDER_SECRET:-}
+      CLIENT_INTERNAL_URL: http://client:3000
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_FROM: ${MAIL_FROM}
       RMQ_URI: ${RMQ_URI}
       RMQ_EXCHANGE: ${RMQ_EXCHANGE}
     depends_on:
+      client:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
     restart: unless-stopped

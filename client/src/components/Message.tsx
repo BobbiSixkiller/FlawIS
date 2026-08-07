@@ -18,7 +18,7 @@ export function FormMessage() {
 
   useEffect(() => {
     clear();
-  }, [path]);
+  }, [clear, path]);
 
   return (
     <Transition

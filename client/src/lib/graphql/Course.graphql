@@ -1,4 +1,4 @@
-fragment Course on Course {
+fragment CourseListItem on Course {
   id
   name
   categories {
@@ -9,15 +9,20 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  thumbnail
+  hasElearning
+}
+
+fragment Course on Course {
+  ...CourseListItem
   registrationForm {
     ...Form
   }
   maxAttendees
   description
-  thumbnail
   price
   billing {
-    ...FlawBilling
+    ...InvoiceBilling
   }
   isPaid
   attending {
@@ -68,6 +73,7 @@ fragment CourseSession on CourseSession {
 
 fragment CourseAttendee on CourseAttendee {
   id
+  hasInvoice
   user {
     id
     name
@@ -78,6 +84,7 @@ fragment CourseAttendee on CourseAttendee {
   }
   course
   status
+  elearningStatus
   application {
     ...FormSubmission
   }
@@ -92,6 +99,8 @@ fragment Attendance on Attendance {
       name
     }
     status
+    elearningStatus
+    elearningErrorCode
     application {
       ...FormSubmission
     }
@@ -120,7 +129,7 @@ query courses(
     edges {
       cursor
       node {
-        ...Course
+        ...CourseListItem
       }
     }
     pageInfo {
@@ -139,6 +148,17 @@ query courses(
 query course($id: ObjectId!) {
   course(id: $id) {
     ...Course
+    elearningAccess {
+      status
+      launchUrl
+    }
+  }
+}
+
+query courseReachConfig($courseId: ObjectId!) {
+  courseReachConfig(courseId: $courseId) {
+    courseId
+    launchUrl
   }
 }
 
@@ -225,7 +245,7 @@ mutation deleteCourseSession($id: ObjectId!) {
 mutation createCourseAttendee(
   $courseId: ObjectId!
   $application: FormSubmissionInput!
-  $billing: AttendeeBillingInput
+  $billing: BillingInput
 ) {
   createCourseAttendee(
     courseId: $courseId
@@ -262,6 +282,15 @@ mutation deleteCourseAttendee($id: ObjectId!) {
 
 mutation changeCourseAttendeeStatus($id: ObjectId!, $status: Status!) {
   changeCourseAttendeeStatus(id: $id, status: $status) {
+    message
+    data {
+      ...CourseAttendee
+    }
+  }
+}
+
+mutation syncCourseElearningAccess($attendeeId: ObjectId!) {
+  syncCourseElearningAccess(attendeeId: $attendeeId) {
     message
     data {
       ...CourseAttendee

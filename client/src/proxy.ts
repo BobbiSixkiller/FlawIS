@@ -1,3 +1,4 @@
+import type { NextProxy } from "next/server";
 import { chain } from "./middlewares/chainMiddleware";
 import { withAuth } from "./middlewares/authMiddleware";
 import { withLocalization } from "./middlewares/i18nMiddleware";
@@ -9,4 +10,8 @@ export const config = {
   ],
 };
 
-export default chain([withLocalization, withAuth, withSubdomain]);
+export const proxy: NextProxy = chain([
+  withLocalization,
+  withAuth,
+  withSubdomain,
+]);

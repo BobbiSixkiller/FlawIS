@@ -24,6 +24,7 @@ import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
+import { invitedTicketId } from "@/lib/conferenceRegistration";
 import { handleAPIErrors } from "@/utils/helpers";
 
 export default function ConferenceRegistrationForm({
@@ -52,7 +53,7 @@ export default function ConferenceRegistrationForm({
       lng={lng}
       values={{
         conferenceId: conference.id,
-        ticketId: "",
+        ticketId: invitedTicketId(conference.tickets, Boolean(submission)),
         billing: {
           name: "",
           address: {
@@ -73,9 +74,9 @@ export default function ConferenceRegistrationForm({
               keywords: submission?.translations.sk.keywords || [],
             },
             en: {
-              name: submission?.translations.sk.name || "",
-              abstract: submission?.translations.sk.abstract || "",
-              keywords: submission?.translations.sk.keywords || [],
+              name: submission?.translations.en.name || "",
+              abstract: submission?.translations.en.abstract || "",
+              keywords: submission?.translations.en.keywords || [],
             },
           },
           authors: [],
@@ -92,7 +93,6 @@ export default function ConferenceRegistrationForm({
             conferenceId: data.conferenceId,
             billing: data.billing,
           },
-          searchParams.get("submission"),
           searchParams.get("token"),
           submissionStep ? { data: data.submission } : undefined,
         );
