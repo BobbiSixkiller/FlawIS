@@ -1,6 +1,6 @@
 import Heading from "@/components/Heading";
 import { getConferences } from "../flawis/conferences/actions";
-import ListConferences from "./ListConferences";
+import OfferingList from "@/components/OfferingList";
 import { translate } from "@/lib/i18n";
 import { ConferencesQueryVariables } from "@/lib/graphql/generated/graphql";
 
@@ -19,7 +19,15 @@ export default async function Conferences({
   return (
     <div className="flex flex-col gap-6">
       <Heading heading={t("heading")} subHeading={t("subheading")} lng={lng} />
-      {initialData && <ListConferences vars={vars} initialData={initialData} />}
+      {initialData ? (
+        <OfferingList
+          kind="conference"
+          vars={vars}
+          initialData={initialData}
+          hrefBase=""
+          lng={lng}
+        />
+      ) : null}
     </div>
   );
 }

@@ -173,9 +173,17 @@ test("returns 502 when the upstream request times out", async () => {
             new Promise<Response>((_resolve, reject) => {
               const signal = init?.signal;
               assert.ok(signal);
-              signal.addEventListener("abort", () => reject(signal.reason), {
-                once: true,
-              });
+              // AbortSignal.timeout uses an unref'd timer in Node. Keep this
+              // mocked request alive so the isolated timeout test is stable.
+              const keepAlive = setTimeout(() => undefined, 50);
+              signal.addEventListener(
+                "abort",
+                () => {
+                  clearTimeout(keepAlive);
+                  reject(signal.reason);
+                },
+                { once: true },
+              );
             }),
         ),
       },

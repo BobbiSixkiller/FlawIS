@@ -26,5 +26,11 @@
   "country": "Krajina",
   "address": "Adresa",
   "addOption": "Pridať: {{ value }}",
-  "home": "Domov"
+  "home": "Domov",
+  "offering": {
+    "start": "Začiatok",
+    "end": "Koniec",
+    "registrationEnd": "Registrácia do",
+    "empty": "Momentálne nie sú dostupné žiadne podujatia."
+  }
 }

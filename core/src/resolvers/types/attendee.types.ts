@@ -13,6 +13,7 @@ import { CreateArgs, CreateConnection } from "./pagination.types";
 import { Attendee } from "../../entitites/Attendee";
 import { Invoice, InvoiceData } from "../../entitites/Invoice";
 import { IMutationResponse } from "./interface.types";
+import { SubmissionInput } from "./submission.types";
 
 @ObjectType({
   description: "AttendeeConnection type enabling cursor based pagination",
@@ -73,6 +74,9 @@ export class AttendeeInput {
 
   @Field(() => BillingInput)
   billing: BillingInput;
+
+  @Field(() => SubmissionInput, { nullable: true })
+  initialSubmission?: SubmissionInput;
 }
 
 @InputType()

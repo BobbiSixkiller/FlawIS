@@ -69,7 +69,12 @@ export class AttendeeResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => Invoice)
+  @FieldResolver(() => Boolean)
+  hasInvoice(@Root() { invoice, invoiceId }: Attendee) {
+    return Boolean(invoiceId || invoice);
+  }
+
+  @FieldResolver(() => Invoice, { nullable: true })
   invoice(@Root() attendee: Attendee) {
     return this.attendeeService.getInvoice(attendee);
   }

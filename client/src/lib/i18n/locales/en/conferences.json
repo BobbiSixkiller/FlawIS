@@ -39,6 +39,35 @@
     "delete": "Delete submission",
     "submissions": "Submissions"
   },
+  "workspace": {
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "In progress",
+      "ended": "Ended"
+    },
+    "registered": "You are registered",
+    "importantDates": "Important dates",
+    "participation": "Your participation",
+    "online": "Online attendance",
+    "inPerson": "In-person attendance",
+    "registrationOpen": "Registration is open",
+    "registrationOpenDescription": "Choose how you will attend and complete your conference registration.",
+    "registrationClosed": "Registration has closed",
+    "registrationClosedDescription": "Registration is no longer available for this conference.",
+    "register": "Register",
+    "mySubmissions": "My submissions",
+    "submissionsEditable": "You can add and update submissions until the submission deadline.",
+    "submissionsReadOnly": "The submission deadline has passed. Your submissions are now read-only.",
+    "addSubmission": "Add",
+    "editSubmission": "Edit submission",
+    "deleteSubmission": "Delete submission",
+    "authors": "Authors",
+    "presentationLanguage": "Presentation language",
+    "downloadFile": "Download file",
+    "fileMissing": "No submission file has been uploaded yet.",
+    "noSubmissionsEditable": "You do not have a submission yet. Add your first one.",
+    "noSubmissions": "You do not have any submissions."
+  },
   "conference": {
     "start": "Start",
     "end": "End",

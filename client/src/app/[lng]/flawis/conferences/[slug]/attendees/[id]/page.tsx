@@ -69,19 +69,23 @@ export default async function AttendeePage({
           </ModalTrigger>,
         ]}
       />
-      <div className="flex gap-2">
-        <DownloadInvoiceButton
-          attendeeId={attendee.id}
-          lng={lng}
-          ownerType={InvoiceOwnerType.ConferenceAttendee}
-        />
+      {attendee.hasInvoice ? (
+        <div className="flex gap-2">
+          <DownloadInvoiceButton
+            attendeeId={attendee.id}
+            lng={lng}
+            ownerType={InvoiceOwnerType.ConferenceAttendee}
+          />
 
-        <ModalTrigger dialogId={updateInvoiceDialogId}>
-          <Button size="icon" variant="ghost">
-            <PencilIcon className="w-5 h-5" />
-          </Button>
-        </ModalTrigger>
-      </div>
+          {attendee.invoice ? (
+            <ModalTrigger dialogId={updateInvoiceDialogId}>
+              <Button size="icon" variant="ghost">
+                <PencilIcon className="w-5 h-5" />
+              </Button>
+            </ModalTrigger>
+          ) : null}
+        </div>
+      ) : null}
       {attendee.submissions.length > 0 && (
         <div className="flex flex-col gap-4">
           {attendee.submissions.map((s) => (
@@ -185,13 +189,15 @@ export default async function AttendeePage({
           user={attendee.user}
         />
       </Modal>
-      <Modal dialogId={updateInvoiceDialogId} title="Upravit fakturu">
-        <UpdateInvoiceForm
-          dialogId={updateInvoiceDialogId}
-          lng={lng}
-          invoice={attendee.invoice}
-        />
-      </Modal>
+      {attendee.invoice ? (
+        <Modal dialogId={updateInvoiceDialogId} title="Upravit fakturu">
+          <UpdateInvoiceForm
+            dialogId={updateInvoiceDialogId}
+            lng={lng}
+            invoice={attendee.invoice}
+          />
+        </Modal>
+      ) : null}
     </div>
   );
 }

@@ -4,5 +4,9 @@
   "new": "Submission {{name}} has been created.",
   "delete": "Submission {{name}} has been deleted.",
   "skNameExists": "Submission name {{name}} in Slovak is already taken!",
-  "enNameExists": "Submission name {{name}} in English is already taken!"
+  "enNameExists": "Submission name {{name}} in English is already taken!",
+  "notAllowed": "You are not allowed to manage this submission.",
+  "submissionTicketRequired": "Your conference ticket does not include submissions.",
+  "deadlinePassed": "The submission deadline has passed.",
+  "sectionMismatch": "The selected section does not belong to this conference."
 }

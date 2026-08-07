@@ -71,12 +71,12 @@ export default function ConferenceRegistrationForm({
               name: submission?.translations.sk.name || "",
               abstract: submission?.translations.sk.abstract || "",
               keywords: submission?.translations.sk.keywords || [],
-            },
-            en: {
-              name: submission?.translations.sk.name || "",
-              abstract: submission?.translations.sk.abstract || "",
-              keywords: submission?.translations.sk.keywords || [],
-            },
+          },
+          en: {
+            name: submission?.translations.en.name || "",
+            abstract: submission?.translations.en.abstract || "",
+            keywords: submission?.translations.en.keywords || [],
+          },
           },
           authors: [],
           conference: conference.id,
@@ -92,7 +92,6 @@ export default function ConferenceRegistrationForm({
             conferenceId: data.conferenceId,
             billing: data.billing,
           },
-          searchParams.get("submission"),
           searchParams.get("token"),
           submissionStep ? { data: data.submission } : undefined,
         );

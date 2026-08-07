@@ -5,6 +5,7 @@ import {
   CreateSubmissionMutationVariables,
   DeleteSubmissionDocument,
   SubmissionDocument,
+  SubmissionInviteDocument,
   UpdateSubmissionDocument,
   UpdateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
@@ -19,6 +20,18 @@ export async function getSubmission(id?: string) {
   }
 
   return res.data?.submission;
+}
+
+export async function getSubmissionInvite(token?: string) {
+  if (!token) return;
+
+  const res = await executeGqlFetch(SubmissionInviteDocument, { token });
+  if (res.errors) {
+    console.log(res.errors[0]);
+    throw new Error(res.errors[0].message);
+  }
+
+  return res.data.submissionInvite;
 }
 
 export async function createSubmission(

@@ -40,8 +40,17 @@ export class SubmissionResolver {
 
   @Authorized()
   @Query(() => Submission)
-  async submission(@Arg("id") id: ObjectId) {
-    return await this.submissionService.getSubmission(id);
+  async submission(@Arg("id") id: ObjectId, @Ctx() { user }: Context) {
+    return await this.submissionService.getAuthorizedSubmission(id, user!);
+  }
+
+  @Authorized()
+  @Query(() => Submission)
+  async submissionInvite(
+    @Arg("token") token: string,
+    @Ctx() { user }: Context,
+  ) {
+    return await this.submissionService.getSubmissionInvite(token, user!);
   }
 
   @Authorized()

@@ -54,12 +54,15 @@ export class Attendee extends TimeStamps {
   ticket: Ticket;
 
   // Legacy invoices remain readable while new records reference Invoice.
-  @Field(() => Invoice)
+  @Field(() => Invoice, { nullable: true })
   @Property({ type: () => LegacyInvoiceSnapshot, _id: false })
   invoice?: Invoice;
 
   @Property()
   invoiceId?: ObjectId;
+
+  @Field()
+  hasInvoice: boolean;
 
   @Field(() => [Submission])
   submissions: Submission[];

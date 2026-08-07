@@ -201,13 +201,15 @@ export class ConferenceResolver {
   @Mutation(() => ConferenceMutationResponse)
   async addAttendee(
     @Arg("data") data: AttendeeInput,
-    @Ctx() { user, locale }: Context,
+    @Ctx() { user, locale, req }: Context,
   ): Promise<ConferenceMutationResponse> {
+    const hostname = req.headers["tenant-domain"] as string;
     const conference =
       await this.conferenceAttendeeService.registerAttendee(
         data,
         user!,
         locale,
+        hostname,
       );
     return {
       data: conference,

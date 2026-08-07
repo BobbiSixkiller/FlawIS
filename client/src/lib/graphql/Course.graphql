@@ -1,4 +1,4 @@
-fragment Course on Course {
+fragment CourseListItem on Course {
   id
   name
   categories {
@@ -9,18 +9,22 @@ fragment Course on Course {
   start
   end
   registrationEnd
+  thumbnail
+  hasElearning
+}
+
+fragment Course on Course {
+  ...CourseListItem
   registrationForm {
     ...Form
   }
   maxAttendees
   description
-  thumbnail
   price
   billing {
     ...InvoiceBilling
   }
   isPaid
-  hasElearning
   attending {
     ...CourseAttendee
   }
@@ -125,7 +129,7 @@ query courses(
     edges {
       cursor
       node {
-        ...Course
+        ...CourseListItem
       }
     }
     pageInfo {

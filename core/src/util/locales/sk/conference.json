@@ -12,5 +12,6 @@
   "newAttendee": "Úspešne ste sa zaregistrovali na {{name}}! Faktúra by mala čoskoro prísť na vašu e-mailovú adresu.",
   "updateInvoice": "Faktúra bola aktualizovaná!",
   "deleteAttendee": "Účastník bol zmazaný!",
-  "attendeeNotFound": "Účastník nebol nájdený!"
+  "attendeeNotFound": "Účastník nebol nájdený!",
+  "registrationClosed": "Registrácia na túto konferenciu bola ukončená."
 }

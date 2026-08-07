@@ -1,5 +1,6 @@
 fragment Attendee on Attendee {
   id
+  hasInvoice
   user {
     ... on User {
       __typename

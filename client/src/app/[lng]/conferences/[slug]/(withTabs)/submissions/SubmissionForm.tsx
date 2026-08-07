@@ -99,7 +99,6 @@ export default function SubmissionForm({
         <form
           className="space-y-6 w-80 sm:w-96"
           onSubmit={methods.handleSubmit(async (vals) => {
-            console.log(vals.files);
             const selectedSection = conference.sections.find(
               (section) => section.id === vals.section,
             );
@@ -230,7 +229,7 @@ export default function SubmissionForm({
             {methods.formState.isSubmitting ? (
               <Spinner inverted />
             ) : (
-              t("update", { ns: "common" })
+              t(submission ? "update" : "create", { ns: "common" })
             )}
           </Button>
         </form>

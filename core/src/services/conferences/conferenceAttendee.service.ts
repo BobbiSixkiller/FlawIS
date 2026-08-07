@@ -18,6 +18,7 @@ import { withOptionalTransaction } from "../../util/helpers";
 import { I18nService } from "../i18n.service";
 import { InvoiceService } from "../invoice.service";
 import { RmqService } from "../rmq.service";
+import { SubmissionService } from "../submission.service";
 
 function isDuplicateAttendeeError(error: unknown) {
   if (!error || typeof error !== "object") return false;
@@ -44,6 +45,7 @@ export class ConferenceAttendeeService {
     private readonly i18nService: I18nService,
     private readonly invoiceService: InvoiceService,
     private readonly rmqService: RmqService,
+    private readonly submissionService: SubmissionService,
   ) {}
 
   async getAttendees(args: AttendeeArgs) {
@@ -67,13 +69,29 @@ export class ConferenceAttendeeService {
     });
   }
 
-  async registerAttendee(data: AttendeeInput, user: CtxUser, locale: string) {
+  async registerAttendee(
+    data: AttendeeInput,
+    user: CtxUser,
+    locale: string,
+    hostname: string,
+  ) {
     const conference = await this.conferenceRepository.findOne({
       _id: data.conferenceId,
     });
     if (!conference) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "conference" }),
+      );
+    }
+
+    if (
+      conference.dates.regEnd &&
+      Date.now() > new Date(conference.dates.regEnd).getTime()
+    ) {
+      throw new Error(
+        this.i18nService.translate("registrationClosed", {
+          ns: "conference",
+        }),
       );
     }
 
@@ -85,6 +103,22 @@ export class ConferenceAttendeeService {
         this.i18nService.translate("notFound", { ns: "ticket" }),
       );
     }
+    if (data.initialSubmission && !ticket.withSubmission) {
+      throw new Error(
+        this.i18nService.translate("submissionTicketRequired", {
+          ns: "submission",
+        }),
+      );
+    }
+    if (
+      data.initialSubmission &&
+      data.initialSubmission.conference.toString() !==
+        data.conferenceId.toString()
+    ) {
+      throw new Error(
+        this.i18nService.translate("sectionMismatch", { ns: "submission" }),
+      );
+    }
 
     const existing = await this.getAttending(conference.id, user.id);
     if (existing) this.throwAlreadyRegistered(user.name, conference, locale);
@@ -93,7 +127,7 @@ export class ConferenceAttendeeService {
     const attendeeId = new ObjectId();
 
     try {
-      const invoice = await withOptionalTransaction(
+      const result = await withOptionalTransaction(
         undefined,
         async (session) => {
           const createdInvoice = await this.invoiceService.createInvoice({
@@ -139,7 +173,16 @@ export class ConferenceAttendeeService {
             { session },
           );
 
-          return createdInvoice;
+          const initialSubmission = data.initialSubmission
+            ? await this.submissionService.createSubmission(
+                hostname,
+                user,
+                data.initialSubmission,
+                { deferNotifications: true, session },
+              )
+            : undefined;
+
+          return { invoice: createdInvoice, initialSubmission };
         },
         isDuplicateInvoiceNumberError,
       );
@@ -153,10 +196,20 @@ export class ConferenceAttendeeService {
             conference.translations[this.localeKey(locale)].name,
           conferenceLogo:
             conference.translations[this.localeKey(locale)].logoUrl,
-          invoice: this.invoiceService.toInvoice(invoice),
+          invoice: this.invoiceService.toInvoice(result.invoice),
         }),
         "mail.conference.invoice",
       );
+
+      if (result.initialSubmission && data.initialSubmission) {
+        await this.submissionService.sendCoAuthorInvites(
+          hostname,
+          user,
+          conference,
+          result.initialSubmission,
+          data.initialSubmission.authors,
+        );
+      }
 
       return conference;
     } catch (error) {

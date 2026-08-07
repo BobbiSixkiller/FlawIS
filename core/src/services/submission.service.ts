@@ -1,70 +1,50 @@
-import { Service } from "typedi";
 import { ObjectId } from "mongodb";
+import { ClientSession } from "mongoose";
+import { ArgumentValidationError } from "type-graphql";
+import { Service } from "typedi";
 
-import { SubmissionRepository } from "../repositories/submission.repository";
+import { Conference } from "../entitites/Conference";
 import { Submission } from "../entitites/Submission";
-import { I18nService } from "./i18n.service";
+import { Access } from "../entitites/User";
+import { AttendeeRepository } from "../repositories/conferenceAttendee.repository";
+import { ConferenceRepository } from "../repositories/conference.repository";
+import { SectionRepository } from "../repositories/section.repository";
+import { SubmissionRepository } from "../repositories/submission.repository";
 import {
   SubmissionArgs,
   SubmissionInput,
 } from "../resolvers/types/submission.types";
-import { ConferenceRepository } from "../repositories/conference.repository";
-import { RmqService } from "./rmq.service";
-import { ArgumentValidationError } from "type-graphql";
-import mongoose from "mongoose";
-import { Access } from "../entitites/User";
-import { Conference } from "../entitites/Conference";
-import { TokenService } from "./token.service";
-import { CtxUser } from "../util/types";
 import { toDTO } from "../util/helpers";
+import { CtxUser } from "../util/types";
+import { I18nService } from "./i18n.service";
+import { RmqService } from "./rmq.service";
+import { TokenService } from "./token.service";
+
+type SubmissionTokenPayload = {
+  email: string;
+  submissionId: string;
+};
+
+type CreateSubmissionOptions = {
+  deferNotifications?: boolean;
+  session?: ClientSession;
+};
+
+function sameId(left: unknown, right: unknown) {
+  return String(left) === String(right);
+}
 
 @Service()
 export class SubmissionService {
   constructor(
     private readonly submissionRepository: SubmissionRepository,
     private readonly conferenceRepository: ConferenceRepository,
+    private readonly attendeeRepository: AttendeeRepository,
+    private readonly sectionRepository: SectionRepository,
     private readonly tokenService: TokenService,
     private readonly rmqService: RmqService,
-    private readonly i18nService: I18nService
+    private readonly i18nService: I18nService,
   ) {}
-
-  private async sendAddAuthorLink(
-    hostname: string,
-    email: string,
-    ctxUser: CtxUser,
-    conference: Conference,
-    submission: Submission
-  ) {
-    const token = await this.tokenService.generateOneTimeToken(
-      60 * 60 * 24 * 7,
-      { email, submissionId: submission.id }
-    );
-
-    this.rmqService.produceMessage(
-      JSON.stringify({
-        locale: this.i18nService.language(),
-        hostname,
-        name: ctxUser.name,
-        email,
-        conferenceName:
-          conference?.translations[this.i18nService.language() as "sk" | "en"]
-            .name,
-        conferenceSlug: conference?.slug,
-        token,
-        submissionId: submission.id,
-        submissionName:
-          submission.translations[this.i18nService.language() as "sk" | "en"]
-            .name,
-        submissionAbstract:
-          submission.translations[this.i18nService.language() as "sk" | "en"]
-            .abstract,
-        submissionKeywords:
-          submission.translations[this.i18nService.language() as "sk" | "en"]
-            .keywords,
-      }),
-      "mail.conference.coAuthor"
-    );
-  }
 
   async getSubmissions(args: SubmissionArgs) {
     return await this.submissionRepository.paginatedSubmissions(args);
@@ -72,268 +52,396 @@ export class SubmissionService {
 
   async getSubmission(id: ObjectId) {
     const submission = await this.submissionRepository.findOne({ _id: id });
-    if (!submission) {
+    if (!submission) this.throwNotFound();
+    return toDTO(submission!);
+  }
+
+  async getAuthorizedSubmission(id: ObjectId, user: CtxUser) {
+    const submission = await this.submissionRepository.findOne({ _id: id });
+    if (!submission) this.throwNotFound();
+    if (!this.isAdmin(user) && !this.isAuthor(submission!, user.id)) {
+      this.throwNotAllowed();
+    }
+    return toDTO(submission!);
+  }
+
+  async getSubmissionInvite(
+    token: string,
+    user: CtxUser,
+    expectedSubmissionId?: ObjectId,
+  ) {
+    const decoded = await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(
+      token,
+    );
+    const payload = decoded.payload;
+    if (
+      !payload ||
+      payload.email.toLowerCase() !== user.email.toLowerCase() ||
+      (expectedSubmissionId &&
+        !sameId(payload.submissionId, expectedSubmissionId))
+    ) {
       throw new Error(
-        this.i18nService.translate("notFound", { ns: "submission" })
+        this.i18nService.translate("tokenMalformed", { ns: "common" }),
       );
     }
 
-    return toDTO(submission);
+    return await this.getSubmission(new ObjectId(payload.submissionId));
   }
 
   async createSubmission(
     hostname: string,
-    ctxUser: CtxUser,
-    data: SubmissionInput
+    user: CtxUser,
+    data: SubmissionInput,
+    options: CreateSubmissionOptions = {},
   ) {
-    const conference = await this.conferenceRepository.findOne({
-      _id: data.conference,
-    });
-    if (!conference) {
-      throw new Error(
-        this.i18nService.translate("notFound", { ns: "conference" })
+    const conference = await this.assertSubmissionContext(
+      user,
+      data.conference,
+      data.section,
+      options.session,
+    );
+    await this.assertUniqueNames(data, undefined, options.session);
+
+    const submission = await this.submissionRepository.create(
+      {
+        ...data,
+        authors: [user.id],
+      },
+      { session: options.session },
+    );
+    const result = toDTO(submission);
+
+    if (!options.deferNotifications) {
+      await this.sendCoAuthorInvites(
+        hostname,
+        user,
+        conference,
+        result,
+        data.authors,
       );
     }
 
-    const [skExists, enExists] = await Promise.all([
-      this.submissionRepository.findOne({
-        "translations.sk.name": data.translations.sk.name,
-      }),
-      this.submissionRepository.findOne({
-        "translations.en.name": data.translations.en.name,
-      }),
-    ]);
-
-    // Validate uniqueness for SK name
-    if (skExists) {
-      throw new ArgumentValidationError([
-        {
-          target: Submission,
-          property: "translations.sk.name",
-          value: data.translations.sk.name,
-          constraints: {
-            name: this.i18nService.translate("skNameExists", {
-              ns: "submission",
-              name: data.translations.sk.name,
-            }),
-          },
-        },
-      ]);
-    }
-
-    // 2. Validate uniqueness for EN name
-    if (enExists) {
-      throw new ArgumentValidationError([
-        {
-          target: Submission,
-          property: "translations.en.name",
-          value: data.translations.en.name,
-          constraints: {
-            name: this.i18nService.translate("enNameExists", {
-              ns: "submission",
-              name: data.translations.en.name,
-            }),
-          },
-        },
-      ]);
-    }
-
-    const submission = await this.submissionRepository.create({
-      ...data,
-      authors: [ctxUser.id],
-    });
-
-    if (data.authors.length !== 0) {
-      data.authors?.forEach((author) =>
-        this.sendAddAuthorLink(
-          hostname,
-          author,
-          ctxUser,
-          conference,
-          submission
-        )
-      );
-    }
-
-    return toDTO(submission);
+    return result;
   }
 
   async updateSubmission(
     id: ObjectId,
     hostname: string,
-    ctxUser: CtxUser,
-    { authors, ...data }: SubmissionInput
+    user: CtxUser,
+    { authors, ...data }: SubmissionInput,
   ) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    const existing = await this.submissionRepository.findOne({ _id: id });
+    if (!existing) this.throwNotFound();
 
-    try {
-      const conference = await this.conferenceRepository.findOne({
-        _id: data.conference,
-      });
-      if (!conference) {
-        throw new Error(
-          this.i18nService.translate("notFound", { ns: "conference" })
-        );
-      }
-
-      const [skExists, enExists] = await Promise.all([
-        this.submissionRepository.findOne({
-          "translations.sk.name": data.translations.sk.name,
-        }),
-        this.submissionRepository.findOne({
-          "translations.en.name": data.translations.en.name,
-        }),
-      ]);
-
-      // Validate uniqueness for SK name
-      if (skExists && skExists.id !== id.toString()) {
-        throw new ArgumentValidationError([
-          {
-            target: Submission,
-            property: "translations.sk.name",
-            value: data.translations.sk.name,
-            constraints: {
-              name: this.i18nService.translate("skNameExists", {
-                ns: "submission",
-                name: data.translations.sk.name,
-              }),
-            },
-          },
-        ]);
-      }
-
-      // 2. Validate uniqueness for EN name
-      if (enExists && enExists.id !== id.toString()) {
-        throw new ArgumentValidationError([
-          {
-            target: Submission,
-            property: "translations.en.name",
-            value: data.translations.en.name,
-            constraints: {
-              name: this.i18nService.translate("enNameExists", {
-                ns: "submission",
-                name: data.translations.en.name,
-              }),
-            },
-          },
-        ]);
-      }
-
-      const submission = await this.submissionRepository.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        { $set: { ...data } },
-        { session }
-      );
-      if (!submission) {
-        throw new Error(
-          this.i18nService.translate("notFound", { ns: "submission" })
-        );
-      }
-
-      if (
-        !ctxUser.access.includes(Access.Admin) &&
-        !submission.authors.some(
-          (author) => author.toString() === ctxUser.id.toString()
-        )
-      ) {
-        throw new Error("Not allowed!");
-      }
-
-      if (authors.length !== 0) {
-        authors.forEach(async (author) =>
-          this.sendAddAuthorLink(
-            hostname,
-            author,
-            ctxUser,
-            conference,
-            submission
-          )
-        );
-      }
-
-      await session.commitTransaction();
-
-      return toDTO(submission);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
+    const isAdmin = this.isAdmin(user);
+    if (!isAdmin && !this.isAuthor(existing!, user.id)) {
+      this.throwNotAllowed();
     }
-  }
-
-  async deleteSubmission(id: ObjectId, ctxUser: CtxUser) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      const submission = await this.submissionRepository.findOneAndDelete(
-        { _id: id },
-        { session }
-      );
-      if (!submission) {
-        throw new Error(
-          this.i18nService.translate("notFound", { ns: "submission" })
-        );
-      }
-      if (
-        !ctxUser.access.includes(Access.Admin) &&
-        !submission.authors.some(
-          (author) => author.toString() === ctxUser.id.toString()
-        )
-      ) {
-        throw new Error("Not allowed!");
-      }
-
-      await session.commitTransaction();
-
-      return toDTO(submission);
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
+    if (!sameId(existing!.conference, data.conference)) {
+      this.throwSectionMismatch();
     }
-  }
 
-  async addCoAuthor(token: string, ctxUser: CtxUser) {
-    const decoded = await this.tokenService.verifyOneTimeToken<{
-      email: string;
-      submissionId: string;
-    }>(token);
-    if (!decoded.payload || decoded.payload.email !== ctxUser.email) {
-      throw new Error(
-        this.i18nService.translate("tokenMalformed", { ns: "common" })
-      );
-    }
+    const conference = await this.assertSubmissionContext(
+      user,
+      data.conference,
+      data.section,
+    );
+    await this.assertUniqueNames(data, id);
 
     const submission = await this.submissionRepository.findOneAndUpdate(
-      { _id: decoded.payload.submissionId },
-      { $addToSet: { authors: ctxUser.id } }
+      {
+        _id: id,
+        ...(isAdmin ? {} : { authors: user.id }),
+      },
+      { $set: data },
+      { new: true, runValidators: true },
     );
-    if (!submission) {
+    if (!submission) this.throwNotAllowed();
+
+    const result = toDTO(submission!);
+    await this.sendCoAuthorInvites(
+      hostname,
+      user,
+      conference,
+      result,
+      authors,
+    );
+    return result;
+  }
+
+  async deleteSubmission(id: ObjectId, user: CtxUser) {
+    const existing = await this.submissionRepository.findOne({ _id: id });
+    if (!existing) this.throwNotFound();
+
+    const isAdmin = this.isAdmin(user);
+    if (!isAdmin && !this.isAuthor(existing!, user.id)) {
+      this.throwNotAllowed();
+    }
+
+    const conference = await this.conferenceRepository.findOne({
+      _id: existing!.conference,
+    });
+    if (!conference) {
       throw new Error(
-        this.i18nService.translate("notFound", { ns: "submission" })
+        this.i18nService.translate("notFound", { ns: "conference" }),
+      );
+    }
+    await this.assertParticipantCanSubmit(user, conference!);
+
+    const submission = await this.submissionRepository.findOneAndDelete({
+      _id: id,
+      ...(isAdmin ? {} : { authors: user.id }),
+    });
+    if (!submission) this.throwNotAllowed();
+    return toDTO(submission!);
+  }
+
+  async addCoAuthor(token: string, user: CtxUser) {
+    const inspected =
+      await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(token);
+    const payload = inspected.payload;
+    if (
+      !payload ||
+      payload.email.toLowerCase() !== user.email.toLowerCase()
+    ) {
+      throw new Error(
+        this.i18nService.translate("tokenMalformed", { ns: "common" }),
       );
     }
 
-    return toDTO(submission);
+    const submission = await this.submissionRepository.findOne({
+      _id: payload.submissionId,
+    });
+    if (!submission) this.throwNotFound();
+    const conference = await this.conferenceRepository.findOne({
+      _id: submission!.conference,
+    });
+    if (!conference) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "conference" }),
+      );
+    }
+    await this.assertParticipantCanSubmit(user, conference!);
+
+    await this.tokenService.verifyOneTimeToken<SubmissionTokenPayload>(token);
+    const updated = await this.submissionRepository.findOneAndUpdate(
+      { _id: submission!.id },
+      { $addToSet: { authors: user.id } },
+      { new: true },
+    );
+    if (!updated) this.throwNotFound();
+    return toDTO(updated!);
   }
 
   async removeAuthor(submissionId: ObjectId, authorId: ObjectId) {
     const submission = await this.submissionRepository.findOneAndUpdate(
       { _id: submissionId },
-      { $pull: { authors: authorId } }
+      { $pull: { authors: authorId } },
+      { new: true },
     );
-    if (!submission) {
+    if (!submission) this.throwNotFound();
+    return toDTO(submission!);
+  }
+
+  async sendCoAuthorInvites(
+    hostname: string,
+    user: CtxUser,
+    conference: Conference,
+    submission: Submission,
+    authors: string[] = [],
+  ) {
+    await Promise.all(
+      authors.map((email) =>
+        this.sendAddAuthorLink(hostname, email, user, conference, submission),
+      ),
+    );
+  }
+
+  private async sendAddAuthorLink(
+    hostname: string,
+    email: string,
+    user: CtxUser,
+    conference: Conference,
+    submission: Submission,
+  ) {
+    const token = await this.tokenService.generateOneTimeToken(
+      60 * 60 * 24 * 7,
+      { email, submissionId: submission.id },
+    );
+    const locale = this.localeKey();
+
+    this.rmqService.produceMessage(
+      JSON.stringify({
+        locale: this.i18nService.language(),
+        hostname,
+        name: user.name,
+        email,
+        conferenceName: conference.translations[locale].name,
+        conferenceSlug: conference.slug,
+        token,
+        submissionId: submission.id,
+        submissionName: submission.translations[locale].name,
+        submissionAbstract: submission.translations[locale].abstract,
+        submissionKeywords: submission.translations[locale].keywords,
+      }),
+      "mail.conference.coAuthor",
+    );
+  }
+
+  private async assertSubmissionContext(
+    user: CtxUser,
+    conferenceId: ObjectId,
+    sectionId: ObjectId,
+    session?: ClientSession,
+  ) {
+    const [conference, section] = await Promise.all([
+      this.conferenceRepository.findOne(
+        { _id: conferenceId },
+        null,
+        { session },
+      ),
+      this.sectionRepository.findOne({ _id: sectionId }, null, { session }),
+    ]);
+    if (!conference) {
       throw new Error(
-        this.i18nService.translate("notFound", { ns: "submission" })
+        this.i18nService.translate("notFound", { ns: "conference" }),
+      );
+    }
+    if (!section) {
+      throw new Error(
+        this.i18nService.translate("notFound", { ns: "section" }),
+      );
+    }
+    if (!sameId(section!.conference, conference!.id)) {
+      this.throwSectionMismatch();
+    }
+
+    await this.assertParticipantCanSubmit(user, conference!, session);
+    return conference!;
+  }
+
+  private async assertParticipantCanSubmit(
+    user: CtxUser,
+    conference: Conference,
+    session?: ClientSession,
+  ) {
+    if (this.isAdmin(user)) return;
+
+    const attendee = await this.attendeeRepository.findOne(
+      {
+        "conference._id": conference.id,
+        "user._id": user.id,
+      },
+      null,
+      { session },
+    );
+    if (!attendee?.ticket.withSubmission) {
+      throw new Error(
+        this.i18nService.translate("submissionTicketRequired", {
+          ns: "submission",
+        }),
       );
     }
 
-    return toDTO(submission);
+    const deadline = conference.dates.submissionDeadline;
+    if (deadline && Date.now() > new Date(deadline).getTime()) {
+      throw new Error(
+        this.i18nService.translate("deadlinePassed", { ns: "submission" }),
+      );
+    }
+  }
+
+  private async assertUniqueNames(
+    data: Pick<SubmissionInput, "translations">,
+    excludedId?: ObjectId,
+    session?: ClientSession,
+  ) {
+    const excluded = excludedId ? { _id: { $ne: excludedId } } : {};
+    const [skExists, enExists] = await Promise.all([
+      this.submissionRepository.findOne(
+        {
+          ...excluded,
+          "translations.sk.name": data.translations.sk.name,
+        },
+        null,
+        { session },
+      ),
+      this.submissionRepository.findOne(
+        {
+          ...excluded,
+          "translations.en.name": data.translations.en.name,
+        },
+        null,
+        { session },
+      ),
+    ]);
+
+    if (skExists) {
+      this.throwNameExists(
+        "translations.sk.name",
+        "skNameExists",
+        data.translations.sk.name,
+      );
+    }
+    if (enExists) {
+      this.throwNameExists(
+        "translations.en.name",
+        "enNameExists",
+        data.translations.en.name,
+      );
+    }
+  }
+
+  private isAdmin(user: CtxUser) {
+    return user.access.includes(Access.Admin);
+  }
+
+  private isAuthor(
+    submission: Pick<Submission, "authors">,
+    userId: ObjectId,
+  ) {
+    return submission.authors.some((author) => sameId(author, userId));
+  }
+
+  private localeKey(): "sk" | "en" {
+    return this.i18nService.language() === "en" ? "en" : "sk";
+  }
+
+  private throwNameExists(
+    property: string,
+    key: "skNameExists" | "enNameExists",
+    name: string,
+  ): never {
+    throw new ArgumentValidationError([
+      {
+        target: Submission,
+        property,
+        value: name,
+        constraints: {
+          name: this.i18nService.translate(key, {
+            ns: "submission",
+            name,
+          }),
+        },
+      },
+    ]);
+  }
+
+  private throwNotFound(): never {
+    throw new Error(
+      this.i18nService.translate("notFound", { ns: "submission" }),
+    );
+  }
+
+  private throwNotAllowed(): never {
+    throw new Error(
+      this.i18nService.translate("notAllowed", { ns: "submission" }),
+    );
+  }
+
+  private throwSectionMismatch(): never {
+    throw new Error(
+      this.i18nService.translate("sectionMismatch", { ns: "submission" }),
+    );
   }
 }

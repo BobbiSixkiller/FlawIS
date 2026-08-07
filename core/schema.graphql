@@ -78,8 +78,9 @@ type AttendanceRecordMutationResponse implements IMutationResponse {
 type Attendee {
   conference: Conference!
   createdAt: DateTimeISO!
+  hasInvoice: Boolean!
   id: ObjectId!
-  invoice: Invoice!
+  invoice: Invoice
   submissions: [Submission!]!
   ticket: Ticket!
   updatedAt: DateTimeISO!
@@ -108,6 +109,7 @@ input AttendeeFilterInput {
 input AttendeeInput {
   billing: BillingInput!
   conferenceId: ObjectId!
+  initialSubmission: SubmissionInput
   ticketId: ObjectId!
 }
 
@@ -612,7 +614,7 @@ enum InternshipSortableField {
   ORGANIZATION
 }
 
-"""Invoice entity subdocument type"""
+"""Invoice entity"""
 type Invoice {
   body: InvoiceData!
   issuer: Billing!
@@ -631,12 +633,6 @@ type InvoiceData {
   vatDate: DateTimeISO!
 }
 
-"""The registration type that owns an invoice."""
-enum InvoiceOwnerType {
-  CONFERENCE_ATTENDEE
-  COURSE_ATTENDEE
-}
-
 input InvoiceDataInput {
   body: String!
   comment: String!
@@ -652,6 +648,12 @@ input InvoiceInput {
   body: InvoiceDataInput!
   issuer: BillingInput!
   payer: BillingInput!
+}
+
+"""The registration type that owns an invoice."""
+enum InvoiceOwnerType {
+  CONFERENCE_ATTENDEE
+  COURSE_ATTENDEE
 }
 
 """
@@ -779,6 +781,7 @@ type Query {
   invoice(attendeeId: ObjectId!, ownerType: InvoiceOwnerType!): Invoice
   me: User!
   submission(id: ObjectId!): Submission!
+  submissionInvite(token: String!): Submission!
   textSearchAttendee(slug: String!, text: String!): [Attendee!]!
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!

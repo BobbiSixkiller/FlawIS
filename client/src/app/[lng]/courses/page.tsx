@@ -1,7 +1,7 @@
 import { getMe } from "../(auth)/actions";
 import { translate } from "@/lib/i18n";
 import { getCourses } from "../flawis/courses/actions";
-import CourseList from "../flawis/courses/CourseList";
+import OfferingList from "@/components/OfferingList";
 import FilterDropdown from "@/components/FilterDropdown";
 import {
   CourseSortableField,
@@ -63,7 +63,13 @@ export default async function CoursesPage({
       />
 
       <div className="col-span-full row-start-2">
-        <CourseList initialData={initialData} vars={vars} />
+        <OfferingList
+          kind="course"
+          initialData={initialData}
+          vars={vars}
+          hrefBase=""
+          lng={lng}
+        />
       </div>
     </div>
   );

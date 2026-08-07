@@ -11,6 +11,7 @@ import { Conference } from "../src/entitites/Conference";
 import { CourseAttendee } from "../src/entitites/Course";
 import { ConferenceService } from "../src/services/conferences/conference.service";
 import { ConferenceAttendeeService } from "../src/services/conferences/conferenceAttendee.service";
+import { AttendeeResolver } from "../src/resolvers/conferences/attendee.resolver";
 
 async function withMockSession(operation: () => Promise<void>) {
   const originalStartSession = mongoose.startSession;
@@ -113,6 +114,13 @@ test("attendee schemas enforce registration uniqueness without invoice indexes",
   );
 });
 
+test("conference attendees derive invoice availability from stored history", () => {
+  const resolver = new AttendeeResolver({} as any, i18n());
+  assert.equal(resolver.hasInvoice({ invoiceId: new ObjectId() } as any), true);
+  assert.equal(resolver.hasInvoice({ invoice: { body: {} } } as any), true);
+  assert.equal(resolver.hasInvoice({} as any), false);
+});
+
 test("conference service owns translated uniqueness validation", async () => {
   let createCalls = 0;
   const service = new ConferenceService(
@@ -190,6 +198,7 @@ test("duplicate registration is rejected before invoice creation", async () => {
       findOne: async () => ({
         id: conferenceId,
         slug: "conference",
+        dates: {},
         tickets: [{ id: ticketId, price: 100 }],
         translations: {
           sk: { name: "Konferencia", logoUrl: "logo" },
@@ -205,6 +214,7 @@ test("duplicate registration is rejected before invoice creation", async () => {
         invoiceCalls += 1;
       },
     } as any,
+    {} as any,
     {} as any,
   );
 
@@ -222,8 +232,55 @@ test("duplicate registration is rejected before invoice creation", async () => {
         access: [],
       },
       "sk",
+      "conferences.example.com",
     ),
     /alreadyRegistered/,
+  );
+  assert.equal(invoiceCalls, 0);
+});
+
+test("conference registration is rejected after its configured deadline", async () => {
+  const conferenceId = new ObjectId();
+  const ticketId = new ObjectId();
+  let invoiceCalls = 0;
+  const service = new ConferenceAttendeeService(
+    { findOne: async () => null } as any,
+    {
+      findOne: async () => ({
+        id: conferenceId,
+        dates: { regEnd: new Date(Date.now() - 1_000) },
+        tickets: [{ id: ticketId, price: 100 }],
+      }),
+    } as any,
+    {} as any,
+    {} as any,
+    i18n(),
+    {
+      createInvoice: async () => {
+        invoiceCalls += 1;
+      },
+    } as any,
+    {} as any,
+    {} as any,
+  );
+
+  await assert.rejects(
+    service.registerAttendee(
+      {
+        conferenceId,
+        ticketId,
+        billing: { name: "Payer" } as any,
+      },
+      {
+        id: new ObjectId(),
+        name: "Learner",
+        email: "learner@example.com",
+        access: [],
+      },
+      "en",
+      "conferences.example.com",
+    ),
+    /registrationClosed/,
   );
   assert.equal(invoiceCalls, 0);
 });
@@ -240,6 +297,7 @@ test("conference registration creates invoice and attendee in one transaction", 
     const conference = {
       id: conferenceId,
       slug: "conference",
+      dates: {},
       billing: { name: "Issuer", variableSymbol: "123" },
       tickets: [{ id: ticketId, price: 12_000 }],
       translations: {
@@ -281,6 +339,7 @@ test("conference registration creates invoice and attendee in one transaction", 
           mail = { body: JSON.parse(body), routingKey };
         },
       } as any,
+      {} as any,
     );
 
     const result = await service.registerAttendee(
@@ -296,6 +355,7 @@ test("conference registration creates invoice and attendee in one transaction", 
         access: [],
       },
       "en",
+      "conferences.example.com",
     );
 
     assert.equal(result, conference);
@@ -308,6 +368,106 @@ test("conference registration creates invoice and attendee in one transaction", 
     assert.equal(mail.routingKey, "mail.conference.invoice");
     assert.equal(mail.body.conferenceName, "Conference");
     assert.equal(mail.body.conferenceLogo, "en-logo");
+  });
+});
+
+test("conference registration creates an initial submission in the same transaction", async () => {
+  await withMockSession(async () => {
+    const conferenceId = new ObjectId();
+    const ticketId = new ObjectId();
+    const userId = new ObjectId();
+    const sectionId = new ObjectId();
+    let submissionCreate: any;
+    let invitation: any;
+    const conference = {
+      id: conferenceId,
+      slug: "conference",
+      dates: {},
+      billing: { name: "Issuer", variableSymbol: "123" },
+      tickets: [
+        { id: ticketId, price: 12_000, withSubmission: true },
+      ],
+      translations: {
+        sk: { name: "Konferencia", logoUrl: "sk-logo" },
+        en: { name: "Conference", logoUrl: "en-logo" },
+      },
+    };
+    const submission = {
+      id: new ObjectId(),
+      translations: {
+        sk: { name: "Príspevok", abstract: "Abstrakt", keywords: [] },
+        en: { name: "Submission", abstract: "Abstract", keywords: [] },
+      },
+    };
+    const submissionService = {
+      createSubmission: async (
+        hostname: string,
+        user: unknown,
+        data: unknown,
+        options: unknown,
+      ) => {
+        submissionCreate = { hostname, user, data, options };
+        return submission;
+      },
+      sendCoAuthorInvites: async (...args: unknown[]) => {
+        invitation = args;
+      },
+    };
+    const service = new ConferenceAttendeeService(
+      {
+        findOne: async () => null,
+        create: async (data: unknown) => data,
+      } as any,
+      { findOne: async () => conference } as any,
+      { updateMany: async () => undefined } as any,
+      {} as any,
+      i18n(),
+      {
+        createInvoice: async () => ({
+          _id: new ObjectId(),
+          payer: {},
+          issuer: {},
+          body: {},
+        }),
+        toInvoice: () => ({}),
+      } as any,
+      { produceMessage: () => undefined } as any,
+      submissionService as any,
+    );
+    const initialSubmission = {
+      conference: conferenceId,
+      section: sectionId,
+      authors: ["coauthor@example.com"],
+      presentationLng: "EN",
+      translations: {
+        sk: { name: "Príspevok", abstract: "Abstrakt", keywords: [] },
+        en: { name: "Submission", abstract: "Abstract", keywords: [] },
+      },
+    } as any;
+
+    await service.registerAttendee(
+      {
+        conferenceId,
+        ticketId,
+        billing: { name: "Payer" } as any,
+        initialSubmission,
+      },
+      {
+        id: userId,
+        name: "Learner",
+        email: "learner@example.com",
+        access: [],
+      },
+      "en",
+      "conferences.example.com",
+    );
+
+    assert.equal(submissionCreate.hostname, "conferences.example.com");
+    assert.equal(submissionCreate.data, initialSubmission);
+    assert.equal(submissionCreate.options.deferNotifications, true);
+    assert.ok(submissionCreate.options.session);
+    assert.equal(invitation[3], submission);
+    assert.deepEqual(invitation[4], ["coauthor@example.com"]);
   });
 });
 
@@ -339,6 +499,7 @@ test("attendee deletion scopes submission cleanup to its conference", async () =
         },
       } as any,
       i18n(),
+      {} as any,
       {} as any,
       {} as any,
     );
