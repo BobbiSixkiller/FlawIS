@@ -13,7 +13,7 @@ import { JSONObject, ObjectIdScalar } from "./util/scalars";
 import { TypegooseMiddleware } from "./middlewares/typegoose.middleware";
 
 import { UserResolver } from "./resolvers/user.resolver";
-import { ConferencerResolver } from "./resolvers/conferences/conference.resolver";
+import { ConferenceResolver } from "./resolvers/conferences/conference.resolver";
 
 import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
@@ -61,7 +61,7 @@ async function main() {
   const schema = await buildSchema({
     resolvers: [
       UserResolver,
-      ConferencerResolver,
+      ConferenceResolver,
       SectionResolver,
       SubmissionResolver,
       AttendeeResolver,

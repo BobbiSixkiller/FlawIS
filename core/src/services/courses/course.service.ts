@@ -171,12 +171,64 @@ export class CourseService {
   }
 
   async deleteCourse(id: ObjectId) {
-    const deleted = await this.courseRepository.findOneAndDelete({ _id: id });
-    if (!deleted) {
-      throw new Error(this.i18nService.translate("notFound", { ns: "course" }));
-    }
+    return withOptionalTransaction(undefined, async (session) => {
+      const course = await this.courseRepository.findOne(
+        { _id: id },
+        null,
+        { session },
+      );
+      if (!course) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "course" }),
+        );
+      }
 
-    return toDTO(deleted);
+      const attendees = await this.courseAttendeeRepository.findAll(
+        { course: id },
+        { _id: 1 },
+        { session },
+      );
+      const courseSessions = await this.courseSessionRepository.findAll(
+        { course: id },
+        { _id: 1 },
+        { session },
+      );
+      const attendeeIds = attendees.map((attendee) => attendee._id);
+      const sessionIds = courseSessions.map(
+        (courseSession) => courseSession._id,
+      );
+
+      await this.attendanceRecordRepository.deleteMany(
+        {
+          $or: [
+            { attendee: { $in: attendeeIds } },
+            { session: { $in: sessionIds } },
+          ],
+        },
+        { session },
+      );
+      await this.courseAttendeeRepository.deleteMany(
+        { course: id },
+        { session },
+      );
+      await this.courseSessionRepository.deleteMany(
+        { course: id },
+        { session },
+      );
+      await this.formService.deleteCourseForms(id, session);
+
+      const deleted = await this.courseRepository.findOneAndDelete(
+        { _id: id },
+        { session },
+      );
+      if (!deleted) {
+        throw new Error(
+          this.i18nService.translate("notFound", { ns: "course" }),
+        );
+      }
+
+      return toDTO(deleted);
+    });
   }
 
   async createCourseSession(data: CourseSessionInput) {

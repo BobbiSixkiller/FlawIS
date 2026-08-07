@@ -315,6 +315,11 @@ export class Reach360Service {
 
     const results = [];
     for (const attendee of attendees) {
+      const courseExists = await this.courseRepository.exists({
+        _id: attendee.course,
+      });
+      if (!courseExists) continue;
+
       results.push(await this.syncAttendee(attendee._id, true));
     }
     return results;

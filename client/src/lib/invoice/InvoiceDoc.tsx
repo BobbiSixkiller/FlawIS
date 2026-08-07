@@ -1,6 +1,7 @@
 import {
   Document,
   Font,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -19,6 +20,15 @@ const COLORS = {
   panel: "#F3F4F6",
   accent: "#97357C",
 };
+
+const DEFAULT_INVOICE_LOGO = path.resolve(
+  process.cwd(),
+  "public/images/Flaw-logo-notext.png",
+);
+const INVOICE_STAMP = path.resolve(
+  process.cwd(),
+  "public/images/peciatka.jpeg",
+);
 
 Font.register({
   family: "UKsans",
@@ -57,12 +67,26 @@ const styles = StyleSheet.create({
   accentRule: {
     backgroundColor: COLORS.accent,
     height: 3,
-    marginBottom: 18,
     width: 52,
   },
   header: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+  brand: {
+    alignItems: "flex-start",
+  },
+  logo: {
+    height: 46,
+    marginBottom: 12,
+    objectFit: "contain",
+    width: 46,
+  },
+  headerCopy: {
     alignItems: "flex-end",
-    marginBottom: 36,
+    paddingTop: 5,
   },
   eyebrow: {
     color: COLORS.muted,
@@ -238,6 +262,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textTransform: "uppercase",
   },
+  stampContainer: {
+    alignItems: "flex-end",
+    marginTop: 18,
+  },
+  stamp: {
+    height: 86,
+    objectFit: "contain",
+    width: 220,
+  },
   footerLeft: {
     bottom: 20,
     color: COLORS.muted,
@@ -316,9 +349,11 @@ function Party({
 export default async function InvoiceDoc({
   invoice,
   lng,
+  logo,
 }: {
   invoice: InvoiceFragment;
   lng: string;
+  logo?: string | null;
 }) {
   const locale = lng === "en" ? "en-GB" : "sk-SK";
   const { t } = await translate(lng, "invoice");
@@ -337,6 +372,7 @@ export default async function InvoiceDoc({
     }).format(value);
   const total = Number(invoice.body.price) + Number(invoice.body.vat);
   const number = invoice.issuer.variableSymbol;
+  const logoSource = logo?.trim() || DEFAULT_INVOICE_LOGO;
 
   return (
     <Document
@@ -357,12 +393,19 @@ export default async function InvoiceDoc({
           }
         />
 
-        <View style={styles.accentRule} />
         <View style={styles.header} wrap={false}>
-          <Text style={styles.eyebrow}>{t("documentNumber")}</Text>
-          <Text style={styles.title}>
-            {invoice.body.type} {number}
-          </Text>
+          <View style={styles.brand}>
+            {/* React PDF's Image is not a DOM image and has no alt prop. */}
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={logoSource} style={styles.logo} />
+            <View style={styles.accentRule} />
+          </View>
+          <View style={styles.headerCopy}>
+            <Text style={styles.eyebrow}>{t("documentNumber")}</Text>
+            <Text style={styles.title}>
+              {invoice.body.type} {number}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.partyRow}>
@@ -471,6 +514,11 @@ export default async function InvoiceDoc({
           <Text>{invoice.body.comment}</Text>
         </View>
 
+        <View style={styles.stampContainer} wrap={false}>
+          {/* React PDF's Image is not a DOM image and has no alt prop. */}
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
+          <Image src={INVOICE_STAMP} style={styles.stamp} />
+        </View>
       </Page>
     </Document>
   );

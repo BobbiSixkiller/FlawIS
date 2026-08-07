@@ -91,6 +91,13 @@ export class FormService {
     return forms.map(toDTO);
   }
 
+  async deleteCourseForms(courseId: ObjectId, session?: ClientSession) {
+    return await this.formRepository.deleteMany(
+      { course: courseId },
+      { session },
+    );
+  }
+
   async createForm(
     formFields: FormFieldInput[],
     courseId: ObjectId,

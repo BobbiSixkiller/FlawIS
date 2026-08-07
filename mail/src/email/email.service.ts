@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { Invoice, InvoiceMsg } from './templates/invoice';
 import { AuthorMsg } from './templates/author';
+import { resolveTenantOrigin } from './tenant-domain';
 
 export interface Msg {
   locale: 'en' | 'sk';
@@ -35,7 +36,11 @@ export class EmailService {
     private i18n: I18nService,
   ) {}
 
-  private async renderInvoice(invoice: Invoice, locale: Msg['locale']) {
+  private async renderInvoice(
+    invoice: Invoice,
+    locale: Msg['locale'],
+    logo?: string,
+  ) {
     const secret =
       process.env.INVOICE_RENDER_SECRET || process.env.SECRET || '';
     if (!secret) {
@@ -49,12 +54,14 @@ export class EmailService {
         'Content-Type': 'application/json',
         'x-invoice-render-secret': secret,
       },
-      body: JSON.stringify({ invoice, locale }),
+      body: JSON.stringify({ invoice, locale, logo }),
     });
 
     if (!response.ok) {
       throw new Error(
-        `Invoice renderer failed with status ${response.status}: ${await response.text()}`,
+        `Invoice renderer failed with status ${
+          response.status
+        }: ${await response.text()}`,
       );
     }
 
@@ -67,6 +74,12 @@ export class EmailService {
       '-',
     );
     return `invoice-${number || 'document'}.pdf`;
+  }
+
+  private courseAttendeeUrl(msg: CourseMsg) {
+    return `${resolveTenantOrigin(msg.hostname, 'courses')}/${msg.locale}/${
+      msg.courseId
+    }`;
   }
 
   @RabbitSubscribe({
@@ -128,7 +141,11 @@ export class EmailService {
     routingKey: 'mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
-    const pdfBuffer = await this.renderInvoice(msg.invoice, msg.locale);
+    const pdfBuffer = await this.renderInvoice(
+      msg.invoice,
+      msg.locale,
+      msg.conferenceLogo,
+    );
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -362,11 +379,7 @@ export class EmailService {
     routingKey: 'mail.courses.applied',
   })
   async sendCourseAttendeeApplied(msg: CourseMsg) {
-    const url = `${
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : `https://${msg.hostname}`
-    }/${msg.locale}/${msg.courseId}`;
+    const url = this.courseAttendeeUrl(msg);
 
     const attachment = msg.invoice
       ? {
@@ -394,11 +407,7 @@ export class EmailService {
     routingKey: 'mail.courses.eligible',
   })
   async sendCourseAttendeeEligible(msg: CourseMsg) {
-    const url = `${
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : `https://${msg.hostname}`
-    }/${msg.locale}/${msg.courseId}`;
+    const url = this.courseAttendeeUrl(msg);
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -418,11 +427,7 @@ export class EmailService {
     routingKey: 'mail.courses.accepted',
   })
   async sendCourseAttendeeAccepted(msg: CourseMsg) {
-    const url = `${
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : `https://${msg.hostname}`
-    }/${msg.locale}/${msg.courseId}`;
+    const url = this.courseAttendeeUrl(msg);
 
     await this.mailerService.sendMail({
       to: msg.email,
@@ -442,11 +447,7 @@ export class EmailService {
     routingKey: 'mail.courses.rejected',
   })
   async sendCourseAttendeeRejected(msg: CourseMsg) {
-    const url = `${
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : `https://${msg.hostname}`
-    }/${msg.locale}/${msg.courseId}`;
+    const url = this.courseAttendeeUrl(msg);
 
     await this.mailerService.sendMail({
       to: msg.email,

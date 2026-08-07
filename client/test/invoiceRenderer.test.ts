@@ -102,3 +102,15 @@ test("renders when optional issuer fields are absent", async () => {
 
   assert.equal(pdf.subarray(0, 4).toString(), "%PDF");
 });
+
+test("embeds the no-text FLAW logo when no logo is supplied", async () => {
+  const pdf = await renderInvoiceToBuffer(invoice, "en");
+
+  assert.match(pdf.toString("latin1"), /\/Subtype \/Image\b/);
+});
+
+test("embeds the issuer stamp on the final invoice page", async () => {
+  const pdf = await renderInvoiceToBuffer(invoice, "en");
+
+  assert.match(pdf.toString("latin1"), /\/DCTDecode\b/);
+});

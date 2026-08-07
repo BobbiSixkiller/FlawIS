@@ -200,6 +200,84 @@ test("pending Reach invitations are reused", async () => {
   );
 });
 
+test("user-created processing skips orphan attendees and enrolls valid ones", async () => {
+  const userId = new ObjectId();
+  const orphanCourseId = new ObjectId();
+  const courseId = new ObjectId();
+  const orphanAttendee = {
+    _id: new ObjectId(),
+    course: orphanCourseId,
+    status: Status.Accepted,
+    user: { id: userId, email: "learner@example.com" },
+  } as any;
+  const attendee = {
+    _id: new ObjectId(),
+    course: courseId,
+    status: Status.Accepted,
+    user: { id: userId, email: "learner@example.com" },
+  } as any;
+  const user = {
+    _id: userId,
+    email: "learner@example.com",
+  } as any;
+  let enrollmentCount = 0;
+
+  const service = new Reach360Service(
+    {
+      exists: async ({ _id }: { _id: ObjectId }) =>
+        _id.toString() === courseId.toString(),
+      findOne: async ({ _id }: { _id: ObjectId }) =>
+        _id.toString() === courseId.toString()
+          ? {
+              _id: courseId,
+              reachCourse: {
+                courseId: "reach-course",
+                launchUrl: "https://training.example.com/course",
+              },
+            }
+          : null,
+    } as any,
+    {
+      findAll: async () => [orphanAttendee, attendee],
+      findOne: async ({ _id }: { _id: ObjectId }) =>
+        _id.toString() === attendee._id.toString() ? attendee : null,
+      findOneAndUpdate: async (
+        { _id }: { _id: ObjectId },
+        update: any,
+      ) => {
+        if (_id.toString() !== attendee._id.toString()) return null;
+        attendee.reachEnrollment = update.$set.reachEnrollment;
+        return attendee;
+      },
+    } as any,
+    {
+      findOne: async () => user,
+      findOneAndUpdate: async (_filter: unknown, update: any) => {
+        user.reachUserId = update.$set.reachUserId;
+        return user;
+      },
+    } as any,
+  );
+  (service as any).client = {
+    enrollUser: async () => {
+      enrollmentCount += 1;
+    },
+  };
+
+  const results = await service.handleUserCreated({
+    id: "reach-user",
+    email: "learner@example.com",
+  });
+
+  assert.equal(results.length, 1);
+  assert.equal(enrollmentCount, 1);
+  assert.equal(
+    attendee.reachEnrollment.status,
+    ElearningProvisioningStatus.Enrolled,
+  );
+  assert.equal(orphanAttendee.reachEnrollment, undefined);
+});
+
 test("trial invitation exhaustion is recorded without throwing", async () => {
   const fixture = createProvisioningFixture({
     createInvitationError: new Reach360ApiError(

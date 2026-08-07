@@ -74,6 +74,11 @@ test("rejects malformed internal render requests", async () => {
     request(JSON.stringify({ locale: "sk", invoice: {} })),
   );
   assert.equal(invalidPayload.status, 400);
+
+  const invalidLogo = await POST(
+    request(JSON.stringify({ locale: "sk", invoice, logo: "../secret.png" })),
+  );
+  assert.equal(invalidLogo.status, 400);
 });
 
 test("returns a PDF with the invoice filename", async () => {

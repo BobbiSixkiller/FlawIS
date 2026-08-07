@@ -38,6 +38,21 @@ function isOptionalString(value: unknown) {
   return value === undefined || value === null || isString(value);
 }
 
+function isOptionalLogo(
+  value: unknown,
+): value is string | null | undefined {
+  if (value === undefined || value === null) return true;
+  if (!isString(value) || value.length > 2_048) return false;
+  if (!value.trim()) return true;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function isInvoice(value: unknown): value is InvoiceFragment {
   if (!isRecord(value)) return false;
   const { body, issuer, payer } = value;
@@ -86,7 +101,7 @@ export async function POST(request: Request) {
     return Response.json({ message: "Unauthorized." }, { status: 401 });
   }
 
-  let payload: { invoice?: unknown; locale?: unknown };
+  let payload: { invoice?: unknown; locale?: unknown; logo?: unknown };
   try {
     payload = await request.json();
   } catch {
@@ -95,12 +110,17 @@ export async function POST(request: Request) {
 
   if (
     !isInvoice(payload.invoice) ||
-    (payload.locale !== "sk" && payload.locale !== "en")
+    (payload.locale !== "sk" && payload.locale !== "en") ||
+    !isOptionalLogo(payload.logo)
   ) {
     return Response.json({ message: "Invalid invoice data." }, { status: 400 });
   }
 
-  const pdf = await renderInvoiceToBuffer(payload.invoice, payload.locale);
+  const pdf = await renderInvoiceToBuffer(
+    payload.invoice,
+    payload.locale,
+    payload.logo,
+  );
 
   return new Response(pdf, {
     headers: invoicePdfHeaders(payload.invoice),

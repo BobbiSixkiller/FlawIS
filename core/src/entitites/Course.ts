@@ -10,7 +10,7 @@ import {
   registerEnumType,
 } from "type-graphql";
 import { Billing } from "./Billing";
-import { Invoice } from "./Invoice";
+import { Invoice, LegacyInvoiceSnapshot } from "./Invoice";
 import { UserStub } from "./User";
 import { Status } from "./Internship";
 import { Form, FormSubmission } from "./Form";
@@ -239,7 +239,7 @@ export class CourseAttendee extends TimeStamps {
   application: FormSubmission;
 
   @Field(() => Invoice, { nullable: true })
-  @Property({ type: () => Invoice, _id: false })
+  @Property({ type: () => LegacyInvoiceSnapshot, _id: false })
   invoice?: Invoice;
 
   @Property()

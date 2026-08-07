@@ -1,5 +1,6 @@
 import { EmailService } from './email.service';
 import { Invoice } from './templates/invoice';
+import { resolveTenantHostname } from './tenant-domain';
 
 const invoice: Invoice = {
   body: {
@@ -87,9 +88,11 @@ describe('course application invoice attachments', () => {
 
   it('renders and attaches an invoice for a paid course', async () => {
     const { message, sendMail, service } = fixture();
-    global.fetch = jest.fn().mockResolvedValue(
-      new Response(new Uint8Array([37, 80, 68, 70]), { status: 200 }),
-    ) as any;
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(new Uint8Array([37, 80, 68, 70]), { status: 200 }),
+      ) as any;
 
     await service.sendCourseAttendeeApplied({ ...message, invoice });
 
@@ -115,11 +118,68 @@ describe('course application invoice attachments', () => {
     const { message, sendMail, service } = fixture();
     global.fetch = jest
       .fn()
-      .mockResolvedValue(new Response('renderer failed', { status: 500 })) as any;
+      .mockResolvedValue(
+        new Response('renderer failed', { status: 500 }),
+      ) as any;
 
     await expect(
       service.sendCourseAttendeeApplied({ ...message, invoice }),
     ).rejects.toThrow(/renderer failed/i);
     expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it('passes a conference logo to the shared invoice renderer', async () => {
+    const { message, service } = fixture();
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(new Uint8Array([37, 80, 68, 70]), { status: 200 }),
+      ) as any;
+
+    await service.sendConferenceInvoice({
+      ...message,
+      conferenceLogo: 'http://minio:9000/images/conference-logo.png',
+      conferenceName: 'Conference',
+      invoice,
+    });
+
+    const request = (global.fetch as jest.Mock).mock.calls[0][1];
+    expect(JSON.parse(request.body)).toEqual(
+      expect.objectContaining({
+        logo: 'http://minio:9000/images/conference-logo.png',
+      }),
+    );
+  });
+});
+
+describe('course notification tenant links', () => {
+  it.each([
+    ['flawis.flaw.uniba.sk', 'https://courses.flaw.uniba.sk/en/course-id'],
+    [
+      'flawis-staging.flaw.uniba.sk',
+      'https://courses-staging.flaw.uniba.sk/en/course-id',
+    ],
+  ])(
+    'links accepted attendees from %s to %s',
+    async (hostname, expectedUrl) => {
+      const { message, sendMail, service } = fixture();
+
+      await service.sendCourseAttendeeAccepted({ ...message, hostname });
+
+      expect(sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          context: expect.objectContaining({ url: expectedUrl }),
+        }),
+      );
+    },
+  );
+
+  it('resolves admin tenant domains for both environments', () => {
+    expect(resolveTenantHostname('courses.flaw.uniba.sk', 'flawis')).toBe(
+      'flawis.flaw.uniba.sk',
+    );
+    expect(
+      resolveTenantHostname('courses-staging.flaw.uniba.sk', 'flawis'),
+    ).toBe('flawis-staging.flaw.uniba.sk');
   });
 });

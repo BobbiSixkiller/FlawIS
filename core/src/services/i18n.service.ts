@@ -40,6 +40,7 @@ export class I18nService {
             "ticket",
             "submission",
             "validation",
+            "course",
             "internship",
             "intern",
             "common",

@@ -46,6 +46,19 @@ export class InvoiceData {
   comment: string;
 }
 
+// Persistence-only shape for historical invoice subdocuments. Keeping it
+// separate prevents canonical Invoice indexes from leaking into owner schemas.
+export class LegacyInvoiceSnapshot {
+  @Property({ required: true, type: () => Billing, _id: false })
+  payer: Billing;
+
+  @Property({ required: true, type: () => Billing, _id: false })
+  issuer: Billing;
+
+  @Property({ required: true, type: () => InvoiceData, _id: false })
+  body: InvoiceData;
+}
+
 @ObjectType({ description: "Invoice entity" })
 @Index({ "issuer.variableSymbol": 1 }, { unique: true })
 @Index({ ownerType: 1, attendeeId: 1 }, { unique: true })

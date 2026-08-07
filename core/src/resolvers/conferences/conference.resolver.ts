@@ -1,22 +1,30 @@
+import { ObjectId } from "mongodb";
 import {
   Arg,
   Args,
   Authorized,
   Ctx,
   FieldResolver,
+  Int,
   Mutation,
   Query,
   Resolver,
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
+
 import {
   Conference,
   ConferenceTranslation,
-  Ticket,
   TicketTranslation,
 } from "../../entitites/Conference";
+import { Attendee } from "../../entitites/Attendee";
+import { Section } from "../../entitites/Section";
+import { ConferenceService } from "../../services/conferences/conference.service";
+import { ConferenceAttendeeService } from "../../services/conferences/conferenceAttendee.service";
 import { I18nService } from "../../services/i18n.service";
+import { Context } from "../../util/auth";
+import { AttendeeInput } from "../types/attendee.types";
 import {
   ConferenceArgs,
   ConferenceConnection,
@@ -25,69 +33,42 @@ import {
   DatesInput,
   TicketInput,
 } from "../types/conference.types";
-import { ObjectId } from "mongodb";
-import { CheckTicket, LoadResource } from "../../util/decorators";
-import { DocumentType } from "@typegoose/typegoose";
-
-import { Context } from "../../util/auth";
-import { Attendee } from "../../entitites/Attendee";
-import { Section } from "../../entitites/Section";
-import { AttendeeInput, InvoiceOwnerType } from "../types/attendee.types";
-import { VerifiedTicket } from "../../util/types";
-import { RmqService } from "../../services/rmq.service";
-import { Repository } from "../../repositories/base.repository";
-import { ConferenceRepository } from "../../repositories/conference.repository";
-import { AttendeeRepository } from "../../repositories/conferenceAttendee.repository";
-import { UserRepository } from "../../repositories/user.repository";
-import { InvoiceService } from "../../services/invoice.service";
-import { withOptionalTransaction } from "../../util/helpers";
-import { isDuplicateInvoiceNumberError } from "../../repositories/invoice.repository";
-import { assertInvoiceIssuerBilling } from "../../entitites/Billing";
 
 @Service()
 @Resolver(() => Conference)
-export class ConferencerResolver {
+export class ConferenceResolver {
   constructor(
-    private readonly conferenceRepository: ConferenceRepository,
-    private readonly sectionService = new Repository(Section),
-    private readonly attendeeRepository: AttendeeRepository,
-    private readonly userRepository: UserRepository,
+    private readonly conferenceService: ConferenceService,
+    private readonly conferenceAttendeeService: ConferenceAttendeeService,
     private readonly i18nService: I18nService,
-    private readonly rmqService: RmqService,
-    private readonly invoiceService: InvoiceService,
   ) {}
 
   @Authorized()
   @Query(() => ConferenceConnection)
   async conferences(
-    @Args() args: ConferenceArgs
+    @Args() args: ConferenceArgs,
   ): Promise<ConferenceConnection> {
-    return await this.conferenceRepository.paginatedConferences(args);
+    return await this.conferenceService.getConferences(args);
   }
 
   @Authorized()
   @Query(() => Conference)
-  async conference(
-    @Arg("slug") _slug: string,
-    @LoadResource(Conference) conference: DocumentType<Conference>
-  ) {
-    return conference;
+  async conference(@Arg("slug") slug: string) {
+    return await this.conferenceService.getConference(slug);
   }
 
   @Authorized(["ADMIN"])
   @Query(() => [Conference])
   async textSearchConference(@Arg("text") text: string) {
-    return await this.conferenceRepository.textSearch(text);
+    return await this.conferenceService.searchConferences(text);
   }
 
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async createConference(
-    @Arg("data") data: ConferenceInput
+    @Arg("data") data: ConferenceInput,
   ): Promise<ConferenceMutationResponse> {
-    assertInvoiceIssuerBilling(data.billing);
-    const conference = await this.conferenceRepository.create(data);
-
+    const conference = await this.conferenceService.createConference(data);
     return {
       data: conference,
       message: this.i18nService.translate("new", {
@@ -102,11 +83,9 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async deleteConference(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Conference) conference: DocumentType<Conference>
+    @Arg("id") id: ObjectId,
   ): Promise<ConferenceMutationResponse> {
-    await this.conferenceRepository.deleteOne({ _id: conference.id });
-
+    const conference = await this.conferenceService.deleteConference(id);
     return {
       data: conference,
       message: this.i18nService.translate("delete", {
@@ -121,14 +100,13 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async updateConferenceDates(
-    @Arg("slug") _slug: string,
+    @Arg("slug") slug: string,
     @Arg("data") data: DatesInput,
-    @LoadResource(Conference) conference: DocumentType<Conference>
   ): Promise<ConferenceMutationResponse> {
-    conference.dates = data;
-
-    await conference.save();
-
+    const conference = await this.conferenceService.updateConferenceDates(
+      slug,
+      data,
+    );
     return {
       data: conference,
       message: this.i18nService.translate("update", {
@@ -141,33 +119,29 @@ export class ConferencerResolver {
   }
 
   @Authorized()
-  @FieldResolver(() => Attendee)
+  @FieldResolver(() => Attendee, { nullable: true })
   async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
-    return await this.attendeeRepository.findOne({
-      "conference._id": id,
-      "user._id": user?.id,
-    });
+    return await this.conferenceAttendeeService.getAttending(id, user!.id);
   }
 
   @Authorized()
   @FieldResolver(() => [Section])
   async sections(@Root() { id }: Conference) {
-    return await this.sectionService.findAll({
-      conference: id,
-    });
+    return await this.conferenceService.getSections(id);
+  }
+
+  @FieldResolver(() => Int)
+  async attendeesCount(@Root() { id }: Conference) {
+    return await this.conferenceService.getAttendeesCount(id);
   }
 
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async createTicket(
-    @Arg("slug") _slug: string,
+    @Arg("slug") slug: string,
     @Arg("data") data: TicketInput,
-    @LoadResource(Conference) conference: DocumentType<Conference>
   ): Promise<ConferenceMutationResponse> {
-    conference.tickets.push(data as Ticket);
-
-    await conference.save();
-
+    const conference = await this.conferenceService.createTicket(slug, data);
     return {
       data: conference,
       message: this.i18nService.translate("new", {
@@ -182,26 +156,20 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async updateTicket(
-    @Arg("slug") _slug: string,
+    @Arg("slug") slug: string,
     @Arg("ticketId") ticketId: ObjectId,
     @Arg("data") data: TicketInput,
-    @LoadResource(Conference) conference: DocumentType<Conference>
   ): Promise<ConferenceMutationResponse> {
-    const tIndex = conference.tickets.findIndex(
-      (t) => t.id.toString() === ticketId.toString()
+    const { conference, ticket } = await this.conferenceService.updateTicket(
+      slug,
+      ticketId,
+      data,
     );
-    if (tIndex === -1) {
-      throw new Error(this.i18nService.translate("notFound", { ns: "ticket" }));
-    }
-    conference.tickets[tIndex] = { ...conference.tickets[tIndex], ...data };
-
-    await conference.save();
-
     return {
       data: conference,
       message: this.i18nService.translate("update", {
         ns: "ticket",
-        name: conference.tickets[tIndex].translations[
+        name: ticket.translations[
           this.i18nService.language() as keyof TicketTranslation
         ].name,
       }),
@@ -211,22 +179,13 @@ export class ConferencerResolver {
   @Authorized(["ADMIN"])
   @Mutation(() => ConferenceMutationResponse)
   async deleteTicket(
-    @Arg("slug") _slug: string,
+    @Arg("slug") slug: string,
     @Arg("ticketId") ticketId: ObjectId,
-    @LoadResource(Conference) conference: DocumentType<Conference>
-  ) {
-    const ticket = conference.tickets.find(
-      (t) => t.id.toString() === ticketId.toString()
+  ): Promise<ConferenceMutationResponse> {
+    const { conference, ticket } = await this.conferenceService.deleteTicket(
+      slug,
+      ticketId,
     );
-    if (!ticket) {
-      throw new Error(this.i18nService.translate("notFound", { ns: "ticket" }));
-    }
-
-    conference.tickets = conference.tickets.filter(
-      (t) => t.id.toString() !== ticketId.toString()
-    );
-    await conference.save();
-
     return {
       data: conference,
       message: this.i18nService.translate("delete", {
@@ -241,89 +200,23 @@ export class ConferencerResolver {
   @Authorized()
   @Mutation(() => ConferenceMutationResponse)
   async addAttendee(
-    @Arg("data")
-    { billing }: AttendeeInput,
-    @CheckTicket() { ticket, conference }: VerifiedTicket,
+    @Arg("data") data: AttendeeInput,
     @Ctx() { user, locale }: Context,
   ): Promise<ConferenceMutationResponse> {
-    const isFlaw = user?.email.split("@")[1] === "flaw.uniba.sk";
-    const attendeeId = new ObjectId();
-    const invoice = await withOptionalTransaction(
-      undefined,
-      async (session) => {
-        const invoice = await this.invoiceService.createInvoice({
-          attendeeId,
-          body: this.i18nService.translate("invoiceBody", {
-            ns: "conference",
-            name: user?.name,
-          }),
-          comment: this.i18nService.translate("invoiceComment", {
-            ns: "conference",
-          }),
-          grossPriceCents: ticket.price,
-          issuer: conference.billing,
-          ownerType: InvoiceOwnerType.CONFERENCE_ATTENDEE,
-          payer: {
-            ...billing,
-            name: isFlaw ? `${user!.name}, ${billing.name}` : billing.name,
-          },
-          payerEmail: user!.email,
-          session,
-          type: this.i18nService.translate("invoiceType", {
-            ns: "conference",
-          }),
-          userId: user!.id,
-        });
-
-        await this.userRepository.updateMany(
-          { _id: user?.id },
-          {
-            $addToSet: { billings: billing },
-          },
-          { upsert: true, session },
-        );
-
-        await this.attendeeRepository.create(
-          {
-            _id: attendeeId,
-            conference: { _id: conference.id, slug: conference.slug },
-            user: { _id: user?.id, name: user?.name, email: user?.email },
-            ticket,
-            invoiceId: invoice._id,
-          },
-          { session },
-        );
-
-        return invoice;
-      },
-      isDuplicateInvoiceNumberError,
-    );
-    const invoiceData = this.invoiceService.toInvoice(invoice);
-
-    this.rmqService.produceMessage(
-      JSON.stringify({
+    const conference =
+      await this.conferenceAttendeeService.registerAttendee(
+        data,
+        user!,
         locale,
-        name: user?.name,
-        email: user?.email,
-        conferenceName:
-          conference.translations[this.i18nService.language() as "sk" | "en"]
-            .name,
-        conferenceLogo:
-          conference.translations[this.i18nService.language() as "sk" | "en"]
-            .logoUrl,
-        invoice: invoiceData,
-      }),
-      "mail.conference.invoice"
-    );
-
+      );
     return {
+      data: conference,
       message: this.i18nService.translate("newAttendee", {
         ns: "conference",
         name: conference.translations[
           this.i18nService.language() as keyof ConferenceTranslation
         ].name,
       }),
-      data: conference,
     };
   }
 }

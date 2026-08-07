@@ -22,9 +22,9 @@ import { Section } from "../../entitites/Section";
 import { User } from "../../entitites/User";
 import { I18nService } from "../../services/i18n.service";
 import { Repository } from "../../repositories/base.repository";
-import { ConferenceRepository } from "../../repositories/conference.repository";
 import { UserRepository } from "../../repositories/user.repository";
 import { SubmissionService } from "../../services/submission.service";
+import { ConferenceService } from "../../services/conferences/conference.service";
 
 // Refactor section, conference and authors field with The Extended Reference Pattern to include name and ID
 @Service()
@@ -32,7 +32,7 @@ import { SubmissionService } from "../../services/submission.service";
 export class SubmissionResolver {
   constructor(
     private readonly submissionService: SubmissionService,
-    private readonly conferenceRepository: ConferenceRepository,
+    private readonly conferenceService: ConferenceService,
     private readonly sectionRepository = new Repository(Section),
     private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService,
@@ -152,7 +152,9 @@ export class SubmissionResolver {
   @Authorized()
   @FieldResolver(() => Conference, { nullable: true })
   async conference(@Root() { conference }: Submission) {
-    return await this.conferenceRepository.findOne({ _id: conference });
+    return await this.conferenceService.findConferenceById(
+      conference as ObjectId,
+    );
   }
 
   @Authorized()

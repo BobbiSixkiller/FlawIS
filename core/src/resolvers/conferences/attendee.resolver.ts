@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import {
   Arg,
   Args,
@@ -9,52 +10,38 @@ import {
   Root,
 } from "type-graphql";
 import { Service } from "typedi";
+
 import { Attendee, UserStubUnion } from "../../entitites/Attendee";
+import { Conference } from "../../entitites/Conference";
 import { Invoice } from "../../entitites/Invoice";
+import { Submission } from "../../entitites/Submission";
+import { ConferenceAttendeeService } from "../../services/conferences/conferenceAttendee.service";
 import { I18nService } from "../../services/i18n.service";
 import {
   AttendeeArgs,
   AttendeeConnection,
   AttendeeMutationResponse,
   InvoiceInput,
-  InvoiceOwnerType,
 } from "../types/attendee.types";
-import { ObjectId } from "mongodb";
-import { LoadResource } from "../../util/decorators";
-import { DocumentType } from "@typegoose/typegoose";
-import { Submission } from "../../entitites/Submission";
-import { Conference } from "../../entitites/Conference";
-import { AttendeeRepository } from "../../repositories/conferenceAttendee.repository";
-import { ConferenceRepository } from "../../repositories/conference.repository";
-import { UserRepository } from "../../repositories/user.repository";
-import { SubmissionRepository } from "../../repositories/submission.repository";
-import { InvoiceService } from "../../services/invoice.service";
 
 @Service()
 @Resolver(() => Attendee)
 export class AttendeeResolver {
   constructor(
-    private readonly attendeeRepository: AttendeeRepository,
-    private readonly conferenceRepository: ConferenceRepository,
-    private readonly userRepository: UserRepository,
-    private readonly submissionRepository: SubmissionRepository,
+    private readonly attendeeService: ConferenceAttendeeService,
     private readonly i18nService: I18nService,
-    private readonly invoiceService: InvoiceService,
   ) {}
 
   @Authorized(["ADMIN"])
   @Query(() => AttendeeConnection)
   async attendees(@Args() args: AttendeeArgs): Promise<AttendeeConnection> {
-    return await this.attendeeRepository.paginatedConferenceAttendees(args);
+    return await this.attendeeService.getAttendees(args);
   }
 
   @Authorized(["ADMIN"])
   @Query(() => Attendee)
-  async attendee(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
-  ) {
-    return attendee;
+  async attendee(@Arg("id") id: ObjectId) {
+    return await this.attendeeService.getAttendee(id);
   }
 
   @Authorized(["ADMIN"])
@@ -63,27 +50,16 @@ export class AttendeeResolver {
     @Arg("text") text: string,
     @Arg("slug") slug: string,
   ) {
-    return await this.attendeeRepository.textSearch(text, slug);
+    return await this.attendeeService.searchAttendees(text, slug);
   }
 
   @Authorized(["ADMIN"])
   @Mutation(() => AttendeeMutationResponse)
   async updateInvoice(
-    @Arg("id") _id: ObjectId,
+    @Arg("id") id: ObjectId,
     @Arg("data") data: InvoiceInput,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
   ): Promise<AttendeeMutationResponse> {
-    const result = await this.invoiceService.updateInvoice(
-      InvoiceOwnerType.CONFERENCE_ATTENDEE,
-      attendee.id,
-      data,
-      attendee.invoice,
-    );
-    if (!result.stored) {
-      attendee.invoice = result.invoice;
-      await attendee.save();
-    }
-
+    const attendee = await this.attendeeService.updateInvoice(id, data);
     return {
       message: this.i18nService.translate("updateInvoice", {
         ns: "conference",
@@ -95,21 +71,15 @@ export class AttendeeResolver {
   @Authorized()
   @FieldResolver(() => Invoice)
   invoice(@Root() attendee: Attendee) {
-    return this.invoiceService.getInvoice(
-      InvoiceOwnerType.CONFERENCE_ATTENDEE,
-      attendee.id,
-      attendee.invoice,
-    );
+    return this.attendeeService.getInvoice(attendee);
   }
 
   @Authorized(["ADMIN"])
   @Mutation(() => AttendeeMutationResponse)
   async deleteAttendee(
-    @Arg("id") _id: ObjectId,
-    @LoadResource(Attendee) attendee: DocumentType<Attendee>,
+    @Arg("id") id: ObjectId,
   ): Promise<AttendeeMutationResponse> {
-    await this.attendeeRepository.deleteOne({ _id: attendee.id });
-
+    const attendee = await this.attendeeService.deleteAttendee(id);
     return {
       data: attendee,
       message: this.i18nService.translate("deleteAttendee", {
@@ -120,32 +90,19 @@ export class AttendeeResolver {
 
   @Authorized()
   @FieldResolver(() => UserStubUnion)
-  async user(
-    @Root() { user: userStub }: Attendee,
-  ): Promise<typeof UserStubUnion> {
-    const user = await this.userRepository.findOne({ _id: userStub.id });
-    if (user) {
-      return user;
-    } else {
-      return userStub;
-    }
+  async user(@Root() attendee: Attendee): Promise<typeof UserStubUnion> {
+    return await this.attendeeService.getUser(attendee);
   }
 
   @Authorized()
   @FieldResolver(() => Conference)
-  async conference(@Root() { conference: { id } }: Attendee) {
-    return this.conferenceRepository.findOne({ _id: id });
+  async conference(@Root() attendee: Attendee) {
+    return await this.attendeeService.getConference(attendee);
   }
 
   @Authorized()
   @FieldResolver(() => [Submission])
-  async submissions(
-    @Root()
-    { user: { id: userId }, conference: { id: conferenceId } }: Attendee,
-  ) {
-    return await this.submissionRepository.findAll({
-      conference: conferenceId,
-      authors: userId,
-    });
+  async submissions(@Root() attendee: Attendee) {
+    return await this.attendeeService.getSubmissions(attendee);
   }
 }

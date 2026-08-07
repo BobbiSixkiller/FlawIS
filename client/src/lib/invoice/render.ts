@@ -15,8 +15,9 @@ export function invoiceFilename(invoice: InvoiceFragment) {
 export async function renderInvoiceToBuffer(
   invoice: InvoiceFragment,
   locale: string,
+  logo?: string | null,
 ) {
-  const document = await InvoiceDoc({ invoice, lng: locale });
+  const document = await InvoiceDoc({ invoice, lng: locale, logo });
   return renderToBuffer(document);
 }
 
