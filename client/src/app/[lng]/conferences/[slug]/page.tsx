@@ -25,8 +25,8 @@ import { translate } from "@/lib/i18n";
 import { currentTimestamp } from "@/lib/serverTime";
 import { conferenceWorkspaceState } from "@/lib/conferenceWorkspace";
 import { capitalizeFirstLetter } from "@/utils/helpers";
-import DeleteSubmissionForm from "./submissions/DeleteSubmissionForm";
-import SubmissionForm from "./submissions/SubmissionForm";
+import DeleteSubmissionForm from "./DeleteSubmissionForm";
+import SubmissionForm from "./SubmissionForm";
 
 type Conference = ConferenceQuery["conference"];
 

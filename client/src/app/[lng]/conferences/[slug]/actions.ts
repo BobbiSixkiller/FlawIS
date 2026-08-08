@@ -12,7 +12,7 @@ import {
 import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
 
 export async function getSubmission(id?: string) {
-  if (!id) return;
+  if (!id) return undefined;
 
   const res = await executeGqlFetch(SubmissionDocument, { id });
   if (res.errors) {
@@ -23,7 +23,7 @@ export async function getSubmission(id?: string) {
 }
 
 export async function getSubmissionInvite(token?: string) {
-  if (!token) return;
+  if (!token) return undefined;
 
   const res = await executeGqlFetch(SubmissionInviteDocument, { token });
   if (res.errors) {

@@ -3,7 +3,7 @@ import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import { conferenceWorkspaceHref } from "@/lib/conferenceRegistration";
-import { getSubmissionInvite } from "../submissions/actions";
+import { getSubmissionInvite } from "../actions";
 import { acceptAuthorInvite } from "./actions";
 
 export default async function ConferenceRegisterPage({

@@ -19,7 +19,7 @@ import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import SubmissionForm from "@/app/[lng]/conferences/[slug]/submissions/SubmissionForm";
+import SubmissionForm from "@/app/[lng]/conferences/[slug]/SubmissionForm";
 import { translate } from "@/lib/i18n";
 import Tooltip from "@/components/Tooltip";
 
