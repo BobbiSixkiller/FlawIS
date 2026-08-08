@@ -2,10 +2,11 @@ import { getMe } from "@/app/[lng]/(auth)/actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import { getSubmissionInvite } from "../../(withTabs)/submissions/actions";
+import { conferenceWorkspaceHref } from "@/lib/conferenceRegistration";
+import { getSubmissionInvite } from "../submissions/actions";
 import { acceptAuthorInvite } from "./actions";
 
-export default async function RegisterPage({
+export default async function ConferenceRegisterPage({
   params,
   searchParams,
 }: {
@@ -24,17 +25,16 @@ export default async function RegisterPage({
     getMe(),
   ]);
 
-  if (conference?.attending && !submission) {
-    redirect(`/${slug}`);
-  }
-
-  if (conference?.attending?.ticket.withSubmission && submission && token) {
-    const { success, message } = await acceptAuthorInvite(token);
-    if (!success) {
-      throw new Error(message);
-    } else {
-      redirect(`/${slug}/submissions`);
+  if (conference.attending) {
+    if (conference.attending.ticket.withSubmission && submission && token) {
+      const { success, message } = await acceptAuthorInvite(token);
+      if (!success) {
+        throw new Error(message);
+      }
+      redirect(conferenceWorkspaceHref(slug, true));
     }
+
+    redirect(conferenceWorkspaceHref(slug));
   }
 
   return (

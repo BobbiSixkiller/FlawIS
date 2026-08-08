@@ -5,7 +5,7 @@ import { cn } from "@/utils/helpers";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { Control, useController } from "react-hook-form";
 
-export default function Ticket({
+export default function ConferenceTicket({
   tickets,
   setSubmission,
   submission,

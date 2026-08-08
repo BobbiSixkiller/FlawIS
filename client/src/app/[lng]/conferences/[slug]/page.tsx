@@ -166,7 +166,7 @@ function SubmissionCard({
   );
 }
 
-export default async function ConferencePage({
+export default async function ConferenceWorkspacePage({
   params,
 }: {
   params: Promise<{ slug: string; lng: string }>;
@@ -178,11 +178,12 @@ export default async function ConferencePage({
   ]);
   const locale = lng === "en" ? "en" : "sk";
   const translation = conference.translations[locale];
+  const attendee = conference.attending;
   const formatter = dateFormatter(lng);
   const now = currentTimestamp();
   const state = conferenceWorkspaceState(
     conference.dates,
-    Boolean(conference.attending?.ticket.withSubmission),
+    Boolean(attendee?.ticket.withSubmission),
     now,
   );
   const registrationEnd = conference.dates.regEnd
@@ -238,7 +239,7 @@ export default async function ConferencePage({
             <span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-200">
               {t(`workspace.status.${state.eventState}`)}
             </span>
-            {conference.attending ? (
+            {attendee ? (
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
                 {t("workspace.registered")}
               </span>
@@ -281,10 +282,10 @@ export default async function ConferencePage({
         </ol>
       </section>
 
-      {conference.attending ? (
+      {attendee ? (
         <section className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-2">
-            {conference.attending.ticket.online ? (
+            {attendee.ticket.online ? (
               <ComputerDesktopIcon className="size-5 text-primary-600 dark:text-primary-300" />
             ) : (
               <MapPinIcon className="size-5 text-primary-600 dark:text-primary-300" />
@@ -294,20 +295,20 @@ export default async function ConferencePage({
             </h2>
           </div>
           <p className="mt-3 font-medium">
-            {conference.attending.ticket.translations[locale].name}
+            {attendee.ticket.translations[locale].name}
           </p>
           <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
-            {conference.attending.ticket.translations[locale].description}
+            {attendee.ticket.translations[locale].description}
           </p>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {conference.attending.ticket.online
+            {attendee.ticket.online
               ? t("workspace.online")
               : t("workspace.inPerson")}
           </p>
-          {conference.attending.hasInvoice ? (
+          {attendee.hasInvoice ? (
             <div className="mt-4 border-t pt-4 dark:border-gray-700">
               <DownloadInvoiceButton
-                attendeeId={conference.attending.id}
+                attendeeId={attendee.id}
                 lng={lng}
                 ownerType={InvoiceOwnerType.ConferenceAttendee}
               />
@@ -337,7 +338,7 @@ export default async function ConferencePage({
         </section>
       )}
 
-      {conference.attending?.ticket.withSubmission ? (
+      {attendee?.ticket.withSubmission ? (
         <section id="submissions" className="scroll-mt-6">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -364,8 +365,8 @@ export default async function ConferencePage({
           </div>
 
           <div className="mt-4 flex flex-col gap-4">
-            {conference.attending.submissions.length > 0 ? (
-              conference.attending.submissions.map((submission) => (
+            {attendee.submissions.length > 0 ? (
+              attendee.submissions.map((submission) => (
                 <SubmissionCard
                   key={submission.id}
                   conference={conference}

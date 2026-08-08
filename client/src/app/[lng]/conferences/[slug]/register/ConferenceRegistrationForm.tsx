@@ -24,7 +24,10 @@ import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
-import { invitedTicketId } from "@/lib/conferenceRegistration";
+import {
+  conferenceWorkspaceHref,
+  invitedTicketId,
+} from "@/lib/conferenceRegistration";
 import { handleAPIErrors } from "@/utils/helpers";
 
 export default function ConferenceRegistrationForm({
@@ -104,7 +107,7 @@ export default function ConferenceRegistrationForm({
         setMessage(res.message, res.success);
 
         if (res.success) {
-          router.push(`/${conference.slug}`);
+          router.replace(conferenceWorkspaceHref(conference.slug));
         }
       }}
     >

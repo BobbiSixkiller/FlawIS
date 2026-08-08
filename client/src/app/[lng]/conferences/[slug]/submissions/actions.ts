@@ -36,7 +36,7 @@ export async function getSubmissionInvite(token?: string) {
 
 export async function createSubmission(
   vars: CreateSubmissionMutationVariables,
-  fromAddAttendee?: boolean
+  fromAddAttendee?: boolean,
 ) {
   const res = await executeGqlMutation(
     CreateSubmissionDocument,

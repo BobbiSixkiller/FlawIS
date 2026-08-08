@@ -22,7 +22,7 @@ import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
 
-export default function SubmissionForm({
+export default function ConferenceSubmissionForm({
   submission,
   conference,
   lng,

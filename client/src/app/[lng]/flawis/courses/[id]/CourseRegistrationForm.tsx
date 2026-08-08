@@ -1,6 +1,6 @@
 "use client";
 
-import BillingInput from "@/app/[lng]/conferences/[slug]/(register)/register/BillingInput";
+import BillingInput from "@/app/[lng]/conferences/[slug]/register/BillingInput";
 import { Input } from "@/components/Input";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import useUser from "@/hooks/useUser";

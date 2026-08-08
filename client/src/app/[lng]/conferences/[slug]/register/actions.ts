@@ -11,7 +11,7 @@ import { executeGqlMutation } from "@/utils/actions";
 export async function addAttendee(
   attendeeInput: AttendeeInput,
   token: string | null,
-  submissionInput?: CreateSubmissionMutationVariables
+  submissionInput?: CreateSubmissionMutationVariables,
 ) {
   const registration = await executeGqlMutation(
     AddAttendeeDocument,

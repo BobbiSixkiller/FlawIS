@@ -20,9 +20,9 @@ export async function removeAuthor(vars: RemoveAuthorMutationVariables) {
     }),
     {
       revalidatePaths: (data) => [
-        `/conferences/${data.removeAuthor.data.conference.slug}/submissions`,
+        `/${data.removeAuthor.data.conference.slug}`,
       ],
-    }
+    },
   );
 }
 
