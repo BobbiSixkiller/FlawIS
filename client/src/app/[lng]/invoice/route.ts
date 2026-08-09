@@ -3,7 +3,7 @@ import {
   InvoiceOwnerType,
 } from "@/lib/graphql/generated/graphql";
 import { invoicePdfHeaders, renderInvoiceToBuffer } from "@/lib/invoice/render";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export const runtime = "nodejs";
 
@@ -11,7 +11,7 @@ const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ lng: string }> }
+  { params }: { params: Promise<{ lng: string }> },
 ) {
   const { lng } = await params;
 

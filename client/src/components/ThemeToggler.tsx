@@ -1,7 +1,7 @@
 "use client";
 
-import { setDarkThemeCookie } from "@/utils/actions";
-import { cn } from "@/utils/helpers";
+import { setDarkThemeCookie } from "@/lib/graphql/actions";
+import { cn } from "@/lib/clientUtils";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 import Button from "./Button";

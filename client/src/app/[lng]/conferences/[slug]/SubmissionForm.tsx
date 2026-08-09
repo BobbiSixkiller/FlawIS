@@ -10,7 +10,7 @@ import {
 import { LocalizedTextarea } from "@/components/Textarea";
 import Select from "@/components/Select";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import { handleAPIErrors, uploadOrDelete } from "@/utils/helpers";
+import { handleAPIErrors, uploadOrDelete } from "@/lib/clientUtils";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
@@ -22,7 +22,7 @@ import GenericCombobox, {
   LocalizedGenericCombobox,
 } from "@/components/GenericCombobox";
 
-export default function SubmissionForm({
+export default function ConferenceSubmissionForm({
   submission,
   conference,
   lng,

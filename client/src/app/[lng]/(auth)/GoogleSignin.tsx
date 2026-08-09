@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { googleOAuthHref } from "@/lib/authRedirect";
 
 export default function GoogleSignIn() {

@@ -1,7 +1,7 @@
 "use server";
 
 import { ForgotPasswordDocument } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function sendResetLink(email: string) {
   return await executeGqlMutation(
@@ -10,6 +10,6 @@ export async function sendResetLink(email: string) {
     (data) => ({ message: data.forgotPassword }),
     undefined,
     undefined,
-    { revalidate: 3600 }
+    { revalidate: 3600 },
   );
 }

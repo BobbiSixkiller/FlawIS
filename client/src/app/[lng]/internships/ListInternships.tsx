@@ -13,7 +13,7 @@ import {
   InternshipsQueryVariables,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { useTranslation } from "@/lib/i18n/client";
 
 interface InternshipData {

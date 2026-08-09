@@ -1,7 +1,7 @@
 import { getConference } from "../actions";
 import Heading from "@/components/Heading";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { displayDate } from "@/utils/helpers";
+import { displayDate } from "@/lib/clientUtils";
 import DynamicImage from "@/components/DynamicImage";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";

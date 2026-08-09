@@ -4,7 +4,7 @@ import {
   PasswordInput,
   PasswordResetDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -17,7 +17,7 @@ export async function resetPassword(data: PasswordInput, token: string) {
       data: data.passwordReset.data,
     }),
     undefined,
-    { resettoken: token }
+    { resettoken: token },
   );
 
   if (res.data) {

@@ -8,7 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
-import { capitalizeFirstLetter, cn } from "@/utils/helpers";
+import { capitalizeFirstLetter, cn } from "@/lib/clientUtils";
 import RemoveAuthorForm from "./RemoveAuthorForm";
 import { deleteAttendee, getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
@@ -19,7 +19,7 @@ import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import SubmissionForm from "@/app/[lng]/conferences/[slug]/(withTabs)/submissions/SubmissionForm";
+import SubmissionForm from "@/app/[lng]/conferences/[slug]/SubmissionForm";
 import { translate } from "@/lib/i18n";
 import Tooltip from "@/components/Tooltip";
 

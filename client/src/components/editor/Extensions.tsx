@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import Underline from "@tiptap/extension-underline";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import StarterKit from "@tiptap/starter-kit";

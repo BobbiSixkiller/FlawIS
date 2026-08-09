@@ -5,7 +5,7 @@ import useValidation from "@/hooks/useValidation";
 import { CategoryFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import { handleAPIErrors } from "@/utils/helpers";
+import { handleAPIErrors } from "@/lib/clientUtils";
 import { Input } from "@/components/Input";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";

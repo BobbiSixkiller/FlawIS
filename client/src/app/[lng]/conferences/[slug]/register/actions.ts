@@ -6,12 +6,12 @@ import {
   AttendeeInput,
   CreateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function addAttendee(
   attendeeInput: AttendeeInput,
   token: string | null,
-  submissionInput?: CreateSubmissionMutationVariables
+  submissionInput?: CreateSubmissionMutationVariables,
 ) {
   const registration = await executeGqlMutation(
     AddAttendeeDocument,
@@ -80,6 +80,6 @@ export async function acceptAuthorInvite(token: string) {
       //   `conferences:${data.acceptAuthorInvite.data.conference.slug}`,
       // ],
     },
-    { token }
+    { token },
   );
 }

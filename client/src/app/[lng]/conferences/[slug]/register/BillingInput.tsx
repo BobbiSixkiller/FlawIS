@@ -2,7 +2,7 @@
 
 import { Billing, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import {
   Combobox,
   ComboboxButton,
@@ -21,7 +21,7 @@ import { useParams } from "next/navigation";
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
-export default function BillingInput({
+export default function ConferenceBillingInput({
   billings,
   methods,
 }: {

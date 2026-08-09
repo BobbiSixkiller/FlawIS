@@ -11,7 +11,7 @@ import { updateConferenceDates } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import RHFormContainer from "@/components/RHFormContainer";
-import { formatDatetimeLocal } from "@/utils/helpers";
+import { formatDatetimeLocal } from "@/lib/clientUtils";
 
 export default function UpdateDatesForm({
   conference,

@@ -9,14 +9,14 @@ import {
   UpdateInternDataDocument,
   UpdateInternDataMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getInternship(id: string) {
   const res = await executeGqlFetch(
     InternshipDocument,
     { id },
     {},
-    { revalidate: 3600, tags: [`internships:${id}`] }
+    { revalidate: 3600, tags: [`internships:${id}`] },
   );
 
   if (res.errors) {
@@ -34,7 +34,7 @@ export async function deleteInternship(id: string) {
       message: data.deleteInternship.message,
       data: data.deleteInternship.data,
     }),
-    { revalidateTags: () => ["internships", `internships:${id}`] }
+    { revalidateTags: () => ["internships", `internships:${id}`] },
   );
 }
 
@@ -51,7 +51,7 @@ export async function deleteIntern(id: string) {
         "internships",
         `internships:${data.deleteIntern.data.internship}`,
       ],
-    }
+    },
   );
 }
 
@@ -62,12 +62,12 @@ export async function createIntern(vars: CreateInternMutationVariables) {
     (data) => ({ message: data.createIntern.message }),
     {
       revalidateTags: () => ["internships", `internships:${vars.internshipId}`],
-    }
+    },
   );
 }
 
 export async function changeInternData(
-  vars: UpdateInternDataMutationVariables
+  vars: UpdateInternDataMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateInternDataDocument,
@@ -80,6 +80,6 @@ export async function changeInternData(
       revalidateTags: (data) => [
         `internships:${data.updateInternData.data.internship}`,
       ],
-    }
+    },
   );
 }

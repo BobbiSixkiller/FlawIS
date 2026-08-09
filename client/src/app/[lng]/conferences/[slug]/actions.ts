@@ -9,10 +9,10 @@ import {
   UpdateSubmissionDocument,
   UpdateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getSubmission(id?: string) {
-  if (!id) return;
+  if (!id) return undefined;
 
   const res = await executeGqlFetch(SubmissionDocument, { id });
   if (res.errors) {
@@ -23,7 +23,7 @@ export async function getSubmission(id?: string) {
 }
 
 export async function getSubmissionInvite(token?: string) {
-  if (!token) return;
+  if (!token) return undefined;
 
   const res = await executeGqlFetch(SubmissionInviteDocument, { token });
   if (res.errors) {
@@ -36,7 +36,7 @@ export async function getSubmissionInvite(token?: string) {
 
 export async function createSubmission(
   vars: CreateSubmissionMutationVariables,
-  fromAddAttendee?: boolean
+  fromAddAttendee?: boolean,
 ) {
   const res = await executeGqlMutation(
     CreateSubmissionDocument,
@@ -49,7 +49,7 @@ export async function createSubmission(
       revalidateTags: (data) => [
         `conferences:${data.createSubmission.data.conference.slug}`,
       ],
-    }
+    },
   );
 
   if (!res.success && res.errors && fromAddAttendee) {
@@ -69,7 +69,7 @@ export async function createSubmission(
 
 export async function updateSubmission(
   vars: UpdateSubmissionMutationVariables,
-  attendeeId?: string
+  attendeeId?: string,
 ) {
   return await executeGqlMutation(
     UpdateSubmissionDocument,
@@ -83,7 +83,7 @@ export async function updateSubmission(
         `conferences:${data.updateSubmission.data.conference.slug}`,
         ...(attendeeId ? [`attendees:${attendeeId}`] : []),
       ],
-    }
+    },
   );
 }
 
@@ -99,6 +99,6 @@ export async function deleteSubmission(id: string) {
       revalidateTags: (data) => [
         `conferences:${data.deleteSubmission.data.conference.slug}`,
       ],
-    }
+    },
   );
 }

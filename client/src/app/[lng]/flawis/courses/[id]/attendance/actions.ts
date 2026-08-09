@@ -12,10 +12,20 @@ import {
   UpdateAttendanceOnlineDocument,
   UpdateAttendanceOnlineMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+import {
+  courseAttendeeMutationTags,
+  courseCacheConfig,
+  courseCacheTags,
+} from "@/lib/courseCache";
 
 export async function getCourseAttendance(vars: AttendanceQueryVariables) {
-  const res = await executeGqlFetch(AttendanceDocument, vars);
+  const res = await executeGqlFetch(
+    AttendanceDocument,
+    vars,
+    null,
+    courseCacheConfig(courseCacheTags.attendance(vars.id)),
+  );
 
   if (res.errors) {
     console.log(res.errors[0]);
@@ -25,7 +35,7 @@ export async function getCourseAttendance(vars: AttendanceQueryVariables) {
 }
 
 export async function changeCourseAttendeeStatus(
-  vars: ChangeCourseAttendeeStatusMutationVariables
+  vars: ChangeCourseAttendeeStatusMutationVariables,
 ) {
   return await executeGqlMutation(
     ChangeCourseAttendeeStatusDocument,
@@ -35,10 +45,11 @@ export async function changeCourseAttendeeStatus(
       data: data.changeCourseAttendeeStatus.data,
     }),
     {
-      revalidatePaths: (data) => [
-        `/courses/${data.changeCourseAttendeeStatus.data.course}/attendance`,
-      ],
-    }
+      revalidateTags: (data) =>
+        courseAttendeeMutationTags(
+          data.changeCourseAttendeeStatus.data.course,
+        ),
+    },
   );
 }
 
@@ -53,15 +64,16 @@ export async function syncCourseElearningAccess(
       data: data.syncCourseElearningAccess.data,
     }),
     {
-      revalidatePaths: (data) => [
-        `/courses/${data.syncCourseElearningAccess.data.course}/attendance`,
-      ],
+      revalidateTags: (data) =>
+        courseAttendeeMutationTags(
+          data.syncCourseElearningAccess.data.course,
+        ),
     },
   );
 }
 
 export async function setAttendedHours(
-  vars: UpdateAttendanceHoursMutationVariables
+  vars: UpdateAttendanceHoursMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateAttendanceHoursDocument,
@@ -71,15 +83,17 @@ export async function setAttendedHours(
       data: data.updateAttendanceHours.data,
     }),
     {
-      revalidatePaths: (data) => [
-        `/courses/${data.updateAttendanceHours.data.session.course}/attendance`,
+      revalidateTags: (data) => [
+        courseCacheTags.attendance(
+          data.updateAttendanceHours.data.session.course,
+        ),
       ],
-    }
+    },
   );
 }
 
 export async function setOnlineAttendance(
-  vars: UpdateAttendanceOnlineMutationVariables
+  vars: UpdateAttendanceOnlineMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateAttendanceOnlineDocument,
@@ -89,9 +103,11 @@ export async function setOnlineAttendance(
       data: data.updateAttendanceOnline.data,
     }),
     {
-      revalidatePaths: (data) => [
-        `/courses/${data.updateAttendanceOnline.data.session.course}/attendance`,
+      revalidateTags: (data) => [
+        courseCacheTags.attendance(
+          data.updateAttendanceOnline.data.session.course,
+        ),
       ],
-    }
+    },
   );
 }

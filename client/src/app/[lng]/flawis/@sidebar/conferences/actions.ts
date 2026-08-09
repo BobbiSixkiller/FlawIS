@@ -1,7 +1,7 @@
 "use server";
 
 import { TextSearchConferenceDocument } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export async function searchConference(params: { text: string }) {
   const res = await executeGqlFetch(TextSearchConferenceDocument, params);

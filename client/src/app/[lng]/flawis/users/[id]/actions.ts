@@ -7,7 +7,7 @@ import {
   ToggleVerifiedUserDocument,
   UserDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 import { updateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -20,7 +20,7 @@ export async function getUser(id: string) {
     {
       tags: [`user:${id}`],
       revalidate: 3600,
-    }
+    },
   );
   if (res.errors) {
     console.log(res.errors[0]);
@@ -67,7 +67,7 @@ export async function impersonate(id: string) {
     { id },
     null,
     undefined,
-    "no-cache"
+    "no-cache",
   );
 
   if (res.errors) {
@@ -95,13 +95,13 @@ export async function impersonate(id: string) {
     redirect(
       res.data.user.access.includes(Access.ConferenceAttendee)
         ? "https://conferences-staging.flaw.uniba.sk"
-        : "https://internships-staging.flaw.uniba.sk"
+        : "https://internships-staging.flaw.uniba.sk",
     );
   } else {
     redirect(
       res.data.user.access.includes(Access.ConferenceAttendee)
         ? "https://conferences.flaw.uniba.sk"
-        : "https://internships.flaw.uniba.sk"
+        : "https://internships.flaw.uniba.sk",
     );
   }
 }

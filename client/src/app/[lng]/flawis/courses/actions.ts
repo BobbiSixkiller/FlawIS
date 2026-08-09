@@ -14,12 +14,20 @@ import {
   UpdateCategoryDocument,
   UpdateCategoryMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+import {
+  courseCacheConfig,
+  courseCacheTags,
+  courseCategoryMutationTags,
+} from "@/lib/courseCache";
 
 export async function getCourses(args: CoursesQueryVariables) {
-  const res = await executeGqlFetch(CoursesDocument, args, null, {
-    tags: ["courses"],
-  });
+  const res = await executeGqlFetch(
+    CoursesDocument,
+    args,
+    null,
+    courseCacheConfig(courseCacheTags.collection),
+  );
   if (res.errors) {
     console.log(res.errors[0]);
   }
@@ -35,7 +43,7 @@ export async function createCourse(vars: CreateCourseMutationVariables) {
       message: data.createCourse.message,
       data: data.createCourse.data,
     }),
-    { revalidateTags: () => ["courses"] }
+    { revalidateTags: () => [courseCacheTags.collection] },
   );
 }
 
@@ -44,7 +52,7 @@ export async function fetchCategories(search: string) {
     CategoriesDocument,
     { search } as CategoriesQueryVariables,
     null,
-    { tags: ["categories"] },
+    courseCacheConfig(courseCacheTags.categories),
   );
   if (res.errors) {
     console.log(res.errors[0]);
@@ -62,7 +70,7 @@ export async function createCategoryAction(
       message: data.createCategory.message,
       data: data.createCategory.data,
     }),
-    { revalidateTags: () => ["categories", "courses"] },
+    { revalidateTags: courseCategoryMutationTags },
   );
 }
 
@@ -76,7 +84,7 @@ export async function updateCategoryAction(
       message: data.updateCategory.message,
       data: data.updateCategory.data,
     }),
-    { revalidateTags: () => ["categories", "courses"] },
+    { revalidateTags: courseCategoryMutationTags },
   );
 }
 
@@ -90,6 +98,6 @@ export async function deleteCategoryAction(
       message: data.deleteCategory.message,
       data: data.deleteCategory.data,
     }),
-    { revalidateTags: () => ["categories", "courses"] },
+    { revalidateTags: courseCategoryMutationTags },
   );
 }

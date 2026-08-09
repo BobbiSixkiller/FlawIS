@@ -4,7 +4,7 @@ import {
   InternDocument,
   UpdateOrgFeedbackDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getIntern(id: string) {
   const res = await executeGqlFetch(InternDocument, { id });
@@ -27,6 +27,6 @@ export async function updateOrgFeedback(id: string, fileUrl: string | null) {
       revalidateTags: (data) => [
         `internship:${data.updateOrgFeedback.data.internship}`,
       ],
-    }
+    },
   );
 }

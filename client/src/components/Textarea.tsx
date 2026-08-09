@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { withLocalizedInput } from "./withLocalizedInput";
 import { InputProps } from "./Input";
 import { useFormContext, useFormState } from "react-hook-form";

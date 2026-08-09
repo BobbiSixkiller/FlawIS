@@ -17,7 +17,7 @@ import { createCourse, createCategoryAction, fetchCategories } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import GenericCombobox from "@/components/GenericCombobox";
-import { cn, handleAPIErrors, uploadOrDelete } from "@/utils/helpers";
+import { cn, handleAPIErrors, uploadOrDelete } from "@/lib/clientUtils";
 import ImageFileInput from "@/components/ImageFileInput";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import { updateCouse } from "./[id]/actions";

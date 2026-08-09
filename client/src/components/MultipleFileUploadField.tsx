@@ -15,7 +15,7 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import Button from "./Button";
-import { fetchFromMinio } from "@/utils/helpers";
+import { fetchFromMinio } from "@/lib/clientUtils";
 import Spinner from "./Spinner";
 
 const getColorClasses = ({

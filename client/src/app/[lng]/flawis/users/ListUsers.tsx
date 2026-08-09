@@ -12,7 +12,7 @@ import {
   UserFilterInput,
   UsersQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 interface UserData {
   id: string;

@@ -8,7 +8,7 @@ import {
   UpdateInvoiceDocument,
   UpdateInvoiceMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function removeAuthor(vars: RemoveAuthorMutationVariables) {
   return await executeGqlMutation(
@@ -19,10 +19,8 @@ export async function removeAuthor(vars: RemoveAuthorMutationVariables) {
       data: data.removeAuthor.data,
     }),
     {
-      revalidatePaths: (data) => [
-        `/conferences/${data.removeAuthor.data.conference.slug}/submissions`,
-      ],
-    }
+      revalidatePaths: (data) => [`/${data.removeAuthor.data.conference.slug}`],
+    },
   );
 }
 
@@ -31,7 +29,7 @@ export async function getAttendee(id: string) {
     AttendeeDocument,
     { id },
     {},
-    { tags: [`attendees:${id}`] }
+    { tags: [`attendees:${id}`] },
   );
   if (res.errors) {
     console.log(res.errors[0]);
@@ -49,7 +47,7 @@ export async function deleteAttendee(id: string) {
       message: data.deleteAttendee.message,
       data: data.deleteAttendee.data,
     }),
-    { revalidateTags: () => ["attendees"] }
+    { revalidateTags: () => ["attendees"] },
   );
 }
 
@@ -66,6 +64,6 @@ export async function updateInvoice(vars: UpdateInvoiceMutationVariables) {
         `conferences:${data.updateInvoice.data.conference.slug}`,
         `attendees:${vars.id}`,
       ],
-    }
+    },
   );
 }

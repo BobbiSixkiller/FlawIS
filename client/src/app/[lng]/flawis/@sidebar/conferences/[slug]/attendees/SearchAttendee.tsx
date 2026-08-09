@@ -3,7 +3,7 @@
 import SearchComponent from "@/components/Search";
 import { useParams, useRouter } from "next/navigation";
 import { searchAttendee } from "./actions";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 interface AttendeeOpt {
   id: string;

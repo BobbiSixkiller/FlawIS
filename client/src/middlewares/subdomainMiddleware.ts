@@ -21,7 +21,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
   return async (
     req: NextRequest,
     event: NextFetchEvent,
-    res?: NextResponse
+    res?: NextResponse,
   ) => {
     const url = req.nextUrl.clone();
 

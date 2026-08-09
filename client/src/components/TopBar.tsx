@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import Breadcrumbs from "./Breadcrumbs";
 import {
   ArrowLeftStartOnRectangleIcon,
@@ -80,14 +80,11 @@ export default function TopBar({
           {avatar ? (
             <Dropdown
               anchor={{ gap: 6, to: "bottom end" }}
-              trigger={
-                <Button
-                  size="icon"
-                  className="rounded-full flex items-center w-fit h-fit"
-                >
-                  {avatar}
-                </Button>
-              }
+              trigger={avatar}
+              triggerProps={{
+                size: "icon",
+                className: "rounded-full flex items-center w-fit h-fit",
+              }}
               items={[
                 <Link href="/profile" key={0}>
                   <UserCircleIcon className="size-5" aria-hidden="true" />

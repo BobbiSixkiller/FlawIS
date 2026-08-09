@@ -4,7 +4,7 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
 import logo from "../../public/images/Flaw-logo-notext.png";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { cookies } from "next/headers";
 
 export default async function Logo({

@@ -6,7 +6,7 @@ import {
   UpdateUserDocument,
   UserInput,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 import { cookies } from "next/headers";
 
 export async function register({
@@ -18,7 +18,7 @@ export async function register({
     { data },
     (data) => ({ message: data.register.message, data: data.register.data }),
     {},
-    { token }
+    { token },
   );
 
   if (res.data) {
@@ -47,7 +47,7 @@ export async function addUser(data: RegisterUserInput) {
       message: data.register.message,
       data: data.register.data,
     }),
-    { revalidateTags: () => ["users"] }
+    { revalidateTags: () => ["users"] },
   );
 }
 
@@ -72,6 +72,6 @@ export async function updateUser(id: string, data: UserInput) {
         user,
       ],
       revalidatePaths: () => ["/profile", "/"],
-    }
+    },
   );
 }

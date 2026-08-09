@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { Checkbox, Field, Label } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Control, useController } from "react-hook-form";

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleSignInDocument } from "@/lib/graphql/generated/graphql";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export async function GET(
   req: NextRequest,

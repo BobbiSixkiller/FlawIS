@@ -2,7 +2,7 @@ import Modal from "@/components/Modal";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import { translate } from "@/lib/i18n";
-import { getSubdomain } from "@/utils/actions";
+import { getSubdomain } from "@/lib/serverUtils";
 
 export default async function UpdateProfilePage({
   params,

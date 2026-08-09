@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter } from "@/utils/helpers";
+import { capitalizeFirstLetter } from "@/lib/clientUtils";
 import { getAttendees } from "../flawis/conferences/[slug]/attendees/actions";
 import { getCourseAttendance } from "../flawis/courses/[id]/attendance/actions";
 import { getInterns } from "../internships/[internshipId]/applications/actions";

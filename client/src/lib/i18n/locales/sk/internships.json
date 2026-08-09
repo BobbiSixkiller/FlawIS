@@ -49,6 +49,7 @@
   "orgFeedback": "Potvrdenie absolvovania",
   "internship": "Stáž",
   "applied_one": "Prihlásený ({{count}})",
+  "applied_few": "Prihlásení ({{count}})",
   "applied_other": "Prihlásených ({{count}})",
   "docs": "Dokumenty",
   "apply": "Prihlásiť sa",

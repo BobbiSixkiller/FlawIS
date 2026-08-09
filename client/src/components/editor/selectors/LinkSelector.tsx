@@ -1,7 +1,7 @@
 import { CheckIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/react";
 import { useParams } from "next/navigation";

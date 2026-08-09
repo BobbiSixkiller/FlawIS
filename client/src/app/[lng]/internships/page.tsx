@@ -7,7 +7,7 @@ import {
   SortDirection,
 } from "@/lib/graphql/generated/graphql";
 import ListInternships from "./ListInternships";
-import { getAcademicYear } from "@/utils/helpers";
+import { getAcademicYear } from "@/lib/clientUtils";
 import { getInternships } from "./actions";
 import AcademicYearSelect from "./AcademicYearSelect";
 import Tooltip from "@/components/Tooltip";

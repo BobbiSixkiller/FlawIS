@@ -9,7 +9,7 @@ import { Input } from "@/components/Input";
 import useValidation from "@/hooks/useValidation";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { useMessageStore } from "@/stores/messageStore";
 import RHFormContainer from "@/components/RHFormContainer";
 

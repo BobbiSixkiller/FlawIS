@@ -7,14 +7,14 @@ import {
   UsersDocument,
   UsersQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getUsers(vars: UsersQueryVariables) {
   const res = await executeGqlFetch(
     UsersDocument,
     vars,
     {},
-    { tags: ["users"], revalidate: 3600 }
+    { tags: ["users"], revalidate: 3600 },
   );
 
   if (res.errors) {

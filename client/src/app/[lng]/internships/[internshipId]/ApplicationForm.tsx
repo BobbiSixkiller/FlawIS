@@ -9,7 +9,7 @@ import {
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { uploadOrDelete } from "@/utils/helpers";
+import { uploadOrDelete } from "@/lib/clientUtils";
 import { useParams } from "next/navigation";
 import { deleteFiles } from "@/lib/minio";
 import { changeInternData, createIntern } from "./actions";

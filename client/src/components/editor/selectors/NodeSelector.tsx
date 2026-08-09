@@ -13,7 +13,7 @@ import {
   Bars3CenterLeftIcon,
 } from "@heroicons/react/24/outline";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/core";
 import { useTranslation } from "@/lib/i18n/client";

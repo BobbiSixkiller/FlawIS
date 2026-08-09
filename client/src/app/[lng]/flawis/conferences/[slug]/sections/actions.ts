@@ -10,10 +10,10 @@ import {
   UpdateSectionDocument,
   UpdateSectionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function conferenceSections(
-  vars: ConferenceSectionsQueryVariables
+  vars: ConferenceSectionsQueryVariables,
 ) {
   const res = await executeGqlFetch(ConferenceSectionsDocument, vars);
   if (res.errors) {
@@ -35,7 +35,7 @@ export async function createSection(vars: CreateSectionMutationVariables) {
       revalidateTags: (data) => [
         `conferences:${data.createSection.data.conference?.slug}`,
       ],
-    }
+    },
   );
 }
 
@@ -51,7 +51,7 @@ export async function deleteSection(vars: DeleteSectionMutationVariables) {
       revalidateTags: (data) => [
         `conferences:${data.deleteSection.data.conference?.slug}`,
       ],
-    }
+    },
   );
 }
 
@@ -67,6 +67,6 @@ export async function updateSection(vars: UpdateSectionMutationVariables) {
       revalidateTags: (data) => [
         `conferences:${data.updateSection.data.conference?.slug}`,
       ],
-    }
+    },
   );
 }

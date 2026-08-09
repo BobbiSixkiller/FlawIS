@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/client";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import { GqlMutationResponse } from "@/utils/actions";
+import { GqlMutationResponse } from "@/lib/graphql/actions";
 
 interface ConfirmDeleteFormProps<TData> {
   text: string;
