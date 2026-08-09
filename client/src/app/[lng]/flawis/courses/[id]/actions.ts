@@ -22,12 +22,24 @@ import {
   UpdateCourseSessionDocument,
   UpdateCourseSessionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+import {
+  courseAttendeeMutationTags,
+  courseCacheConfig,
+  courseCacheTags,
+  courseEntityMutationTags,
+} from "@/lib/courseCache";
 
 export async function getCourse(vars: CourseQueryVariables) {
-  const res = await executeGqlFetch(CourseDocument, vars, undefined, {
-    tags: [`courses:${vars.id}`],
-  });
+  const res = await executeGqlFetch(
+    CourseDocument,
+    vars,
+    undefined,
+    courseCacheConfig(
+      courseCacheTags.allDetails,
+      courseCacheTags.detail(vars.id),
+    ),
+  );
   if (res.errors) {
     console.log(res.errors[0].message);
   }
@@ -42,9 +54,7 @@ export async function getCourseReachConfig(
     CourseReachConfigDocument,
     vars,
     undefined,
-    {
-      tags: [`courses:${vars.courseId}:reach-config`],
-    },
+    courseCacheConfig(courseCacheTags.reachConfig(vars.courseId)),
   );
   if (res.errors) {
     console.log(res.errors[0].message);
@@ -61,12 +71,9 @@ export async function updateCouse(vars: UpdateCourseMutationVariables) {
       data: data.updateCourse.data,
     }),
     {
-      revalidateTags: (data) => [
-        `courses:${data.updateCourse.data.id}`,
-        `courses:${data.updateCourse.data.id}:reach-config`,
-        "courses",
-      ],
-    }
+      revalidateTags: (data) =>
+        courseEntityMutationTags(data.updateCourse.data.id),
+    },
   );
 }
 
@@ -79,16 +86,14 @@ export async function deleteCourse(vars: DeleteCourseMutationVariables) {
       data: data.deleteCourse.data,
     }),
     {
-      revalidateTags: (data) => [
-        `courses:${data.deleteCourse.data.id}`,
-        "courses",
-      ],
-    }
+      revalidateTags: (data) =>
+        courseEntityMutationTags(data.deleteCourse.data.id),
+    },
   );
 }
 
 export async function createCourseSession(
-  vars: CreateCourseSessionMutationVariables
+  vars: CreateCourseSessionMutationVariables,
 ) {
   return await executeGqlMutation(
     CreateCourseSessionDocument,
@@ -99,14 +104,14 @@ export async function createCourseSession(
     }),
     {
       revalidateTags: (data) => [
-        `courses:${data.createCourseSession.data.course}`,
+        courseCacheTags.attendance(data.createCourseSession.data.course),
       ],
-    }
+    },
   );
 }
 
 export async function updateCourseSession(
-  vars: UpdateCourseSessionMutationVariables
+  vars: UpdateCourseSessionMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateCourseSessionDocument,
@@ -117,14 +122,14 @@ export async function updateCourseSession(
     }),
     {
       revalidateTags: (data) => [
-        `courses:${data.updateCourseSession.data.course}`,
+        courseCacheTags.attendance(data.updateCourseSession.data.course),
       ],
-    }
+    },
   );
 }
 
 export async function deleteCourseSession(
-  vars: DeleteCourseSessionMutationVariables
+  vars: DeleteCourseSessionMutationVariables,
 ) {
   return await executeGqlMutation(
     DeleteCourseSessionDocument,
@@ -135,14 +140,14 @@ export async function deleteCourseSession(
     }),
     {
       revalidateTags: (data) => [
-        `courses:${data.deleteCourseSession.data.course}`,
+        courseCacheTags.attendance(data.deleteCourseSession.data.course),
       ],
-    }
+    },
   );
 }
 
 export async function createCourseAttendee(
-  vars: CreateCourseAttendeeMutationVariables
+  vars: CreateCourseAttendeeMutationVariables,
 ) {
   return await executeGqlMutation(
     CreateCourseAttendeeDocument,
@@ -152,15 +157,14 @@ export async function createCourseAttendee(
       data: data.createCourseAttendee.data,
     }),
     {
-      revalidateTags: (data) => [
-        `courses:${data.createCourseAttendee.data.course}`,
-      ],
-    }
+      revalidateTags: (data) =>
+        courseAttendeeMutationTags(data.createCourseAttendee.data.course),
+    },
   );
 }
 
 export async function updateCourseAttendee(
-  vars: UpdateCourseAttendeeMutationVariables
+  vars: UpdateCourseAttendeeMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateCourseAttendeeDocument,
@@ -170,15 +174,14 @@ export async function updateCourseAttendee(
       data: data.updateCourseAttendee.data,
     }),
     {
-      revalidateTags: (data) => [
-        `courses:${data.updateCourseAttendee.data.course}`,
-      ],
-    }
+      revalidateTags: (data) =>
+        courseAttendeeMutationTags(data.updateCourseAttendee.data.course),
+    },
   );
 }
 
 export async function deleteCourseAttendee(
-  vars: DeleteCourseAttendeeMutationVariables
+  vars: DeleteCourseAttendeeMutationVariables,
 ) {
   return await executeGqlMutation(
     DeleteCourseAttendeeDocument,
@@ -188,10 +191,8 @@ export async function deleteCourseAttendee(
       data: data.deleteCourseAttendee.data,
     }),
     {
-      revalidateTags: (data) => [
-        `courses:${data.deleteCourseAttendee.data.course}`,
-        `courses:${data.deleteCourseAttendee.data.course}/attendance`,
-      ],
-    }
+      revalidateTags: (data) =>
+        courseAttendeeMutationTags(data.deleteCourseAttendee.data.course),
+    },
   );
 }

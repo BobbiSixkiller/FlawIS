@@ -10,7 +10,7 @@ import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import { createCourseSession, updateCourseSession } from "./actions";
-import { formatDatetimeLocal, handleAPIErrors } from "@/utils/helpers";
+import { formatDatetimeLocal, handleAPIErrors } from "@/lib/clientUtils";
 import { Textarea } from "@/components/Textarea";
 import { Input } from "@/components/Input";
 import TiptapEditor from "@/components/editor/Editor";

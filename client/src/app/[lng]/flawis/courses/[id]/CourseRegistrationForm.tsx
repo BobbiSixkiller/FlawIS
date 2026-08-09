@@ -11,7 +11,7 @@ import {
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { uploadToMinio } from "@/utils/helpers";
+import { uploadToMinio } from "@/lib/clientUtils";
 import { useParams, useRouter } from "next/navigation";
 import { createCourseAttendee, updateCourseAttendee } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";

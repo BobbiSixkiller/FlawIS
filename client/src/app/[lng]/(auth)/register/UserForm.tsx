@@ -24,7 +24,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import useValidation from "@/hooks/useValidation";
 import Spinner from "@/components/Spinner";
-import { cn, uploadOrDelete } from "@/utils/helpers";
+import { cn, uploadOrDelete } from "@/lib/clientUtils";
 import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import Button from "@/components/Button";
 import AvatarInput from "@/components/ImageFileInput";

@@ -5,7 +5,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Dropdown from "./Dropdown";
-import Button from "./Button";
 import Link from "next/link";
 
 export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
@@ -18,19 +17,22 @@ export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
     <Dropdown
       anchor={{ gap: 6, to: authLayout ? "bottom end" : "top" }}
       buttonWidth={!authLayout}
+      triggerProps={
+        authLayout
+          ? { size: "icon", variant: "ghost", className: "rounded-full" }
+          : { variant: "ghost", className: "w-full justify-start" }
+      }
       trigger={
         authLayout ? (
-          <Button size="icon" variant="ghost" className="rounded-full">
-            <Image
-              alt="Locale-flag"
-              priority
-              src={`/images/${lng}.svg`}
-              width={36}
-              height={36}
-            />
-          </Button>
+          <Image
+            alt="Locale-flag"
+            priority
+            src={`/images/${lng}.svg`}
+            width={36}
+            height={36}
+          />
         ) : (
-          <Button variant="ghost" className="w-full justify-start">
+          <>
             <Image
               alt="Locale-flag"
               priority
@@ -39,7 +41,7 @@ export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
               height={20}
             />
             <span className="ml-2 text-white dark:text-white/85">{t(lng)}</span>
-          </Button>
+          </>
         )
       }
       items={languages.map((l) => (

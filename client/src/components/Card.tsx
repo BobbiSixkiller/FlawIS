@@ -1,4 +1,4 @@
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { ComponentPropsWithoutRef, ElementType, forwardRef } from "react";
 
 interface CardOwnProps {

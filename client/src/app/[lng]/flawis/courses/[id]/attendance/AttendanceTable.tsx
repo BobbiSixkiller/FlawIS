@@ -9,7 +9,7 @@ import {
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { cn, formatDatetimeLocal } from "@/utils/helpers";
+import { cn, formatDatetimeLocal } from "@/lib/clientUtils";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import {
@@ -24,8 +24,10 @@ import {
 import {
   Children,
   cloneElement,
+  createContext,
   isValidElement,
   useEffect,
+  useContext,
   useRef,
   useState,
 } from "react";
@@ -53,13 +55,29 @@ interface ScrollState {
   horizontal: boolean;
 }
 
+interface AttendanceTableContextValue {
+  sessions: AttendanceQuery["course"]["attendance"]["sessions"];
+  registrationForm: FormFragment;
+}
+
+const AttendanceTableContext = createContext<AttendanceTableContextValue | null>(
+  null,
+);
+
+function useAttendanceTableContext() {
+  const context = useContext(AttendanceTableContext);
+  if (!context) {
+    throw new Error("Attendance table components require their context");
+  }
+  return context;
+}
+
 function AttendanceTableContainer({
   children,
-  sessions,
 }: {
   children: React.ReactNode;
-  sessions: AttendanceQuery["course"]["attendance"]["sessions"];
 }) {
+  const { sessions } = useAttendanceTableContext();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState<ScrollState>({
     vertical: false,
@@ -132,7 +150,7 @@ function AttendanceTableContainer({
                   </button>
                 </ModalTrigger>
                 {isAdmin && (
-                  <ModalTrigger dialogId="delete-session">
+                  <ModalTrigger dialogId={`session:${s?.id}-delete`}>
                     <Button
                       size="icon"
                       variant="destructive"
@@ -174,9 +192,12 @@ function AttendanceTableContainer({
                     </>
                   )}
                 </Modal>
-                <Modal dialogId="delete-session" title="Zmazat termin">
+                <Modal
+                  dialogId={`session:${s?.id}-delete`}
+                  title="Zmazat termin"
+                >
                   <ConfirmDeleteForm
-                    dialogId="delete-session"
+                    dialogId={`session:${s?.id}-delete`}
                     text={`Naozaj chcete zmazat termin ${formatDatetimeLocal(
                       s?.start,
                       false,
@@ -417,6 +438,18 @@ function AttendanceRow({
   );
 }
 
+function AttendanceListItem({ data }: { data?: AttendanceFragment }) {
+  const { sessions, registrationForm } = useAttendanceTableContext();
+
+  return (
+    <AttendanceRow
+      data={data}
+      sessions={sessions}
+      registrationForm={registrationForm}
+    />
+  );
+}
+
 const AttendancePlaceholder = ({
   cardRef,
 }: {
@@ -447,34 +480,18 @@ export function AttendanceTable({
   vars: AttendanceQueryVariables;
   registrationForm: FormFragment;
 }) {
-  // useState initializer runs exactly once — no stale closure risk, no lint suppression needed
-  const [{ ListItem, Container }] = useState(() => ({
-    ListItem: function AttendanceListItem(props: { data?: AttendanceFragment }) {
-      return (
-        <AttendanceRow
-          sessions={initialData.sessions}
-          registrationForm={registrationForm}
-          {...props}
-        />
-      );
-    },
-    Container: function AttendanceContainer(props: {
-      children: React.ReactNode;
-    }) {
-      return (
-        <AttendanceTableContainer sessions={initialData.sessions} {...props} />
-      );
-    },
-  }));
-
   return (
-    <InfiniteScroll<AttendanceFragment, AttendanceQueryVariables>
-      vars={vars}
-      getData={getCourseAttendance}
-      initialData={initialData}
-      ListItem={ListItem}
-      Container={Container}
-      Placeholder={AttendancePlaceholder}
-    />
+    <AttendanceTableContext.Provider
+      value={{ sessions: initialData.sessions, registrationForm }}
+    >
+      <InfiniteScroll<AttendanceFragment, AttendanceQueryVariables>
+        vars={vars}
+        getData={getCourseAttendance}
+        initialData={initialData}
+        ListItem={AttendanceListItem}
+        Container={AttendanceTableContainer}
+        Placeholder={AttendancePlaceholder}
+      />
+    </AttendanceTableContext.Provider>
   );
 }

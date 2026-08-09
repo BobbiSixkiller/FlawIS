@@ -4,7 +4,9 @@ import { TypedDocumentString } from "@/lib/graphql/generated/graphql";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { cookies, headers } from "next/headers";
-import parseValidationErrors, { ValidationErrors } from "./parseErrors";
+import parseValidationErrors, {
+  ValidationErrors,
+} from "@/lib/clientUtils";
 import { revalidatePath, updateTag } from "next/cache";
 
 export async function setDarkThemeCookie(val: boolean) {
@@ -40,7 +42,7 @@ export async function executeGqlFetch<Data, Variables>(
   variables?: Variables,
   customHeaders: IncomingHttpHeaders | null = null,
   next?: NextFetchRequestConfig,
-  nextCache?: RequestCache
+  nextCache?: RequestCache,
 ): Promise<GraphQLResponse<Data>> {
   const reqHeaders = await headers();
   const reqCookies = await cookies();
@@ -89,14 +91,14 @@ export async function executeGqlMutation<Data, Variables, TransformedData>(
   options?: MutationOptions<Data>,
   customHeaders: IncomingHttpHeaders | null = null,
   next?: NextFetchRequestConfig,
-  nextCache?: RequestCache
+  nextCache?: RequestCache,
 ): Promise<GqlMutationResponse<TransformedData>> {
   const res = await executeGqlFetch(
     document,
     variables,
     customHeaders,
     next,
-    nextCache
+    nextCache,
   );
 
   if (res.errors) {
@@ -130,12 +132,4 @@ export async function executeGqlMutation<Data, Variables, TransformedData>(
     message,
     data,
   };
-}
-
-export async function getSubdomain() {
-  const headerStore = await headers();
-  const host = headerStore.get("host") || "localhost:3000"; // Get the hostname from the request
-  const subdomain = host.split(".")[0].replace("-staging", ""); // Parse the subdomain (assuming subdomain is the first part)
-
-  return subdomain;
 }

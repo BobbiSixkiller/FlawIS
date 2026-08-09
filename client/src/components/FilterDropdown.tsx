@@ -8,7 +8,7 @@ import {
 } from "@headlessui/react";
 import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import Button, { ButtonProps } from "@/components/Button";
 import Toggle from "@/components/Toggle";
 

@@ -6,7 +6,7 @@ import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { uploadOrDelete } from "@/utils/helpers";
+import { uploadOrDelete } from "@/lib/clientUtils";
 import { useParams } from "next/navigation";
 import { updateOrgFeedback } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";

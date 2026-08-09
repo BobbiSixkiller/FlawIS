@@ -28,7 +28,7 @@ import {
   conferenceWorkspaceHref,
   invitedTicketId,
 } from "@/lib/conferenceRegistration";
-import { handleAPIErrors } from "@/utils/helpers";
+import { handleAPIErrors } from "@/lib/clientUtils";
 
 export default function ConferenceRegistrationForm({
   lng,

@@ -1,7 +1,7 @@
 "use client";
 
 import Spinner from "@/components/Spinner";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import {
   Combobox,
   ComboboxInput,

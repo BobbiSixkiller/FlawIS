@@ -4,7 +4,7 @@ import {
   InternsDocument,
   InternsQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export async function getInterns(vars: InternsQueryVariables) {
   const res = await executeGqlFetch(InternsDocument, vars);

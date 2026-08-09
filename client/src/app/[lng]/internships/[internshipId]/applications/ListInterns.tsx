@@ -11,7 +11,7 @@ import {
   InternsQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
-import { displayDate } from "@/utils/helpers";
+import { displayDate } from "@/lib/clientUtils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "@/components/Button";

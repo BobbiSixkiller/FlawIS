@@ -93,11 +93,8 @@ function Section({
       </span>
 
       <Dropdown
-        trigger={
-          <Button variant="ghost" size="icon">
-            <EllipsisHorizontalIcon className="h-5 w-5" />
-          </Button>
-        }
+        trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
+        triggerProps={{ variant: "ghost", size: "icon" }}
         items={
           countFiles(section.submissions) > 0
             ? [

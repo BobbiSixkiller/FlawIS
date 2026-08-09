@@ -10,7 +10,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { cookies } from "next/headers";
 import Avatar from "./Avatar";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { Snackbar } from "./Message";
 
 export default async function Dashboard({

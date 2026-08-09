@@ -13,7 +13,7 @@ import { TextButtons } from "./selectors/TextButtons";
 import { useDebouncedCallback } from "use-debounce";
 import { Control, useController } from "react-hook-form";
 
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { SlashCommandExtension } from "./SlashCommand";
 import CommandsDropdown from "./selectors/CommandsDropdown";
 import useLocalizedExtensions from "./Extensions";

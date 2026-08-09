@@ -8,7 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { redirect } from "next/navigation";
-import { capitalizeFirstLetter, cn } from "@/utils/helpers";
+import { capitalizeFirstLetter, cn } from "@/lib/clientUtils";
 import RemoveAuthorForm from "./RemoveAuthorForm";
 import { deleteAttendee, getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";

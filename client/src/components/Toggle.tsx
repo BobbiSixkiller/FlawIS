@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { Field, Label, Switch } from "@headlessui/react";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 const sizeMap = {
   regular: { container: "h-[38px] w-[74px]", btn: "h-[34px] w-[34px]" },

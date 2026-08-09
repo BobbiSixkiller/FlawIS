@@ -8,14 +8,14 @@ import {
   CreateConferenceMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { notFound } from "next/navigation";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getConferences(vars: ConferencesQueryVariables) {
   const res = await executeGqlFetch(
     ConferencesDocument,
     vars,
     {},
-    { tags: ["conferences"], revalidate: 3600 }
+    { tags: ["conferences"], revalidate: 3600 },
   );
 
   if (res.errors) {
@@ -29,7 +29,7 @@ export async function getConference(slug: string) {
   const res = await executeGqlFetch(
     ConferenceDocument,
     { slug },
-    {}
+    {},
     // commented because of error triggered by a acceptAuthorInvite called inside conference register page server component
     // {
     //   tags: [`conferences:${slug}`],
@@ -46,12 +46,12 @@ export async function getConference(slug: string) {
 }
 
 export async function createConference(
-  vars: CreateConferenceMutationVariables
+  vars: CreateConferenceMutationVariables,
 ) {
   return await executeGqlMutation(
     CreateConferenceDocument,
     vars,
     (data) => ({ message: data.createConference.message }),
-    { revalidateTags: () => ["conferences"] }
+    { revalidateTags: () => ["conferences"] },
   );
 }

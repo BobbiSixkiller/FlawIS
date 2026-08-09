@@ -10,7 +10,7 @@ import {
 import { deleteFiles } from "@/lib/minio";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
-import { uploadToMinio } from "@/utils/helpers";
+import { uploadToMinio } from "@/lib/clientUtils";
 import useUser from "@/hooks/useUser";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";

@@ -7,14 +7,14 @@ import {
   InternshipsQueryVariables,
   UpdateInternshipDocument,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getInternships(vars: InternshipsQueryVariables) {
   const res = await executeGqlFetch(
     InternshipsDocument,
     vars,
     {},
-    { tags: ["internships"], revalidate: 3600 }
+    { tags: ["internships"], revalidate: 3600 },
   );
 
   if (res.errors) {
@@ -31,7 +31,7 @@ export async function createInternship(input: InternshipInput) {
     (data) => ({
       message: data.createInternship.message,
     }),
-    { revalidateTags: () => ["internships"] }
+    { revalidateTags: () => ["internships"] },
   );
 }
 
@@ -51,6 +51,6 @@ export async function updateInternship({
     }),
     {
       revalidateTags: () => ["internships", `internships:${id}`],
-    }
+    },
   );
 }

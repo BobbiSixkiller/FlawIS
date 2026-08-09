@@ -8,7 +8,7 @@ import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
-import { GqlMutationResponse } from "@/utils/actions";
+import { GqlMutationResponse } from "@/lib/graphql/actions";
 
 export default function ChangeStatusForm<TData>({
   dialogId,

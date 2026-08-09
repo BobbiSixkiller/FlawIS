@@ -10,7 +10,7 @@ import {
 } from "@headlessui/react";
 import { Control, useController } from "react-hook-form";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 interface Option {
   name: string;

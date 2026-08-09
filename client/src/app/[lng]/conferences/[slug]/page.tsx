@@ -22,9 +22,9 @@ import {
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { currentTimestamp } from "@/lib/serverTime";
-import { conferenceWorkspaceState } from "@/lib/conferenceWorkspace";
-import { capitalizeFirstLetter } from "@/utils/helpers";
+import { currentTimestamp } from "@/lib/serverUtils";
+import { conferenceWorkspaceState } from "@/lib/conferenceRegistration";
+import { capitalizeFirstLetter } from "@/lib/clientUtils";
 import DeleteSubmissionForm from "./DeleteSubmissionForm";
 import SubmissionForm from "./SubmissionForm";
 

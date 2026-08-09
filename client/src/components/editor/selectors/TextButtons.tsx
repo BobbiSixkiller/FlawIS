@@ -5,7 +5,7 @@ import {
   StrikethroughIcon,
   UnderlineIcon,
 } from "@heroicons/react/24/outline";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { SelectorItem } from "./NodeSelector";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/core";

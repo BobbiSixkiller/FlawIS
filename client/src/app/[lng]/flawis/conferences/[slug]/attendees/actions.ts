@@ -4,7 +4,7 @@ import {
   AttendeesDocument,
   AttendeesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch } from "@/utils/actions";
+import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export async function getAttendees(vars: AttendeesQueryVariables) {
   const res = await executeGqlFetch(AttendeesDocument, vars);

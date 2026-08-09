@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import {
   CloseButton,
   Popover,

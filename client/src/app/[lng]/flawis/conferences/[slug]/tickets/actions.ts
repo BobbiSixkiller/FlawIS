@@ -8,7 +8,7 @@ import {
   UpdateTicketDocument,
   UpdateTicketMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function createTicket(vars: CreateTicketMutationVariables) {
   return await executeGqlMutation(
@@ -17,7 +17,7 @@ export async function createTicket(vars: CreateTicketMutationVariables) {
     (data) => ({
       message: data.createTicket.message,
     }),
-    { revalidateTags: () => [`conferences:${vars.slug}`] }
+    { revalidateTags: () => [`conferences:${vars.slug}`] },
   );
 }
 
@@ -28,7 +28,7 @@ export async function updateTicket(vars: UpdateTicketMutationVariables) {
     (data) => ({
       message: data.updateTicket.message,
     }),
-    { revalidateTags: () => [`conferences:${vars.slug}`] }
+    { revalidateTags: () => [`conferences:${vars.slug}`] },
   );
 }
 
@@ -39,6 +39,6 @@ export async function deleteTicket(vars: DeleteTicketMutationVariables) {
     (data) => ({
       message: data.deleteTicket.message,
     }),
-    { revalidateTags: (data) => [`conferences:${vars.slug}`] }
+    { revalidateTags: (data) => [`conferences:${vars.slug}`] },
   );
 }

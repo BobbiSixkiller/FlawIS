@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { conferenceWorkspaceState } from "../src/lib/conferenceWorkspace";
+import { conferenceWorkspaceState } from "../src/lib/conferenceRegistration";
 
 const dates = {
   start: "2026-10-10T08:00:00.000Z",

@@ -9,7 +9,7 @@ import {
   UpdateSubmissionDocument,
   UpdateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getSubmission(id?: string) {
   if (!id) return undefined;
@@ -49,7 +49,7 @@ export async function createSubmission(
       revalidateTags: (data) => [
         `conferences:${data.createSubmission.data.conference.slug}`,
       ],
-    }
+    },
   );
 
   if (!res.success && res.errors && fromAddAttendee) {
@@ -69,7 +69,7 @@ export async function createSubmission(
 
 export async function updateSubmission(
   vars: UpdateSubmissionMutationVariables,
-  attendeeId?: string
+  attendeeId?: string,
 ) {
   return await executeGqlMutation(
     UpdateSubmissionDocument,
@@ -83,7 +83,7 @@ export async function updateSubmission(
         `conferences:${data.updateSubmission.data.conference.slug}`,
         ...(attendeeId ? [`attendees:${attendeeId}`] : []),
       ],
-    }
+    },
   );
 }
 
@@ -99,6 +99,6 @@ export async function deleteSubmission(id: string) {
       revalidateTags: (data) => [
         `conferences:${data.deleteSubmission.data.conference.slug}`,
       ],
-    }
+    },
   );
 }

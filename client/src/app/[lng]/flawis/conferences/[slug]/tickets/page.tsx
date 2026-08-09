@@ -49,11 +49,8 @@ export default async function TicketsPage({
             </div>
 
             <Dropdown
-              trigger={
-                <Button size="icon" variant="ghost">
-                  <EllipsisHorizontalIcon className="h-5 w-5" />
-                </Button>
-              }
+              trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
+              triggerProps={{ size: "icon", variant: "ghost" }}
               items={[
                 <ModalTrigger dialogId={updateTicketDialogId(t.id)} key={0}>
                   <Button size="sm">Aktualizovat</Button>

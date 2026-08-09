@@ -4,10 +4,10 @@ import {
   ChangeInternStatusDocument,
   ChangeInternStatusMutationVariables,
 } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function changeInternStatus(
-  params: ChangeInternStatusMutationVariables
+  params: ChangeInternStatusMutationVariables,
 ) {
   return await executeGqlMutation(
     ChangeInternStatusDocument,
@@ -20,6 +20,6 @@ export async function changeInternStatus(
       revalidateTags: (data) => [
         `internship:${data.changeInternStatus.data.internship}`,
       ],
-    }
+    },
   );
 }

@@ -14,14 +14,14 @@ import { useDebouncedCallback } from "use-debounce";
 import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
-import { cn, handleAPIErrors } from "@/utils/helpers";
+import { cn, handleAPIErrors } from "@/lib/clientUtils";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { withLocalizedInput } from "./withLocalizedInput";
-import { GqlMutationResponse } from "@/utils/actions";
+import { GqlMutationResponse } from "@/lib/graphql/actions";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 

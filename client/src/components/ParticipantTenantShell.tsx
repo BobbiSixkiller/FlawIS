@@ -21,7 +21,7 @@ import SessionPolling from "@/components/SessionPolling";
 import ThemeToggler from "@/components/ThemeToggler";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 export default async function ParticipantTenantShell({
   children,
@@ -55,14 +55,11 @@ export default async function ParticipantTenantShell({
         {user ? (
           <Dropdown
             anchor={{ gap: 6, to: "bottom" }}
-            trigger={
-              <Button
-                size="icon"
-                className="flex h-fit w-fit items-center rounded-full"
-              >
-                <Avatar name={user.name} avatarUrl={user.avatarUrl} />
-              </Button>
-            }
+            trigger={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
+            triggerProps={{
+              size: "icon",
+              className: "flex h-fit w-fit items-center rounded-full",
+            }}
             items={[
               <Link href="/profile" prefetch={false} key="profile">
                 <UserCircleIcon className="size-5" aria-hidden="true" />

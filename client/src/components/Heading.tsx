@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Dropdown, { DropdownItem } from "./Dropdown";
-import Button from "./Button";
 import { translate } from "@/lib/i18n";
 
 interface HeadingProps {
@@ -45,14 +44,15 @@ export default async function Heading({
           <div className="sm:hidden">
             <Dropdown
               trigger={
-                <Button variant="secondary" size="sm">
+                <>
                   {t("more")}
                   <ChevronDownIcon
                     className="-mr-1 ml-1.5 size-5"
                     aria-hidden="true"
                   />
-                </Button>
+                </>
               }
+              triggerProps={{ variant: "secondary", size: "sm" }}
               items={secondaryActions}
             />
           </div>

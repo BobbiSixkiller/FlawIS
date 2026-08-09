@@ -2,7 +2,7 @@
 
 import useWidth from "@/hooks/useWidth";
 import { useDialogStore } from "@/stores/dialogStore";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import React, {
   MouseEvent,
   TouchEvent,

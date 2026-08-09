@@ -1,6 +1,6 @@
 import Image, { ImageProps } from "next/image";
 import { getPlaiceholder } from "plaiceholder";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { readFile } from "node:fs/promises";
 
 const FALLBACK_SRC = "/images/img-placeholder.jpg";

@@ -2,7 +2,7 @@ import { translate } from "@/lib/i18n";
 import { NextRequest, NextResponse } from "next/server";
 import { getMe } from "../(auth)/actions";
 import { csvExportRegistry } from "./util";
-import { createCSVResponse, toCSV } from "@/utils/helpers";
+import { createCSVResponse, toCSV } from "@/lib/clientUtils";
 
 export async function GET(
   request: NextRequest,

@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/Dashboard";
 import MissingStudentDataDialog from "./MissingStudentDataDialog";
-import { getSubdomain } from "@/utils/actions";
+import { getSubdomain } from "@/lib/serverUtils";
 
 export async function generateMetadata(
   {
@@ -18,7 +18,7 @@ export async function generateMetadata(
     sidebar: React.ReactNode;
     modal: React.ReactNode;
   },
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { lng } = await params;
   const { t } = await translate(lng, "dashboard");

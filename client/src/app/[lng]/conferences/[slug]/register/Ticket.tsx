@@ -1,7 +1,7 @@
 "use client";
 
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
 import { Control, useController } from "react-hook-form";
 

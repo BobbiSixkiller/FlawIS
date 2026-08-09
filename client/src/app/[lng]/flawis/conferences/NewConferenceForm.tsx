@@ -8,7 +8,7 @@ import { LocalizedImageFileInput } from "@/components/ImageFileInput";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import useValidation from "@/hooks/useValidation";
-import { uploadToMinio } from "@/utils/helpers";
+import { uploadToMinio } from "@/lib/clientUtils";
 import { ConferenceInput } from "@/lib/graphql/generated/graphql";
 import { deleteFiles } from "@/lib/minio";
 import WizzardForm, { WizzardStep } from "@/components/WizzardForm";

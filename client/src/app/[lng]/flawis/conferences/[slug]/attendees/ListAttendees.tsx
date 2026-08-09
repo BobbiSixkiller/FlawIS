@@ -11,7 +11,7 @@ import {
   AttendeeFragment,
   AttendeesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 
 function ListItem({ data }: { data?: AttendeeFragment }) {
   return (

@@ -1,7 +1,7 @@
 "use server";
 
 import { LoginDocument } from "@/lib/graphql/generated/graphql";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 
@@ -9,7 +9,7 @@ export async function login(email: string, password: string, url?: string) {
   const res = await executeGqlMutation(
     LoginDocument,
     { email, password },
-    (data) => ({ message: data.login.message, data: data.login.data })
+    (data) => ({ message: data.login.message, data: data.login.data }),
   );
 
   if (res.data) {

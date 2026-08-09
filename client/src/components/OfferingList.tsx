@@ -18,7 +18,7 @@ import {
   CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import {
   conferenceOfferingModel,
   courseOfferingModel,

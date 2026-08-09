@@ -7,7 +7,7 @@ import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { InputProps } from "./Input";
-import { fetchFromMinio } from "@/utils/helpers";
+import { fetchFromMinio } from "@/lib/clientUtils";
 
 export default function ImageFileInput({
   avatarUrl,

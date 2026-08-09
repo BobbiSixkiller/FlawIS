@@ -54,7 +54,13 @@ export function InfiniteScroll<TEdge, TGqlVars>({
   Empty,
 }: InfiniteScrollProps<TEdge, TGqlVars>) {
   const [data, setData] = useState(initialData);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
   const { ref, inView } = useInView();
+
+  if (initialData !== previousInitialData) {
+    setPreviousInitialData(initialData);
+    setData(initialData);
+  }
 
   useEffect(() => {
     if (!inView || !data.pageInfo.hasNextPage) return;

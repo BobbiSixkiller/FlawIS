@@ -8,10 +8,10 @@ import {
   UpdateConferenceDatesMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { deleteFiles } from "@/lib/minio";
-import { executeGqlMutation } from "@/utils/actions";
+import { executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function deleteConference(
-  vars: DeleteConferenceMutationVariables
+  vars: DeleteConferenceMutationVariables,
 ) {
   const res = await executeGqlMutation(
     DeleteConferenceDocument,
@@ -25,7 +25,7 @@ export async function deleteConference(
         "conferences",
         `conference:${data.deleteConference.data.slug}`,
       ],
-    }
+    },
   );
   if (res.data) {
     await deleteFiles([
@@ -37,7 +37,7 @@ export async function deleteConference(
 }
 
 export async function updateConferenceDates(
-  vars: UpdateConferenceDatesMutationVariables
+  vars: UpdateConferenceDatesMutationVariables,
 ) {
   return await executeGqlMutation(
     UpdateConferenceDatesDocument,
@@ -51,6 +51,6 @@ export async function updateConferenceDates(
         "conferences",
         `conference:${data.updateConferenceDates.data.slug}`,
       ],
-    }
+    },
   );
 }

@@ -12,7 +12,7 @@ import { updateInvoice } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import RHFormContainer from "@/components/RHFormContainer";
 import useValidation from "@/hooks/useValidation";
-import { formatDatetimeLocal } from "@/utils/helpers";
+import { formatDatetimeLocal } from "@/lib/clientUtils";
 
 function withoutNull(value: string | null | undefined) {
   return value ?? undefined;

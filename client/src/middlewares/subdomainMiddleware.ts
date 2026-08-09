@@ -21,7 +21,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
   return async (
     req: NextRequest,
     event: NextFetchEvent,
-    res?: NextResponse
+    res?: NextResponse,
   ) => {
     const url = req.nextUrl.clone();
 
@@ -47,7 +47,7 @@ export function withSubdomain(middleware: CustomMiddleware) {
       process.env.NODE_ENV === "development"
     ) {
       const newUrl = new URL(
-        `/${lng}/courses/${paths.join("/")}${url.search}`,
+        `/${lng}/flawis/${paths.join("/")}${url.search}`,
         req.url,
       ); // Rewrite the path with the subdomain
 

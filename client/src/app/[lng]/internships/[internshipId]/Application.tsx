@@ -1,7 +1,7 @@
 import Avatar from "@/components/Avatar";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { displayDate } from "@/utils/helpers";
+import { displayDate } from "@/lib/clientUtils";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { ReactNode } from "react";

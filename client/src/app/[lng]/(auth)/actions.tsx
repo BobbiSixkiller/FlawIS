@@ -8,7 +8,7 @@ import {
   ResendActivationLinkDocument,
 } from "@/lib/graphql/generated/graphql";
 
-import { executeGqlFetch, executeGqlMutation } from "@/utils/actions";
+import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getMe() {
   const res = await executeGqlFetch(MeDocument);
@@ -37,7 +37,7 @@ export async function activate() {
     {},
     {
       activation: token,
-    }
+    },
   );
 
   cookieStore.delete("activationToken");
@@ -51,6 +51,6 @@ export async function resendActivationLink() {
     (data) => ({ message: data.resendActivationLink }),
     undefined,
     undefined,
-    { revalidate: 15 * 60 }
+    { revalidate: 15 * 60 },
   );
 }

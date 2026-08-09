@@ -2,10 +2,10 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { FormMessage } from "@/components/Message";
 import Link from "next/link";
-import { getSubdomain } from "@/utils/actions";
+import { getSubdomain } from "@/lib/serverUtils";
 
 export default async function Register({
   params,
@@ -30,22 +30,21 @@ export default async function Register({
 
       <UserForm subdomain={subdomain} namespace="register" />
 
-      {(subdomain.includes("conferences") ||
-        subdomain.includes("courses")) && (
-          <div>
-            <div className="relative flex py-6 items-center">
-              <div className="grow border-t border-gray-300"></div>
-              <span className="shrink mx-4 font-light text-sm">
-                {t("continue")}
-              </span>
-              <div className="grow border-t border-gray-300"></div>
-            </div>
-
-            <div className="flex justify-center pt-4">
-              <GoogleSignIn />
-            </div>
+      {(subdomain.includes("conferences") || subdomain.includes("courses")) && (
+        <div>
+          <div className="relative flex py-6 items-center">
+            <div className="grow border-t border-gray-300"></div>
+            <span className="shrink mx-4 font-light text-sm">
+              {t("continue")}
+            </span>
+            <div className="grow border-t border-gray-300"></div>
           </div>
-        )}
+
+          <div className="flex justify-center pt-4">
+            <GoogleSignIn />
+          </div>
+        </div>
+      )}
 
       <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-300">
         <Trans

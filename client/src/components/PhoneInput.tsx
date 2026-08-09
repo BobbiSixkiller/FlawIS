@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useController } from "react-hook-form";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { Input } from "@headlessui/react";
-import { cn } from "@/utils/helpers";
+import { cn } from "@/lib/clientUtils";
 import { InputProps } from "./Input";
 
 export default function PhoneInput({ label, name, control }: InputProps) {
