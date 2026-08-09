@@ -43,6 +43,7 @@ export default async function Heading({
         {secondaryActions.length > 0 && (
           <div className="sm:hidden">
             <Dropdown
+              anchor={{ gap: 4, to: "bottom end" }}
               trigger={
                 <>
                   {t("more")}
