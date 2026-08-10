@@ -50,7 +50,6 @@ export class ConferenceResolver {
     return await this.conferenceService.getConferences(args);
   }
 
-  @Authorized()
   @Query(() => Conference)
   async conference(@Arg("slug") slug: string) {
     return await this.conferenceService.getConference(slug);
@@ -117,13 +116,13 @@ export class ConferenceResolver {
     };
   }
 
-  @Authorized()
   @FieldResolver(() => Attendee, { nullable: true })
   async attending(@Ctx() { user }: Context, @Root() { id }: Conference) {
-    return await this.conferenceAttendeeService.getAttending(id, user!.id);
+    if (!user) return null;
+
+    return await this.conferenceAttendeeService.getAttending(id, user.id);
   }
 
-  @Authorized()
   @FieldResolver(() => [Section])
   async sections(@Root() { id }: Conference) {
     return await this.conferenceService.getSections(id);

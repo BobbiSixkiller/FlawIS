@@ -3,8 +3,10 @@ import "reflect-metadata";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { getModelForClass } from "@typegoose/typegoose";
+import { graphql } from "graphql";
 import mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import { buildSchema } from "type-graphql";
 
 import { Attendee } from "../src/entitites/Attendee";
 import { Conference } from "../src/entitites/Conference";
@@ -12,6 +14,9 @@ import { CourseAttendee } from "../src/entitites/Course";
 import { ConferenceService } from "../src/services/conferences/conference.service";
 import { ConferenceAttendeeService } from "../src/services/conferences/conferenceAttendee.service";
 import { AttendeeResolver } from "../src/resolvers/conferences/attendee.resolver";
+import { ConferenceResolver } from "../src/resolvers/conferences/conference.resolver";
+import { SectionResolver } from "../src/resolvers/conferences/section.resolver";
+import { ObjectIdScalar } from "../src/util/scalars";
 
 async function withMockSession(operation: () => Promise<void>) {
   const originalStartSession = mongoose.startSession;
@@ -66,6 +71,84 @@ test("conference attendee count is read from attendee documents", async () => {
 
   assert.equal(await service.getAttendeesCount(conferenceId), 193);
   assert.deepEqual(receivedFilter, { "conference._id": conferenceId });
+});
+
+test("public conference attendance lookup returns null without a user", async () => {
+  let lookupCalls = 0;
+  const resolver = new ConferenceResolver(
+    {} as any,
+    {
+      getAttending: async () => {
+        lookupCalls += 1;
+        return {};
+      },
+    } as any,
+    i18n(),
+  );
+
+  const attending = await resolver.attending(
+    { user: null } as any,
+    { id: new ObjectId() } as Conference,
+  );
+
+  assert.equal(attending, null);
+  assert.equal(lookupCalls, 0);
+});
+
+test("conference details resolve for an unauthenticated visitor", async () => {
+  const conferenceId = new ObjectId();
+  const conference = { id: conferenceId, slug: "BPF2026" } as Conference;
+  const conferenceResolver = new ConferenceResolver(
+    {
+      getConference: async () => conference,
+      getSections: async () => [
+        { id: new ObjectId(), conference: { _id: conferenceId } },
+      ],
+    } as any,
+    {
+      getAttending: async () => {
+        throw new Error("anonymous attendance lookup should be skipped");
+      },
+    } as any,
+    i18n(),
+  );
+  const sectionResolver = new SectionResolver(
+    { getConference: async () => conference } as any,
+    i18n(),
+  );
+  const schema = await buildSchema({
+    authChecker: () => false,
+    container: {
+      get: (resolverClass) => {
+        if (resolverClass === ConferenceResolver) return conferenceResolver;
+        if (resolverClass === SectionResolver) return sectionResolver;
+        throw new Error(`Unexpected resolver: ${String(resolverClass)}`);
+      },
+    },
+    resolvers: [ConferenceResolver, SectionResolver],
+    scalarsMap: [{ type: ObjectId, scalar: ObjectIdScalar }],
+  });
+
+  const result = await graphql({
+    schema,
+    source: `{
+      conference(slug: "BPF2026") {
+        slug
+        sections { conference { slug } }
+        attending { id }
+      }
+    }`,
+    contextValue: { user: null },
+  });
+
+  assert.equal(result.errors, undefined);
+  assert.deepEqual(JSON.parse(JSON.stringify(result.data)), {
+    conference: {
+      slug: "BPF2026",
+      sections: [{ conference: { slug: "BPF2026" } }],
+      attending: null,
+    },
+  });
 });
 
 test("attendee schemas enforce registration uniqueness without invoice indexes", () => {

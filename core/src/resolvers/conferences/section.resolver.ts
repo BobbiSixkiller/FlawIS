@@ -83,7 +83,6 @@ export class SectionResolver {
     };
   }
 
-  @Authorized()
   @FieldResolver(() => Conference, { nullable: true })
   async conference(@Root() { conference }: Section) {
     return await this.sectionService.getConference(conference?._id);
