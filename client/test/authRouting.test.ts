@@ -4,11 +4,11 @@ import test from "node:test";
 import { googleOAuthHref } from "../src/lib/authRedirect";
 import { isSubdomainPublicPath } from "../src/lib/authRoutes";
 
-test("the conference catalogue is public while conference workspaces remain protected", () => {
+test("conference catalogue and detail pages are public while registration remains protected", () => {
   const host = "conferences.flaw.uniba.sk";
 
   assert.equal(isSubdomainPublicPath(host, "/"), true);
-  assert.equal(isSubdomainPublicPath(host, "/milniky-prava"), false);
+  assert.equal(isSubdomainPublicPath(host, "/milniky-prava"), true);
   assert.equal(
     isSubdomainPublicPath(host, "/milniky-prava/register"),
     false,

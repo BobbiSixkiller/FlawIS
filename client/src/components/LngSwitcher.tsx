@@ -1,11 +1,26 @@
 "use client";
 
-import { languages } from "@/lib/i18n/settings";
+import {
+  cookieName,
+  getLocaleCookieDomain,
+  getLocalizedPath,
+  languages,
+  localePreferenceMaxAge,
+} from "@/lib/i18n/settings";
 import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Dropdown from "./Dropdown";
 import Link from "next/link";
+
+function saveLocalePreference(lng: string) {
+  const { hostname, protocol } = window.location;
+  const cookieDomain = getLocaleCookieDomain(hostname);
+  const domain = cookieDomain ? `; Domain=${cookieDomain}` : "";
+  const secure = protocol === "https:" ? "; Secure" : "";
+
+  document.cookie = `${cookieName}=${encodeURIComponent(lng)}; Path=/; Max-Age=${localePreferenceMaxAge}; SameSite=Lax${domain}${secure}`;
+}
 
 export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
   const path = usePathname();
@@ -47,7 +62,9 @@ export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
       items={languages.map((l) => (
         <Link
           key={l}
-          href={`/${l}${path.replace("/en", "").replace("/sk", "")}`}
+          href={getLocalizedPath(path, l)}
+          prefetch={false}
+          onNavigate={() => saveLocalePreference(l)}
         >
           <Image
             alt="Locale-flag"
