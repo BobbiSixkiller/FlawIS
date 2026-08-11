@@ -1,8 +1,14 @@
 import "./globals.css";
 import localFont from "next/font/local";
 import { dir } from "i18next";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { ReactNode } from "react";
+import {
+  cookieName,
+  fallbackLng,
+  getSupportedLocale,
+  localeHeaderName,
+} from "@/lib/i18n/settings";
 
 const UKsans = localFont({
   src: [
@@ -42,8 +48,11 @@ const UKsans = localFont({
 });
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const lng = cookieStore.get("NEXT_locale")?.value || "sk";
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
+  const lng =
+    getSupportedLocale(headerStore.get(localeHeaderName)) ??
+    getSupportedLocale(cookieStore.get(cookieName)?.value) ??
+    fallbackLng;
   const theme = cookieStore.get("theme")?.value;
 
   return (

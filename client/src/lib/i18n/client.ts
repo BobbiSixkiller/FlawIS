@@ -9,7 +9,7 @@ import {
 import resourcesToBackend from "i18next-resources-to-backend";
 // import LocizeBackend from 'i18next-locize-backend'
 import LanguageDetector from "i18next-browser-languagedetector";
-import { getOptions, languages } from "./settings";
+import { cookieName, getOptions, languages } from "./settings";
 
 const runsOnServerSide = typeof window === "undefined";
 
@@ -29,6 +29,8 @@ i18next
     lng: undefined, // let detect the language on client side
     detection: {
       order: ["path", "htmlTag", "cookie", "navigator"],
+      lookupCookie: cookieName,
+      caches: [],
     },
     preload: runsOnServerSide ? languages : [],
   });
@@ -42,7 +44,12 @@ export function useTranslation(
   const { i18n } = ret;
 
   useEffect(() => {
-    if (runsOnServerSide || !lng || i18n.resolvedLanguage === lng) return;
+    if (runsOnServerSide || !lng) return;
+
+    document.documentElement.lang = lng;
+    document.documentElement.dir = i18n.dir(lng);
+
+    if (i18n.resolvedLanguage === lng) return;
     void i18n.changeLanguage(lng);
   }, [lng, i18n]);
 

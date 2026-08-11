@@ -1,13 +1,22 @@
 import Button from "@/components/Button";
 import Logo from "@/components/Logo";
 import { translate } from "@/lib/i18n";
+import {
+  cookieName,
+  fallbackLng,
+  getSupportedLocale,
+  localeHeaderName,
+} from "@/lib/i18n/settings";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Link from "next/link";
 
 export default async function NotFound() {
-  const cookieStore = await cookies();
-  const lng = cookieStore.get("NEXT_locale")?.value || "sk";
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
+  const lng =
+    getSupportedLocale(headerStore.get(localeHeaderName)) ??
+    getSupportedLocale(cookieStore.get(cookieName)?.value) ??
+    fallbackLng;
   const { t } = await translate(lng, ["common", "landing"]);
 
   return (
