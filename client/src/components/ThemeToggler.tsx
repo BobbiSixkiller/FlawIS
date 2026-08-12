@@ -181,10 +181,10 @@ export default function ThemeToggler({
             value={value}
             title={t(`theme.${value}`)}
             className={cn(
-              "group flex size-9 shrink-0 cursor-pointer items-center justify-center border-l border-black/10 text-gray-700 first:border-l-0",
+              "group flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-gray-700",
               "transition-colors duration-150 hover:bg-primary-50 hover:text-primary-700 focus:outline-hidden focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500",
               "data-checked:bg-primary-500 data-checked:text-white",
-              "dark:border-white/10 dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white",
+              "dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white",
               "dark:data-checked:bg-primary-300 dark:data-checked:text-gray-950 dark:focus-visible:ring-primary-300",
               "motion-reduce:transition-none",
             )}
