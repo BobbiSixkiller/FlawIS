@@ -9,29 +9,6 @@ import parseValidationErrors, {
 } from "@/lib/clientUtils";
 import { revalidatePath, updateTag } from "next/cache";
 
-export async function setDarkThemeCookie(val: boolean) {
-  const cookieStore = await cookies();
-  const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year
-
-  if (val) {
-    cookieStore.set("theme", "dark", {
-      expires,
-      sameSite: "lax",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
-    });
-  } else {
-    cookieStore.delete({
-      name: "theme",
-      sameSite: "lax",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".flaw.uniba.sk",
-    });
-  }
-}
-
 export type GraphQLResponse<GraphQLData> = {
   data: GraphQLData;
   errors?: GraphQLError[];

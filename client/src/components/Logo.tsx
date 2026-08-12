@@ -5,7 +5,6 @@ import logoInverted from "../../public/images/Flaw-logo-notext-inverted.png";
 import logo from "../../public/images/Flaw-logo-notext.png";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/lib/clientUtils";
-import { cookies } from "next/headers";
 
 export default async function Logo({
   lng,
@@ -24,24 +23,42 @@ export default async function Logo({
 }) {
   const { t } = await translate(lng || "sk", "dashboard");
 
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value;
-
   return (
     <div
       className={cn([
         "flex gap-4 font-normal",
-        inverted || theme === "dark" ? "text-white/85" : "text-gray-900",
+        inverted ? "text-white/85" : "text-gray-900 dark:text-white/85",
         className,
       ])}
     >
-      <Image
-        priority
-        src={inverted || theme === "dark" ? logoInverted : logo}
-        width={width}
-        height={height}
-        alt="Flaw-logo"
-      />
+      {inverted ? (
+        <Image
+          priority
+          src={logoInverted}
+          width={width}
+          height={height}
+          alt="Flaw-logo"
+        />
+      ) : (
+        <>
+          <Image
+            priority
+            src={logo}
+            width={width}
+            height={height}
+            alt="Flaw-logo"
+            className="dark:hidden"
+          />
+          <Image
+            priority
+            src={logoInverted}
+            width={width}
+            height={height}
+            alt="Flaw-logo"
+            className="hidden dark:block"
+          />
+        </>
+      )}
       {!notext && (
         <div className="text-sm flex flex-col self-center leading-none">
           <Trans

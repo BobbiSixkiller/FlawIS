@@ -6,7 +6,6 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { ReactNode } from "react";
 
 import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
@@ -36,12 +35,7 @@ export default async function ParticipantTenantShell({
   sessionPolling?: boolean;
   user?: UserFragment | null;
 }) {
-  const [cookieStore, translation] = await Promise.all([
-    cookies(),
-    translate(lng, "dashboard"),
-  ]);
-  const theme = cookieStore.get("theme")?.value || "";
-  const { t, i18n } = translation;
+  const { t, i18n } = await translate(lng, "dashboard");
 
   return (
     <div
@@ -51,7 +45,7 @@ export default async function ParticipantTenantShell({
       )}
     >
       <header className="flex h-[60px] w-full items-center justify-end gap-2 p-6 sm:max-w-md sm:p-2">
-        <ThemeToggler authLayout dark={theme === "dark"} />
+        <ThemeToggler lng={lng} />
         {user ? (
           <Dropdown
             anchor={{ gap: 6, to: "bottom" }}
@@ -110,7 +104,6 @@ export default async function ParticipantTenantShell({
           lng={lng}
           height={60}
           width={60}
-          inverted={theme === "dark"}
           className="justify-center"
         />
 

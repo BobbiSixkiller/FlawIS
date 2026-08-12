@@ -8,7 +8,6 @@ import Footer from "./Footer";
 import Logo from "./Logo";
 import Breadcrumbs from "./Breadcrumbs";
 import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
-import { cookies } from "next/headers";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/clientUtils";
 import { Snackbar } from "./Message";
@@ -26,9 +25,6 @@ export default async function Dashboard({
   user: UserFragment;
   lng: string;
 }) {
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value || "";
-
   return (
     <div className="flex flex-col lg:flex-row min-h-screen dark:bg-gray-950 w-screen">
       <div className="hidden lg:flex flex-col gap-4 p-4 bg-primary-500 dark:bg-gray-900 dark:border-r dark:border-gray-700 lg:w-full lg:max-w-xs h-screen sticky top-0">
@@ -42,7 +38,7 @@ export default async function Dashboard({
 
         <div className="mt-auto flex gap-2 items-center">
           <LngSwitcher />
-          <ThemeToggler dark={theme === "dark"} />
+          <ThemeToggler lng={lng} />
         </div>
       </div>
 
@@ -65,7 +61,7 @@ export default async function Dashboard({
 
               <div className="mt-auto flex gap-2 items-center">
                 <LngSwitcher />
-                <ThemeToggler dark={theme === "dark"} />
+                <ThemeToggler lng={lng} />
               </div>
             </>
           }

@@ -202,13 +202,6 @@ export default async function ConferenceWorkspacePage({
           value: registrationEnd,
         }
       : null,
-    submissionDeadline
-      ? {
-          key: "submission",
-          label: t("conference.submissionDeadline"),
-          value: submissionDeadline,
-        }
-      : null,
     {
       key: "start",
       label: t("conference.start"),
@@ -219,6 +212,13 @@ export default async function ConferenceWorkspacePage({
       label: t("conference.end"),
       value: new Date(conference.dates.end),
     },
+    submissionDeadline
+      ? {
+          key: "submission",
+          label: t("conference.submissionDeadline"),
+          value: submissionDeadline,
+        }
+      : null,
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
