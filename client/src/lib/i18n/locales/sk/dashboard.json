@@ -25,5 +25,11 @@
   "invite": "Pozvať",
   "application": "Prihláška",
   "applications": "Prihlášky",
-  "courses": "Kurzy"
+  "courses": "Kurzy",
+  "theme": {
+    "label": "Motív",
+    "light": "Svetlý",
+    "system": "Systémový",
+    "dark": "Tmavý"
+  }
 }

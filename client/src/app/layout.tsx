@@ -9,6 +9,12 @@ import {
   getSupportedLocale,
   localeHeaderName,
 } from "@/lib/i18n/settings";
+import ThemeProvider from "@/components/ThemeProvider";
+import {
+  getThemePreference,
+  systemThemeScript,
+  themeCookieName,
+} from "@/lib/theme";
 
 const UKsans = localFont({
   src: [
@@ -53,11 +59,23 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     getSupportedLocale(headerStore.get(localeHeaderName)) ??
     getSupportedLocale(cookieStore.get(cookieName)?.value) ??
     fallbackLng;
-  const theme = cookieStore.get("theme")?.value;
+  const theme = getThemePreference(cookieStore.get(themeCookieName)?.value);
 
   return (
-    <html lang={lng} dir={dir(lng)} className={theme === "dark" ? "dark" : ""}>
-      <body className={UKsans.className}>{children}</body>
+    <html
+      lang={lng}
+      dir={dir(lng)}
+      className={theme === "dark" ? "dark" : ""}
+      suppressHydrationWarning
+    >
+      {theme === "system" ? (
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: systemThemeScript }} />
+        </head>
+      ) : null}
+      <body className={UKsans.className}>
+        <ThemeProvider initialPreference={theme}>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
