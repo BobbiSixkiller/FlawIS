@@ -25,7 +25,7 @@ export default function Dropdown({
   trigger,
   triggerProps,
   items,
-  anchor,
+  anchor = "bottom",
   buttonWidth,
 }: DropdownProps) {
   return (
