@@ -4,6 +4,13 @@
   "registration": {
     "heading": "Registrácia",
     "ticket": "Forma účasti",
+    "invitationError": {
+      "heading": "Pozvánku nie je možné otvoriť",
+      "signedInAs": "Prihlásený účet: {{email}}",
+      "accountMismatchHelp": "Odhláste sa a použite účet s emailovou adresou, na ktorú bola pozvánka odoslaná.",
+      "useAnotherAccount": "Použiť iný účet",
+      "backToConference": "Späť na konferenciu"
+    },
     "billing": {
       "info": "Fakturačné údaje",
       "name": "Meno/Nazov inštitucie",

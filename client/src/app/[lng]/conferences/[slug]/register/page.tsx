@@ -2,9 +2,13 @@ import { getMe } from "@/app/[lng]/(auth)/actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import { conferenceWorkspaceHref } from "@/lib/conferenceRegistration";
+import {
+  conferenceInvitationHref,
+  conferenceWorkspaceHref,
+} from "@/lib/conferenceRegistration";
 import { getSubmissionInvite } from "../actions";
 import { acceptAuthorInvite } from "./actions";
+import InvitationError from "./InvitationError";
 
 export default async function ConferenceRegisterPage({
   params,
@@ -17,13 +21,33 @@ export default async function ConferenceRegisterPage({
   }>;
 }) {
   const { lng, slug } = await params;
-  const { token } = await searchParams;
+  const { submission: submissionId, token } = await searchParams;
 
-  const [conference, submission, user] = await Promise.all([
+  const [conference, invitation, user] = await Promise.all([
     getConference(slug),
     getSubmissionInvite(token),
     getMe(),
   ]);
+
+  if (invitation.error) {
+    return (
+      <InvitationError
+        lng={lng}
+        message={invitation.error.message}
+        code={invitation.error.code}
+        currentEmail={user?.email}
+        invitationHref={conferenceInvitationHref(
+          lng,
+          slug,
+          submissionId,
+          token,
+        )}
+        conferenceHref={conferenceWorkspaceHref(slug)}
+      />
+    );
+  }
+
+  const submission = invitation.submission;
 
   if (conference.attending) {
     if (conference.attending.ticket.withSubmission && submission && token) {

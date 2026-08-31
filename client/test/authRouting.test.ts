@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { googleOAuthHref } from "../src/lib/authRedirect";
+import { googleOAuthHref, logoutHref } from "../src/lib/authRedirect";
 import { isSubdomainPublicPath } from "../src/lib/authRoutes";
 
 test("conference catalogue and detail pages are public while registration remains protected", () => {
@@ -23,4 +23,15 @@ test("Google sign-in preserves the complete nested coauthor invite URL", () => {
 
   assert.equal(oauthUrl.searchParams.get("url"), inviteUrl);
   assert.equal(oauthUrl.searchParams.get("token"), null);
+});
+
+test("switching accounts preserves the complete coauthor invite URL", () => {
+  const inviteUrl =
+    "/sk/BPF2026/register?submission=submission-id&token=invite-token";
+  const href = logoutHref(inviteUrl);
+  const logoutUrl = new URL(href, "https://conferences.flaw.uniba.sk");
+
+  assert.equal(logoutUrl.pathname, "/logout");
+  assert.equal(logoutUrl.searchParams.get("url"), inviteUrl);
+  assert.equal(logoutUrl.searchParams.get("token"), null);
 });

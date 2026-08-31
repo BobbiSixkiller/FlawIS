@@ -2,6 +2,7 @@ import "reflect-metadata";
 
 import assert from "node:assert/strict";
 import test from "node:test";
+import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 
 import { Access } from "../src/entitites/User";
@@ -283,7 +284,7 @@ test("invitation preview validates without consuming the token", async () => {
   assert.equal(consumeCalls, 0);
 });
 
-test("invitation preview rejects a different account", async () => {
+test("invitation preview identifies a different signed-in account", async () => {
   const submissionId = new ObjectId();
   const instance = service({
     submissionRepository: {
@@ -299,8 +300,39 @@ test("invitation preview rejects a different account", async () => {
     },
   });
 
-  await assert.rejects(
-    instance.getSubmissionInvite("token", user()),
-    /tokenMalformed/,
-  );
+  await assert.rejects(instance.getSubmissionInvite("token", user()), (error) => {
+    assert.equal((error as Error).message, "inviteEmailMismatch");
+    assert.equal(
+      (error as GraphQLError).extensions.code,
+      "INVITATION_EMAIL_MISMATCH",
+    );
+    return true;
+  });
+});
+
+test("co-author acceptance does not consume a token for a different account", async () => {
+  let consumeCalls = 0;
+  const instance = service({
+    tokenService: {
+      inspectOneTimeToken: async () => ({
+        payload: {
+          email: "invited@example.com",
+          submissionId: new ObjectId().toHexString(),
+        },
+      }),
+      verifyOneTimeToken: async () => {
+        consumeCalls += 1;
+      },
+    },
+  });
+
+  await assert.rejects(instance.addCoAuthor("token", user()), (error) => {
+    assert.equal((error as Error).message, "inviteEmailMismatch");
+    assert.equal(
+      (error as GraphQLError).extensions.code,
+      "INVITATION_EMAIL_MISMATCH",
+    );
+    return true;
+  });
+  assert.equal(consumeCalls, 0);
 });

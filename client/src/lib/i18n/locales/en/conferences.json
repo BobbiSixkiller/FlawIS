@@ -4,6 +4,13 @@
   "registration": {
     "heading": "Registration",
     "ticket": "Form of attendance",
+    "invitationError": {
+      "heading": "This invitation cannot be opened",
+      "signedInAs": "Signed-in account: {{email}}",
+      "accountMismatchHelp": "Sign out and use the account with the email address that received the invitation.",
+      "useAnotherAccount": "Use another account",
+      "backToConference": "Back to conference"
+    },
     "billing": {
       "info": "Billing information",
       "name": "Full name/Name of the organization",

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  conferenceInvitationHref,
   conferenceWorkspaceHref,
   invitedTicketId,
 } from "../src/lib/conferenceRegistration";
@@ -25,4 +26,18 @@ test("registered attendees return to the conference workspace", () => {
     conferenceWorkspaceHref("milniky-prava", true),
     "/milniky-prava#submissions",
   );
+});
+
+test("a coauthor invitation URL preserves its submission and token", () => {
+  const href = conferenceInvitationHref(
+    "sk",
+    "BPF2026",
+    "submission-id",
+    "invite-token",
+  );
+  const url = new URL(href, "https://conferences.flaw.uniba.sk");
+
+  assert.equal(url.pathname, "/sk/BPF2026/register");
+  assert.equal(url.searchParams.get("submission"), "submission-id");
+  assert.equal(url.searchParams.get("token"), "invite-token");
 });
