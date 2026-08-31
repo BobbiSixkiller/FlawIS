@@ -104,7 +104,7 @@ function Section({
                   href={`/minio?bucketName=${section.conference?.slug}${
                     section.submissions.edges
                       .map((sub) =>
-                        sub?.node.fileUrl ? `&url=${sub.node.fileUrl}` : null
+                        sub?.node.fileUrl ? `&url=${sub.node.fileUrl}` : null,
                       ) // Return null for invalid entries
                       .filter(Boolean) // Filter out null values
                       .join("") // Join without adding commas

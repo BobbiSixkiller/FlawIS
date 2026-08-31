@@ -14,6 +14,21 @@ export function conferenceWorkspaceHref(
   return focusSubmissions ? `${workspaceHref}#submissions` : workspaceHref;
 }
 
+export function conferenceInvitationHref(
+  lng: string,
+  slug: string,
+  submissionId?: string,
+  token?: string,
+) {
+  const query = new URLSearchParams();
+  if (submissionId) query.set("submission", submissionId);
+  if (token) query.set("token", token);
+
+  const path = `/${lng}/${slug}/register`;
+  const search = query.toString();
+  return search ? `${path}?${search}` : path;
+}
+
 type ConferenceDates = {
   end: string | Date;
   regEnd?: string | Date | null;

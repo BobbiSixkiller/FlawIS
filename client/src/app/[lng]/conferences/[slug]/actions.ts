@@ -4,12 +4,21 @@ import {
   CreateSubmissionDocument,
   CreateSubmissionMutationVariables,
   DeleteSubmissionDocument,
+  SubmissionFragment,
   SubmissionDocument,
   SubmissionInviteDocument,
   UpdateSubmissionDocument,
   UpdateSubmissionMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+
+type SubmissionInviteResult = {
+  submission?: SubmissionFragment;
+  error?: {
+    message: string;
+    code?: string;
+  };
+};
 
 export async function getSubmission(id?: string) {
   if (!id) return undefined;
@@ -22,16 +31,28 @@ export async function getSubmission(id?: string) {
   return res.data?.submission;
 }
 
-export async function getSubmissionInvite(token?: string) {
-  if (!token) return undefined;
+export async function getSubmissionInvite(
+  token?: string,
+): Promise<SubmissionInviteResult> {
+  if (!token) return { submission: undefined };
 
   const res = await executeGqlFetch(SubmissionInviteDocument, { token });
   if (res.errors) {
-    console.log(res.errors[0]);
-    throw new Error(res.errors[0].message);
+    const error = res.errors[0];
+    const code = error.extensions.code;
+
+    return {
+      submission: undefined,
+      error: {
+        message: error.message,
+        code: typeof code === "string" ? code : undefined,
+      },
+    };
   }
 
-  return res.data.submissionInvite;
+  return {
+    submission: res.data.submissionInvite,
+  };
 }
 
 export async function createSubmission(

@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { ClientSession } from "mongoose";
+import { GraphQLError } from "graphql";
 import { ArgumentValidationError } from "type-graphql";
 import { Service } from "typedi";
 
@@ -73,17 +74,11 @@ export class SubmissionService {
     const decoded = await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(
       token,
     );
-    const payload = decoded.payload;
-    if (
-      !payload ||
-      payload.email.toLowerCase() !== user.email.toLowerCase() ||
-      (expectedSubmissionId &&
-        !sameId(payload.submissionId, expectedSubmissionId))
-    ) {
-      throw new Error(
-        this.i18nService.translate("tokenMalformed", { ns: "common" }),
-      );
-    }
+    const payload = this.validateInvitePayload(
+      decoded.payload,
+      user,
+      expectedSubmissionId,
+    );
 
     return await this.getSubmission(new ObjectId(payload.submissionId));
   }
@@ -199,15 +194,7 @@ export class SubmissionService {
   async addCoAuthor(token: string, user: CtxUser) {
     const inspected =
       await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(token);
-    const payload = inspected.payload;
-    if (
-      !payload ||
-      payload.email.toLowerCase() !== user.email.toLowerCase()
-    ) {
-      throw new Error(
-        this.i18nService.translate("tokenMalformed", { ns: "common" }),
-      );
-    }
+    const payload = this.validateInvitePayload(inspected.payload, user);
 
     const submission = await this.submissionRepository.findOne({
       _id: payload.submissionId,
@@ -318,6 +305,31 @@ export class SubmissionService {
 
     await this.assertParticipantCanSubmit(user, conference!, session);
     return conference!;
+  }
+
+  private validateInvitePayload(
+    payload: SubmissionTokenPayload | undefined,
+    user: CtxUser,
+    expectedSubmissionId?: ObjectId,
+  ) {
+    if (
+      !payload ||
+      (expectedSubmissionId &&
+        !sameId(payload.submissionId, expectedSubmissionId))
+    ) {
+      throw new Error(
+        this.i18nService.translate("tokenMalformed", { ns: "common" }),
+      );
+    }
+
+    if (payload.email.toLowerCase() !== user.email.toLowerCase()) {
+      throw new GraphQLError(
+        this.i18nService.translate("inviteEmailMismatch", { ns: "common" }),
+        { extensions: { code: "INVITATION_EMAIL_MISMATCH" } },
+      );
+    }
+
+    return payload;
   }
 
   private async assertParticipantCanSubmit(
