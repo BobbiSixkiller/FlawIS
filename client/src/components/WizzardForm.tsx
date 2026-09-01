@@ -12,6 +12,7 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import Spinner from "./Spinner";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface WizzardStepProps<TVals extends Record<string, any>> {
   name: string;
@@ -47,6 +48,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
   >[];
 
   const [step, setStep] = useState(0);
+  const { t } = useTranslation(lng, "common");
 
   function isLastStep() {
     return step === steps.length - 1;
@@ -155,8 +157,10 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                   type="button"
                   onClick={back}
                   disabled={step === 0}
+                  aria-label={t("previous")}
                 >
                   <ChevronLeftIcon className="h-4 w-4" />
+                  <span className="hidden md:inline">{t("previous")}</span>
                 </Button>
               )}
               <Button
@@ -164,13 +168,20 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                 color="primary"
                 type="submit"
                 disabled={methods.formState.isSubmitting}
+                aria-label={isLastStep() ? t("submit") : t("next")}
               >
                 {methods.formState.isSubmitting ? (
                   <Spinner inverted />
                 ) : isLastStep() ? (
-                  <CheckIcon className="h-4 w-4" />
+                  <>
+                    <CheckIcon className="h-4 w-4" />
+                    <span className="hidden md:inline">{t("submit")}</span>
+                  </>
                 ) : (
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <>
+                    <span className="hidden md:inline">{t("next")}</span>
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </>
                 )}
               </Button>
             </div>

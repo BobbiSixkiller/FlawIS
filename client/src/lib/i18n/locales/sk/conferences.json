@@ -36,6 +36,7 @@
       "file": "Súbor príspevku",
       "authors": {
         "label": "Email adresy spoluautorov",
+        "description": "Po pridaní e-mailovej adresy a odoslaní formulára dostane príjemca registračný odkaz.",
         "placeholder": "Pre pridanie adresy stlačte enter"
       }
     }

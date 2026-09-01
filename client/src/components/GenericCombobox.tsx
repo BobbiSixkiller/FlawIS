@@ -6,10 +6,11 @@ import {
   ComboboxInput,
   ComboboxOption,
   ComboboxOptions,
+  Description,
   Field,
   Label,
 } from "@headlessui/react";
-import { useEffect, useState, useMemo } from "react";
+import { type ReactNode, useEffect, useState, useMemo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
@@ -30,6 +31,7 @@ export interface GenericComboboxProps<TOption, TValue> {
   name: string;
   control: Control<any>;
   label?: string;
+  description?: ReactNode;
   placeholder?: string;
   disabled?: boolean;
   defaultOptions: TOption[];
@@ -57,6 +59,7 @@ export default function GenericCombobox<
   name,
   control,
   label,
+  description,
   placeholder,
   disabled,
   multiple,
@@ -343,6 +346,12 @@ export default function GenericCombobox<
           {renderComboboxContent()}
         </Combobox>
       )}
+
+      {description ? (
+        <Description className="mt-1 text-xs/5 text-gray-500 dark:text-gray-400">
+          {description}
+        </Description>
+      ) : null}
 
       {fieldState.error && (
         <p className="text-sm text-red-500">

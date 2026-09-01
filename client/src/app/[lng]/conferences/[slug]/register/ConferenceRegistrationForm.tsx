@@ -283,6 +283,9 @@ export default function ConferenceRegistrationForm({
                 label={t("registration.submission.authors.label", {
                   ns: "conferences",
                 })}
+                description={t("registration.submission.authors.description", {
+                  ns: "conferences",
+                })}
                 placeholder={t("registration.submission.authors.placeholder", {
                   ns: "conferences",
                 })}

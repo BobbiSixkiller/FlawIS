@@ -36,6 +36,7 @@
       "file": "Submission file",
       "authors": {
         "label": "Co-authors email addresses",
+        "description": "After you add an email address and submit the form, the recipient receives a registration link.",
         "placeholder": "To add an adress press enter"
       }
     }

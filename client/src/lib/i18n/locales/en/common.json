@@ -27,6 +27,8 @@
   "address": "Address",
   "addOption": "Add: {{ value }}",
   "home": "Home",
+  "previous": "Back",
+  "next": "Next",
   "offering": {
     "start": "Starts",
     "end": "Ends",
