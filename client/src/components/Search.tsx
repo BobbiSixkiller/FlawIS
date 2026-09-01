@@ -26,7 +26,7 @@ interface SearchComponentProps<TOption, TParams> {
 
 export default function SearchComponent<
   TOption extends { id: string },
-  TParams extends { text: string }
+  TParams extends { text: string },
 >({
   fetchOptions,
   Option,
@@ -44,13 +44,13 @@ export default function SearchComponent<
       setText(value);
     },
     // delay in ms
-    800
+    800,
   );
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "z" && (event.metaKey || event.ctrlKey)) {
-        setOpen(!open);
+        setOpen((currentOpen) => !currentOpen);
       }
     }
 
@@ -59,7 +59,7 @@ export default function SearchComponent<
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     async function fetchOptionsAsync() {
@@ -91,7 +91,7 @@ export default function SearchComponent<
         <Dialog
           as="div"
           onClose={() => setOpen(false)}
-          className="z-10 fixed inset-0 p-4 pt-[25vh] overflow-y-auto"
+          className="fixed inset-0 z-50 p-4 pt-[25vh] overflow-y-auto"
         >
           <TransitionChild
             enter="duration-300 ease-out"

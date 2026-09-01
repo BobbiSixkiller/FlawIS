@@ -27,6 +27,8 @@
   "address": "Adresa",
   "addOption": "Pridať: {{ value }}",
   "home": "Domov",
+  "previous": "Späť",
+  "next": "Ďalej",
   "offering": {
     "start": "Začiatok",
     "end": "Koniec",
