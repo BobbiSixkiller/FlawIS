@@ -29,12 +29,98 @@ export interface CourseMsg extends Msg {
   invoice?: Invoice;
 }
 
+type SendMailOptions = Parameters<MailerService['sendMail']>[0];
+
+const TRANSIENT_MAIL_RETRY_DELAYS_MS = [1_000, 5_000];
+
 @Injectable()
 export class EmailService {
   constructor(
     private mailerService: MailerService,
     private i18n: I18nService,
   ) {}
+
+  private mailErrorDetails(error: unknown) {
+    const smtpError =
+      error && typeof error === 'object'
+        ? (error as {
+            code?: unknown;
+            command?: unknown;
+            responseCode?: unknown;
+          })
+        : undefined;
+
+    return {
+      message: error instanceof Error ? error.message : String(error),
+      code: smtpError?.code,
+      command: smtpError?.command,
+      responseCode: smtpError?.responseCode,
+    };
+  }
+
+  private isPermanentMailError(error: unknown) {
+    const responseCode =
+      error && typeof error === 'object'
+        ? Number((error as { responseCode?: unknown }).responseCode)
+        : NaN;
+
+    return responseCode >= 500 && responseCode < 600;
+  }
+
+  private async deliverMail(
+    routingKey: string,
+    recipient: string,
+    options: SendMailOptions,
+  ) {
+    const attempts = TRANSIENT_MAIL_RETRY_DELAYS_MS.length + 1;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      try {
+        await this.mailerService.sendMail(options);
+        console.log(
+          JSON.stringify({
+            event: 'mail.delivery_succeeded',
+            routingKey,
+            recipient,
+            attempt,
+          }),
+        );
+        return true;
+      } catch (error) {
+        const permanent = this.isPermanentMailError(error);
+        const finalAttempt = attempt === attempts;
+
+        if (permanent || finalAttempt) {
+          console.error(
+            JSON.stringify({
+              event: 'mail.delivery_failed',
+              routingKey,
+              recipient,
+              attempt,
+              permanent,
+              ...this.mailErrorDetails(error),
+            }),
+          );
+          return false;
+        }
+
+        const retryDelayMs = TRANSIENT_MAIL_RETRY_DELAYS_MS[attempt - 1];
+        console.warn(
+          JSON.stringify({
+            event: 'mail.delivery_retry',
+            routingKey,
+            recipient,
+            attempt,
+            retryDelayMs,
+            ...this.mailErrorDetails(error),
+          }),
+        );
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
+    }
+
+    return false;
+  }
 
   private async renderInvoice(
     invoice: Invoice,
@@ -85,35 +171,33 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.registration',
+    queue: 'flawis.mail.registration',
   })
   async sendActivationLink(msg: AuthMsg) {
-    try {
-      const url = `${
-        process.env.NODE_ENV === 'development'
-          ? 'http://localhost:3000'
-          : `https://${msg.hostname}`
-      }/${msg.locale}/activate?token=${msg.token}`;
+    const url = `${
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : `https://${msg.hostname}`
+    }/${msg.locale}/activate?token=${msg.token}`;
 
-      await this.mailerService.sendMail({
-        to: msg.email,
-        // from: '"Support Team" <support@example.com>', // override default from
-        subject: this.i18n.t('activation.subject', { lang: msg.locale }),
-        template: 'activation',
-        context: {
-          // ✏️ filling curly brackets with content
-          name: msg.name,
-          url,
-          i18nLang: msg.locale,
-        },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    await this.deliverMail('mail.registration', msg.email, {
+      to: msg.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject: this.i18n.t('activation.subject', { lang: msg.locale }),
+      template: 'activation',
+      context: {
+        // ✏️ filling curly brackets with content
+        name: msg.name,
+        url,
+        i18nLang: msg.locale,
+      },
+    });
   }
 
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.reset',
+    queue: 'flawis.mail.reset',
   })
   async sendResetLink(msg: AuthMsg) {
     const url = `${
@@ -122,7 +206,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/resetPassword?token=${msg.token}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.reset', msg.email, {
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
       subject: this.i18n.t('passwordReset.subject', { lang: msg.locale }),
@@ -139,6 +223,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.conference.invoice',
+    queue: 'flawis.mail.conference.invoice',
   })
   async sendConferenceInvoice(msg: InvoiceMsg) {
     const pdfBuffer = await this.renderInvoice(
@@ -147,7 +232,7 @@ export class EmailService {
       msg.conferenceLogo,
     );
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.conference.invoice', msg.email, {
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
       subject:
@@ -175,6 +260,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.conference.coAuthor',
+    queue: 'flawis.mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
     const url = `${
@@ -185,7 +271,7 @@ export class EmailService {
       msg.submissionId
     }&token=${msg.token}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.conference.coAuthor', msg.email, {
       to: msg.email,
       // from: '"Support Team" <support@example.com>', // override default from
       subject:
@@ -210,6 +296,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.newOrg',
+    queue: 'flawis.mail.internships.newOrg',
   })
   async sendOrgRegistrationLink(msg: AuthMsg) {
     const url = `${
@@ -218,7 +305,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/register?token=${msg.token}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.newOrg', msg.email, {
       to: msg.email,
       subject: this.i18n.t('newOrg.subject', { lang: msg.locale }),
       template: 'newOrg',
@@ -232,6 +319,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.applied',
+    queue: 'flawis.mail.internships.applied',
   })
   async sendInternApplied(msg: InternshipMsg) {
     const url = `${
@@ -240,7 +328,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.internshipId}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.applied', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.applied.subject', { lang: msg.locale }),
       template: 'internApplied',
@@ -256,6 +344,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.eligible',
+    queue: 'flawis.mail.internships.eligible',
   })
   async sendInternEligible(msg: InternshipMsg) {
     const url = `${
@@ -264,7 +353,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.internshipId}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.eligible', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.eligible.subject', { lang: msg.locale }),
       template: 'internEligible',
@@ -280,6 +369,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.accepted',
+    queue: 'flawis.mail.internships.accepted',
   })
   async sendInternAccepted(msg: InternshipMsg) {
     const url = `${
@@ -288,7 +378,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.internshipId}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.accepted', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.accepted.subject', { lang: msg.locale }),
       template: 'internAccepted',
@@ -304,6 +394,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.rejected',
+    queue: 'flawis.mail.internships.rejected',
   })
   async sendInternRejected(msg: InternshipMsg) {
     const url = `${
@@ -312,7 +403,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.internshipId}`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.rejected', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.rejected.subject', { lang: msg.locale }),
       template: 'internRejected',
@@ -329,6 +420,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.admin',
+    queue: 'flawis.mail.internships.admin',
   })
   async sendAdminInternNotification(msg: InternshipMsg) {
     const url = `${
@@ -337,7 +429,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/internships`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.admin', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.admin.subject', { lang: msg.locale }),
       template: 'adminPendingIntern',
@@ -352,6 +444,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.internships.org',
+    queue: 'flawis.mail.internships.org',
   })
   async sendOrgInternsNotification(msg: InternshipMsg) {
     const url = `${
@@ -360,7 +453,7 @@ export class EmailService {
         : `https://${msg.hostname}`
     }/${msg.locale}/${msg.internshipId}/applications`;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.internships.org', msg.email, {
       to: msg.email,
       subject: this.i18n.t('intern.org.subject', { lang: msg.locale }),
       template: 'orgPendingInterns',
@@ -377,6 +470,7 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.courses.applied',
+    queue: 'flawis.mail.courses.applied',
   })
   async sendCourseAttendeeApplied(msg: CourseMsg) {
     const url = this.courseAttendeeUrl(msg);
@@ -388,7 +482,7 @@ export class EmailService {
         }
       : undefined;
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.courses.applied', msg.email, {
       to: msg.email,
       subject: this.i18n.t('course.applied.subject', { lang: msg.locale }),
       template: 'courses/attendeeApplied',
@@ -405,11 +499,12 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.courses.eligible',
+    queue: 'flawis.mail.courses.eligible',
   })
   async sendCourseAttendeeEligible(msg: CourseMsg) {
     const url = this.courseAttendeeUrl(msg);
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.courses.eligible', msg.email, {
       to: msg.email,
       subject: this.i18n.t('course.eligible.subject', { lang: msg.locale }),
       template: 'courses/attendeeEligible',
@@ -425,11 +520,12 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.courses.accepted',
+    queue: 'flawis.mail.courses.accepted',
   })
   async sendCourseAttendeeAccepted(msg: CourseMsg) {
     const url = this.courseAttendeeUrl(msg);
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.courses.accepted', msg.email, {
       to: msg.email,
       subject: this.i18n.t('course.accepted.subject', { lang: msg.locale }),
       template: 'courses/attendeeAccepted',
@@ -445,11 +541,12 @@ export class EmailService {
   @RabbitSubscribe({
     exchange: process.env.RMQ_EXCHANGE,
     routingKey: 'mail.courses.rejected',
+    queue: 'flawis.mail.courses.rejected',
   })
   async sendCourseAttendeeRejected(msg: CourseMsg) {
     const url = this.courseAttendeeUrl(msg);
 
-    await this.mailerService.sendMail({
+    await this.deliverMail('mail.courses.rejected', msg.email, {
       to: msg.email,
       subject: this.i18n.t('course.rejected.subject', { lang: msg.locale }),
       template: 'courses/attendeeRejected',
