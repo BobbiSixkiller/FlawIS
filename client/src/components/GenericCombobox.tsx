@@ -73,6 +73,7 @@ export default function GenericCombobox<
 }: GenericComboboxProps<TOption, TValue>) {
   const { lng: uiLng } = useParams<{ lng: string }>();
   const [text, setText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<TOption[]>(defaultOptions);
 
@@ -98,33 +99,48 @@ export default function GenericCombobox<
   }, [field.value, multiple]);
 
   // Debounced search input
-  const debounced = useDebouncedCallback(
-    (value: string) => {
-      setText(value);
-    },
-    fetchOptions ? 500 : 0,
-  );
+  const debounced = useDebouncedCallback((value: string) => {
+    setSearchText(value);
+  }, 500);
+
+  function handleQueryChange(value: string) {
+    setText(value);
+
+    if (fetchOptions) {
+      debounced(value);
+    } else {
+      setSearchText(value);
+    }
+  }
+
+  function clearQuery() {
+    debounced.cancel();
+    setText("");
+    setSearchText("");
+  }
 
   // Fetch or filter options
   useEffect(() => {
     async function getOrFilterOptions() {
-      if (fetchOptions && text) {
+      if (fetchOptions && searchText) {
         setLoading(true);
-        const res = await fetchOptions(text);
+        const res = await fetchOptions(searchText);
         setOptions(res);
         setLoading(false);
       } else {
         const filtered =
-          text === ""
+          searchText === ""
             ? defaultOptions
             : defaultOptions.filter((opt) =>
-                getOptionLabel(opt).toLowerCase().includes(text.toLowerCase()),
+                getOptionLabel(opt)
+                  .toLowerCase()
+                  .includes(searchText.toLowerCase()),
               );
         setOptions(filtered);
       }
     }
     getOrFilterOptions();
-  }, [text, fetchOptions, defaultOptions, getOptionLabel]);
+  }, [searchText, fetchOptions, defaultOptions, getOptionLabel]);
 
   async function handleChange(newValue: TOption | TOption[] | null) {
     if (Array.isArray(newValue)) {
@@ -137,6 +153,7 @@ export default function GenericCombobox<
             ...newValue.slice(0, newValue.length - 1).map(getOptionValue),
             getOptionValue(res.data),
           ]);
+          clearQuery();
         }
         if (!res.success) {
           if (res.errors) {
@@ -152,6 +169,7 @@ export default function GenericCombobox<
         setLoading(false);
       } else {
         field.onChange(newValue.map(getOptionValue));
+        clearQuery();
       }
     } else {
       if (createOption && !newValue?.id) {
@@ -240,7 +258,8 @@ export default function GenericCombobox<
           <div className="flex flex-1">
             <ComboboxInput
               placeholder={placeholder}
-              onChange={(e) => debounced(e.target.value)}
+              onChange={(e) => handleQueryChange(e.target.value)}
+              {...(multiple ? { value: text } : {})}
               displayValue={({ val }: TOption) => {
                 const selected = options.find((o) =>
                   Object.values(o.val).some((v) => isEqual(v, val)),

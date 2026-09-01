@@ -183,3 +183,70 @@ describe('course notification tenant links', () => {
     ).toBe('flawis-staging.flaw.uniba.sk');
   });
 });
+
+describe('mail delivery error handling', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('acknowledges a permanent SMTP rejection after logging it once', async () => {
+    const { message, sendMail, service } = fixture();
+    const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+    const errorLog = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    sendMail.mockRejectedValue(
+      Object.assign(new Error('Recipient address rejected'), {
+        code: 'EENVELOPE',
+        command: 'RCPT TO',
+        responseCode: 550,
+      }),
+    );
+
+    await expect(
+      service.sendResetLink({ ...message, token: 'reset-token' }),
+    ).resolves.toBeUndefined();
+
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(log).not.toHaveBeenCalled();
+    expect(errorLog).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(errorLog.mock.calls[0][0])).toEqual(
+      expect.objectContaining({
+        event: 'mail.delivery_failed',
+        routingKey: 'mail.reset',
+        recipient: message.email,
+        attempt: 1,
+        permanent: true,
+        code: 'EENVELOPE',
+        command: 'RCPT TO',
+        responseCode: 550,
+      }),
+    );
+  });
+
+  it('records which queue accepted a successful co-author message', async () => {
+    const { message, sendMail, service } = fixture();
+    const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    await service.sendCoauthorLink({
+      ...message,
+      conferenceName: 'Conference',
+      conferenceSlug: 'conference',
+      token: 'author-token',
+      submissionId: 'submission-id',
+      submissionName: 'Submission',
+      submissionAbstract: 'Abstract',
+      submissionKeywords: ['keyword'],
+    });
+
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(log.mock.calls[0][0])).toEqual(
+      expect.objectContaining({
+        event: 'mail.delivery_succeeded',
+        routingKey: 'mail.conference.coAuthor',
+        recipient: message.email,
+        attempt: 1,
+      }),
+    );
+  });
+});
