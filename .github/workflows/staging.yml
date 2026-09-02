@@ -85,8 +85,41 @@ jobs:
           docker cp flawis-mongo-1:/data/backup ./backup
           docker exec flawis-mongo-1 rm -rf /data/backup
 
-      - name: Stop staging containers
-        run: docker compose -f docker-compose.staging.yml -p flawis-staging down
+      - name: Stop staging containers and preserve Redis data
+        run: |
+          set -euo pipefail
+
+          COMPOSE=(docker compose -f docker-compose.staging.yml -p flawis-staging)
+          TARGET_VOLUME=flawis_staging_redis_data
+          REDIS_CONTAINER=$("${COMPOSE[@]}" ps -q redis)
+
+          if [ -n "$REDIS_CONTAINER" ]; then
+            CURRENT_VOLUME=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{end}}{{end}}' "$REDIS_CONTAINER")
+
+            if [ "$CURRENT_VOLUME" != "$TARGET_VOLUME" ]; then
+              echo "Migrating Redis data from $CURRENT_VOLUME to $TARGET_VOLUME"
+              docker volume create "$TARGET_VOLUME" >/dev/null
+
+              RESTORE_CORE=true
+              trap 'if [ "$RESTORE_CORE" = true ]; then "${COMPOSE[@]}" start core; fi' ERR
+
+              "${COMPOSE[@]}" stop core
+              docker exec "$REDIS_CONTAINER" redis-cli SAVE
+              docker run --rm \
+                --volumes-from "$REDIS_CONTAINER":ro \
+                -v "$TARGET_VOLUME:/target" \
+                redis:8.0.3 \
+                sh -c 'test -z "$(find /target -mindepth 1 -maxdepth 1 -print -quit)" && cp -a /data/. /target/'
+
+              echo "Redis data migration completed"
+            fi
+          else
+            docker volume create "$TARGET_VOLUME" >/dev/null
+          fi
+
+          "${COMPOSE[@]}" down
+          RESTORE_CORE=false
+          trap - ERR
 
       - name: Start staging data services
         run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d mongo minio
