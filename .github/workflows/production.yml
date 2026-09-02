@@ -70,8 +70,41 @@ jobs:
       - name: Build production images
         run: docker compose -f docker-compose.prod.yml build --parallel
 
-      - name: Stop production containers
-        run: docker compose -f docker-compose.prod.yml down
+      - name: Stop production containers and preserve Redis data
+        run: |
+          set -euo pipefail
+
+          COMPOSE=(docker compose -f docker-compose.prod.yml)
+          TARGET_VOLUME=flawis_redis_data
+          REDIS_CONTAINER=$("${COMPOSE[@]}" ps -q redis)
+
+          if [ -n "$REDIS_CONTAINER" ]; then
+            CURRENT_VOLUME=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/data"}}{{.Name}}{{end}}{{end}}' "$REDIS_CONTAINER")
+
+            if [ "$CURRENT_VOLUME" != "$TARGET_VOLUME" ]; then
+              echo "Migrating Redis data from $CURRENT_VOLUME to $TARGET_VOLUME"
+              docker volume create "$TARGET_VOLUME" >/dev/null
+
+              RESTORE_CORE=true
+              trap 'if [ "$RESTORE_CORE" = true ]; then "${COMPOSE[@]}" start core; fi' ERR
+
+              "${COMPOSE[@]}" stop core
+              docker exec "$REDIS_CONTAINER" redis-cli SAVE
+              docker run --rm \
+                --volumes-from "$REDIS_CONTAINER":ro \
+                -v "$TARGET_VOLUME:/target" \
+                redis:8.0.3 \
+                sh -c 'test -z "$(find /target -mindepth 1 -maxdepth 1 -print -quit)" && cp -a /data/. /target/'
+
+              echo "Redis data migration completed"
+            fi
+          else
+            docker volume create "$TARGET_VOLUME" >/dev/null
+          fi
+
+          "${COMPOSE[@]}" down
+          RESTORE_CORE=false
+          trap - ERR
 
       - name: Start production services
         run: docker compose -f docker-compose.prod.yml up -d --no-build
