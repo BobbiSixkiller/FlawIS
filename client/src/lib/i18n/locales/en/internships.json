@@ -51,6 +51,7 @@
   "applied_one": "Applied ({{count}})",
   "applied_other": "Applied ({{count}})",
   "docs": "Documents",
+  "back": "Back",
   "apply": "Apply",
   "signInToApply": "Sign in to apply",
   "applicationsCount_one": "{{count}} applicant",
