@@ -27,7 +27,7 @@ export default function BackButton({
     <Button
       variant="ghost"
       size="sm"
-      className="ml-auto rounded-full"
+      className="rounded-md"
       onClick={goBack}
       aria-label={label}
     >
