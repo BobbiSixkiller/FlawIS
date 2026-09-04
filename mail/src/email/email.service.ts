@@ -263,13 +263,11 @@ export class EmailService {
     queue: 'flawis.mail.conference.coAuthor',
   })
   async sendCoauthorLink(msg: AuthorMsg) {
-    const url = `${
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : `https://${msg.hostname}`
-    }/${msg.locale}/${msg.conferenceSlug}/register?submission=${
-      msg.submissionId
-    }&token=${msg.token}`;
+    const url = `${resolveTenantOrigin(msg.hostname, 'conferences')}/${
+      msg.locale
+    }/${msg.conferenceSlug}/register?submission=${msg.submissionId}&token=${
+      msg.token
+    }`;
 
     await this.deliverMail('mail.conference.coAuthor', msg.email, {
       to: msg.email,
