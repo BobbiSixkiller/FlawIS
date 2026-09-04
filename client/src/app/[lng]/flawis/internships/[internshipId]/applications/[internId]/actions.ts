@@ -18,7 +18,8 @@ export async function changeInternStatus(
     }),
     {
       revalidateTags: (data) => [
-        `internship:${data.changeInternStatus.data.internship}`,
+        "internships",
+        `internships:${data.changeInternStatus.data.internship}`,
       ],
     },
   );

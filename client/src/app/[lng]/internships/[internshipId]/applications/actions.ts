@@ -7,7 +7,13 @@ import {
 import { executeGqlFetch } from "@/lib/graphql/actions";
 
 export async function getInterns(vars: InternsQueryVariables) {
-  const res = await executeGqlFetch(InternsDocument, vars);
+  const res = await executeGqlFetch(
+    InternsDocument,
+    vars,
+    null,
+    undefined,
+    "no-store",
+  );
 
   if (res.errors) {
     console.log(res.errors[0]);

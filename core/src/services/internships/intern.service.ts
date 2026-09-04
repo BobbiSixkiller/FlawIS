@@ -26,17 +26,38 @@ export class InternService {
     private readonly minioService: MinioService
   ) {}
 
-  async getInterns(args: InternArgs) {
+  async getInterns(args: InternArgs, ctxUser: CtxUser) {
+    const isAdmin = ctxUser.access.includes(Access.Admin);
+    const isOrganization =
+      !isAdmin && ctxUser.access.includes(Access.Organization);
+
+    if (isOrganization && args.filter?.internship) {
+      await this.internshipService.assertCanManageInternship(
+        args.filter.internship,
+        ctxUser
+      );
+    } else if (!isAdmin) {
+      throw new Error("Not allowed!");
+    }
+
     return await this.internRepository.paginatedInterns(args);
   }
 
-  async getById(id: ObjectId) {
-    const intern = await this.internRepository.findOne({ _id: id });
-    if (!intern) {
-      throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
-    }
+  async getById(id: ObjectId, ctxUser: CtxUser) {
+    const intern = await this.getInternOrThrow(id);
+    await this.internshipService.assertCanManageInternship(
+      intern.internship as ObjectId,
+      ctxUser
+    );
 
     return toDTO(intern);
+  }
+
+  async countApplications(internshipId: ObjectId, status?: Status[]) {
+    return await this.internRepository.countDocuments({
+      internship: internshipId,
+      ...(status ? { status: { $in: status } } : {}),
+    });
   }
 
   async getByUserInternship(userId: ObjectId, internshipId: ObjectId) {
@@ -52,17 +73,25 @@ export class InternService {
   }
 
   async createIntern(
-    userId: ObjectId,
+    ctxUser: CtxUser,
     internshipId: ObjectId,
     fileUrls: string[],
     semester: Semester,
     hostname: string
   ): Promise<Intern> {
+    if (
+      ctxUser.access.includes(Access.Admin) ||
+      ctxUser.access.includes(Access.Organization) ||
+      !ctxUser.access.includes(Access.Student)
+    ) {
+      throw new Error("Not allowed!");
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const user = await this.userService.getUser(userId);
+      const user = await this.userService.getUser(ctxUser.id);
       if (!user.organization || !user.telephone || !user.studyProgramme) {
         throw new Error(this.i18nService.translate("user", { ns: "intern" }));
       }
@@ -89,7 +118,8 @@ export class InternService {
 
       // Fetch internship (ensure it exists)
       const internship = await this.internshipService.getInternship(
-        internshipId
+        internshipId,
+        ctxUser
       );
 
       // Create the document within the transaction
@@ -135,7 +165,18 @@ export class InternService {
     }
   }
 
-  async changeStatus(status: Status, id: ObjectId, hostname: string) {
+  async changeStatus(
+    status: Status,
+    id: ObjectId,
+    ctxUser: CtxUser,
+    hostname: string
+  ) {
+    const existingIntern = await this.getInternOrThrow(id);
+    await this.internshipService.assertCanManageInternship(
+      existingIntern.internship as ObjectId,
+      ctxUser
+    );
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -180,6 +221,18 @@ export class InternService {
     user: CtxUser,
     semester: Semester
   ) {
+    const existingIntern = await this.getInternOrThrow(id);
+    const isAdmin = user.access.includes(Access.Admin);
+    const isOwningStudent =
+      !isAdmin &&
+      user.access.includes(Access.Student) &&
+      !user.access.includes(Access.Organization) &&
+      existingIntern.user.id.toString() === user.id.toString();
+
+    if (!isAdmin && !isOwningStudent) {
+      throw new Error("Not allowed!");
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -194,13 +247,6 @@ export class InternService {
           this.i18nService.translate("notFound", { ns: "intern" })
         );
       }
-      if (
-        intern.user.id.toString() !== user.id.toString() &&
-        !user.access.includes(Access.Admin)
-      ) {
-        throw new Error("Not allowed!");
-      }
-
       await session.commitTransaction();
 
       return toDTO(intern);
@@ -213,6 +259,18 @@ export class InternService {
   }
 
   async deleteIntern(id: ObjectId, ctxUser: CtxUser) {
+    const existingIntern = await this.getInternOrThrow(id);
+    const isAdmin = ctxUser.access.includes(Access.Admin);
+    const isOwningStudent =
+      !isAdmin &&
+      ctxUser.access.includes(Access.Student) &&
+      !ctxUser.access.includes(Access.Organization) &&
+      existingIntern.user.id.toString() === ctxUser.id.toString();
+
+    if (!isAdmin && !isOwningStudent) {
+      throw new Error("Not allowed!");
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -226,14 +284,6 @@ export class InternService {
           this.i18nService.translate("notFound", { ns: "intern" })
         );
       }
-      if (
-        ctxUser.access.includes(Access.Student) &&
-        intern.user.id.toString() !== ctxUser.id.toString()
-      ) {
-        console.log(intern.user.id.toString(), ctxUser.id.toString());
-        throw new Error("Not allowed!");
-      }
-
       await this.minioService.deleteFiles(intern.fileUrls);
       if (intern.organizationFeedbackUrl) {
         await this.minioService.deleteFiles([intern.organizationFeedbackUrl]);
@@ -255,6 +305,12 @@ export class InternService {
     user: CtxUser,
     fileUrl: string
   ) {
+    const existingIntern = await this.getInternOrThrow(id);
+    await this.internshipService.assertCanManageInternship(
+      existingIntern.internship as ObjectId,
+      user
+    );
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -269,16 +325,6 @@ export class InternService {
           this.i18nService.translate("notFound", { ns: "intern" })
         );
       }
-      const internship = await this.internshipService.getInternship(
-        intern.internship as ObjectId
-      );
-      if (
-        internship.user.toString() !== user.id.toString() &&
-        !user.access.includes(Access.Admin)
-      ) {
-        throw new Error("Not allowed!");
-      }
-
       await session.commitTransaction();
 
       return toDTO(intern);
@@ -352,6 +398,15 @@ export class InternService {
         "mail.internships.org"
       );
     }
+  }
+
+  private async getInternOrThrow(id: ObjectId) {
+    const intern = await this.internRepository.findOne({ _id: id });
+    if (!intern) {
+      throw new Error(this.i18nService.translate("notFound", { ns: "intern" }));
+    }
+
+    return intern;
   }
 
 }

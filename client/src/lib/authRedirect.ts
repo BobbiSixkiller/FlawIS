@@ -11,3 +11,10 @@ export function logoutHref(redirectUrl?: string) {
   const query = new URLSearchParams({ url: redirectUrl });
   return `/logout?${query.toString()}`;
 }
+
+export function loginHref(redirectUrl?: string) {
+  if (!redirectUrl) return "/login";
+
+  const query = new URLSearchParams({ url: redirectUrl });
+  return `/login?${query.toString()}`;
+}

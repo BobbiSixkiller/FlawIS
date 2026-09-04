@@ -10,13 +10,18 @@ import {
   UpdateInternDataMutationVariables,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+import { cookies } from "next/headers";
 
 export async function getInternship(id: string) {
+  const hasSession = (await cookies()).has("accessToken");
   const res = await executeGqlFetch(
     InternshipDocument,
     { id },
     {},
-    { revalidate: 3600, tags: [`internships:${id}`] },
+    hasSession
+      ? undefined
+      : { revalidate: 3600, tags: [`internships:${id}`] },
+    hasSession ? "no-store" : undefined,
   );
 
   if (res.errors) {
@@ -78,6 +83,7 @@ export async function changeInternData(
     }),
     {
       revalidateTags: (data) => [
+        "internships",
         `internships:${data.updateInternData.data.internship}`,
       ],
     },

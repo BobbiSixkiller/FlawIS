@@ -13,18 +13,23 @@ import {
 import DynamicImageClient from "@/components/DynamicImageClient";
 import { displayDate } from "@/lib/clientUtils";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import Button from "@/components/Button";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-function ListItem({ data }: { data?: ApplicationFragment }) {
+function ListItem({
+  data,
+  hrefBase,
+}: {
+  data?: ApplicationFragment;
+  hrefBase: string;
+}) {
   const { lng, internshipId } = useParams<{
     lng: string;
     internshipId: string;
   }>();
   const { t } = useTranslation(lng, ["internships", "common"]);
-  const path = usePathname();
 
   return (
     <li className="flex sm:justify-between items-center gap-6 py-5">
@@ -77,11 +82,7 @@ function ListItem({ data }: { data?: ApplicationFragment }) {
         variant="ghost"
         className="rounded-full"
         as={Link}
-        href={
-          path.includes("internships")
-            ? `/internships/${internshipId}/applications/${data?.id}`
-            : `/${internshipId}/applications/${data?.id}`
-        }
+        href={`${hrefBase}/${internshipId}/applications/${data?.id}`}
       >
         <ChevronRightIcon className="size-5" />
       </Button>
@@ -120,16 +121,20 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 export default function ListInterns({
   initialData,
   vars,
+  hrefBase,
 }: {
   initialData: Connection<ApplicationFragment>;
   vars: InternsQueryVariables;
+  hrefBase: string;
 }) {
   return (
     <InfiniteScroll<ApplicationFragment, InternsQueryVariables>
       vars={vars}
       getData={getInterns}
       initialData={initialData}
-      ListItem={ListItem}
+      renderItem={(data) => (
+        <ListItem data={data} hrefBase={hrefBase.replace(/\/$/, "")} />
+      )}
       Container={Container}
       Placeholder={Placeholder}
     />

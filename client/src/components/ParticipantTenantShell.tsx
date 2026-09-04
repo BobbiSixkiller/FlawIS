@@ -27,12 +27,14 @@ export default async function ParticipantTenantShell({
   lng,
   modal,
   sessionPolling = false,
+  signInHref = "/login",
   user,
 }: {
   children: ReactNode;
   lng: string;
   modal: ReactNode;
   sessionPolling?: boolean;
+  signInHref?: string;
   user?: UserFragment | null;
 }) {
   const { t, i18n } = await translate(lng, "dashboard");
@@ -71,7 +73,7 @@ export default async function ParticipantTenantShell({
         ) : (
           <Button
             as={Link}
-            href="/login"
+            href={signInHref}
             variant="ghost"
             size="icon"
             className="rounded-full"

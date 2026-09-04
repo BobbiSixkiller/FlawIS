@@ -25,6 +25,19 @@ export class InternshipRepository extends Repository<typeof Internship> {
     { first = 20, after, filter, sort }: InternshipArgs,
     ctxUser: CtxUser | null
   ) {
+    const isAdmin = ctxUser?.access.includes(Access.Admin) ?? false;
+    const isOrganization =
+      !isAdmin && (ctxUser?.access.includes(Access.Organization) ?? false);
+    const isStudent =
+      !isAdmin &&
+      !isOrganization &&
+      (ctxUser?.access.includes(Access.Student) ?? false);
+    const scopedUser = isOrganization
+      ? ctxUser?.id
+      : isAdmin
+        ? filter?.user
+        : undefined;
+
     // 1. Build Mongo sort object + sortFields for cursor filter
     const sortFields: SortField[] = ensureIdSort(
       sort.map((s) => ({
@@ -49,10 +62,10 @@ export class InternshipRepository extends Repository<typeof Internship> {
     >([
       {
         $match: {
-          ...(filter?.user ? { user: filter.user } : {}),
+          ...(scopedUser ? { user: scopedUser } : {}),
         },
       },
-      ...(ctxUser?.access.includes(Access.Student)
+      ...(isStudent
         ? [
             {
               $lookup: {
@@ -65,7 +78,7 @@ export class InternshipRepository extends Repository<typeof Internship> {
                         $and: [
                           { $eq: ["$internship", "$$internshipId"] },
                           {
-                            $eq: ["$user._id", ctxUser.id],
+                            $eq: ["$user._id", ctxUser!.id],
                           },
                         ],
                       },

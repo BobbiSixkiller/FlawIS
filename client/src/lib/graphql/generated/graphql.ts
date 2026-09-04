@@ -2004,7 +2004,7 @@ export type CreateInternshipMutationVariables = Exact<{
 }>;
 
 
-export type CreateInternshipMutation = { __typename?: 'Mutation', createInternship: { __typename?: 'InternshipMutationResponse', message: string } };
+export type CreateInternshipMutation = { __typename?: 'Mutation', createInternship: { __typename?: 'InternshipMutationResponse', message: string, data: { __typename?: 'Internship', id: any } } };
 
 export type UpdateInternshipMutationVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -5233,6 +5233,9 @@ export const CreateInternshipDocument = new TypedDocumentString(`
     mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
     message
+    data {
+      id
+    }
   }
 }
     `) as unknown as TypedDocumentString<CreateInternshipMutation, CreateInternshipMutationVariables>;

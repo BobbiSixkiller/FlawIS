@@ -1,7 +1,5 @@
 import { translate } from "@/lib/i18n";
-import { getMe } from "../(auth)/actions";
 import {
-  Access,
   InternshipSortableField,
   InternshipsQueryVariables,
   SortDirection,
@@ -17,19 +15,29 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import Modal from "@/components/Modal";
 import InternshipForm from "./InternshipForm";
 import FilterDropdown from "@/components/FilterDropdown";
+import { getOptionalViewer } from "@/lib/optionalViewer";
+import {
+  getInternshipAccess,
+  normalizeQueryValues,
+} from "@/lib/internshipAccess";
 
 export default async function InternshipsHomePage({
   params,
   searchParams,
 }: {
   params: Promise<{ lng: string }>;
-  searchParams?: Promise<{ academicYear?: string; organization?: string[] }>;
+  searchParams?: Promise<{
+    academicYear?: string;
+    organization?: string | string[];
+  }>;
 }) {
-  const { lng } = await params;
-  const queryParams = await searchParams;
-
-  const user = await getMe();
+  const [{ lng }, queryParams, user] = await Promise.all([
+    params,
+    searchParams,
+    getOptionalViewer(),
+  ]);
   const { academicYear } = getAcademicYear();
+  const access = getInternshipAccess(user);
 
   const vars: InternshipsQueryVariables = {
     sort: [
@@ -43,12 +51,9 @@ export default async function InternshipsHomePage({
       },
     ],
 
-    // If user is an organization get all internships associated with the organization,
-    // otherwise return all internships for given academic year
     filter: {
-      user: user.access.includes(Access.Organization) ? user.id : undefined,
       academicYear: queryParams?.academicYear ?? academicYear,
-      organizations: queryParams?.organization,
+      organizations: normalizeQueryValues(queryParams?.organization),
     },
   };
 
@@ -75,7 +80,7 @@ export default async function InternshipsHomePage({
             anchor={{ gap: 6, to: "bottom" }}
             filters={[
               {
-                label: "Inštitúcie",
+                label: t("filters.organizations"),
                 type: "multi",
                 queryKey: "organization",
                 options: initialData.organizations.map((org) => ({
@@ -89,8 +94,7 @@ export default async function InternshipsHomePage({
             selectedYear={queryParams?.academicYear ?? academicYear}
             years={initialData.academicYears.map((y) => y.academicYear)}
           />
-          {(user.access.includes(Access.Organization) ||
-            user.access.includes(Access.Admin)) && (
+          {access.canCreate && (
             <Tooltip message={t("tooltip.new")} position="below">
               <ModalTrigger dialogId={addDialogId}>
                 <Button size="sm">
@@ -103,14 +107,16 @@ export default async function InternshipsHomePage({
         </div>
       </div>
 
-      <ListInternships initialData={initialData} vars={vars} />
+      <ListInternships initialData={initialData} vars={vars} hrefBase="" />
 
-      <Modal dialogId={addDialogId} title={t("new")}>
-        <InternshipForm
-          dialogId={addDialogId}
-          organization={user.organization}
-        />
-      </Modal>
+      {access.canCreate && user ? (
+        <Modal dialogId={addDialogId} title={t("new")}>
+          <InternshipForm
+            dialogId={addDialogId}
+            organization={user.organization}
+          />
+        </Modal>
+      ) : null}
     </div>
   );
 }
