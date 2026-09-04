@@ -1,14 +1,11 @@
-import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
-import { getMe } from "../(auth)/actions";
-import SessionPolling from "@/components/SessionPolling";
-import { HomeIcon } from "@heroicons/react/24/outline";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import Dashboard from "@/components/Dashboard";
+import { cookies, headers } from "next/headers";
 import MissingStudentDataDialog from "./MissingStudentDataDialog";
 import { getSubdomain } from "@/lib/serverUtils";
+import ParticipantTenantShell from "@/components/ParticipantTenantShell";
+import { getOptionalViewer } from "@/lib/optionalViewer";
+import { logoutHref } from "@/lib/authRedirect";
 
 export async function generateMetadata(
   {
@@ -50,49 +47,38 @@ export async function generateMetadata(
   };
 }
 
-export default async function DashboardLayout({
+export default async function InternshipsLayout({
   children,
   modal,
-  sidebar,
   params,
 }: {
   children: React.ReactNode;
-  sidebar: React.ReactNode;
   modal: React.ReactNode;
   params: Promise<{ lng: string }>;
 }) {
-  const { lng } = await params;
-  const user = await getMe();
-  if (!user) {
-    redirect("/logout");
-  }
-
-  const { t } = await translate(lng, "dashboard");
-
-  const subdomain = await getSubdomain();
+  const [{ lng }, user, subdomain, cookieStore] = await Promise.all([
+    params,
+    getOptionalViewer(),
+    getSubdomain(),
+    cookies(),
+  ]);
+  const signInHref =
+    !user && cookieStore.get("accessToken")?.value
+      ? logoutHref("/login")
+      : "/login";
 
   return (
-    <div>
-      <Dashboard
-        sidebar={sidebar}
-        lng={lng}
-        user={user}
-        navLinks={[
-          {
-            href: "/",
-            icon: <HomeIcon className="mr-2 h-5 w-5" aria-hidden="true" />,
-            text: t("home"),
-          },
-        ]}
-      >
-        {children}
-      </Dashboard>
-
-      {modal}
-
-      <MissingStudentDataDialog user={user} subdomain={subdomain} />
-      <ActivateAccountDialog lng={lng} user={user} />
-      <SessionPolling />
-    </div>
+    <ParticipantTenantShell
+      lng={lng}
+      user={user}
+      modal={modal}
+      sessionPolling={Boolean(user)}
+      signInHref={signInHref}
+    >
+      {children}
+      {user ? (
+        <MissingStudentDataDialog user={user} subdomain={subdomain} />
+      ) : null}
+    </ParticipantTenantShell>
   );
 }

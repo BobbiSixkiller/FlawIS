@@ -10,6 +10,8 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { replaceQueryParameter } from "@/lib/internshipAccess";
 
 export default function AcademicYearSelect({
   selectedYear,
@@ -18,6 +20,9 @@ export default function AcademicYearSelect({
   selectedYear: string;
   years: string[];
 }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   return (
     <Popover>
       <PopoverButton
@@ -41,7 +46,11 @@ export default function AcademicYearSelect({
             className="hover:bg-primary-500 hover:text-white dark:hover:bg-primary-300 dark:hover:text-white/85 -mx-2 px-2 py-1 text-center"
             as={Link}
             key={year}
-            href={`?academicYear=${year}`}
+            href={`${pathname}?${replaceQueryParameter(
+              searchParams,
+              "academicYear",
+              year,
+            )}`}
           >
             {year}
           </CloseButton>

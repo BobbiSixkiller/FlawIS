@@ -16,5 +16,11 @@ export default async function ApplicationsPage({
 
   const initialData = await getInterns(vars);
 
-  return <ListInterns initialData={initialData} vars={vars} />;
+  return (
+    <ListInterns
+      initialData={initialData}
+      vars={vars}
+      hrefBase="/internships"
+    />
+  );
 }

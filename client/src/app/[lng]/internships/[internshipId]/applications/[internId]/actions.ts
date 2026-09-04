@@ -7,7 +7,13 @@ import {
 import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
 
 export async function getIntern(id: string) {
-  const res = await executeGqlFetch(InternDocument, { id });
+  const res = await executeGqlFetch(
+    InternDocument,
+    { id },
+    null,
+    undefined,
+    "no-store",
+  );
   if (res.errors) {
     console.log(res.errors[0]);
   }
@@ -25,7 +31,8 @@ export async function updateOrgFeedback(id: string, fileUrl: string | null) {
     }),
     {
       revalidateTags: (data) => [
-        `internship:${data.updateOrgFeedback.data.internship}`,
+        "internships",
+        `internships:${data.updateOrgFeedback.data.internship}`,
       ],
     },
   );

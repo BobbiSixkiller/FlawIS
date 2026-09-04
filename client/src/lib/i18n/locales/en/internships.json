@@ -52,6 +52,17 @@
   "applied_other": "Applied ({{count}})",
   "docs": "Documents",
   "apply": "Apply",
+  "signInToApply": "Sign in to apply",
+  "applicationsCount_one": "{{count}} applicant",
+  "applicationsCount_other": "{{count}} applicants",
+  "filters": {
+    "organizations": "Organizations"
+  },
+  "checkProfile": {
+    "prefix": "Before applying, please check your",
+    "link": "personal details",
+    "suffix": "."
+  },
   "tooltip": {
     "new": "Internships created starting from june are for the upcoming academic year."
   },

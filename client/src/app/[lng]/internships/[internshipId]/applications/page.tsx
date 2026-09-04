@@ -2,12 +2,12 @@ import { getMe } from "@/app/[lng]/(auth)/actions";
 import { getInterns } from "./actions";
 import ListInterns from "./ListInterns";
 import {
-  Access,
   InternsQueryVariables,
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { getInternship } from "../actions";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getInternshipAccess } from "@/lib/internshipAccess";
 
 export default async function ApplicationsPage({
   params,
@@ -15,29 +15,28 @@ export default async function ApplicationsPage({
   params: Promise<{ internshipId: string }>;
 }) {
   const { internshipId } = await params;
-  // Implement backend checking if user with org access is viewing someone elses internship applications
   const [user, internship] = await Promise.all([
     getMe(),
     getInternship(internshipId),
   ]);
   if (!internship) {
-    redirect("/");
+    notFound();
   }
-  if (!user.access.includes(Access.Admin) && user.id !== internship.user) {
-    redirect(`/${internship}`);
+
+  const access = getInternshipAccess(user, internship.user);
+  if (!access.canManage) {
+    redirect(`/${internshipId}`);
   }
 
   const vars: InternsQueryVariables = {
     sort: [],
-    filter: user.access.includes(Access.Organization)
-      ? {
-          internship: internshipId,
-          status: [Status.Eligible, Status.Accepted, Status.Rejected],
-        }
-      : { internship: internshipId },
+    filter: {
+      internship: internshipId,
+      status: [Status.Eligible, Status.Accepted, Status.Rejected],
+    },
   };
 
   const initialData = await getInterns(vars);
 
-  return <ListInterns initialData={initialData} vars={vars} />;
+  return <ListInterns initialData={initialData} vars={vars} hrefBase="" />;
 }

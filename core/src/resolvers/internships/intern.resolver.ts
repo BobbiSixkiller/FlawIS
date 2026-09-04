@@ -39,17 +39,23 @@ export class InternResolver {
 
   @Authorized([Access.Admin, Access.Organization])
   @Query(() => Intern)
-  async intern(@Arg("id") id: ObjectId): Promise<Intern> {
-    return await this.internService.getById(id);
+  async intern(
+    @Arg("id") id: ObjectId,
+    @Ctx() { user }: Context
+  ): Promise<Intern> {
+    return await this.internService.getById(id, user!);
   }
 
   @Authorized([Access.Admin, Access.Organization])
   @Query(() => InternConnection)
-  async interns(@Args() args: InternArgs): Promise<InternConnection> {
-    return await this.internService.getInterns(args);
+  async interns(
+    @Args() args: InternArgs,
+    @Ctx() { user }: Context
+  ): Promise<InternConnection> {
+    return await this.internService.getInterns(args, user!);
   }
 
-  @Authorized()
+  @Authorized([Access.Student])
   @Mutation(() => InternMutationResponse)
   async createIntern(
     @Ctx() { user, req }: Context,
@@ -60,7 +66,7 @@ export class InternResolver {
     const hostname = req.headers["tenant-domain"] as string;
 
     const intern = await this.internService.createIntern(
-      user!.id,
+      user!,
       internshipId,
       fileUrls,
       semester,
@@ -78,11 +84,16 @@ export class InternResolver {
   async changeInternStatus(
     @Arg("id") id: ObjectId,
     @Arg("status", () => Status) status: Status,
-    @Ctx() { req }: Context,
+    @Ctx() { req, user }: Context,
   ): Promise<InternMutationResponse> {
     const hostname = req.headers["tenant-domain"] as string;
 
-    const intern = await this.internService.changeStatus(status, id, hostname);
+    const intern = await this.internService.changeStatus(
+      status,
+      id,
+      user!,
+      hostname
+    );
 
     return {
       message: this.i18nService.translate("status", { ns: "intern" }),
@@ -90,7 +101,7 @@ export class InternResolver {
     };
   }
 
-  @Authorized()
+  @Authorized([Access.Admin, Access.Student])
   @Mutation(() => InternMutationResponse)
   async updateInternData(
     @Ctx() { user }: Context,
@@ -130,7 +141,7 @@ export class InternResolver {
     };
   }
 
-  @Authorized()
+  @Authorized([Access.Admin, Access.Student])
   @Mutation(() => InternMutationResponse)
   async deleteIntern(
     @Ctx() { user }: Context,

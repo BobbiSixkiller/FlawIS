@@ -34,19 +34,20 @@ export class InternshipResolver {
     private readonly i18nService: I18nService
   ) {}
 
-  @Authorized()
   @Query(() => Internship)
-  async internship(@Arg("id") id: ObjectId): Promise<Internship> {
-    return await this.internshipService.getInternship(id);
+  async internship(
+    @Arg("id") id: ObjectId,
+    @Ctx() { user }: Context
+  ): Promise<Internship> {
+    return await this.internshipService.getInternship(id, user);
   }
 
-  @Authorized()
   @Query(() => InternshipConnection)
   async internships(
     @Args() args: InternshipArgs,
     @Ctx() { user }: Context
   ): Promise<InternshipConnection> {
-    return await this.internshipService.getInternships(args, user!);
+    return await this.internshipService.getInternships(args, user);
   }
 
   @Authorized([Access.Admin, Access.Organization])
@@ -93,8 +94,14 @@ export class InternshipResolver {
 
   @Authorized([Access.Admin, Access.Organization])
   @Mutation(() => InternshipMutationResponse)
-  async deleteInternship(@Arg("id") id: ObjectId) {
-    const internship = await this.internshipService.deleteInternship(id);
+  async deleteInternship(
+    @Arg("id") id: ObjectId,
+    @Ctx() { user }: Context
+  ) {
+    const internship = await this.internshipService.deleteInternship(
+      id,
+      user!
+    );
 
     return {
       data: internship,
@@ -105,15 +112,23 @@ export class InternshipResolver {
     };
   }
 
-  @Authorized()
   @FieldResolver(() => Intern, { nullable: true })
   async myApplication(
     @Ctx() { user }: Context,
     @Root() { id: internshipId }: Internship
   ) {
+    if (
+      !user ||
+      user.access.includes(Access.Admin) ||
+      user.access.includes(Access.Organization) ||
+      !user.access.includes(Access.Student)
+    ) {
+      return null;
+    }
+
     try {
       return await this.internService.getByUserInternship(
-        user!.id,
+        user.id,
         internshipId
       );
     } catch (error) {
@@ -121,23 +136,22 @@ export class InternshipResolver {
     }
   }
 
-  @Authorized()
   @FieldResolver(() => Int)
   async applicationsCount(
     @Ctx() { user }: Context,
-    @Root() { id }: Internship
+    @Root() { id, user: ownerId }: Internship
   ) {
-    const { totalCount } = await this.internService.getInterns({
-      first: 1000,
-      filter: {
-        internship: id,
-        status: user?.access.includes(Access.Organization)
-          ? [Status.Eligible, Status.Accepted, Status.Rejected] // This is because students have to be checked by Admin first and then reviewed by org
-          : undefined,
-      },
-      sort: [],
-    });
+    const isAdmin = user?.access.includes(Access.Admin) ?? false;
+    const isOwningOrganization =
+      !isAdmin &&
+      (user?.access.includes(Access.Organization) ?? false) &&
+      user?.id.toString() === ownerId.toString();
 
-    return totalCount;
+    return await this.internService.countApplications(
+      id,
+      isOwningOrganization
+        ? [Status.Eligible, Status.Accepted, Status.Rejected]
+        : undefined
+    );
   }
 }

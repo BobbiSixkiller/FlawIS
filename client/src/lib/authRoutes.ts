@@ -17,7 +17,7 @@ function getSubdomainType(host: string): SubdomainType {
 const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
   flawis: () => false,
   conferences: (path) => path === "/" || path.split("/").length === 2,
-  internships: () => false,
+  internships: (path) => path === "/" || objectIdRegex.test(path),
   courses: (path) => path === "/" || objectIdRegex.test(path),
 };
 

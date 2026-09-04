@@ -53,6 +53,18 @@
   "applied_other": "Prihlásených ({{count}})",
   "docs": "Dokumenty",
   "apply": "Prihlásiť sa",
+  "signInToApply": "Prihlásiť sa a podať prihlášku",
+  "applicationsCount_one": "{{count}} záujemca",
+  "applicationsCount_few": "{{count}} záujemcovia",
+  "applicationsCount_other": "{{count}} záujemcov",
+  "filters": {
+    "organizations": "Inštitúcie"
+  },
+  "checkProfile": {
+    "prefix": "Pred prihlásením si, prosím, skontrolujte",
+    "link": "osobné údaje",
+    "suffix": "."
+  },
   "tooltip": {
     "new": "Vytvaránie stáže pre nasledujúci akademický rok je možné od júna aktuálneho roka."
   },

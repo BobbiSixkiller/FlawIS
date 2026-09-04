@@ -10,13 +10,17 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import FilterDropdown from "@/components/FilterDropdown";
 import ExportButton from "@/components/ExportButton";
+import { normalizeQueryValues } from "@/lib/internshipAccess";
 
 export default async function InternshipsPage({
   params,
   searchParams,
 }: {
   params: Promise<{ lng: string }>;
-  searchParams?: Promise<{ academicYear?: string; organization?: string[] }>;
+  searchParams?: Promise<{
+    academicYear?: string;
+    organization?: string | string[];
+  }>;
 }) {
   const { lng } = await params;
   const queryParams = await searchParams;
@@ -38,7 +42,7 @@ export default async function InternshipsPage({
 
     filter: {
       academicYear: queryParams?.academicYear ?? academicYear, // Default to current academic year
-      organizations: queryParams?.organization,
+      organizations: normalizeQueryValues(queryParams?.organization),
     },
   };
 
@@ -61,7 +65,7 @@ export default async function InternshipsPage({
             anchor={{ gap: 6, to: "bottom" }}
             filters={[
               {
-                label: "Inštitúcie",
+                label: t("filters.organizations"),
                 type: "multi",
                 queryKey: "organization",
                 options: initialData.organizations.map((org) => ({
@@ -79,7 +83,13 @@ export default async function InternshipsPage({
         </div>
       </div>
 
-      {initialData && <ListInternships initialData={initialData} vars={vars} />}
+      {initialData && (
+        <ListInternships
+          initialData={initialData}
+          vars={vars}
+          hrefBase="/internships"
+        />
+      )}
     </div>
   );
 }

@@ -74,6 +74,9 @@ query internship($id: ObjectId!) {
 mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
     message
+    data {
+      id
+    }
   }
 }
 

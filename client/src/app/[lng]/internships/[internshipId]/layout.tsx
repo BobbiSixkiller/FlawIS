@@ -1,9 +1,13 @@
 import { ReactNode } from "react";
-import { getMe } from "../../(auth)/actions";
 import TabMenu from "@/components/TabMenu";
-import { Access } from "@/lib/graphql/generated/graphql";
 import { getInternship } from "./actions";
 import { translate } from "@/lib/i18n";
+import { getOptionalViewer } from "@/lib/optionalViewer";
+import {
+  getInternshipAccess,
+  isObjectId,
+} from "@/lib/internshipAccess";
+import { notFound } from "next/navigation";
 
 export default async function InternshipLayout({
   children,
@@ -13,20 +17,27 @@ export default async function InternshipLayout({
   params: Promise<{ lng: string; internshipId: string }>;
 }) {
   const { internshipId, lng } = await params;
+
+  if (!isObjectId(internshipId)) {
+    notFound();
+  }
+
   const [user, internship] = await Promise.all([
-    getMe(),
+    getOptionalViewer(),
     getInternship(internshipId),
   ]);
 
-  const showTabs =
-    user.access.includes(Access.Admin) ||
-    user.access.includes(Access.Organization);
+  if (!internship) {
+    notFound();
+  }
+
+  const access = getInternshipAccess(user, internship.user);
 
   const { t } = await translate(lng, "internships");
 
   return (
     <div className="flex flex-1 flex-col">
-      {showTabs && internship && (
+      {access.canManage && (
         <TabMenu
           tabs={[
             { href: `/${internshipId}`, name: t("internship") },

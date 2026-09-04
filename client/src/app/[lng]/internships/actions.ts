@@ -8,13 +8,16 @@ import {
   UpdateInternshipDocument,
 } from "@/lib/graphql/generated/graphql";
 import { executeGqlFetch, executeGqlMutation } from "@/lib/graphql/actions";
+import { cookies } from "next/headers";
 
 export async function getInternships(vars: InternshipsQueryVariables) {
+  const hasSession = (await cookies()).has("accessToken");
   const res = await executeGqlFetch(
     InternshipsDocument,
     vars,
     {},
-    { tags: ["internships"], revalidate: 3600 },
+    hasSession ? undefined : { tags: ["internships"], revalidate: 3600 },
+    hasSession ? "no-store" : undefined,
   );
 
   if (res.errors) {
@@ -31,7 +34,12 @@ export async function createInternship(input: InternshipInput) {
     (data) => ({
       message: data.createInternship.message,
     }),
-    { revalidateTags: () => ["internships"] },
+    {
+      revalidateTags: (data) => [
+        "internships",
+        `internships:${data.createInternship.data.id}`,
+      ],
+    },
   );
 }
 

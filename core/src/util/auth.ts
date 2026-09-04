@@ -34,13 +34,10 @@ export function createContext({
     const token = req.cookies.accessToken.split("Bearer ")[1];
     if (token) {
       const decoded: CtxUser | null = verifyJwt(token);
-      appContext.user = decoded
-        ? { ...decoded, id: new ObjectId(decoded.id) }
-        : null;
-    } else
-      throw new Error(
-        "Authentication header format must be: 'Bearer [token]'."
-      );
+      if (decoded && ObjectId.isValid(decoded.id)) {
+        appContext.user = { ...decoded, id: new ObjectId(decoded.id) };
+      }
+    }
   }
 
   return appContext;

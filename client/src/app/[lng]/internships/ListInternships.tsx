@@ -7,7 +7,7 @@ import {
   InfiniteScroll,
 } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   ApplicationFragment,
   InternshipsQueryVariables,
@@ -15,6 +15,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/lib/clientUtils";
 import { useTranslation } from "@/lib/i18n/client";
+import { internshipListHref } from "@/lib/internshipAccess";
 
 interface InternshipData {
   id: string;
@@ -44,8 +45,7 @@ const statusClasses = {
   },
 };
 
-function ListItem({ data }: { data?: InternshipData }) {
-  const path = usePathname();
+function ListItem({ data, hrefBase }: { data?: InternshipData; hrefBase: string }) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "internships");
 
@@ -55,11 +55,7 @@ function ListItem({ data }: { data?: InternshipData }) {
         "relative rounded-2xl border dark:border-gray-700 shadow-sm hover:shadow-lg p-4 text-gray-900 dark:text-white text-sm cursor-pointer outline-hidden focus:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-2 bg-white dark:bg-gray-700",
         data?.myApplication && statusClasses[data?.myApplication?.status].card,
       ])}
-      href={
-        path.includes("internships")
-          ? `/internships/${data?.id}`
-          : `/${data?.id}`
-      }
+      href={internshipListHref(hrefBase, data?.id ?? "")}
     >
       <div className="flex flex-wrap justify-between">
         <h2 className="font-medium leading-6">{data?.organization}</h2>
@@ -76,7 +72,9 @@ function ListItem({ data }: { data?: InternshipData }) {
       <p className="line-clamp-3">
         {data?.description.replace(/<[^>]*>/g, " ").trim()}
       </p>
-      <p className="mt-2">Pocet zaujemcov: {data?.applicationsCount}</p>
+      <p className="mt-2">
+        {t("applicationsCount", { count: data?.applicationsCount ?? 0 })}
+      </p>
     </Link>
   );
 }
@@ -108,16 +106,18 @@ function Placeholder({ cardRef }: { cardRef?: LegacyRef<HTMLDivElement> }) {
 export default function ListInternships({
   initialData,
   vars,
+  hrefBase,
 }: {
   initialData: Connection<InternshipData>;
   vars: InternshipsQueryVariables;
+  hrefBase: string;
 }) {
   return (
     <InfiniteScroll<InternshipData, InternshipsQueryVariables>
       vars={vars}
       getData={getInternships}
       initialData={initialData}
-      ListItem={ListItem}
+      renderItem={(data) => <ListItem data={data} hrefBase={hrefBase} />}
       Container={Container}
       Placeholder={Placeholder}
     />
