@@ -3,7 +3,7 @@ import {
   deleteInternship,
   getInternship,
 } from "@/app/[lng]/internships/[internshipId]/actions";
-import CloseButton from "@/components/CloseButton";
+import BackButton from "@/components/BackButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -42,7 +42,7 @@ export default async function InternshipPage({
           </Button>
         </ModalTrigger>
 
-        <CloseButton href={`/internships`} />
+        <BackButton fallbackHref="/internships" label={t("back")} />
       </div>
 
       <div

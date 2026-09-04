@@ -20,7 +20,7 @@ export default async function InternshipLayout({
   const { t } = await translate(lng, "internships");
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-1 flex-col">
       <TabMenu
         tabs={[
           { href: `/internships/${internshipId}`, name: t("internship") },
@@ -32,7 +32,7 @@ export default async function InternshipLayout({
           },
         ]}
       />
-      <div className="flex-1">{children}</div>
+      <div className="flex flex-1 flex-col">{children}</div>
     </div>
   );
 }

@@ -52,6 +52,7 @@
   "applied_few": "Prihlásení ({{count}})",
   "applied_other": "Prihlásených ({{count}})",
   "docs": "Dokumenty",
+  "back": "Späť",
   "apply": "Prihlásiť sa",
   "signInToApply": "Prihlásiť sa a podať prihlášku",
   "applicationsCount_one": "{{count}} záujemca",

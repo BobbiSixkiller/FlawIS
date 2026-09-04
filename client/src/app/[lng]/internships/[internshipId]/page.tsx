@@ -3,7 +3,7 @@ import { deleteIntern, deleteInternship, getInternship } from "./actions";
 import { notFound } from "next/navigation";
 import { Status } from "@/lib/graphql/generated/graphql";
 import { Application } from "./Application";
-import CloseButton from "@/components/CloseButton";
+import BackButton from "@/components/BackButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import {
   InboxArrowDownIcon,
@@ -79,7 +79,7 @@ export default async function InternshipPage({
           </>
         )}
 
-        <CloseButton />
+        <BackButton fallbackHref="/" label={t("back")} />
       </div>
 
       <div
