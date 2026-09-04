@@ -6,13 +6,12 @@ import {
   ComponentType,
   Fragment,
   ReactElement,
-  useEffect,
   useRef,
   useState,
 } from "react";
 import { get } from "lodash";
 import { InputProps } from "./Input";
-import { Control } from "react-hook-form";
+import { useFormState } from "react-hook-form";
 
 type WithLocalizedInputProps = {
   lng: string;
@@ -24,16 +23,19 @@ export function withLocalizedInput<T extends ComponentType<any>>(
   type Props = React.ComponentProps<T> & WithLocalizedInputProps;
 
   function Wrapper(props: Props) {
-    const { name, lng, errors, error, label, ...rest } = props;
+    const { name, lng, label, ...rest } = props;
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     const localizedInputName = name.replace(lng, lng === "sk" ? "en" : "sk");
-    const localizedError = get(errors, localizedInputName)?.message;
+    const { errors } = useFormState({
+      control: props.control,
+      name: [name, localizedInputName],
+    });
+    const error = get(errors, name)?.message?.toString();
+    const localizedError = get(errors, localizedInputName)?.message?.toString();
 
-    useEffect(() => {
-      if (error || localizedError) setVisible(true);
-    }, [error, localizedError]);
+    const showLocalizedInput = visible || Boolean(error || localizedError);
 
     useOnClickOutside(ref, () => {
       if (!error && !localizedError) setVisible(false);
@@ -46,18 +48,16 @@ export function withLocalizedInput<T extends ComponentType<any>>(
           name={name}
           lng={lng}
           label={label}
-          error={error}
           onFocus={() => setVisible(true)}
           onClick={() => setVisible(true)}
         />
-        <Transition as={Fragment} show={visible}>
+        <Transition as={Fragment} show={showLocalizedInput}>
           <div className="mt-2">
             <InputComponent
               {...(rest as any)}
               name={localizedInputName}
               lng={lng === "sk" ? "en" : "sk"}
               label={lng === "sk" ? `${label} anglicky` : `${label} in Slovak`}
-              error={localizedError}
               onFocus={() => setVisible(true)}
             />
           </div>

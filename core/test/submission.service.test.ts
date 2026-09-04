@@ -57,12 +57,14 @@ function document(data: Record<string, any>) {
 function service({
   attendeeRepository = {},
   conferenceRepository = {},
+  rmqService = {},
   sectionRepository = {},
   submissionRepository = {},
   tokenService = {},
 }: {
   attendeeRepository?: object;
   conferenceRepository?: object;
+  rmqService?: object;
   sectionRepository?: object;
   submissionRepository?: object;
   tokenService?: object;
@@ -73,7 +75,7 @@ function service({
     attendeeRepository as any,
     sectionRepository as any,
     tokenService as any,
-    {} as any,
+    rmqService as any,
     i18n(),
   );
 }
@@ -257,6 +259,65 @@ test("administrators can update after the deadline without an author filter", as
     submissionInput(conferenceId, sectionId),
   );
   assert.deepEqual(receivedFilter, { _id: submissionId });
+});
+
+test("administrators can send co-author invitations from the FLAWIS dashboard", async () => {
+  const conferenceId = new ObjectId();
+  const sectionId = new ObjectId();
+  const submissionId = new ObjectId();
+  const stored = document({
+    _id: submissionId,
+    authors: [new ObjectId()],
+    conference: conferenceId,
+    translations: submissionInput(conferenceId, sectionId).translations,
+  });
+  let invitation:
+    | { routingKey: string; message: Record<string, unknown> }
+    | undefined;
+
+  const instance = service({
+    submissionRepository: {
+      findOne: async (filter: Record<string, any>) =>
+        filter._id === submissionId && !filter._id?.$ne ? stored : null,
+      findOneAndUpdate: async () => stored,
+    },
+    conferenceRepository: {
+      findOne: async () => ({
+        id: conferenceId,
+        dates: { submissionDeadline: new Date(Date.now() - 1_000) },
+        slug: "conference",
+        translations: {
+          sk: { name: "Konferencia" },
+          en: { name: "Conference" },
+        },
+      }),
+    },
+    sectionRepository: {
+      findOne: async () => ({ conference: conferenceId }),
+    },
+    tokenService: {
+      generateOneTimeToken: async () => "invite-token",
+    },
+    rmqService: {
+      produceMessage: (message: string, routingKey: string) => {
+        invitation = { routingKey, message: JSON.parse(message) };
+      },
+    },
+  });
+  const data = submissionInput(conferenceId, sectionId);
+  data.authors = ["coauthor@example.com"];
+
+  await instance.updateSubmission(
+    submissionId,
+    "flawis.flaw.uniba.sk",
+    user([Access.Admin]),
+    data,
+  );
+
+  assert.equal(invitation?.routingKey, "mail.conference.coAuthor");
+  assert.equal(invitation?.message.hostname, "flawis.flaw.uniba.sk");
+  assert.equal(invitation?.message.email, "coauthor@example.com");
+  assert.equal(invitation?.message.token, "invite-token");
 });
 
 test("invitation preview validates without consuming the token", async () => {

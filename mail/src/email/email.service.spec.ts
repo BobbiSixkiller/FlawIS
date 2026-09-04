@@ -1,6 +1,6 @@
 import { EmailService } from './email.service';
 import { Invoice } from './templates/invoice';
-import { resolveTenantHostname } from './tenant-domain';
+import { resolveTenantHostname, resolveTenantOrigin } from './tenant-domain';
 
 const invoice: Invoice = {
   body: {
@@ -181,6 +181,49 @@ describe('course notification tenant links', () => {
     expect(
       resolveTenantHostname('courses-staging.flaw.uniba.sk', 'flawis'),
     ).toBe('flawis-staging.flaw.uniba.sk');
+  });
+});
+
+describe('conference co-author tenant links', () => {
+  it.each([
+    [
+      'flawis.flaw.uniba.sk',
+      'https://conferences.flaw.uniba.sk/en/conference/register?submission=submission-id&token=author-token',
+    ],
+    [
+      'flawis-staging.flaw.uniba.sk',
+      'https://conferences-staging.flaw.uniba.sk/en/conference/register?submission=submission-id&token=author-token',
+    ],
+    [
+      'conferences.flaw.uniba.sk',
+      'https://conferences.flaw.uniba.sk/en/conference/register?submission=submission-id&token=author-token',
+    ],
+  ])('links invitations from %s to %s', async (hostname, expectedUrl) => {
+    const { message, sendMail, service } = fixture();
+
+    await service.sendCoauthorLink({
+      ...message,
+      hostname,
+      conferenceName: 'Conference',
+      conferenceSlug: 'conference',
+      token: 'author-token',
+      submissionId: 'submission-id',
+      submissionName: 'Submission',
+      submissionAbstract: 'Abstract',
+      submissionKeywords: ['keyword'],
+    });
+
+    expect(sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ url: expectedUrl }),
+      }),
+    );
+  });
+
+  it('uses the conference tenant when developing locally', () => {
+    expect(
+      resolveTenantOrigin('localhost:3000', 'conferences', 'development'),
+    ).toBe('http://conferences.localhost:3000');
   });
 });
 

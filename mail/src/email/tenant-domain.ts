@@ -1,4 +1,4 @@
-export type TenantSubdomain = 'courses' | 'flawis';
+export type TenantSubdomain = 'conferences' | 'courses' | 'flawis';
 
 const STAGING_SUFFIX = '-staging';
 
@@ -21,6 +21,10 @@ export function resolveTenantOrigin(
   tenant: TenantSubdomain,
   nodeEnv = process.env.NODE_ENV,
 ) {
-  if (nodeEnv === 'development') return 'http://localhost:3000';
+  if (nodeEnv === 'development') {
+    return tenant === 'courses'
+      ? 'http://localhost:3000'
+      : `http://${tenant}.localhost:3000`;
+  }
   return `https://${resolveTenantHostname(hostname, tenant)}`;
 }
