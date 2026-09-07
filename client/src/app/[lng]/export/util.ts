@@ -1,7 +1,14 @@
 import { capitalizeFirstLetter } from "@/lib/clientUtils";
+import type {
+  InternshipAcademicYearsQuery,
+  InternsQuery,
+} from "@/lib/graphql/generated/graphql";
 import { getAttendees } from "../flawis/conferences/[slug]/attendees/actions";
 import { getCourseAttendance } from "../flawis/courses/[id]/attendance/actions";
-import { getInterns } from "../internships/[internshipId]/applications/actions";
+import {
+  getInterns,
+  getInternshipAcademicYears,
+} from "../internships/[internshipId]/applications/actions";
 
 type ExportParams = Record<string, string | undefined>;
 type ExportFetcher = (params: ExportParams) => Promise<Record<string, any>[]>;
@@ -112,19 +119,38 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
     });
   },
   interns: async () => {
-    const allInterns: any[] = [];
+    const allInterns: NonNullable<InternsQuery["interns"]["edges"][number]>["node"][] = [];
+    const academicYears = new Map<string, string>();
     let after: string | null = null;
+    let internshipsAfter: string | null = null;
     let hasNextPage = true;
+    let hasNextInternshipPage = true;
 
-    while (hasNextPage) {
-      const page = await getInterns({ sort: [], after });
+    while (hasNextPage || hasNextInternshipPage) {
+      const [page, internshipsPage]: [
+        InternsQuery["interns"] | undefined,
+        InternshipAcademicYearsQuery["internships"] | undefined,
+      ] = await Promise.all([
+        hasNextPage ? getInterns({ sort: [], after }) : undefined,
+        hasNextInternshipPage
+          ? getInternshipAcademicYears({ after: internshipsAfter })
+          : undefined,
+      ]);
 
       for (const edge of page?.edges || []) {
         if (edge?.node) allInterns.push(edge.node);
       }
 
+      for (const edge of internshipsPage?.edges || []) {
+        if (edge?.node) {
+          academicYears.set(edge.node.id, edge.node.academicYear);
+        }
+      }
+
       hasNextPage = page?.pageInfo.hasNextPage ?? false;
       after = page?.pageInfo.endCursor ?? null;
+      hasNextInternshipPage = internshipsPage?.pageInfo.hasNextPage ?? false;
+      internshipsAfter = internshipsPage?.pageInfo.endCursor ?? null;
     }
 
     return allInterns.map((i) => ({
@@ -135,6 +161,7 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
       phone: i.user.telephone,
       class: i.user.studyProgramme,
       semester: i.semester,
+      academicYear: academicYears.get(i.internship) ?? "",
     }));
   },
 };

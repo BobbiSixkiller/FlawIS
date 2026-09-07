@@ -1999,6 +1999,13 @@ export type InternshipQueryVariables = Exact<{
 
 export type InternshipQuery = { __typename?: 'Query', internship: { __typename?: 'Internship', id: any, user: any, organization: string, description: string, updatedAt: any, createdAt: any, applicationsCount: number, myApplication?: { __typename?: 'Intern', id: any, organization: string, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } | null } };
 
+export type InternshipAcademicYearsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type InternshipAcademicYearsQuery = { __typename?: 'Query', internships: { __typename?: 'InternshipConnection', edges: Array<{ __typename?: 'InternshipEdge', node: { __typename?: 'Internship', id: any, academicYear: string } } | null>, pageInfo: { __typename?: 'InternshipPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
+
 export type CreateInternshipMutationVariables = Exact<{
   input: InternshipInput;
 }>;
@@ -2029,7 +2036,7 @@ export type InternsQueryVariables = Exact<{
 }>;
 
 
-export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: string, node: { __typename?: 'Intern', id: any, organization: string, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
+export type InternsQuery = { __typename?: 'Query', interns: { __typename?: 'InternConnection', totalCount: number, edges: Array<{ __typename?: 'InternEdge', cursor: string, node: { __typename?: 'Intern', internship: any, id: any, organization: string, fileUrls: Array<string>, organizationFeedbackUrl?: string | null, status: Status, semester?: Semester | null, createdAt: any, updatedAt: any, user: { __typename?: 'StudentReference', id: any, name: string, email: string, studyProgramme: StudyProgramme, telephone: string, avatarUrl?: string | null, address: { __typename?: 'Address', street: string, city: string, postal: string, country: string } } } } | null>, pageInfo: { __typename?: 'InternPageInfo', endCursor?: string | null, hasNextPage: boolean } } };
 
 export type InternQueryVariables = Exact<{
   id: Scalars['ObjectId']['input'];
@@ -5229,6 +5236,22 @@ fragment Application on Intern {
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<InternshipQuery, InternshipQueryVariables>;
+export const InternshipAcademicYearsDocument = new TypedDocumentString(`
+    query internshipAcademicYears($after: String) {
+  internships(after: $after, first: 100, sort: []) {
+    edges {
+      node {
+        id
+        academicYear
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<InternshipAcademicYearsQuery, InternshipAcademicYearsQueryVariables>;
 export const CreateInternshipDocument = new TypedDocumentString(`
     mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
@@ -5266,6 +5289,7 @@ export const InternsDocument = new TypedDocumentString(`
     edges {
       cursor
       node {
+        internship
         ...Application
       }
     }
