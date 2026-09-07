@@ -71,6 +71,21 @@ query internship($id: ObjectId!) {
   }
 }
 
+query internshipAcademicYears($after: String) {
+  internships(after: $after, first: 100, sort: []) {
+    edges {
+      node {
+        id
+        academicYear
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+
 mutation createInternship($input: InternshipInput!) {
   createInternship(input: $input) {
     message
@@ -109,6 +124,7 @@ query interns(
     edges {
       cursor
       node {
+        internship
         ...Application
       }
     }

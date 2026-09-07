@@ -78,13 +78,13 @@ test("internship rich text retains editor markup and removes executable HTML", (
   assert.doesNotMatch(sanitized, /script|onclick|onerror|onmouseover|style=|javascript:|<img|<section/i);
 });
 
-test("internship writes and legacy reads are sanitized", async () => {
+test("internship writes and legacy reads preserve editor classes while sanitizing HTML", async () => {
   const ownerId = new ObjectId();
   let createdDescription = "";
   const legacy = document({
     organization: "Court",
     user: ownerId,
-    description: '<p onclick="x()">Legacy</p><script>x()</script>',
+    description: '<p class="dark:text-gray-300 hidden" onclick="x()">Legacy</p><script>x()</script>',
   });
   const service = new InternshipService(
     {
@@ -101,13 +101,13 @@ test("internship writes and legacy reads are sanitized", async () => {
   );
 
   await service.createInternship(
-    { description: '<p onload="x()">New</p><script>x()</script>' },
+    { description: '<p class="dark:text-gray-300 fixed" onload="x()">New</p><script>x()</script>' },
     viewer(ownerId, [Access.Organization]),
   );
   const outbound = await service.getInternship(new ObjectId());
 
-  assert.equal(createdDescription, "<p>New</p>");
-  assert.equal(outbound.description, "<p>Legacy</p>");
+  assert.equal(createdDescription, '<p class="dark:text-gray-300">New</p>');
+  assert.equal(outbound.description, '<p class="dark:text-gray-300">Legacy</p>');
 });
 
 test("anonymous internship catalogue and detail GraphQL queries expose counts but not applications", async () => {
