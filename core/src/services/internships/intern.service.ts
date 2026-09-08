@@ -270,6 +270,11 @@ export class InternService {
     if (!isAdmin && !isOwningStudent) {
       throw new Error("Not allowed!");
     }
+    if (isAdmin && existingIntern.status !== Status.Rejected) {
+      throw new Error(
+        this.i18nService.translate("deleteRejectedOnly", { ns: "intern" })
+      );
+    }
 
     const session = await mongoose.startSession();
     session.startTransaction();

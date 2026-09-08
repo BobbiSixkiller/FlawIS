@@ -4,6 +4,7 @@
   "new": "Stážista {{name}} bol vytvorená.",
   "delete": "Stážista {{name}} bol vymazaná.",
   "applicationLimitReached": "Môžete podať maximálne dve prihlášky naraz!",
+  "deleteRejectedOnly": "Odstrániť možno iba zamietnutého uchádzača.",
   "internFiles": "Súbory boli aktualizované.",
   "status": "Stav prihlášky bol úspešne zmenený.",
   "feedback": "Výstupný list bol úspešne aktualizovaný.",

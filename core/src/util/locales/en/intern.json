@@ -4,6 +4,7 @@
   "new": "Intern {{name}} has been created.",
   "delete": "Intern {{name}} has been deleted.",
   "applicationLimitReached": "You can submit 2 applications at most!",
+  "deleteRejectedOnly": "Only rejected applicants can be deleted.",
   "internFiles": "Files has been updated.",
   "status": "Status of the application was successfully updated.",
   "feedback": "Certificate of internship completition has been updated.",

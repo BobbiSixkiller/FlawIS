@@ -386,6 +386,48 @@ test("student self-service and applicant mutations authorize before writing", as
   });
 });
 
+test("admins can delete only rejected internship applicants", async () => {
+  await withMockSession(async () => {
+    let storedIntern = document({
+      status: Status.Applied,
+      user: { id: new ObjectId(), name: "Student" },
+      fileUrls: [],
+    });
+    let deleteCalls = 0;
+    const service = new InternService(
+      {
+        findOne: async () => storedIntern,
+        findOneAndDelete: async () => {
+          deleteCalls += 1;
+          return storedIntern;
+        },
+      } as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      i18n(),
+      {} as any,
+      { deleteFiles: async () => undefined } as any,
+    );
+    const admin = viewer(new ObjectId(), [Access.Admin]);
+
+    await assert.rejects(
+      service.deleteIntern(storedIntern.id, admin),
+      /deleteRejectedOnly/,
+    );
+    assert.equal(deleteCalls, 0);
+
+    storedIntern = document({
+      _id: storedIntern.id,
+      status: Status.Rejected,
+      user: storedIntern.user,
+      fileUrls: [],
+    });
+    await service.deleteIntern(storedIntern.id, admin);
+    assert.equal(deleteCalls, 1);
+  });
+});
+
 test("malformed access-token cookies are treated as anonymous", () => {
   const context = createContext({
     req: { cookies: { accessToken: "invalid" } },

@@ -24,7 +24,8 @@
   },
   "deleteIntern": {
     "title": "Zmazať prihlášku",
-    "text": "Naozaj si prajete zmazať túto prihlášku?"
+    "text": "Naozaj si prajete zmazať túto prihlášku?",
+    "rejectFirst": "Pred zmazaním prihlášky musíte uchádzača najskôr zamietnuť."
   },
   "editor": {
     "label": "Deatilný popis stáže. Upravte podľa potreby pomocou rich text editora.",

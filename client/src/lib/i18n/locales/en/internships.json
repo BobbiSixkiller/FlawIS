@@ -24,7 +24,8 @@
   },
   "deleteIntern": {
     "title": "Delete application",
-    "text": "Do you really want to delete this application?"
+    "text": "Do you really want to delete this application?",
+    "rejectFirst": "Reject the applicant before deleting their application."
   },
   "editor": {
     "label": "A detailed description of the internship. Edit as needed using the rich text editor.",

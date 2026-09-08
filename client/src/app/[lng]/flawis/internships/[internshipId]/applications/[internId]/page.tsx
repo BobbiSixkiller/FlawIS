@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { deleteIntern } from "@/app/[lng]/internships/[internshipId]/actions";
 import { changeInternStatus } from "./actions";
+import Tooltip from "@/components/Tooltip";
 
 export default async function InternPage({
   params,
@@ -28,6 +29,7 @@ export default async function InternPage({
 
   const deleteDialogId = "delete-intern";
   const statusDialogId = (status: Status) => "status-" + status;
+  const canDelete = intern.status === Status.Rejected;
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,11 +39,28 @@ export default async function InternPage({
         application={intern}
         controls={
           <div className="flex gap-2">
-            <ModalTrigger dialogId={deleteDialogId}>
-              <Button size="icon" variant="destructive">
-                <Icon name="trash" className="size-5" />
-              </Button>
-            </ModalTrigger>
+            {canDelete ? (
+              <ModalTrigger dialogId={deleteDialogId}>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  aria-label={t("deleteIntern.title")}
+                >
+                  <Icon name="trash" className="size-5" />
+                </Button>
+              </ModalTrigger>
+            ) : (
+              <Tooltip message={t("deleteIntern.rejectFirst")}>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  disabled
+                  aria-label={t("deleteIntern.title")}
+                >
+                  <Icon name="trash" className="size-5" />
+                </Button>
+              </Tooltip>
+            )}
 
             <ModalTrigger dialogId={statusDialogId(Status.Eligible)}>
               <Button
@@ -68,7 +87,7 @@ export default async function InternPage({
       <Modal dialogId={deleteDialogId} title={t("deleteIntern.title")}>
         <ConfirmDeleteForm
           dialogId={deleteDialogId}
-          text={`Naozaj si prajete zmazať vašu prihlášku?`}
+          text={t("deleteIntern.text")}
           action={async () => {
             "use server";
             return deleteIntern(intern.id);
