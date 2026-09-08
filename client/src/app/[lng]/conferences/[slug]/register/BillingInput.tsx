@@ -11,12 +11,7 @@ import {
   ComboboxOptions,
   Transition,
 } from "@headlessui/react";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useParams } from "next/navigation";
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -127,15 +122,15 @@ export default function ConferenceBillingInput({
                     setValue("billing.ICDPH", "");
                   }}
                 >
-                  <XMarkIcon className="size-3" />
+                  <Icon name="x-mark" className="size-3" />
                 </button>
               )}
               <ComboboxButton className="p-2 text-gray-400">
                 {({ open }) =>
                   open ? (
-                    <ChevronUpIcon className="size-3" aria-hidden="true" />
+                    <Icon name="chevron-up" className="size-3" aria-hidden="true" />
                   ) : (
-                    <ChevronDownIcon className="size-3" aria-hidden="true" />
+                    <Icon name="chevron-down" className="size-3" aria-hidden="true" />
                   )
                 }
               </ComboboxButton>
@@ -184,7 +179,7 @@ export default function ConferenceBillingInput({
                               focus ? "text-white" : "text-primary-600"
                             }`}
                           >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                            <Icon name="check" className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
                       </>

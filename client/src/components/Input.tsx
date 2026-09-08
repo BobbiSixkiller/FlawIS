@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { withLocalizedInput } from "./withLocalizedInput";
 import {
   Control,
@@ -142,9 +142,9 @@ export function Input({
             }}
           >
             {showPassword ? (
-              <EyeSlashIcon className="size-5" />
+              <Icon name="eye-slash" className="size-5" />
             ) : (
-              <EyeIcon className="size-5" />
+              <Icon name="eye" className="size-5" />
             )}
           </button>
         )}

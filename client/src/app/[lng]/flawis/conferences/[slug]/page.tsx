@@ -1,6 +1,6 @@
 import { getConference } from "../actions";
 import Heading from "@/components/Heading";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { displayDate } from "@/lib/clientUtils";
 import DynamicImage from "@/components/DynamicImage";
 import ModalTrigger from "@/components/ModalTrigger";
@@ -44,13 +44,13 @@ export default async function ConferencePage({
           items={[
             <ModalTrigger key={0} dialogId={updateDatesDialogId}>
               <Button size="sm">
-                <PencilIcon className="size-5" />
+                <Icon name="pencil" className="size-5" />
                 Aktualizovat
               </Button>
             </ModalTrigger>,
             <ModalTrigger key={1} dialogId={deleteConfDialogId}>
               <Button size="sm" variant="secondary">
-                <TrashIcon className="size-5" />
+                <Icon name="trash" className="size-5" />
                 Zmazat
               </Button>
             </ModalTrigger>,

@@ -1,4 +1,5 @@
 import { Editor } from "@tiptap/core";
+import Icon from "@/components/Icon";
 import { useEffect, useState } from "react";
 import { items } from "./NodeSelector";
 import { useParams } from "next/navigation";
@@ -84,7 +85,7 @@ export default function CommandsDropdown({ editor }: { editor?: Editor }) {
             editor.view.focus();
           }}
         >
-          <item.icon className="size-5 text-white" />
+          <Icon name={item.icon} className="size-5 text-white" />
           <span className="text-white">{t(item.name)}</span>
         </div>
       ))}

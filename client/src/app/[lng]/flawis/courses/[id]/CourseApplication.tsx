@@ -1,7 +1,7 @@
 import Avatar from "@/components/Avatar";
 import { CourseAttendeeFragment } from "@/lib/graphql/generated/graphql";
 import { displayDate } from "@/lib/clientUtils";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { ReactNode } from "react";
 
@@ -46,7 +46,7 @@ export default function CourseApplication({
                   className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                   href={`mailto:${courseAttendee.user.email}`}
                 >
-                  <EnvelopeIcon className="size-4" />{" "}
+                  <Icon name="envelope" className="size-4" />{" "}
                   {courseAttendee.user.email}
                 </a>
               </li>
@@ -56,7 +56,7 @@ export default function CourseApplication({
                     className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                     href={`tel:${courseAttendee.user.telephone}`}
                   >
-                    <PhoneIcon className="size-4" />{" "}
+                    <Icon name="phone" className="size-4" />{" "}
                     {courseAttendee.user.telephone}
                   </a>
                 </li>

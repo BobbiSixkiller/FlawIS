@@ -1,10 +1,5 @@
 import { ReactNode } from "react";
-import {
-  FolderOpenIcon,
-  InformationCircleIcon,
-  TicketIcon,
-  UserGroupIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import TabMenu from "@/components/TabMenu";
 
 export default async function TabsLayout({
@@ -19,22 +14,22 @@ export default async function TabsLayout({
     {
       href: `/conferences/${slug}`,
       name: "Info",
-      icon: <InformationCircleIcon className="h-5 w-5" />,
+      icon: <Icon name="information-circle" className="h-5 w-5" />,
     },
     {
       href: `/conferences/${slug}/attendees`,
       name: "Ucastnici",
-      icon: <UserGroupIcon className="h-5 w-5" />,
+      icon: <Icon name="user-group" className="h-5 w-5" />,
     },
     {
       href: `/conferences/${slug}/sections`,
       name: "Sekcie",
-      icon: <FolderOpenIcon className="h-5 w-5" />,
+      icon: <Icon name="folder-open" className="h-5 w-5" />,
     },
     {
       href: `/conferences/${slug}/tickets`,
       name: "Listky",
-      icon: <TicketIcon className="h-5 w-5" />,
+      icon: <Icon name="ticket" className="h-5 w-5" />,
     },
   ];
 

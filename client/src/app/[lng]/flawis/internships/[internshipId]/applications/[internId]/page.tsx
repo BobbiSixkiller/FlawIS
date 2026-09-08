@@ -3,7 +3,7 @@ import { Application } from "@/app/[lng]/internships/[internshipId]/Application"
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/[internId]/actions";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
-import { CheckIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import { translate } from "@/lib/i18n";
@@ -39,7 +39,7 @@ export default async function InternPage({
           <div className="flex gap-2">
             <ModalTrigger dialogId={deleteDialogId}>
               <Button size="icon" variant="destructive">
-                <TrashIcon className="size-5" />
+                <Icon name="trash" className="size-5" />
               </Button>
             </ModalTrigger>
 
@@ -49,7 +49,7 @@ export default async function InternPage({
                 variant="positive"
                 disabled={intern.status === Status.Eligible}
               >
-                <CheckIcon className="size-5" />
+                <Icon name="check" className="size-5" />
               </Button>
             </ModalTrigger>
 
@@ -59,7 +59,7 @@ export default async function InternPage({
                 variant="destructive"
                 disabled={intern.status === Status.Rejected}
               >
-                <XMarkIcon className="size-5" />
+                <Icon name="x-mark" className="size-5" />
               </Button>
             </ModalTrigger>
           </div>

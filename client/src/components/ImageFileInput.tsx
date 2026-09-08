@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Control, useController } from "react-hook-form";
 import { withLocalizedInput } from "./withLocalizedInput";
 import Button from "./Button";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { InputProps } from "./Input";
 import { fetchFromMinio } from "@/lib/clientUtils";
 
@@ -95,7 +95,7 @@ export default function ImageFileInput({
             className="rounded-full p-2 size-8"
             onClick={() => field.onChange(null)}
           >
-            <TrashIcon className="size-5" />
+            <Icon name="trash" className="size-5" />
           </Button>
         )}
       </div>

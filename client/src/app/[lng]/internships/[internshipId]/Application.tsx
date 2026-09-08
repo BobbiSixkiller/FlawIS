@@ -2,7 +2,7 @@ import Avatar from "@/components/Avatar";
 import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
 import { displayDate } from "@/lib/clientUtils";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { ReactNode } from "react";
 
@@ -48,7 +48,7 @@ export async function Application({
                   className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                   href={`mailto:${application.user.email}`}
                 >
-                  <EnvelopeIcon className="size-4" /> {application.user.email}
+                  <Icon name="envelope" className="size-4" /> {application.user.email}
                 </a>
               </li>
               <li>
@@ -56,7 +56,7 @@ export async function Application({
                   className="text-primary-500 dark:text-primary-400 hover:underline inline-flex gap-1 items-center"
                   href={`tel:${application.user.telephone}`}
                 >
-                  <PhoneIcon className="size-4" /> {application.user.telephone}
+                  <Icon name="phone" className="size-4" /> {application.user.telephone}
                 </a>
               </li>
             </ul>

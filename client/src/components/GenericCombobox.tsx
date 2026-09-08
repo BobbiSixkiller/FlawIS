@@ -16,11 +16,7 @@ import { last, isEqual, isObject } from "lodash";
 import { Control, useController } from "react-hook-form";
 import Spinner from "./Spinner";
 import { cn, handleAPIErrors } from "@/lib/clientUtils";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { withLocalizedInput } from "./withLocalizedInput";
 import { GqlMutationResponse } from "@/lib/graphql/actions";
 import { useTranslation } from "@/lib/i18n/client";
@@ -253,7 +249,7 @@ export default function GenericCombobox<
                     )
                   }
                 >
-                  <XMarkIcon className="h-3 w-3" />
+                  <Icon name="x-mark" className="h-3 w-3" />
                 </button>
               </div>
             ))}
@@ -279,9 +275,9 @@ export default function GenericCombobox<
               <ComboboxButton className="p-2 text-gray-400">
                 {({ open }) =>
                   open ? (
-                    <ChevronUpIcon className="size-3" />
+                    <Icon name="chevron-up" className="size-3" />
                   ) : (
-                    <ChevronDownIcon className="size-3" />
+                    <Icon name="chevron-down" className="size-3" />
                   )
                 }
               </ComboboxButton>

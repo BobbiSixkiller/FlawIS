@@ -5,7 +5,7 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import Icon from "@/components/Icon";
 import { Fragment, ReactNode } from "react";
 
 interface DrawerProps {
@@ -151,7 +151,7 @@ export default function Drawer({
                         >
                           <span className="absolute -inset-0.5" />
                           <span className="sr-only">Close panel</span>
-                          <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                          <Icon name="x-mark-solid" className="h-6 w-6" aria-hidden="true" />
                         </button>
                       </div>
                     </div>

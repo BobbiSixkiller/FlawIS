@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useRouter } from "next/navigation";
 
 import Button from "@/components/Button";
@@ -31,7 +31,7 @@ export default function BackButton({
       onClick={goBack}
       aria-label={label}
     >
-      <ChevronLeftIcon className="size-4" aria-hidden="true" />
+      <Icon name="chevron-left" className="size-4" aria-hidden="true" />
       {label}
     </Button>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Toggle from "@/components/Toggle";
-import { ComputerDesktopIcon, UserIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { setOnlineAttendance } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 
@@ -30,9 +30,9 @@ export default function OnlineSwitch({
       }}
       icon={
         online ? (
-          <ComputerDesktopIcon className="size-3" />
+          <Icon name="computer-desktop" className="size-3" />
         ) : (
-          <UserIcon className="size-3" />
+          <Icon name="user" className="size-3" />
         )
       }
     />

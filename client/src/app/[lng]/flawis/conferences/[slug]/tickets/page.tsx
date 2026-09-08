@@ -1,6 +1,6 @@
 import Dropdown from "@/components/Dropdown";
 import { getConference } from "../../actions";
-import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
@@ -28,7 +28,7 @@ export default async function TicketsPage({
     <div className="">
       <ModalTrigger dialogId={newTicketDialogId}>
         <Button size="sm">
-          <PlusIcon className="h-5 w-5" />
+          <Icon name="plus" className="h-5 w-5" />
           Novy
         </Button>
       </ModalTrigger>
@@ -49,7 +49,7 @@ export default async function TicketsPage({
             </div>
 
             <Dropdown
-              trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
+              trigger={<Icon name="ellipsis-horizontal" className="h-5 w-5" />}
               triggerProps={{ size: "icon", variant: "ghost" }}
               items={[
                 <ModalTrigger dialogId={updateTicketDialogId(t.id)} key={0}>

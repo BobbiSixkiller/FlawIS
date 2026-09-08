@@ -1,10 +1,4 @@
-import {
-  BoldIcon,
-  CodeBracketIcon,
-  ItalicIcon,
-  StrikethroughIcon,
-  UnderlineIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { cn } from "@/lib/clientUtils";
 import { SelectorItem } from "./NodeSelector";
 import Button from "@/components/Button";
@@ -18,31 +12,31 @@ export const TextButtons = ({ editor }: { editor: Editor }) => {
       name: "bold",
       isActive: (editor) => editor?.isActive("bold") ?? false,
       command: (editor) => editor?.chain().focus().toggleBold().run(),
-      icon: BoldIcon,
+      icon: "bold",
     },
     {
       name: "italic",
       isActive: (editor) => editor?.isActive("italic") ?? false,
       command: (editor) => editor?.chain().focus().toggleItalic().run(),
-      icon: ItalicIcon,
+      icon: "italic",
     },
     {
       name: "underline",
       isActive: (editor) => editor?.isActive("underline") ?? false,
       command: (editor) => editor?.chain().focus().toggleUnderline().run(),
-      icon: UnderlineIcon,
+      icon: "underline",
     },
     {
       name: "strike",
       isActive: (editor) => editor?.isActive("strike") ?? false,
       command: (editor) => editor?.chain().focus().toggleStrike().run(),
-      icon: StrikethroughIcon,
+      icon: "strikethrough",
     },
     {
       name: "code",
       isActive: (editor) => editor?.isActive("code") ?? false,
       command: (editor) => editor?.chain().focus().toggleCode().run(),
-      icon: CodeBracketIcon,
+      icon: "code-bracket",
     },
   ];
 
@@ -56,7 +50,8 @@ export const TextButtons = ({ editor }: { editor: Editor }) => {
           className="rounded-none border-none dark focus:ring-0"
           variant="ghost"
         >
-          <item.icon
+          <Icon
+            name={item.icon}
             className={cn("h-4 w-4", {
               "text-blue-500": item.isActive(editor), // Ensures dynamic class application
             })}

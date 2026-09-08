@@ -1,6 +1,6 @@
 import Heading from "@/components/Heading";
 import { getConferences } from "./actions";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { translate } from "@/lib/i18n";
 import OfferingList from "@/components/OfferingList";
 import ModalTrigger from "@/components/ModalTrigger";
@@ -29,7 +29,7 @@ export default async function Conferences({
         items={[
           <ModalTrigger dialogId={newConferenceDialogId} key={0}>
             <Button size="sm">
-              <PlusIcon className="size-5" />
+              <Icon name="plus" className="size-5" />
               Nova
             </Button>
           </ModalTrigger>,

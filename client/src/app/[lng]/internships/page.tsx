@@ -11,7 +11,7 @@ import AcademicYearSelect from "./AcademicYearSelect";
 import Tooltip from "@/components/Tooltip";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import InternshipForm from "./InternshipForm";
 import FilterDropdown from "@/components/FilterDropdown";
@@ -98,7 +98,7 @@ export default async function InternshipsHomePage({
             <Tooltip message={t("tooltip.new")} position="below">
               <ModalTrigger dialogId={addDialogId}>
                 <Button size="sm">
-                  <PlusIcon className="size-5 mr-2" />
+                  <Icon name="plus" className="size-5 mr-2" />
                   {t("create", { ns: "common" })}
                 </Button>
               </ModalTrigger>

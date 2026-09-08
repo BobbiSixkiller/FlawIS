@@ -7,7 +7,7 @@ import NavLink, { NavLinkProps } from "./NavLink";
 import Footer from "./Footer";
 import Logo from "./Logo";
 import Breadcrumbs from "./Breadcrumbs";
-import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/clientUtils";
 import { Snackbar } from "./Message";
@@ -70,8 +70,8 @@ export default async function Dashboard({
         />
 
         <Breadcrumbs
-          homeElement={<HomeIcon className="h-5 w-5" />}
-          separator={<ChevronRightIcon className="h-3 w-3" />}
+          homeElement={<Icon name="home" className="h-5 w-5" />}
+          separator={<Icon name="chevron-right" className="h-3 w-3" />}
           activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="md:hidden p-4 flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
           listClasses="outline-hidden focus:ring-2 focus:ring-primary-500"

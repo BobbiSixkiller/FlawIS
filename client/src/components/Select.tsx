@@ -9,7 +9,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { Control, useController } from "react-hook-form";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { cn } from "@/lib/clientUtils";
 
 interface Option {
@@ -83,7 +83,7 @@ export default function Select({
               : placeholder}
           </span>
 
-          <ChevronDownIcon className="size-3 group-data-open:rotate-180 text-gray-300" />
+          <Icon name="chevron-down" className="size-3 group-data-open:rotate-180 text-gray-300" />
         </ListboxButton>
         <ListboxOptions
           anchor="bottom"
@@ -104,7 +104,7 @@ export default function Select({
               ])}
             >
               {option.name}
-              <CheckIcon className="size-3 stroke-2 hidden group-data-selected:block" />
+              <Icon name="check" className="size-3 stroke-2 hidden group-data-selected:block" />
             </ListboxOption>
           ))}
         </ListboxOptions>

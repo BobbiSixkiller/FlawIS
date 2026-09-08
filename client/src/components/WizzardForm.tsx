@@ -6,11 +6,7 @@ import { ObjectSchema } from "yup";
 import RHFormContainer from "./RHFormContainer";
 import Stepper from "./Stepper";
 import Button from "./Button";
-import {
-  CheckIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Spinner from "./Spinner";
 import { useTranslation } from "@/lib/i18n/client";
 
@@ -159,7 +155,7 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                   disabled={step === 0}
                   aria-label={t("previous")}
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <Icon name="chevron-left" className="h-4 w-4" />
                   <span className="hidden md:inline">{t("previous")}</span>
                 </Button>
               )}
@@ -174,13 +170,13 @@ export default function WizzardForm<TInputVals extends Record<string, any>>({
                   <Spinner inverted />
                 ) : isLastStep() ? (
                   <>
-                    <CheckIcon className="h-4 w-4" />
+                    <Icon name="check" className="h-4 w-4" />
                     <span className="hidden md:inline">{t("submit")}</span>
                   </>
                 ) : (
                   <>
                     <span className="hidden md:inline">{t("next")}</span>
-                    <ChevronRightIcon className="h-4 w-4" />
+                    <Icon name="chevron-right" className="h-4 w-4" />
                   </>
                 )}
               </Button>

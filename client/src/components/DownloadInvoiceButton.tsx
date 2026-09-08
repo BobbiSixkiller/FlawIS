@@ -1,6 +1,6 @@
 "use client";
 
-import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useTransition } from "react";
 
 import Button from "@/components/Button";
@@ -72,7 +72,7 @@ export default function DownloadInvoiceButton({
       {isPending ? (
         <Spinner />
       ) : (
-        <DocumentArrowDownIcon className="size-5" />
+        <Icon name="document-arrow-down" className="size-5" />
       )}
       {isPending ? t("loading") : t("download")}
     </Button>

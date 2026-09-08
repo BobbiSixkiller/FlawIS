@@ -2,7 +2,7 @@ import Heading from "@/components/Heading";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import CourseSessionForm from "../CourseSessionForm";
 import { getCourseAttendance } from "./actions";
@@ -28,7 +28,7 @@ export default async function AttendancePage({
           <CloseButton href={`/courses/${id}`} key={0} />,
           <ModalTrigger dialogId="add-course-session" key={1}>
             <Button size="icon" className="rounded-full" variant="positive">
-              <PlusIcon className="size-5" />
+              <Icon name="plus" className="size-5" />
             </Button>
           </ModalTrigger>,
           <ExportButton

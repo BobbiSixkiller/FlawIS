@@ -2,14 +2,7 @@
 
 import { cn } from "@/lib/clientUtils";
 import Breadcrumbs from "./Breadcrumbs";
-import {
-  ArrowLeftStartOnRectangleIcon,
-  ArrowRightStartOnRectangleIcon,
-  Bars3Icon,
-  ChevronRightIcon,
-  HomeIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { ReactNode, useState } from "react";
 import Drawer from "./Drawer";
 import Dropdown from "./Dropdown";
@@ -60,14 +53,14 @@ export default function TopBar({
           ])}
           variant="ghost"
         >
-          <Bars3Icon className="size-5" />
+          <Icon name="bars3" className="size-5" />
         </Button>
 
         <div className={cn(["mx-auto", "md:hidden"])}>{logo}</div>
 
         <Breadcrumbs
-          homeElement={<HomeIcon className="h-5 w-5" />}
-          separator={<ChevronRightIcon className="h-3 w-3" />}
+          homeElement={<Icon name="home" className="h-5 w-5" />}
+          separator={<Icon name="chevron-right" className="h-3 w-3" />}
           activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="hidden md:flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
           listClasses="outline-hidden focus:ring-2 focus:ring-primary-500"
@@ -87,11 +80,11 @@ export default function TopBar({
               }}
               items={[
                 <Link href="/profile" key={0}>
-                  <UserCircleIcon className="size-5" aria-hidden="true" />
+                  <Icon name="user-circle" className="size-5" aria-hidden="true" />
                   {t("profile")}
                 </Link>,
                 <Link prefetch={false} href="/logout" key={1}>
-                  <ArrowLeftStartOnRectangleIcon
+                  <Icon name="arrow-left-start-on-rectangle"
                     className="size-5"
                     aria-hidden="true"
                   />
@@ -101,7 +94,7 @@ export default function TopBar({
             />
           ) : (
             <Button as={Link} href="/login" variant="ghost" size="icon">
-              <ArrowRightStartOnRectangleIcon className="size-5" />
+              <Icon name="arrow-right-start-on-rectangle" className="size-5" />
             </Button>
           )}
         </div>

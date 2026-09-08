@@ -7,7 +7,7 @@ import {
   getSupportedLocale,
   localeHeaderName,
 } from "@/lib/i18n/settings";
-import { HomeIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
 
@@ -28,7 +28,7 @@ export default async function NotFound() {
         {t("notFoundMsg", { ns: "common" })}
       </h1>
       <Button as={Link} href="/" className="rounded-full">
-        <HomeIcon className="h-5 w-5" />
+        <Icon name="home" className="h-5 w-5" />
         {t("home", { ns: "common" })}
       </Button>
     </div>

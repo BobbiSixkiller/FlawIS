@@ -1,5 +1,5 @@
 import Dropdown, { DropdownItem } from "@/components/Dropdown";
-import { EllipsisHorizontalIcon, PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { conferenceSections, deleteSection } from "./actions";
 import {
   SectionFragment,
@@ -26,7 +26,7 @@ export default async function SectionsPage({
     <div>
       <ModalTrigger dialogId={newSectionDialogId}>
         <Button size="sm">
-          <PlusIcon className="h-5 w-5" />
+          <Icon name="plus" className="h-5 w-5" />
           Nova
         </Button>
       </ModalTrigger>
@@ -93,7 +93,7 @@ function Section({
       </span>
 
       <Dropdown
-        trigger={<EllipsisHorizontalIcon className="h-5 w-5" />}
+        trigger={<Icon name="ellipsis-horizontal" className="h-5 w-5" />}
         triggerProps={{ variant: "ghost", size: "icon" }}
         items={
           countFiles(section.submissions) > 0

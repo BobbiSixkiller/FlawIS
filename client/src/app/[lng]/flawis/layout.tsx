@@ -2,12 +2,7 @@ import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
 import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/SessionPolling";
 import { Access } from "@/lib/graphql/generated/graphql";
-import {
-  AcademicCapIcon,
-  BriefcaseIcon,
-  BuildingLibraryIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
@@ -82,13 +77,13 @@ export default async function DashboardLayout({
         navLinks={[
           {
             href: "/users",
-            icon: <UsersIcon className="mr-2 h-5 w-5" aria-hidden="true" />,
+            icon: <Icon name="users" className="mr-2 h-5 w-5" aria-hidden="true" />,
             text: t("users"),
           },
           {
             href: "/conferences",
             icon: (
-              <BuildingLibraryIcon
+              <Icon name="building-library"
                 className="mr-2 h-5 w-5"
                 aria-hidden="true"
               />
@@ -97,13 +92,13 @@ export default async function DashboardLayout({
           },
           {
             href: "/internships",
-            icon: <BriefcaseIcon className="mr-2 h-5 w-5" aria-hidden="true" />,
+            icon: <Icon name="briefcase" className="mr-2 h-5 w-5" aria-hidden="true" />,
             text: t("internships"),
           },
           {
             href: "/courses",
             icon: (
-              <AcademicCapIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              <Icon name="academic-cap" className="mr-2 h-5 w-5" aria-hidden="true" />
             ),
             text: t("courses"),
           },

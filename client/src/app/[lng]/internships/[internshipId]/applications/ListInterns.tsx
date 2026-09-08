@@ -15,7 +15,7 @@ import { displayDate } from "@/lib/clientUtils";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import Button from "@/components/Button";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 
 function ListItem({
@@ -84,7 +84,7 @@ function ListItem({
         as={Link}
         href={`${hrefBase}/${internshipId}/applications/${data?.id}`}
       >
-        <ChevronRightIcon className="size-5" />
+        <Icon name="chevron-right" className="size-5" />
       </Button>
     </li>
   );

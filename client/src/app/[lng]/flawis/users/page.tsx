@@ -1,7 +1,7 @@
 import Heading from "@/components/Heading";
 import { getUsers } from "./actions";
 import ListUsers from "./ListUsers";
-import { BuildingLibraryIcon, PlusIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { translate } from "@/lib/i18n";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
@@ -42,13 +42,13 @@ export default async function Users({
         items={[
           <ModalTrigger key={0} dialogId={newUserDialogId}>
             <Button size="sm">
-              <PlusIcon className="size-5" />
+              <Icon name="plus" className="size-5" />
               Novy
             </Button>
           </ModalTrigger>,
           <ModalTrigger key={1} dialogId={inviteUserDialogId}>
             <Button size="sm" variant="secondary">
-              <BuildingLibraryIcon className="size-5" />
+              <Icon name="building-library" className="size-5" />
               Pozvat instituciu
             </Button>
           </ModalTrigger>,

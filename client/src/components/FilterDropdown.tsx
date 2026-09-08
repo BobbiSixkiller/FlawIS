@@ -6,7 +6,7 @@ import {
   PopoverPanel,
   PopoverPanelProps,
 } from "@headlessui/react";
-import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/clientUtils";
 import Button, { ButtonProps } from "@/components/Button";
@@ -85,9 +85,9 @@ export default function FilterDropdown({
             className={cn(["p-2", className])}
           >
             {open ? (
-              <XMarkIcon className="size-5" />
+              <Icon name="x-mark" className="size-5" />
             ) : (
-              <FunnelIcon className="size-5" />
+              <Icon name="funnel" className="size-5" />
             )}
           </PopoverButton>
 

@@ -1,11 +1,7 @@
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
-import {
-  ArrowsRightLeftIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { deleteUser, getUser, toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
@@ -41,20 +37,20 @@ export default async function User({
         items={[
           <ModalTrigger key={0} dialogId={impersonateDialogId}>
             <Button size="sm">
-              <ArrowsRightLeftIcon className="size-5" />
+              <Icon name="arrows-right-left" className="size-5" />
               Impersonovat
             </Button>
           </ModalTrigger>,
           <ModalTrigger key={1} dialogId={updateUserDialogId}>
             <Button variant="secondary" size="sm">
-              <PencilIcon className="size-5" />
+              <Icon name="pencil" className="size-5" />
               Aktualizovat
             </Button>
           </ModalTrigger>,
 
           <ModalTrigger key={2} dialogId={deleteUserDialogId}>
             <Button variant="secondary" size="sm">
-              <TrashIcon className="size-5" />
+              <Icon name="trash" className="size-5" />
               Zmazat
             </Button>
           </ModalTrigger>,

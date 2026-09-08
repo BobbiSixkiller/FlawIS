@@ -3,7 +3,7 @@
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { useMessageStore } from "@/stores/messageStore";
-import { TableCellsIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useState } from "react";
 
 export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
@@ -55,7 +55,7 @@ export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
         <Spinner inverted />
       ) : (
         <span className="flex gap-2 items-center">
-          .csv <TableCellsIcon className="size-5" />
+          .csv <Icon name="table-cells" className="size-5" />
         </span>
       )}
     </Button>

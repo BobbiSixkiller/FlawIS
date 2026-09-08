@@ -4,7 +4,7 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
-import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useMessageStore } from "@/stores/messageStore";
 import { deleteCategoryAction } from "../actions";
 import CategoryForm from "./CategoryForm";
@@ -34,7 +34,7 @@ export default function CategoriesManager({
       <div className="flex justify-end">
         <ModalTrigger dialogId={CREATE_DIALOG_ID}>
           <Button size="sm">
-            <PlusIcon className="size-5" /> Nová kategória
+            <Icon name="plus" className="size-5" /> Nová kategória
           </Button>
         </ModalTrigger>
       </div>
@@ -76,7 +76,7 @@ export default function CategoriesManager({
                           variant="ghost"
                           onClick={() => setEditingCategory(cat)}
                         >
-                          <PencilIcon className="size-4" />
+                          <Icon name="pencil" className="size-4" />
                         </Button>
                       </ModalTrigger>
                       <Button
@@ -84,7 +84,7 @@ export default function CategoriesManager({
                         variant="destructive"
                         onClick={() => handleDelete(cat)}
                       >
-                        <TrashIcon className="size-4" />
+                        <Icon name="trash" className="size-4" />
                       </Button>
                     </div>
                   </td>

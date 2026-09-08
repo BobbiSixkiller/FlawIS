@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  ChevronDownIcon,
-  ListBulletIcon,
-  ChatBubbleBottomCenterTextIcon,
-  CheckIcon,
-  NumberedListIcon,
-  SlashIcon,
-  H1Icon,
-  H2Icon,
-  H3Icon,
-  Bars3CenterLeftIcon,
-} from "@heroicons/react/24/outline";
+import Icon, { type IconName } from "@/components/Icon";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/lib/clientUtils";
 import Button from "@/components/Button";
@@ -21,7 +10,7 @@ import { useParams } from "next/navigation";
 
 export type SelectorItem = {
   name: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Updated type for Heroicons
+  icon: IconName;
   command: (editor: Editor) => void;
   isActive: (editor: Editor) => boolean;
 };
@@ -29,7 +18,7 @@ export type SelectorItem = {
 export const items: SelectorItem[] = [
   {
     name: "Text",
-    icon: Bars3CenterLeftIcon,
+    icon: "bars3-center-left",
     command: (editor) => editor.chain().focus().clearNodes().run(),
     isActive: (editor) =>
       editor.isActive("paragraph") &&
@@ -38,49 +27,49 @@ export const items: SelectorItem[] = [
   },
   {
     name: "Heading 1",
-    icon: H1Icon,
+    icon: "h1",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleHeading({ level: 1 }).run(),
     isActive: (editor) => editor.isActive("heading", { level: 1 }),
   },
   {
     name: "Heading 2",
-    icon: H2Icon,
+    icon: "h2",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleHeading({ level: 2 }).run(),
     isActive: (editor) => editor.isActive("heading", { level: 2 }),
   },
   {
     name: "Heading 3",
-    icon: H3Icon,
+    icon: "h3",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleHeading({ level: 3 }).run(),
     isActive: (editor) => editor.isActive("heading", { level: 3 }),
   },
   {
     name: "Bullet List",
-    icon: ListBulletIcon,
+    icon: "list-bullet",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleBulletList().run(),
     isActive: (editor) => editor.isActive("bulletList"),
   },
   {
     name: "Numbered List",
-    icon: NumberedListIcon,
+    icon: "numbered-list",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleOrderedList().run(),
     isActive: (editor) => editor.isActive("orderedList"),
   },
   {
     name: "Quote",
-    icon: ChatBubbleBottomCenterTextIcon,
+    icon: "chat-bubble-bottom-center-text",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleBlockquote().run(),
     isActive: (editor) => editor.isActive("blockquote"),
   },
   {
     name: "Code",
-    icon: SlashIcon,
+    icon: "slash",
     command: (editor) =>
       editor.chain().focus().clearNodes().toggleCodeBlock().run(),
     isActive: (editor) => editor.isActive("codeBlock"),
@@ -106,7 +95,7 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
         className={cn("gap-2 rounded-none border-none dark focus:ring-0")}
       >
         <span className="whitespace-nowrap text-sm">{t(activeItem.name)}</span>
-        <ChevronDownIcon className="size-4 group-data-open:rotate-180" />
+        <Icon name="chevron-down" className="size-4 group-data-open:rotate-180" />
       </PopoverButton>
       <PopoverPanel
         anchor="bottom start"
@@ -124,11 +113,11 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
           >
             <div className="flex items-center space-x-2">
               <div className="rounded-xs border p-1">
-                <item.icon className="h-5 w-5" />
+                <Icon name={item.icon} className="h-5 w-5" />
               </div>
               <span>{t(item.name)}</span>
             </div>
-            {activeItem.name === item.name && <CheckIcon className="h-4 w-4" />}
+            {activeItem.name === item.name && <Icon name="check" className="h-4 w-4" />}
           </div>
         ))}
       </PopoverPanel>

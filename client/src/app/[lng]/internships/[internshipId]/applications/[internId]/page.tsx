@@ -6,11 +6,7 @@ import { getIntern } from "./actions";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import {
-  CheckIcon,
-  InboxArrowDownIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import ChangeStatusForm from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/ChangeStatusForm";
 import CertificateForm from "./CertificateForm";
@@ -44,7 +40,7 @@ export default async function InternPage({
               <Tooltip message={t("internReview")}>
                 <ModalTrigger dialogId={certificateDialogId}>
                   <Button size="icon">
-                    <InboxArrowDownIcon className="size-5" />
+                    <Icon name="inbox-arrow-down" className="size-5" />
                   </Button>
                 </ModalTrigger>
               </Tooltip>
@@ -57,7 +53,7 @@ export default async function InternPage({
                   variant="positive"
                   disabled={intern.status === Status.Accepted}
                 >
-                  <CheckIcon className="size-5" />
+                  <Icon name="check" className="size-5" />
                 </Button>
               </ModalTrigger>
             </Tooltip>
@@ -69,7 +65,7 @@ export default async function InternPage({
                   variant="destructive"
                   disabled={intern.status === Status.Rejected}
                 >
-                  <XMarkIcon className="size-5" />
+                  <Icon name="x-mark" className="size-5" />
                 </Button>
               </ModalTrigger>
             </Tooltip>

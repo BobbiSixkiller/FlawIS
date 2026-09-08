@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Button from "./Button";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 
 export default function CloseButton({ href = "/" }: { href?: string }) {
   return (
@@ -11,7 +11,7 @@ export default function CloseButton({ href = "/" }: { href?: string }) {
       className="rounded-full ml-auto"
       href={href}
     >
-      <XMarkIcon className="size-5" />
+      <Icon name="x-mark" className="size-5" />
     </Button>
   );
 }

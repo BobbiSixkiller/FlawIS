@@ -12,7 +12,7 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { ComponentType, Fragment, useEffect, useState } from "react";
 import Button from "./Button";
 import { useDebouncedCallback } from "use-debounce";
@@ -85,7 +85,7 @@ export default function SearchComponent<
           "dark:border-white/30 dark:border dark:text-white/85",
         ])}
       >
-        <MagnifyingGlassIcon className="size-4" />
+        <Icon name="magnifying-glass" className="size-4" />
       </Button>
       <Transition show={open} as={Fragment}>
         <Dialog
@@ -127,7 +127,7 @@ export default function SearchComponent<
                 ])}
               >
                 <div className="px-4 flex items-center">
-                  <MagnifyingGlassIcon className="h-6 w-6 text-gray-500" />
+                  <Icon name="magnifying-glass" className="h-6 w-6 text-gray-500" />
                   <ComboboxInput
                     autoComplete="off"
                     autoFocus

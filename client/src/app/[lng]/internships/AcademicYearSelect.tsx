@@ -8,7 +8,7 @@ import {
   PopoverButton,
   PopoverPanel,
 } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { replaceQueryParameter } from "@/lib/internshipAccess";
@@ -31,7 +31,7 @@ export default function AcademicYearSelect({
         className="flex gap-2 group relative"
       >
         {selectedYear}
-        <ChevronDownIcon className="size-3 group-data-open:rotate-180" />
+        <Icon name="chevron-down" className="size-3 group-data-open:rotate-180" />
       </PopoverButton>
       <PopoverPanel
         transition

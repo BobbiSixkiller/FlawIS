@@ -1,4 +1,4 @@
-import { CheckIcon, TrashIcon, LinkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { cn } from "@/lib/clientUtils";
@@ -44,7 +44,7 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
         variant="ghost"
         className="inline-flex gap-2 rounded-none border-none dark"
       >
-        <LinkIcon className="h-4 w-4" />
+        <Icon name="link" className="h-4 w-4" />
         <p
           className={cn("underline decoration-stone-400 underline-offset-4", {
             "text-blue-500": editor.isActive("link"),
@@ -73,7 +73,7 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
               editor.chain().focus().unsetLink().run();
             }}
           >
-            <TrashIcon className="h-4 w-4" />
+            <Icon name="trash" className="h-4 w-4" />
           </Button>
         ) : (
           <Button
@@ -87,7 +87,7 @@ export const LinkSelector = ({ editor }: { editor?: Editor }) => {
               }
             }}
           >
-            <CheckIcon className="h-4 w-4" />
+            <Icon name="check" className="h-4 w-4" />
           </Button>
         )}
       </PopoverPanel>

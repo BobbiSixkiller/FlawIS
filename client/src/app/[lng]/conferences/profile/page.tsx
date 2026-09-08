@@ -1,7 +1,7 @@
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
 import { translate } from "@/lib/i18n";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import Link from "next/link";
@@ -23,7 +23,7 @@ export default async function Profile({
         lng={lng}
         items={[
           <Button key={0} as={Link} href="/profile/update">
-            <PencilIcon className="size-5" />
+            <Icon name="pencil" className="size-5" />
             {t("update")}
           </Button>,
         ]}

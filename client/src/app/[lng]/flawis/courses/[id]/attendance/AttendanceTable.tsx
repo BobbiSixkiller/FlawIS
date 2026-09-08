@@ -32,13 +32,7 @@ import {
   useState,
 } from "react";
 import Button from "@/components/Button";
-import {
-  CheckIcon,
-  ArrowPathIcon,
-  PencilIcon,
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import ChangeStatusForm from "../../../internships/[internshipId]/applications/[internId]/ChangeStatusForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { deleteCourseAttendee, deleteCourseSession } from "../actions";
@@ -156,7 +150,7 @@ function AttendanceTableContainer({
                       variant="destructive"
                       className="h-fit w-fit p-2"
                     >
-                      <TrashIcon className="size-3" />
+                      <Icon name="trash" className="size-3" />
                     </Button>
                   </ModalTrigger>
                 )}
@@ -177,7 +171,7 @@ function AttendanceTableContainer({
                     <>
                       <ModalTrigger dialogId={`session:${s?.id}-edit`}>
                         <Button size="icon" className="mt-6">
-                          <PencilIcon className="size-5" />
+                          <Icon name="pencil" className="size-5" />
                         </Button>
                       </ModalTrigger>
                       <Modal
@@ -292,7 +286,7 @@ function AttendanceRow({
                       setSyncingElearning(false);
                     }}
                   >
-                    <ArrowPathIcon
+                    <Icon name="arrow-path"
                       className={cn([
                         "size-4",
                         syncingElearning && "animate-spin",
@@ -357,7 +351,7 @@ function AttendanceRow({
                   variant="positive"
                   className="h-fit w-fit p-2"
                 >
-                  <CheckIcon className="size-3" />
+                  <Icon name="check" className="size-3" />
                 </Button>
               </ModalTrigger>
 
@@ -368,7 +362,7 @@ function AttendanceRow({
                     variant="destructive"
                     className="h-fit w-fit p-2"
                   >
-                    <TrashIcon className="size-3" />
+                    <Icon name="trash" className="size-3" />
                   </Button>
                 </ModalTrigger>
               ) : (
@@ -378,7 +372,7 @@ function AttendanceRow({
                     variant="destructive"
                     className="h-fit w-fit p-2"
                   >
-                    <XMarkIcon className="size-3" />
+                    <Icon name="x-mark" className="size-3" />
                   </Button>
                 </ModalTrigger>
               )}

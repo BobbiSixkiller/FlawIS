@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/clientUtils";
 import { Checkbox, Field, Label } from "@headlessui/react";
-import { CheckIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { Control, useController } from "react-hook-form";
 
 export default function CheckBox({
@@ -27,7 +27,7 @@ export default function CheckBox({
             "dark:focus:ring-primary-300 dark:data-checked:ring-primary-300 dark:data-checked:bg-primary-300",
           ])}
         >
-          <CheckIcon className="hidden size-3 stroke-2 text-white dark:text-gray-900 group-data-checked:block" />
+          <Icon name="check" className="hidden size-3 stroke-2 text-white dark:text-gray-900 group-data-checked:block" />
         </Checkbox>
         <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
           {label}

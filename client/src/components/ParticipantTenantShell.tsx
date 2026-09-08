@@ -1,10 +1,4 @@
-import {
-  ArrowLeftStartOnRectangleIcon,
-  ArrowRightStartOnRectangleIcon,
-  ChevronRightIcon,
-  HomeIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 import { ReactNode } from "react";
 
@@ -58,11 +52,11 @@ export default async function ParticipantTenantShell({
             }}
             items={[
               <Link href="/profile" prefetch={false} key="profile">
-                <UserCircleIcon className="size-5" aria-hidden="true" />
+                <Icon name="user-circle" className="size-5" aria-hidden="true" />
                 {t("profile")}
               </Link>,
               <Link href="/logout" prefetch={false} key="logout">
-                <ArrowLeftStartOnRectangleIcon
+                <Icon name="arrow-left-start-on-rectangle"
                   className="size-5"
                   aria-hidden="true"
                 />
@@ -78,7 +72,7 @@ export default async function ParticipantTenantShell({
             size="icon"
             className="rounded-full"
           >
-            <ArrowRightStartOnRectangleIcon className="size-5" />
+            <Icon name="arrow-right-start-on-rectangle" className="size-5" />
           </Button>
         )}
         <LngSwitcher authLayout />
@@ -86,8 +80,8 @@ export default async function ParticipantTenantShell({
 
       <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0">
         <Breadcrumbs
-          homeElement={<HomeIcon className="h-5 w-5" />}
-          separator={<ChevronRightIcon className="h-3 w-3" />}
+          homeElement={<Icon name="home" className="h-5 w-5" />}
+          separator={<Icon name="chevron-right" className="h-3 w-3" />}
           activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
           containerClasses="flex justify-center flex-wrap text-sm gap-2 items-center dark:text-white/85"
           listClasses="outline-hidden focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-300"

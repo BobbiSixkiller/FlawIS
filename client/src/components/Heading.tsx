@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import Icon from "@/components/Icon";
 import Dropdown, { DropdownItem } from "./Dropdown";
 import { translate } from "@/lib/i18n";
 
@@ -47,7 +47,7 @@ export default async function Heading({
               trigger={
                 <>
                   {t("more")}
-                  <ChevronDownIcon
+                  <Icon name="chevron-down-solid"
                     className="-mr-1 ml-1.5 size-5"
                     aria-hidden="true"
                   />

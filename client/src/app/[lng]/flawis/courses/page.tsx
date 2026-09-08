@@ -2,7 +2,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
-import { PlusIcon, TagIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import CourseForm from "./CourseForm";
 import { getCourses } from "./actions";
 import OfferingList from "@/components/OfferingList";
@@ -26,11 +26,11 @@ export default async function CoursesPage({
         subHeading="Kurzy na falkute"
         items={[
           <Button key={0} as={Link} href="/courses/categories" size="sm" variant="secondary">
-            <TagIcon className="size-5" /> Kategórie
+            <Icon name="tag" className="size-5" /> Kategórie
           </Button>,
           <ModalTrigger key={1} dialogId={createCourseDialogId}>
             <Button size="sm">
-              <PlusIcon className="size-5" /> Nový
+              <Icon name="plus" className="size-5" /> Nový
             </Button>
           </ModalTrigger>,
         ]}

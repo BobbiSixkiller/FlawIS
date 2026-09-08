@@ -6,7 +6,7 @@ import {
 import BackButton from "@/components/BackButton";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import InternshipForm from "@/app/[lng]/internships/InternshipForm";
 import { translate } from "@/lib/i18n";
@@ -33,12 +33,12 @@ export default async function InternshipPage({
       <div className="flex gap-2">
         <ModalTrigger dialogId={updateDialogId}>
           <Button size="icon" className="rounded-full">
-            <PencilIcon className="size-5" />
+            <Icon name="pencil" className="size-5" />
           </Button>
         </ModalTrigger>
         <ModalTrigger dialogId={deleteDialogId}>
           <Button variant="destructive" size="icon" className="rounded-full">
-            <TrashIcon className="size-5" />
+            <Icon name="trash" className="size-5" />
           </Button>
         </ModalTrigger>
 

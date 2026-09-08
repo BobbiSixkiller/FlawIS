@@ -9,11 +9,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import {
-  InboxArrowDownIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import Link from "next/link";
@@ -64,14 +60,14 @@ export default async function CoursePage({
                 {course.attending.status === Status.Applied && (
                   <ModalTrigger dialogId="delete-course-application">
                     <Button variant="destructive" size="icon">
-                      <TrashIcon className="size-5" />
+                      <Icon name="trash" className="size-5" />
                     </Button>
                   </ModalTrigger>
                 )}
                 {course.attending.status !== Status.Accepted && (
                   <ModalTrigger dialogId="course-application">
                     <Button size="icon">
-                      <PencilIcon className="size-5" />
+                      <Icon name="pencil" className="size-5" />
                     </Button>
                   </ModalTrigger>
                 )}
@@ -90,7 +86,7 @@ export default async function CoursePage({
           scroll={false}
           prefetch={false}
         >
-          <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
+          <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
           Prihlasit sa
         </Button>
       ) : (

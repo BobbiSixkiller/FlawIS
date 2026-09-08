@@ -5,11 +5,7 @@ import { Status } from "@/lib/graphql/generated/graphql";
 import { Application } from "./Application";
 import BackButton from "@/components/BackButton";
 import ModalTrigger from "@/components/ModalTrigger";
-import {
-  InboxArrowDownIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import InternshipForm from "../InternshipForm";
@@ -64,7 +60,7 @@ export default async function InternshipPage({
           <>
             <ModalTrigger dialogId={updateInternshipDialogId}>
               <Button size="icon" className="rounded-full">
-                <PencilIcon className="size-5" />
+                <Icon name="pencil" className="size-5" />
               </Button>
             </ModalTrigger>
             <ModalTrigger dialogId={deleteInternshipDialogId}>
@@ -73,7 +69,7 @@ export default async function InternshipPage({
                 size="icon"
                 className="rounded-full"
               >
-                <TrashIcon className="size-5" />
+                <Icon name="trash" className="size-5" />
               </Button>
             </ModalTrigger>
           </>
@@ -103,7 +99,7 @@ export default async function InternshipPage({
                   {internship.myApplication.status === Status.Applied && (
                     <ModalTrigger dialogId={applicationDialogId}>
                       <Button size="icon">
-                        <PencilIcon className="size-5" />
+                        <Icon name="pencil" className="size-5" />
                       </Button>
                     </ModalTrigger>
                   )}
@@ -111,7 +107,7 @@ export default async function InternshipPage({
                   {internship.myApplication.status !== Status.Accepted && (
                     <ModalTrigger dialogId={deleteApplicationDialogId}>
                       <Button size="icon" variant="destructive">
-                        <TrashIcon className="size-5" />
+                        <Icon name="trash" className="size-5" />
                       </Button>
                     </ModalTrigger>
                   )}
@@ -135,7 +131,7 @@ export default async function InternshipPage({
 
             <ModalTrigger dialogId={applicationDialogId}>
               <Button className="w-full">
-                <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
+                <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
                 {t("apply")}
               </Button>
             </ModalTrigger>
@@ -147,7 +143,7 @@ export default async function InternshipPage({
           href={signInHref}
           className="w-full"
         >
-          <InboxArrowDownIcon className="size-5 stroke-2 mr-2" />
+          <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
           {t("signInToApply")}
         </Button>
       ) : null}

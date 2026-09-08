@@ -7,7 +7,7 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import Icon from "@/components/Icon";
 import { usePathname, useRouter } from "next/navigation";
 import Spinner from "./Spinner";
 import { useDialogStore } from "@/stores/dialogStore";
@@ -100,7 +100,7 @@ export default function Modal({
                   onClick={handleClose}
                   className="hover:text-gray-500 dark:text-gray-300 focus:outline-primary-500"
                 >
-                  <XMarkIcon className="h-5 w-5" />
+                  <Icon name="x-mark-solid" className="h-5 w-5" />
                 </button>
               )}
             </div>

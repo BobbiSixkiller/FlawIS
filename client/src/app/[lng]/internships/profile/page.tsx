@@ -1,6 +1,6 @@
 import { getMe } from "../../(auth)/actions";
 import Heading from "@/components/Heading";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { Access } from "@/lib/graphql/generated/graphql";
 import Link from "next/link";
 import { translate } from "@/lib/i18n";
@@ -24,7 +24,7 @@ export default async function Profile({
         lng={lng}
         items={[
           <Button key={0} as={Link} href="/profile/update">
-            <PencilIcon className="size-5" />
+            <Icon name="pencil" className="size-5" />
             {t("update")}
           </Button>,
         ]}

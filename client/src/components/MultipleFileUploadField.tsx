@@ -1,4 +1,4 @@
-import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useCallback, useEffect, useState } from "react";
 import {
   Accept,
@@ -199,7 +199,7 @@ export default function MultipleFileUploadField({
           <Spinner />
         ) : (
           <Button className="rounded-full" size="icon">
-            <PlusIcon className="stroke-2 size-5" />
+            <Icon name="plus" className="stroke-2 size-5" />
           </Button>
         )}
         {/* <p className="text-xs text-center">Drag n drop</p> */}
@@ -320,7 +320,7 @@ function SingleUploadProgress({
           variant="ghost"
           className="rounded-full"
         >
-          <XMarkIcon className="stroke-2 size-5" />
+          <Icon name="x-mark" className="stroke-2 size-5" />
         </Button>
       </div>
       {/* <ProgressBar progress={progress} /> */}

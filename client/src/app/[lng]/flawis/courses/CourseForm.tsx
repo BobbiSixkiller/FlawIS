@@ -190,7 +190,7 @@ export default function CourseForm({
                   ])}
                 >
                   {option.val.name}
-                  {props.selected && <CheckIcon className="size-3 stroke-2" />}
+                  {props.selected && <Icon name="check" className="size-3 stroke-2" />}
                 </p>
               )}
             />
@@ -376,14 +376,7 @@ export default function CourseForm({
 
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import Button from "@/components/Button";
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  PlusIcon,
-  TrashIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { Field, Label, Select } from "@headlessui/react";
 import CheckBox from "@/components/Checkbox";
 
@@ -455,7 +448,7 @@ function CourseRegistrationFormBuilder({
                     disabled={index === 0}
                     onClick={() => move(index, index - 1)}
                   >
-                    <ChevronUpIcon className="size-5" />
+                    <Icon name="chevron-up" className="size-5" />
                   </Button>
                   <Button
                     type="button"
@@ -464,7 +457,7 @@ function CourseRegistrationFormBuilder({
                     disabled={index === fields.length - 1}
                     onClick={() => move(index, index + 1)}
                   >
-                    <ChevronDownIcon className="size-5" />
+                    <Icon name="chevron-down" className="size-5" />
                   </Button>
                   <Button
                     type="button"
@@ -472,7 +465,7 @@ function CourseRegistrationFormBuilder({
                     variant="ghost"
                     onClick={() => remove(index)}
                   >
-                    <TrashIcon className="size-5" />
+                    <Icon name="trash" className="size-5" />
                   </Button>
                 </div>
               </div>
@@ -608,19 +601,19 @@ function CourseRegistrationFormBuilder({
       </div>
       <div className="flex flex-wrap gap-2">
         <Button type="button" onClick={() => addField(FieldType.Text)}>
-          <PlusIcon className="size-5" /> Text
+          <Icon name="plus" className="size-5" /> Text
         </Button>
         <Button type="button" onClick={() => addField(FieldType.Textarea)}>
-          <PlusIcon className="size-5" /> Textarea
+          <Icon name="plus" className="size-5" /> Textarea
         </Button>
         <Button type="button" onClick={() => addField(FieldType.Select)}>
-          <PlusIcon className="size-5" /> Select
+          <Icon name="plus" className="size-5" /> Select
         </Button>
         <Button type="button" onClick={() => addField(FieldType.RadioGroup)}>
-          <PlusIcon className="size-5" /> Radio Group
+          <Icon name="plus" className="size-5" /> Radio Group
         </Button>
         <Button type="button" onClick={() => addField(FieldType.FileUpload)}>
-          <PlusIcon className="size-5" /> File Upload
+          <Icon name="plus" className="size-5" /> File Upload
         </Button>
       </div>
     </div>
@@ -687,7 +680,7 @@ function SelectOptionsEditor({
                 variant="ghost"
                 size="icon"
               >
-                <ChevronUpIcon className="size-3" />
+                <Icon name="chevron-up" className="size-3" />
               </Button>
               <Button
                 type="button"
@@ -696,7 +689,7 @@ function SelectOptionsEditor({
                 variant="ghost"
                 size="icon"
               >
-                <ChevronDownIcon className="size-3" />
+                <Icon name="chevron-down" className="size-3" />
               </Button>
               <Button
                 type="button"
@@ -704,7 +697,7 @@ function SelectOptionsEditor({
                 variant="ghost"
                 size="icon"
               >
-                <XMarkIcon className="size-3" />
+                <Icon name="x-mark" className="size-3" />
               </Button>
             </div>
           </div>

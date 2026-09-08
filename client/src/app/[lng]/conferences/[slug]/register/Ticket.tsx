@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/Icon";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { cn } from "@/lib/clientUtils";
 import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
@@ -87,7 +88,7 @@ export default function ConferenceTicket({
                     </div>
                     {checked && (
                       <div className="shrink-0 text-white">
-                        <CheckIcon className="h-6 w-6" />
+                        <Icon name="check-circle" className="h-6 w-6" />
                       </div>
                     )}
                   </div>
@@ -101,20 +102,5 @@ export default function ConferenceTicket({
         <p className="text-sm text-red-500">{fieldState.error.message}</p>
       )}
     </div>
-  );
-}
-
-function CheckIcon(props: { className: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <circle cx={12} cy={12} r={12} fill="#fff" opacity="0.2" />
-      <path
-        d="M7 13l3 3 7-7"
-        stroke="#fff"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

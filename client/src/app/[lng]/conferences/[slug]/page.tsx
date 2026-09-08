@@ -1,13 +1,4 @@
-import {
-  ArrowDownTrayIcon,
-  CalendarDaysIcon,
-  ComputerDesktopIcon,
-  DocumentTextIcon,
-  MapPinIcon,
-  PencilIcon,
-  PlusIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Link from "next/link";
 
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
@@ -76,7 +67,7 @@ function SubmissionCard({
                 variant="ghost"
                 aria-label={t("workspace.editSubmission")}
               >
-                <PencilIcon className="size-4" />
+                <Icon name="pencil" className="size-4" />
               </Button>
             </ModalTrigger>
             <ModalTrigger dialogId={deleteDialogId}>
@@ -86,7 +77,7 @@ function SubmissionCard({
                 className="text-red-600 hover:text-red-700 dark:text-red-300"
                 aria-label={t("workspace.deleteSubmission")}
               >
-                <TrashIcon className="size-4" />
+                <Icon name="trash" className="size-4" />
               </Button>
             </ModalTrigger>
           </div>
@@ -134,7 +125,7 @@ function SubmissionCard({
           rel="noreferrer"
           className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"
         >
-          <ArrowDownTrayIcon className="size-4" />
+          <Icon name="arrow-down-tray" className="size-4" />
           {t("workspace.downloadFile")}
         </a>
       ) : (
@@ -259,7 +250,7 @@ export default async function ConferenceWorkspacePage({
         className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="flex items-center gap-2">
-          <CalendarDaysIcon className="size-5 text-primary-600 dark:text-primary-300" />
+          <Icon name="calendar-days" className="size-5 text-primary-600 dark:text-primary-300" />
           <h2 id="timeline-heading" className="text-lg font-semibold">
             {t("workspace.importantDates")}
           </h2>
@@ -286,9 +277,9 @@ export default async function ConferenceWorkspacePage({
         <section className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-2">
             {attendee.ticket.online ? (
-              <ComputerDesktopIcon className="size-5 text-primary-600 dark:text-primary-300" />
+              <Icon name="computer-desktop" className="size-5 text-primary-600 dark:text-primary-300" />
             ) : (
-              <MapPinIcon className="size-5 text-primary-600 dark:text-primary-300" />
+              <Icon name="map-pin" className="size-5 text-primary-600 dark:text-primary-300" />
             )}
             <h2 className="text-lg font-semibold">
               {t("workspace.participation")}
@@ -343,7 +334,7 @@ export default async function ConferenceWorkspacePage({
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <DocumentTextIcon className="size-5 text-primary-600 dark:text-primary-300" />
+                <Icon name="document-text" className="size-5 text-primary-600 dark:text-primary-300" />
                 <h2 className="text-xl font-semibold">
                   {t("workspace.mySubmissions")}
                 </h2>
@@ -357,7 +348,7 @@ export default async function ConferenceWorkspacePage({
             {state.submissionsEditable ? (
               <ModalTrigger dialogId={newSubmissionDialogId}>
                 <Button size="sm">
-                  <PlusIcon className="size-4" />
+                  <Icon name="plus" className="size-4" />
                   {t("workspace.addSubmission")}
                 </Button>
               </ModalTrigger>

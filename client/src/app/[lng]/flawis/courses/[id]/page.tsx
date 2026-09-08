@@ -6,7 +6,7 @@ import {
 } from "./actions";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
-import { PencilIcon, TrashIcon, UsersIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { redirect } from "next/navigation";
@@ -39,13 +39,13 @@ export default async function CoursePage({
           <CloseButton href="/courses" key={0} />,
           <ModalTrigger dialogId="delete-course" key={1}>
             <Button size="icon" className="rounded-full" variant="destructive">
-              <TrashIcon className="size-5" />{" "}
+              <Icon name="trash" className="size-5" />{" "}
               <span className="sm:hidden">Zmazat</span>
             </Button>
           </ModalTrigger>,
           <ModalTrigger dialogId="edit-course" key={2}>
             <Button size="icon" className="rounded-full">
-              <PencilIcon className="size-5" />{" "}
+              <Icon name="pencil" className="size-5" />{" "}
               <span className="sm:hidden">Upravit</span>
             </Button>
           </ModalTrigger>,
@@ -56,7 +56,7 @@ export default async function CoursePage({
             className="rounded-full"
             href={`/courses/${id}/attendance`}
           >
-            <UsersIcon className="size-5" />
+            <Icon name="users" className="size-5" />
             <span className="sm:hidden">Dochadzka</span>
           </Button>,
         ]}

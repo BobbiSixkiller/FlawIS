@@ -1,11 +1,7 @@
 "use client";
 
 import { Radio, RadioGroup } from "@headlessui/react";
-import {
-  ComputerDesktopIcon,
-  MoonIcon,
-  SunIcon,
-} from "@heroicons/react/24/outline";
+import Icon, { type IconName } from "@/components/Icon";
 import {
   FocusEvent,
   KeyboardEvent,
@@ -22,10 +18,10 @@ import { ThemePreference } from "@/lib/theme";
 import { useThemePreference } from "./ThemeProvider";
 
 const options = [
-  { value: "light", Icon: SunIcon },
-  { value: "system", Icon: ComputerDesktopIcon },
-  { value: "dark", Icon: MoonIcon },
-] as const;
+  { value: "light", icon: "sun" },
+  { value: "system", icon: "computer-desktop" },
+  { value: "dark", icon: "moon" },
+] as const satisfies readonly { value: ThemePreference; icon: IconName }[];
 
 export default function ThemeToggler({
   lng,
@@ -45,7 +41,6 @@ export default function ThemeToggler({
   const suppressTriggerFocusRef = useRef(false);
 
   const selectedOption = options.find((option) => option.value === preference)!;
-  const SelectedIcon = selectedOption.Icon;
 
   function setExpanded(nextExpanded: boolean) {
     expandedRef.current = nextExpanded;
@@ -152,7 +147,7 @@ export default function ThemeToggler({
         }}
         onClick={expandAndFocus}
       >
-        <SelectedIcon className="size-5" aria-hidden="true" />
+        <Icon name={selectedOption.icon} className="size-5" aria-hidden="true" />
       </button>
 
       <RadioGroup
@@ -174,7 +169,7 @@ export default function ThemeToggler({
           collapseAfterSelectionRef.current = event.pointerType !== "mouse";
         }}
       >
-        {options.map(({ value, Icon }) => (
+        {options.map(({ value, icon }) => (
           <Radio
             ref={value === preference ? selectedRadioRef : undefined}
             key={value}
@@ -195,7 +190,7 @@ export default function ThemeToggler({
               }
             }}
           >
-            <Icon className="size-5" aria-hidden="true" />
+            <Icon name={icon} className="size-5" aria-hidden="true" />
             <span className="sr-only">{t(`theme.${value}`)}</span>
           </Radio>
         ))}

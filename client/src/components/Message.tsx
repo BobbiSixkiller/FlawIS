@@ -3,7 +3,7 @@
 import { useTranslation } from "@/lib/i18n/client";
 import { useMessageStore } from "@/stores/messageStore";
 import { Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import Icon from "@/components/Icon";
 import { useParams, usePathname } from "next/navigation";
 import { Fragment, useEffect } from "react";
 import { setTimeout } from "timers";
@@ -53,7 +53,7 @@ export function FormMessage() {
             onClick={() => clear()}
           >
             <span className="sr-only">Hide message</span>
-            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            <Icon name="x-mark" className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -106,7 +106,7 @@ export function Snackbar() {
             onClick={() => clear()}
           >
             <span className="sr-only">Hide message</span>
-            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            <Icon name="x-mark" className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
