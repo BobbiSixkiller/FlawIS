@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { useState } from "react";
 
 export default function DynamicImageClient({

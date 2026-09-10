@@ -1,7 +1,7 @@
 import Icon from "@/components/Icon";
 import { useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/react";
 import { useParams } from "next/navigation";

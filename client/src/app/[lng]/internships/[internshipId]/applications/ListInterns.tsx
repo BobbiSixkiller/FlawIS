@@ -1,17 +1,14 @@
 "use client";
 
 import { LegacyRef, ReactNode } from "react";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import { getInterns } from "./actions";
 import {
   ApplicationFragment,
   InternsQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/DynamicImageClient";
-import { displayDate } from "@/lib/clientUtils";
+import { displayDate } from "@/lib/utilsClient";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams } from "next/navigation";
 import Button from "@/components/Button";

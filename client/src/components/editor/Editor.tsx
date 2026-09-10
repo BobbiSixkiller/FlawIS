@@ -1,40 +1,43 @@
 "use client";
 
-import {
-  useEditor,
-  EditorContent,
-  BubbleMenu,
-  Editor,
-  JSONContent,
-} from "@tiptap/react";
+import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import { LinkSelector } from "./selectors/LinkSelector";
 import { items, NodeSelector } from "./selectors/NodeSelector";
 import { TextButtons } from "./selectors/TextButtons";
-import { useDebouncedCallback } from "use-debounce";
-import { Control, useController } from "react-hook-form";
 
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
+import {
+  useEffect,
+  useImperativeHandle,
+  type AriaAttributes,
+  type Ref,
+} from "react";
+import useLocalizedExtensions from "./Extensions";
 import { SlashCommandExtension } from "./SlashCommand";
 import CommandsDropdown from "./selectors/CommandsDropdown";
-import useLocalizedExtensions from "./Extensions";
-import { useEffect } from "react";
 
-interface EditorProps {
-  initialValue?: string | JSONContent; // Use HTML or JSON as needed
-  name: string;
-  control: Control<any>;
+interface EditorProps extends AriaAttributes {
+  value?: string | null;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  id?: string;
+  name?: string;
+  ref?: Ref<{ focus: () => void }>;
+  disabled?: boolean;
   className?: string;
   compact?: boolean;
 }
-
 export default function TiptapEditor({
   className,
-  initialValue,
-  name,
-  control,
+  value,
+  onChange,
+  onBlur,
+  id,
+  ref,
+  disabled,
   compact,
+  ...props
 }: EditorProps) {
-  const { field, fieldState, formState } = useController({ name, control });
   const { defaultExtensions } = useLocalizedExtensions();
 
   const editor = useEditor({
@@ -43,17 +46,30 @@ export default function TiptapEditor({
       ...defaultExtensions,
       SlashCommandExtension.configure({ items }),
     ], // Add extensions here
-    content: initialValue,
-    onUpdate: ({ editor }) => debouncedUpdates(editor),
+    content: value ?? "",
+    editable: !disabled,
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
+    onBlur: () => onBlur?.(),
     editorProps: {
       attributes: {
+        ...(id ? { id } : {}),
+        role: "textbox",
+        "aria-multiline": "true",
+        ...(props["aria-label"] ? { "aria-label": props["aria-label"] } : {}),
+        "aria-invalid": String(Boolean(props["aria-invalid"])),
+        ...(props["aria-describedby"]
+          ? { "aria-describedby": props["aria-describedby"] }
+          : {}),
+        ...(props["aria-labelledby"]
+          ? { "aria-labelledby": props["aria-labelledby"] }
+          : {}),
         class: cn([
           className,
           "prose prose-lg prose-headings:font-title font-default prose-a:no-underline",
           compact ? "min-h-8" : "min-h-96",
           "focus:outline-hidden p-3 shadow-xs text-gray-900 placeholder:text-gray-400 rounded-md ring-1 focus-within:ring-2",
           "dark:ring-gray-700 dark:bg-gray-800",
-          fieldState.error
+          props["aria-invalid"]
             ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
             : "ring-gray-300 focus-within:ring-primary-500 dark:focus-within:ring-primary-300",
         ]),
@@ -61,21 +77,22 @@ export default function TiptapEditor({
     },
   });
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => {
+        editor?.commands.focus();
+      },
+    }),
+    [editor],
+  );
   useEffect(() => {
-    if (
-      Object.values(formState.errors).length > 0 &&
-      fieldState.error &&
-      editor
-    ) {
-      editor.commands.focus();
-    }
-  }, [editor, fieldState.error, formState]);
-
-  const debouncedUpdates = useDebouncedCallback((editor: Editor) => {
-    if (editor) {
-      field.onChange(editor.getHTML());
-    }
-  }, 500);
+    if (editor && editor.getHTML() !== (value ?? ""))
+      editor.commands.setContent(value ?? "", false);
+  }, [editor, value]);
+  useEffect(() => {
+    editor?.setEditable(!disabled);
+  }, [editor, disabled]);
 
   if (!editor) {
     return null;
@@ -103,9 +120,6 @@ export default function TiptapEditor({
 
         <EditorContent editor={editor} />
       </div>
-      {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-      )}
     </div>
   );
 }

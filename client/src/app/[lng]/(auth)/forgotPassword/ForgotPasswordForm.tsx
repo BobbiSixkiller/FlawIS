@@ -1,28 +1,33 @@
 "use client";
+import { z } from "zod";
 
-import { useTranslation } from "@/lib/i18n/client";
-import { sendResetLink } from "./actions";
-import { useParams } from "next/navigation";
-import useValidation from "@/hooks/useValidation";
-import { Input } from "@/components/Input";
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import { Input } from "@/components/Input";
 import Spinner from "@/components/Spinner";
+import useValidation from "@/hooks/useValidation";
+import { useTranslation } from "@/lib/i18n/client";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
+import { useParams } from "next/navigation";
+import { sendResetLink } from "./actions";
 
 export default function ForgotPasswordForm() {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "forgotPassword");
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    email: v.string().email(v.email).min(1, v.required),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      yupSchema={yup.object({ email: yup.string().email().required() })}
-      defaultValues={{ email: "" }}
-    >
+    <FormContainer schema={schema} defaultValues={{ email: "" }}>
       {(methods) => (
         <form
           className="space-y-6 mt-4"
@@ -32,7 +37,19 @@ export default function ForgotPasswordForm() {
             setMessage(message, success);
           })}
         >
-          <Input name="email" label={t("email")} autoComplete="off" />
+          <FormField<FormValues, "email"> name="email" label={t("email")}>
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                autoComplete="off"
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           <Button
             className="w-full"
@@ -51,6 +68,6 @@ export default function ForgotPasswordForm() {
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

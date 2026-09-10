@@ -1,427 +1,54 @@
 import { useTranslation } from "@/lib/i18n/client";
 
+const escape = (value: string) =>
+  value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        character
+      ]!,
+  );
+const paragraph = (value: string) => `<p>${escape(value)}</p>`;
+const label = (value: string) =>
+  `<p><strong><u>${escape(value)}</u></strong></p>`;
+const list = (value: string) => `<ul><li>${paragraph(value)}</li></ul>`;
+
 export default function useDefaultContent(
   lng: string,
-  organization?: string | null
+  organization?: string | null,
 ) {
   const { t } = useTranslation(lng, ["internships", "courses"]);
-
-  const defaultInternshipEditorContent = {
-    type: "doc",
-    content: [
-      {
-        type: "heading",
-        attrs: { level: 2 },
-        content: [
-          {
-            type: "text",
-            text: organization ?? t("editor.org"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.dept"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.name"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.semesterLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.semester"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.estimatedLength"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.timePeriod"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.internsCountLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.internsCount"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.educLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.educ"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.lngLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.lng"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.otherLabel"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.other"),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.internshipDescLabel"),
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        attrs: {
-          tight: true,
-        },
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: t("editor.internshipDesc"),
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-
-  const defaultCourseEditorContent = {
-    type: "doc",
-    content: [
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.term", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.termValue", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.variableSymbol", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.variableSymbolValue", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.price", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: t("editor.priceValue", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.syllabus", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        attrs: {
-          tight: true,
-        },
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: "Sylabus 1",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.profile", { ns: "courses" }),
-          },
-          { type: "text", text: " Laicka verejnost" },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            marks: [
-              {
-                type: "bold",
-              },
-              {
-                type: "underline",
-              },
-            ],
-            text: t("editor.lecturers", { ns: "courses" }),
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        attrs: {
-          tight: true,
-        },
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    text: "Meno",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-
+  const defaultInternshipEditorContent = [
+    `<h2>${escape(organization ?? t("editor.org"))}</h2>`,
+    ...[
+      ["dept", "name"],
+      ["semesterLabel", "semester"],
+      ["estimatedLength", "timePeriod"],
+      ["internsCountLabel", "internsCount"],
+      ["educLabel", "educ"],
+      ["lngLabel", "lng"],
+      ["otherLabel", "other"],
+    ].flatMap(([heading, value]) => [
+      label(t(`editor.${heading}`)),
+      paragraph(t(`editor.${value}`)),
+    ]),
+    label(t("editor.internshipDescLabel")),
+    list(t("editor.internshipDesc")),
+  ].join("");
+  const defaultCourseEditorContent = [
+    ...[
+      ["term", "termValue"],
+      ["variableSymbol", "variableSymbolValue"],
+      ["price", "priceValue"],
+    ].flatMap(([heading, value]) => [
+      label(t(`editor.${heading}`, { ns: "courses" })),
+      paragraph(t(`editor.${value}`, { ns: "courses" })),
+    ]),
+    label(t("editor.syllabus", { ns: "courses" })),
+    list("Sylabus 1"),
+    `<p><strong><u>${escape(t("editor.profile", { ns: "courses" }))}</u></strong> Laicka verejnost</p>`,
+    label(t("editor.lecturers", { ns: "courses" })),
+    list("Meno"),
+  ].join("");
   return { defaultInternshipEditorContent, defaultCourseEditorContent };
 }

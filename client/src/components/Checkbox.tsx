@@ -1,41 +1,26 @@
 "use client";
-
-import { cn } from "@/lib/clientUtils";
-import { Checkbox, Field, Label } from "@headlessui/react";
 import Icon from "@/components/Icon";
-import { Control, useController } from "react-hook-form";
-
+import { cn } from "@/lib/utilsClient";
+import { Checkbox } from "@headlessui/react";
+import type { ComponentPropsWithRef } from "react";
 export default function CheckBox({
-  name,
-  label,
-  control,
-}: {
-  name: string;
-  label: any;
-  control: Control<any>;
-}) {
-  const { field, fieldState } = useController({ name, control });
-
+  ref,
+  ...props
+}: ComponentPropsWithRef<typeof Checkbox>) {
   return (
-    <div>
-      <Field className="flex items-center gap-x-3">
-        <Checkbox
-          checked={field.value}
-          onChange={() => field.onChange(!field.value)}
-          className={cn([
-            "outline-hidden shadow-xs group size-5 p-1 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-primary-500 data-checked:bg-primary-500 data-checked:ring-primary-500 rounded-md",
-            "dark:focus:ring-primary-300 dark:data-checked:ring-primary-300 dark:data-checked:bg-primary-300",
-          ])}
-        >
-          <Icon name="check" className="hidden size-3 stroke-2 text-white dark:text-gray-900 group-data-checked:block" />
-        </Checkbox>
-        <Label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85">
-          {label}
-        </Label>
-      </Field>
-      {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-      )}
-    </div>
+    <Checkbox
+      {...props}
+      checked={props.checked ?? false}
+      ref={ref}
+      className={cn([
+        "outline-hidden shadow-xs group size-5 p-1 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-primary-500 data-checked:bg-primary-500 data-checked:ring-primary-500 rounded-md",
+        "dark:focus:ring-primary-300 dark:data-checked:ring-primary-300 dark:data-checked:bg-primary-300",
+      ])}
+    >
+      <Icon
+        name="check"
+        className="hidden size-3 stroke-2 text-white dark:text-gray-900 group-data-checked:block"
+      />
+    </Checkbox>
   );
 }

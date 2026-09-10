@@ -1,109 +1,87 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { Control, useController } from "react-hook-form";
-import { withLocalizedInput } from "./withLocalizedInput";
-import Button from "./Button";
 import Icon from "@/components/Icon";
-import { InputProps } from "./Input";
-import { fetchFromMinio } from "@/lib/clientUtils";
+import Image from "next/image";
+import { type ComponentPropsWithRef, type ReactNode } from "react";
+import Button from "./Button";
+import { useFileSource } from "./useFileSource";
+import { useObjectURL } from "./useObjectURL";
 
-export default function ImageFileInput({
-  avatarUrl,
-  label,
-  name,
-  control,
-  bucket = "avatars",
-  ...props
-}: {
+interface ImageFileInputProps
+  extends Omit<
+    ComponentPropsWithRef<"input">,
+    "value" | "onChange" | "onLoad" | "onError"
+  > {
+  value?: File | null;
+  onChange: (file: File | null) => void;
+  onLoad?: (file: File | null) => void;
+  onError?: (message: string) => void;
   avatarUrl?: string;
   bucket?: string;
-  control: Control<any>;
-} & InputProps) {
-  const { field, fieldState } = useController({ name, control });
-  const [filePreview, setFilePreview] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (field.value) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(field.value);
-    }
-  }, [field.value]);
-
-  useEffect(() => {
-    async function initializeFromAvatar() {
-      if (!avatarUrl || field.value) return;
-
-      try {
-        const file = await fetchFromMinio(bucket, avatarUrl);
-        field.onChange(file);
-      } catch (e) {
-        console.error("Failed to convert avatar to file", e);
-      }
-    }
-
-    initializeFromAvatar();
-  }, [avatarUrl, bucket, field]);
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFilePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      field.onChange(file);
-    }
-  };
-
+  buttonLabel?: ReactNode;
+}
+export default function ImageFileInput({
+  value,
+  onChange,
+  onLoad = onChange,
+  onError,
+  avatarUrl,
+  bucket = "avatars",
+  buttonLabel,
+  ref,
+  ...props
+}: ImageFileInputProps) {
+  const preview = useObjectURL(value);
+  const loading = useFileSource({
+    value,
+    sources: { [bucket]: avatarUrl },
+    onLoad,
+    onError,
+    convert: (files) => files[0] ?? null,
+  });
   return (
-    <div>
-      <div className="flex gap-4 items-center">
-        <div className="size-16 rounded-full relative">
-          <Image
-            src={
-              field.value && filePreview
-                ? filePreview
-                : (avatarUrl ?? "/images/img-placeholder.jpg")
-            }
-            alt="Picture of the property"
-            fill
-            style={{ objectFit: "cover" }}
-            className="rounded-full"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-        <label className="cursor-pointer bg-primary-100 px-5 py-1 hover:bg-primary-200 text-primary-600 rounded-full font-semibold">
-          {label}
-          <input
-            {...props}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </label>
-        {field.value && (
-          <Button
-            variant="destructive"
-            type="button"
-            className="rounded-full p-2 size-8"
-            onClick={() => field.onChange(null)}
-          >
-            <Icon name="trash" className="size-5" />
-          </Button>
-        )}
+    <div className="flex gap-4 items-center">
+      <div className="size-16 rounded-full relative">
+        <Image
+          src={
+            preview ??
+            (value === undefined ? avatarUrl : undefined) ??
+            "/images/img-placeholder.jpg"
+          }
+          alt=""
+          fill
+          style={{ objectFit: "cover" }}
+          className="rounded-full"
+          sizes="64px"
+        />
       </div>
-      {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+      <label className="cursor-pointer bg-primary-100 px-5 py-1 hover:bg-primary-200 text-primary-600 rounded-full font-semibold">
+        {buttonLabel}
+        <input
+          {...props}
+          ref={ref}
+          disabled={props.disabled || loading}
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            onChange(event.target.files?.[0] ?? null);
+            event.target.value = "";
+          }}
+          className="sr-only"
+        />
+      </label>
+      {value && (
+        <Button
+          disabled={props.disabled}
+          variant="destructive"
+          type="button"
+          className="rounded-full p-2 size-8"
+          aria-label="Remove image"
+          onClick={() => onChange(null)}
+        >
+          <Icon name="trash" className="size-5" />
+        </Button>
       )}
     </div>
   );
 }
-
-export const LocalizedImageFileInput = withLocalizedInput(ImageFileInput);

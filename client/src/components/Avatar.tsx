@@ -1,6 +1,6 @@
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import DynamicImage from "./DynamicImage";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 
 const sizeMap = {
   regular: "size-9",

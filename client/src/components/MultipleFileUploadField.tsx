@@ -1,349 +1,139 @@
+"use client";
+
 import Icon from "@/components/Icon";
-import { useCallback, useEffect, useState } from "react";
-import {
-  Accept,
-  DropzoneRootProps,
-  FileError,
-  FileRejection,
-  useDropzone,
-} from "react-dropzone";
-
-import {
-  Control,
-  useController,
-  UseFormSetError,
-  UseFormSetValue,
-} from "react-hook-form";
+import { type AriaAttributes, type Ref } from "react";
+import { useDropzone, type Accept } from "react-dropzone";
 import Button from "./Button";
-import { fetchFromMinio } from "@/lib/clientUtils";
 import Spinner from "./Spinner";
+import { useFileSource, type FileSources } from "./useFileSource";
+import { useObjectURL } from "./useObjectURL";
 
-const getColorClasses = ({
-  isDragAccept,
-  isDragReject,
-  isFocused,
-}: DropzoneRootProps) => {
-  if (isDragAccept) {
-    return "border-green-500";
-  }
-  if (isDragReject) {
-    return "border-red-500";
-  }
-  if (isFocused) {
-    return "border-primary-500";
-  }
-  return "border-gray-300";
-};
-
-export interface UploadableFile {
-  file: File;
-  uploadedFile?: string;
-  errors: FileError[];
+export interface MultipleFileUploadProps extends AriaAttributes {
+  name?: string;
+  id?: string;
+  ref?: Ref<HTMLDivElement>;
+  onBlur?: () => void;
+  value?: File[];
+  onChange: (files: File[]) => void;
+  onLoad?: (files: File[]) => void;
+  onError?: (message: string) => void;
+  disabled?: boolean;
+  maxFiles?: number;
+  maxSize?: number;
+  accept?: Accept;
+  fileSources?: FileSources;
 }
-
 export default function MultipleFileUploadField({
-  name,
-  control,
-  setValue,
-  setError,
-  label,
+  value,
+  onChange,
+  onLoad = onChange,
+  onError,
   maxFiles,
   maxSize,
   accept,
   fileSources,
-}: {
-  name: string;
-  control: Control<any>;
-  setValue: UseFormSetValue<any>;
-  setError: UseFormSetError<any>;
-  label: string;
-  maxFiles?: number;
-  maxSize?: number;
-  accept?: Accept;
-  fileSources?: Record<string, string | string[] | null | undefined>;
-}) {
-  const { fieldState } = useController({ name, control });
-
-  const [files, setFiles] = useState<UploadableFile[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const syncFormField = useCallback(
-    (shouldValidate: boolean, nextFiles: File[]) => {
-      setValue(name, nextFiles, { shouldValidate });
-    },
-    [name, setValue],
-  );
-
-  const serializedFileSources = JSON.stringify(fileSources);
-
-  useEffect(() => {
-    async function prefillFiles() {
-      const currentFileSources = serializedFileSources
-        ? (JSON.parse(serializedFileSources) as NonNullable<
-            typeof fileSources
-          >)
-        : undefined;
-
-      if (!currentFileSources) {
-        return setLoading(false);
-      }
-
-      const loadedFiles: UploadableFile[] = [];
-
-      await Promise.all(
-        Object.entries(currentFileSources).map(async ([bucket, urls]) => {
-          if (!urls) return;
-
-          const urlsArray = Array.isArray(urls) ? urls : [urls];
-
-          for (const url of urlsArray) {
-            try {
-              const file = await fetchFromMinio(bucket, url);
-              loadedFiles.push({ file, uploadedFile: url, errors: [] });
-            } catch (err: any) {
-              console.error(`Failed to fetch ${url}`, err);
-              setError(name, { message: `Failed to fetch ${url}` });
-            }
-          }
-        }),
-      );
-
-      setFiles(loadedFiles);
-      syncFormField(
-        false,
-        loadedFiles.map((f) => f.file),
-      );
-
-      setLoading(false);
-    }
-
-    void prefillFiles();
-  }, [name, serializedFileSources, setError, syncFormField]);
-
-  const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      const mappedAccepted = acceptedFiles.map((file) => ({
-        file,
-        errors: [],
-      }));
-
-      if (
-        fileRejections.some((r) =>
-          r.errors.some((e) => e.code === "too-many-files"),
-        )
-      ) {
-        setError(name, { message: "too-many-files" });
-        return;
-      }
-
-      setFiles((curr) => {
-        const next = [...curr, ...mappedAccepted];
-        syncFormField(
-          true,
-          next.map((f) => f.file),
-        );
-        return next;
-      });
-    },
-    [name, setError, syncFormField],
-  );
-
+  disabled,
+  ref,
+  ...props
+}: MultipleFileUploadProps) {
+  const loading = useFileSource({
+    value,
+    sources: fileSources,
+    onLoad,
+    onError,
+    convert: (files) => files,
+  });
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
-      onDrop,
       maxFiles,
       maxSize,
       accept,
-      disabled: loading,
+      disabled: disabled || loading,
       multiple: true,
+      onDrop: (accepted, rejected) => {
+        if (rejected.length) {
+          onError?.(
+            rejected
+              .flatMap((file) => file.errors.map((error) => error.message))
+              .join(" "),
+          );
+          return;
+        }
+        if (maxFiles && (value?.length ?? 0) + accepted.length > maxFiles) {
+          onError?.(`Maximum number of files: ${maxFiles}`);
+          return;
+        }
+        onChange([...(value ?? []), ...accepted]);
+      },
     });
-
-  function onDelete(file: File) {
-    setFiles((prev) => {
-      const next = prev.filter((f) => f.file !== file);
-      syncFormField(
-        true,
-        next.map((f) => f.file),
-      );
-      return next;
-    });
-  }
-
-  function onUpload(file: File, uploadedFile: string, errors: FileError[]) {
-    setFiles((prev) =>
-      prev.map((f) => (f.file === file ? { ...f, uploadedFile, errors } : f)),
-    );
-  }
-
   return (
     <div>
-      <label
-        htmlFor={name}
-        className="text-sm/6 font-medium dark:text-white/85"
-      >
-        {label}
-      </label>
       <div
-        {...getRootProps()}
-        className={`mt-1 flex gap-4 flex-col items-center p-12 border-2 border-dashed rounded-lg transition-all ease-in-out ${getColorClasses(
-          {
-            isDragAccept,
-            isDragReject: isDragReject || fieldState.error,
-            ...(!loading ? { isFocused } : {}),
-          },
-        )} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-hidden`}
+        {...getRootProps({
+          ...props,
+          role: "button",
+          "aria-disabled": disabled || loading,
+        })}
+        ref={(element) => {
+          const rootRef = getRootProps().ref;
+          if (rootRef) rootRef.current = element;
+          if (typeof ref === "function") ref(element);
+          else if (ref) ref.current = element;
+        }}
+        className={`mt-1 flex gap-4 flex-col items-center p-12 border-2 border-dashed rounded-lg transition-all ease-in-out ${isDragAccept ? "border-green-500" : isDragReject || props["aria-invalid"] ? "border-red-500" : isFocused ? "border-primary-500" : "border-gray-300"} bg-gray-50 dark:bg-gray-800 dark:border-gray-600 text-gray-400 outline-hidden`}
       >
-        <input name={name} id={name} disabled={loading} {...getInputProps()} />
-
+        <input {...getInputProps({ name: props.name })} />
         {loading ? (
           <Spinner />
         ) : (
-          <Button className="rounded-full" size="icon">
+          <span className="rounded-full p-2">
             <Icon name="plus" className="stroke-2 size-5" />
-          </Button>
+          </span>
         )}
-        {/* <p className="text-xs text-center">Drag n drop</p> */}
       </div>
-
-      {files.map((uploadableFile, i) => (
-        <SingleUploadProgress
-          key={i}
-          file={uploadableFile.file}
-          uploadedFile={uploadableFile.uploadedFile}
-          errors={uploadableFile.errors}
-          onDelete={onDelete}
-          onUpload={onUpload}
+      {(value ?? []).map((file, index) => (
+        <FileRow
+          key={`${file.name}-${index}`}
+          file={file}
+          disabled={disabled}
+          onDelete={() => onChange((value ?? []).filter((_, i) => i !== index))}
         />
       ))}
-
-      {fieldState.error && (
-        <p className="mt-1 text-sm text-red-500">{fieldState.error.message}</p>
-      )}
     </div>
   );
 }
-
-interface SingleUploadProgressProps {
-  file: File;
-  errors: FileError[];
-  uploadedFile?: string;
-  onDelete: (file: File) => void;
-  onUpload: (file: File, uploadedFile: string, errors: FileError[]) => void;
-}
-
-function SingleUploadProgress({
+function FileRow({
   file,
-  errors,
-  uploadedFile,
+  disabled,
   onDelete,
-  onUpload,
-}: SingleUploadProgressProps) {
-  const [progress, setProgress] = useState(0);
-
-  // useEffect(() => {
-  //   async function upload() {
-  //     const res = await uploadFile(file, setProgress);
-  //     onUpload(file, res.data || undefined, res.errors || []);
-  //   }
-
-  //   if (errors.length === 0 && uploadedFile === undefined) {
-  //     upload();
-  //   }
-  //   onUpload(file, "", errors);
-  // }, []);
-
-  function uploadFile(file: File, onProgress: (percentage: number) => void) {
-    console.log("Uploading", file.name);
-
-    const url =
-      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/upload";
-
-    return new Promise<{
-      errors?: FileError[];
-      data?: any;
-    }>((res, rej) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", url);
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          const response = JSON.parse(xhr.responseText);
-          res(response);
-        } else {
-          const errorMessage = `Upload failed with status: ${xhr.status} - ${xhr.statusText}`;
-          console.error(errorMessage);
-          res({
-            errors: [{ code: "upload_failed", message: errorMessage }],
-          });
-        }
-      };
-
-      xhr.onerror = (evt) => {
-        const errorMessage = `Network error: ${evt.type}`;
-        console.error(errorMessage);
-        res({
-          errors: [{ code: "network_error", message: errorMessage }],
-        });
-      };
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentage = (event.loaded / event.total) * 100;
-          onProgress(Math.round(percentage));
-        }
-      };
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      xhr.withCredentials = true;
-      xhr.send(formData);
-    });
-  }
-
+}: {
+  file: File;
+  disabled?: boolean;
+  onDelete: () => void;
+}) {
+  const url = useObjectURL(file);
   return (
     <div className="flex flex-col p-2 gap-1">
       <div className="flex flex-row justify-between items-center w-full gap-2">
         <a
-          href={URL.createObjectURL(file)}
+          href={url}
           download={file.name}
           className="text-primary-500 dark:text-primary-300 hover:underline whitespace-normal overflow-hidden truncate"
         >
-          {file?.name}
+          {file.name}
         </a>
         <Button
-          onClick={async (e) => {
-            e.preventDefault();
-            onDelete(file);
-          }}
+          type="button"
+          disabled={disabled}
+          onClick={onDelete}
           size="icon"
           variant="ghost"
           className="rounded-full"
+          aria-label={`Remove ${file.name}`}
         >
           <Icon name="x-mark" className="stroke-2 size-5" />
         </Button>
       </div>
-      {/* <ProgressBar progress={progress} /> */}
-      <p className="text-sm text-red-500">{errors.map((e) => e.message)}</p>
     </div>
   );
 }
-
-interface ProgressBarProps {
-  progress: number;
-  label?: string;
-}
-
-const ProgressBar: React.FC<ProgressBarProps> = ({ progress, label }) => {
-  return (
-    <div className="w-full bg-gray-200 rounded-full h-2">
-      <div
-        className="bg-blue-500 h-2 rounded-full"
-        style={{ width: `${progress}%` }}
-      ></div>
-      {label && (
-        <div className="mt-1 text-sm text-center text-gray-700">{label}</div>
-      )}
-    </div>
-  );
-};

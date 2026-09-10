@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { useTranslation } from "@/lib/i18n/client";
 import { ThemePreference } from "@/lib/theme";
 
@@ -147,7 +147,11 @@ export default function ThemeToggler({
         }}
         onClick={expandAndFocus}
       >
-        <Icon name={selectedOption.icon} className="size-5" aria-hidden="true" />
+        <Icon
+          name={selectedOption.icon}
+          className="size-5"
+          aria-hidden="true"
+        />
       </button>
 
       <RadioGroup

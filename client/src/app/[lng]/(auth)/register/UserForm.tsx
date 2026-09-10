@@ -1,51 +1,42 @@
 "use client";
+import type { z } from "zod";
+
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { ComponentType, useEffect } from "react";
+import { useEffect } from "react";
 import { Trans } from "react-i18next";
 
-import { addUser, register, updateUser } from "./actions";
-import { Input, InputProps } from "@/components/Input";
+import Button from "@/components/Button";
 import CheckBox from "@/components/Checkbox";
+import { FormContainer } from "@/components/form";
+import AvatarInput from "@/components/ImageFileInput";
+import { Input } from "@/components/Input";
+import MultipleFileUploadField from "@/components/MultipleFileUploadField";
 import PhoneInput from "@/components/PhoneInput";
-import parsePhoneNumberFromString from "libphonenumber-js";
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
 import Select from "@/components/Select";
+import Spinner from "@/components/Spinner";
+import useUser from "@/hooks/useUser";
+import { cn, uploadOrDelete } from "@/lib/utilsClient";
 import {
   Access,
   Address,
   StudyProgramme,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
-import useValidation from "@/hooks/useValidation";
-import Spinner from "@/components/Spinner";
-import { cn, uploadOrDelete } from "@/lib/clientUtils";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import Button from "@/components/Button";
-import AvatarInput from "@/components/ImageFileInput";
-import { mixed } from "yup";
+import { createUserFormSchema } from "@/lib/validation/user-form-schema";
 import { useDialogStore } from "@/stores/dialogStore";
-import useUser from "@/hooks/useUser";
 import { useMessageStore } from "@/stores/messageStore";
 import { useScrollStore } from "@/stores/scrollStore";
-import RHFormContainer from "@/components/RHFormContainer";
-import { deleteFiles } from "@/lib/minio";
-import { useFormContext } from "react-hook-form";
-
-const SLOVAK_NAME_LETTERS =
-  "A-Za-zÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽáäčďéíĺľňóôŕšťúýž";
-const SLOVAK_NAME_PART =
-  `[${SLOVAK_NAME_LETTERS}]+(?:-[${SLOVAK_NAME_LETTERS}]+)*`;
-const SLOVAK_FULL_NAME_PATTERN = new RegExp(
-  `^${SLOVAK_NAME_PART}(?:\\s+${SLOVAK_NAME_PART})+$`,
-);
-const TITLE_PATTERN =
-  /(?:^|\s)(?:Bc|Mgr|Ing|JUDr|MUDr|MVDr|MDDr|PhDr|RNDr|PaedDr|PharmDr|ThDr|ThLic|doc|prof|Dr|PhD|ArtD|CSc|DrSc|MBA|LL\.?M|MSc|MA|BA)\.?(?=\s|$|,)/i;
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+import { useFormContext, useWatch } from "react-hook-form";
+import { addUser, register, updateUser } from "./actions";
 
 export default function UserForm({
   user,
@@ -65,7 +56,23 @@ export default function UserForm({
 
   const ctxUser = useUser();
 
-  const { yup } = useValidation();
+  const { t: validationT } = useTranslation(lng, "validation");
+  const schema = createUserFormSchema(validationT, {
+    profile: namespace === "profile",
+    requireUniversityEmail: Boolean(
+      (searchParams.get("token") === null && subdomain?.includes("intern")) ||
+      ctxUser?.access.includes(Access.Student),
+    ),
+    student: Boolean(ctxUser?.access.includes(Access.Student)),
+    requirePhone: Boolean(
+      subdomain?.includes("conferences") || subdomain?.includes("intern"),
+    ),
+    requireCv: Boolean(
+      ctxUser?.access.includes(Access.Student) ||
+      ctxUser?.access.includes(Access.CourseAttendee),
+    ),
+    registering: path === "/register",
+  });
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
@@ -73,8 +80,9 @@ export default function UserForm({
 
   const router = useRouter();
 
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
+    <FormContainer
       defaultValues={{
         name: user?.name || "",
         email: user?.email || "",
@@ -91,156 +99,15 @@ export default function UserForm({
         telephone: user?.telephone || "",
         studyProgramme: user?.studyProgramme || null,
         privacy: path === "/register" ? false : true,
-        files: [],
+        files:
+          path.includes("users") ||
+          path.includes("profile") ||
+          namespace === "profile"
+            ? undefined
+            : [],
+        avatar: undefined,
       }}
-      yupSchema={yup.object({
-        name: yup
-          .string()
-          .transform((value) =>
-            typeof value === "string"
-              ? value.replace(/\s+/g, " ").trim()
-              : value,
-          )
-          .required()
-          .test(
-            "without-titles",
-            t("nameTitles", { ns: "validation" }),
-            (value) => !value || !TITLE_PATTERN.test(value),
-          )
-          .matches(SLOVAK_FULL_NAME_PATTERN, {
-            message: t("nameFormat", { ns: "validation" }),
-            excludeEmptyString: true,
-          }),
-        email: yup
-          .string()
-          .required()
-          .email()
-          .when({
-            is: () =>
-              (searchParams.get("token") === null &&
-                subdomain?.includes("intern")) ||
-              ctxUser?.access.includes(Access.Student), // When creating student account on internships tenant
-            then: (schema) =>
-              schema.matches(
-                /^[a-zA-Z0-9._%+-]+@(?:([a-zA-Z0-9-]+\.)*uniba\.sk|([a-zA-Z0-9-]+\.)*student\.euba\.sk)$/,
-                {
-                  message: t("isUniba", { ns: "validation" }),
-                },
-              ),
-          }),
-        password: yup
-          .string()
-          .trim()
-          .when({
-            is: () => namespace === "profile",
-            then: (schema) =>
-              schema
-                .transform((value) => (!value ? null : value))
-                .nullable()
-                .matches(
-                  /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
-                  t("password", { ns: "validation" }),
-                ),
-            otherwise: (schema) =>
-              schema
-                .required()
-                .matches(
-                  /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
-                  t("password", { ns: "validation" }),
-                ),
-          }),
-        confirmPass: yup
-          .string()
-          .trim()
-          .when("password", ([password], schema) =>
-            password || path === "/register"
-              ? schema
-                  .required()
-                  .oneOf(
-                    [yup.ref("password")],
-                    t("confirmPass", { ns: "validation" }),
-                  )
-              : schema.transform((value) => (!value ? null : value)).nullable(),
-          ),
-        address: yup
-          .object({
-            street: yup.string(),
-            city: yup.string(),
-            postal: yup.string(),
-            country: yup.string(),
-          })
-          .when({
-            is: () => ctxUser?.access.includes(Access.Student),
-            then: (schema) =>
-              schema.shape({
-                street: yup.string().trim().required(),
-                city: yup.string().trim().required(),
-                postal: yup.string().trim().required(),
-                country: yup.string().trim().required(),
-              }),
-          }),
-        organization: yup
-          .string()
-          .transform((value) =>
-            typeof value === "string"
-              ? value.replace(/\s+/g, " ").trim()
-              : value,
-          )
-          .required(t("organizationFullName", { ns: "validation" }))
-          .min(3, t("organizationFullName", { ns: "validation" })),
-        telephone: yup
-          .string()
-          .trim()
-          .when({
-            is: () =>
-              subdomain?.includes("conferences") ||
-              subdomain?.includes("intern"),
-            then: (schema) =>
-              schema
-                .required()
-                .test(
-                  "is-valid-phone",
-                  t("phone", { ns: "validation" }),
-                  function (value) {
-                    if (!value) return false;
-                    const phoneNumber = parsePhoneNumberFromString(value);
-                    return phoneNumber?.isValid() || false;
-                  },
-                ),
-            otherwise: (schema) => schema.nullable(),
-          }),
-        studyProgramme: yup
-          .mixed<StudyProgramme>()
-          .nullable()
-          .when({
-            is: () => ctxUser?.access.includes(Access.Student),
-            then: (schema) => schema.required(),
-          }),
-        access: yup.array().of(yup.string<Access>().required()),
-        privacy: yup
-          .boolean()
-          .oneOf([true], t("privacy", { ns: "validation" }))
-          .required(),
-        files: yup
-          .array()
-          .of(yup.mixed<File>().required())
-          .max(1, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
-          .required()
-          .when({
-            is: () =>
-              ctxUser?.access.includes(Access.Student) ||
-              ctxUser?.access.includes(Access.CourseAttendee),
-            then: (schema) =>
-              schema.min(1, (val) =>
-                t("minFiles", { value: val.min, ns: "validation" }),
-              ),
-          }),
-        avatar: mixed<File>()
-          .nullable()
-          .test("fileSize", "Only pictures up to 2MB are permitted.", (file) =>
-            file ? file.size < 2_000_000 : true,
-          ),
-      })}
+      schema={schema}
     >
       {(methods) => (
         <form
@@ -256,13 +123,16 @@ export default function UserForm({
                 return methods.setError("files", { message: error });
               }
 
-              const { error: avatarErr, url: avatarUrl } = await uploadOrDelete(
-                "avatars",
-                user?.avatarUrl,
-                val.avatar,
-              );
+              const { error: avatarErr, url: avatarUrl } =
+                val.avatar === undefined
+                  ? { url: user?.avatarUrl }
+                  : await uploadOrDelete(
+                      "avatars",
+                      user?.avatarUrl,
+                      val.avatar,
+                    );
               if (avatarErr) {
-                return methods.setError("avatar", { message: error });
+                return methods.setError("avatar", { message: avatarErr });
               }
 
               let res;
@@ -337,125 +207,254 @@ export default function UserForm({
           )}
         >
           {path.includes("update") && (
-            <AvatarInput
-              avatarUrl={user?.avatarUrl ? user.avatarUrl : undefined}
-              control={methods.control}
-              name="avatar"
-              label="Fotka"
-            />
+            <FormField<FormValues, "avatar"> name="avatar">
+              {({ field, controlProps, initialize, onError }) => (
+                <AvatarInput
+                  {...field}
+                  {...controlProps}
+                  avatarUrl={user?.avatarUrl ? user.avatarUrl : undefined}
+                  onLoad={initialize}
+                  onError={onError}
+                  buttonLabel={"Fotka"}
+                  aria-label={"Fotka"}
+                />
+              )}
+            </FormField>
           )}
-          <Input label={t("name")} name="name" autoComplete="name" />
-          <IsUnibaMailInput
-            label={t("email")}
-            name="email"
-            autoComplete="email"
-          />
+          <FormField<FormValues, "name"> name="name" label={t("name")}>
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                autoComplete="name"
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <UniversityOrganization />
+          <FormField<FormValues, "email"> name="email" label={t("email")}>
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                autoComplete="email"
+                value={field.value ?? ""}
+              />
+            )}
+          </FormField>
 
           {path.includes("users") && (
-            <Select
-              control={methods.control}
-              name="access"
-              label="Access"
-              multiple
-              options={[
-                { name: Access.Admin, value: Access.Admin },
-                {
-                  name: Access.ConferenceAttendee,
-                  value: Access.ConferenceAttendee,
-                },
-                { name: Access.Organization, value: Access.Organization },
-                { name: Access.Student, value: Access.Student },
-              ]}
-            />
+            <FormField<FormValues, "access"> name="access" label="Access">
+              {({ field, controlProps }) => (
+                <Select
+                  {...field}
+                  {...controlProps}
+                  multiple
+                  options={[
+                    { name: Access.Admin, value: Access.Admin },
+                    {
+                      name: Access.ConferenceAttendee,
+                      value: Access.ConferenceAttendee,
+                    },
+                    { name: Access.Organization, value: Access.Organization },
+                    { name: Access.Student, value: Access.Student },
+                  ]}
+                />
+              )}
+            </FormField>
           )}
 
-          <PhoneInput
-            label={t("phone")}
+          <FormField<FormValues, "telephone">
             name="telephone"
-            control={methods.control}
-          />
-          <Input label={t("org")} name="organization" autoComplete="off" />
+            label={t("phone")}
+          >
+            {({ field, controlProps }) => (
+              <PhoneInput {...field} {...controlProps} />
+            )}
+          </FormField>
+          <FormField<FormValues, "organization">
+            name="organization"
+            label={t("org")}
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                autoComplete="off"
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           {(path.includes("users") ||
             user?.access.includes(Access.Student)) && (
             <>
               <div className="flex gap-2">
-                <Input
-                  label={t("street", { ns: "common" })}
+                <FormField<FormValues, "address.street">
                   name="address.street"
-                  autoComplete="address-line1"
-                />
-                <Input
-                  label={t("city", { ns: "common" })}
+                  label={t("street", { ns: "common" })}
+                >
+                  {({ field, controlProps }) => (
+                    <Input
+                      {...field}
+                      {...controlProps}
+                      autoComplete="address-line1"
+                      value={inputValue(field.value, undefined)}
+                      onChange={(event) => {
+                        field.onChange(inputChange(event));
+                      }}
+                    />
+                  )}
+                </FormField>
+                <FormField<FormValues, "address.city">
                   name="address.city"
-                  autoComplete="address-level2"
-                />
+                  label={t("city", { ns: "common" })}
+                >
+                  {({ field, controlProps }) => (
+                    <Input
+                      {...field}
+                      {...controlProps}
+                      autoComplete="address-level2"
+                      value={inputValue(field.value, undefined)}
+                      onChange={(event) => {
+                        field.onChange(inputChange(event));
+                      }}
+                    />
+                  )}
+                </FormField>
               </div>
               <div className="flex gap-2">
-                <Input
-                  label={t("postal", { ns: "common" })}
+                <FormField<FormValues, "address.postal">
                   name="address.postal"
-                  autoComplete="postal-code"
-                />
-                <Input
-                  label={t("country", { ns: "common" })}
+                  label={t("postal", { ns: "common" })}
+                >
+                  {({ field, controlProps }) => (
+                    <Input
+                      {...field}
+                      {...controlProps}
+                      autoComplete="postal-code"
+                      value={inputValue(field.value, undefined)}
+                      onChange={(event) => {
+                        field.onChange(inputChange(event));
+                      }}
+                    />
+                  )}
+                </FormField>
+                <FormField<FormValues, "address.country">
                   name="address.country"
-                  autoComplete="country"
-                />
+                  label={t("country", { ns: "common" })}
+                >
+                  {({ field, controlProps }) => (
+                    <Input
+                      {...field}
+                      {...controlProps}
+                      autoComplete="country"
+                      value={inputValue(field.value, undefined)}
+                      onChange={(event) => {
+                        field.onChange(inputChange(event));
+                      }}
+                    />
+                  )}
+                </FormField>
               </div>
 
-              <Select
-                control={methods.control}
+              <FormField<FormValues, "studyProgramme">
                 name="studyProgramme"
                 label="Ročník"
-                options={[
-                  { name: "1. bakalársky", value: StudyProgramme.Bachelor1 },
-                  { name: "2. bakalársky", value: StudyProgramme.Bachelor2 },
-                  { name: "3. bakalársky", value: StudyProgramme.Bachelor3 },
-                  { name: "1. magisterský", value: StudyProgramme.Master1 },
-                  { name: "2. magisterský", value: StudyProgramme.Master2 },
-                ]}
-              />
+              >
+                {({ field, controlProps }) => (
+                  <Select
+                    {...field}
+                    {...controlProps}
+                    options={[
+                      {
+                        name: "1. bakalársky",
+                        value: StudyProgramme.Bachelor1,
+                      },
+                      {
+                        name: "2. bakalársky",
+                        value: StudyProgramme.Bachelor2,
+                      },
+                      {
+                        name: "3. bakalársky",
+                        value: StudyProgramme.Bachelor3,
+                      },
+                      { name: "1. magisterský", value: StudyProgramme.Master1 },
+                      { name: "2. magisterský", value: StudyProgramme.Master2 },
+                    ]}
+                  />
+                )}
+              </FormField>
             </>
           )}
 
           {(path.includes("users") ||
             path.includes("profile") ||
             namespace === "profile") && (
-            <MultipleFileUploadField
-              control={methods.control}
-              setError={methods.setError}
-              setValue={methods.setValue}
-              label="CV.pdf"
-              name="files"
-              maxFiles={1}
-              accept={{
-                "application/pdf": [".pdf"],
-              }}
-              fileSources={{ resumes: user?.cvUrl }}
-            />
+            <FormField<FormValues, "files"> name="files" label="CV.pdf">
+              {({ field, controlProps, initialize, onError }) => (
+                <MultipleFileUploadField
+                  {...field}
+                  {...controlProps}
+                  maxFiles={1}
+                  accept={{
+                    "application/pdf": [".pdf"],
+                  }}
+                  fileSources={{ resumes: user?.cvUrl }}
+                  onLoad={initialize}
+                  onError={onError}
+                />
+              )}
+            </FormField>
           )}
 
           {!path.includes("profile") && namespace !== "profile" && (
             <>
-              <Input
+              <FormField<FormValues, "password">
                 name="password"
                 label={t("password")}
-                type="password"
-                autoComplete="current-password"
-              />
-              <Input
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="password"
+                    autoComplete="current-password"
+                    value={inputValue(field.value, "password")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField<FormValues, "confirmPass">
                 name="confirmPass"
                 label={t("confirmPass")}
-                type="password"
-                autoComplete="current-password"
-              />
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="password"
+                    autoComplete="current-password"
+                    value={inputValue(field.value, "password")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
             </>
           )}
 
           {path.includes("register") && (
-            <CheckBox
-              control={methods.control}
+            <FormField<FormValues, "privacy">
               name="privacy"
               label={
                 <Trans
@@ -477,7 +476,16 @@ export default function UserForm({
                   }}
                 />
               }
-            />
+              layout="inline"
+            >
+              {({ field, controlProps }) => (
+                <CheckBox
+                  {...field}
+                  {...controlProps}
+                  checked={Boolean(field.value)}
+                />
+              )}
+            </FormField>
           )}
 
           <Button
@@ -497,28 +505,19 @@ export default function UserForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }
 
-function withUnibaEmail(InputComponent: ComponentType<InputProps>) {
-  return function WithUnibaEmailWrapper(props: InputProps) {
-    const { watch, setValue } = useFormContext();
-    const email = watch("email");
-
-    const { lng } = useParams<{ lng: string }>();
-    const { t } = useTranslation(lng, ["common"]);
-
-    useEffect(() => {
-      if (email.includes("uniba")) {
-        setValue("organization", t("flaw", { ns: "common" }), {
-          shouldValidate: true,
-        });
-      }
-    }, [email, lng, setValue, t]);
-
-    return <InputComponent {...props} />;
-  };
+function UniversityOrganization() {
+  const { control, setValue } =
+    useFormContext<z.input<ReturnType<typeof createUserFormSchema>>>();
+  const email = useWatch({ control, name: "email" });
+  const { lng } = useParams<{ lng: string }>();
+  const { t } = useTranslation(lng, "common");
+  useEffect(() => {
+    if (email?.includes("uniba"))
+      setValue("organization", t("flaw"), { shouldValidate: true });
+  }, [email, setValue, t]);
+  return null;
 }
-
-const IsUnibaMailInput = withUnibaEmail(Input);

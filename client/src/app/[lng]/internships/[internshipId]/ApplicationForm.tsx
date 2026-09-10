@@ -1,24 +1,26 @@
 "use client";
+import { z } from "zod";
+
+import { FormField } from "@/components/form";
 
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import Select from "@/components/Select";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
+import { uploadOrDelete } from "@/lib/utilsClient";
 import {
   ApplicationFragment,
   Semester,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { uploadOrDelete } from "@/lib/clientUtils";
-import { useParams } from "next/navigation";
 import { deleteFiles } from "@/lib/minio";
-import { changeInternData, createIntern } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import CheckBox from "@/components/Checkbox";
-import Select from "@/components/Select";
+import { useParams } from "next/navigation";
+import { changeInternData, createIntern } from "./actions";
 
 export default function ApplicationForm({
   user,
@@ -35,24 +37,24 @@ export default function ApplicationForm({
   }>();
   const { t } = useTranslation(lng, ["validation", "common"]);
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    files: z
+      .array(z.file({ error: v.required }))
+      .min(1, t("minFiles", { value: 1, ns: "validation" }))
+      .max(5, t("maxFiles", { value: 5, ns: "validation" })),
+    semester: z.enum(Semester, { error: v.required }),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      yupSchema={yup.object({
-        files: yup
-          .array()
-          .of(yup.mixed<File>().required())
-          .min(1, (val) => t("minFiles", { value: val.min, ns: "validation" }))
-          .max(5, (val) => t("maxFiles", { value: val.max, ns: "validation" }))
-          .required(),
-        semester: yup.string<Semester>().required(),
-      })}
+    <FormContainer
+      schema={schema}
       defaultValues={{
-        files: [],
+        files: undefined,
         semester: application?.semester ?? Semester.Winter,
       }}
     >
@@ -72,7 +74,7 @@ export default function ApplicationForm({
                     "internships",
                     application?.fileUrls[index],
                     file,
-                    user.email
+                    user.email,
                   );
                   if (error) {
                     return methods.setError("files", { message: error });
@@ -95,7 +97,7 @@ export default function ApplicationForm({
                     "internships",
                     null,
                     file,
-                    user.email
+                    user.email,
                   );
                   if (error) {
                     return methods.setError("files", { message: error });
@@ -121,36 +123,48 @@ export default function ApplicationForm({
                 closeDialog(dialogId);
               }
             },
-            (err) => console.log(err)
+            (err) => console.log(err),
           )}
           className="space-y-6 sm:w-96"
         >
-          <Select
+          <FormField<FormValues, "semester">
             name="semester"
             label={"Mam zaujem stazovat v semestri"}
-            control={methods.control}
-            options={[
-              { name: "Zimny", value: Semester.Winter },
-              { name: "Letny", value: Semester.Summer },
-              { name: "Zimny aj letny", value: Semester.Both },
-            ]}
-          />
+          >
+            {({ field, controlProps }) => (
+              <Select
+                {...field}
+                {...controlProps}
+                options={[
+                  { name: "Zimny", value: Semester.Winter },
+                  { name: "Letny", value: Semester.Summer },
+                  { name: "Zimny aj letny", value: Semester.Both },
+                ]}
+              />
+            )}
+          </FormField>
 
-          <MultipleFileUploadField
-            control={methods.control}
-            setValue={methods.setValue}
-            setError={methods.setError}
-            label="CV, motivacny list, ine... (.pdf)"
+          <FormField<FormValues, "files">
             name="files"
-            maxFiles={5}
-            accept={{
-              "application/pdf": [".pdf"],
-            }}
-            fileSources={{
-              resumes: !application?.fileUrls ? user?.cvUrl : undefined,
-              internships: application?.fileUrls,
-            }}
-          />
+            label="CV, motivacny list, ine... (.pdf)"
+          >
+            {({ field, controlProps, initialize, onError }) => (
+              <MultipleFileUploadField
+                {...field}
+                {...controlProps}
+                maxFiles={5}
+                accept={{
+                  "application/pdf": [".pdf"],
+                }}
+                fileSources={{
+                  resumes: !application?.fileUrls ? user?.cvUrl : undefined,
+                  internships: application?.fileUrls,
+                }}
+                onLoad={initialize}
+                onError={onError}
+              />
+            )}
+          </FormField>
           <Button
             type="submit"
             disabled={methods.formState.isSubmitting}
@@ -164,6 +178,6 @@ export default function ApplicationForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

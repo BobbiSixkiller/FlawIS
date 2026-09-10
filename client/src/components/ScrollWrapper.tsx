@@ -1,7 +1,7 @@
 "use client";
 
 import { useScrollStore } from "@/stores/scrollStore";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { ReactNode, useEffect, useRef } from "react";
 
 export default function ScrollWrapper({

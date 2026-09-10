@@ -1,6 +1,6 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
-import { getSubdomain } from "@/lib/serverUtils";
+import { getSubdomain } from "@/lib/utilsServer";
 
 export default async function UpdateProfilePage(props: {
   params: Promise<{ lng: string }>;

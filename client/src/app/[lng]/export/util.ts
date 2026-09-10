@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter } from "@/lib/clientUtils";
+import { capitalizeFirstLetter } from "@/lib/utilsClient";
 import type {
   InternshipAcademicYearsQuery,
   InternsQuery,
@@ -55,10 +55,10 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
           ...base,
           section: submission.section.translations[lng as "sk" | "en"].name,
           submission_name_sk: capitalizeFirstLetter(
-            submission.translations.sk.name
+            submission.translations.sk.name,
           ),
           submission_name_en: capitalizeFirstLetter(
-            submission.translations.en.name
+            submission.translations.en.name,
           ),
           abstract_sk: submission.translations.sk.abstract,
           abstract_en: submission.translations.en.abstract,
@@ -119,7 +119,9 @@ export const csvExportRegistry: Record<string, ExportFetcher> = {
     });
   },
   interns: async () => {
-    const allInterns: NonNullable<InternsQuery["interns"]["edges"][number]>["node"][] = [];
+    const allInterns: NonNullable<
+      InternsQuery["interns"]["edges"][number]
+    >["node"][] = [];
     const academicYears = new Map<string, string>();
     let after: string | null = null;
     let internshipsAfter: string | null = null;

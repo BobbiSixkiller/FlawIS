@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { ReactElement } from "react";
 
 export default function Stepper<TStepProps extends { name: string }>({
@@ -32,7 +32,7 @@ export default function Stepper<TStepProps extends { name: string }>({
           <div
             className={`border-l-2 flex flex-col border-t-0 pl-4 pt-0 border-solid ${calculateBorderColor(
               i,
-              activeIndex
+              activeIndex,
             )} font-medium md:pt-4 md:border-t-2 md:border-l-0 md:pl-0`}
           >
             <span

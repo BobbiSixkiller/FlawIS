@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import {
   CloseButton,
   Popover,
@@ -31,7 +31,10 @@ export default function AcademicYearSelect({
         className="flex gap-2 group relative"
       >
         {selectedYear}
-        <Icon name="chevron-down" className="size-3 group-data-open:rotate-180" />
+        <Icon
+          name="chevron-down"
+          className="size-3 group-data-open:rotate-180"
+        />
       </PopoverButton>
       <PopoverPanel
         transition

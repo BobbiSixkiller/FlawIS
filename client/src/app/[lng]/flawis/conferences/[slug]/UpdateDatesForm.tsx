@@ -1,17 +1,21 @@
 "use client";
+import { z } from "zod";
+
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+import useValidation from "@/hooks/useValidation";
+import { compareFields } from "@/lib/validation/form-validation";
 
 import Button from "@/components/Button";
-import { date, object, ref } from "yup";
-import { useTranslation } from "@/lib/i18n/client";
-import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
+import { FormContainer } from "@/components/form";
 import { Input } from "@/components/Input";
 import Spinner from "@/components/Spinner";
+import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
+import { useTranslation } from "@/lib/i18n/client";
 import { useDialogStore } from "@/stores/dialogStore";
-import { updateConferenceDates } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
-import RHFormContainer from "@/components/RHFormContainer";
-import { formatDatetimeLocal } from "@/lib/clientUtils";
+import { updateConferenceDates } from "./actions";
 
 export default function UpdateDatesForm({
   conference,
@@ -20,45 +24,45 @@ export default function UpdateDatesForm({
   conference: ConferenceFragment;
   dialogId: string;
 }) {
+  const { v } = useValidation();
   const { lng, slug } = useParams<{ lng: string; slug: string }>();
   const { t } = useTranslation(lng, "validation");
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = compareFields(
+    compareFields(
+      z.object({
+        start: v.date(),
+        end: v.date(),
+        regEnd: v.date().nullable().default(null),
+        submissionDeadline: v.date().nullable().default(null),
+      }),
+      "end",
+      "start",
+      (value, other) => value == null || other == null || value >= other,
+      t("endDateInvalid"),
+    ),
+    "regEnd",
+    "start",
+    (value, other) => value == null || other == null || value <= other,
+    t("endDateInvalid"),
+  );
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
+    <FormContainer
       defaultValues={{
-        start: formatDatetimeLocal(
-          conference.dates.start,
-          true,
-        ) as unknown as Date,
-        end: formatDatetimeLocal(conference.dates.end, true) as unknown as Date,
+        start: new Date(conference.dates.start),
+        end: new Date(conference.dates.end),
         regEnd: conference.dates.regEnd
-          ? (formatDatetimeLocal(
-              conference.dates.regEnd,
-              true,
-            ) as unknown as Date)
+          ? new Date(conference.dates.regEnd)
           : null,
         submissionDeadline: conference.dates.submissionDeadline
-          ? (formatDatetimeLocal(
-              conference.dates.submissionDeadline,
-              true,
-            ) as unknown as Date)
+          ? new Date(conference.dates.submissionDeadline)
           : null,
       }}
-      yupSchema={object({
-        start: date().typeError(t("date")).required(t("required")),
-        end: date()
-          .typeError(t("date"))
-          .min(ref("start"), t("endDateInvalid"))
-          .required(t("required")),
-        regEnd: date()
-          .nullable()
-          .default(null)
-          .max(ref("start"), t("endDateInvalid")),
-        submissionDeadline: date().nullable().default(null),
-      })}
+      schema={schema}
     >
       {(methods) => (
         <form
@@ -73,22 +77,67 @@ export default function UpdateDatesForm({
             }
           })}
         >
-          <Input
-            type="datetime-local"
+          <FormField<FormValues, "start">
             name="start"
             label="Zaciatok konferencie"
-          />
-          <Input type="datetime-local" name="end" label="Koniec konferencie" />
-          <Input
-            type="datetime-local"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="datetime-local"
+                value={inputValue(field.value, "datetime-local")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "end"> name="end" label="Koniec konferencie">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="datetime-local"
+                value={inputValue(field.value, "datetime-local")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "regEnd">
             name="regEnd"
             label="Koniec registracie"
-          />
-          <Input
-            type="datetime-local"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="datetime-local"
+                value={inputValue(field.value, "datetime-local")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "submissionDeadline">
             name="submissionDeadline"
             label="Deadline odovzdania prispevkov"
-          />
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="datetime-local"
+                value={inputValue(field.value, "datetime-local")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           <Button
             color="primary"
@@ -104,6 +153,6 @@ export default function UpdateDatesForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

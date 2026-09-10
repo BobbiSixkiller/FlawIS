@@ -1,158 +1,55 @@
 "use client";
-
 import Icon from "@/components/Icon";
-import { withLocalizedInput } from "./withLocalizedInput";
-import {
-  Control,
-  useController,
-  useFormContext,
-  useFormState,
-} from "react-hook-form";
-import { cn, formatDatetimeLocal } from "@/lib/clientUtils";
-import { InputHTMLAttributes, useState } from "react";
-import { get } from "lodash";
-
-export interface InputProps extends InputHTMLAttributes<
-  HTMLInputElement | HTMLTextAreaElement
-> {
-  name: string;
-  label?: string;
-  control?: Control<any>;
-  normalizeValue?: (value: string) => string;
-}
-
-export function Input({
-  name,
-  label,
-  onFocus,
-  className,
-  normalizeValue,
-  ...props
-}: InputProps) {
-  const { control } = useFormContext();
-  const { errors } = useFormState({ control, name });
-
-  const isDate = props.type === "datetime-local" || props.type === "date";
-
-  // useController reads the current value synchronously on every render —
-  // no subscription timing lag unlike useWatch which returns undefined on first mount.
-  const { field: controlledField } = useController({ name, control });
-  const {
-    ref: inputRef,
-    name: fieldName,
-    onBlur: onFieldBlur,
-    disabled: fieldDisabled,
-    value: fieldValue,
-    onChange: onFieldChange,
-  } = controlledField;
-
-  const error = get(errors, name)?.message?.toString();
-
+import { cn } from "@/lib/utilsClient";
+import { useState, type ComponentPropsWithRef } from "react";
+export type InputProps = ComponentPropsWithRef<"input">;
+export function Input({ ref, className, ...props }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
-
   return (
-    <div className={cn(["w-full flex flex-col gap-2", className])}>
-      {label && (
-        <label
-          htmlFor={name}
-          className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85"
+    <div
+      className={cn([
+        className,
+        "flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
+        "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none",
+        props["aria-invalid"]
+          ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
+          : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
+        props.disabled &&
+          "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
+      ])}
+    >
+      <input
+        className={
+          "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
+        }
+        {...props}
+        ref={ref}
+        onWheel={(event) => {
+          if (props.type === "number") event.currentTarget.blur();
+          props.onWheel?.(event);
+        }}
+        type={showPassword ? "text" : props.type}
+      />
+      {props.type === "password" && (
+        <button
+          type="button"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          aria-pressed={showPassword}
+          className={cn([
+            "p-2 text-gray-400 hover:text-primary-500 focus:outline-hidden focus:text-primary-500",
+            "dark:hover:text-primary-300 dark:text-gray-600 dark:focus:text-primary-300",
+          ])}
+          onClick={() => {
+            setShowPassword(!showPassword);
+          }}
         >
-          {label}
-        </label>
+          {showPassword ? (
+            <Icon name="eye-slash" className="size-5" />
+          ) : (
+            <Icon name="eye" className="size-5" />
+          )}
+        </button>
       )}
-      <div
-        className={cn([
-          "flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
-          "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none",
-          error
-            ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
-            : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300 ring-gray-300",
-          props.disabled &&
-            "bg-slate-100 text-slate-500 ring-slate-200 shadow-none dark:bg-gray-900 dark:ring-gray-700 focus-within:ring-transparent",
-        ])}
-      >
-        <input
-          className={
-            "w-full sm:text-sm/6 bg-transparent border-transparent focus:border-transparent focus:ring-0 py-1.5 h-9 dark:text-white/85 rounded-md disabled:text-slate-500 placeholder:text-gray-400"
-          }
-          {...props}
-          ref={inputRef}
-          name={fieldName}
-          onBlur={onFieldBlur}
-          disabled={fieldDisabled ?? props.disabled}
-          value={
-            isDate
-              ? formatDatetimeLocal(
-                  fieldValue,
-                  props.type === "datetime-local",
-                )
-              : (fieldValue ?? "")
-          }
-          onChange={(e) => {
-            let val: any;
-            if (props.type === "number") val = e.target.valueAsNumber;
-            else if (isDate) {
-              if (props.type === "datetime-local") {
-                // new Date(string) without timezone suffix has ambiguous parsing
-                // across browsers (UTC vs local). Multi-arg constructor always
-                // uses local time, preventing the +1h shift for UTC+1 users.
-                if (e.target.value) {
-                  const [y, mo, d, h, mi] = e.target.value
-                    .split(/[-T:]/)
-                    .map(Number);
-                  val = new Date(y, mo - 1, d, h, mi);
-                } else {
-                  val = null;
-                }
-              } else {
-                // type="date": valueAsDate returns UTC midnight, which
-                // formatDatetimeLocal handles correctly via getTimezoneOffset.
-                val =
-                  e.target.valueAsDate ??
-                  (e.target.value ? new Date(e.target.value) : null);
-              }
-            }
-            else {
-              val = normalizeValue
-                ? normalizeValue(e.target.value)
-                : e.target.value;
-            }
-
-            onFieldChange(val);
-            props.onChange?.(e);
-          }}
-          onFocus={onFocus}
-          onWheel={(e) => {
-            if (props.type === "number") {
-              e.currentTarget.blur();
-            }
-          }}
-          id={name}
-          type={showPassword ? "text" : props.type}
-        />
-        {props.type === "password" && (
-          <button
-            type="button"
-            className={cn([
-              "p-2 text-gray-400 hover:text-primary-500 focus:outline-hidden focus:text-primary-500",
-              "dark:hover:text-primary-300 dark:text-gray-600 dark:focus:text-primary-300",
-            ])}
-            onClick={() => {
-              setShowPassword(!showPassword);
-            }}
-          >
-            {showPassword ? (
-              <Icon name="eye-slash" className="size-5" />
-            ) : (
-              <Icon name="eye" className="size-5" />
-            )}
-          </button>
-        )}
-      </div>
-
-      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }
-
-export const LocalizedInput = withLocalizedInput(Input);

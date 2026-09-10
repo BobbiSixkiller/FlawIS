@@ -8,7 +8,7 @@ import {
 } from "@headlessui/react";
 import Icon from "@/components/Icon";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Button, { ButtonProps } from "@/components/Button";
 import Toggle from "@/components/Toggle";
 

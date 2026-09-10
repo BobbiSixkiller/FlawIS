@@ -9,7 +9,7 @@ import Logo from "./Logo";
 import Breadcrumbs from "./Breadcrumbs";
 import Icon from "@/components/Icon";
 import Avatar from "./Avatar";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { Snackbar } from "./Message";
 
 export default async function Dashboard({

@@ -1,189 +1,242 @@
 "use client";
 
-import { Children, ReactElement, ReactNode, useState } from "react";
-import { DefaultValues, Path, UseFormReturn } from "react-hook-form";
-import { ObjectSchema } from "yup";
-import RHFormContainer from "./RHFormContainer";
-import Stepper from "./Stepper";
-import Button from "./Button";
-import Icon from "@/components/Icon";
-import Spinner from "./Spinner";
 import { useTranslation } from "@/lib/i18n/client";
+import {
+  Children,
+  useEffect,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from "react";
+import {
+  type DefaultValues,
+  type FieldErrors,
+  type FieldValues,
+  type Path,
+  type UseFormReturn,
+} from "react-hook-form";
+import { z } from "zod";
+import Button from "./Button";
+import { FormContainer, FormError } from "./form";
+import Icon from "./Icon";
+import Spinner from "./Spinner";
+import Stepper from "./Stepper";
 
-interface WizzardStepProps<TVals extends Record<string, any>> {
+interface WizzardStepProps<
+  TValues extends FieldValues,
+  TOutput extends FieldValues = TValues,
+> {
+  id: string;
   name: string;
-  yupSchema: ObjectSchema<TVals>;
-  children: ((methods: UseFormReturn<TVals>) => ReactNode) | ReactNode;
+  fields: Path<TValues>[];
+  children:
+    | ((methods: UseFormReturn<TValues, unknown, TOutput>) => ReactNode)
+    | ReactNode;
 }
-
-export function WizzardStep<TVals extends Record<string, any>>({
-  children,
-}: WizzardStepProps<TVals>) {
-  return <>{children}</>;
+export function WizzardStep<
+  TValues extends FieldValues = FieldValues,
+  TOutput extends FieldValues = TValues,
+>({ children }: WizzardStepProps<TValues, TOutput>) {
+  return <>{typeof children === "function" ? null : children}</>;
 }
-
-interface WizzardFormProps<TVals extends Record<string, any>> {
+interface WizzardFormProps<S extends z.ZodType<FieldValues, FieldValues>> {
+  schema: S;
   lng: string;
-  defaultValues?: DefaultValues<TVals>;
-  values?: TVals;
-  onSubmitCb: (values: TVals, methods: UseFormReturn<TVals>) => Promise<void>;
+  defaultValues?: DefaultValues<z.input<S>>;
+  values?: z.input<S>;
+  onSubmitCb: (
+    values: z.output<S>,
+    methods: UseFormReturn<z.input<S>, unknown, z.output<S>>,
+  ) => Promise<void>;
   children: ReactNode;
   className?: string;
 }
+export default function WizzardForm<
+  S extends z.ZodType<FieldValues, FieldValues>,
+>({ schema, defaultValues, values, ...props }: WizzardFormProps<S>) {
+  return (
+    <FormContainer
+      schema={schema}
+      defaultValues={defaultValues}
+      values={values}
+      shouldUnregister={false}
+    >
+      {(methods) => <WizardBody {...props} methods={methods} />}
+    </FormContainer>
+  );
+}
 
-export default function WizzardForm<TInputVals extends Record<string, any>>({
+export function firstErrorPath(
+  errors: unknown,
+  prefix = "",
+): string | undefined {
+  if (!errors || typeof errors !== "object") return undefined;
+  if ("message" in errors && typeof errors.message === "string") return prefix;
+  for (const [key, value] of Object.entries(errors)) {
+    if (["ref", "type", "types"].includes(key)) continue;
+    const result = firstErrorPath(
+      value,
+      key === "root" ? prefix : prefix ? `${prefix}.${key}` : key,
+    );
+    if (result) return result;
+  }
+}
+function WizardBody<TValues extends FieldValues, TOutput extends FieldValues>({
   children,
-  lng,
-  values,
-  defaultValues,
+  methods,
   onSubmitCb,
+  lng,
   className,
-}: WizzardFormProps<TInputVals>) {
+}: {
+  children: ReactNode;
+  methods: UseFormReturn<TValues, unknown, TOutput>;
+  onSubmitCb: (
+    values: TOutput,
+    methods: UseFormReturn<TValues, unknown, TOutput>,
+  ) => Promise<void>;
+  lng: string;
+  className?: string;
+}) {
   const steps = Children.toArray(children) as ReactElement<
-    WizzardStepProps<TInputVals>
+    WizzardStepProps<TValues, TOutput>
   >[];
-
-  const [step, setStep] = useState(0);
-  const { t } = useTranslation(lng, "common");
-
-  function isLastStep() {
-    return step === steps.length - 1;
-  }
-
-  function back() {
-    if (step > 0) {
-      setStep(step - 1);
-    }
-  }
-
+  const [activeId, setActiveId] = useState(steps[0]?.props.id);
+  const [focusPath, setFocusPath] = useState<Path<TValues>>();
+  const [advancing, setAdvancing] = useState(false);
+  const step = Math.max(
+    0,
+    steps.findIndex((s) => s.props.id === activeId),
+  );
   const activeStep = steps[step];
-
-  function handleApiErrors(
-    apiErrors: Record<string, string>,
-    methods: UseFormReturn<TInputVals>,
-  ) {
-    const firstField = Object.keys(apiErrors)[0];
-
-    // Determine step index based on field names and schema
-    const stepIndex = steps.findIndex((step) => {
-      const keys = Object.keys(step.props.yupSchema.fields);
-
-      return keys.some(
-        (k) => firstField === k || firstField.startsWith(`${k}.`),
-      );
-    });
-
-    if (stepIndex !== -1) {
-      setStep(stepIndex);
-    }
-
-    setTimeout(() => {
-      for (const [key, msg] of Object.entries(apiErrors)) {
-        methods.setError(
-          key as Path<TInputVals>,
-          {
-            message: msg,
-          },
-          { shouldFocus: true },
-        );
-      }
+  const last = step === steps.length - 1;
+  const { t } = useTranslation(lng, "common");
+  useEffect(() => {
+    if (!focusPath) return;
+    // Both the destination step and an expanded localized field must mount first.
+    const timeout = setTimeout(() => {
+      methods.setFocus(focusPath);
+      setFocusPath(undefined);
     }, 0);
+    return () => clearTimeout(timeout);
+  }, [focusPath, methods, step]);
+  function navigate(path?: string) {
+    if (!path) return;
+    const target = steps.find((s) =>
+      s.props.fields.some(
+        (field) => path === field || path.startsWith(`${field}.`),
+      ),
+    );
+    if (target) {
+      setActiveId(target.props.id);
+      setFocusPath(path as Path<TValues>);
+    }
   }
-
+  function navigateErrors(errors?: FieldErrors<TValues>) {
+    if (errors) {
+      navigate(firstErrorPath(errors));
+      return;
+    }
+    for (const s of steps)
+      for (const field of s.props.fields) {
+        const error = methods.getFieldState(field).error;
+        if (error) {
+          navigate(firstErrorPath(error, field));
+          return;
+        }
+      }
+  }
+  if (!activeStep) return null;
   return (
     <div className="flex flex-col gap-6">
       <Stepper activeIndex={step} lng={lng} steps={steps} />
-      <RHFormContainer<TInputVals>
-        values={values}
-        defaultValues={defaultValues}
-        yupSchema={steps[step].props.yupSchema}
-        shouldUnregister={false}
+      <form
+        className={className}
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (advancing || methods.formState.isSubmitting) return;
+          if (!last) {
+            setAdvancing(true);
+            try {
+              if (
+                await methods.trigger(activeStep.props.fields, {
+                  shouldFocus: true,
+                })
+              ) {
+                setActiveId(steps[step + 1].props.id);
+              } else {
+                navigateErrors();
+              }
+            } finally {
+              setAdvancing(false);
+            }
+            return;
+          }
+          await methods.handleSubmit(async (values) => {
+            try {
+              await onSubmitCb(values, methods);
+            } catch (error: unknown) {
+              if (
+                error &&
+                typeof error === "object" &&
+                !(error instanceof Error)
+              ) {
+                for (const [field, message] of Object.entries(error))
+                  if (typeof message === "string")
+                    methods.setError(field as Path<TValues>, {
+                      type: "server",
+                      message,
+                    });
+              } else
+                methods.setError("root", {
+                  message: error instanceof Error ? error.message : t("error"),
+                });
+            }
+            navigateErrors();
+          }, navigateErrors)(event);
+        }}
       >
-        {(methods) => (
-          <form
-            className={className}
-            onSubmit={methods.handleSubmit(
-              async (vals) => {
-                try {
-                  if (isLastStep()) {
-                    await onSubmitCb(vals, methods);
-                    // Defer reading errors so React has committed any setError
-                    // calls made inside onSubmitCb before we inspect them.
-                    setTimeout(() => {
-                      const errors = methods.formState.errors;
-                      const errorKeys = Object.keys(errors);
-                      if (errorKeys.length > 0) {
-                        const firstErrorField = errorKeys[0];
-                        const errorStepIndex = steps.findIndex((s) => {
-                          const schemaKeys = Object.keys(
-                            s.props.yupSchema.fields,
-                          );
-                          return schemaKeys.some(
-                            (k) =>
-                              firstErrorField === k ||
-                              firstErrorField.startsWith(`${k}.`),
-                          );
-                        });
-                        if (errorStepIndex !== -1) {
-                          setStep(errorStepIndex);
-                        }
-                      }
-                    }, 0);
-                  } else {
-                    setStep(step + 1);
-                  }
-                } catch (errors: any) {
-                  console.log(errors);
-                  if (errors && typeof errors === "object") {
-                    handleApiErrors(errors, methods);
-                  }
-                }
-              },
-              (err) => console.log(err),
-            )}
+        <div key={activeStep.props.id} className="contents">
+          {typeof activeStep.props.children === "function"
+            ? activeStep.props.children(methods)
+            : activeStep.props.children}
+        </div>
+        <FormError />
+        <div className="flex justify-between mt-6">
+          {steps.length > 1 && (
+            <Button
+              color="secondary"
+              type="button"
+              onClick={() => setActiveId(steps[step - 1].props.id)}
+              disabled={step === 0 || methods.formState.isSubmitting}
+              aria-label={t("previous")}
+            >
+              <Icon name="chevron-left" className="h-4 w-4" />
+              <span className="hidden md:inline">{t("previous")}</span>
+            </Button>
+          )}
+          <Button
+            className={steps.length === 1 ? "w-full" : ""}
+            color="primary"
+            type="submit"
+            disabled={advancing || methods.formState.isSubmitting}
+            aria-label={t(last ? "submit" : "next")}
           >
-            {typeof activeStep.props.children === "function"
-              ? activeStep.props.children(methods)
-              : activeStep.props.children}
-
-            <div className="flex justify-between mt-6">
-              {steps.length > 1 && (
-                <Button
-                  color="secondary"
-                  type="button"
-                  onClick={back}
-                  disabled={step === 0}
-                  aria-label={t("previous")}
-                >
-                  <Icon name="chevron-left" className="h-4 w-4" />
-                  <span className="hidden md:inline">{t("previous")}</span>
-                </Button>
-              )}
-              <Button
-                className={steps.length === 1 ? "w-full" : ""}
-                color="primary"
-                type="submit"
-                disabled={methods.formState.isSubmitting}
-                aria-label={isLastStep() ? t("submit") : t("next")}
-              >
-                {methods.formState.isSubmitting ? (
-                  <Spinner inverted />
-                ) : isLastStep() ? (
-                  <>
-                    <Icon name="check" className="h-4 w-4" />
-                    <span className="hidden md:inline">{t("submit")}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="hidden md:inline">{t("next")}</span>
-                    <Icon name="chevron-right" className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        )}
-      </RHFormContainer>
+            {advancing || methods.formState.isSubmitting ? (
+              <Spinner inverted />
+            ) : last ? (
+              <>
+                <Icon name="check" className="h-4 w-4" />
+                <span className="hidden md:inline">{t("submit")}</span>
+              </>
+            ) : (
+              <>
+                <span className="hidden md:inline">{t("next")}</span>
+                <Icon name="chevron-right" className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

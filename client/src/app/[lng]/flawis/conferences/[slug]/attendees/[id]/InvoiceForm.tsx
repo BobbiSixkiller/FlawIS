@@ -1,18 +1,21 @@
 "use client";
+import { z } from "zod";
 
-import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+
 import Button from "@/components/Button";
-import { InvoiceInput } from "@/lib/graphql/generated/graphql";
+import { FormContainer } from "@/components/form";
 import { Input } from "@/components/Input";
-import { Textarea } from "@/components/Textarea";
 import Spinner from "@/components/Spinner";
-import { useDialogStore } from "@/stores/dialogStore";
-import { updateInvoice } from "./actions";
-import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
+import { Textarea } from "@/components/Textarea";
 import useValidation from "@/hooks/useValidation";
-import { formatDatetimeLocal } from "@/lib/clientUtils";
+import { InvoiceInput } from "@/lib/graphql/generated/graphql";
+import { useTranslation } from "@/lib/i18n/client";
+import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
+import { useParams } from "next/navigation";
+import { updateInvoice } from "./actions";
 
 function withoutNull(value: string | null | undefined) {
   return value ?? undefined;
@@ -32,11 +35,51 @@ export default function UpdateInvoiceForm({
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
   const { t } = useTranslation(lng, "validation");
 
+  const schema = z.object({
+    issuer: z.object({
+      name: v.string().trim().min(1, v.required),
+      address: z.object({
+        street: v.string().trim().min(1, v.required),
+        city: v.string().trim().min(1, v.required),
+        postal: v.string().trim().min(1, v.required),
+        country: v.string().trim().min(1, v.required),
+      }),
+      variableSymbol: v.string().trim().min(1, v.required),
+      IBAN: v.string().trim().nullable().optional(),
+      SWIFT: v.string().trim().nullable().optional(),
+      ICO: v.string().trim().nullable().optional(),
+      DIC: v.string().trim().nullable().optional(),
+      ICDPH: v.string().trim().nullable().optional(),
+    }),
+    payer: z.object({
+      name: v.string().trim().min(1, v.required),
+      address: z.object({
+        street: v.string().trim().min(1, v.required),
+        city: v.string().trim().min(1, v.required),
+        postal: v.string().trim().min(1, v.required),
+        country: v.string().trim().min(1, v.required),
+      }),
+      ICO: v.string().trim().nullable().optional(),
+      DIC: v.string().trim().nullable().optional(),
+      ICDPH: v.string().trim().nullable().optional(),
+    }),
+    body: z.object({
+      body: v.string().trim().min(1, v.required),
+      comment: v.string().trim().min(1, v.required),
+      type: v.string().trim().min(1, v.required),
+      issueDate: v.date(),
+      dueDate: v.date(),
+      vatDate: v.date(),
+      price: v.number(),
+      vat: v.number(),
+    }),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
+    <FormContainer
       defaultValues={{
         issuer: {
           ...invoice.issuer,
@@ -49,18 +92,9 @@ export default function UpdateInvoiceForm({
         },
         body: {
           ...invoice.body,
-          issueDate: formatDatetimeLocal(
-            invoice.body.issueDate,
-            false
-          ) as unknown as Date,
-          dueDate: formatDatetimeLocal(
-            invoice.body.dueDate,
-            false
-          ) as unknown as Date,
-          vatDate: formatDatetimeLocal(
-            invoice.body.vatDate,
-            false
-          ) as unknown as Date,
+          issueDate: new Date(invoice.body.issueDate),
+          dueDate: new Date(invoice.body.dueDate),
+          vatDate: new Date(invoice.body.vatDate),
         },
         payer: {
           ...invoice.payer,
@@ -69,45 +103,7 @@ export default function UpdateInvoiceForm({
           ICO: withoutNull(invoice.payer.ICO),
         },
       }}
-      yupSchema={yup.object({
-        issuer: yup.object({
-          name: yup.string().trim().required(),
-          address: yup.object({
-            street: yup.string().trim().required(),
-            city: yup.string().trim().required(),
-            postal: yup.string().trim().required(),
-            country: yup.string().trim().required(),
-          }),
-          variableSymbol: yup.string().trim().required(),
-          IBAN: yup.string().trim().nullable(),
-          SWIFT: yup.string().trim().nullable(),
-          ICO: yup.string().trim().nullable(),
-          DIC: yup.string().trim().nullable(),
-          ICDPH: yup.string().trim().nullable(),
-        }),
-        payer: yup.object({
-          name: yup.string().trim().required(),
-          address: yup.object({
-            street: yup.string().trim().required(),
-            city: yup.string().trim().required(),
-            postal: yup.string().trim().required(),
-            country: yup.string().trim().required(),
-          }),
-          ICO: yup.string().trim().nullable(),
-          DIC: yup.string().trim().nullable(),
-          ICDPH: yup.string().trim().nullable(),
-        }),
-        body: yup.object({
-          body: yup.string().trim().required(),
-          comment: yup.string().trim().required(),
-          type: yup.string().trim().required(),
-          issueDate: yup.date().typeError(t("date")).required(),
-          dueDate: yup.date().typeError(t("date")).required(),
-          vatDate: yup.date().typeError(t("date")).required(),
-          price: yup.number().required(),
-          vat: yup.number().required(),
-        }),
-      })}
+      schema={schema}
     >
       {(methods) => (
         <form
@@ -122,25 +118,216 @@ export default function UpdateInvoiceForm({
             }
           })}
         >
-          <Textarea label="Fakturacne meno" name={`payer.name`} />
-          <Input label="Ulica" name={`payer.address.street`} />
-          <Input label="Mesto" name={`payer.address.city`} />
-          <Input label="PSC" name={`payer.address.postal`} />
-          <Input label="Krajina" name={`payer.address.country`} />
-          <Input label="ICO" name={`payer.ICO`} />
-          <Input label="ICDPH" name={`payer.ICDPH`} />
-          <Input label="DIC" name={`payer.DIC`} />
-          <Input type="date" name="body.issueDate" label="Datum vystavenia" />
-          <Input
-            type="date"
+          <FormField<FormValues, `payer.name`>
+            name={`payer.name`}
+            label="Fakturacne meno"
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.address.street`>
+            name={`payer.address.street`}
+            label="Ulica"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.address.city`>
+            name={`payer.address.city`}
+            label="Mesto"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.address.postal`>
+            name={`payer.address.postal`}
+            label="PSC"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.address.country`>
+            name={`payer.address.country`}
+            label="Krajina"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.ICO`> name={`payer.ICO`} label="ICO">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.ICDPH`>
+            name={`payer.ICDPH`}
+            label="ICDPH"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `payer.DIC`> name={`payer.DIC`} label="DIC">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "body.issueDate">
+            name="body.issueDate"
+            label="Datum vystavenia"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="date"
+                value={inputValue(field.value, "date")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "body.vatDate">
             name="body.vatDate"
             label="Dátum zdaniteľného plnenia"
-          />
-          <Input type="date" name="body.dueDate" label="Uhradiť do" />
-          <Textarea label="Telo" name={`body.body`} />
-          <Textarea label="Komentar" name={`body.comment`} />
-          <Input label="Cena bez DPH v eurach" name="body.price" />
-          <Input label="DPH v eurach" name="body.vat" />
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="date"
+                value={inputValue(field.value, "date")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "body.dueDate">
+            name="body.dueDate"
+            label="Uhradiť do"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="date"
+                value={inputValue(field.value, "date")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `body.body`> name={`body.body`} label="Telo">
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, `body.comment`>
+            name={`body.comment`}
+            label="Komentar"
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "body.price">
+            name="body.price"
+            label="Cena bez DPH v eurach"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "body.vat">
+            name="body.vat"
+            label="DPH v eurach"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           <Button
             color="primary"
@@ -156,6 +343,6 @@ export default function UpdateInvoiceForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

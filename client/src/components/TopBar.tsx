@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Breadcrumbs from "./Breadcrumbs";
 import Icon from "@/components/Icon";
 import { ReactNode, useState } from "react";
@@ -41,7 +41,7 @@ export default function TopBar({
       className={cn([
         "bg-white sticky top-0 z-20 h-[60px] border-b",
         "dark:border-gray-700 dark:bg-gray-900",
-        y ?? 0 > 0 ? "shadow-bottom" : "",
+        (y ?? 0 > 0) ? "shadow-bottom" : "",
       ])}
     >
       <div className={cn(["h-full flex items-center p-4 container mx-auto"])}>
@@ -80,11 +80,16 @@ export default function TopBar({
               }}
               items={[
                 <Link href="/profile" key={0}>
-                  <Icon name="user-circle" className="size-5" aria-hidden="true" />
+                  <Icon
+                    name="user-circle"
+                    className="size-5"
+                    aria-hidden="true"
+                  />
                   {t("profile")}
                 </Link>,
                 <Link prefetch={false} href="/logout" key={1}>
-                  <Icon name="arrow-left-start-on-rectangle"
+                  <Icon
+                    name="arrow-left-start-on-rectangle"
                     className="size-5"
                     aria-hidden="true"
                   />

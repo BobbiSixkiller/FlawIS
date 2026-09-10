@@ -1,8 +1,9 @@
 "use client";
 
-import { Billing, UserFragment } from "@/lib/graphql/generated/graphql";
+import Icon from "@/components/Icon";
+import { cn } from "@/lib/utilsClient";
+import { BillingInput, UserFragment } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/clientUtils";
 import {
   Combobox,
   ComboboxButton,
@@ -11,45 +12,37 @@ import {
   ComboboxOptions,
   Transition,
 } from "@headlessui/react";
-import Icon from "@/components/Icon";
 import { useParams } from "next/navigation";
-import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import {
+  ChangeEvent,
+  Fragment,
+  useState,
+  type AriaAttributes,
+  type Ref,
+} from "react";
 
 export default function ConferenceBillingInput({
   billings,
-  methods,
-}: {
+  value,
+  onNameChange,
+  onSelect,
+  onClear,
+  ref,
+  ...props
+}: AriaAttributes & {
   billings?: UserFragment["billings"];
-  methods: UseFormReturn<{
-    billing: {
-      ICO?: string | undefined;
-      DIC?: string | undefined;
-      ICDPH?: string | undefined;
-      name: string;
-      address: {
-        country: string;
-        street: string;
-        city: string;
-        postal: string;
-      };
-    };
-  }>;
+  value?: BillingInput | null;
+  onNameChange: (name: string) => void;
+  onSelect: (billing: BillingInput) => void;
+  onClear: () => void;
+  id?: string;
+  onBlur?: () => void;
+  ref?: Ref<HTMLInputElement>;
 }) {
-  const ref = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const { lng } = useParams<{ lng: string }>();
 
   const { t } = useTranslation(lng, ["conferences", "common"]);
-
-  const { watch, setValue, getFieldState, formState } = methods;
-  const { error } = getFieldState("billing.name", formState);
-
-  useEffect(() => {
-    if (error) {
-      setTimeout(() => ref.current?.focus(), 0);
-    }
-  }, [error]);
 
   const filteredBillings =
     query === ""
@@ -58,34 +51,24 @@ export default function ConferenceBillingInput({
           billing?.name
             .toLowerCase()
             .replace(/\s+/g, "")
-            .includes(query.toLowerCase().replace(/\s+/g, ""))
+            .includes(query.toLowerCase().replace(/\s+/g, "")),
         );
 
-  function compareBillings(a?: Billing, b?: Billing) {
+  function compareBillings(a?: BillingInput | null, b?: BillingInput | null) {
     return a?.name.toLowerCase() === b?.name.toLowerCase();
   }
 
   const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
-    setValue("billing.name", event.target.value, {
-      shouldValidate: true,
-    });
+    onNameChange(event.target.value);
   };
 
   return (
     <div>
-      <label
-        htmlFor="billing.name"
-        className="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
-      >
-        {t("registration.billing.name")}
-      </label>
       <Combobox
         immediate
-        value={watch("billing")}
-        onChange={(val) =>
-          val ? setValue("billing", val, { shouldValidate: true }) : null
-        }
+        value={value}
+        onChange={(val) => (val ? onSelect(val) : null)}
         by={compareBillings}
       >
         <div className="relative mt-2">
@@ -93,34 +76,27 @@ export default function ConferenceBillingInput({
             className={cn([
               "flex gap-1 w-full rounded-md border-0 text-gray-900 ring-1 ring-gray-300 focus-within:ring-2 shadow-xs",
               "dark:bg-gray-800 dark:ring-gray-600 dark:text-white",
-              error
+              props["aria-invalid"]
                 ? "ring-red-500 dark:ring-red-500 focus-within:ring-red-500"
                 : "focus-within:ring-primary-500",
             ])}
           >
             <ComboboxInput
+              {...props}
               ref={ref}
               className={cn([
                 "w-full border-none rounded-r-none rounded-l-md py-1.5 bg-transparent placeholder:text-gray-400 focus:ring-transparent sm:text-sm sm:leading-6",
               ])}
-              displayValue={(billing: Billing) => billing?.name}
+              displayValue={(billing: BillingInput) => billing?.name}
               onChange={handleInput}
-              id="billing.name"
             />
             <div className="flex">
-              {watch("billing.name") && (
+              {value?.name && (
                 <button
                   className="p-2 hover:text-primary-500 text-gray-400"
-                  onClick={() => {
-                    setValue("billing.name", "");
-                    setValue("billing.address.street", "");
-                    setValue("billing.address.city", "");
-                    setValue("billing.address.postal", "");
-                    setValue("billing.address.country", "");
-                    setValue("billing.ICO", "");
-                    setValue("billing.DIC", "");
-                    setValue("billing.ICDPH", "");
-                  }}
+                  type="button"
+                  aria-label={t("clear", { ns: "common" })}
+                  onClick={onClear}
                 >
                   <Icon name="x-mark" className="size-3" />
                 </button>
@@ -128,9 +104,17 @@ export default function ConferenceBillingInput({
               <ComboboxButton className="p-2 text-gray-400">
                 {({ open }) =>
                   open ? (
-                    <Icon name="chevron-up" className="size-3" aria-hidden="true" />
+                    <Icon
+                      name="chevron-up"
+                      className="size-3"
+                      aria-hidden="true"
+                    />
                   ) : (
-                    <Icon name="chevron-down" className="size-3" aria-hidden="true" />
+                    <Icon
+                      name="chevron-down"
+                      className="size-3"
+                      aria-hidden="true"
+                    />
                   )
                 }
               </ComboboxButton>
@@ -179,7 +163,11 @@ export default function ConferenceBillingInput({
                               focus ? "text-white" : "text-primary-600"
                             }`}
                           >
-                            <Icon name="check" className="h-5 w-5" aria-hidden="true" />
+                            <Icon
+                              name="check"
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                            />
                           </span>
                         ) : null}
                       </>
@@ -191,7 +179,6 @@ export default function ConferenceBillingInput({
           </Transition>
         </div>
       </Combobox>
-      {error && <p className="text-sm text-red-500">{error.message}</p>}
     </div>
   );
 }

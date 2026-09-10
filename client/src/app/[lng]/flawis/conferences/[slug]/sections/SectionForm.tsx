@@ -1,15 +1,18 @@
 "use client";
+import { z } from "zod";
 
-import { useParams } from "next/navigation";
+import { LocalizedFormField } from "@/components/form";
+
 import Button from "@/components/Button";
-import { createSection, updateSection } from "./actions";
-import { LocalizedTextarea } from "@/components/Textarea";
+import { FormContainer } from "@/components/form";
 import Spinner from "@/components/Spinner";
+import { Textarea } from "@/components/Textarea";
+import useValidation from "@/hooks/useValidation";
+import { SectionFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import { SectionFragment } from "@/lib/graphql/generated/graphql";
-import RHFormContainer from "@/components/RHFormContainer";
-import useValidation from "@/hooks/useValidation";
+import { useParams } from "next/navigation";
+import { createSection, updateSection } from "./actions";
 
 export default function SectionForm({
   conferenceId,
@@ -22,13 +25,27 @@ export default function SectionForm({
 }) {
   const { lng } = useParams<{ slug: string; lng: string }>();
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    conference: v.string().min(1, v.required),
+    translations: z.object({
+      sk: z.object({
+        name: v.string().trim().min(1, v.required),
+        topic: v.string().trim().min(1, v.required),
+      }),
+      en: z.object({
+        name: v.string().trim().min(1, v.required),
+        topic: v.string().trim().min(1, v.required),
+      }),
+    }),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
+    <FormContainer
       defaultValues={{
         conference: conferenceId,
         translations: section?.translations || {
@@ -36,19 +53,7 @@ export default function SectionForm({
           en: { name: "", topic: "" },
         },
       }}
-      yupSchema={yup.object({
-        conference: yup.string().required(),
-        translations: yup.object({
-          sk: yup.object({
-            name: yup.string().trim().required(),
-            topic: yup.string().trim().required(),
-          }),
-          en: yup.object({
-            name: yup.string().trim().required(),
-            topic: yup.string().trim().required(),
-          }),
-        }),
-      })}
+      schema={schema}
     >
       {(methods) => (
         <form
@@ -68,16 +73,32 @@ export default function SectionForm({
             }
           })}
         >
-          <LocalizedTextarea
+          <LocalizedFormField<FormValues, `translations.${"sk" | "en"}.name`>
+            name={`translations.${lng as "sk" | "en"}.name`}
             lng={lng}
             label="Nazov sekcie"
-            name={`translations.${lng}.name`}
-          />
-          <LocalizedTextarea
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </LocalizedFormField>
+          <LocalizedFormField<FormValues, `translations.${"sk" | "en"}.topic`>
+            name={`translations.${lng as "sk" | "en"}.topic`}
             lng={lng}
             label="Tema sekcie"
-            name={`translations.${lng}.topic`}
-          />
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </LocalizedFormField>
 
           <Button
             color="primary"
@@ -89,6 +110,6 @@ export default function SectionForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

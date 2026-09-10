@@ -1,33 +1,36 @@
 "use client";
+import { z } from "zod";
+
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
 
 import { useTranslation } from "@/lib/i18n/client";
-import { Trans } from "../../../../../node_modules/react-i18next";
 import Link from "next/link";
+import { Trans } from "react-i18next";
 import { login } from "./actions";
 
-import { Input } from "@/components/Input";
-import useValidation from "@/hooks/useValidation";
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import { Input } from "@/components/Input";
 import Spinner from "@/components/Spinner";
-import { cn } from "@/lib/clientUtils";
+import useValidation from "@/hooks/useValidation";
+import { cn } from "@/lib/utilsClient";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
 
 export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
   const { t } = useTranslation(lng, "login");
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    email: v.string().email(v.email).min(1, v.required),
+    password: v.string().min(1, v.required),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      defaultValues={{ email: "", password: "" }}
-      yupSchema={yup.object({
-        email: yup.string().email().required(),
-        password: yup.string().required(),
-      })}
-    >
+    <FormContainer defaultValues={{ email: "", password: "" }} schema={schema}>
       {(methods) => (
         <form
           className="space-y-6"
@@ -40,21 +43,29 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
             if (res.success) {
               return setTimeout(
                 () => window.location.replace(url ? url : "/"),
-                300
+                300,
               );
             }
           })}
         >
-          <Input name="email" label="Email" autoComplete="email" />
+          <FormField<FormValues, "email"> name="email" label="Email">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                autoComplete="email"
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85"
-              >
-                {t("password")}
-              </label>
+          <FormField<FormValues, "password">
+            name="password"
+            label={t("password")}
+            labelAction={
               <Trans
                 i18nKey={"forgot"}
                 t={t}
@@ -69,14 +80,21 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
                   />,
                 ]}
               />
-            </div>
-
-            <Input
-              name="password"
-              type="password"
-              autoComplete="current-password"
-            />
-          </div>
+            }
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="password"
+                autoComplete="current-password"
+                value={inputValue(field.value, "password")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           <Button
             className="w-full items-center justify-center gap-2"
@@ -95,6 +113,6 @@ export default function LoginForm({ lng, url }: { lng: string; url?: string }) {
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

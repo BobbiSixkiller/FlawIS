@@ -1,21 +1,24 @@
 "use client";
+import { z } from "zod";
+import { useTranslation } from "@/lib/i18n/client";
 
-import RHFormContainer from "@/components/RHFormContainer";
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+import { compareFields } from "@/lib/validation/form-validation";
+
+import Button from "@/components/Button";
+import { Input } from "@/components/Input";
+import Spinner from "@/components/Spinner";
+import { Textarea } from "@/components/Textarea";
+import TiptapEditor from "@/components/editor/Editor";
+import { FormContainer } from "@/components/form";
 import useValidation from "@/hooks/useValidation";
-import {
-  CourseSessionFragment,
-  CourseSessionInput,
-} from "@/lib/graphql/generated/graphql";
+import { handleAPIErrors } from "@/lib/utilsClient";
+import { CourseSessionFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import { createCourseSession, updateCourseSession } from "./actions";
-import { formatDatetimeLocal, handleAPIErrors } from "@/lib/clientUtils";
-import { Textarea } from "@/components/Textarea";
-import { Input } from "@/components/Input";
-import TiptapEditor from "@/components/editor/Editor";
-import Button from "@/components/Button";
-import Spinner from "@/components/Spinner";
 
 export default function CourseSessionForm({
   dialogId,
@@ -24,30 +27,39 @@ export default function CourseSessionForm({
   dialogId: string;
   courseSession?: CourseSessionFragment;
 }) {
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
-  const { id: courseId } = useParams<{ lng: string; id: string }>();
+  const { id: courseId, lng } = useParams<{ lng: string; id: string }>();
+  const { t } = useTranslation(lng, "courses");
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
   const today = new Date().toUTCString();
 
+  const schema = compareFields(
+    z.object({
+      course: v.string().min(1, v.required),
+      name: v.string().min(1, v.required),
+      description: v.string().optional(),
+      start: v.date(),
+      end: v.date(),
+    }),
+    "end",
+    "start",
+    (value, other) => value == null || other == null || value >= other,
+    v.required,
+  );
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer<CourseSessionInput>
-      yupSchema={yup.object({
-        course: yup.string().required(),
-        name: yup.string().required(),
-        description: yup.string(),
-        start: yup.date(),
-        end: yup.date().min(yup.ref("start")),
-      })}
+    <FormContainer
+      schema={schema}
       defaultValues={{
         course: courseId,
         name: courseSession?.name ?? "",
         description: courseSession?.description ?? "",
-        start: formatDatetimeLocal(courseSession?.start ?? today, true),
-        end: formatDatetimeLocal(courseSession?.end ?? today, true),
+        start: new Date(courseSession?.start ?? today),
+        end: new Date(courseSession?.end ?? today),
       }}
     >
       {(methods) => (
@@ -76,19 +88,56 @@ export default function CourseSessionForm({
                 closeDialog(dialogId);
               }
             },
-            (errs) => console.log(errs)
+            (errs) => console.log(errs),
           )}
         >
-          <Textarea label="Nazov terminu" name="name" />
+          <FormField<FormValues, "name"> name="name" label="Nazov terminu">
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </FormField>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Input label="Zaciatok" name="start" type="datetime-local" />
-            <Input label="Koniec" name="end" type="datetime-local" />{" "}
+            <FormField<FormValues, "start"> name="start" label="Zaciatok">
+              {({ field, controlProps }) => (
+                <Input
+                  {...field}
+                  {...controlProps}
+                  type="datetime-local"
+                  value={inputValue(field.value, "datetime-local")}
+                  onChange={(event) => {
+                    field.onChange(inputChange(event));
+                  }}
+                />
+              )}
+            </FormField>
+            <FormField<FormValues, "end"> name="end" label="Koniec">
+              {({ field, controlProps }) => (
+                <Input
+                  {...field}
+                  {...controlProps}
+                  type="datetime-local"
+                  value={inputValue(field.value, "datetime-local")}
+                  onChange={(event) => {
+                    field.onChange(inputChange(event));
+                  }}
+                />
+              )}
+            </FormField>{" "}
           </div>
-          <TiptapEditor
-            control={methods.control}
-            className="sm:w-[580px] md:w-[672px]"
-            name="description"
-          />
+          <FormField<FormValues, "description"> name="description">
+            {({ field, controlProps }) => (
+              <TiptapEditor
+                {...field}
+                {...controlProps}
+                aria-label={t("editor.label")}
+                className="sm:w-[580px] md:w-[672px]"
+              />
+            )}
+          </FormField>
 
           <Button
             type="submit"
@@ -105,6 +154,6 @@ export default function CourseSessionForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

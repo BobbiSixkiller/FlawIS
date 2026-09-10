@@ -1,6 +1,6 @@
 import Avatar from "@/components/Avatar";
 import { CourseAttendeeFragment } from "@/lib/graphql/generated/graphql";
-import { displayDate } from "@/lib/clientUtils";
+import { displayDate } from "@/lib/utilsClient";
 import Icon from "@/components/Icon";
 import Link from "next/link";
 import { ReactNode } from "react";

@@ -13,9 +13,9 @@ import {
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { currentTimestamp } from "@/lib/serverUtils";
+import { currentTimestamp } from "@/lib/utilsServer";
 import { conferenceWorkspaceState } from "@/lib/conferenceRegistration";
-import { capitalizeFirstLetter } from "@/lib/clientUtils";
+import { capitalizeFirstLetter } from "@/lib/utilsClient";
 import DeleteSubmissionForm from "./DeleteSubmissionForm";
 import SubmissionForm from "./SubmissionForm";
 
@@ -250,7 +250,10 @@ export default async function ConferenceWorkspacePage({
         className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
       >
         <div className="flex items-center gap-2">
-          <Icon name="calendar-days" className="size-5 text-primary-600 dark:text-primary-300" />
+          <Icon
+            name="calendar-days"
+            className="size-5 text-primary-600 dark:text-primary-300"
+          />
           <h2 id="timeline-heading" className="text-lg font-semibold">
             {t("workspace.importantDates")}
           </h2>
@@ -277,9 +280,15 @@ export default async function ConferenceWorkspacePage({
         <section className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-2">
             {attendee.ticket.online ? (
-              <Icon name="computer-desktop" className="size-5 text-primary-600 dark:text-primary-300" />
+              <Icon
+                name="computer-desktop"
+                className="size-5 text-primary-600 dark:text-primary-300"
+              />
             ) : (
-              <Icon name="map-pin" className="size-5 text-primary-600 dark:text-primary-300" />
+              <Icon
+                name="map-pin"
+                className="size-5 text-primary-600 dark:text-primary-300"
+              />
             )}
             <h2 className="text-lg font-semibold">
               {t("workspace.participation")}
@@ -334,7 +343,10 @@ export default async function ConferenceWorkspacePage({
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <Icon name="document-text" className="size-5 text-primary-600 dark:text-primary-300" />
+                <Icon
+                  name="document-text"
+                  className="size-5 text-primary-600 dark:text-primary-300"
+                />
                 <h2 className="text-xl font-semibold">
                   {t("workspace.mySubmissions")}
                 </h2>
@@ -377,10 +389,7 @@ export default async function ConferenceWorkspacePage({
           </div>
 
           {state.submissionsEditable ? (
-            <Modal
-              dialogId={newSubmissionDialogId}
-              title={t("submission.new")}
-            >
+            <Modal dialogId={newSubmissionDialogId} title={t("submission.new")}>
               <SubmissionForm
                 lng={lng}
                 dialogId={newSubmissionDialogId}

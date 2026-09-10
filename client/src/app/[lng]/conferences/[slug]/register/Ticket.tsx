@@ -1,17 +1,20 @@
 "use client";
 
 import Icon from "@/components/Icon";
+import { cn } from "@/lib/utilsClient";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/lib/clientUtils";
-import { Description, Label, Radio, RadioGroup } from "@headlessui/react";
-import { Control, useController } from "react-hook-form";
+import { Radio, RadioGroup } from "@headlessui/react";
+import type { AriaAttributes, Ref } from "react";
 
 export default function ConferenceTicket({
   tickets,
   setSubmission,
   submission,
-  control,
-}: {
+  value,
+  onChange,
+  ref,
+  ...props
+}: AriaAttributes & {
   submission?: SubmissionFragment;
   tickets: {
     id: string;
@@ -21,30 +24,40 @@ export default function ConferenceTicket({
     withSubmission: boolean;
   }[];
   setSubmission: (visible: boolean) => void;
-  control: Control<any>;
+  value?: string;
+  onChange: (value: string) => void;
+  ref?: Ref<HTMLElement>;
+  id?: string;
+  onBlur?: () => void;
 }) {
-  const { field, fieldState } = useController({
-    name: "ticketId",
-    control,
-  });
-
   return (
     <div className="flex flex-col gap-2">
-      <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-white">
-        Forma ucasti
-      </label>
       <RadioGroup
         aria-label="Conference Tickets"
-        value={field.value}
-        onChange={field.onChange}
+        {...props}
+        value={value}
+        onChange={(value) => {
+          onChange(value);
+          setSubmission(
+            Boolean(
+              tickets.find((ticket) => ticket.id === value)?.withSubmission,
+            ),
+          );
+        }}
       >
         <div className="space-y-2">
           {tickets.map((ticket) => (
             <Radio
               disabled={!!submission && !ticket.withSubmission}
-              onClick={() => setSubmission(ticket.withSubmission)}
+              ref={
+                ticket ===
+                tickets.find((ticket) => !submission || ticket.withSubmission)
+                  ? ref
+                  : undefined
+              }
               key={ticket.id}
               value={ticket.id}
+              aria-label={ticket.name}
               className={({ checked, focus, disabled }) =>
                 cn([
                   "relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-hidden borde bg-white dark:bg-gray-900",
@@ -62,8 +75,7 @@ export default function ConferenceTicket({
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center">
                       <div className="text-sm">
-                        <Label
-                          as="p"
+                        <p
                           className={`font-medium  ${
                             checked
                               ? "text-white"
@@ -71,9 +83,8 @@ export default function ConferenceTicket({
                           }`}
                         >
                           {ticket.name}
-                        </Label>
-                        <Description
-                          as="span"
+                        </p>
+                        <span
                           className={`inline ${
                             checked
                               ? "text-sky-100"
@@ -83,7 +94,7 @@ export default function ConferenceTicket({
                           <span>{ticket.desc}</span>
                           <span aria-hidden="true">&middot;</span>
                           <span>{ticket.price} €</span>
-                        </Description>
+                        </span>
                       </div>
                     </div>
                     {checked && (
@@ -98,9 +109,6 @@ export default function ConferenceTicket({
           ))}
         </div>
       </RadioGroup>
-      {fieldState.error && (
-        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-      )}
     </div>
   );
 }

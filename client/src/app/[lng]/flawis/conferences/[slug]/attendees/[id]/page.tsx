@@ -3,7 +3,7 @@ import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
 import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
 import Icon from "@/components/Icon";
 import { redirect } from "next/navigation";
-import { capitalizeFirstLetter, cn } from "@/lib/clientUtils";
+import { capitalizeFirstLetter, cn } from "@/lib/utilsClient";
 import RemoveAuthorForm from "./RemoveAuthorForm";
 import { deleteAttendee, getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
@@ -95,7 +95,7 @@ export default async function AttendeePage({
                 <div>
                   <h2 className="font-medium leading-6">
                     {capitalizeFirstLetter(
-                      s.translations[lng as "sk" | "en"].name
+                      s.translations[lng as "sk" | "en"].name,
                     )}
                   </h2>
                   <p className="leading-none text-gray-500">
@@ -106,7 +106,9 @@ export default async function AttendeePage({
                 </div>
 
                 <Tooltip message={t("editSubmission")} position="below">
-                  <ModalTrigger dialogId={`${updateSubmissionDialogId}-${s.id}`}>
+                  <ModalTrigger
+                    dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                  >
                     <Button
                       size="icon"
                       variant="ghost"

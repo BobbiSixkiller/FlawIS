@@ -1,15 +1,18 @@
 "use client";
+import { z } from "zod";
 
+import { FormField } from "@/components/form";
+
+import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import GenericCombobox from "@/components/GenericCombobox";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams } from "next/navigation";
-import Button from "@/components/Button";
 import { useDialogStore } from "@/stores/dialogStore";
-import { sendInvites } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
-import GenericCombobox from "@/components/GenericCombobox";
+import { useParams } from "next/navigation";
+import { sendInvites } from "./actions";
 
 export default function RegistrationInviteForm({
   dialogId,
@@ -17,24 +20,21 @@ export default function RegistrationInviteForm({
   dialogId: string;
 }) {
   const { lng } = useParams<{ lng: string }>();
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const { t } = useTranslation(lng, "common");
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    emails: z
+      .array(v.string().email(v.email).min(1, v.required))
+      .min(1, v.min(1)),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      defaultValues={{ emails: [] }}
-      yupSchema={yup.object({
-        emails: yup
-          .array()
-          .of(yup.string().email().required())
-          .min(1)
-          .required(),
-      })}
-    >
+    <FormContainer defaultValues={{ emails: [] }} schema={schema}>
       {(methods) => (
         <form
           className="space-y-6 mt-4 w-full sm:w-96 mx-auto"
@@ -51,7 +51,7 @@ export default function RegistrationInviteForm({
                     {
                       message: value,
                     },
-                    { shouldFocus: true }
+                    { shouldFocus: true },
                   );
                 }
               }
@@ -62,21 +62,27 @@ export default function RegistrationInviteForm({
             },
             (errs) => {
               console.log(errs);
-            }
+            },
           )}
         >
-          <GenericCombobox<{ id: number; val: string }, string>
-            placeholder="Email adresy organizacii pre staze..."
-            control={methods.control}
-            name="emails"
-            allowCreateNewOptions
-            multiple
-            lng={lng}
-            defaultOptions={[]}
-            getOptionLabel={(opt) => opt.val}
-            renderOption={(opt, props) => <span>{opt.val}</span>}
-            getOptionValue={(opt) => opt?.val ?? ""}
-          />
+          <FormField<FormValues, "emails"> name="emails">
+            {({ field, controlProps, onError, itemErrors }) => (
+              <GenericCombobox<{ id: number; val: string }, string>
+                {...field}
+                {...controlProps}
+                placeholder="Email adresy organizacii pre staze..."
+                allowCreateNewOptions
+                multiple
+                lng={lng}
+                defaultOptions={[]}
+                getOptionLabel={(opt) => opt.val}
+                renderOption={(opt, props) => <span>{opt.val}</span>}
+                getOptionValue={(opt) => opt?.val ?? ""}
+                onError={onError}
+                itemErrors={itemErrors}
+              />
+            )}
+          </FormField>
 
           <Button
             className="w-full"
@@ -92,6 +98,6 @@ export default function RegistrationInviteForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

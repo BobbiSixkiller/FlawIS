@@ -9,7 +9,7 @@ import {
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { cn, formatDatetimeLocal } from "@/lib/clientUtils";
+import { cn, formatDatetimeLocal } from "@/lib/utilsClient";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import {
@@ -17,10 +17,7 @@ import {
   getCourseAttendance,
   syncCourseElearningAccess,
 } from "./actions";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import {
   Children,
   cloneElement,
@@ -54,9 +51,8 @@ interface AttendanceTableContextValue {
   registrationForm: FormFragment;
 }
 
-const AttendanceTableContext = createContext<AttendanceTableContextValue | null>(
-  null,
-);
+const AttendanceTableContext =
+  createContext<AttendanceTableContextValue | null>(null);
 
 function useAttendanceTableContext() {
   const context = useContext(AttendanceTableContext);
@@ -66,11 +62,7 @@ function useAttendanceTableContext() {
   return context;
 }
 
-function AttendanceTableContainer({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AttendanceTableContainer({ children }: { children: React.ReactNode }) {
   const { sessions } = useAttendanceTableContext();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState<ScrollState>({
@@ -286,7 +278,8 @@ function AttendanceRow({
                       setSyncingElearning(false);
                     }}
                   >
-                    <Icon name="arrow-path"
+                    <Icon
+                      name="arrow-path"
                       className={cn([
                         "size-4",
                         syncingElearning && "animate-spin",

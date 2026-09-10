@@ -1,33 +1,38 @@
 "use client";
 
+import Icon from "@/components/Icon";
+import { cn } from "@/lib/utilsClient";
+import { GqlMutationResponse } from "@/lib/graphql/actions";
+import { useTranslation } from "@/lib/i18n/client";
 import {
   Combobox,
   ComboboxButton,
   ComboboxInput,
   ComboboxOption,
   ComboboxOptions,
-  Description,
-  Field,
-  Label,
 } from "@headlessui/react";
-import { type ReactNode, useEffect, useState, useMemo } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import { last, isEqual, isObject } from "lodash";
-import { Control, useController } from "react-hook-form";
-import Spinner from "./Spinner";
-import { cn, handleAPIErrors } from "@/lib/clientUtils";
-import Icon from "@/components/Icon";
-import { withLocalizedInput } from "./withLocalizedInput";
-import { GqlMutationResponse } from "@/lib/graphql/actions";
-import { useTranslation } from "@/lib/i18n/client";
+import { isEqual, last } from "lodash";
 import { useParams } from "next/navigation";
+import {
+  type AriaAttributes,
+  type Ref,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useDebouncedCallback } from "use-debounce";
+import Spinner from "./Spinner";
 
-export interface GenericComboboxProps<TOption, TValue> {
+export interface GenericComboboxProps<TOption, TValue> extends AriaAttributes {
   lng: string;
   name: string;
-  control: Control<any>;
-  label?: string;
-  description?: ReactNode;
+  value?: TValue | TValue[] | null;
+  onChange: (value: TValue | TValue[]) => void;
+  onBlur?: () => void;
+  id?: string;
+  ref?: Ref<HTMLInputElement>;
+  onError?: (message: string, errors?: Record<string, string>) => void;
+  itemErrors?: Record<number, string>;
   placeholder?: string;
   disabled?: boolean;
   defaultOptions: TOption[];
@@ -43,7 +48,7 @@ export interface GenericComboboxProps<TOption, TValue> {
   getOptionLabel: (opt: TOption) => string;
   getOptionValue: (opt: TOption | null) => TValue;
   allowCreateNewOptions?: boolean;
-  onFocus?: () => void; // So withLocalizedInput HOC works
+  onFocus?: () => void;
   onClick?: () => void;
 }
 
@@ -53,9 +58,11 @@ export default function GenericCombobox<
 >({
   lng,
   name,
-  control,
-  label,
-  description,
+  value: fieldValue,
+  onChange,
+  onError,
+  itemErrors,
+  ref,
   placeholder,
   disabled,
   multiple,
@@ -76,26 +83,24 @@ export default function GenericCombobox<
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<TOption[]>(defaultOptions);
 
-  const { field, fieldState } = useController({ name, control });
-
   // Transform form value (primitive or object) to TOption(s)
   const value: TOption[] = useMemo(() => {
     if (multiple) {
-      const arr = Array.isArray(field.value) ? field.value : [];
+      const arr = Array.isArray(fieldValue) ? fieldValue : [];
       return arr.map((v, i) =>
         typeof v === "object" && v !== null && "id" in v
           ? (v as TOption)
           : ({ id: i, val: v } as TOption),
       );
     } else {
-      if (!field.value) return [];
-      return typeof field.value === "object" &&
-        field.value !== null &&
-        "id" in field.value
-        ? [field.value as TOption]
-        : [{ id: 0, val: field.value } as TOption];
+      if (!fieldValue) return [];
+      return typeof fieldValue === "object" &&
+        fieldValue !== null &&
+        "id" in fieldValue
+        ? [fieldValue as TOption]
+        : [{ id: 0, val: fieldValue } as TOption];
     }
-  }, [field.value, multiple]);
+  }, [fieldValue, multiple]);
 
   // Debounced search input
   const debounced = useDebouncedCallback((value: string) => {
@@ -144,66 +149,46 @@ export default function GenericCombobox<
   async function handleChange(newValue: TOption | TOption[] | null) {
     if (Array.isArray(newValue)) {
       // Creating a new option
-      if (createOption && !last(newValue)?.id) {
+      if (createOption && newValue.length > 0 && last(newValue)?.id == null) {
         setLoading(true);
         const res = await createOption(last(newValue)!.val);
         if (res.data) {
-          field.onChange([
+          onChange([
             ...newValue.slice(0, newValue.length - 1).map(getOptionValue),
             getOptionValue(res.data),
           ]);
           clearQuery();
         }
         if (!res.success) {
-          if (res.errors) {
-            handleAPIErrors(res.errors, control.setError);
-          } else {
-            control.setError(
-              name,
-              { message: res.message },
-              { shouldFocus: true },
-            );
-          }
+          onError?.(res.message, res.errors);
         }
         setLoading(false);
       } else {
-        field.onChange(newValue.map(getOptionValue));
+        onChange(newValue.map(getOptionValue));
         clearQuery();
       }
     } else {
-      if (createOption && !newValue?.id) {
+      if (createOption && newValue && newValue.id == null) {
         setLoading(true);
         const res = await createOption(newValue?.val);
         if (res.data) {
-          field.onChange(getOptionValue(res.data));
+          onChange(getOptionValue(res.data));
         }
         if (!res.success) {
-          if (res.errors) {
-            handleAPIErrors(res.errors, control.setError);
-          } else {
-            control.setError(
-              name,
-              { message: res.message },
-              { shouldFocus: true },
-            );
-          }
+          onError?.(res.message, res.errors);
         }
         setLoading(false);
       } else {
-        field.onChange(getOptionValue(newValue));
+        onChange(getOptionValue(newValue));
       }
     }
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (
-      event.key === "Backspace" &&
-      text === "" &&
-      Array.isArray(field.value)
-    ) {
+    if (event.key === "Backspace" && text === "" && Array.isArray(fieldValue)) {
       // Prevent the default backspace behavior
       event.preventDefault();
-      field.onChange(field.value.slice(0, -1));
+      onChange(fieldValue.slice(0, -1));
     }
   };
 
@@ -217,7 +202,7 @@ export default function GenericCombobox<
             "min-h-9 py-1 pl-2.5 flex flex-wrap gap-1 w-full rounded-md border-0 ring-gray-300 shadow-xs sm:text-sm sm:leading-6",
             "dark:bg-gray-800 dark:ring-gray-600 text-gray-900 dark:text-white",
             "ring-1 focus-within:ring-2",
-            fieldState.error
+            props["aria-invalid"]
               ? "ring-red-500 dark:ring-red-500 focus:ring-red-500 dark:focus:ring-red-500"
               : "focus-within:ring-primary-500 dark:focus-within:ring-primary-300",
             disabled
@@ -231,9 +216,7 @@ export default function GenericCombobox<
                 key={val.id}
                 className={cn([
                   "flex gap-1 whitespace-nowrap rounded-md bg-gray-300 dark:bg-gray-600 dark:text-white px-1 h-7 items-center",
-                  fieldState.error &&
-                    Array.isArray(fieldState.error) &&
-                    fieldState.error[i] &&
+                  itemErrors?.[i] &&
                     "bg-red-300 dark:bg-red-300 text-red-500 dark:text-red-500",
                 ])}
               >
@@ -242,7 +225,7 @@ export default function GenericCombobox<
                   type="button"
                   disabled={disabled}
                   onClick={() =>
-                    field.onChange(
+                    onChange(
                       value
                         .filter((i) => i.id !== val.id)
                         .map((v) => getOptionValue(v)),
@@ -256,14 +239,22 @@ export default function GenericCombobox<
 
           <div className="flex flex-1">
             <ComboboxInput
+              {...props}
+              ref={ref}
+              name={name}
               placeholder={placeholder}
               onChange={(e) => handleQueryChange(e.target.value)}
               {...(multiple ? { value: text } : {})}
-              displayValue={({ val }: TOption) => {
+              displayValue={(option: TOption) => {
+                if (multiple || !option) return "";
+                if (displayValue) return displayValue(option);
+                const { val } = option;
                 const selected = options.find((o) =>
                   Object.values(o.val).some((v) => isEqual(v, val)),
                 );
-                return selected?.val.text;
+                return selected
+                  ? getOptionLabel(selected)
+                  : getOptionLabel(option);
               }}
               className="bg-transparent border-none focus:ring-0 p-0 w-full"
               onKeyDown={handleKeyDown}
@@ -316,16 +307,11 @@ export default function GenericCombobox<
   }
 
   return (
-    <Field {...props}>
-      {label && (
-        <Label className="block mb-2 text-sm font-medium leading-6 text-gray-900 dark:text-white">
-          {label}
-        </Label>
-      )}
-
+    <>
       {multiple ? (
         <Combobox
           multiple
+          disabled={disabled}
           immediate={immediate}
           value={value}
           onChange={handleChange}
@@ -334,6 +320,7 @@ export default function GenericCombobox<
         </Combobox>
       ) : (
         <Combobox
+          disabled={disabled}
           immediate={immediate}
           value={value[0] ?? undefined}
           onChange={handleChange}
@@ -342,22 +329,6 @@ export default function GenericCombobox<
           {renderComboboxContent()}
         </Combobox>
       )}
-
-      {description ? (
-        <Description className="mt-1 text-xs/5 text-gray-500 dark:text-gray-400">
-          {description}
-        </Description>
-      ) : null}
-
-      {fieldState.error && (
-        <p className="text-sm text-red-500">
-          {!Array.isArray(fieldState.error)
-            ? fieldState.error?.message
-            : fieldState.error.map((err) => err.message).join(" ")}
-        </p>
-      )}
-    </Field>
+    </>
   );
 }
-
-export const LocalizedGenericCombobox = withLocalizedInput(GenericCombobox);

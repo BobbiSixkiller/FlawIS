@@ -1,7 +1,7 @@
 import { getConference } from "../actions";
 import Heading from "@/components/Heading";
 import Icon from "@/components/Icon";
-import { displayDate } from "@/lib/clientUtils";
+import { displayDate } from "@/lib/utilsClient";
 import DynamicImage from "@/components/DynamicImage";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";

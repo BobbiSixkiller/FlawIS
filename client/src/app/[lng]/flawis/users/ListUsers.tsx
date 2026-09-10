@@ -2,17 +2,14 @@
 
 import Link from "next/link";
 import { getUsers } from "./actions";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import {
   Access,
   UserFilterInput,
   UsersQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 
 interface UserData {
   id: string;

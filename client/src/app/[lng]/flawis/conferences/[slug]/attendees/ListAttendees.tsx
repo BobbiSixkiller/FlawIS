@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import { getAttendees } from "./actions";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import { LegacyRef, ReactNode } from "react";
 import {
   AttendeeFragment,
   AttendeesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 
 function ListItem({ data }: { data?: AttendeeFragment }) {
   return (

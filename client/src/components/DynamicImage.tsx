@@ -1,6 +1,6 @@
 import Image, { ImageProps } from "next/image";
 import { getPlaiceholder } from "plaiceholder";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { readFile } from "node:fs/promises";
 
 const FALLBACK_SRC = "/images/img-placeholder.jpg";
@@ -8,7 +8,7 @@ const FALLBACK_SRC = "/images/img-placeholder.jpg";
 export async function getImage(src: string) {
   try {
     const buffer = await fetch(src).then(async (res) =>
-      Buffer.from(await res.arrayBuffer())
+      Buffer.from(await res.arrayBuffer()),
     );
 
     const {
@@ -23,7 +23,7 @@ export async function getImage(src: string) {
   } catch (error) {
     console.error(
       `Failed to fetch image from ${src}. Falling back to default image.`,
-      error
+      error,
     );
     const file = await readFile(process.cwd() + "/public" + FALLBACK_SRC);
 

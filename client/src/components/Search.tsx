@@ -1,7 +1,7 @@
 "use client";
 
 import Spinner from "@/components/Spinner";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import {
   Combobox,
   ComboboxInput,
@@ -127,7 +127,10 @@ export default function SearchComponent<
                 ])}
               >
                 <div className="px-4 flex items-center">
-                  <Icon name="magnifying-glass" className="h-6 w-6 text-gray-500" />
+                  <Icon
+                    name="magnifying-glass"
+                    className="h-6 w-6 text-gray-500"
+                  />
                   <ComboboxInput
                     autoComplete="off"
                     autoFocus

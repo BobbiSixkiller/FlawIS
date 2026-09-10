@@ -1,14 +1,18 @@
 "use client";
+import { z } from "zod";
 
-import RHFormContainer from "@/components/RHFormContainer";
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+
+import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import { Input } from "@/components/Input";
+import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
+import { handleAPIErrors } from "@/lib/utilsClient";
 import { CategoryFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import { handleAPIErrors } from "@/lib/clientUtils";
-import { Input } from "@/components/Input";
-import Button from "@/components/Button";
-import Spinner from "@/components/Spinner";
 import { createCategoryAction, updateCategoryAction } from "../actions";
 
 export default function CategoryForm({
@@ -18,15 +22,15 @@ export default function CategoryForm({
   dialogId: string;
   category?: CategoryFragment;
 }) {
-  const { yup } = useValidation();
+  const { v } = useValidation();
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({ name: v.string().min(1, v.required) });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer<{ name: string }>
-      yupSchema={yup.object({
-        name: yup.string().required(),
-      })}
+    <FormContainer
+      schema={schema}
       defaultValues={{
         name: category?.name ?? "",
       }}
@@ -56,7 +60,18 @@ export default function CategoryForm({
             }
           })}
         >
-          <Input label="Názov" name="name" />
+          <FormField<FormValues, "name"> name="name" label="Názov">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
           <Button
             type="submit"
             disabled={methods.formState.isSubmitting}
@@ -72,6 +87,6 @@ export default function CategoryForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

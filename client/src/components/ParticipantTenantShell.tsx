@@ -14,7 +14,7 @@ import SessionPolling from "@/components/SessionPolling";
 import ThemeToggler from "@/components/ThemeToggler";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 
 export default async function ParticipantTenantShell({
   children,
@@ -52,11 +52,16 @@ export default async function ParticipantTenantShell({
             }}
             items={[
               <Link href="/profile" prefetch={false} key="profile">
-                <Icon name="user-circle" className="size-5" aria-hidden="true" />
+                <Icon
+                  name="user-circle"
+                  className="size-5"
+                  aria-hidden="true"
+                />
                 {t("profile")}
               </Link>,
               <Link href="/logout" prefetch={false} key="logout">
-                <Icon name="arrow-left-start-on-rectangle"
+                <Icon
+                  name="arrow-left-start-on-rectangle"
                   className="size-5"
                   aria-hidden="true"
                 />
@@ -91,17 +96,9 @@ export default async function ParticipantTenantShell({
       </main>
 
       <footer
-        className={cn(
-          "w-full max-w-lg border-t p-12",
-          "dark:border-gray-700",
-        )}
+        className={cn("w-full max-w-lg border-t p-12", "dark:border-gray-700")}
       >
-        <Logo
-          lng={lng}
-          height={60}
-          width={60}
-          className="justify-center"
-        />
+        <Logo lng={lng} height={60} width={60} className="justify-center" />
 
         <ul className="flex justify-center gap-2 pt-4 text-xs text-gray-500 dark:text-white/75">
           <li className="cursor-pointer hover:underline lg:hover:text-primary-500 dark:hover:text-primary-300">

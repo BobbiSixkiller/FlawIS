@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Underline from "@tiptap/extension-underline";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import StarterKit from "@tiptap/starter-kit";
@@ -32,7 +32,7 @@ export default function useLocalizedExtensions() {
       }
     },
     emptyNodeClass: cn(
-      "text-gray-400 relative before:absolute before:content-[attr(data-placeholder)]"
+      "text-gray-400 relative before:absolute before:content-[attr(data-placeholder)]",
     ),
     includeChildren: true,
   });
@@ -80,14 +80,14 @@ export default function useLocalizedExtensions() {
     bulletList: {
       HTMLAttributes: {
         class: cn(
-          "list-disc list-outside leading-3 dark:text-gray-300 marker:text-primary-500 dark:marker:text-primary-300"
+          "list-disc list-outside leading-3 dark:text-gray-300 marker:text-primary-500 dark:marker:text-primary-300",
         ),
       },
     },
     orderedList: {
       HTMLAttributes: {
         class: cn(
-          "list-decimal list-outside leading-3 dark:text-gray-300 marker:text-primary-500 dark:marker:text-primary-300"
+          "list-decimal list-outside leading-3 dark:text-gray-300 marker:text-primary-500 dark:marker:text-primary-300",
         ),
       },
     },
@@ -104,14 +104,14 @@ export default function useLocalizedExtensions() {
     codeBlock: {
       HTMLAttributes: {
         class: cn(
-          "rounded-md bg-gray-300/30 text-gray-900 border p-3 font-mono font-medium"
+          "rounded-md bg-gray-300/30 text-gray-900 border p-3 font-mono font-medium",
         ),
       },
     },
     code: {
       HTMLAttributes: {
         class: cn(
-          "rounded-md bg-gray-300/30 px-1.5 py-1 font-mono font-medium"
+          "rounded-md bg-gray-300/30 px-1.5 py-1 font-mono font-medium",
         ),
         spellcheck: "false",
       },

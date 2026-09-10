@@ -1,16 +1,19 @@
 "use client";
+import { z } from "zod";
 
+import { FormField } from "@/components/form";
+
+import Button from "@/components/Button";
+import Editor from "@/components/editor/Editor";
+import useDefaultContent from "@/components/editor/useDefaultContent";
+import { FormContainer } from "@/components/form";
 import Spinner from "@/components/Spinner";
 import useValidation from "@/hooks/useValidation";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams } from "next/navigation";
-import Button from "@/components/Button";
-import Editor from "@/components/editor/Editor";
-import { createInternship, updateInternship } from "./actions";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
-import useDefaultContent from "@/components/editor/useDefaultContent";
-import RHFormContainer from "@/components/RHFormContainer";
+import { useParams } from "next/navigation";
+import { createInternship, updateInternship } from "./actions";
 
 export default function InternshipForm({
   data,
@@ -25,21 +28,23 @@ export default function InternshipForm({
   const { t } = useTranslation(lng, ["internships", "common"]);
   const { closeDialog } = useDialogStore();
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const { defaultInternshipEditorContent } = useDefaultContent(
     lng,
-    organization
+    organization,
   );
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({ description: v.string().min(1, v.required) });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      yupSchema={yup.object({
-        description: yup.string().required(),
-      })}
-      defaultValues={{ description: data?.description || "" }}
+    <FormContainer
+      schema={schema}
+      defaultValues={{
+        description: data?.description || defaultInternshipEditorContent,
+      }}
     >
       {(methods) => (
         <form
@@ -60,17 +65,14 @@ export default function InternshipForm({
             }
           })}
         >
-          <div>
-            <p className="block text-sm font-medium leading-6 text-gray-900 dark:text-white mb-2">
-              {t("editor.label")}
-            </p>
-
-            <Editor
-              control={methods.control}
-              name="description"
-              initialValue={data?.description || defaultInternshipEditorContent}
-            />
-          </div>
+          <FormField<FormValues, "description">
+            name="description"
+            label={t("editor.label")}
+          >
+            {({ field, controlProps }) => (
+              <Editor {...field} {...controlProps} />
+            )}
+          </FormField>
 
           <Button
             type="submit"
@@ -87,6 +89,6 @@ export default function InternshipForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

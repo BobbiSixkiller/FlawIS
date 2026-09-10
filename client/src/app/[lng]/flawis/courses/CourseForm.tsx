@@ -1,34 +1,38 @@
 "use client";
+import { z } from "zod";
 
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+import { compareFields } from "@/lib/validation/form-validation";
+
+import TiptapEditor from "@/components/editor/Editor";
 import useDefaultContent from "@/components/editor/useDefaultContent";
+import GenericCombobox from "@/components/GenericCombobox";
+import ImageFileInput from "@/components/ImageFileInput";
 import { Input } from "@/components/Input";
+import { Textarea } from "@/components/Textarea";
+import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
 import useValidation from "@/hooks/useValidation";
+import { cn, handleAPIErrors, uploadOrDelete } from "@/lib/utilsClient";
 import {
   CategoryFragment,
   CourseFragment,
-  CourseInput,
+  FieldType,
   FormFieldInput,
   ReachCourseConfigInput,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { useParams } from "next/navigation";
-import { useState } from "react";
-import { createCourse, createCategoryAction, fetchCategories } from "./actions";
-import { useMessageStore } from "@/stores/messageStore";
-import { useDialogStore } from "@/stores/dialogStore";
-import GenericCombobox from "@/components/GenericCombobox";
-import { cn, handleAPIErrors, uploadOrDelete } from "@/lib/clientUtils";
-import ImageFileInput from "@/components/ImageFileInput";
-import WizzardForm, { WizzardStep } from "@/components/WizzardForm";
-import { updateCouse } from "./[id]/actions";
-import { Textarea } from "@/components/Textarea";
-import TiptapEditor from "@/components/editor/Editor";
-import { FieldType } from "@/lib/graphql/generated/graphql";
 import {
   normalizeVariableSymbolPrefix,
   VARIABLE_SYMBOL_PREFIX_MAX_LENGTH,
   VARIABLE_SYMBOL_PREFIX_PATTERN,
-} from "@/lib/invoice/validation";
+} from "@/lib/validation/invoice-validation";
+import { useDialogStore } from "@/stores/dialogStore";
+import { useMessageStore } from "@/stores/messageStore";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { updateCouse } from "./[id]/actions";
+import { createCategoryAction, createCourse, fetchCategories } from "./actions";
 
 export default function CourseForm({
   dialogId,
@@ -41,7 +45,7 @@ export default function CourseForm({
 }) {
   const [price, setPrice] = useState(course?.price ?? 0);
   const { lng } = useParams<{ lng: string }>();
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const { t } = useTranslation(lng, ["validation", "courses"]);
 
@@ -50,13 +54,153 @@ export default function CourseForm({
   const setMessage = useMessageStore((s) => s.setMessage);
   const closeDialog = useDialogStore((s) => s.closeDialog);
 
+  const infoSchema = compareFields(
+    compareFields(
+      z.object({
+        name: v.string().min(1, v.required),
+        description: v.string().min(1, v.required),
+        categories: z.array(
+          z.object({
+            id: z.string(),
+            val: z.object({
+              id: z.string(),
+              name: z.string(),
+              slug: z.string(),
+            }),
+          }),
+        ),
+        thumbnailFile: z.file().nullish(),
+        price: v.number(),
+        maxAttendees: v.number().min(1, v.min(1)),
+        start: v.date(),
+        end: v.date(),
+        registrationEnd: v.date(),
+      }),
+      "end",
+      "start",
+      (value, other) => value == null || other == null || value >= other,
+      v.required,
+    ),
+    "registrationEnd",
+    "end",
+    (value, other) => value == null || other == null || value <= other,
+    v.required,
+  );
+  const elearningSchema = z.discriminatedUnion("hasElearning", [
+    z.object({
+      hasElearning: z.literal(true),
+      reachCourse: z.object({
+        courseId: v.string().trim().min(1, v.required),
+        launchUrl: v.string().trim().min(1, v.required).url(v.url),
+      }),
+    }),
+    z.object({
+      hasElearning: z.literal(false),
+      reachCourse: z
+        .object({ courseId: z.string(), launchUrl: z.string() })
+        .nullish(),
+    }),
+  ]);
+  const billingSchema = z.object({
+    billing: z.object({
+      name: v.string().trim().min(1, v.required),
+      address: z.object({
+        street: v.string().trim().min(1, v.required),
+        city: v.string().trim().min(1, v.required),
+        postal: v.string().trim().min(1, v.required),
+        country: v.string().trim().min(1, v.required),
+      }),
+      variableSymbol: v
+        .string()
+        .trim()
+        .refine(
+          (value) => !value || VARIABLE_SYMBOL_PREFIX_PATTERN.test(value),
+          t("variableSymbol"),
+        )
+        .min(1, v.required),
+      IBAN: v.string().trim().min(1, v.required),
+      SWIFT: v.string().trim().min(1, v.required),
+      ICO: v.string().trim().min(1, v.required),
+      DIC: v.string().trim().min(1, v.required),
+      ICDPH: v.string().trim().min(1, v.required),
+    }),
+  });
+  const fieldsSchema = z.object({
+    formFields: z
+      .array(
+        z
+          .object({
+            id: v.string().nullable().optional(),
+            type: z
+              .enum(FieldType, { error: v.required })
+              .refine(
+                (value) =>
+                  [
+                    FieldType.Text,
+                    FieldType.Textarea,
+                    FieldType.Select,
+                    FieldType.RadioGroup,
+                    FieldType.FileUpload,
+                  ].includes(value),
+                v.required,
+              ),
+            label: v.string().min(1, v.required),
+            required: z.boolean({ error: v.required }),
+            placeholder: v.string().nullable().optional(),
+            helpText: v.string().nullable().optional(),
+            selectOptions: z
+              .array(
+                z.object({
+                  value: v.string().min(1, v.required),
+                  text: v.string().min(1, v.required),
+                }),
+              )
+              .nullish(),
+            minFiles: v.number().nullable().optional(),
+            maxFiles: v.number().nullable().optional(),
+          })
+          .superRefine((field, ctx) => {
+            if (
+              (field.type === FieldType.Select ||
+                field.type === FieldType.RadioGroup) &&
+              !field.selectOptions?.length
+            )
+              ctx.addIssue({
+                code: "custom",
+                path: ["selectOptions"],
+                message: v.min(1),
+              });
+          })
+          .transform((field) => ({
+            ...field,
+            selectOptions:
+              field.type === FieldType.Select ||
+              field.type === FieldType.RadioGroup
+                ? field.selectOptions
+                : undefined,
+          })),
+      )
+      .min(0, v.min(0)),
+  });
+  const schema = z.intersection(
+    z.intersection(
+      z.intersection(infoSchema, elearningSchema),
+      price > 0
+        ? billingSchema
+        : z.object({
+            // Keep edits while the step is hidden; validate when it is enabled.
+            billing: z
+              .custom<z.input<typeof billingSchema>["billing"]>()
+              .nullish(),
+          }),
+    ),
+    fieldsSchema,
+  );
+  type FormValues = z.input<typeof schema>;
+  type FormOutput = z.output<typeof schema>;
   return (
-    <WizzardForm<
-      CourseInput & {
-        thumbnailFile: File | null;
-        hasElearning: boolean;
-      }
-    >
+    <WizzardForm
+      schema={schema}
       lng={lng}
       defaultValues={{
         name: course?.name ?? "",
@@ -67,12 +211,22 @@ export default function CourseForm({
         registrationEnd: course?.registrationEnd
           ? new Date(course.registrationEnd)
           : new Date(),
-        description: course?.description ?? "",
+        description: course?.description ?? defaultCourseEditorContent,
         maxAttendees: course?.maxAttendees ?? 0,
         price: course?.price ?? 0,
-        billing: course?.billing,
+        billing: course?.billing
+          ? {
+              ...course.billing,
+              variableSymbol: course.billing.variableSymbol ?? "",
+              IBAN: course.billing.IBAN ?? "",
+              SWIFT: course.billing.SWIFT ?? "",
+              ICO: course.billing.ICO ?? "",
+              DIC: course.billing.DIC ?? "",
+              ICDPH: course.billing.ICDPH ?? "",
+            }
+          : undefined,
         formFields: course?.registrationForm.fields ?? [],
-        thumbnailFile: null,
+        thumbnailFile: undefined,
         hasElearning: Boolean(reachCourseConfig),
         reachCourse: reachCourseConfig ?? {
           courseId: "",
@@ -80,29 +234,29 @@ export default function CourseForm({
         },
       }}
       onSubmitCb={async (vals, methods) => {
-        const { url: thumbnail, error: thumbnailError } = await uploadOrDelete(
-          "images",
-          course?.thumbnail ?? null,
-          vals.thumbnailFile instanceof File ? vals.thumbnailFile : null,
-          "courses/thumbnails",
-        );
+        const { url: thumbnail, error: thumbnailError } =
+          vals.thumbnailFile === undefined
+            ? { url: course?.thumbnail }
+            : await uploadOrDelete(
+                "images",
+                course?.thumbnail ?? null,
+                vals.thumbnailFile instanceof File ? vals.thumbnailFile : null,
+                "courses/thumbnails",
+              );
         if (thumbnailError) {
-          methods.setError("thumbnailFile" as any, { message: thumbnailError });
+          methods.setError("thumbnailFile", { message: thumbnailError });
           return;
         }
 
-        const {
-          thumbnailFile: _,
-          hasElearning,
-          ...courseVals
-        } = vals;
+        const { thumbnailFile: _, hasElearning, ...courseVals } = vals;
         const data = {
           ...courseVals,
-          billing: courseVals.price > 0 ? courseVals.billing : null,
+          billing:
+            courseVals.price > 0
+              ? billingSchema.shape.billing.parse(courseVals.billing)
+              : null,
           reachCourse: hasElearning ? courseVals.reachCourse : null,
-          categories: (courseVals.categories as any[]).map((c: any) =>
-            typeof c === "object" && c !== null && c.val ? c.val.id : c,
-          ),
+          categories: courseVals.categories.map((category) => category.val.id),
           thumbnail: thumbnail !== undefined ? thumbnail : course?.thumbnail,
         };
 
@@ -126,275 +280,464 @@ export default function CourseForm({
         }
       }}
     >
-      <WizzardStep
+      <WizzardStep<FormValues, FormOutput>
         name="Info o kurze"
-        yupSchema={yup.object({
-          name: yup.string().required(),
-          description: yup.string().required(),
-          price: yup.number().required(),
-          maxAttendees: yup.number().required().min(1),
-          start: yup.date(),
-          end: yup.date().min(yup.ref("start")),
-          registrationEnd: yup.date().max(yup.ref("end")),
-        })}
+        id="info"
+        fields={[
+          "name",
+          "description",
+          "price",
+          "maxAttendees",
+          "start",
+          "end",
+          "registrationEnd",
+          "categories",
+          "thumbnailFile",
+        ]}
       >
         {(methods) => (
           <div className="space-y-6 max-w-2xl w-full">
-            <ImageFileInput
-              bucket="images"
-              name="thumbnailFile"
-              label="Thumbnail"
-              avatarUrl={course?.thumbnail ?? undefined}
-              control={methods.control}
-            />
-            <Textarea label="Nazov kurzu" name="name" />
-            <GenericCombobox<
-              { id: string; val: CategoryFragment },
-              { id: string; val: CategoryFragment }
-            >
-              lng={lng}
-              label="Kategórie"
-              name="categories"
-              control={methods.control}
-              allowCreateNewOptions
-              multiple
-              placeholder="Hľadaj kategóriu..."
-              defaultOptions={
-                course?.categories.map((c) => ({
-                  id: String(c.id),
-                  val: c,
-                })) ?? []
-              }
-              fetchOptions={async (query) => {
-                const cats = await fetchCategories(query);
-                return cats.map((c) => ({ id: String(c.id), val: c }));
-              }}
-              createOption={async (name) => {
-                const res = await createCategoryAction({ data: { name } });
-                if (res.success && res.data) {
-                  return {
-                    ...res,
-                    data: { id: String(res.data.id), val: res.data },
-                  };
-                }
-                return { ...res, data: undefined };
-              }}
-              getOptionValue={(opt) => opt!}
-              getOptionLabel={(opt) => opt.val.name}
-              renderOption={(option, props) => (
-                <p
-                  className={cn([
-                    props.focus &&
-                      "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full",
-                    "p-2 flex justify-between items-center",
-                  ])}
-                >
-                  {option.val.name}
-                  {props.selected && <Icon name="check" className="size-3 stroke-2" />}
-                </p>
+            <FormField<FormValues, "thumbnailFile"> name="thumbnailFile">
+              {({ field, controlProps, initialize, onError }) => (
+                <ImageFileInput
+                  {...field}
+                  {...controlProps}
+                  bucket="images"
+                  avatarUrl={course?.thumbnail ?? undefined}
+                  onLoad={initialize}
+                  onError={onError}
+                  buttonLabel={"Thumbnail"}
+                  aria-label={"Thumbnail"}
+                />
               )}
-            />
+            </FormField>
+            <FormField<FormValues, "name"> name="name" label="Nazov kurzu">
+              {({ field, controlProps }) => (
+                <Textarea
+                  {...field}
+                  {...controlProps}
+                  value={field.value ?? ""}
+                />
+              )}
+            </FormField>
+            <FormField<FormValues, "categories">
+              name="categories"
+              label="Kategórie"
+            >
+              {({ field, controlProps, onError, itemErrors }) => (
+                <GenericCombobox<
+                  { id: string; val: CategoryFragment },
+                  { id: string; val: CategoryFragment }
+                >
+                  lng={lng}
+                  {...field}
+                  {...controlProps}
+                  allowCreateNewOptions
+                  multiple
+                  placeholder="Hľadaj kategóriu..."
+                  defaultOptions={
+                    course?.categories.map((c) => ({
+                      id: String(c.id),
+                      val: c,
+                    })) ?? []
+                  }
+                  fetchOptions={async (query) => {
+                    const cats = await fetchCategories(query);
+                    return cats.map((c) => ({ id: String(c.id), val: c }));
+                  }}
+                  createOption={async (name) => {
+                    const res = await createCategoryAction({ data: { name } });
+                    if (res.success && res.data) {
+                      return {
+                        ...res,
+                        data: { id: String(res.data.id), val: res.data },
+                      };
+                    }
+                    return { ...res, data: undefined };
+                  }}
+                  getOptionValue={(opt) => opt!}
+                  getOptionLabel={(opt) => opt.val.name}
+                  renderOption={(option, props) => (
+                    <p
+                      className={cn([
+                        props.focus &&
+                          "text-white bg-primary-500 dark:bg-primary-300 dark:text-white/80 w-full",
+                        "p-2 flex justify-between items-center",
+                      ])}
+                    >
+                      {option.val.name}
+                      {props.selected && (
+                        <Icon name="check" className="size-3 stroke-2" />
+                      )}
+                    </p>
+                  )}
+                  onError={onError}
+                  itemErrors={itemErrors}
+                />
+              )}
+            </FormField>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Input label="Zaciatok" name="start" type="datetime-local" />
-              <Input label="Koniec" name="end" type="datetime-local" />
-              <Input
-                label="Koniec registracie"
+              <FormField<FormValues, "start"> name="start" label="Zaciatok">
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="datetime-local"
+                    value={inputValue(field.value, "datetime-local")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField<FormValues, "end"> name="end" label="Koniec">
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="datetime-local"
+                    value={inputValue(field.value, "datetime-local")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField<FormValues, "registrationEnd">
                 name="registrationEnd"
-                type="datetime-local"
-              />
+                label="Koniec registracie"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="datetime-local"
+                    value={inputValue(field.value, "datetime-local")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
             </div>
-            <TiptapEditor
-              control={methods.control}
-              className="sm:w-[580px] md:w-[672px]"
-              name="description"
-              initialValue={course?.description || defaultCourseEditorContent}
-            />
+            <FormField<FormValues, "description"> name="description">
+              {({ field, controlProps }) => (
+                <TiptapEditor
+                  {...field}
+                  {...controlProps}
+                  aria-label={t("editor.label", { ns: "courses" })}
+                  className="sm:w-[580px] md:w-[672px]"
+                />
+              )}
+            </FormField>
             <div className="flex gap-4">
-              <Input
-                label="Kapacita ucastnikov"
+              <FormField<FormValues, "maxAttendees">
                 name="maxAttendees"
-                type="number"
-              />
-              <Input
-                label="Cena kurzu v centoch s DPH"
+                label="Kapacita ucastnikov"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="number"
+                    value={inputValue(field.value, "number")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField<FormValues, "price">
                 name="price"
-                type="number"
-                onChange={(event) => {
-                  const value = (event.target as HTMLInputElement)
-                    .valueAsNumber;
-                  setPrice(Number.isFinite(value) ? value : 0);
-                }}
-              />
+                label="Cena kurzu v centoch s DPH"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="number"
+                    value={inputValue(field.value, "number")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                      ((event) => {
+                        const value = (event.target as HTMLInputElement)
+                          .valueAsNumber;
+                        setPrice(Number.isFinite(value) ? value : 0);
+                      })(event);
+                    }}
+                  />
+                )}
+              </FormField>
             </div>
           </div>
         )}
       </WizzardStep>
-      <WizzardStep
+      <WizzardStep<FormValues, FormOutput>
         name="E-learning"
-        yupSchema={yup.object({
-          hasElearning: yup.boolean().required(),
-          reachCourse: yup.mixed().when("hasElearning", {
-            is: true,
-            then: () =>
-              yup
-                .object({
-                  courseId: yup.string().trim().required(),
-                  launchUrl: yup.string().trim().url().required(),
-                })
-                .required(),
-            otherwise: () => yup.mixed().nullable(),
-          }),
-        })}
+        id="elearning"
+        fields={["hasElearning", "reachCourse"]}
       >
         {(methods) => {
           const hasElearning = methods.watch("hasElearning");
 
           return (
             <div className="space-y-6 max-w-2xl w-full">
-              <CheckBox
-                control={methods.control}
-                label="Kurz obsahuje e-learning v Reach 360"
+              <FormField<FormValues, "hasElearning">
                 name="hasElearning"
-              />
+                label="Kurz obsahuje e-learning v Reach 360"
+                layout="inline"
+              >
+                {({ field, controlProps }) => (
+                  <CheckBox
+                    {...field}
+                    {...controlProps}
+                    checked={Boolean(field.value)}
+                  />
+                )}
+              </FormField>
 
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Použite ID publikovaného kurzu a odkaz skopírovaný z karty
-                Learn v Reach 360. API URL kurzu nie je odkaz pre účastníkov.
+                Použite ID publikovaného kurzu a odkaz skopírovaný z karty Learn
+                v Reach 360. API URL kurzu nie je odkaz pre účastníkov.
               </p>
 
-              <Input
-                label="Reach 360 course ID"
+              <FormField<FormValues, "reachCourse.courseId">
                 name="reachCourse.courseId"
-                disabled={!hasElearning}
-              />
-              <Input
-                label="Odkaz na spustenie e-learningu"
+                label="Reach 360 course ID"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    disabled={!hasElearning}
+                    value={inputValue(field.value, undefined)}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
+              <FormField<FormValues, "reachCourse.launchUrl">
                 name="reachCourse.launchUrl"
-                type="url"
-                disabled={!hasElearning}
-              />
+                label="Odkaz na spustenie e-learningu"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    type="url"
+                    disabled={!hasElearning}
+                    value={inputValue(field.value, "url")}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
             </div>
           );
         }}
       </WizzardStep>
       {price > 0 && (
-        <WizzardStep
+        <WizzardStep<FormValues, FormOutput>
           name="Fakturacne udaje"
-          yupSchema={yup.object({
-            billing: yup.object({
-              name: yup.string().trim().required(),
-              address: yup.object({
-                street: yup.string().trim().required(),
-                city: yup.string().trim().required(),
-                postal: yup.string().trim().required(),
-                country: yup.string().trim().required(),
-              }),
-              variableSymbol: yup
-                .string()
-                .trim()
-                .matches(VARIABLE_SYMBOL_PREFIX_PATTERN, t("variableSymbol"))
-                .required(),
-              IBAN: yup.string().trim().required(),
-              SWIFT: yup.string().trim().required(),
-              ICO: yup.string().trim().required(),
-              DIC: yup.string().trim().required(),
-              ICDPH: yup.string().trim().required(),
-            }),
-          })}
+          id="billing"
+          fields={["billing"]}
         >
-          <Input label="Meno" name="billing.name" />
-          <Input label="Ulica" name="billing.address.street" />
-          <Input label="Mesto" name="billing.address.city" />
-          <Input label="PSC" name="billing.address.postal" />
-          <Input label="Krajina" name="billing.address.country" />
-          <Input
-            label="Variabilny"
+          <FormField<FormValues, "billing.name">
+            name="billing.name"
+            label="Meno"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.address.street">
+            name="billing.address.street"
+            label="Ulica"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.address.city">
+            name="billing.address.city"
+            label="Mesto"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.address.postal">
+            name="billing.address.postal"
+            label="PSC"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.address.country">
+            name="billing.address.country"
+            label="Krajina"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.variableSymbol">
             name="billing.variableSymbol"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={VARIABLE_SYMBOL_PREFIX_MAX_LENGTH}
-            normalizeValue={normalizeVariableSymbolPrefix}
-          />
-          <Input label="IBAN" name="billing.IBAN" />
-          <Input label="SWIFT" name="billing.SWIFT" />
-          <Input label="ICO" name="billing.ICO" />
-          <Input label="DIC" name="billing.DIC" />
-          <Input label="ICDPH" name="billing.ICDPH" />
+            label="Variabilny"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={VARIABLE_SYMBOL_PREFIX_MAX_LENGTH}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(
+                    inputChange(event, normalizeVariableSymbolPrefix),
+                  );
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.IBAN">
+            name="billing.IBAN"
+            label="IBAN"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.SWIFT">
+            name="billing.SWIFT"
+            label="SWIFT"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.ICO"> name="billing.ICO" label="ICO">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.DIC"> name="billing.DIC" label="DIC">
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "billing.ICDPH">
+            name="billing.ICDPH"
+            label="ICDPH"
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                value={inputValue(field.value, undefined)}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
         </WizzardStep>
       )}
-      <WizzardStep
+      <WizzardStep<FormValues, FormOutput>
         name="Form builder"
-        yupSchema={yup.object({
-          formFields: yup
-            .array()
-            .of(
-              yup.object({
-                id: yup.string().nullable(), // present on edit, absent on create
-                type: yup
-                  .mixed<FieldType>()
-                  .oneOf([
-                    FieldType.Text,
-                    FieldType.Textarea,
-                    FieldType.Select,
-                    FieldType.RadioGroup,
-                    FieldType.FileUpload,
-                  ] as any)
-                  .required(),
-                label: yup.string().required(),
-                required: yup.boolean().required(),
-                placeholder: yup.string().nullable(),
-                helpText: yup.string().nullable(),
-                selectOptions: yup.mixed().when("type", {
-                  is: (val: FieldType) =>
-                    val === FieldType.Select || val === FieldType.RadioGroup,
-                  then: () =>
-                    yup
-                      .array()
-                      .of(
-                        yup.object({
-                          value: yup.string().required(),
-                          text: yup.string().required(),
-                        }),
-                      )
-                      .min(1)
-                      .required(),
-                  otherwise: () => yup.mixed().nullable().strip(),
-                }),
-                minFiles: yup.number().nullable(),
-                maxFiles: yup.number().nullable(),
-              }),
-            )
-            .min(0)
-            .required(),
-        })}
+        id="fields"
+        fields={["formFields"]}
       >
-        {(methods) => <CourseRegistrationFormBuilder methods={methods} />}
+        {(methods) => <CourseRegistrationFormBuilder />}
       </WizzardStep>
     </WizzardForm>
   );
 }
 
-import { useFieldArray, UseFormReturn } from "react-hook-form";
 import Button from "@/components/Button";
-import Icon from "@/components/Icon";
-import { Field, Label, Select } from "@headlessui/react";
 import CheckBox from "@/components/Checkbox";
+import Icon from "@/components/Icon";
+import { Select } from "@headlessui/react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 
-function CourseRegistrationFormBuilder({
-  methods,
-}: {
-  methods: UseFormReturn<any>;
-}) {
-  const { control, watch, setValue } = methods;
+type BuilderValues = { formFields: FormFieldInput[] };
+
+function CourseRegistrationFormBuilder() {
+  const { control, watch, setValue } = useFormContext<BuilderValues>();
 
   const { fields, append, remove, move } = useFieldArray({
     control,
-    name: "formFields" as any,
+    name: "formFields",
   });
 
-  console.log(watch());
-
-  const watched = watch("formFields" as any) as FormFieldInput[] | undefined;
+  const watched = watch("formFields") as FormFieldInput[] | undefined;
 
   function addField(type: FieldType) {
     append({
@@ -409,7 +752,7 @@ function CourseRegistrationFormBuilder({
           : null,
       minFiles: type === FieldType.FileUpload ? 1 : null,
       maxFiles: type === FieldType.FileUpload ? 5 : null,
-    } as any);
+    });
   }
 
   return (
@@ -422,11 +765,11 @@ function CourseRegistrationFormBuilder({
 
       <div className="space-y-4">
         {fields.map((f, index) => {
-          const type = watched?.[index]?.type ?? (f as FormFieldInput).type;
+          const type = watched?.[index]?.type ?? f.type;
 
           return (
             <div
-              key={(f as any).id ?? index}
+              key={f.id ?? index}
               className={cn([
                 "rounded-md shadow-sm border p-4 space-y-4",
                 "dark:border-gray-800 border-2 dark:bg-gray-900",
@@ -470,130 +813,188 @@ function CourseRegistrationFormBuilder({
                 </div>
               </div>
 
-              {/* Keep id in state if present (editing), undefined on create */}
-              {/* <input
-                type="hidden"
-                {...register(`formFields.${index}.id` as any)}
-              /> */}
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Label" name={`formFields.${index}.label`} />
-                <Field>
-                  <Label className="text-sm font-medium">Type</Label>
-                  <Select
-                    className={cn(
-                      "w-fit focus:outline-hidden focus:ring-primary-500 py-1.5 h-9 mt-2 flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
-                      "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none dark:text-white/85 focus:ring-primary-300",
-                    )}
-                    value={type}
-                    onChange={(e) => {
-                      const newType = e.target.value as FieldType;
-                      setValue(`formFields.${index}.type` as any, newType);
+                <FormField<BuilderValues, `formFields.${number}.label`>
+                  name={`formFields.${index}.label`}
+                  label="Label"
+                >
+                  {({ field, controlProps }) => (
+                    <Input
+                      {...field}
+                      {...controlProps}
+                      value={inputValue(field.value, undefined)}
+                      onChange={(event) => {
+                        field.onChange(inputChange(event));
+                      }}
+                    />
+                  )}
+                </FormField>
+                <FormField<BuilderValues, `formFields.${number}.type`>
+                  name={`formFields.${index}.type`}
+                  label="Type"
+                >
+                  {({ field, controlProps }) => (
+                    <Select
+                      {...field}
+                      {...controlProps}
+                      className={cn(
+                        "w-fit focus:outline-hidden focus:ring-primary-500 py-1.5 h-9 mt-2 flex items-center rounded-md text-gray-900 shadow-xs ring-1 ring-inset focus-within:ring-2 border-none",
+                        "dark:bg-gray-800 dark:ring-gray-600 dark:shadow-none dark:text-white/85 focus:ring-primary-300",
+                      )}
+                      value={type}
+                      onChange={(e) => {
+                        const newType = e.target.value as FieldType;
+                        field.onChange(newType);
 
-                      if (
-                        newType === FieldType.Select ||
-                        newType === FieldType.RadioGroup
-                      ) {
-                        const curr =
-                          (watch(`formFields.${index}.selectOptions` as any) as
-                            | Array<{ value: string; text: string }>
-                            | null
-                            | undefined) ?? [];
-                        if (curr.length === 0) {
-                          setValue(`formFields.${index}.selectOptions` as any, [
-                            { value: "", text: "" },
-                          ]);
+                        if (
+                          newType === FieldType.Select ||
+                          newType === FieldType.RadioGroup
+                        ) {
+                          const curr =
+                            (watch(`formFields.${index}.selectOptions`) as
+                              | Array<{ value: string; text: string }>
+                              | null
+                              | undefined) ?? [];
+                          if (curr.length === 0) {
+                            setValue(`formFields.${index}.selectOptions`, [
+                              { value: "", text: "" },
+                            ]);
+                          }
+                          setValue(`formFields.${index}.minFiles`, null);
+                          setValue(`formFields.${index}.maxFiles`, null);
+                        } else if (newType === FieldType.FileUpload) {
+                          setValue(`formFields.${index}.selectOptions`, null);
+                          setValue(`formFields.${index}.minFiles`, 1);
+                          setValue(`formFields.${index}.maxFiles`, 5);
+                        } else {
+                          setValue(`formFields.${index}.selectOptions`, null);
+                          setValue(`formFields.${index}.minFiles`, null);
+                          setValue(`formFields.${index}.maxFiles`, null);
                         }
-                        setValue(`formFields.${index}.minFiles` as any, null);
-                        setValue(`formFields.${index}.maxFiles` as any, null);
-                      } else if (newType === FieldType.FileUpload) {
-                        setValue(
-                          `formFields.${index}.selectOptions` as any,
-                          null,
-                        );
-                        setValue(`formFields.${index}.minFiles` as any, 1);
-                        setValue(`formFields.${index}.maxFiles` as any, 5);
-                      } else {
-                        setValue(
-                          `formFields.${index}.selectOptions` as any,
-                          null,
-                        );
-                        setValue(`formFields.${index}.minFiles` as any, null);
-                        setValue(`formFields.${index}.maxFiles` as any, null);
-                      }
-                    }}
-                  >
-                    <option value={FieldType.Text}>TEXT</option>
-                    <option value={FieldType.Textarea}>TEXTAREA</option>
-                    <option value={FieldType.Select}>SELECT</option>
-                    <option value={FieldType.RadioGroup}>RADIO_GROUP</option>
-                    <option value={FieldType.FileUpload}>FILE_UPLOAD</option>
-                  </Select>
-                </Field>
+                      }}
+                    >
+                      <option value={FieldType.Text}>TEXT</option>
+                      <option value={FieldType.Textarea}>TEXTAREA</option>
+                      <option value={FieldType.Select}>SELECT</option>
+                      <option value={FieldType.RadioGroup}>RADIO_GROUP</option>
+                      <option value={FieldType.FileUpload}>FILE_UPLOAD</option>
+                    </Select>
+                  )}
+                </FormField>
 
-                <CheckBox
-                  control={control}
-                  label={"Required"}
+                <FormField<BuilderValues, `formFields.${number}.required`>
                   name={`formFields.${index}.required`}
-                />
+                  label={"Required"}
+                  layout="inline"
+                >
+                  {({ field, controlProps }) => (
+                    <CheckBox
+                      {...field}
+                      {...controlProps}
+                      checked={Boolean(field.value)}
+                    />
+                  )}
+                </FormField>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {type !== FieldType.FileUpload &&
                 type !== FieldType.RadioGroup ? (
                   <>
-                    <Input
-                      label="Placeholder"
+                    <FormField<
+                      BuilderValues,
+                      `formFields.${number}.placeholder`
+                    >
                       name={`formFields.${index}.placeholder`}
-                    />
+                      label="Placeholder"
+                    >
+                      {({ field, controlProps }) => (
+                        <Input
+                          {...field}
+                          {...controlProps}
+                          value={inputValue(field.value, undefined)}
+                          onChange={(event) => {
+                            field.onChange(inputChange(event));
+                          }}
+                        />
+                      )}
+                    </FormField>
                     <div className="sm:col-span-2 space-y-2">
-                      <p className="text-sm font-medium">Help text</p>
-                      <TiptapEditor
-                        compact
+                      <FormField<BuilderValues, `formFields.${number}.helpText`>
                         name={`formFields.${index}.helpText`}
-                        control={control}
-                      />
+                        label="Help text"
+                      >
+                        {({ field, controlProps }) => (
+                          <TiptapEditor {...field} {...controlProps} compact />
+                        )}
+                      </FormField>
                     </div>
                   </>
                 ) : type === FieldType.RadioGroup ? (
                   <div className="sm:col-span-2 space-y-2">
-                    <p className="text-sm font-medium">Help text</p>
-                    <TiptapEditor
-                      compact
+                    <FormField<BuilderValues, `formFields.${number}.helpText`>
                       name={`formFields.${index}.helpText`}
-                      control={control}
-                    />
+                      label="Help text"
+                    >
+                      {({ field, controlProps }) => (
+                        <TiptapEditor {...field} {...controlProps} compact />
+                      )}
+                    </FormField>
                   </div>
                 ) : (
                   <div className="col-span-2 space-y-4">
                     <div className="flex gap-2 sm:w-1/3">
-                      <Input
-                        label="Min files"
+                      <FormField<BuilderValues, `formFields.${number}.minFiles`>
                         name={`formFields.${index}.minFiles`}
-                        type="number"
+                        label="Min files"
                         className="w-fit"
-                      />
-                      <Input
-                        label="Max files"
+                      >
+                        {({ field, controlProps }) => (
+                          <Input
+                            {...field}
+                            {...controlProps}
+                            type="number"
+                            value={inputValue(field.value, "number")}
+                            onChange={(event) => {
+                              field.onChange(inputChange(event));
+                            }}
+                          />
+                        )}
+                      </FormField>
+                      <FormField<BuilderValues, `formFields.${number}.maxFiles`>
                         name={`formFields.${index}.maxFiles`}
-                        type="number"
+                        label="Max files"
                         className="w-fit"
-                      />
+                      >
+                        {({ field, controlProps }) => (
+                          <Input
+                            {...field}
+                            {...controlProps}
+                            type="number"
+                            value={inputValue(field.value, "number")}
+                            onChange={(event) => {
+                              field.onChange(inputChange(event));
+                            }}
+                          />
+                        )}
+                      </FormField>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Help text</p>
-                      <TiptapEditor
-                        compact
+                      <FormField<BuilderValues, `formFields.${number}.helpText`>
                         name={`formFields.${index}.helpText`}
-                        control={control}
-                      />
+                        label="Help text"
+                      >
+                        {({ field, controlProps }) => (
+                          <TiptapEditor {...field} {...controlProps} compact />
+                        )}
+                      </FormField>
                     </div>
                   </div>
                 )}
               </div>
 
               {(type === FieldType.Select || type === FieldType.RadioGroup) && (
-                <SelectOptionsEditor methods={methods} fieldIndex={index} />
+                <SelectOptionsEditor fieldIndex={index} />
               )}
             </div>
           );
@@ -620,18 +1021,12 @@ function CourseRegistrationFormBuilder({
   );
 }
 
-function SelectOptionsEditor({
-  methods,
-  fieldIndex,
-}: {
-  methods: UseFormReturn<any>;
-  fieldIndex: number;
-}) {
-  const { control } = methods;
+function SelectOptionsEditor({ fieldIndex }: { fieldIndex: number }) {
+  const { control } = useFormContext<BuilderValues>();
 
   const { fields, append, remove, move } = useFieldArray({
     control,
-    name: `formFields.${fieldIndex}.selectOptions` as any,
+    name: `formFields.${fieldIndex}.selectOptions`,
   });
 
   return (
@@ -641,7 +1036,7 @@ function SelectOptionsEditor({
         <Button
           type="button"
           variant="ghost"
-          onClick={() => append({ value: "", text: "" } as any)}
+          onClick={() => append({ value: "", text: "" })}
         >
           + Add option
         </Button>
@@ -655,21 +1050,46 @@ function SelectOptionsEditor({
 
       <div className="space-y-2">
         {fields.map((opt, optIndex) => (
-          <div
-            key={(opt as any).id ?? optIndex}
-            className="flex gap-2 items-start"
-          >
+          <div key={opt.id ?? optIndex} className="flex gap-2 items-start">
             <div className="flex-1">
-              <Input
-                label="Value"
+              <FormField<
+                BuilderValues,
+                `formFields.${number}.selectOptions.${number}.value`
+              >
                 name={`formFields.${fieldIndex}.selectOptions.${optIndex}.value`}
-              />
+                label="Value"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    value={inputValue(field.value, undefined)}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
             </div>
             <div className="flex-1">
-              <Input
-                label="Text"
+              <FormField<
+                BuilderValues,
+                `formFields.${number}.selectOptions.${number}.text`
+              >
                 name={`formFields.${fieldIndex}.selectOptions.${optIndex}.text`}
-              />
+                label="Text"
+              >
+                {({ field, controlProps }) => (
+                  <Input
+                    {...field}
+                    {...controlProps}
+                    value={inputValue(field.value, undefined)}
+                    onChange={(event) => {
+                      field.onChange(inputChange(event));
+                    }}
+                  />
+                )}
+              </FormField>
             </div>
 
             <div className="flex gap-2 mt-8">

@@ -7,10 +7,7 @@ import { getConferences } from "@/app/[lng]/flawis/conferences/actions";
 import { getCourses } from "@/app/[lng]/flawis/courses/actions";
 import Card from "@/components/Card";
 import DynamicImageClient from "@/components/DynamicImageClient";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import {
   ConferenceListItemFragment,
   ConferencesQueryVariables,
@@ -18,7 +15,7 @@ import {
   CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import {
   conferenceOfferingModel,
   courseOfferingModel,

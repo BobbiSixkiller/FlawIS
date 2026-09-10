@@ -3,9 +3,9 @@ import { FormMessage } from "@/components/Message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Link from "next/link";
-import { getSubdomain } from "@/lib/serverUtils";
+import { getSubdomain } from "@/lib/utilsServer";
 
 export default async function LoginPage({
   params,

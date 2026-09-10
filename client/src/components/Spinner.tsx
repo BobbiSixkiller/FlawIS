@@ -1,5 +1,5 @@
 import Icon from "@/components/Icon";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 
 const sizeMap = {
   sm: "size-3",

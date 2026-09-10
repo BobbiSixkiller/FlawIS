@@ -1,26 +1,27 @@
 "use client";
+import { z } from "zod";
 
-import { useTranslation } from "@/lib/i18n/client";
+import { FormField, LocalizedFormField } from "@/components/form";
+
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import GenericCombobox from "@/components/GenericCombobox";
+import MultipleFileUploadField from "@/components/MultipleFileUploadField";
+import Select from "@/components/Select";
+import Spinner from "@/components/Spinner";
+import { Textarea } from "@/components/Textarea";
+import useValidation from "@/hooks/useValidation";
+import { handleAPIErrors, uploadOrDelete } from "@/lib/utilsClient";
 import {
   ConferenceQuery,
   PresentationLng,
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
-import { LocalizedTextarea } from "@/components/Textarea";
-import Select from "@/components/Select";
-import MultipleFileUploadField from "@/components/MultipleFileUploadField";
-import { handleAPIErrors, uploadOrDelete } from "@/lib/clientUtils";
-import useValidation from "@/hooks/useValidation";
-import Spinner from "@/components/Spinner";
+import { useTranslation } from "@/lib/i18n/client";
 import { useDialogStore } from "@/stores/dialogStore";
-import { createSubmission, updateSubmission } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
 import { omit } from "lodash";
-import GenericCombobox, {
-  LocalizedGenericCombobox,
-} from "@/components/GenericCombobox";
+import { createSubmission, updateSubmission } from "./actions";
 
 export default function ConferenceSubmissionForm({
   submission,
@@ -37,44 +38,40 @@ export default function ConferenceSubmissionForm({
 }) {
   const { t } = useTranslation(lng, ["validation", "common", "conferences"]);
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = z.object({
+    conference: v.string().min(1, v.required),
+    section: v.string().min(1, v.required),
+    authors: z.array(v.string().email(v.email).min(1, v.required)).default([]),
+    files: z
+      .array(z.file({ error: v.required }))
+      .max(1, t("maxFiles", { value: 1 })),
+    presentationLng: z.enum(PresentationLng, { error: v.required }),
+    translations: z.object({
+      sk: z.object({
+        name: v.string().trim().min(1, v.required),
+        abstract: v.string().trim().min(1, v.required),
+        keywords: z
+          .array(v.string().trim().min(1, v.required))
+          .min(1, t("keywords", { value: 1 })),
+      }),
+      en: z.object({
+        name: v.string().trim().min(1, v.required),
+        abstract: v.string().trim().min(1, v.required),
+        keywords: z
+          .array(v.string().trim().min(1, v.required))
+          .min(1, t("keywords", { value: 1 })),
+      }),
+    }),
+  });
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
-      yupSchema={yup.object({
-        conference: yup.string().required(),
-        section: yup.string().required(),
-        authors: yup.array().of(yup.string().email().required()).default([]),
-        files: yup
-          .array()
-          .of(yup.mixed<File>().required())
-          .required()
-          .max(1, (val) => t("maxFiles", { value: val.max })),
-        presentationLng: yup.string<PresentationLng>().required(),
-        translations: yup.object({
-          sk: yup.object({
-            name: yup.string().trim().required(),
-            abstract: yup.string().trim().required(),
-            keywords: yup
-              .array()
-              .of(yup.string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
-          }),
-          en: yup.object({
-            name: yup.string().trim().required(),
-            abstract: yup.string().trim().required(),
-            keywords: yup
-              .array()
-              .of(yup.string().required().trim())
-              .min(1, (val) => t("keywords", { value: val.min }))
-              .required(),
-          }),
-        }),
-      })}
+    <FormContainer
+      schema={schema}
       defaultValues={{
         translations: {
           sk: {
@@ -89,7 +86,7 @@ export default function ConferenceSubmissionForm({
           },
         },
         authors: [],
-        files: [],
+        files: undefined,
         conference: conference.id,
         section: submission?.section.id,
         presentationLng: (submission?.presentationLng || "") as PresentationLng,
@@ -139,89 +136,146 @@ export default function ConferenceSubmissionForm({
             }
           })}
         >
-          <Select
-            control={methods.control}
+          <FormField<FormValues, "section">
             name="section"
             label={t("registration.submission.section", { ns: "conferences" })}
-            options={conference.sections.map((s) => ({
-              name: s.translations[lng as "sk" | "en"].name,
-              value: s.id,
-            }))}
-          />
-          <LocalizedTextarea
+          >
+            {({ field, controlProps }) => (
+              <Select
+                {...field}
+                {...controlProps}
+                options={conference.sections.map((s) => ({
+                  name: s.translations[lng as "sk" | "en"].name,
+                  value: s.id,
+                }))}
+              />
+            )}
+          </FormField>
+          <LocalizedFormField<FormValues, `translations.${"sk" | "en"}.name`>
+            name={`translations.${lng as "sk" | "en"}.name`}
             lng={lng}
             label={t("registration.submission.name", { ns: "conferences" })}
-            name={`translations.${lng}.name`}
-          />
-          <LocalizedTextarea
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </LocalizedFormField>
+          <LocalizedFormField<
+            FormValues,
+            `translations.${"sk" | "en"}.abstract`
+          >
+            name={`translations.${lng as "sk" | "en"}.abstract`}
             lng={lng}
             label={t("registration.submission.abstract", { ns: "conferences" })}
-            name={`translations.${lng}.abstract`}
-          />
-          <LocalizedGenericCombobox<{ id: number; val: string }, string>
-            control={methods.control}
-            name={`translations.${lng}.keywords`}
+          >
+            {({ field, controlProps }) => (
+              <Textarea
+                {...field}
+                {...controlProps}
+                value={field.value ?? ""}
+              />
+            )}
+          </LocalizedFormField>
+          <LocalizedFormField<
+            FormValues,
+            `translations.${"sk" | "en"}.keywords`
+          >
+            name={`translations.${lng as "sk" | "en"}.keywords`}
             lng={lng}
             label={t("registration.submission.keywords.label", {
               ns: "conferences",
             })}
-            placeholder={t("registration.submission.keywords.placeholder", {
-              ns: "conferences",
-            })}
-            defaultOptions={[]}
-            renderOption={(opt) => <span>{opt.val}</span>}
-            getOptionLabel={(opt) => opt.val}
-            getOptionValue={(opt) => opt?.val ?? ""}
-            allowCreateNewOptions
-            multiple
-          />
-          <Select
-            control={methods.control}
+          >
+            {({ field, controlProps, onError, itemErrors }) => (
+              <GenericCombobox<{ id: number; val: string }, string>
+                {...field}
+                {...controlProps}
+                lng={lng}
+                placeholder={t("registration.submission.keywords.placeholder", {
+                  ns: "conferences",
+                })}
+                defaultOptions={[]}
+                renderOption={(opt) => <span>{opt.val}</span>}
+                getOptionLabel={(opt) => opt.val}
+                getOptionValue={(opt) => opt?.val ?? ""}
+                allowCreateNewOptions
+                multiple
+                onError={onError}
+                itemErrors={itemErrors}
+              />
+            )}
+          </LocalizedFormField>
+          <FormField<FormValues, "presentationLng">
             name="presentationLng"
             label={t("registration.submission.lng", { ns: "conferences" })}
-            options={[
-              { name: PresentationLng.Sk, value: PresentationLng.Sk },
-              { name: PresentationLng.Cz, value: PresentationLng.Cz },
-              { name: PresentationLng.En, value: PresentationLng.En },
-            ]}
-          />
-          <GenericCombobox<{ id: number; val: string }, string>
-            control={methods.control}
+          >
+            {({ field, controlProps }) => (
+              <Select
+                {...field}
+                {...controlProps}
+                options={[
+                  { name: PresentationLng.Sk, value: PresentationLng.Sk },
+                  { name: PresentationLng.Cz, value: PresentationLng.Cz },
+                  { name: PresentationLng.En, value: PresentationLng.En },
+                ]}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "authors">
             name="authors"
-            lng={lng}
             label={t("registration.submission.authors.label", {
               ns: "conferences",
             })}
             description={t("registration.submission.authors.description", {
               ns: "conferences",
             })}
-            placeholder={t("registration.submission.authors.placeholder", {
-              ns: "conferences",
-            })}
-            defaultOptions={[]}
-            renderOption={(opt) => <span>{opt.val}</span>}
-            getOptionLabel={(opt) => opt.val}
-            getOptionValue={(opt) => opt?.val ?? ""}
-            allowCreateNewOptions
-            multiple
-          />
-          <MultipleFileUploadField
+          >
+            {({ field, controlProps, onError, itemErrors }) => (
+              <GenericCombobox<{ id: number; val: string }, string>
+                {...field}
+                {...controlProps}
+                lng={lng}
+                placeholder={t("registration.submission.authors.placeholder", {
+                  ns: "conferences",
+                })}
+                defaultOptions={[]}
+                renderOption={(opt) => <span>{opt.val}</span>}
+                getOptionLabel={(opt) => opt.val}
+                getOptionValue={(opt) => opt?.val ?? ""}
+                allowCreateNewOptions
+                multiple
+                onError={onError}
+                itemErrors={itemErrors}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "files">
+            name="files"
             label={t("registration.submission.file", {
               ns: "conferences",
             })}
-            name="files"
-            control={methods.control}
-            setValue={methods.setValue}
-            setError={methods.setError}
-            maxFiles={1}
-            accept={{
-              "application/pdf": [".pdf"],
-              "application/msword": [".doc"],
-              "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                [".docx"],
-            }}
-            fileSources={{ [conference.slug]: submission?.fileUrl }}
-          />
+          >
+            {({ field, controlProps, initialize, onError }) => (
+              <MultipleFileUploadField
+                {...field}
+                {...controlProps}
+                maxFiles={1}
+                accept={{
+                  "application/pdf": [".pdf"],
+                  "application/msword": [".doc"],
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                    [".docx"],
+                }}
+                fileSources={{ [conference.slug]: submission?.fileUrl }}
+                onLoad={initialize}
+                onError={onError}
+              />
+            )}
+          </FormField>
 
           <Button
             color="primary"
@@ -237,6 +291,6 @@ export default function ConferenceSubmissionForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

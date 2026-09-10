@@ -1,7 +1,7 @@
 import { translate } from "@/lib/i18n";
 import { getInternships } from "../../internships/actions";
 import ListInternships from "../../internships/ListInternships";
-import { getAcademicYear } from "@/lib/clientUtils";
+import { getAcademicYear } from "@/lib/utilsClient";
 import AcademicYearSelect from "../../internships/AcademicYearSelect";
 import {
   InternshipSortableField,

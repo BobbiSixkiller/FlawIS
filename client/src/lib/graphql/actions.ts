@@ -4,9 +4,7 @@ import { TypedDocumentString } from "@/lib/graphql/generated/graphql";
 import { GraphQLError } from "graphql";
 import { IncomingHttpHeaders } from "http";
 import { cookies, headers } from "next/headers";
-import parseValidationErrors, {
-  ValidationErrors,
-} from "@/lib/clientUtils";
+import parseValidationErrors, { ValidationErrors } from "@/lib/utilsClient";
 import { revalidatePath, updateTag } from "next/cache";
 
 export type GraphQLResponse<GraphQLData> = {

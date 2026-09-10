@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { LegacyRef, ReactNode } from "react";
-import {
-  Connection,
-  InfiniteScroll,
-} from "@/components/withInfiniteScroll";
+import { Connection, InfiniteScroll } from "@/components/withInfiniteScroll";
 import { getInternships } from "./actions";
 import { useParams } from "next/navigation";
 import {
@@ -13,7 +10,7 @@ import {
   InternshipsQueryVariables,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { useTranslation } from "@/lib/i18n/client";
 import { internshipListHref } from "@/lib/internshipAccess";
 
@@ -45,7 +42,13 @@ const statusClasses = {
   },
 };
 
-function ListItem({ data, hrefBase }: { data?: InternshipData; hrefBase: string }) {
+function ListItem({
+  data,
+  hrefBase,
+}: {
+  data?: InternshipData;
+  hrefBase: string;
+}) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "internships");
 

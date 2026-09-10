@@ -2,7 +2,7 @@
 
 import Icon, { type IconName } from "@/components/Icon";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/core";
 import { useTranslation } from "@/lib/i18n/client";
@@ -95,7 +95,10 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
         className={cn("gap-2 rounded-none border-none dark focus:ring-0")}
       >
         <span className="whitespace-nowrap text-sm">{t(activeItem.name)}</span>
-        <Icon name="chevron-down" className="size-4 group-data-open:rotate-180" />
+        <Icon
+          name="chevron-down"
+          className="size-4 group-data-open:rotate-180"
+        />
       </PopoverButton>
       <PopoverPanel
         anchor="bottom start"
@@ -117,7 +120,9 @@ export const NodeSelector = ({ editor }: { editor?: Editor }) => {
               </div>
               <span>{t(item.name)}</span>
             </div>
-            {activeItem.name === item.name && <Icon name="check" className="h-4 w-4" />}
+            {activeItem.name === item.name && (
+              <Icon name="check" className="h-4 w-4" />
+            )}
           </div>
         ))}
       </PopoverPanel>

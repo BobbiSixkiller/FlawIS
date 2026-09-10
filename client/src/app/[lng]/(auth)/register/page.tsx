@@ -2,10 +2,10 @@ import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../GoogleSignin";
 import UserForm from "./UserForm";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { FormMessage } from "@/components/Message";
 import Link from "next/link";
-import { getSubdomain } from "@/lib/serverUtils";
+import { getSubdomain } from "@/lib/utilsServer";
 
 export default async function Register({
   params,

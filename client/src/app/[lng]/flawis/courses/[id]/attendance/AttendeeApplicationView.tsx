@@ -1,20 +1,23 @@
 "use client";
+import type { z } from "zod";
 
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import useUser from "@/hooks/useUser";
+import { uploadToMinio } from "@/lib/utilsClient";
 import {
   AttendanceFragment,
   FieldType,
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
+import { useTranslation } from "@/lib/i18n/client";
 import { deleteFiles } from "@/lib/minio";
-import { useMessageStore } from "@/stores/messageStore";
+import { createRegistrationSchema } from "@/lib/validation/registration-form-schema";
 import { useDialogStore } from "@/stores/dialogStore";
-import { uploadToMinio } from "@/lib/clientUtils";
-import useUser from "@/hooks/useUser";
+import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { updateCourseAttendee } from "../actions";
 import RegistrationFormFields from "../RegistrationFormFields";
 
@@ -44,11 +47,11 @@ export default function AttendeeApplicationView({
   }, [attendee.application?.answers]);
 
   const defaultValues = useMemo(() => {
-    const defaults: Record<string, string | string[] | File[]> = {};
+    const defaults: Record<string, string | string[] | File[] | undefined> = {};
 
     registrationForm.fields.forEach((field) => {
       if (field.type === FieldType.FileUpload) {
-        defaults[`field_${field.id}`] = [];
+        defaults[`field_${field.id}`] = undefined;
       } else {
         const val = existingAnswers[field.id];
         if (val !== undefined) {
@@ -60,7 +63,11 @@ export default function AttendeeApplicationView({
     return defaults;
   }, [registrationForm.fields, existingAnswers]);
 
-  const methods = useForm({ defaultValues });
+  const { t } = useTranslation(lng, "validation");
+  const schema = useMemo(
+    () => createRegistrationSchema(registrationForm.fields, t, false),
+    [registrationForm.fields, t],
+  );
 
   const onSubmit = async (vals: Record<string, unknown>) => {
     const answers: Record<string, string | string[]> = {};
@@ -71,6 +78,11 @@ export default function AttendeeApplicationView({
         const val = vals[fieldName];
 
         if (field.type === FieldType.FileUpload) {
+          if (val === undefined) {
+            const existing = existingAnswers[field.id];
+            answers[field.id] = Array.isArray(existing) ? existing : [];
+            return;
+          }
           const files = (val as File[]) ?? [];
           const newUrls = await Promise.all(
             files.map((file) =>
@@ -106,38 +118,35 @@ export default function AttendeeApplicationView({
     }
   };
 
+  type FormValues = z.input<typeof schema>;
   return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
-        {!canEdit && (
-          <p className="text-sm text-amber-600 dark:text-amber-400">
-            Prihlaska bola spracovana a nie je mozne ju upravovat.
-          </p>
-        )}
+    <FormContainer schema={schema} defaultValues={defaultValues}>
+      {(methods) => (
+        <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+          {!canEdit && (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Prihlaska bola spracovana a nie je mozne ju upravovat.
+            </p>
+          )}
 
-        <RegistrationFormFields
-          fields={registrationForm.fields}
-          canEdit={canEdit}
-          control={methods.control}
-          setValue={methods.setValue}
-          setError={methods.setError}
-          existingAnswers={existingAnswers}
-          lng={lng}
-        />
+          <RegistrationFormFields
+            fields={registrationForm.fields}
+            canEdit={canEdit}
+            existingAnswers={existingAnswers}
+            lng={lng}
+          />
 
-        {canEdit && (
-          <Button
-            type="submit"
-            className="w-full mt-4"
-            disabled={methods.formState.isSubmitting}
-          >
-            Uložiť
-          </Button>
-        )}
-      </form>
-    </FormProvider>
+          {canEdit && (
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              disabled={methods.formState.isSubmitting}
+            >
+              Uložiť
+            </Button>
+          )}
+        </form>
+      )}
+    </FormContainer>
   );
 }

@@ -1,5 +1,5 @@
 import Icon from "@/components/Icon";
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import { SelectorItem } from "./NodeSelector";
 import Button from "@/components/Button";
 import { Editor } from "@tiptap/core";

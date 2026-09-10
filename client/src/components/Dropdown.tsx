@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import {
   Menu,
   MenuButton,

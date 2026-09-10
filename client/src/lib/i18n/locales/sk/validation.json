@@ -17,5 +17,8 @@
   "minFiles": "Minimálny počet súborov je {{value}}!",
   "phone": "Nesprávny formát telefónneho čísla!",
   "isUniba": "Email doména musí obsahovať 'uniba.sk'",
-  "variableSymbol": "Variabilný symbol musí obsahovať 1 až 6 číslic."
+  "variableSymbol": "Variabilný symbol musí obsahovať 1 až 6 číslic.",
+  "number": "Zadajte číslo!",
+  "url": "Neplatná URL adresa!",
+  "max": "Maximálna hodnota je {{value}}!"
 }

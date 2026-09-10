@@ -1,13 +1,18 @@
 "use client";
+import { z } from "zod";
 
-import { useTranslation } from "@/lib/i18n/client";
-import { resetPassword } from "./actions";
-import useValidation from "@/hooks/useValidation";
-import { Input } from "@/components/Input";
+import { FormField } from "@/components/form";
+import { inputChange, inputValue } from "@/components/form-values";
+import { compareFields } from "@/lib/validation/form-validation";
+
 import Button from "@/components/Button";
+import { FormContainer } from "@/components/form";
+import { Input } from "@/components/Input";
 import Spinner from "@/components/Spinner";
+import useValidation from "@/hooks/useValidation";
+import { useTranslation } from "@/lib/i18n/client";
 import { useMessageStore } from "@/stores/messageStore";
-import RHFormContainer from "@/components/RHFormContainer";
+import { resetPassword } from "./actions";
 
 export default function ResetPasswordForm({
   lng,
@@ -18,29 +23,32 @@ export default function ResetPasswordForm({
 }) {
   const { t } = useTranslation(lng, "resetPassword");
 
-  const { yup } = useValidation();
+  const { v } = useValidation();
 
   const setMessage = useMessageStore((s) => s.setMessage);
 
+  const schema = compareFields(
+    z.object({
+      password: v
+        .string()
+        .trim()
+        .min(1, v.required)
+        .refine(
+          (value) => !value || /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/.test(value),
+          t("password", { ns: "validation" }),
+        ),
+      confirmPass: v.string().trim().min(1, v.required),
+    }),
+    "confirmPass",
+    "password",
+    (value, other) => value == null || other == null || value === other,
+    t("confirmPass", { ns: "validation" }),
+  );
+  type FormValues = z.input<typeof schema>;
   return (
-    <RHFormContainer
+    <FormContainer
       defaultValues={{ password: "", confirmPass: "" }}
-      yupSchema={yup.object({
-        password: yup
-          .string()
-          .trim()
-          .required()
-          .matches(
-            /^(?=.*[A-Za-z])(?=.*\d)\S{8,}$/,
-            t("password", { ns: "validation" })
-          ),
-        confirmPass: yup
-          .string()
-          .trim()
-
-          .required()
-          .oneOf([yup.ref("password")], t("confirmPass", { ns: "validation" })),
-      })}
+      schema={schema}
     >
       {(methods) => (
         <form
@@ -52,21 +60,43 @@ export default function ResetPasswordForm({
                 setMessage(res.message, res.success);
               }
             },
-            (err) => console.log(err)
+            (err) => console.log(err),
           )}
         >
-          <Input
+          <FormField<FormValues, "password">
             name="password"
             label={t("password")}
-            type="password"
-            autoComplete="off"
-          />
-          <Input
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="password"
+                autoComplete="off"
+                value={inputValue(field.value, "password")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
+          <FormField<FormValues, "confirmPass">
             name="confirmPass"
             label={t("repeatPass")}
-            type="password"
-            autoComplete="off"
-          />
+          >
+            {({ field, controlProps }) => (
+              <Input
+                {...field}
+                {...controlProps}
+                type="password"
+                autoComplete="off"
+                value={inputValue(field.value, "password")}
+                onChange={(event) => {
+                  field.onChange(inputChange(event));
+                }}
+              />
+            )}
+          </FormField>
 
           <Button
             className="w-full items-center justify-center gap-2"
@@ -85,6 +115,6 @@ export default function ResetPasswordForm({
           </Button>
         </form>
       )}
-    </RHFormContainer>
+    </FormContainer>
   );
 }

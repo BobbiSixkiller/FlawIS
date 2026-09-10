@@ -1,4 +1,4 @@
-import { cn } from "@/lib/clientUtils";
+import { cn } from "@/lib/utilsClient";
 import React, {
   ElementType,
   forwardRef,
@@ -59,7 +59,7 @@ function Button<E extends ElementType = "button">(
     type,
     ...props
   }: ButtonProps<E>,
-  ref: React.Ref<ComponentPropsWithoutRef<E>["ref"]>
+  ref: React.Ref<ComponentPropsWithoutRef<E>["ref"]>,
 ) {
   const Component = as || "button"; // Defaults to "button" if no "as" is provided.
 
@@ -69,7 +69,7 @@ function Button<E extends ElementType = "button">(
         buttonStyles.base,
         buttonStyles.variants.variant[variant as VariantType],
         buttonStyles.variants.size[size as SizeType],
-        className
+        className,
       )}
       type={type || "button"}
       ref={ref}
@@ -81,5 +81,5 @@ function Button<E extends ElementType = "button">(
 export default forwardRef(Button) as <E extends ElementType = "button">(
   props: ButtonProps<E> & {
     ref?: React.Ref<ComponentPropsWithoutRef<E>["ref"]>;
-  }
+  },
 ) => React.ReactElement | null;

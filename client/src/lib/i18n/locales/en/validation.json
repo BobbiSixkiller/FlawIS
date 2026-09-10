@@ -17,5 +17,9 @@
   "minFiles": "Minimum number of files is {{value}}!",
   "phone": "Invalid phone number!",
   "isUniba": "Email domain must include 'uniba.sk'",
-  "variableSymbol": "The variable symbol must contain 1 to 6 digits."
+  "variableSymbol": "The variable symbol must contain 1 to 6 digits.",
+  "number": "Enter a number!",
+  "url": "Invalid URL!",
+  "max": "Maximum value is {{value}}!",
+  "privacy": "You have to agree with privacy policy!"
 }

@@ -4,7 +4,7 @@ import test from "node:test";
 import {
   normalizeVariableSymbolPrefix,
   VARIABLE_SYMBOL_PREFIX_PATTERN,
-} from "../src/lib/invoice/validation";
+} from "../src/lib/validation/invoice-validation";
 
 test("normalizes invoice prefixes to at most six digits", () => {
   assert.equal(normalizeVariableSymbolPrefix("20ab26/001"), "202600");
