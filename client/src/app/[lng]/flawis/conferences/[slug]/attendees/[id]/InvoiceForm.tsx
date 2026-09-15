@@ -229,6 +229,14 @@ export default function UpdateInvoiceForm({
               />
             )}
           </FormField>
+          <FormField<FormValues, "body.type">
+            name="body.type"
+            label="Typ faktúry"
+          >
+            {({ field, controlProps }) => (
+              <Input {...field} {...controlProps} value={field.value ?? ""} />
+            )}
+          </FormField>
           <FormField<FormValues, "body.issueDate">
             name="body.issueDate"
             label="Datum vystavenia"
