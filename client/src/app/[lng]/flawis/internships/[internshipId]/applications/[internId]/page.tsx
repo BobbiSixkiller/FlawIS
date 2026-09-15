@@ -40,14 +40,13 @@ export default async function InternPage({
         controls={
           <div className="flex gap-2">
             {canDelete ? (
-              <ModalTrigger dialogId={deleteDialogId}>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  aria-label={t("deleteIntern.title")}
-                >
-                  <Icon name="trash" className="size-5" />
-                </Button>
+              <ModalTrigger
+                dialogId={deleteDialogId}
+                size="icon"
+                variant="destructive"
+                aria-label={t("deleteIntern.title")}
+              >
+                <Icon name="trash" className="size-5" />
               </ModalTrigger>
             ) : (
               <Tooltip message={t("deleteIntern.rejectFirst")}>
@@ -62,24 +61,22 @@ export default async function InternPage({
               </Tooltip>
             )}
 
-            <ModalTrigger dialogId={statusDialogId(Status.Eligible)}>
-              <Button
-                size="icon"
-                variant="positive"
-                disabled={intern.status === Status.Eligible}
-              >
-                <Icon name="check" className="size-5" />
-              </Button>
+            <ModalTrigger
+              dialogId={statusDialogId(Status.Eligible)}
+              size="icon"
+              variant="positive"
+              disabled={intern.status === Status.Eligible}
+            >
+              <Icon name="check" className="size-5" />
             </ModalTrigger>
 
-            <ModalTrigger dialogId={statusDialogId(Status.Rejected)}>
-              <Button
-                size="icon"
-                variant="destructive"
-                disabled={intern.status === Status.Rejected}
-              >
-                <Icon name="x-mark" className="size-5" />
-              </Button>
+            <ModalTrigger
+              dialogId={statusDialogId(Status.Rejected)}
+              size="icon"
+              variant="destructive"
+              disabled={intern.status === Status.Rejected}
+            >
+              <Icon name="x-mark" className="size-5" />
             </ModalTrigger>
           </div>
         }

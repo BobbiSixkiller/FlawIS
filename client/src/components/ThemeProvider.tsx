@@ -5,7 +5,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -47,17 +47,19 @@ export default function ThemeProvider({
   const confirmedPreferenceRef = useRef(initialPreference);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mediaQuery = window.matchMedia(systemDarkQuery);
     const syncSystemTheme = () => applyTheme("system");
 
+    // Cookie mutations also rerender the root html class on the server. Reapply
+    // the current client preference after that commit, before the browser paints.
     applyTheme(preference);
 
     if (preference !== "system") return;
 
     mediaQuery.addEventListener("change", syncSystemTheme);
     return () => mediaQuery.removeEventListener("change", syncSystemTheme);
-  }, [preference]);
+  }, [preference, initialPreference]);
 
   const setPreference = useCallback((nextPreference: ThemePreference) => {
     if (nextPreference === preferenceRef.current) return;
@@ -97,7 +99,9 @@ export default function ThemeProvider({
     [pending, preference, setPreference],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useThemePreference() {

@@ -34,5 +34,11 @@
     "end": "Koniec",
     "registrationEnd": "Registrácia do",
     "empty": "Momentálne nie sú dostupné žiadne podujatia."
+  },
+  "urlFilter": {
+    "label": "Filtre",
+    "clear": "Zrušiť filtre",
+    "empty": "Nie sú dostupné žiadne možnosti.",
+    "updating": "Aktualizujú sa výsledky…"
   }
 }

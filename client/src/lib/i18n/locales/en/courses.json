@@ -12,5 +12,9 @@
     "syllabus": "Course content:",
     "profile": "The course is intended for:",
     "lecturers": "Lecturers:"
+  },
+  "catalogue": {
+    "title": "Courses",
+    "categories": "Categories"
   }
 }

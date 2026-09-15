@@ -4,7 +4,6 @@ import Icon from "@/components/Icon";
 import { displayDate } from "@/lib/utilsClient";
 import DynamicImage from "@/components/DynamicImage";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import UpdateDatesForm from "./UpdateDatesForm";
 import { redirect } from "next/navigation";
@@ -42,17 +41,18 @@ export default async function ConferencePage({
           heading={conference!.slug}
           subHeading={conference!.translations[lng as "sk" | "en"].name}
           items={[
-            <ModalTrigger key={0} dialogId={updateDatesDialogId}>
-              <Button size="sm">
-                <Icon name="pencil" className="size-5" />
-                Aktualizovat
-              </Button>
+            <ModalTrigger key={0} dialogId={updateDatesDialogId} size="sm">
+              <Icon name="pencil" className="size-5" />
+              Aktualizovat
             </ModalTrigger>,
-            <ModalTrigger key={1} dialogId={deleteConfDialogId}>
-              <Button size="sm" variant="secondary">
-                <Icon name="trash" className="size-5" />
-                Zmazat
-              </Button>
+            <ModalTrigger
+              key={1}
+              dialogId={deleteConfDialogId}
+              size="sm"
+              variant="secondary"
+            >
+              <Icon name="trash" className="size-5" />
+              Zmazat
             </ModalTrigger>,
           ]}
         />

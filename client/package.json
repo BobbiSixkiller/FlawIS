@@ -23,6 +23,7 @@
     "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@floating-ui/react": "0.26.28",
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^5.2.2",

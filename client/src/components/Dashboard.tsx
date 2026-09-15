@@ -1,3 +1,4 @@
+import AccountMenu from "./AccountMenu";
 import { ReactNode } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import LngSwitcher from "./LngSwitcher";
@@ -6,8 +7,6 @@ import TopBar from "./TopBar";
 import NavLink, { NavLinkProps } from "./NavLink";
 import Footer from "./Footer";
 import Logo from "./Logo";
-import Breadcrumbs from "./Breadcrumbs";
-import Icon from "@/components/Icon";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/utilsClient";
 import { Snackbar } from "./Message";
@@ -44,38 +43,37 @@ export default async function Dashboard({
 
       <div
         className={cn([
-          "flex-1 flex flex-col md:border-r w-full lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl",
+          "min-w-0 flex-1 flex flex-col md:border-r w-full lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl",
           "dark:border-gray-700",
         ])}
       >
         <TopBar
-          logo={<Logo notext height={40} width={40} />}
-          drawerTitle={<Logo lng={lng} height={60} width={60} inverted />}
-          drawerContent={
-            <>
-              <nav className="flex flex-col gap-2">
-                {navLinks.map((link, i) => (
-                  <NavLink key={i} {...link} />
-                ))}
-              </nav>
+          logo={<Logo lng={lng} notext height={40} width={40} />}
+          drawer={{
+            title: <Logo lng={lng} height={60} width={60} inverted />,
+            content: (
+              <>
+                <nav className="flex flex-col gap-2">
+                  {navLinks.map((link, i) => (
+                    <NavLink key={i} {...link} />
+                  ))}
+                </nav>
 
-              <div className="mt-auto flex gap-2 items-center">
-                <LngSwitcher />
-                <ThemeToggler lng={lng} />
-              </div>
+                <div className="mt-auto flex gap-2 items-center">
+                  <LngSwitcher />
+                  <ThemeToggler lng={lng} />
+                </div>
+              </>
+            ),
+          }}
+          actions={
+            <>
+              {sidebar}
+              <AccountMenu
+                avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
+              />
             </>
           }
-          search={sidebar}
-          avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
-        />
-
-        <Breadcrumbs
-          homeElement={<Icon name="home" className="h-5 w-5" />}
-          separator={<Icon name="chevron-right" className="h-3 w-3" />}
-          activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
-          containerClasses="md:hidden p-4 flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
-          listClasses="outline-hidden focus:ring-2 focus:ring-primary-500"
-          capitalizeLinks
         />
 
         <div className="flex-1 flex flex-col p-4">{children}</div>

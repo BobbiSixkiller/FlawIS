@@ -3,7 +3,7 @@ import { getAttendees } from "./actions";
 import { getConference } from "../../actions";
 
 import ExportButton from "../../../../../../components/ExportButton";
-import FilterDropdown from "@/components/FilterDropdown";
+import UrlFilter from "@/components/UrlFilter";
 import { AttendeesQueryVariables } from "@/lib/graphql/generated/graphql";
 
 export default async function AttendeesPage({
@@ -41,7 +41,8 @@ export default async function AttendeesPage({
           fetchUrl={`/export?type=conferenceAttendees&slug=${slug}`}
         />
 
-        <FilterDropdown
+        <UrlFilter
+          lng={lng}
           anchor={{ gap: 6, to: "bottom" }}
           filters={[
             {

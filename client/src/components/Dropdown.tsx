@@ -8,7 +8,7 @@ import {
   MenuItems,
   MenuItemsProps,
 } from "@headlessui/react";
-import { ReactElement, ReactNode } from "react";
+import { Children, ReactElement, ReactNode } from "react";
 import Button, { ButtonProps } from "./Button";
 
 export type DropdownItem = ReactElement;
@@ -21,6 +21,12 @@ interface DropdownProps {
   buttonWidth?: boolean;
 }
 
+function DropdownMenuItem({ item }: { item: DropdownItem }) {
+  // Resolve streamed server children only when the menu mounts its items.
+  const children = Children.toArray(item);
+  return <MenuItem>{children.length === 1 ? children[0] : children}</MenuItem>;
+}
+
 export default function Dropdown({
   trigger,
   triggerProps,
@@ -30,7 +36,11 @@ export default function Dropdown({
 }: DropdownProps) {
   return (
     <Menu>
-      <MenuButton as={Button} {...triggerProps}>
+      <MenuButton
+        as={Button}
+        {...triggerProps}
+        className={cn(triggerProps?.className, "cursor-pointer")}
+      >
         {trigger}
       </MenuButton>
 
@@ -46,25 +56,17 @@ export default function Dropdown({
         anchor={anchor}
       >
         {items.map((item, i) => (
-          <div className="p-1" key={i}>
-            <MenuItem>
-              {({ close, focus }) => {
-                return (
-                  <div
-                    className={cn([
-                      "flex w-full gap-2 items-center rounded-md text-sm p-2",
-                      focus &&
-                        "bg-primary-500 dark:bg-primary-300/90 dark:text-gray-900 text-white",
-                      "[&>*]:flex [&>*]:w-full [&>*]:items-center [&>*]:gap-2",
-                      "[&_button]:h-auto [&_button]:w-full [&_button]:justify-start [&_button]:bg-transparent [&_button]:p-0 [&_button]:text-inherit [&_button]:shadow-none",
-                    ])}
-                    onClick={() => close()}
-                  >
-                    {item}
-                  </div>
-                );
-              }}
-            </MenuItem>
+          <div
+            className={cn([
+              "p-1",
+              "[&>*]:flex [&>*]:min-h-11 [&>*]:h-auto [&>*]:w-full [&>*]:items-center [&>*]:justify-start [&>*]:gap-2 [&>*]:rounded-md [&>*]:p-2 [&>*]:text-sm",
+              "[&>*]:bg-transparent [&>*]:text-inherit [&>*]:shadow-none",
+              "[&>[data-focus]]:bg-primary-500 [&>[data-focus]]:text-white dark:[&>[data-focus]]:bg-primary-300/90 dark:[&>[data-focus]]:text-gray-900",
+            ])}
+            key={item.key ?? i}
+          >
+            {/* Keep touch and keyboard activation on the actual link or button. */}
+            <DropdownMenuItem item={item} />
           </div>
         ))}
       </MenuItems>

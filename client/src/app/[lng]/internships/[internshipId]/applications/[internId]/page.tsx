@@ -5,7 +5,6 @@ import Tooltip from "@/components/Tooltip";
 import { getIntern } from "./actions";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import ChangeStatusForm from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/ChangeStatusForm";
@@ -38,35 +37,31 @@ export default async function InternPage({
           <div className="ml-auto flex gap-2">
             {intern.status === Status.Accepted && (
               <Tooltip message={t("internReview")}>
-                <ModalTrigger dialogId={certificateDialogId}>
-                  <Button size="icon">
-                    <Icon name="inbox-arrow-down" className="size-5" />
-                  </Button>
+                <ModalTrigger dialogId={certificateDialogId} size="icon">
+                  <Icon name="inbox-arrow-down" className="size-5" />
                 </ModalTrigger>
               </Tooltip>
             )}
 
             <Tooltip message={t("accept")}>
-              <ModalTrigger dialogId={statusDialogId(Status.Accepted)}>
-                <Button
-                  size="icon"
-                  variant="positive"
-                  disabled={intern.status === Status.Accepted}
-                >
-                  <Icon name="check" className="size-5" />
-                </Button>
+              <ModalTrigger
+                dialogId={statusDialogId(Status.Accepted)}
+                size="icon"
+                variant="positive"
+                disabled={intern.status === Status.Accepted}
+              >
+                <Icon name="check" className="size-5" />
               </ModalTrigger>
             </Tooltip>
 
             <Tooltip message={t("reject")}>
-              <ModalTrigger dialogId={statusDialogId(Status.Rejected)}>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  disabled={intern.status === Status.Rejected}
-                >
-                  <Icon name="x-mark" className="size-5" />
-                </Button>
+              <ModalTrigger
+                dialogId={statusDialogId(Status.Rejected)}
+                size="icon"
+                variant="destructive"
+                disabled={intern.status === Status.Rejected}
+              >
+                <Icon name="x-mark" className="size-5" />
               </ModalTrigger>
             </Tooltip>
           </div>

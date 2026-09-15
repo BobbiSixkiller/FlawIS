@@ -5,11 +5,10 @@ import Icon from "@/components/Icon";
 import { translate } from "@/lib/i18n";
 import Modal from "@/components/Modal";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import UserForm from "../../(auth)/register/UserForm";
 import RegistrationInviteForm from "./RegistrationInviteForm";
 import { Access, UsersQueryVariables } from "@/lib/graphql/generated/graphql";
-import FilterDropdown from "@/components/FilterDropdown";
+import UrlFilter from "@/components/UrlFilter";
 
 export default async function Users({
   params,
@@ -40,22 +39,24 @@ export default async function Users({
         heading={t("heading")}
         subHeading="Pouzivatelia registrovani v systeme"
         items={[
-          <ModalTrigger key={0} dialogId={newUserDialogId}>
-            <Button size="sm">
-              <Icon name="plus" className="size-5" />
-              Novy
-            </Button>
+          <ModalTrigger key={0} dialogId={newUserDialogId} size="sm">
+            <Icon name="plus" className="size-5" />
+            Novy
           </ModalTrigger>,
-          <ModalTrigger key={1} dialogId={inviteUserDialogId}>
-            <Button size="sm" variant="secondary">
-              <Icon name="building-library" className="size-5" />
-              Pozvat instituciu
-            </Button>
+          <ModalTrigger
+            key={1}
+            dialogId={inviteUserDialogId}
+            size="sm"
+            variant="secondary"
+          >
+            <Icon name="building-library" className="size-5" />
+            Pozvat instituciu
           </ModalTrigger>,
         ]}
       />
       <div className="flex justify-between">
-        <FilterDropdown
+        <UrlFilter
+          lng={lng}
           anchor={{ gap: 6, to: "bottom start" }}
           filters={[
             {

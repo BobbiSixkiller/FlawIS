@@ -10,11 +10,10 @@ import { getInternships } from "./actions";
 import AcademicYearSelect from "./AcademicYearSelect";
 import Tooltip from "@/components/Tooltip";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import InternshipForm from "./InternshipForm";
-import FilterDropdown from "@/components/FilterDropdown";
+import UrlFilter from "@/components/UrlFilter";
 import { getOptionalViewer } from "@/lib/optionalViewer";
 import {
   getInternshipAccess,
@@ -76,7 +75,8 @@ export default async function InternshipsHomePage({
         </div>
 
         <div className="flex gap-2">
-          <FilterDropdown
+          <UrlFilter
+            lng={lng}
             anchor={{ gap: 6, to: "bottom" }}
             filters={[
               {
@@ -96,11 +96,9 @@ export default async function InternshipsHomePage({
           />
           {access.canCreate && (
             <Tooltip message={t("tooltip.new")} position="below">
-              <ModalTrigger dialogId={addDialogId}>
-                <Button size="sm">
-                  <Icon name="plus" className="size-5 mr-2" />
-                  {t("create", { ns: "common" })}
-                </Button>
+              <ModalTrigger dialogId={addDialogId} size="sm">
+                <Icon name="plus" className="size-5 mr-2" />
+                {t("create", { ns: "common" })}
               </ModalTrigger>
             </Tooltip>
           )}

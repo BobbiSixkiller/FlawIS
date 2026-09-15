@@ -53,7 +53,11 @@ const UKsans = localFont({
   variable: "--font-UKsans",
 });
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
   const lng =
     getSupportedLocale(headerStore.get(localeHeaderName)) ??
@@ -68,11 +72,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={theme === "dark" ? "dark" : ""}
       suppressHydrationWarning
     >
-      {theme === "system" ? (
-        <head>
-          <script dangerouslySetInnerHTML={{ __html: systemThemeScript }} />
-        </head>
-      ) : null}
+      <head>
+        {/* Keep this node mounted when a theme cookie update rerenders the layout.
+            It initializes the first paint; ThemeProvider handles client changes. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: theme === "system" ? systemThemeScript : "",
+          }}
+        />
+      </head>
       <body className={UKsans.className}>
         <ThemeProvider initialPreference={theme}>{children}</ThemeProvider>
       </body>

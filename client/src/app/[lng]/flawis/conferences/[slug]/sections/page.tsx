@@ -5,7 +5,6 @@ import {
   SectionFragment,
   SubmissionFilesFragment,
 } from "@/lib/graphql/generated/graphql";
-import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import SectionForm from "./SectionForm";
@@ -24,11 +23,9 @@ export default async function SectionsPage({
 
   return (
     <div>
-      <ModalTrigger dialogId={newSectionDialogId}>
-        <Button size="sm">
-          <Icon name="plus" className="h-5 w-5" />
-          Nova
-        </Button>
+      <ModalTrigger dialogId={newSectionDialogId} size="sm">
+        <Icon name="plus" className="h-5 w-5" />
+        Nova
       </ModalTrigger>
 
       <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
@@ -66,11 +63,11 @@ function Section({
   const deleteSectionDialogId = `delete-section-${section.id}`;
 
   const dropdownItems: DropdownItem[] = [
-    <ModalTrigger dialogId={updateSectionDialogId} key={0}>
-      <Button size="sm">Aktualizovat</Button>
+    <ModalTrigger dialogId={updateSectionDialogId} key={0} size="sm">
+      Aktualizovat
     </ModalTrigger>,
-    <ModalTrigger dialogId={deleteSectionDialogId} key={1}>
-      <Button size="sm">Zmazat</Button>
+    <ModalTrigger dialogId={deleteSectionDialogId} key={1} size="sm">
+      Zmazat
     </ModalTrigger>,
   ];
 

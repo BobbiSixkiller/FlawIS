@@ -1,8 +1,7 @@
-import { getMe } from "../(auth)/actions";
-import { translate } from "@/lib/i18n";
 import { getCourses } from "../flawis/courses/actions";
 import OfferingList from "@/components/OfferingList";
-import FilterDropdown from "@/components/FilterDropdown";
+import UrlFilter from "@/components/UrlFilter";
+import { translate } from "@/lib/i18n";
 import {
   CourseSortableField,
   CoursesQueryVariables,
@@ -17,9 +16,8 @@ export default async function CoursesPage({
   searchParams?: Promise<{ category?: string | string[] }>;
 }) {
   const { lng } = await params;
+  const { t } = await translate(lng, "courses");
   const queryParams = await searchParams;
-
-  const { t, i18n } = await translate(lng, "dashboard");
 
   const categorySlugs = queryParams?.category
     ? Array.isArray(queryParams.category)
@@ -40,37 +38,36 @@ export default async function CoursesPage({
   const initialData = await getCourses(vars);
 
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-y-6">
-      <div className="col-span-full row-start-1 flex items-center justify-center">
-        <h1 className="text-3xl font-bold leading-7 text-center">Kurzy</h1>
-      </div>
-
-      <FilterDropdown
-        wrapperClassName="fixed bottom-6 right-6 z-50 sm:sticky sm:top-4 sm:bottom-auto sm:right-auto sm:col-start-2 sm:row-start-1 sm:z-30 sm:justify-self-end sm:self-start"
-        className="p-2"
-        anchor={{ gap: 6, to: "bottom end" }}
-        filters={[
-          {
-            label: "Kategórie",
-            type: "multi",
-            queryKey: "category",
-            options: initialData.availableCategories.map((c) => ({
-              label: `${c.name} (${c.count})`,
-              value: c.slug,
-            })),
-          },
-        ]}
-      />
-
-      <div className="col-span-full row-start-2">
-        <OfferingList
-          kind="course"
-          initialData={initialData}
-          vars={vars}
-          hrefBase=""
+    <div className="flex min-w-0 flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-bold leading-tight">
+          {t("catalogue.title")}
+        </h1>
+        <UrlFilter
           lng={lng}
+          label={t("catalogue.categories")}
+          filters={[
+            {
+              label: t("catalogue.categories"),
+              queryKey: "category",
+              type: "multi",
+              options: initialData.availableCategories.map((category) => ({
+                value: category.slug,
+                label: category.name,
+                count: category.count,
+              })),
+            },
+          ]}
         />
       </div>
+
+      <OfferingList
+        kind="course"
+        initialData={initialData}
+        vars={vars}
+        hrefBase=""
+        lng={lng}
+      />
     </div>
   );
 }

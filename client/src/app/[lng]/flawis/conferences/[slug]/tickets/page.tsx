@@ -1,7 +1,6 @@
 import Dropdown from "@/components/Dropdown";
 import { getConference } from "../../actions";
 import Icon from "@/components/Icon";
-import Button from "@/components/Button";
 import ModalTrigger from "@/components/ModalTrigger";
 import Modal from "@/components/Modal";
 import { redirect } from "next/navigation";
@@ -26,11 +25,9 @@ export default async function TicketsPage({
 
   return (
     <div className="">
-      <ModalTrigger dialogId={newTicketDialogId}>
-        <Button size="sm">
-          <Icon name="plus" className="h-5 w-5" />
-          Novy
-        </Button>
+      <ModalTrigger dialogId={newTicketDialogId} size="sm">
+        <Icon name="plus" className="h-5 w-5" />
+        Novy
       </ModalTrigger>
 
       <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
@@ -52,11 +49,19 @@ export default async function TicketsPage({
               trigger={<Icon name="ellipsis-horizontal" className="h-5 w-5" />}
               triggerProps={{ size: "icon", variant: "ghost" }}
               items={[
-                <ModalTrigger dialogId={updateTicketDialogId(t.id)} key={0}>
-                  <Button size="sm">Aktualizovat</Button>
+                <ModalTrigger
+                  dialogId={updateTicketDialogId(t.id)}
+                  key={0}
+                  size="sm"
+                >
+                  Aktualizovat
                 </ModalTrigger>,
-                <ModalTrigger dialogId={deleteTicketDialogId(t.id)} key={1}>
-                  <Button size="sm">Zmazat</Button>
+                <ModalTrigger
+                  dialogId={deleteTicketDialogId(t.id)}
+                  key={1}
+                  size="sm"
+                >
+                  Zmazat
                 </ModalTrigger>,
               ]}
             />

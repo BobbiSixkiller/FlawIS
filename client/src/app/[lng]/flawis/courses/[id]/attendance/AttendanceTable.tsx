@@ -128,22 +128,23 @@ function AttendanceTableContainer({ children }: { children: React.ReactNode }) {
                   "dark:bg-gray-800 dark:border-gray-600 dark:text-white/85",
                 ])}
               >
-                <ModalTrigger dialogId={`session:${s?.id}`}>
-                  <button className="w-full cursor-pointer text-center">
-                    <span className="hover:underline">
-                      {formatDatetimeLocal(s?.start, false)}
-                    </span>
-                  </button>
+                <ModalTrigger
+                  dialogId={`session:${s?.id}`}
+                  unstyled
+                  className="w-full cursor-pointer text-center"
+                >
+                  <span className="hover:underline">
+                    {formatDatetimeLocal(s?.start, false)}
+                  </span>
                 </ModalTrigger>
                 {isAdmin && (
-                  <ModalTrigger dialogId={`session:${s?.id}-delete`}>
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      className="h-fit w-fit p-2"
-                    >
-                      <Icon name="trash" className="size-3" />
-                    </Button>
+                  <ModalTrigger
+                    dialogId={`session:${s?.id}-delete`}
+                    size="icon"
+                    variant="destructive"
+                    className="h-fit w-fit p-2"
+                  >
+                    <Icon name="trash" className="size-3" />
                   </ModalTrigger>
                 )}
                 <Modal
@@ -161,10 +162,12 @@ function AttendanceTableContainer({ children }: { children: React.ReactNode }) {
 
                   {isAdmin && (
                     <>
-                      <ModalTrigger dialogId={`session:${s?.id}-edit`}>
-                        <Button size="icon" className="mt-6">
-                          <Icon name="pencil" className="size-5" />
-                        </Button>
+                      <ModalTrigger
+                        dialogId={`session:${s?.id}-edit`}
+                        size="icon"
+                        className="mt-6"
+                      >
+                        <Icon name="pencil" className="size-5" />
                       </ModalTrigger>
                       <Modal
                         dialogId={`session:${s?.id}-edit`}
@@ -247,12 +250,14 @@ function AttendanceRow({
         >
           {user?.access.includes(Access.Admin) ? (
             <div className="flex w-full items-center gap-1">
-              <ModalTrigger dialogId={`attendee:${data?.attendee.id}`}>
-                <button className="min-w-0 flex-1 cursor-pointer truncate text-center">
-                  <span className="hover:underline">
-                    {data?.attendee.user.name}
-                  </span>
-                </button>
+              <ModalTrigger
+                dialogId={`attendee:${data?.attendee.id}`}
+                unstyled
+                className="min-w-0 flex-1 cursor-pointer truncate text-center"
+              >
+                <span className="hover:underline">
+                  {data?.attendee.user.name}
+                </span>
               </ModalTrigger>
               {data?.attendee.elearningStatus ===
                 ElearningProvisioningStatus.SyncFailed && (
@@ -338,35 +343,32 @@ function AttendanceRow({
                 "dark:bg-gray-800 dark:text-white/85",
               ])}
             >
-              <ModalTrigger dialogId={`accept-dialog:${data?.attendee.id}`}>
-                <Button
-                  size="icon"
-                  variant="positive"
-                  className="h-fit w-fit p-2"
-                >
-                  <Icon name="check" className="size-3" />
-                </Button>
+              <ModalTrigger
+                dialogId={`accept-dialog:${data?.attendee.id}`}
+                size="icon"
+                variant="positive"
+                className="h-fit w-fit p-2"
+              >
+                <Icon name="check" className="size-3" />
               </ModalTrigger>
 
               {enableDelete ? (
-                <ModalTrigger dialogId={`delete-attendee:${data.attendee.id}`}>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-fit w-fit p-2"
-                  >
-                    <Icon name="trash" className="size-3" />
-                  </Button>
+                <ModalTrigger
+                  dialogId={`delete-attendee:${data.attendee.id}`}
+                  size="icon"
+                  variant="destructive"
+                  className="h-fit w-fit p-2"
+                >
+                  <Icon name="trash" className="size-3" />
                 </ModalTrigger>
               ) : (
-                <ModalTrigger dialogId={`reject-dialog:${data?.attendee.id}`}>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-fit w-fit p-2"
-                  >
-                    <Icon name="x-mark" className="size-3" />
-                  </Button>
+                <ModalTrigger
+                  dialogId={`reject-dialog:${data?.attendee.id}`}
+                  size="icon"
+                  variant="destructive"
+                  className="h-fit w-fit p-2"
+                >
+                  <Icon name="x-mark" className="size-3" />
                 </ModalTrigger>
               )}
             </div>

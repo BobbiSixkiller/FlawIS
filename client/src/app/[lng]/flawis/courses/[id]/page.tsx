@@ -1,9 +1,5 @@
 import Heading from "@/components/Heading";
-import {
-  deleteCourse,
-  getCourse,
-  getCourseReachConfig,
-} from "./actions";
+import { deleteCourse, getCourse, getCourseReachConfig } from "./actions";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
@@ -37,17 +33,24 @@ export default async function CoursePage({
         heading={course.name}
         items={[
           <CloseButton href="/courses" key={0} />,
-          <ModalTrigger dialogId="delete-course" key={1}>
-            <Button size="icon" className="rounded-full" variant="destructive">
-              <Icon name="trash" className="size-5" />{" "}
-              <span className="sm:hidden">Zmazat</span>
-            </Button>
+          <ModalTrigger
+            dialogId="delete-course"
+            key={1}
+            size="icon"
+            className="rounded-full"
+            variant="destructive"
+          >
+            <Icon name="trash" className="size-5" />{" "}
+            <span className="sm:hidden">Zmazat</span>
           </ModalTrigger>,
-          <ModalTrigger dialogId="edit-course" key={2}>
-            <Button size="icon" className="rounded-full">
-              <Icon name="pencil" className="size-5" />{" "}
-              <span className="sm:hidden">Upravit</span>
-            </Button>
+          <ModalTrigger
+            dialogId="edit-course"
+            key={2}
+            size="icon"
+            className="rounded-full"
+          >
+            <Icon name="pencil" className="size-5" />{" "}
+            <span className="sm:hidden">Upravit</span>
           </ModalTrigger>,
           <Button
             key={3}

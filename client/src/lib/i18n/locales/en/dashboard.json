@@ -31,5 +31,10 @@
     "light": "Light",
     "system": "System",
     "dark": "Dark"
+  },
+  "openNavigation": "Open navigation",
+  "breadcrumbs": {
+    "label": "Breadcrumbs",
+    "showFullPath": "Show full navigation"
   }
 }

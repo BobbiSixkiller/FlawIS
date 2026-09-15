@@ -25,13 +25,17 @@ export default async function CoursesPage({
         heading="Kurzy"
         subHeading="Kurzy na falkute"
         items={[
-          <Button key={0} as={Link} href="/courses/categories" size="sm" variant="secondary">
+          <Button
+            key={0}
+            as={Link}
+            href="/courses/categories"
+            size="sm"
+            variant="secondary"
+          >
             <Icon name="tag" className="size-5" /> Kategórie
           </Button>,
-          <ModalTrigger key={1} dialogId={createCourseDialogId}>
-            <Button size="sm">
-              <Icon name="plus" className="size-5" /> Nový
-            </Button>
+          <ModalTrigger key={1} dialogId={createCourseDialogId} size="sm">
+            <Icon name="plus" className="size-5" /> Nový
           </ModalTrigger>,
         ]}
       />

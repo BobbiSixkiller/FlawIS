@@ -111,6 +111,9 @@ services:
     build:
       context: ./mongo
       dockerfile: Dockerfile
+    environment:
+      # Avoid the MongoDB 8 TCMalloc/kernel incompatibility (SERVER-121912) locally.
+      GLIBC_TUNABLES: glibc.pthread.rseq=1
     restart: unless-stopped
     ports:
       - "27017:27017"

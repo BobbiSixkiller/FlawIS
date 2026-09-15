@@ -13,10 +13,7 @@ import { translate } from "@/lib/i18n";
 import ApplicationForm from "./ApplicationForm";
 import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
 import { getOptionalViewer } from "@/lib/optionalViewer";
-import {
-  getInternshipAccess,
-  isObjectId,
-} from "@/lib/internshipAccess";
+import { getInternshipAccess, isObjectId } from "@/lib/internshipAccess";
 import { loginHref, logoutHref } from "@/lib/authRedirect";
 import { cookies } from "next/headers";
 
@@ -58,24 +55,25 @@ export default async function InternshipPage({
       <div className="flex gap-2">
         {access.canManage && (
           <>
-            <ModalTrigger dialogId={updateInternshipDialogId}>
-              <Button size="icon" className="rounded-full">
-                <Icon name="pencil" className="size-5" />
-              </Button>
+            <ModalTrigger
+              dialogId={updateInternshipDialogId}
+              size="icon"
+              className="rounded-full"
+            >
+              <Icon name="pencil" className="size-5" />
             </ModalTrigger>
-            <ModalTrigger dialogId={deleteInternshipDialogId}>
-              <Button
-                variant="destructive"
-                size="icon"
-                className="rounded-full"
-              >
-                <Icon name="trash" className="size-5" />
-              </Button>
+            <ModalTrigger
+              dialogId={deleteInternshipDialogId}
+              variant="destructive"
+              size="icon"
+              className="rounded-full"
+            >
+              <Icon name="trash" className="size-5" />
             </ModalTrigger>
           </>
         )}
 
-        <BackButton fallbackHref="/" label={t("back")} />
+        <BackButton label={t("back")} />
       </div>
 
       <div
@@ -97,18 +95,18 @@ export default async function InternshipPage({
               controls={
                 <div className="flex gap-2">
                   {internship.myApplication.status === Status.Applied && (
-                    <ModalTrigger dialogId={applicationDialogId}>
-                      <Button size="icon">
-                        <Icon name="pencil" className="size-5" />
-                      </Button>
+                    <ModalTrigger dialogId={applicationDialogId} size="icon">
+                      <Icon name="pencil" className="size-5" />
                     </ModalTrigger>
                   )}
 
                   {internship.myApplication.status !== Status.Accepted && (
-                    <ModalTrigger dialogId={deleteApplicationDialogId}>
-                      <Button size="icon" variant="destructive">
-                        <Icon name="trash" className="size-5" />
-                      </Button>
+                    <ModalTrigger
+                      dialogId={deleteApplicationDialogId}
+                      size="icon"
+                      variant="destructive"
+                    >
+                      <Icon name="trash" className="size-5" />
                     </ModalTrigger>
                   )}
                 </div>
@@ -118,7 +116,7 @@ export default async function InternshipPage({
         ) : (
           <>
             <div className="text-center rounded-lg p-4 border border-orange-300 bg-orange-100 text-orange-500  dark:border-orange-500 dark:bg-orange-300 dark:text-orange-700">
-              {t("checkProfile.prefix")} {" "}
+              {t("checkProfile.prefix")}{" "}
               <Link
                 className="font-semibold hover:underline"
                 href={"/profile/update"}
@@ -129,20 +127,14 @@ export default async function InternshipPage({
               {t("checkProfile.suffix")}
             </div>
 
-            <ModalTrigger dialogId={applicationDialogId}>
-              <Button className="w-full">
-                <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
-                {t("apply")}
-              </Button>
+            <ModalTrigger dialogId={applicationDialogId} className="w-full">
+              <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
+              {t("apply")}
             </ModalTrigger>
           </>
         )
       ) : !user ? (
-        <Button
-          as={Link}
-          href={signInHref}
-          className="w-full"
-        >
+        <Button as={Link} href={signInHref} className="w-full">
           <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
           {t("signInToApply")}
         </Button>
@@ -156,10 +148,7 @@ export default async function InternshipPage({
               data={internship}
             />
           </Modal>
-          <Modal
-            dialogId={deleteInternshipDialogId}
-            title={t("delete.title")}
-          >
+          <Modal dialogId={deleteInternshipDialogId} title={t("delete.title")}>
             <ConfirmDeleteForm
               dialogId={deleteInternshipDialogId}
               text={t("delete.text")}

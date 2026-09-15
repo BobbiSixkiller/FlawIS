@@ -4,7 +4,6 @@ import Icon from "@/components/Icon";
 import { translate } from "@/lib/i18n";
 import OfferingList from "@/components/OfferingList";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import NewConferenceForm from "./NewConferenceForm";
 
@@ -27,11 +26,9 @@ export default async function Conferences({
         subHeading={t("subheading")}
         lng={lng}
         items={[
-          <ModalTrigger dialogId={newConferenceDialogId} key={0}>
-            <Button size="sm">
-              <Icon name="plus" className="size-5" />
-              Nova
-            </Button>
+          <ModalTrigger dialogId={newConferenceDialogId} key={0} size="sm">
+            <Icon name="plus" className="size-5" />
+            Nova
           </ModalTrigger>,
         ]}
       />

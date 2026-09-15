@@ -12,5 +12,9 @@
     "syllabus": "Obsah kurzu:",
     "profile": "Kurz je určený pre:",
     "lecturers": "Lektori:"
+  },
+  "catalogue": {
+    "title": "Kurzy",
+    "categories": "Kategórie"
   }
 }

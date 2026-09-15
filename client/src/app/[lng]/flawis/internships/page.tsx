@@ -8,7 +8,7 @@ import {
   InternshipsQueryVariables,
   SortDirection,
 } from "@/lib/graphql/generated/graphql";
-import FilterDropdown from "@/components/FilterDropdown";
+import UrlFilter from "@/components/UrlFilter";
 import ExportButton from "@/components/ExportButton";
 import { normalizeQueryValues } from "@/lib/internshipAccess";
 
@@ -61,7 +61,8 @@ export default async function InternshipsPage({
         </div>
 
         <div className="flex gap-2 items-center">
-          <FilterDropdown
+          <UrlFilter
+            lng={lng}
             anchor={{ gap: 6, to: "bottom" }}
             filters={[
               {

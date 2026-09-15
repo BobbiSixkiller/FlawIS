@@ -3,10 +3,7 @@ import {
   deleteCourseAttendee,
   getCourse,
 } from "../../flawis/courses/[id]/actions";
-import {
-  InvoiceOwnerType,
-  Status,
-} from "@/lib/graphql/generated/graphql";
+import { InvoiceOwnerType, Status } from "@/lib/graphql/generated/graphql";
 import ModalTrigger from "@/components/ModalTrigger";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
@@ -58,17 +55,17 @@ export default async function CoursePage({
                   />
                 )}
                 {course.attending.status === Status.Applied && (
-                  <ModalTrigger dialogId="delete-course-application">
-                    <Button variant="destructive" size="icon">
-                      <Icon name="trash" className="size-5" />
-                    </Button>
+                  <ModalTrigger
+                    dialogId="delete-course-application"
+                    variant="destructive"
+                    size="icon"
+                  >
+                    <Icon name="trash" className="size-5" />
                   </ModalTrigger>
                 )}
                 {course.attending.status !== Status.Accepted && (
-                  <ModalTrigger dialogId="course-application">
-                    <Button size="icon">
-                      <Icon name="pencil" className="size-5" />
-                    </Button>
+                  <ModalTrigger dialogId="course-application" size="icon">
+                    <Icon name="pencil" className="size-5" />
                   </ModalTrigger>
                 )}
               </div>

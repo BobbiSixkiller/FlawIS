@@ -32,10 +32,8 @@ export default function CategoriesManager({
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <ModalTrigger dialogId={CREATE_DIALOG_ID}>
-          <Button size="sm">
-            <Icon name="plus" className="size-5" /> Nová kategória
-          </Button>
+        <ModalTrigger dialogId={CREATE_DIALOG_ID} size="sm">
+          <Icon name="plus" className="size-5" /> Nová kategória
         </ModalTrigger>
       </div>
 
@@ -70,14 +68,13 @@ export default function CategoriesManager({
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <ModalTrigger dialogId={EDIT_DIALOG_ID}>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setEditingCategory(cat)}
-                        >
-                          <Icon name="pencil" className="size-4" />
-                        </Button>
+                      <ModalTrigger
+                        dialogId={EDIT_DIALOG_ID}
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setEditingCategory(cat)}
+                      >
+                        <Icon name="pencil" className="size-4" />
                       </ModalTrigger>
                       <Button
                         size="icon"

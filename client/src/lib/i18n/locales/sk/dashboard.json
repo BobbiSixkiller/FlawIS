@@ -31,5 +31,10 @@
     "light": "Svetlý",
     "system": "Systémový",
     "dark": "Tmavý"
+  },
+  "openNavigation": "Otvoriť navigáciu",
+  "breadcrumbs": {
+    "label": "Navigácia",
+    "showFullPath": "Zobraziť celú navigáciu"
   }
 }

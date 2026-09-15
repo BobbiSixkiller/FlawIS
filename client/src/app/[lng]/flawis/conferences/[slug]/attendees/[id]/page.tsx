@@ -8,7 +8,6 @@ import RemoveAuthorForm from "./RemoveAuthorForm";
 import { deleteAttendee, getAttendee } from "./actions";
 import CloseButton from "@/components/CloseButton";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
 import UpdateInvoiceForm from "./InvoiceForm";
@@ -50,17 +49,18 @@ export default async function AttendeePage({
             : "N/A"
         }
         items={[
-          <ModalTrigger key={0} dialogId={impersonateDialogId}>
-            <Button size="sm">
-              <Icon name="arrows-right-left" className="size-5" />
-              Impersonovat
-            </Button>
+          <ModalTrigger key={0} dialogId={impersonateDialogId} size="sm">
+            <Icon name="arrows-right-left" className="size-5" />
+            Impersonovat
           </ModalTrigger>,
-          <ModalTrigger key={1} dialogId={deleteDialogId}>
-            <Button size="sm" variant="secondary">
-              <Icon name="trash" className="size-5" />
-              Zmazat
-            </Button>
+          <ModalTrigger
+            key={1}
+            dialogId={deleteDialogId}
+            size="sm"
+            variant="secondary"
+          >
+            <Icon name="trash" className="size-5" />
+            Zmazat
           </ModalTrigger>,
         ]}
       />
@@ -73,10 +73,12 @@ export default async function AttendeePage({
           />
 
           {attendee.invoice ? (
-            <ModalTrigger dialogId={updateInvoiceDialogId}>
-              <Button size="icon" variant="ghost">
-                <Icon name="pencil" className="w-5 h-5" />
-              </Button>
+            <ModalTrigger
+              dialogId={updateInvoiceDialogId}
+              size="icon"
+              variant="ghost"
+            >
+              <Icon name="pencil" className="w-5 h-5" />
             </ModalTrigger>
           ) : null}
         </div>
@@ -108,14 +110,11 @@ export default async function AttendeePage({
                 <Tooltip message={t("editSubmission")} position="below">
                   <ModalTrigger
                     dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                    size="icon"
+                    variant="ghost"
+                    aria-label={t("editSubmission")}
                   >
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      aria-label={t("editSubmission")}
-                    >
-                      <Icon name="pencil" className="w-5 h-5" />
-                    </Button>
+                    <Icon name="pencil" className="w-5 h-5" />
                   </ModalTrigger>
                 </Tooltip>
               </div>
@@ -124,13 +123,12 @@ export default async function AttendeePage({
                   <li key={a.id} className="flex gap-1">
                     {a.name}
 
-                    <ModalTrigger dialogId={`${deleteAuthorDialogId}-${a.id}`}>
-                      <Button
-                        variant="ghost"
-                        className="p-1 h-fit bg-transparent"
-                      >
-                        <Icon name="x-mark" className="size-3 stroke-2" />
-                      </Button>
+                    <ModalTrigger
+                      dialogId={`${deleteAuthorDialogId}-${a.id}`}
+                      variant="ghost"
+                      className="p-1 h-fit bg-transparent"
+                    >
+                      <Icon name="x-mark" className="size-3 stroke-2" />
                     </ModalTrigger>
 
                     <Modal

@@ -4,9 +4,13 @@ import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { useMessageStore } from "@/stores/messageStore";
 import Icon from "@/components/Icon";
-import { useState } from "react";
+import { ComponentPropsWithRef, useState } from "react";
 
-export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
+export default function ExportButton({
+  fetchUrl,
+  onClick,
+  ...props
+}: { fetchUrl: string } & ComponentPropsWithRef<"button">) {
   const [loading, setLoading] = useState(false);
   const setMessage = useMessageStore((s) => s.setMessage);
 
@@ -50,7 +54,16 @@ export default function ExportButton({ fetchUrl }: { fetchUrl: string }) {
   }
 
   return (
-    <Button onClick={handleClick} size="sm" variant="positive" className="w-20">
+    <Button
+      size="sm"
+      variant="positive"
+      className="w-20"
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) void handleClick();
+      }}
+    >
       {loading ? (
         <Spinner inverted />
       ) : (

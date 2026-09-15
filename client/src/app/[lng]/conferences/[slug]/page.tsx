@@ -61,24 +61,22 @@ function SubmissionCard({
 
         {editable ? (
           <div className="flex shrink-0 gap-1">
-            <ModalTrigger dialogId={updateDialogId}>
-              <Button
-                size="icon"
-                variant="ghost"
-                aria-label={t("workspace.editSubmission")}
-              >
-                <Icon name="pencil" className="size-4" />
-              </Button>
+            <ModalTrigger
+              dialogId={updateDialogId}
+              size="icon"
+              variant="ghost"
+              aria-label={t("workspace.editSubmission")}
+            >
+              <Icon name="pencil" className="size-4" />
             </ModalTrigger>
-            <ModalTrigger dialogId={deleteDialogId}>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="text-red-600 hover:text-red-700 dark:text-red-300"
-                aria-label={t("workspace.deleteSubmission")}
-              >
-                <Icon name="trash" className="size-4" />
-              </Button>
+            <ModalTrigger
+              dialogId={deleteDialogId}
+              size="icon"
+              variant="ghost"
+              className="text-red-600 hover:text-red-700 dark:text-red-300"
+              aria-label={t("workspace.deleteSubmission")}
+            >
+              <Icon name="trash" className="size-4" />
             </ModalTrigger>
           </div>
         ) : null}
@@ -358,11 +356,9 @@ export default async function ConferenceWorkspacePage({
               </p>
             </div>
             {state.submissionsEditable ? (
-              <ModalTrigger dialogId={newSubmissionDialogId}>
-                <Button size="sm">
-                  <Icon name="plus" className="size-4" />
-                  {t("workspace.addSubmission")}
-                </Button>
+              <ModalTrigger dialogId={newSubmissionDialogId} size="sm">
+                <Icon name="plus" className="size-4" />
+                {t("workspace.addSubmission")}
               </ModalTrigger>
             ) : null}
           </div>

@@ -1,12 +1,9 @@
-import Icon from "@/components/Icon";
-import Link from "next/link";
+import AccountMenu from "@/components/AccountMenu";
+import TopBar from "@/components/TopBar";
 import { ReactNode } from "react";
 
 import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
 import Avatar from "@/components/Avatar";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import Button from "@/components/Button";
-import Dropdown from "@/components/Dropdown";
 import LngSwitcher from "@/components/LngSwitcher";
 import Logo from "@/components/Logo";
 import { Snackbar } from "@/components/Message";
@@ -40,58 +37,26 @@ export default async function ParticipantTenantShell({
         "dark:bg-gray-950 dark:text-white/85",
       )}
     >
-      <header className="flex h-[60px] w-full items-center justify-end gap-2 p-6 sm:max-w-md sm:p-2">
-        <ThemeToggler lng={lng} />
-        {user ? (
-          <Dropdown
-            anchor={{ gap: 6, to: "bottom" }}
-            trigger={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
-            triggerProps={{
-              size: "icon",
-              className: "flex h-fit w-fit items-center rounded-full",
-            }}
-            items={[
-              <Link href="/profile" prefetch={false} key="profile">
-                <Icon
-                  name="user-circle"
-                  className="size-5"
-                  aria-hidden="true"
-                />
-                {t("profile")}
-              </Link>,
-              <Link href="/logout" prefetch={false} key="logout">
-                <Icon
-                  name="arrow-left-start-on-rectangle"
-                  className="size-5"
-                  aria-hidden="true"
-                />
-                {t("logout")}
-              </Link>,
-            ]}
-          />
-        ) : (
-          <Button
-            as={Link}
-            href={signInHref}
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-          >
-            <Icon name="arrow-right-start-on-rectangle" className="size-5" />
-          </Button>
-        )}
-        <LngSwitcher authLayout />
-      </header>
+      <TopBar
+        logo={<Logo lng={lng} notext height={40} width={40} />}
+        contentClassName="max-w-xl px-6 sm:px-2"
+        actions={
+          <>
+            <ThemeToggler lng={lng} />
+            <AccountMenu
+              avatar={
+                user ? (
+                  <Avatar name={user.name} avatarUrl={user.avatarUrl} />
+                ) : undefined
+              }
+              signInHref={signInHref}
+            />
+            <LngSwitcher authLayout />
+          </>
+        }
+      />
 
       <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0">
-        <Breadcrumbs
-          homeElement={<Icon name="home" className="h-5 w-5" />}
-          separator={<Icon name="chevron-right" className="h-3 w-3" />}
-          activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
-          containerClasses="flex justify-center flex-wrap text-sm gap-2 items-center dark:text-white/85"
-          listClasses="outline-hidden focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-300"
-          capitalizeLinks
-        />
         {children}
       </main>
 

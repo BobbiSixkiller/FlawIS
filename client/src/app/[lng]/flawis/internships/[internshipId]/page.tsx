@@ -5,7 +5,6 @@ import {
 } from "@/app/[lng]/internships/[internshipId]/actions";
 import BackButton from "@/components/BackButton";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import InternshipForm from "@/app/[lng]/internships/InternshipForm";
@@ -31,18 +30,23 @@ export default async function InternshipPage({
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
-        <ModalTrigger dialogId={updateDialogId}>
-          <Button size="icon" className="rounded-full">
-            <Icon name="pencil" className="size-5" />
-          </Button>
+        <ModalTrigger
+          dialogId={updateDialogId}
+          size="icon"
+          className="rounded-full"
+        >
+          <Icon name="pencil" className="size-5" />
         </ModalTrigger>
-        <ModalTrigger dialogId={deleteDialogId}>
-          <Button variant="destructive" size="icon" className="rounded-full">
-            <Icon name="trash" className="size-5" />
-          </Button>
+        <ModalTrigger
+          dialogId={deleteDialogId}
+          variant="destructive"
+          size="icon"
+          className="rounded-full"
+        >
+          <Icon name="trash" className="size-5" />
         </ModalTrigger>
 
-        <BackButton fallbackHref="/internships" label={t("back")} />
+        <BackButton label={t("back")} />
       </div>
 
       <div

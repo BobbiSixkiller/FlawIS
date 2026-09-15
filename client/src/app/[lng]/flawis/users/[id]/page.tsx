@@ -6,7 +6,6 @@ import Link from "next/link";
 import { deleteUser, getUser, toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
 import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
 import Modal from "@/components/Modal";
 import UserForm from "@/app/[lng]/(auth)/register/UserForm";
 import ImpersonateForm from "./ImpersonateForm";
@@ -35,24 +34,28 @@ export default async function User({
         lng={lng}
         heading={user.name}
         items={[
-          <ModalTrigger key={0} dialogId={impersonateDialogId}>
-            <Button size="sm">
-              <Icon name="arrows-right-left" className="size-5" />
-              Impersonovat
-            </Button>
+          <ModalTrigger key={0} dialogId={impersonateDialogId} size="sm">
+            <Icon name="arrows-right-left" className="size-5" />
+            Impersonovat
           </ModalTrigger>,
-          <ModalTrigger key={1} dialogId={updateUserDialogId}>
-            <Button variant="secondary" size="sm">
-              <Icon name="pencil" className="size-5" />
-              Aktualizovat
-            </Button>
+          <ModalTrigger
+            key={1}
+            dialogId={updateUserDialogId}
+            variant="secondary"
+            size="sm"
+          >
+            <Icon name="pencil" className="size-5" />
+            Aktualizovat
           </ModalTrigger>,
 
-          <ModalTrigger key={2} dialogId={deleteUserDialogId}>
-            <Button variant="secondary" size="sm">
-              <Icon name="trash" className="size-5" />
-              Zmazat
-            </Button>
+          <ModalTrigger
+            key={2}
+            dialogId={deleteUserDialogId}
+            variant="secondary"
+            size="sm"
+          >
+            <Icon name="trash" className="size-5" />
+            Zmazat
           </ModalTrigger>,
         ]}
       />

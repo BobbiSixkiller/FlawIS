@@ -2,31 +2,26 @@
 
 import { cn } from "@/lib/utilsClient";
 import Breadcrumbs from "./Breadcrumbs";
-import Icon from "@/components/Icon";
+import Icon from "./Icon";
 import { ReactNode, useState } from "react";
 import Drawer from "./Drawer";
-import Dropdown from "./Dropdown";
 import { useTranslation } from "@/lib/i18n/client";
 import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
-import Link from "next/link";
 import { useWindowScroll } from "@uidotdev/usehooks";
 
 export default function TopBar({
-  avatar,
-  search,
-  drawerTitle,
-  drawerContent,
   logo,
+  actions,
+  drawer,
+  contentClassName = "container",
 }: {
-  avatar?: ReactNode;
-  search: ReactNode;
-  drawerTitle: ReactNode;
-  drawerContent: ReactNode;
   logo: ReactNode;
+  actions: ReactNode;
+  drawer?: { title: ReactNode; content: ReactNode };
+  contentClassName?: string;
 }) {
-  const [{ y = 0 }] = useWindowScroll();
-
+  const [{ y }] = useWindowScroll();
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "dashboard");
   const path = usePathname();
@@ -37,84 +32,47 @@ export default function TopBar({
   }
 
   return (
-    <div
-      className={cn([
-        "bg-white sticky top-0 z-20 h-[60px] border-b",
-        "dark:border-gray-700 dark:bg-gray-900",
-        (y ?? 0 > 0) ? "shadow-bottom" : "",
-      ])}
+    <header
+      className={cn(
+        "sticky top-0 z-20 h-15 w-full shrink-0 border-b bg-white dark:border-gray-700 dark:bg-gray-900",
+        (y ?? 0) > 0 && "shadow-bottom",
+      )}
     >
-      <div className={cn(["h-full flex items-center p-4 container mx-auto"])}>
-        <Button
-          onClick={() => setDrawerState({ path, visible: true })}
-          className={cn([
-            "lg:hidden sm:static",
-            "sm:mr-4 absolute left-2 p-2 w-fit",
-          ])}
-          variant="ghost"
-        >
-          <Icon name="bars3" className="size-5" />
-        </Button>
-
-        <div className={cn(["mx-auto", "md:hidden"])}>{logo}</div>
-
+      <div
+        className={cn(
+          "mx-auto flex h-full w-full min-w-0 items-center gap-2 px-4",
+          contentClassName,
+        )}
+      >
+        {drawer && (
+          <Button
+            onClick={() => setDrawerState({ path, visible: true })}
+            aria-label={t("openNavigation")}
+            aria-expanded={drawerState.visible}
+            className="shrink-0 rounded-full lg:hidden"
+            variant="ghost"
+            size="icon"
+          >
+            <Icon name="bars3" className="size-5" />
+          </Button>
+        )}
         <Breadcrumbs
-          homeElement={<Icon name="home" className="h-5 w-5" />}
-          separator={<Icon name="chevron-right" className="h-3 w-3" />}
-          activeClasses="text-primary-500 dark:text-primary-300 hover:underline"
-          containerClasses="hidden md:flex flex-wrap text-sm gap-2 items-center dark:text-white/85"
-          listClasses="outline-hidden focus:ring-2 focus:ring-primary-500"
-          capitalizeLinks
+          homeElement={drawer ? <Icon name="home" className="size-5" /> : logo}
         />
-
-        <div className="absolute sm:static right-4 flex md:flex-1 md:justify-end items-center gap-2">
-          {search}
-
-          {avatar ? (
-            <Dropdown
-              anchor={{ gap: 6, to: "bottom end" }}
-              trigger={avatar}
-              triggerProps={{
-                size: "icon",
-                className: "rounded-full flex items-center w-fit h-fit",
-              }}
-              items={[
-                <Link href="/profile" key={0}>
-                  <Icon
-                    name="user-circle"
-                    className="size-5"
-                    aria-hidden="true"
-                  />
-                  {t("profile")}
-                </Link>,
-                <Link prefetch={false} href="/logout" key={1}>
-                  <Icon
-                    name="arrow-left-start-on-rectangle"
-                    className="size-5"
-                    aria-hidden="true"
-                  />
-                  {t("logout")}
-                </Link>,
-              ]}
-            />
-          ) : (
-            <Button as={Link} href="/login" variant="ghost" size="icon">
-              <Icon name="arrow-right-start-on-rectangle" className="size-5" />
-            </Button>
-          )}
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          {actions}
         </div>
-
-        <Drawer
-          visible={drawerState.visible}
-          setVisible={(nextVisible) =>
-            setDrawerState({ path, visible: nextVisible })
-          }
-          title={drawerTitle}
-          toggleStart="left"
-        >
-          {drawerContent}
-        </Drawer>
+        {drawer && (
+          <Drawer
+            visible={drawerState.visible}
+            setVisible={(visible) => setDrawerState({ path, visible })}
+            title={drawer.title}
+            toggleStart="left"
+          >
+            {drawer.content}
+          </Drawer>
+        )}
       </div>
-    </div>
+    </header>
   );
 }
