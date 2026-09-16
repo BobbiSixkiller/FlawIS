@@ -36,6 +36,13 @@ type ConferenceDates = {
   submissionDeadline?: string | Date | null;
 };
 
+export function isConferenceRegistrationOpen(
+  registrationEnd: string | Date | null | undefined,
+  now: number,
+) {
+  return !registrationEnd || now <= new Date(registrationEnd).getTime();
+}
+
 export function conferenceWorkspaceState(
   dates: ConferenceDates,
   ticketAllowsSubmissions: boolean,
@@ -43,16 +50,13 @@ export function conferenceWorkspaceState(
 ) {
   const start = new Date(dates.start).getTime();
   const end = new Date(dates.end).getTime();
-  const registrationEnd = dates.regEnd
-    ? new Date(dates.regEnd).getTime()
-    : undefined;
   const submissionDeadline = dates.submissionDeadline
     ? new Date(dates.submissionDeadline).getTime()
     : undefined;
 
   return {
     eventState: now < start ? "upcoming" : now <= end ? "ongoing" : "ended",
-    registrationOpen: registrationEnd === undefined || now <= registrationEnd,
+    registrationOpen: isConferenceRegistrationOpen(dates.regEnd, now),
     submissionsEditable:
       ticketAllowsSubmissions &&
       (submissionDeadline === undefined || now <= submissionDeadline),

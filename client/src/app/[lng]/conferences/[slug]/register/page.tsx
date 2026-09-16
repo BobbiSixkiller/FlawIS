@@ -5,7 +5,9 @@ import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import {
   conferenceInvitationHref,
   conferenceWorkspaceHref,
+  isConferenceRegistrationOpen,
 } from "@/lib/conferenceRegistration";
+import { currentTimestamp } from "@/lib/utilsServer";
 import { getSubmissionInvite } from "../actions";
 import { acceptAuthorInvite } from "./actions";
 import InvitationError from "./InvitationError";
@@ -28,6 +30,16 @@ export default async function ConferenceRegisterPage({
     getSubmissionInvite(token),
     getMe(),
   ]);
+
+  if (
+    !conference.attending &&
+    !isConferenceRegistrationOpen(
+      conference.dates.regEnd,
+      currentTimestamp(),
+    )
+  ) {
+    redirect(conferenceWorkspaceHref(slug));
+  }
 
   if (invitation.error) {
     return (
