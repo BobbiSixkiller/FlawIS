@@ -64,8 +64,8 @@ export default async function InternshipsHomePage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap gap-6 justify-between">
-        <div>
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold leading-7 text-gray-900 dark:text-white/85 sm:truncate sm:text-3xl sm:tracking-tight">
             {t("heading")}
           </h2>
@@ -74,10 +74,11 @@ export default async function InternshipsHomePage({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full min-w-0 items-center gap-2 md:w-auto md:shrink-0 md:justify-end">
           <UrlFilter
             lng={lng}
-            anchor={{ gap: 6, to: "bottom" }}
+            anchor={{ gap: 6, padding: 16, to: "bottom end" }}
+            wrapperClassName="order-3 ml-auto md:order-1 md:ml-0"
             filters={[
               {
                 label: t("filters.organizations"),
@@ -90,17 +91,23 @@ export default async function InternshipsHomePage({
               },
             ]}
           />
-          <AcademicYearSelect
-            selectedYear={queryParams?.academicYear ?? academicYear}
-            years={initialData.academicYears.map((y) => y.academicYear)}
-          />
+          <div className="order-1 shrink-0 md:order-2">
+            <AcademicYearSelect
+              selectedYear={queryParams?.academicYear ?? academicYear}
+              years={initialData.academicYears.map((y) => y.academicYear)}
+            />
+          </div>
           {access.canCreate && (
-            <Tooltip message={t("tooltip.new")} position="below">
-              <ModalTrigger dialogId={addDialogId} size="sm">
-                <Icon name="plus" className="size-5 mr-2" />
-                {t("create", { ns: "common" })}
-              </ModalTrigger>
-            </Tooltip>
+            <div className="order-2 shrink-0 md:order-3">
+              <Tooltip message={t("tooltip.new")} position="below">
+                <ModalTrigger dialogId={addDialogId} size="sm">
+                  <Icon name="plus" className="size-5 sm:mr-2" />
+                  <span className="sr-only sm:not-sr-only">
+                    {t("create", { ns: "common" })}
+                  </span>
+                </ModalTrigger>
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>
