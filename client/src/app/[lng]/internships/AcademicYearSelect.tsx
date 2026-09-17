@@ -24,7 +24,7 @@ export default function AcademicYearSelect({
   const searchParams = useSearchParams();
 
   return (
-    <Popover>
+    <Popover className="relative shrink-0">
       <PopoverButton
         size="sm"
         as={Button}
