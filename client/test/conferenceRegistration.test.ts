@@ -5,6 +5,7 @@ import {
   conferenceInvitationHref,
   conferenceWorkspaceHref,
   invitedTicketId,
+  isConferenceRegistrationOpen,
 } from "../src/lib/conferenceRegistration";
 
 const tickets = [
@@ -18,6 +19,20 @@ test("a coauthor invitation preselects a submission ticket", () => {
 
 test("ordinary registration does not preselect a ticket", () => {
   assert.equal(invitedTicketId(tickets, false), "");
+});
+
+test("conference registration closes after its deadline", () => {
+  const deadline = "2026-09-16T12:00:00.000Z";
+
+  assert.equal(
+    isConferenceRegistrationOpen(deadline, Date.parse(deadline)),
+    true,
+  );
+  assert.equal(
+    isConferenceRegistrationOpen(deadline, Date.parse(deadline) + 1),
+    false,
+  );
+  assert.equal(isConferenceRegistrationOpen(null, Date.now()), true);
 });
 
 test("registered attendees return to the conference workspace", () => {
