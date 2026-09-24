@@ -13,6 +13,7 @@ import {
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
+import { minioDownloadHref } from "@/lib/minioUrl";
 import { currentTimestamp } from "@/lib/utilsServer";
 import { conferenceWorkspaceState } from "@/lib/conferenceRegistration";
 import { capitalizeFirstLetter } from "@/lib/utilsClient";
@@ -118,9 +119,7 @@ function SubmissionCard({
 
       {submission.fileUrl ? (
         <a
-          href={submission.fileUrl}
-          target="_blank"
-          rel="noreferrer"
+          href={minioDownloadHref(conference.slug, submission.fileUrl)}
           className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"
         >
           <Icon name="arrow-down-tray" className="size-4" />

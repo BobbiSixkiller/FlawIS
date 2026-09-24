@@ -1,4 +1,5 @@
 import { deleteFiles } from "@/lib/minio";
+import { minioDownloadHref } from "@/lib/minioUrl";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -46,9 +47,7 @@ export function formatDatetimeLocal(val: any, withTime: boolean): string {
 export async function fetchFromMinio(bucketName: string, fileUrl: string) {
   try {
     // Fetch the file from the Next.js route handler
-    const response = await fetch(
-      `/minio?bucketName=${bucketName}&url=${fileUrl}`,
-    );
+    const response = await fetch(minioDownloadHref(bucketName, fileUrl));
 
     // Check if the response is OK (status code 200-299)
     if (!response.ok) {

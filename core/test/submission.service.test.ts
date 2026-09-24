@@ -57,6 +57,7 @@ function document(data: Record<string, any>) {
 function service({
   attendeeRepository = {},
   conferenceRepository = {},
+  minioService = {},
   rmqService = {},
   sectionRepository = {},
   submissionRepository = {},
@@ -64,6 +65,7 @@ function service({
 }: {
   attendeeRepository?: object;
   conferenceRepository?: object;
+  minioService?: object;
   rmqService?: object;
   sectionRepository?: object;
   submissionRepository?: object;
@@ -76,6 +78,7 @@ function service({
     sectionRepository as any,
     tokenService as any,
     rmqService as any,
+    minioService as any,
     i18n(),
   );
 }
@@ -259,6 +262,92 @@ test("administrators can update after the deadline without an author filter", as
     submissionInput(conferenceId, sectionId),
   );
   assert.deepEqual(receivedFilter, { _id: submissionId });
+});
+
+test("replacing a submission file removes the previous MinIO object after the update", async () => {
+  const conferenceId = new ObjectId();
+  const sectionId = new ObjectId();
+  const submissionId = new ObjectId();
+  const oldUrl = "http://minio:9000/conference/old-file.pdf";
+  const newUrl = "http://minio:9000/conference/new-file.pdf";
+  const stored = document({
+    _id: submissionId,
+    authors: [new ObjectId()],
+    conference: conferenceId,
+    fileUrl: oldUrl,
+  });
+  const updated = document({ ...stored, fileUrl: newUrl });
+  const deletedUrls: string[][] = [];
+  let updateFinished = false;
+  const instance = service({
+    submissionRepository: {
+      findOne: async (filter: Record<string, any>) =>
+        filter._id === submissionId && !filter._id?.$ne ? stored : null,
+      findOneAndUpdate: async () => {
+        updateFinished = true;
+        return updated;
+      },
+    },
+    conferenceRepository: {
+      findOne: async () => ({
+        id: conferenceId,
+        dates: {},
+        translations: {
+          sk: { name: "Konferencia" },
+          en: { name: "Conference" },
+        },
+      }),
+    },
+    sectionRepository: {
+      findOne: async () => ({ conference: conferenceId }),
+    },
+    minioService: {
+      deleteFiles: async (urls: string[]) => {
+        assert.equal(updateFinished, true);
+        deletedUrls.push(urls);
+      },
+    },
+  });
+  const data = submissionInput(conferenceId, sectionId);
+  data.fileUrl = newUrl;
+
+  await instance.updateSubmission(
+    submissionId,
+    "flawis.flaw.uniba.sk",
+    user([Access.Admin]),
+    data,
+  );
+
+  assert.deepEqual(deletedUrls, [[oldUrl]]);
+});
+
+test("deleting a submission removes its current MinIO object", async () => {
+  const conferenceId = new ObjectId();
+  const submissionId = new ObjectId();
+  const fileUrl = "http://minio:9000/conference/submission.pdf";
+  const stored = document({
+    _id: submissionId,
+    authors: [new ObjectId()],
+    conference: conferenceId,
+    fileUrl,
+  });
+  const deletedUrls: string[][] = [];
+  const instance = service({
+    submissionRepository: {
+      findOne: async () => stored,
+      findOneAndDelete: async () => stored,
+    },
+    conferenceRepository: {
+      findOne: async () => ({ id: conferenceId, dates: {} }),
+    },
+    minioService: {
+      deleteFiles: async (urls: string[]) => deletedUrls.push(urls),
+    },
+  });
+
+  await instance.deleteSubmission(submissionId, user([Access.Admin]));
+
+  assert.deepEqual(deletedUrls, [[fileUrl]]);
 });
 
 test("administrators can send co-author invitations from the FLAWIS dashboard", async () => {
