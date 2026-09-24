@@ -11,17 +11,30 @@ import Select from "@/components/Select";
 import Spinner from "@/components/Spinner";
 import { Textarea } from "@/components/Textarea";
 import useValidation from "@/hooks/useValidation";
-import { handleAPIErrors, uploadOrDelete } from "@/lib/utilsClient";
+import {
+  handleAPIErrors,
+  uploadToMinio,
+} from "@/lib/utilsClient";
 import {
   ConferenceQuery,
   PresentationLng,
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
+import { deleteFiles } from "@/lib/minio";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { omit } from "lodash";
+import { useRef } from "react";
 import { createSubmission, updateSubmission } from "./actions";
+
+async function deleteUploadedFile(url: string) {
+  try {
+    await deleteFiles([url]);
+  } catch (error) {
+    console.error("Failed to clean up uploaded submission file:", error);
+  }
+}
 
 export default function ConferenceSubmissionForm({
   submission,
@@ -42,6 +55,7 @@ export default function ConferenceSubmissionForm({
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
+  const originalFile = useRef<File | null>(null);
 
   const schema = z.object({
     conference: v.string().min(1, v.required),
@@ -99,15 +113,33 @@ export default function ConferenceSubmissionForm({
             const selectedSection = conference.sections.find(
               (section) => section.id === vals.section,
             );
+            const selectedFile = vals.files[0];
+            const keepsExistingFile =
+              Boolean(submission?.fileUrl) &&
+              selectedFile === originalFile.current;
+            let uploadedUrl: string | undefined;
+            let fileUrl: string | null = keepsExistingFile
+              ? submission!.fileUrl!
+              : null;
 
-            const { error, url } = await uploadOrDelete(
-              conference.slug,
-              submission?.fileUrl,
-              vals.files[0],
-              selectedSection?.translations.sk.name,
-            );
-            if (error) {
-              return methods.setError("files", { message: error });
+            if (selectedFile && !keepsExistingFile) {
+              try {
+                uploadedUrl = await uploadToMinio(
+                  conference.slug,
+                  selectedSection
+                    ? `${selectedSection.translations.sk.name}/${selectedFile.name}`
+                    : selectedFile.name,
+                  selectedFile,
+                );
+                fileUrl = uploadedUrl;
+              } catch (error) {
+                return methods.setError("files", {
+                  message:
+                    error instanceof Error
+                      ? error.message
+                      : "Failed to upload file",
+                });
+              }
             }
 
             let res;
@@ -115,14 +147,18 @@ export default function ConferenceSubmissionForm({
               res = await updateSubmission(
                 {
                   id: submission.id,
-                  data: { ...omit(vals, "files"), fileUrl: url },
+                  data: { ...omit(vals, "files"), fileUrl },
                 },
                 attendeeId,
               );
             } else {
               res = await createSubmission({
-                data: { ...omit(vals, "files"), fileUrl: url },
+                data: { ...omit(vals, "files"), fileUrl },
               });
+            }
+
+            if (!res.success && uploadedUrl) {
+              await deleteUploadedFile(uploadedUrl);
             }
 
             if (res.errors) {
@@ -271,7 +307,10 @@ export default function ConferenceSubmissionForm({
                     [".docx"],
                 }}
                 fileSources={{ [conference.slug]: submission?.fileUrl }}
-                onLoad={initialize}
+                onLoad={(files) => {
+                  originalFile.current = files[0] ?? null;
+                  initialize(files);
+                }}
                 onError={onError}
               />
             )}

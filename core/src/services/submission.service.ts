@@ -18,6 +18,7 @@ import {
 import { toDTO } from "../util/helpers";
 import { CtxUser } from "../util/types";
 import { I18nService } from "./i18n.service";
+import { MinioService } from "./minio.service";
 import { RmqService } from "./rmq.service";
 import { TokenService } from "./token.service";
 
@@ -44,6 +45,7 @@ export class SubmissionService {
     private readonly sectionRepository: SectionRepository,
     private readonly tokenService: TokenService,
     private readonly rmqService: RmqService,
+    private readonly minioService: MinioService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -154,6 +156,9 @@ export class SubmissionService {
     if (!submission) this.throwNotAllowed();
 
     const result = toDTO(submission!);
+    if (existing!.fileUrl && existing!.fileUrl !== result.fileUrl) {
+      await this.deleteFilesQuietly([existing!.fileUrl]);
+    }
     await this.sendCoAuthorInvites(
       hostname,
       user,
@@ -188,7 +193,11 @@ export class SubmissionService {
       ...(isAdmin ? {} : { authors: user.id }),
     });
     if (!submission) this.throwNotAllowed();
-    return toDTO(submission!);
+    const result = toDTO(submission!);
+    if (result.fileUrl) {
+      await this.deleteFilesQuietly([result.fileUrl]);
+    }
+    return result;
   }
 
   async addCoAuthor(token: string, user: CtxUser) {
@@ -417,6 +426,17 @@ export class SubmissionService {
 
   private localeKey(): "sk" | "en" {
     return this.i18nService.language() === "en" ? "en" : "sk";
+  }
+
+  private async deleteFilesQuietly(urls: string[]) {
+    try {
+      await this.minioService.deleteFiles(urls);
+    } catch (error) {
+      // The database write has already succeeded. Keep the mutation successful
+      // and surface the orphan for operational cleanup instead of leaving the
+      // database pointing at a file that the client may remove as a rollback.
+      console.error("Failed to clean up submission files:", error);
+    }
   }
 
   private throwNameExists(
