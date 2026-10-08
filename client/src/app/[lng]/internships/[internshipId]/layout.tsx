@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { ReactNode } from "react";
 import TabMenu from "@/components/TabMenu";
 import { getInternship } from "./actions";
@@ -37,6 +38,12 @@ export default async function InternshipLayout({
 
   return (
     <div className="flex flex-1 flex-col">
+      <BreadcrumbLabel
+        param="internshipId"
+        value={internshipId}
+        path={`/internships/${encodeURIComponent(internshipId)}`}
+        label={internship.organization}
+      />
       {access.canManage && (
         <TabMenu
           tabs={[

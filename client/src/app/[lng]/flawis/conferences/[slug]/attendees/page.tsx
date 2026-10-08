@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import ListAttendees from "./ListAttendees";
 import { getAttendees } from "./actions";
 import { getConference } from "../../actions";
@@ -36,6 +37,12 @@ export default async function AttendeesPage({
 
   return (
     <div className="flex flex-col gap-4">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
       <div className="flex gap-2 items-center">
         <ExportButton
           fetchUrl={`/export?type=conferenceAttendees&slug=${slug}`}

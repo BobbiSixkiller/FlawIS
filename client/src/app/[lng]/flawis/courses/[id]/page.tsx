@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Heading from "@/components/Heading";
 import { deleteCourse, getCourse, getCourseReachConfig } from "./actions";
 import ModalTrigger from "@/components/ModalTrigger";
@@ -28,6 +29,12 @@ export default async function CoursePage({
 
   return (
     <div className="space-y-6">
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/flawis/courses/${encodeURIComponent(id)}`}
+        label={course.name}
+      />
       <Heading
         lng={lng}
         heading={course.name}

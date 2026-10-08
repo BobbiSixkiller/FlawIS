@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { getConference } from "../actions";
 import Heading from "@/components/Heading";
 import Icon from "@/components/Icon";
@@ -26,6 +27,12 @@ export default async function ConferencePage({
 
   return (
     <div className="text-gray-900 dark:text-white flex flex-col gap-6">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
       <div className="flex flex-col gap-4">
         <DynamicImage
           alt="conference-logo"

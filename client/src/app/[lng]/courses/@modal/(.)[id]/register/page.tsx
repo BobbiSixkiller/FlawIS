@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { getCourse } from "@/app/[lng]/flawis/courses/[id]/actions";
 import CourseRegistrationForm from "@/app/[lng]/flawis/courses/[id]/CourseRegistrationForm";
 import Modal from "@/components/Modal";
@@ -23,6 +24,12 @@ export default async function InterceptingModal({
       isInterceptingRoute
       title="Prihlasit sa na kurz"
     >
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/courses/${encodeURIComponent(id)}`}
+        label={course.name}
+      />
       <CourseRegistrationForm course={course} />
     </Modal>
   );

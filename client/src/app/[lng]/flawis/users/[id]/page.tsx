@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Heading from "@/components/Heading";
 import Toggle from "@/components/Toggle";
 import { redirect } from "next/navigation";
@@ -30,6 +31,12 @@ export default async function User({
 
   return (
     <div>
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/flawis/users/${encodeURIComponent(id)}`}
+        label={user.name}
+      />
       <Heading
         lng={lng}
         heading={user.name}

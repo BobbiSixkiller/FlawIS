@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { getCourse } from "@/app/[lng]/flawis/courses/[id]/actions";
 import CourseRegistrationForm from "@/app/[lng]/flawis/courses/[id]/CourseRegistrationForm";
 import { notFound, redirect } from "next/navigation";
@@ -16,5 +17,15 @@ export default async function RegisterPage({
     return redirect(`/${id}`);
   }
 
-  return <CourseRegistrationForm course={course} redirect={`/${id}`} />;
+  return (
+    <>
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/courses/${encodeURIComponent(id)}`}
+        label={course.name}
+      />
+      <CourseRegistrationForm course={course} redirect={`/${id}`} />
+    </>
+  );
 }

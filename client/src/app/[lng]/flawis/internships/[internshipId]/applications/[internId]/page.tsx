@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { Status } from "@/lib/graphql/generated/graphql";
 import { Application } from "@/app/[lng]/internships/[internshipId]/Application";
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/[internId]/actions";
@@ -33,6 +34,12 @@ export default async function InternPage({
 
   return (
     <div className="flex flex-col gap-6">
+      <BreadcrumbLabel
+        param="internId"
+        value={internId}
+        path={`/flawis/internships/${encodeURIComponent(internshipId)}/applications/${encodeURIComponent(internId)}`}
+        label={intern.user.name}
+      />
       <CloseButton href={`/internships/${internshipId}/applications`} />
       <Application
         lng={lng}
