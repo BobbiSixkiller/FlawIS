@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Dropdown, { DropdownItem } from "@/components/Dropdown";
 import Icon from "@/components/Icon";
 import { conferenceSections, deleteSection } from "./actions";
@@ -23,6 +24,12 @@ export default async function SectionsPage({
 
   return (
     <div>
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
       <ModalTrigger dialogId={newSectionDialogId} size="sm">
         <Icon name="plus" className="h-5 w-5" />
         Nova

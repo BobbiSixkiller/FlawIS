@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { ReactNode } from "react";
 import TabMenu from "@/components/TabMenu";
 import { getInternship } from "@/app/[lng]/internships/[internshipId]/actions";
@@ -21,6 +22,12 @@ export default async function InternshipLayout({
 
   return (
     <div className="flex flex-1 flex-col">
+      <BreadcrumbLabel
+        param="internshipId"
+        value={internshipId}
+        path={`/flawis/internships/${encodeURIComponent(internshipId)}`}
+        label={internship.organization}
+      />
       <TabMenu
         tabs={[
           { href: `/internships/${internshipId}`, name: t("internship") },

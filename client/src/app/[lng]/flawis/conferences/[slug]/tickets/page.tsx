@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Dropdown from "@/components/Dropdown";
 import { getConference } from "../../actions";
 import Icon from "@/components/Icon";
@@ -25,6 +26,12 @@ export default async function TicketsPage({
 
   return (
     <div className="">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
       <ModalTrigger dialogId={newTicketDialogId} size="sm">
         <Icon name="plus" className="h-5 w-5" />
         Novy

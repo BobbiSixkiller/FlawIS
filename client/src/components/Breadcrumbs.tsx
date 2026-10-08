@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/client";
 import { getLocalizedPath, stripPathLocale } from "@/lib/i18n/settings";
 import Button from "./Button";
+import { useBreadcrumbLabels } from "./BreadcrumbLabels";
 
 const linkClassName =
   "flex min-h-9 items-center rounded-sm text-primary-500 outline-hidden hover:underline focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300";
@@ -128,15 +129,18 @@ export default function Breadcrumbs({
 }: {
   homeElement: ReactNode;
 }) {
-  const { lng } = useParams<{ lng: string }>();
+  const params = useParams<{ lng: string } & Record<string, string | string[]>>();
+  const { lng } = params;
   const { t } = useTranslation(lng, "dashboard");
   const pathname = usePathname();
   const segments = stripPathLocale(pathname).split("/").filter(Boolean);
+  const labels = useBreadcrumbLabels(segments, params);
   const items = segments.map((segment, index) => {
     const translated = t(segment);
     return {
       href: getLocalizedPath(`/${segments.slice(0, index + 1).join("/")}`, lng),
-      label: translated.charAt(0).toUpperCase() + translated.slice(1),
+      label:
+        labels[index] ?? translated.charAt(0).toUpperCase() + translated.slice(1),
     };
   });
   const home = { href: getLocalizedPath("/", lng), label: t("home") };

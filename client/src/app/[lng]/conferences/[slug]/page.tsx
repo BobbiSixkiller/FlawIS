@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Icon from "@/components/Icon";
 import Link from "next/link";
 
@@ -211,6 +212,12 @@ export default async function ConferenceWorkspacePage({
 
   return (
     <div className="flex flex-col gap-6 text-gray-950 dark:text-white/90">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/conferences/${encodeURIComponent(slug)}`}
+        label={translation.name}
+      />
       <section className="overflow-hidden rounded-3xl border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex min-h-44 items-center justify-center border-b bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-900">
           <DynamicImage

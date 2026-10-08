@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
 import { redirect } from "next/navigation";
@@ -43,19 +44,27 @@ export default async function ConferenceRegisterPage({
 
   if (invitation.error) {
     return (
-      <InvitationError
-        lng={lng}
-        message={invitation.error.message}
-        code={invitation.error.code}
-        currentEmail={user?.email}
-        invitationHref={conferenceInvitationHref(
-          lng,
-          slug,
-          submissionId,
-          token,
-        )}
-        conferenceHref={conferenceWorkspaceHref(slug)}
-      />
+      <>
+        <BreadcrumbLabel
+          param="slug"
+          value={slug}
+          path={`/conferences/${encodeURIComponent(slug)}`}
+          label={conference.translations[lng === "en" ? "en" : "sk"].name}
+        />
+        <InvitationError
+          lng={lng}
+          message={invitation.error.message}
+          code={invitation.error.code}
+          currentEmail={user?.email}
+          invitationHref={conferenceInvitationHref(
+            lng,
+            slug,
+            submissionId,
+            token,
+          )}
+          conferenceHref={conferenceWorkspaceHref(slug)}
+        />
+      </>
     );
   }
 
@@ -75,6 +84,12 @@ export default async function ConferenceRegisterPage({
 
   return (
     <div className="flex flex-col gap-6">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
       <ConferenceRegistrationForm
         lng={lng}
         conference={conference}

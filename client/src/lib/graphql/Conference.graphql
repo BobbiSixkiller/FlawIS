@@ -159,6 +159,14 @@ query conferenceSections(
 ) {
   conference(slug: $slug) {
     id
+    translations {
+      sk {
+        name
+      }
+      en {
+        name
+      }
+    }
     sections {
       ...Section
       submissions(first: $first, after: $after, sort: $sort) {

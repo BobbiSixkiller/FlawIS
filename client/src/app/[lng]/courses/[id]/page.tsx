@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import { notFound } from "next/navigation";
 import {
   deleteCourseAttendee,
@@ -31,6 +32,12 @@ export default async function CoursePage({
 
   return (
     <div className="flex flex-col gap-6">
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/courses/${encodeURIComponent(id)}`}
+        label={course.name}
+      />
       <h1 className="text-3xl font-bold leading-7 text-center">
         {course.name}
       </h1>

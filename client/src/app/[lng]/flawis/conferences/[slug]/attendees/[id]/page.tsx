@@ -1,3 +1,4 @@
+import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
 import Heading from "@/components/Heading";
 import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
 import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
@@ -38,6 +39,18 @@ export default async function AttendeePage({
 
   return (
     <div className="flex flex-col gap-4">
+      <BreadcrumbLabel
+        param="slug"
+        value={slug}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}`}
+        label={conference.translations[lng === "en" ? "en" : "sk"].name}
+      />
+      <BreadcrumbLabel
+        param="id"
+        value={id}
+        path={`/flawis/conferences/${encodeURIComponent(slug)}/attendees/${encodeURIComponent(id)}`}
+        label={attendee.user.name}
+      />
       <CloseButton href={`/conferences/${slug}/attendees`} />
 
       <Heading
