@@ -314,7 +314,9 @@ export default function UpdateInvoiceForm({
               <Input
                 {...field}
                 {...controlProps}
-                value={inputValue(field.value, undefined)}
+                type="number"
+                step="0.01"
+                value={inputValue(field.value, "number")}
                 onChange={(event) => {
                   field.onChange(inputChange(event));
                 }}
@@ -329,7 +331,9 @@ export default function UpdateInvoiceForm({
               <Input
                 {...field}
                 {...controlProps}
-                value={inputValue(field.value, undefined)}
+                type="number"
+                step="0.01"
+                value={inputValue(field.value, "number")}
                 onChange={(event) => {
                   field.onChange(inputChange(event));
                 }}
