@@ -1,13 +1,13 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Icon from "@/components/Icon";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Icon from "@/components/icon";
 import Link from "next/link";
 
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import Button from "@/components/Button";
-import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
-import DynamicImage from "@/components/DynamicImage";
-import Modal from "@/components/Modal";
-import ModalTrigger from "@/components/ModalTrigger";
+import { Button } from "@/components/ui/button";
+import DownloadInvoiceButton from "@/components/download-invoice-button";
+import DynamicImage from "@/components/dynamic-image";
+import Modal from "@/components/modal";
+import ModalTrigger from "@/components/modal-trigger";
 import {
   ConferenceQuery,
   InvoiceOwnerType,
@@ -18,8 +18,8 @@ import { minioDownloadHref } from "@/lib/minioUrl";
 import { currentTimestamp } from "@/lib/utilsServer";
 import { conferenceWorkspaceState } from "@/lib/conferenceRegistration";
 import { capitalizeFirstLetter } from "@/lib/utilsClient";
-import DeleteSubmissionForm from "./DeleteSubmissionForm";
-import SubmissionForm from "./SubmissionForm";
+import DeleteSubmissionForm from "./delete-submission-form";
+import SubmissionForm from "./submission-form";
 
 type Conference = ConferenceQuery["conference"];
 
@@ -50,13 +50,13 @@ function SubmissionCard({
   const deleteDialogId = `delete-submission-${submission.id}`;
 
   return (
-    <article className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <article className="rounded-2xl border bg-card p-5 shadow-sm dark:border-border dark:bg-card">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-primary-600 dark:text-primary-300">
+          <p className="text-xs font-medium uppercase tracking-wide text-primary dark:text-primary">
             {section.name}
           </p>
-          <h3 className="mt-1 text-lg font-medium text-gray-950 dark:text-white">
+          <h3 className="mt-1 text-lg font-medium text-foreground dark:text-foreground">
             {capitalizeFirstLetter(translation.name)}
           </h3>
         </div>
@@ -84,7 +84,7 @@ function SubmissionCard({
         ) : null}
       </div>
 
-      <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+      <p className="mt-3 text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
         {translation.abstract}
       </p>
 
@@ -92,27 +92,27 @@ function SubmissionCard({
         {translation.keywords.map((keyword, index) => (
           <span
             key={`${keyword}-${index}`}
-            className="rounded-full bg-primary-50 px-2 py-0.5 text-xs text-primary-700 dark:bg-primary-950 dark:text-primary-200"
+            className="rounded-full bg-accent px-2 py-0.5 text-xs text-accent-foreground dark:bg-accent dark:text-accent-foreground"
           >
             {keyword}
           </span>
         ))}
       </div>
 
-      <dl className="mt-4 space-y-2 border-t pt-4 text-sm dark:border-gray-700">
+      <dl className="mt-4 space-y-2 border-t pt-4 text-sm dark:border-border">
         <div className="flex justify-between gap-4">
-          <dt className="text-gray-500 dark:text-gray-400">
+          <dt className="text-muted-foreground dark:text-muted-foreground">
             {t("workspace.authors")}
           </dt>
-          <dd className="text-right text-gray-800 dark:text-gray-200">
+          <dd className="text-right text-foreground">
             {submission.authors.map((author) => author.name).join(", ")}
           </dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt className="text-gray-500 dark:text-gray-400">
+          <dt className="text-muted-foreground dark:text-muted-foreground">
             {t("workspace.presentationLanguage")}
           </dt>
-          <dd className="text-gray-800 dark:text-gray-200">
+          <dd className="text-foreground">
             {submission.presentationLng || "—"}
           </dd>
         </div>
@@ -121,7 +121,7 @@ function SubmissionCard({
       {submission.fileUrl ? (
         <a
           href={minioDownloadHref(conference.slug, submission.fileUrl)}
-          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-primary"
         >
           <Icon name="arrow-down-tray" className="size-4" />
           {t("workspace.downloadFile")}
@@ -211,15 +211,15 @@ export default async function ConferenceWorkspacePage({
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
-    <div className="flex flex-col gap-6 text-gray-950 dark:text-white/90">
+    <div className="flex flex-col gap-6 text-foreground dark:text-foreground">
       <BreadcrumbLabel
         param="slug"
         value={slug}
         path={`/conferences/${encodeURIComponent(slug)}`}
         label={translation.name}
       />
-      <section className="overflow-hidden rounded-3xl border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <div className="flex min-h-44 items-center justify-center border-b bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-900">
+      <section className="overflow-hidden rounded-3xl border bg-card shadow-sm dark:border-border dark:bg-card">
+        <div className="flex min-h-44 items-center justify-center border-b bg-muted p-6 dark:border-border dark:bg-card">
           <DynamicImage
             alt={translation.name}
             src={translation.logoUrl || "/images/img-placeholder.jpg"}
@@ -231,7 +231,7 @@ export default async function ConferenceWorkspacePage({
         </div>
         <div className="p-6">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950 dark:text-primary-200">
+            <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground dark:bg-accent dark:text-accent-foreground">
               {t(`workspace.status.${state.eventState}`)}
             </span>
             {attendee ? (
@@ -240,7 +240,7 @@ export default async function ConferenceWorkspacePage({
               </span>
             ) : null}
           </div>
-          <p className="mt-4 text-xs font-medium uppercase tracking-[0.16em] text-gray-400">
+          <p className="mt-4 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
             {conference.slug}
           </p>
           <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight">
@@ -251,12 +251,12 @@ export default async function ConferenceWorkspacePage({
 
       <section
         aria-labelledby="timeline-heading"
-        className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+        className="rounded-2xl border bg-card p-5 shadow-sm dark:border-border dark:bg-card"
       >
         <div className="flex items-center gap-2">
           <Icon
             name="calendar-days"
-            className="size-5 text-primary-600 dark:text-primary-300"
+            className="size-5 text-primary dark:text-primary"
           />
           <h2 id="timeline-heading" className="text-lg font-semibold">
             {t("workspace.importantDates")}
@@ -265,13 +265,13 @@ export default async function ConferenceWorkspacePage({
         <ol className="ml-2 mt-5 border-l border-primary-200 dark:border-primary-800">
           {timeline.map((item) => (
             <li key={item.key} className="relative pb-5 pl-6 last:pb-0">
-              <span className="absolute -left-1.5 top-1.5 size-3 rounded-full border-2 border-white bg-primary-500 dark:border-gray-800 dark:bg-primary-300" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="absolute -left-1.5 top-1.5 size-3 rounded-full border-2 border-white bg-primary dark:border-border dark:bg-primary" />
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">
                 {item.label}
               </p>
               <time
                 dateTime={item.value.toISOString()}
-                className="mt-0.5 block font-medium text-gray-900 dark:text-gray-100"
+                className="mt-0.5 block font-medium text-foreground"
               >
                 {formatter.format(item.value)}
               </time>
@@ -281,17 +281,17 @@ export default async function ConferenceWorkspacePage({
       </section>
 
       {attendee ? (
-        <section className="rounded-2xl border bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <section className="rounded-2xl border bg-card p-5 shadow-sm dark:border-border dark:bg-card">
           <div className="flex items-center gap-2">
             {attendee.ticket.online ? (
               <Icon
                 name="computer-desktop"
-                className="size-5 text-primary-600 dark:text-primary-300"
+                className="size-5 text-primary dark:text-primary"
               />
             ) : (
               <Icon
                 name="map-pin"
-                className="size-5 text-primary-600 dark:text-primary-300"
+                className="size-5 text-primary dark:text-primary"
               />
             )}
             <h2 className="text-lg font-semibold">
@@ -301,16 +301,16 @@ export default async function ConferenceWorkspacePage({
           <p className="mt-3 font-medium">
             {attendee.ticket.translations[locale].name}
           </p>
-          <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          <p className="mt-1 text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
             {attendee.ticket.translations[locale].description}
           </p>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-muted-foreground dark:text-muted-foreground">
             {attendee.ticket.online
               ? t("workspace.online")
               : t("workspace.inPerson")}
           </p>
           {attendee.hasInvoice ? (
-            <div className="mt-4 border-t pt-4 dark:border-gray-700">
+            <div className="mt-4 border-t pt-4 dark:border-border">
               <DownloadInvoiceButton
                 attendeeId={attendee.id}
                 lng={lng}
@@ -320,14 +320,19 @@ export default async function ConferenceWorkspacePage({
           ) : null}
         </section>
       ) : state.registrationOpen ? (
-        <section className="rounded-2xl border border-primary-200 bg-primary-50 p-5 dark:border-primary-800 dark:bg-primary-950">
+        <section className="rounded-2xl border border-primary-200 bg-accent p-5 dark:border-primary-800 dark:bg-accent">
           <h2 className="text-lg font-semibold">
             {t("workspace.registrationOpen")}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          <p className="mt-1 text-sm leading-6 text-muted-foreground dark:text-muted-foreground">
             {t("workspace.registrationOpenDescription")}
           </p>
-          <Button as={Link} href={`/${slug}/register`} className="mt-4 w-full">
+          <Button
+            className="mt-4 w-full"
+            nativeButton={false}
+            role="link"
+            render={<Link href={`/${slug}/register`} />}
+          >
             {t("workspace.register")}
           </Button>
         </section>
@@ -349,13 +354,13 @@ export default async function ConferenceWorkspacePage({
               <div className="flex items-center gap-2">
                 <Icon
                   name="document-text"
-                  className="size-5 text-primary-600 dark:text-primary-300"
+                  className="size-5 text-primary dark:text-primary"
                 />
                 <h2 className="text-xl font-semibold">
                   {t("workspace.mySubmissions")}
                 </h2>
               </div>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
                 {state.submissionsEditable
                   ? t("workspace.submissionsEditable")
                   : t("workspace.submissionsReadOnly")}
@@ -382,7 +387,7 @@ export default async function ConferenceWorkspacePage({
                 />
               ))
             ) : (
-              <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground dark:border-border dark:text-muted-foreground">
                 {state.submissionsEditable
                   ? t("workspace.noSubmissionsEditable")
                   : t("workspace.noSubmissions")}

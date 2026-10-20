@@ -1,14 +1,14 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { getConference } from "../actions";
-import Heading from "@/components/Heading";
-import Icon from "@/components/Icon";
+import Heading from "@/components/heading";
+import Icon from "@/components/icon";
 import { displayDate } from "@/lib/utilsClient";
-import DynamicImage from "@/components/DynamicImage";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import UpdateDatesForm from "./UpdateDatesForm";
+import DynamicImage from "@/components/dynamic-image";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
+import UpdateDatesForm from "./update-dates-form";
 import { redirect } from "next/navigation";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { deleteConference } from "./actions";
 
 export default async function ConferencePage({
@@ -26,7 +26,7 @@ export default async function ConferencePage({
   const deleteConfDialogId = "delete-conference";
 
   return (
-    <div className="text-gray-900 dark:text-white flex flex-col gap-6">
+    <div className="text-foreground dark:text-foreground flex flex-col gap-6">
       <BreadcrumbLabel
         param="slug"
         value={slug}
@@ -65,37 +65,37 @@ export default async function ConferencePage({
         />
       </div>
 
-      <div className="border-t border-gray-100 dark:border-gray-700">
-        <dl className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="border-t border-border dark:border-border">
+        <dl className="divide-y divide-border dark:divide-border">
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               Zaciatok
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.start)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               Koniec
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.end)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               Koniec registracie
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.regEnd)}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               Deadline zaslania prispevkov
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {displayDate(conference.dates.submissionDeadline)}
             </dd>
           </div>

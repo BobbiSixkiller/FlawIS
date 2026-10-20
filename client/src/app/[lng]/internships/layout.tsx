@@ -1,9 +1,9 @@
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { cookies, headers } from "next/headers";
-import MissingStudentDataDialog from "./MissingStudentDataDialog";
+import MissingStudentDataDialog from "./missing-student-data-dialog";
 import { getSubdomain } from "@/lib/utilsServer";
-import ParticipantTenantShell from "@/components/ParticipantTenantShell";
+import ParticipantTenantShell from "@/components/participant-tenant-shell";
 import { getOptionalViewer } from "@/lib/optionalViewer";
 import { logoutHref } from "@/lib/authRedirect";
 

@@ -1,4 +1,4 @@
-import SearchUser from "../SearchUser";
+import SearchUser from "../search-user";
 
 export default async function Sidebar({
   params,

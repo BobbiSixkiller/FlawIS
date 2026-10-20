@@ -1,10 +1,10 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import ListAttendees from "./ListAttendees";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import ListAttendees from "./list-attendees";
 import { getAttendees } from "./actions";
 import { getConference } from "../../actions";
 
-import ExportButton from "../../../../../../components/ExportButton";
-import UrlFilter from "@/components/UrlFilter";
+import ExportButton from "../../../../../../components/export-button";
+import UrlFilter from "@/components/url-filter";
 import { AttendeesQueryVariables } from "@/lib/graphql/generated/graphql";
 
 export default async function AttendeesPage({
@@ -68,7 +68,7 @@ export default async function AttendeesPage({
             },
           ]}
         />
-        <div className="ml-auto text-xl font-bold dark:text-white">
+        <div className="ml-auto text-xl font-bold dark:text-foreground">
           {initialData.totalCount}
         </div>
       </div>

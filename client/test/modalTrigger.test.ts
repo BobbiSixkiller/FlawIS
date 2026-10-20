@@ -5,7 +5,7 @@ import { PassThrough } from "node:stream";
 import { createElement, Fragment, type ReactNode } from "react";
 import { renderToPipeableStream } from "react-dom/server";
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import ModalTrigger from "../src/components/ModalTrigger";
+import ModalTrigger from "../src/components/modal-trigger";
 import { useDialogStore } from "../src/stores/dialogStore";
 
 afterEach(() => {

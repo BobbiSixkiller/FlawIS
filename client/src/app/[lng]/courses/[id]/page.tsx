@@ -1,22 +1,22 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { notFound } from "next/navigation";
 import {
   deleteCourseAttendee,
   getCourse,
 } from "../../flawis/courses/[id]/actions";
 import { InvoiceOwnerType, Status } from "@/lib/graphql/generated/graphql";
-import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
-import Icon from "@/components/Icon";
-import Modal from "@/components/Modal";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ModalTrigger from "@/components/modal-trigger";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/icon";
+import Modal from "@/components/modal";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import Link from "next/link";
 
-import CourseApplication from "../../flawis/courses/[id]/CourseApplication";
-import Attendance from "./Attendance";
-import CourseRegistrationForm from "../../flawis/courses/[id]/CourseRegistrationForm";
-import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
-import ElearningAccess from "./ElearningAccess";
+import CourseApplication from "../../flawis/courses/[id]/course-application";
+import Attendance from "./attendance";
+import CourseRegistrationForm from "../../flawis/courses/[id]/course-registration-form";
+import DownloadInvoiceButton from "@/components/download-invoice-button";
+import ElearningAccess from "./elearning-access";
 
 export default async function CoursePage({
   params,
@@ -83,12 +83,13 @@ export default async function CoursePage({
         </>
       ) : new Date() < new Date(course.registrationEnd) ? (
         <Button
-          as={Link}
-          href={`/${id}/register`}
           className="w-full"
           variant="positive"
-          scroll={false}
-          prefetch={false}
+          nativeButton={false}
+          role="link"
+          render={
+            <Link href={`/${id}/register`} scroll={false} prefetch={false} />
+          }
         >
           <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
           Prihlasit sa
@@ -105,7 +106,8 @@ export default async function CoursePage({
           text="Naozaj chcete zrušiť Vašu registráciu?"
           action={async () => {
             "use server";
-            return await deleteCourseAttendee({ id: course.attending?.id });
+            if (!course.attending) notFound();
+            return await deleteCourseAttendee({ id: course.attending.id });
           }}
         />
       </Modal>

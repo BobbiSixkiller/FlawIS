@@ -3,13 +3,13 @@ import {
   deleteInternship,
   getInternship,
 } from "@/app/[lng]/internships/[internshipId]/actions";
-import BackButton from "@/components/BackButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import Modal from "@/components/Modal";
-import InternshipForm from "@/app/[lng]/internships/InternshipForm";
+import BackButton from "@/components/back-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import Modal from "@/components/modal";
+import InternshipForm from "@/app/[lng]/internships/internship-form";
 import { translate } from "@/lib/i18n";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 
 export default async function InternshipPage({
   params,

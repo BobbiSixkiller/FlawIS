@@ -9,7 +9,7 @@ import {
   getSupportedLocale,
   localeHeaderName,
 } from "@/lib/i18n/settings";
-import ThemeProvider from "@/components/ThemeProvider";
+import ThemeProvider from "@/components/theme-provider";
 import {
   getThemePreference,
   systemThemeScript,
@@ -81,7 +81,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={UKsans.className}>
+      <body className={`${UKsans.variable} font-sans`}>
         <ThemeProvider initialPreference={theme}>{children}</ThemeProvider>
       </body>
     </html>

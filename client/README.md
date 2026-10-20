@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FlawIS client
 
-## Getting Started
+Next.js App Router frontend for the faculty administration and participant portals.
 
-First, run the development server:
+## Development
 
-```bash
+Use Node 24.22 (`nvm use` in this directory), then install from the lockfile:
+
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application uses the repository's existing environment variables, GraphQL service, and MinIO service. See the root README for the full service setup.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```sh
+npm run codegen   # Generate GraphQL types from ../core/schema.graphql
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## UI conventions
 
-## Learn More
+- Shared primitives live in `src/components/ui`. They use shadcn's `base-nova` style with Base UI, configured in `components.json`. Use Base UI's `render` prop to compose triggers with links or buttons.
+- Import basic controls directly from `@/components/ui/*`; avoid pass-through wrapper components. Connect checkboxes with `checked` and `onCheckedChange`, and use `password-input` for password visibility controls. Keep application components for behavior such as async searches, form option mapping, and dialog state. Import `cn` from `@/lib/utils` in new components.
+- Component filenames use kebab-case, including components beside route pages and editor helpers (for example, `dashboard-header.tsx` and `login-form.tsx`). React component exports remain PascalCase. Route directory names are unchanged.
+- `Dashboard` follows UFD's admin shell: `SidebarProvider`, `AppSidebar`, `SidebarInset`, and a separate header with the navigation trigger, breadcrumbs, and account actions. Sidebar state persists in a cookie; navigation becomes a sheet on mobile.
+- Theme tokens in `src/app/globals.css` define light/dark surfaces, faculty plum, typography, focus rings, and spacing. Prefer semantic classes such as `bg-card`, `text-muted-foreground`, and `border-input` over independent gray palettes. Preserve the university's UK Sans and branding.
+- `src/app/shadcn.css` contains the shared shadcn state variants. The shadcn generator is a development CLI, not an application runtime dependency; run it with `npx shadcn@latest` when adding primitives.
+- Keep controls labelled, keyboard operable, and usable with reduced motion. Dialogs, menus, selects, and comboboxes delegate focus and dismissal to Base UI.
 
-To learn more about Next.js, take a look at the following resources:
+## Dependency compatibility
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The October 2026 refresh updates the application dependencies to their current stable releases. ESLint stays on the latest 9.x release because the current Next.js React, import, and accessibility plugins do not support ESLint 10 yet.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+TypeScript 7 supplies the native compiler through the `@typescript/native` alias. The `typescript` package points to Microsoft's TypeScript 6 compatibility package for tools that use the JavaScript compiler API. This follows the [TypeScript 7 migration guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/).
 
-## Deploy on Vercel
+GraphQL Codegen 6 uses explicit scalar mappings and native enums in `codegen.yml`. UI data types come from selected fragments rather than complete schema objects, following the [Codegen migration guidance](https://the-guild.dev/graphql/codegen/docs/migration/operations-and-client-preset-from-5-0).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`npm audit` still reports upstream transitive advisories in the code generation, typography, and MinIO dependency trees. Do not use `npm audit fix --force` to downgrade these direct dependencies; review upstream fixes and verify their compatibility first.

@@ -36,5 +36,8 @@
   "breadcrumbs": {
     "label": "Navigácia",
     "showFullPath": "Zobraziť celú navigáciu"
-  }
+  },
+  "skipToContent": "Prejsť na obsah",
+  "facultyName": "Právnická fakulta UK",
+  "administration": "Administrácia"
 }

@@ -1,6 +1,6 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { ReactNode } from "react";
-import TabMenu from "@/components/TabMenu";
+import TabMenu from "@/components/tab-menu";
 import { getInternship } from "./actions";
 import { translate } from "@/lib/i18n";
 import { getOptionalViewer } from "@/lib/optionalViewer";

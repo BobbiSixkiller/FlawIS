@@ -57,25 +57,9 @@ function sanitizeObjectPath(path: string): string {
 async function ensureBucketExists(bucketName: string): Promise<void> {
   const sanitizedBucketName = sanitizeBucketName(bucketName);
 
-  return new Promise<void>((resolve, reject) => {
-    minioClient.bucketExists(sanitizedBucketName, (err, exists) => {
-      if (err) {
-        return reject(err);
-      }
-      if (exists) {
-        return resolve();
-      } else {
-        // Create the bucket if it does not exist
-        minioClient.makeBucket(sanitizedBucketName, "", (err) => {
-          if (err) {
-            return reject(err);
-          }
-          console.log(`Bucket '${sanitizedBucketName}' created successfully.`);
-          return resolve();
-        });
-      }
-    });
-  });
+  if (!(await minioClient.bucketExists(sanitizedBucketName))) {
+    await minioClient.makeBucket(sanitizedBucketName);
+  }
 }
 
 export async function uploadFile(
@@ -92,34 +76,15 @@ export async function uploadFile(
 
   const objectName = sanitizeObjectPath(path);
 
-  // Upload the object
-  return new Promise<string>((resolve, reject) => {
-    minioClient.putObject(sanitizedBucketName, objectName, buffer, (err) => {
-      if (err) {
-        console.error(`Error uploading file: ${err.message}`);
-        return reject(err);
-      }
-      console.log(
-        `File '${objectName}' uploaded to bucket '${sanitizedBucketName}' successfully.`
-      );
-      resolve(`http://minio:9000/${sanitizedBucketName}/${objectName}`);
-    });
-  });
+  await minioClient.putObject(sanitizedBucketName, objectName, buffer);
+  return `http://minio:9000/${sanitizedBucketName}/${objectName}`;
 }
 
 export async function downloadFile(
   bucketName: string,
   objectName: string
 ): Promise<Readable> {
-  return new Promise<Readable>((resolve, reject) => {
-    minioClient.getObject(bucketName, objectName, (err, stream) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stream as Readable);
-      }
-    });
-  });
+  return minioClient.getObject(bucketName, objectName);
 }
 
 export async function deleteFiles(urls: string[]) {

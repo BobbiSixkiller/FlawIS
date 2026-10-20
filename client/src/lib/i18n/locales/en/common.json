@@ -40,5 +40,11 @@
     "clear": "Clear all",
     "empty": "No options available.",
     "updating": "Updating results…"
-  }
+  },
+  "dialog": "Dialog",
+  "requestFailed": "Could not load options. Please try again.",
+  "remove": "Remove",
+  "dismiss": "Dismiss message",
+  "loading": "Loading…",
+  "showOptions": "Show options"
 }

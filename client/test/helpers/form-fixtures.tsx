@@ -1,21 +1,21 @@
-import GenericCombobox from "../../src/components/GenericCombobox";
+import GenericCombobox from "../../src/components/generic-combobox";
 import type { GqlMutationResponse } from "../../src/lib/graphql/actions";
 import { createInstance } from "i18next";
 import { PathParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import { useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import { z } from "zod";
-import Ticket from "../../src/app/[lng]/conferences/[slug]/register/Ticket";
-import CheckBox from "../../src/components/Checkbox";
-import Editor from "../../src/components/editor/Editor";
+import Ticket from "../../src/app/[lng]/conferences/[slug]/register/ticket";
+import { Checkbox } from "@/components/ui/checkbox";
+import Editor from "../../src/components/editor/editor";
 import { FormContainer, FormError, FormField } from "../../src/components/form";
 import { inputChange, inputValue } from "../../src/components/form-values";
-import ImageFileInput from "../../src/components/ImageFileInput";
-import { Input } from "../../src/components/Input";
-import MultipleFileUploadField from "../../src/components/MultipleFileUploadField";
-import PhoneInput from "../../src/components/PhoneInput";
-import Select from "../../src/components/Select";
-import WizzardForm, { WizzardStep } from "../../src/components/WizzardForm";
+import ImageFileInput from "../../src/components/image-file-input";
+import { Input } from "@/components/ui/input";
+import MultipleFileUploadField from "../../src/components/multiple-file-upload-field";
+import PhoneInput from "../../src/components/phone-input";
+import Select from "../../src/components/select";
+import WizzardForm, { WizzardStep } from "../../src/components/wizzard-form";
 import common from "../../src/lib/i18n/locales/en/common.json";
 
 export const testI18n = createInstance();
@@ -134,7 +134,15 @@ export function ControlsForm({
             layout="inline"
           >
             {({ field, controlProps }) => (
-              <CheckBox {...field} {...controlProps} checked={field.value} />
+              <Checkbox
+                name={field.name}
+                ref={field.ref}
+                onBlur={field.onBlur}
+                disabled={field.disabled}
+                onCheckedChange={field.onChange}
+                {...controlProps}
+                checked={field.value}
+              />
             )}
           </FormField>
           {editor && (

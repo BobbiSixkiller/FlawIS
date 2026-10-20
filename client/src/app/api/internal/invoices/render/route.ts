@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     payload.logo,
   );
 
-  return new Response(pdf, {
+  return new Response(new Uint8Array(pdf), {
     headers: invoicePdfHeaders(payload.invoice),
   });
 }

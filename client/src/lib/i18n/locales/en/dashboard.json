@@ -36,5 +36,8 @@
   "breadcrumbs": {
     "label": "Breadcrumbs",
     "showFullPath": "Show full navigation"
-  }
+  },
+  "skipToContent": "Skip to content",
+  "facultyName": "Faculty of Law, Comenius University",
+  "administration": "Administration"
 }

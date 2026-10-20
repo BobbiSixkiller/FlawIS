@@ -1,5 +1,5 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import UserForm from "@/app/[lng]/(auth)/register/UserForm";
+import UserForm from "@/app/[lng]/(auth)/register/user-form";
 import { getSubdomain } from "@/lib/utilsServer";
 
 export default async function UpdateProfilePage({

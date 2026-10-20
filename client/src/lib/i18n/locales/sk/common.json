@@ -40,5 +40,11 @@
     "clear": "Zrušiť filtre",
     "empty": "Nie sú dostupné žiadne možnosti.",
     "updating": "Aktualizujú sa výsledky…"
-  }
+  },
+  "dialog": "Dialóg",
+  "requestFailed": "Možnosti sa nepodarilo načítať. Skúste to znova.",
+  "remove": "Odstrániť",
+  "dismiss": "Zavrieť správu",
+  "loading": "Načítava sa…",
+  "showOptions": "Zobraziť možnosti"
 }

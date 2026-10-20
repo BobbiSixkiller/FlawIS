@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import Icon from "@/components/Icon";
-import TabMenu from "@/components/TabMenu";
+import Icon from "@/components/icon";
+import TabMenu from "@/components/tab-menu";
 
 export default async function TabsLayout({
   children,

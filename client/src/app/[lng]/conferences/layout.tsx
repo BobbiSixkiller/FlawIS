@@ -2,7 +2,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { cookies, headers } from "next/headers";
 
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import ParticipantTenantShell from "@/components/ParticipantTenantShell";
+import ParticipantTenantShell from "@/components/participant-tenant-shell";
 import { translate } from "@/lib/i18n";
 
 export async function generateMetadata(

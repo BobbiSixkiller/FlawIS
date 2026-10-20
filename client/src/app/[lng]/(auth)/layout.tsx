@@ -1,7 +1,7 @@
-import LngSwitcher from "@/components/LngSwitcher";
-import Logo from "@/components/Logo";
-import ScrollWrapper from "@/components/ScrollWrapper";
-import ThemeToggler from "@/components/ThemeToggler";
+import LngSwitcher from "@/components/lng-switcher";
+import Logo from "@/components/logo";
+import ScrollWrapper from "@/components/scroll-wrapper";
+import ThemeToggler from "@/components/theme-toggler";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
@@ -56,32 +56,32 @@ export default async function AuthLayout({
   const { i18n, t } = await translate(lng, "dashboard");
 
   return (
-    <div className="flex h-screen dark:bg-gray-950">
-      <div className="hidden md:block relative w-5/12">
+    <div className="flex h-screen dark:bg-background">
+      <aside aria-label={t("facultyName")} className="hidden md:block relative w-5/12">
         <Link href="/">
           <Logo lng={lng} inverted className="absolute top-8 left-8 z-10" />
         </Link>
 
         <Image
           priority
-          alt="bg-image"
+          alt=""
           src={"/images/UK-bg-3.jpg"}
           fill
           style={{ objectFit: "cover" }}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-      </div>
+      </aside>
 
       <ScrollWrapper
         id="auth-scroll"
         className="px-6 py-12 flex-1 flex flex-col items-center relative"
       >
-        <div className="absolute top-8 right-6 flex gap-2">
+        <header className="absolute top-8 right-6 flex gap-2">
           <ThemeToggler lng={lng} />
           <LngSwitcher authLayout />
-        </div>
+        </header>
 
-        <div className="w-full max-w-96 my-auto">
+        <main className="w-full max-w-96 my-auto">
           <div className="md:hidden flex justify-center mb-6">
             <Link href="/">
               <Logo
@@ -96,18 +96,18 @@ export default async function AuthLayout({
           {children}
 
           <footer className="mt-20">
-            <ul className="text-xs text-gray-500 dark:text-white/85 flex gap-4 justify-center">
-              <li className="hover:underline hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
+            <ul className="text-xs text-muted-foreground dark:text-foreground flex gap-4 justify-center">
+              <li className="hover:underline hover:text-primary dark:hover:text-primary cursor-pointer">
                 <a
                   href="mailto:matus.muransky@flaw.uniba.sk"
-                  className="focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
+                  className="focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:focus:ring-offset-background dark:focus:ring-ring"
                 >
                   {t("contact")}
                 </a>
               </li>
-              <li className="hover:underline hover:text-primary-500 dark:hover:text-primary-300 cursor-pointer">
+              <li className="hover:underline hover:text-primary dark:hover:text-primary cursor-pointer">
                 <a
-                  className="focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300"
+                  className="focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:focus:ring-offset-background dark:focus:ring-ring"
                   target="_blank"
                   href={
                     i18n.language === "sk"
@@ -120,7 +120,7 @@ export default async function AuthLayout({
               </li>
             </ul>
           </footer>
-        </div>
+        </main>
       </ScrollWrapper>
     </div>
   );

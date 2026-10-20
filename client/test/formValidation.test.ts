@@ -124,7 +124,17 @@ test("validation messages stay scoped to each language", async () => {
 
 test("dynamic fields keep text normalization, file limits, and permissive attendee editing", async () => {
   const fields: FormFragment["fields"] = [
-    { id: "text", type: FieldType.Text, label: "Name", required: true },
+    {
+      id: "text",
+      type: FieldType.Text,
+      label: "Name",
+      required: true,
+      placeholder: null,
+      helpText: null,
+      minFiles: null,
+      maxFiles: null,
+      selectOptions: null,
+    },
     {
       id: "file",
       type: FieldType.FileUpload,
@@ -132,6 +142,9 @@ test("dynamic fields keep text normalization, file limits, and permissive attend
       required: true,
       minFiles: 1,
       maxFiles: 1,
+      placeholder: null,
+      helpText: null,
+      selectOptions: null,
     },
   ];
   const t = await translation("sk");

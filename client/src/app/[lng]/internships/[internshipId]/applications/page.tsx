@@ -1,6 +1,6 @@
 import { getMe } from "@/app/[lng]/(auth)/actions";
 import { getInterns } from "./actions";
-import ListInterns from "./ListInterns";
+import ListInterns from "./list-interns";
 import {
   InternsQueryVariables,
   Status,

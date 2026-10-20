@@ -1,6 +1,6 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { getCourse } from "@/app/[lng]/flawis/courses/[id]/actions";
-import CourseRegistrationForm from "@/app/[lng]/flawis/courses/[id]/CourseRegistrationForm";
+import CourseRegistrationForm from "@/app/[lng]/flawis/courses/[id]/course-registration-form";
 import { notFound, redirect } from "next/navigation";
 
 export default async function RegisterPage({

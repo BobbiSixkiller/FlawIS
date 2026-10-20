@@ -1,9 +1,9 @@
 import { Trans } from "react-i18next/TransWithoutContext";
-import GoogleSignIn from "../GoogleSignin";
-import UserForm from "./UserForm";
+import GoogleSignIn from "../google-signin";
+import UserForm from "./user-form";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/lib/utilsClient";
-import { FormMessage } from "@/components/Message";
+import { FormMessage } from "@/components/message";
 import Link from "next/link";
 import { getSubdomain } from "@/lib/utilsServer";
 
@@ -22,9 +22,9 @@ export default async function Register({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
+      <h1 className="text-2xl text-center font-bold leading-9 tracking-tight text-foreground dark:text-foreground">
         {t("heading")}
-      </h2>
+      </h1>
 
       <FormMessage />
 
@@ -33,11 +33,11 @@ export default async function Register({
       {(subdomain.includes("conferences") || subdomain.includes("courses")) && (
         <div>
           <div className="relative flex py-6 items-center">
-            <div className="grow border-t border-gray-300"></div>
+            <div className="grow border-t border-border"></div>
             <span className="shrink mx-4 font-light text-sm">
               {t("continue")}
             </span>
-            <div className="grow border-t border-gray-300"></div>
+            <div className="grow border-t border-border"></div>
           </div>
 
           <div className="flex justify-center pt-4">
@@ -46,7 +46,7 @@ export default async function Register({
         </div>
       )}
 
-      <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-300">
+      <p className="mt-10 text-center text-sm text-muted-foreground dark:text-muted-foreground">
         <Trans
           i18nKey={"login"}
           t={t}
@@ -56,8 +56,8 @@ export default async function Register({
                 key={"login"}
                 href={`/login${url ? `?url=${encodeURIComponent(url)}` : ""}`}
                 className={cn([
-                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+                  "text-sm font-semibold text-primary hover:text-primary/90 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                  "dark:text-primary dark:hover:text-primary/90 dark:focus:ring-offset-background dark:focus:ring-ring",
                 ])}
               />
             ),

@@ -1,13 +1,13 @@
-import ActivateAccountDialog from "@/app/[lng]/(auth)/ActivateAccountDialog";
+import ActivateAccountDialog from "@/app/[lng]/(auth)/activate-account-dialog";
 import { getMe } from "../(auth)/actions";
-import SessionPolling from "@/components/SessionPolling";
+import SessionPolling from "@/components/session-polling";
 import { Access } from "@/lib/graphql/generated/graphql";
-import Icon from "@/components/Icon";
+import Icon from "@/components/icon";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/components/dashboard";
 
 export async function generateMetadata(
   {
