@@ -27,6 +27,7 @@
   --success-foreground: #ffffff;
   --border: #e4dfe7;
   --input: #d5ceda;
+  --switch-track: var(--input);
   --ring: #97357c;
   --sidebar: #f6f3f7;
   --sidebar-foreground: #39303f;
@@ -58,6 +59,7 @@
   --success-foreground: #0a2616;
   --border: #3c3342;
   --input: #504457;
+  --switch-track: #827389;
   --ring: #e3a6d4;
   --sidebar: #1c1720;
   --sidebar-foreground: #e5dce9;
@@ -89,6 +91,7 @@
   --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-switch-track: var(--switch-track);
   --color-ring: var(--ring);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);

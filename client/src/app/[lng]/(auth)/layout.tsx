@@ -14,7 +14,7 @@ export async function generateMetadata(
   }: {
     params: Promise<{ lng: string }>;
   },
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
@@ -57,7 +57,10 @@ export default async function AuthLayout({
 
   return (
     <div className="flex h-screen dark:bg-background">
-      <aside aria-label={t("facultyName")} className="hidden md:block relative w-5/12">
+      <aside
+        aria-label={t("facultyName")}
+        className="hidden md:block relative w-5/12"
+      >
         <Link href="/">
           <Logo lng={lng} inverted className="absolute top-8 left-8 z-10" />
         </Link>
@@ -76,7 +79,7 @@ export default async function AuthLayout({
         id="auth-scroll"
         className="px-6 py-12 flex-1 flex flex-col items-center relative"
       >
-        <header className="absolute top-8 right-6 flex gap-2">
+        <header className="absolute top-8 right-6 flex items-center gap-2">
           <ThemeToggler lng={lng} />
           <LngSwitcher authLayout />
         </header>
@@ -84,12 +87,7 @@ export default async function AuthLayout({
         <main className="w-full max-w-96 my-auto">
           <div className="md:hidden flex justify-center mb-6">
             <Link href="/">
-              <Logo
-                lng={lng}
-                width={60}
-                height={60}
-                notext
-              />
+              <Logo lng={lng} width={60} height={60} notext />
             </Link>
           </div>
 

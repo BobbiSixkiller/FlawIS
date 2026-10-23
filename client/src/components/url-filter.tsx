@@ -224,9 +224,9 @@ function FilterSwitch({
       )}
       <span
         aria-hidden="true"
-        className="flex h-6 w-10 shrink-0 items-center rounded-full bg-muted p-0.5 transition-colors group-data-checked:bg-primary motion-reduce:transition-none dark:bg-muted dark:group-data-checked:bg-primary-400"
+        className="flex h-6 w-10 shrink-0 items-center rounded-full bg-muted p-0.5 transition-colors group-data-checked:bg-primary motion-reduce:transition-none dark:bg-switch-track dark:group-data-checked:bg-primary"
       >
-        <span className="size-5 rounded-full bg-card shadow-sm transition-transform group-data-checked:translate-x-4 motion-reduce:transition-none" />
+        <span className="size-5 rounded-full bg-card shadow-sm transition-transform group-data-checked:translate-x-4 motion-reduce:transition-none dark:bg-foreground dark:group-data-checked:bg-primary-foreground" />
       </span>
     </Switch.Root>
   );
