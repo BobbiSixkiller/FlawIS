@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { stripPathLocale } from "@/lib/i18n/settings";
-import type { NavLinkProps } from "./nav-link";
+import Icon, { type IconName } from "./icon";
 import {
   Sidebar,
   SidebarContent,
@@ -18,16 +18,20 @@ import {
   useSidebar,
 } from "./ui/sidebar";
 
+export type NavItem = { title: string; href: string; icon: IconName };
+
 export default function AppSidebar({
-  navLinks,
+  navItems,
   logo,
   footer,
-  label,
+  navigationLabel,
+  homeLabel,
 }: {
-  navLinks: NavLinkProps[];
+  navItems: NavItem[];
   logo: ReactNode;
   footer: ReactNode;
-  label: string;
+  navigationLabel: string;
+  homeLabel: string;
 }) {
   const pathname =
     stripPathLocale(usePathname()).replace(/^\/flawis(?=\/|$)/, "") || "/";
@@ -35,45 +39,49 @@ export default function AppSidebar({
   return (
     <Sidebar
       role="complementary"
-      aria-label={label}
-      collapsible="offcanvas"
-      className="border-r border-sidebar-border"
+      aria-label={navigationLabel}
+      collapsible="icon"
+      className="z-30 border-sidebar-border"
     >
-      <SidebarHeader className="border-b border-sidebar-border p-5">
-        <Link href="/" className="rounded-md">
+      <SidebarHeader className="shrink-0 group-data-[collapsible=icon]:px-3">
+        <Link
+          href="/"
+          aria-label={homeLabel}
+          className="flex h-12 shrink-0 items-center overflow-hidden rounded-md px-2 transition-[width,height] ease-linear group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0"
+          onClick={() => {
+            if (isMobile) setOpenMobile(false);
+          }}
+        >
           {logo}
         </Link>
-        <span className="mt-3 text-xs font-medium text-muted-foreground">
-          {label}
-        </span>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup className="p-3">
+        <SidebarGroup className="group-data-[collapsible=icon]:px-3">
           <SidebarGroupContent>
-            <nav aria-label={label}>
-              <SidebarMenu className="gap-1">
-                {navLinks.map((link) => {
+            <nav aria-label={navigationLabel}>
+              <SidebarMenu className="gap-2">
+                {navItems.map((item) => {
                   const active =
-                    pathname === link.href ||
-                    pathname.startsWith(`${link.href}/`);
+                    pathname === item.href ||
+                    pathname.startsWith(`${item.href}/`);
                   return (
-                    <SidebarMenuItem key={link.href}>
+                    <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
                         isActive={active}
-                        className="h-11 gap-3 px-3 text-sm data-active:font-medium data-active:shadow-[inset_3px_0_0_var(--primary)] [&_svg]:mr-0 [&_svg]:size-5"
+                        tooltip={item.title}
+                        aria-label={item.title}
                         render={
                           <Link
-                            href={link.href}
+                            href={item.href}
                             aria-current={active ? "page" : undefined}
                             onClick={() => {
                               if (isMobile) setOpenMobile(false);
-                              link.onClick?.();
                             }}
                           />
                         }
                       >
-                        {link.icon}
-                        <span>{link.text}</span>
+                        <Icon name={item.icon} aria-hidden="true" />
+                        <span>{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
@@ -83,7 +91,7 @@ export default function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="relative z-30 items-start overflow-visible border-t border-sidebar-border group-data-[collapsible=icon]:px-3">
         {footer}
       </SidebarFooter>
       <SidebarRail />

@@ -278,7 +278,9 @@ test("combobox fetches, selects, creates, and exposes nested API errors without 
   await user.clear(input);
   await user.type(input, "New option");
   await user.click(await view.findByRole("option", { name: /New option/ }));
-  await waitFor(() => assert.ok(view.getByText("New option")));
+  const field = input.closest('[data-slot="combobox-chips"]');
+  assert.ok(field, "multiple selections and the input share one field");
+  await waitFor(() => assert.match(field.textContent!, /Law.*New option/));
   fireEvent.keyDown(input, { key: "Escape" });
   fireEvent.click(view.getByRole("button", { name: "Save" }));
   await waitFor(() =>
@@ -294,4 +296,46 @@ test("combobox fetches, selects, creates, and exposes nested API errors without 
   fireEvent.keyDown(input, { key: "Escape" });
   fireEvent.click(view.getByRole("button", { name: "Save" }));
   await waitFor(() => assert.deepEqual(saved[1], { options: ["Law"] }));
+});
+
+test("combobox displays initial selections inside the input field and supports chip removal", async () => {
+  const user = userEvent.setup();
+  const saved: unknown[] = [];
+  const props = {
+    onSubmit: (value: unknown) => saved.push(value),
+    defaultValues: { options: ["Law", "Economics"] },
+    fetchOptions: async () => [],
+    createOption: async (text: string) => ({
+      success: true,
+      message: "Created",
+      data: { id: text, val: text },
+    }),
+  };
+  const view = render(createElement(ComboboxFixture, props), { wrapper });
+  const input = view.getByRole("combobox", { name: "Options" });
+  const field = input.closest('[data-slot="combobox-chips"]');
+  assert.ok(field);
+  assert.ok(field.contains(view.getByText("Law")));
+  assert.ok(field.contains(view.getByText("Economics")));
+
+  await user.type(input, "L");
+  await user.keyboard("{Backspace}");
+  assert.ok(field.contains(view.getByText("Economics")));
+  await user.keyboard("{Backspace}");
+  assert.equal(view.queryByText("Economics"), null);
+  assert.ok(field.contains(view.getByText("Law")));
+  await user.keyboard("{Escape}");
+
+  view.rerender(createElement(ComboboxFixture, { ...props, disabled: true }));
+  assert.equal((input as HTMLInputElement).disabled, true);
+  await user.click(view.getByRole("button", { name: "Remove: Law" }));
+  assert.ok(field.contains(view.getByText("Law")));
+
+  view.rerender(createElement(ComboboxFixture, props));
+  await user.click(view.getByRole("button", { name: "Remove: Law" }));
+  assert.equal(view.queryByText("Law"), null);
+  assert.equal(document.activeElement, input);
+  assert.equal(saved.length, 0, "removing a chip must not submit the form");
+  await user.click(view.getByRole("button", { name: "Save" }));
+  await waitFor(() => assert.deepEqual(saved, [{ options: [] }]));
 });

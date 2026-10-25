@@ -12,7 +12,7 @@ export default function DashboardHeader({
   navigationLabel: string;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex h-16 min-w-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur-sm sm:px-6">
+    <header className="sticky top-0 z-20 flex h-16 min-w-0 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14 sm:px-6">
       <SidebarTrigger
         aria-label={navigationLabel}
         className="size-10 shrink-0"

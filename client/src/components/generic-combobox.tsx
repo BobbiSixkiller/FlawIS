@@ -1,5 +1,4 @@
 "use client";
-import Icon from "@/components/icon";
 import { cn } from "@/lib/utils";
 import type { GqlMutationResponse } from "@/lib/graphql/actions";
 import { useTranslation } from "@/lib/i18n/client";
@@ -14,10 +13,15 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import {
   Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
   ComboboxContent,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxTrigger,
+  useComboboxAnchor,
 } from "./ui/combobox";
 import Spinner from "./spinner";
 import { Button } from "@/components/ui/button";
@@ -77,6 +81,7 @@ export default function GenericCombobox<
   ...props
 }: GenericComboboxProps<TOption, TValue>) {
   const { t } = useTranslation(lng, "common");
+  const anchor = useComboboxAnchor();
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState(false);
@@ -211,57 +216,53 @@ export default function GenericCombobox<
       }}
     >
       <div className="space-y-2">
-        {multiple && selected.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+        {multiple ? (
+          <ComboboxChips
+            ref={anchor}
+            className="min-h-10 w-full bg-background has-disabled:cursor-not-allowed has-disabled:bg-input/50 has-disabled:opacity-50 dark:has-disabled:bg-input/80"
+          >
             {selected.map((option, index) => (
-              <span
+              <ComboboxChip
                 key={index}
+                removeLabel={`${t("remove")}: ${getOptionLabel(option)}`}
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-md border bg-muted py-1 pl-2 text-sm",
+                  "h-7 max-w-full rounded-md border border-transparent text-sm font-normal",
                   itemErrors?.[index] && "border-destructive text-destructive",
                 )}
               >
-                {getOptionLabel(option)}
-                <Button
-                  size="icon-xs"
-                  variant="ghost"
-                  disabled={disabled}
-                  aria-label={`${t("remove")}: ${getOptionLabel(option)}`}
-                  onClick={() =>
-                    onChange(
-                      selected
-                        .filter((_, i) => i !== index)
-                        .map(getOptionValue),
-                    )
-                  }
-                >
-                  <Icon name="x-mark" className="size-3" />
-                </Button>
-              </span>
+                <span className="min-w-0 truncate" title={getOptionLabel(option)}>
+                  {getOptionLabel(option)}
+                </span>
+              </ComboboxChip>
             ))}
-          </div>
+            <div className="flex min-w-24 flex-1 items-center gap-1">
+              <ComboboxChipsInput
+                {...props}
+                ref={ref}
+                name={name}
+                disabled={disabled}
+                placeholder={placeholder}
+                className="h-7 w-full bg-transparent text-base placeholder:text-muted-foreground disabled:cursor-not-allowed sm:text-sm"
+              />
+              <ComboboxTrigger
+                render={<Button variant="ghost" size="icon-xs" />}
+                aria-label={t("showOptions")}
+                disabled={disabled}
+              />
+            </div>
+          </ComboboxChips>
+        ) : (
+          <ComboboxInput
+            toggleLabel={t("showOptions")}
+            {...props}
+            ref={ref}
+            name={name}
+            disabled={disabled}
+            placeholder={placeholder}
+            className="min-h-10 w-full bg-background"
+          />
         )}
-        <ComboboxInput
-          toggleLabel={t("showOptions")}
-          {...props}
-          ref={ref}
-          name={name}
-          disabled={disabled}
-          placeholder={placeholder}
-          className="min-h-10 w-full bg-background"
-          onKeyDown={(event) => {
-            if (
-              multiple &&
-              event.key === "Backspace" &&
-              !text &&
-              Array.isArray(fieldValue)
-            ) {
-              event.preventDefault();
-              onChange(fieldValue.slice(0, -1));
-            }
-          }}
-        />
-        <ComboboxContent>
+        <ComboboxContent anchor={multiple ? anchor : undefined}>
           {loading && (
             <div role="status" className="flex items-center gap-2 p-3">
               <Spinner />

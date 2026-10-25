@@ -361,15 +361,19 @@ export function ComboboxFixture({
   onSubmit,
   fetchOptions,
   createOption,
+  defaultValues = { options: [] },
+  disabled = false,
 }: {
   onSubmit: (values: ComboboxValues) => void;
   fetchOptions: (query: string) => Promise<{ id: string; val: string }[]>;
   createOption: (
     text: string,
   ) => Promise<GqlMutationResponse<{ id: string; val: string }>>;
+  defaultValues?: ComboboxValues;
+  disabled?: boolean;
 }) {
   return (
-    <FormContainer schema={comboboxSchema} defaultValues={{ options: [] }}>
+    <FormContainer schema={comboboxSchema} defaultValues={defaultValues}>
       {(methods) => (
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormField<ComboboxValues, "options">
@@ -383,6 +387,7 @@ export function ComboboxFixture({
                 {...controlProps}
                 lng="en"
                 multiple
+                disabled={disabled}
                 allowCreateNewOptions
                 defaultOptions={[]}
                 fetchOptions={fetchOptions}

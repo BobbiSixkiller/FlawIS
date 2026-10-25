@@ -10,8 +10,17 @@ import {
 import { useTranslation } from "@/lib/i18n/client";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
-import Dropdown from "./dropdown";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Icon from "./icon";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { SidebarMenuButton } from "./ui/sidebar";
 
 function saveLocalePreference(lng: string) {
   const { hostname, protocol } = window.location;
@@ -22,61 +31,81 @@ function saveLocalePreference(lng: string) {
   document.cookie = `${cookieName}=${encodeURIComponent(lng)}; Path=/; Max-Age=${localePreferenceMaxAge}; SameSite=Lax${domain}${secure}`;
 }
 
-export default function LngSwitcher({ authLayout }: { authLayout?: boolean }) {
+export default function LngSwitcher({
+  variant = "compact",
+}: {
+  variant?: "compact" | "sidebar";
+}) {
   const path = usePathname();
   const { lng } = useParams<{ lng: string }>();
 
   const { t } = useTranslation(lng, "dashboard");
+  const isMobile = useIsMobile();
+  const inSidebar = variant === "sidebar";
 
   return (
-    <Dropdown
-      anchor={{ gap: 6, to: authLayout ? "bottom end" : "top" }}
-      buttonWidth={!authLayout}
-      triggerProps={
-        authLayout
-          ? { size: "icon", variant: "ghost", className: "rounded-full", "aria-label": t(lng) }
-          : { variant: "ghost", className: "min-w-0 flex-1 justify-start" }
-      }
-      trigger={
-        authLayout ? (
-          <Image
-            alt=""
-            priority
-            src={`/images/${lng}.svg`}
-            width={36}
-            height={36}
-          />
-        ) : (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={t(lng)}
+        render={
+          inSidebar ? (
+            <SidebarMenuButton className="h-9" />
+          ) : (
+            <Button variant="ghost" size="icon" className="rounded-full" />
+          )
+        }
+      >
+        <Image
+          alt=""
+          priority
+          src={`/images/${lng}.svg`}
+          width={inSidebar ? 16 : 36}
+          height={inSidebar ? 16 : 36}
+          className="shrink-0"
+        />
+        {inSidebar && (
           <>
+            <span className="group-data-[collapsible=icon]:sr-only">
+              {t(lng)}
+            </span>
+            <Icon
+              name="chevron-right"
+              className="ml-auto group-data-[collapsible=icon]:hidden"
+              aria-hidden="true"
+            />
+          </>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        side={inSidebar && !isMobile ? "right" : "bottom"}
+        align="end"
+        sideOffset={4}
+        className="w-max min-w-44"
+      >
+        {languages.map((locale) => (
+          <DropdownMenuItem
+            key={locale}
+            nativeButton={false}
+            className="min-h-11 gap-2 px-3 py-2"
+            render={
+              <Link
+                href={getLocalizedPath(path, locale)}
+                prefetch={false}
+                onNavigate={() => saveLocalePreference(locale)}
+              />
+            }
+          >
             <Image
               alt=""
               priority
-              src={`/images/${lng}.svg`}
+              src={`/images/${locale}.svg`}
               width={20}
               height={20}
             />
-            <span className="ml-2 text-foreground">{t(lng)}</span>
-          </>
-        )
-      }
-      items={languages.map((l) => (
-        <Link
-          key={l}
-          href={getLocalizedPath(path, l)}
-          prefetch={false}
-          onNavigate={() => saveLocalePreference(l)}
-        >
-          <Image
-            alt=""
-            priority
-            src={`/images/${l}.svg`}
-            width={20}
-            height={20}
-            className="mr-2"
-          />
-          {t(l)}
-        </Link>
-      ))}
-    />
+            {t(locale)}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

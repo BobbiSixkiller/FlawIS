@@ -12,7 +12,7 @@ export default function Loading() {
         {[...new Array(6)].map((i, index) => (
           <div
             key={index}
-            className="rounded-2xl border dark:border-slate-500 p-4 shadow-sm"
+            className="rounded-2xl border border-border p-4 shadow-sm"
           >
             <div className="animate-pulse flex space-x-4">
               <div className="rounded-full bg-muted dark:bg-muted h-10 w-10"></div>

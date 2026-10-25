@@ -2,7 +2,6 @@ import ActivateAccountDialog from "@/app/[lng]/(auth)/activate-account-dialog";
 import { getMe } from "../(auth)/actions";
 import SessionPolling from "@/components/session-polling";
 import { Access } from "@/lib/graphql/generated/graphql";
-import Icon from "@/components/icon";
 import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
@@ -14,10 +13,10 @@ export async function generateMetadata(
     params,
   }: {
     params: Promise<{ lng: string }>;
-    sidebar: React.ReactNode;
+    headerActions: React.ReactNode;
     modal: React.ReactNode;
   },
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { lng } = await params;
   const { t } = await translate(lng, "dashboard");
@@ -52,11 +51,11 @@ export async function generateMetadata(
 export default async function DashboardLayout({
   children,
   modal,
-  sidebar,
+  headerActions,
   params,
 }: {
   children: React.ReactNode;
-  sidebar: React.ReactNode;
+  headerActions: React.ReactNode;
   modal: React.ReactNode;
   params: Promise<{ lng: string }>;
 }) {
@@ -71,37 +70,18 @@ export default async function DashboardLayout({
   return (
     <div>
       <Dashboard
-        sidebar={sidebar}
+        headerActions={headerActions}
         lng={lng}
         user={user}
-        navLinks={[
+        navItems={[
+          { title: t("users"), href: "/users", icon: "users" },
           {
-            href: "/users",
-            icon: <Icon name="users" className="mr-2 h-5 w-5" aria-hidden="true" />,
-            text: t("users"),
-          },
-          {
+            title: t("conferences"),
             href: "/conferences",
-            icon: (
-              <Icon name="building-library"
-                className="mr-2 h-5 w-5"
-                aria-hidden="true"
-              />
-            ),
-            text: t("conferences"),
+            icon: "building-library",
           },
-          {
-            href: "/internships",
-            icon: <Icon name="briefcase" className="mr-2 h-5 w-5" aria-hidden="true" />,
-            text: t("internships"),
-          },
-          {
-            href: "/courses",
-            icon: (
-              <Icon name="academic-cap" className="mr-2 h-5 w-5" aria-hidden="true" />
-            ),
-            text: t("courses"),
-          },
+          { title: t("internships"), href: "/internships", icon: "briefcase" },
+          { title: t("courses"), href: "/courses", icon: "academic-cap" },
         ]}
       >
         {children}

@@ -51,7 +51,7 @@ export default async function ParticipantTenantShell({
               }
               signInHref={signInHref}
             />
-            <LngSwitcher authLayout />
+            <LngSwitcher />
           </>
         }
       />

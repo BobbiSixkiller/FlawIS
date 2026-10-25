@@ -81,7 +81,7 @@ export default async function AuthLayout({
       >
         <header className="absolute top-8 right-6 flex items-center gap-2">
           <ThemeToggler lng={lng} />
-          <LngSwitcher authLayout />
+          <LngSwitcher />
         </header>
 
         <main className="w-full max-w-96 my-auto">

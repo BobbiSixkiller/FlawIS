@@ -3,26 +3,25 @@ import { cookies } from "next/headers";
 import type { UserFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
 import { SidebarInset, SidebarProvider } from "./ui/sidebar";
-import AppSidebar from "./app-sidebar";
+import AppSidebar, { type NavItem } from "./app-sidebar";
 import DashboardHeader from "./dashboard-header";
 import AccountMenu from "./account-menu";
 import Avatar from "./avatar";
 import LngSwitcher from "./lng-switcher";
 import ThemeToggler from "./theme-toggler";
-import type { NavLinkProps } from "./nav-link";
 import Footer from "./footer";
 import Logo from "./logo";
 import { Snackbar } from "./message";
 export default async function Dashboard({
   children,
-  navLinks,
-  sidebar,
+  navItems,
+  headerActions,
   user,
   lng,
 }: {
-  navLinks: NavLinkProps[];
+  navItems: NavItem[];
   children: ReactNode;
-  sidebar: ReactNode;
+  headerActions: ReactNode;
   user: UserFragment;
   lng: string;
 }) {
@@ -41,14 +40,24 @@ export default async function Dashboard({
         {t("skipToContent")}
       </a>
       <AppSidebar
-        navLinks={navLinks}
-        logo={<Logo lng={lng} height={40} width={40} />}
-        label={t("administration")}
+        navItems={navItems}
+        logo={
+          <Logo
+            lng={lng}
+            height={56}
+            width={56}
+            className="gap-2 whitespace-nowrap [&>img]:size-auto [&>img]:max-h-12 [&>img]:shrink-0 [&>img]:object-contain group-data-[collapsible=icon]:[&>div]:hidden group-data-[collapsible=icon]:[&>img]:max-h-8 group-data-[collapsible=icon]:[&>img]:max-w-8"
+          />
+        }
+        navigationLabel={t("navigation")}
+        homeLabel={t("home")}
         footer={
-          <div className="flex items-center justify-between gap-2">
-            <LngSwitcher />
-            <ThemeToggler lng={lng} />
-          </div>
+          <>
+            <LngSwitcher variant="sidebar" />
+            <div className="relative h-9 w-8 shrink-0">
+              <ThemeToggler lng={lng} className="absolute top-0 -left-0.5" />
+            </div>
+          </>
         }
       />
       <SidebarInset className="min-w-0 bg-background">
@@ -56,7 +65,7 @@ export default async function Dashboard({
           navigationLabel={t("openNavigation")}
           actions={
             <>
-              {sidebar}
+              {headerActions}
               <AccountMenu
                 avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
               />
