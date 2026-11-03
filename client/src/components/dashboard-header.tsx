@@ -1,5 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
+import { useWindowScroll } from "@uidotdev/usehooks";
+import { cn } from "@/lib/utilsClient";
 import Breadcrumbs from "./breadcrumbs";
 import Icon from "./icon";
 import { SidebarTrigger } from "./ui/sidebar";
@@ -11,8 +13,15 @@ export default function DashboardHeader({
   actions: ReactNode;
   navigationLabel: string;
 }) {
+  const [{ y }] = useWindowScroll();
+
   return (
-    <header className="sticky top-0 z-20 flex h-16 min-w-0 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14 sm:px-6">
+    <header
+      className={cn(
+        "sticky top-0 z-20 flex h-16 min-w-0 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14 sm:px-6",
+        (y ?? 0) > 0 && "shadow-bottom",
+      )}
+    >
       <SidebarTrigger
         aria-label={navigationLabel}
         className="size-10 shrink-0"
