@@ -2,9 +2,13 @@
 
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import { cn } from "@/lib/utilsClient";
-import { Description, Field, Label } from "@headlessui/react";
+import {
+  Field,
+  FieldDescription as Description,
+  FieldLabel as Label,
+} from "./ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { get } from "lodash";
+import get from "lodash/get.js";
 import {
   useId,
   useRef,
@@ -48,7 +52,8 @@ export function FormContainer<
 >({ schema, children, ...options }: FormContainerProps<TSchema>) {
   const methods = useForm<z.input<TSchema>, unknown, z.output<TSchema>>({
     ...options,
-    resolver: zodResolver(schema),
+    // The generic schema preserves both sides of Zod transforms.
+    resolver: zodResolver<FieldValues, unknown, FieldValues, TSchema>(schema),
   });
   return <FormProvider {...methods}>{children(methods)}</FormProvider>;
 }
@@ -131,7 +136,7 @@ export function FormField<
           <Label
             id={`${id}-label`}
             htmlFor={id}
-            className="block text-sm font-medium leading-6 text-gray-900 dark:text-white/85"
+            className="block text-sm font-medium leading-6 text-foreground dark:text-foreground"
           >
             {label}
           </Label>
@@ -193,7 +198,6 @@ export function FormField<
             )}
             {message ? (
               <Description
-                as="p"
                 id={`${id}-message`}
                 className="text-sm text-red-500"
               >
@@ -201,9 +205,8 @@ export function FormField<
               </Description>
             ) : description ? (
               <Description
-                as="p"
                 id={`${id}-message`}
-                className="text-sm text-gray-500 dark:text-gray-400"
+                className="text-sm text-muted-foreground dark:text-muted-foreground"
               >
                 {description}
               </Description>

@@ -1,6 +1,6 @@
-import Modal from "@/components/Modal";
+import Modal from "@/components/modal";
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import UserForm from "@/app/[lng]/(auth)/register/UserForm";
+import UserForm from "@/app/[lng]/(auth)/register/user-form";
 import { translate } from "@/lib/i18n";
 import { getSubdomain } from "@/lib/utilsServer";
 

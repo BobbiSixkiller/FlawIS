@@ -1,1 +1,11 @@
-{ "linkPlaceholder": "Vložte link" }
+{
+  "linkPlaceholder": "Vložte link",
+  "link": "Odkaz",
+  "applyLink": "Použiť odkaz",
+  "removeLink": "Odstrániť odkaz",
+  "bold": "Tučné",
+  "italic": "Kurzíva",
+  "underline": "Podčiarknuté",
+  "strike": "Prečiarknuté",
+  "code": "Kód"
+}

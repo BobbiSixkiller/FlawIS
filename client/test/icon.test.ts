@@ -3,7 +3,7 @@ import test from "node:test";
 import { createElement, createRef } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import Icon, { type IconName, type IconProps } from "../src/components/Icon";
+import Icon, { type IconName, type IconProps } from "../src/components/icon";
 
 test("icons are decorative by default and forward SVG props", () => {
   const markup = renderToStaticMarkup(

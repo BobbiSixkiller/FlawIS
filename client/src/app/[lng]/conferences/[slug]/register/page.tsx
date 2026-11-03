@@ -1,6 +1,6 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import ConferenceRegistrationForm from "./ConferenceRegistrationForm";
+import ConferenceRegistrationForm from "./conference-registration-form";
 import { redirect } from "next/navigation";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
 import {
@@ -11,7 +11,7 @@ import {
 import { currentTimestamp } from "@/lib/utilsServer";
 import { getSubmissionInvite } from "../actions";
 import { acceptAuthorInvite } from "./actions";
-import InvitationError from "./InvitationError";
+import InvitationError from "./invitation-error";
 
 export default async function ConferenceRegisterPage({
   params,

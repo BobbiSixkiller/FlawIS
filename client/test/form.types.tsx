@@ -4,7 +4,7 @@ import {
   FormField,
   type FormFieldRenderArgs,
 } from "../src/components/form";
-import { Input } from "../src/components/Input";
+import { Input } from "@/components/ui/input";
 
 const schema = z.object({
   count: z.number(),

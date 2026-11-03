@@ -1,7 +1,7 @@
-import LoginForm from "./LoginForm";
-import { FormMessage } from "@/components/Message";
+import LoginForm from "./login-form";
+import { FormMessage } from "@/components/message";
 import { Trans } from "react-i18next/TransWithoutContext";
-import GoogleSignIn from "../GoogleSignin";
+import GoogleSignIn from "../google-signin";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/lib/utilsClient";
 import Link from "next/link";
@@ -22,9 +22,9 @@ export default async function LoginPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
+      <h1 className="text-2xl text-center font-bold leading-9 tracking-tight text-foreground dark:text-foreground">
         {t("heading")}
-      </h2>
+      </h1>
 
       <FormMessage />
 
@@ -35,11 +35,11 @@ export default async function LoginPage({
         subdomain === "localhost:3000") && (
         <div>
           <div className="relative flex py-6 items-center">
-            <div className="grow border-t border-gray-300 dark:border-gray-600"></div>
-            <span className="shrink mx-4 font-light text-sm dark:text-white/85">
+            <div className="grow border-t border-border dark:border-border"></div>
+            <span className="shrink mx-4 font-light text-sm dark:text-foreground">
               {t("continue")}
             </span>
-            <div className="grow border-t border-gray-300 dark:border-gray-600"></div>
+            <div className="grow border-t border-border dark:border-border"></div>
           </div>
 
           <div className="flex justify-center pt-4">
@@ -48,7 +48,7 @@ export default async function LoginPage({
         </div>
       )}
 
-      <p className="pt-10 text-center text-sm text-gray-500 dark:text-white/85">
+      <p className="pt-10 text-center text-sm text-muted-foreground dark:text-foreground">
         <Trans
           i18nKey={"register"}
           t={t}
@@ -60,8 +60,8 @@ export default async function LoginPage({
                   url ? `?url=${encodeURIComponent(url)}` : ""
                 }`}
                 className={cn([
-                  "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900 dark:focus:ring-primary-300",
+                  "text-sm font-semibold text-primary hover:text-primary/90 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                  "dark:text-primary dark:hover:text-primary/90 dark:focus:ring-offset-background dark:focus:ring-ring",
                 ])}
               />
             ),

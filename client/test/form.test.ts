@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import type { Editor as TiptapEditor } from "@tiptap/core";
 import assert from "node:assert/strict";
+import userEvent from "@testing-library/user-event";
 import { afterEach, test } from "node:test";
 import { createElement } from "react";
 import {
@@ -68,7 +69,7 @@ test("reset and reactive values update selects and phone fields; blank numbers s
   fireEvent.click(view.getByRole("button", { name: "Reset" }));
   await waitFor(() =>
     assert.match(
-      view.getByRole("button", { name: "Choice" }).textContent!,
+      view.getByRole("combobox", { name: "Choice" }).textContent!,
       /Beta/,
     ),
   );
@@ -102,7 +103,7 @@ test("reset and reactive values update selects and phone fields; blank numbers s
   );
   await waitFor(() =>
     assert.match(
-      view.getByRole("button", { name: "Choice" }).textContent!,
+      view.getByRole("combobox", { name: "Choice" }).textContent!,
       /Alpha/,
     ),
   );
@@ -164,7 +165,10 @@ test("wizard returns to the field with a server error and focuses it after mount
   fireEvent.click(view.getByRole("button", { name: "Submit" }));
   await waitFor(() => assert.ok(view.getByText("Duplicate title")));
   await waitFor(() =>
-    assert.equal(document.activeElement, view.getByLabelText("Title")),
+    assert.ok(
+      document.activeElement === view.getByLabelText("Title"),
+      `Expected title focus; got ${document.activeElement?.tagName}#${document.activeElement?.id}`,
+    ),
   );
 });
 
@@ -229,7 +233,7 @@ test("an editor update is submitted immediately, including its most recent text"
   );
   const editor = (element as HTMLElement & { editor: TiptapEditor }).editor;
   act(() => {
-    editor.commands.setContent("<p>Latest content</p>", true);
+    editor.commands.setContent("<p>Latest content</p>", { emitUpdate: true });
     fireEvent.click(view.getByRole("button", { name: "Save" }));
   });
   await waitFor(() => assert.equal(saved.length, 1));
@@ -237,6 +241,7 @@ test("an editor update is submitted immediately, including its most recent text"
 });
 
 test("combobox fetches, selects, creates, and exposes nested API errors without losing values", async () => {
+  const user = userEvent.setup();
   const saved: unknown[] = [],
     queries: string[] = [];
   const view = render(
@@ -267,25 +272,23 @@ test("combobox fetches, selects, creates, and exposes nested API errors without 
       ?.textContent,
     "Choose or create",
   );
-  fireEvent.change(input, { target: { value: "La" } });
+  await user.type(input, "La");
   await waitFor(() => assert.ok(queries.includes("La")));
-  fireEvent.mouseDown(await view.findByRole("option", { name: "Law" }), {
-    button: 0,
-  });
-  fireEvent.change(input, { target: { value: "New option" } });
-  fireEvent.mouseDown(await view.findByRole("option", { name: /New option/ }), {
-    button: 0,
-  });
-  await waitFor(() => assert.ok(view.getByText("New option")));
+  await user.click(await view.findByRole("option", { name: "Law" }));
+  await user.clear(input);
+  await user.type(input, "New option");
+  await user.click(await view.findByRole("option", { name: /New option/ }));
+  const field = input.closest('[data-slot="combobox-chips"]');
+  assert.ok(field, "multiple selections and the input share one field");
+  await waitFor(() => assert.match(field.textContent!, /Law.*New option/));
   fireEvent.keyDown(input, { key: "Escape" });
   fireEvent.click(view.getByRole("button", { name: "Save" }));
   await waitFor(() =>
     assert.deepEqual(saved, [{ options: ["Law", "New option"] }]),
   );
-  fireEvent.change(input, { target: { value: "Invalid" } });
-  fireEvent.mouseDown(await view.findByRole("option", { name: /Invalid/ }), {
-    button: 0,
-  });
+  await user.clear(input);
+  await user.type(input, "Invalid");
+  await user.click(await view.findByRole("option", { name: /Invalid/ }));
   await waitFor(() => assert.ok(view.getByText("Duplicate option")));
   assert.equal(input.getAttribute("aria-invalid"), "true");
   fireEvent.change(input, { target: { value: "" } });
@@ -293,4 +296,46 @@ test("combobox fetches, selects, creates, and exposes nested API errors without 
   fireEvent.keyDown(input, { key: "Escape" });
   fireEvent.click(view.getByRole("button", { name: "Save" }));
   await waitFor(() => assert.deepEqual(saved[1], { options: ["Law"] }));
+});
+
+test("combobox displays initial selections inside the input field and supports chip removal", async () => {
+  const user = userEvent.setup();
+  const saved: unknown[] = [];
+  const props = {
+    onSubmit: (value: unknown) => saved.push(value),
+    defaultValues: { options: ["Law", "Economics"] },
+    fetchOptions: async () => [],
+    createOption: async (text: string) => ({
+      success: true,
+      message: "Created",
+      data: { id: text, val: text },
+    }),
+  };
+  const view = render(createElement(ComboboxFixture, props), { wrapper });
+  const input = view.getByRole("combobox", { name: "Options" });
+  const field = input.closest('[data-slot="combobox-chips"]');
+  assert.ok(field);
+  assert.ok(field.contains(view.getByText("Law")));
+  assert.ok(field.contains(view.getByText("Economics")));
+
+  await user.type(input, "L");
+  await user.keyboard("{Backspace}");
+  assert.ok(field.contains(view.getByText("Economics")));
+  await user.keyboard("{Backspace}");
+  assert.equal(view.queryByText("Economics"), null);
+  assert.ok(field.contains(view.getByText("Law")));
+  await user.keyboard("{Escape}");
+
+  view.rerender(createElement(ComboboxFixture, { ...props, disabled: true }));
+  assert.equal((input as HTMLInputElement).disabled, true);
+  await user.click(view.getByRole("button", { name: "Remove: Law" }));
+  assert.ok(field.contains(view.getByText("Law")));
+
+  view.rerender(createElement(ComboboxFixture, props));
+  await user.click(view.getByRole("button", { name: "Remove: Law" }));
+  assert.equal(view.queryByText("Law"), null);
+  assert.equal(document.activeElement, input);
+  assert.equal(saved.length, 0, "removing a chip must not submit the form");
+  await user.click(view.getByRole("button", { name: "Save" }));
+  await waitFor(() => assert.deepEqual(saved, [{ options: [] }]));
 });

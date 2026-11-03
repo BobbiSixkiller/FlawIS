@@ -5,7 +5,7 @@ export default defineConfig([
   ...nextCoreWebVitals,
   {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["src/components/Icon.tsx"],
+    ignores: ["src/components/icon.tsx"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -13,7 +13,7 @@ export default defineConfig([
           patterns: [
             {
               group: ["@heroicons/react", "@heroicons/react/**"],
-              message: "Use Icon from @/components/Icon so the icon provider stays centralized.",
+              message: "Use Icon from @/components/icon so the icon provider stays centralized.",
             },
           ],
         },

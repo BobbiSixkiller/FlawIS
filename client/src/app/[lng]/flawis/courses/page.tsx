@@ -1,11 +1,11 @@
-import Button from "@/components/Button";
-import Heading from "@/components/Heading";
-import Modal from "@/components/Modal";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import CourseForm from "./CourseForm";
+import { Button } from "@/components/ui/button";
+import Heading from "@/components/heading";
+import Modal from "@/components/modal";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import CourseForm from "./course-form";
 import { getCourses } from "./actions";
-import OfferingList from "@/components/OfferingList";
+import OfferingList from "@/components/offering-list";
 import Link from "next/link";
 
 export default async function CoursesPage({
@@ -27,10 +27,11 @@ export default async function CoursesPage({
         items={[
           <Button
             key={0}
-            as={Link}
-            href="/courses/categories"
             size="sm"
             variant="secondary"
+            nativeButton={false}
+            role="link"
+            render={<Link href="/courses/categories" />}
           >
             <Icon name="tag" className="size-5" /> Kategórie
           </Button>,

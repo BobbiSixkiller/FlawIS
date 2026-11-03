@@ -1,7 +1,7 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 
 import { InvoiceFragment } from "@/lib/graphql/generated/graphql";
-import InvoiceDoc from "./InvoiceDoc";
+import InvoiceDoc from "./invoice-doc";
 
 export function invoiceFilename(invoice: InvoiceFragment) {
   const variableSymbol = invoice.issuer.variableSymbol?.trim();

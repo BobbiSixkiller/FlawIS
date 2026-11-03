@@ -1,5 +1,5 @@
-import ResetPasswordForm from "./ResetPasswordForm";
-import { FormMessage } from "@/components/Message";
+import ResetPasswordForm from "./reset-password-form";
+import { FormMessage } from "@/components/message";
 import { translate } from "@/lib/i18n";
 import { cn } from "@/lib/utilsClient";
 import Link from "next/link";
@@ -18,15 +18,15 @@ export default async function ResetPassword({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl text-center font-bold leading-9 tracking-tight text-gray-900 dark:text-white/85">
+      <h1 className="text-2xl text-center font-bold leading-9 tracking-tight text-foreground dark:text-foreground">
         {t("heading")}
-      </h2>
+      </h1>
 
       <FormMessage />
 
       <div>
         <ResetPasswordForm lng={lng} token={token} />
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-10 text-center text-sm text-muted-foreground">
           <Trans
             i18nKey={"link"}
             t={t}
@@ -36,8 +36,8 @@ export default async function ResetPassword({
                   key="forgot"
                   href="/forgotPassword"
                   className={cn([
-                    "text-sm font-semibold text-primary-500 hover:text-primary-500/90 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                    "dark:text-primary-300 dark:hover:text-primary-300/90 dark:focus:ring-offset-gray-900",
+                    "text-sm font-semibold text-primary hover:text-primary/90 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
+                    "dark:text-primary dark:hover:text-primary/90 dark:focus:ring-offset-background",
                   ])}
                 />
               ),

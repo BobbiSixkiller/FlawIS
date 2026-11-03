@@ -1,17 +1,13 @@
 import { deleteFiles } from "@/lib/minio";
 import { minioDownloadHref } from "@/lib/minioUrl";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+export { cn } from "./utils";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function displayDate(utc?: string, locale: string = "sk") {
+export function displayDate(utc?: string | null, locale: string = "sk") {
   if (!utc) return "N/A";
 
   const date = new Date(utc);

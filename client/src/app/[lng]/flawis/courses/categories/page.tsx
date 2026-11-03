@@ -1,7 +1,7 @@
-import Heading from "@/components/Heading";
-import CloseButton from "@/components/CloseButton";
+import Heading from "@/components/heading";
+import CloseButton from "@/components/close-button";
 import { fetchCategories } from "../actions";
-import CategoriesManager from "./CategoriesManager";
+import CategoriesManager from "./categories-manager";
 
 export default async function CategoriesPage({
   params,

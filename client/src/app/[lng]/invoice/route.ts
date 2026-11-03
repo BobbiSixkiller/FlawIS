@@ -50,7 +50,7 @@ export async function POST(
 
   const pdf = await renderInvoiceToBuffer(data.invoice, lng);
 
-  return new Response(pdf, {
+  return new Response(new Uint8Array(pdf), {
     headers: invoicePdfHeaders(data.invoice),
   });
 }

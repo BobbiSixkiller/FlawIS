@@ -1,14 +1,14 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Heading from "@/components/Heading";
-import CloseButton from "@/components/CloseButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import Modal from "@/components/Modal";
-import CourseSessionForm from "../CourseSessionForm";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Heading from "@/components/heading";
+import CloseButton from "@/components/close-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import Modal from "@/components/modal";
+import CourseSessionForm from "../course-session-form";
 import { getCourseAttendance } from "./actions";
 import { getCourse } from "../actions";
-import { AttendanceTable } from "./AttendanceTable";
-import ExportButton from "@/components/ExportButton";
+import { AttendanceTable } from "./attendance-table";
+import ExportButton from "@/components/export-button";
 
 export default async function AttendancePage({
   params,

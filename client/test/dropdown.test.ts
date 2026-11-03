@@ -1,6 +1,7 @@
 import "./helpers/dom";
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import assert from "node:assert/strict";
+import userEvent from "@testing-library/user-event";
 import { afterEach, test } from "node:test";
 import { createElement, createRef } from "react";
 import { useDialogStore } from "../src/stores/dialogStore";
@@ -65,9 +66,9 @@ for (const activation of ["click", "keyboard"] as const) {
       // Touch release activates the registered menu item itself.
       fireEvent.click(item);
     } else {
-      const menu = view.getByRole("menu");
-      fireEvent.keyDown(menu, { key: "ArrowDown" });
-      fireEvent.keyDown(menu, { key: "Enter" });
+      const user = userEvent.setup();
+      act(() => item.focus());
+      await user.keyboard("{Enter}");
     }
     assert.equal(navigations, 1);
     assert.equal(
@@ -92,8 +93,9 @@ test("modal dropdown items forward menu behavior and refs to their buttons", asy
   const item = await view.findByRole("menuitem", { name: "Edit" });
   assert.equal(item, ref.current);
   assert.equal(item.tagName, "BUTTON");
-  fireEvent.keyDown(view.getByRole("menu"), { key: "ArrowDown" });
-  fireEvent.keyDown(view.getByRole("menu"), { key: "Enter" });
+  const user = userEvent.setup();
+  act(() => item.focus());
+  await user.keyboard("{Enter}");
   assert.equal(clicks, 1);
   assert.equal(useDialogStore.getState().isDialogOpen("edit"), true);
   assert.equal(

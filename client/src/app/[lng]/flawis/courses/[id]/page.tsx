@@ -1,16 +1,16 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Heading from "@/components/Heading";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Heading from "@/components/heading";
 import { deleteCourse, getCourse, getCourseReachConfig } from "./actions";
-import ModalTrigger from "@/components/ModalTrigger";
-import Button from "@/components/Button";
-import Icon from "@/components/Icon";
-import Modal from "@/components/Modal";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ModalTrigger from "@/components/modal-trigger";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/icon";
+import Modal from "@/components/modal";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { redirect } from "next/navigation";
-import CloseButton from "@/components/CloseButton";
+import CloseButton from "@/components/close-button";
 import Link from "next/link";
-import CourseForm from "../CourseForm";
-import Spinner from "@/components/Spinner";
+import CourseForm from "../course-form";
+import Spinner from "@/components/spinner";
 
 export default async function CoursePage({
   params,
@@ -61,10 +61,11 @@ export default async function CoursePage({
           </ModalTrigger>,
           <Button
             key={3}
-            as={Link}
             size="icon"
             className="rounded-full"
-            href={`/courses/${id}/attendance`}
+            nativeButton={false}
+            role="link"
+            render={<Link href={`/courses/${id}/attendance`} />}
           >
             <Icon name="users" className="size-5" />
             <span className="sm:hidden">Dochadzka</span>

@@ -2,7 +2,7 @@ import { downloadFile, uploadFile } from "@/lib/minio";
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
 import { getMe } from "../(auth)/actions";
-import archiver from "archiver";
+import { ZipArchive } from "archiver";
 import { translate } from "@/lib/i18n";
 
 function nodeStreamToWebReadable(stream: Readable): ReadableStream {
@@ -68,7 +68,7 @@ export async function GET(
       });
     } else {
       // Create a zip archive
-      const archive = archiver("zip", { zlib: { level: 9 } });
+      const archive = new ZipArchive( { zlib: { level: 9 } });
 
       // Create a PassThrough stream to convert it to a web-readable stream
       const zipStream = new Readable().wrap(archive);

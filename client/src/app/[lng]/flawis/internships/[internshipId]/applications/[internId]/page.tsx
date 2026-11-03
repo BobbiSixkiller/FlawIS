@@ -1,19 +1,23 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { Status } from "@/lib/graphql/generated/graphql";
-import { Application } from "@/app/[lng]/internships/[internshipId]/Application";
+import { Application } from "@/app/[lng]/internships/[internshipId]/application";
 import { getIntern } from "@/app/[lng]/internships/[internshipId]/applications/[internId]/actions";
-import CloseButton from "@/components/CloseButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import Button from "@/components/Button";
-import Modal from "@/components/Modal";
+import CloseButton from "@/components/close-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import { Button } from "@/components/ui/button";
+import Modal from "@/components/modal";
 import { translate } from "@/lib/i18n";
-import ChangeStatusForm from "./ChangeStatusForm";
+import ChangeStatusForm from "./change-status-form";
 import { redirect } from "next/navigation";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { deleteIntern } from "@/app/[lng]/internships/[internshipId]/actions";
 import { changeInternStatus } from "./actions";
-import Tooltip from "@/components/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export default async function InternPage({
   params,
@@ -56,15 +60,22 @@ export default async function InternPage({
                 <Icon name="trash" className="size-5" />
               </ModalTrigger>
             ) : (
-              <Tooltip message={t("deleteIntern.rejectFirst")}>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  disabled
-                  aria-label={t("deleteIntern.title")}
-                >
-                  <Icon name="trash" className="size-5" />
-                </Button>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      disabled
+                      aria-label={t("deleteIntern.title")}
+                    >
+                      <Icon name="trash" className="size-5" />
+                    </Button>
+                  }
+                />
+                <TooltipContent side="top" className="max-w-xs text-pretty">
+                  {t("deleteIntern.rejectFirst")}
+                </TooltipContent>
               </Tooltip>
             )}
 

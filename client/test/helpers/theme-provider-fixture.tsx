@@ -1,4 +1,4 @@
-import ThemeProvider from "../../src/components/ThemeProvider";
+import ThemeProvider from "../../src/components/theme-provider";
 import type { ThemePreference } from "../../src/lib/theme";
 
 export function ThemeProviderFixture({

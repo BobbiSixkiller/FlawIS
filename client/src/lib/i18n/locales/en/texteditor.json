@@ -1,1 +1,11 @@
-{ "linkPlaceholder": "Paste a link" }
+{
+  "linkPlaceholder": "Paste a link",
+  "link": "Link",
+  "applyLink": "Apply link",
+  "removeLink": "Remove link",
+  "bold": "Bold",
+  "italic": "Italic",
+  "underline": "Underline",
+  "strike": "Strikethrough",
+  "code": "Code"
+}

@@ -1,11 +1,11 @@
-import Heading from "@/components/Heading";
+import Heading from "@/components/heading";
 import { getConferences } from "./actions";
-import Icon from "@/components/Icon";
+import Icon from "@/components/icon";
 import { translate } from "@/lib/i18n";
-import OfferingList from "@/components/OfferingList";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import NewConferenceForm from "./NewConferenceForm";
+import OfferingList from "@/components/offering-list";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
+import NewConferenceForm from "./new-conference-form";
 
 export default async function Conferences({
   params,

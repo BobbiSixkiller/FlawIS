@@ -1,15 +1,19 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { Status } from "@/lib/graphql/generated/graphql";
-import { Application } from "../../Application";
+import { Application } from "../../application";
 import { translate } from "@/lib/i18n";
-import Tooltip from "@/components/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { getIntern } from "./actions";
-import CloseButton from "@/components/CloseButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import Modal from "@/components/Modal";
-import ChangeStatusForm from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/ChangeStatusForm";
-import CertificateForm from "./CertificateForm";
+import CloseButton from "@/components/close-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import Modal from "@/components/modal";
+import ChangeStatusForm from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/change-status-form";
+import CertificateForm from "./certificate-form";
 import { redirect } from "next/navigation";
 import { changeInternStatus } from "@/app/[lng]/flawis/internships/[internshipId]/applications/[internId]/actions";
 
@@ -43,33 +47,54 @@ export default async function InternPage({
         controls={
           <div className="ml-auto flex gap-2">
             {intern.status === Status.Accepted && (
-              <Tooltip message={t("internReview")}>
-                <ModalTrigger dialogId={certificateDialogId} size="icon">
-                  <Icon name="inbox-arrow-down" className="size-5" />
-                </ModalTrigger>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <ModalTrigger dialogId={certificateDialogId} size="icon">
+                      <Icon name="inbox-arrow-down" className="size-5" />
+                    </ModalTrigger>
+                  }
+                />
+                <TooltipContent side="top" className="max-w-xs text-pretty">
+                  {t("internReview")}
+                </TooltipContent>
               </Tooltip>
             )}
 
-            <Tooltip message={t("accept")}>
-              <ModalTrigger
-                dialogId={statusDialogId(Status.Accepted)}
-                size="icon"
-                variant="positive"
-                disabled={intern.status === Status.Accepted}
-              >
-                <Icon name="check" className="size-5" />
-              </ModalTrigger>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <ModalTrigger
+                    dialogId={statusDialogId(Status.Accepted)}
+                    size="icon"
+                    variant="positive"
+                    disabled={intern.status === Status.Accepted}
+                  >
+                    <Icon name="check" className="size-5" />
+                  </ModalTrigger>
+                }
+              />
+              <TooltipContent side="top" className="max-w-xs text-pretty">
+                {t("accept")}
+              </TooltipContent>
             </Tooltip>
 
-            <Tooltip message={t("reject")}>
-              <ModalTrigger
-                dialogId={statusDialogId(Status.Rejected)}
-                size="icon"
-                variant="destructive"
-                disabled={intern.status === Status.Rejected}
-              >
-                <Icon name="x-mark" className="size-5" />
-              </ModalTrigger>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <ModalTrigger
+                    dialogId={statusDialogId(Status.Rejected)}
+                    size="icon"
+                    variant="destructive"
+                    disabled={intern.status === Status.Rejected}
+                  >
+                    <Icon name="x-mark" className="size-5" />
+                  </ModalTrigger>
+                }
+              />
+              <TooltipContent side="top" className="max-w-xs text-pretty">
+                {t("reject")}
+              </TooltipContent>
             </Tooltip>
           </div>
         }

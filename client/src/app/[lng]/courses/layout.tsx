@@ -1,7 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 
-import ParticipantTenantShell from "@/components/ParticipantTenantShell";
+import ParticipantTenantShell from "@/components/participant-tenant-shell";
 import { translate } from "@/lib/i18n";
 import { getMe } from "../(auth)/actions";
 

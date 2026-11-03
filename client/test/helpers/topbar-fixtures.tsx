@@ -8,9 +8,9 @@ import {
 } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import en from "../../src/lib/i18n/locales/en/dashboard.json";
 import sk from "../../src/lib/i18n/locales/sk/dashboard.json";
-import TopBar from "../../src/components/TopBar";
-import AccountMenu from "../../src/components/AccountMenu";
-import { BreadcrumbLabel } from "../../src/components/BreadcrumbLabels";
+import TopBar from "../../src/components/top-bar";
+import AccountMenu from "../../src/components/account-menu";
+import { BreadcrumbLabel } from "../../src/components/breadcrumb-labels";
 
 const i18n = createInstance();
 const ignoreRender: ProfilerOnRenderCallback = () => {};
@@ -19,7 +19,7 @@ void i18n.use(initReactI18next).init({
   fallbackLng: "en",
   defaultNS: "dashboard",
   resources: { en: { dashboard: en }, sk: { dashboard: sk } },
-  initImmediate: false,
+  initAsync: false,
 });
 
 export function TestTopBar({

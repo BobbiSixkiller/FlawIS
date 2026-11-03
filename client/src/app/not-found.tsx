@@ -1,5 +1,5 @@
-import Button from "@/components/Button";
-import Logo from "@/components/Logo";
+import { Button } from "@/components/ui/button";
+import Logo from "@/components/logo";
 import { translate } from "@/lib/i18n";
 import {
   cookieName,
@@ -7,7 +7,7 @@ import {
   getSupportedLocale,
   localeHeaderName,
 } from "@/lib/i18n/settings";
-import Icon from "@/components/Icon";
+import Icon from "@/components/icon";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
 
@@ -20,14 +20,19 @@ export default async function NotFound() {
   const { t } = await translate(lng, ["common", "landing"]);
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center gap-6 dark:bg-gray-900">
+    <div className="h-screen flex flex-col items-center justify-center gap-6 dark:bg-card">
       <div>
         <Logo lng={lng} height={60} width={60} />
       </div>
-      <h1 className="text-2xl dark:text-white/85">
+      <h1 className="text-2xl dark:text-foreground">
         {t("notFoundMsg", { ns: "common" })}
       </h1>
-      <Button as={Link} href="/" className="rounded-full">
+      <Button
+        className="rounded-full"
+        nativeButton={false}
+        role="link"
+        render={<Link href="/" />}
+      >
         <Icon name="home" className="h-5 w-5" />
         {t("home", { ns: "common" })}
       </Button>

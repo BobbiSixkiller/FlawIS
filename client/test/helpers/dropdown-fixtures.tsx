@@ -1,7 +1,8 @@
 import { Suspense, type Ref, type ReactElement } from "react";
-import Dropdown from "../../src/components/Dropdown";
-import ExportButton from "../../src/components/ExportButton";
-import ModalTrigger from "../../src/components/ModalTrigger";
+import Dropdown from "../../src/components/dropdown";
+import ExportButton from "../../src/components/export-button";
+import ModalTrigger from "../../src/components/modal-trigger";
+import { Button } from "../../src/components/ui/button";
 
 // Next.js can stream labels and icons into a client ModalTrigger.
 const streamedContent = Promise.resolve(<>Streamed edit</>);
@@ -43,9 +44,15 @@ export function LanguageDropdown({ onClick }: { onClick: () => void }) {
     <Dropdown
       trigger="Language"
       items={[
-        <a key="en" href="#english" onClick={onClick}>
+        <Button
+          key="en"
+          nativeButton={false}
+          role="link"
+          render={<a href="#english" />}
+          onClick={onClick}
+        >
           English
-        </a>,
+        </Button>,
       ]}
     />
   );

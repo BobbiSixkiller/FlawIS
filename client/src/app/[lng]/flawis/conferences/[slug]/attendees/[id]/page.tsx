@@ -1,22 +1,26 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Heading from "@/components/Heading";
-import DownloadInvoiceButton from "@/components/DownloadInvoiceButton";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Heading from "@/components/heading";
+import DownloadInvoiceButton from "@/components/download-invoice-button";
 import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
-import Icon from "@/components/Icon";
+import Icon from "@/components/icon";
 import { redirect } from "next/navigation";
 import { capitalizeFirstLetter, cn } from "@/lib/utilsClient";
-import RemoveAuthorForm from "./RemoveAuthorForm";
+import RemoveAuthorForm from "./remove-author-form";
 import { deleteAttendee, getAttendee } from "./actions";
-import CloseButton from "@/components/CloseButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/ImpersonateForm";
-import UpdateInvoiceForm from "./InvoiceForm";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import CloseButton from "@/components/close-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
+import ImpersonateForm from "@/app/[lng]/flawis/users/[id]/impersonate-form";
+import UpdateInvoiceForm from "./invoice-form";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { getConference } from "@/app/[lng]/flawis/conferences/actions";
-import SubmissionForm from "@/app/[lng]/conferences/[slug]/SubmissionForm";
+import SubmissionForm from "@/app/[lng]/conferences/[slug]/submission-form";
 import { translate } from "@/lib/i18n";
-import Tooltip from "@/components/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export default async function AttendeePage({
   params,
@@ -102,8 +106,8 @@ export default async function AttendeePage({
             <div
               key={s.id}
               className={cn([
-                "rounded-2xl border p-4 shadow-sm text-gray-900 text-sm focus:outline-primary-500 col-span-2 sm:col-span-1",
-                "dark:border-gray-700 dark:bg-gray-700 dark:text-white",
+                "rounded-2xl border p-4 shadow-sm text-foreground text-sm focus:ring-ring col-span-2 sm:col-span-1",
+                "dark:border-border dark:bg-muted dark:text-foreground",
               ])}
             >
               <div className="flex items-start justify-between gap-2">
@@ -113,22 +117,32 @@ export default async function AttendeePage({
                       s.translations[lng as "sk" | "en"].name,
                     )}
                   </h2>
-                  <p className="leading-none text-gray-500">
+                  <p className="leading-none text-muted-foreground">
                     {s.section.translations[lng as "sk" | "en"].name}
                     <br />
                     {s.id}
                   </p>
                 </div>
 
-                <Tooltip message={t("editSubmission")} position="below">
-                  <ModalTrigger
-                    dialogId={`${updateSubmissionDialogId}-${s.id}`}
-                    size="icon"
-                    variant="ghost"
-                    aria-label={t("editSubmission")}
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <ModalTrigger
+                        dialogId={`${updateSubmissionDialogId}-${s.id}`}
+                        size="icon"
+                        variant="ghost"
+                        aria-label={t("editSubmission")}
+                      >
+                        <Icon name="pencil" className="w-5 h-5" />
+                      </ModalTrigger>
+                    }
+                  />
+                  <TooltipContent
+                    side="bottom"
+                    className="max-w-xs text-pretty"
                   >
-                    <Icon name="pencil" className="w-5 h-5" />
-                  </ModalTrigger>
+                    {t("editSubmission")}
+                  </TooltipContent>
                 </Tooltip>
               </div>
               <ul className="mt-2 flex gap-1">

@@ -87,7 +87,7 @@ test("wraps long invoice content across numbered A4 pages", async () => {
   assert.ok((pageCount ?? 0) > 1);
 });
 
-test("renders when optional issuer fields are absent", async () => {
+test("renders when optional issuer fields are null", async () => {
   const pdf = await renderInvoiceToBuffer(
     {
       ...invoice,
@@ -95,6 +95,11 @@ test("renders when optional issuer fields are absent", async () => {
         name: invoice.issuer.name,
         address: invoice.issuer.address,
         variableSymbol: invoice.issuer.variableSymbol,
+        ICO: null,
+        ICDPH: null,
+        DIC: null,
+        IBAN: null,
+        SWIFT: null,
       },
     },
     "en",

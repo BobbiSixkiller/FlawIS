@@ -1,12 +1,12 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Dropdown from "@/components/Dropdown";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Dropdown from "@/components/dropdown";
 import { getConference } from "../../actions";
-import Icon from "@/components/Icon";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
+import Icon from "@/components/icon";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
 import { redirect } from "next/navigation";
-import TicketForm from "./TicketForm";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import TicketForm from "./ticket-form";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { deleteTicket } from "./actions";
 
 export default async function TicketsPage({
@@ -37,17 +37,17 @@ export default async function TicketsPage({
         Novy
       </ModalTrigger>
 
-      <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
+      <div className="-mx-6 sm:mx-0 divide-y dark:divide-border">
         {conference?.tickets.map((t) => (
           <div
-            className="p-6 sm:p-4 flex justify-between gap-4 text-gray-900 dark:text-white"
+            className="p-6 sm:p-4 flex justify-between gap-4 text-foreground dark:text-foreground"
             key={t.id}
           >
             <div className="flex flex-col">
               <span className="text-lg">
                 {t.translations[lng as "sk" | "en"].name}
               </span>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-muted-foreground">
                 {t.translations[lng as "sk" | "en"].description}
               </span>
             </div>

@@ -1,6 +1,6 @@
-import Heading from "@/components/Heading";
+import Heading from "@/components/heading";
 import { getConferences } from "../flawis/conferences/actions";
-import OfferingList from "@/components/OfferingList";
+import OfferingList from "@/components/offering-list";
 import { translate } from "@/lib/i18n";
 import { ConferencesQueryVariables } from "@/lib/graphql/generated/graphql";
 

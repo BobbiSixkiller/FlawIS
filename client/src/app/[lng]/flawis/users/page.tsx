@@ -1,14 +1,14 @@
-import Heading from "@/components/Heading";
+import Heading from "@/components/heading";
 import { getUsers } from "./actions";
-import ListUsers from "./ListUsers";
-import Icon from "@/components/Icon";
+import ListUsers from "./list-users";
+import Icon from "@/components/icon";
 import { translate } from "@/lib/i18n";
-import Modal from "@/components/Modal";
-import ModalTrigger from "@/components/ModalTrigger";
-import UserForm from "../../(auth)/register/UserForm";
-import RegistrationInviteForm from "./RegistrationInviteForm";
+import Modal from "@/components/modal";
+import ModalTrigger from "@/components/modal-trigger";
+import UserForm from "../../(auth)/register/user-form";
+import RegistrationInviteForm from "./registration-invite-form";
 import { Access, UsersQueryVariables } from "@/lib/graphql/generated/graphql";
-import UrlFilter from "@/components/UrlFilter";
+import UrlFilter from "@/components/url-filter";
 
 export default async function Users({
   params,
@@ -76,7 +76,7 @@ export default async function Users({
           ]}
         />
 
-        <div className="ml-auto text-xl font-bold dark:text-white">
+        <div className="ml-auto text-xl font-bold dark:text-foreground">
           {initialData.totalCount}
         </div>
       </div>

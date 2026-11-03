@@ -1,15 +1,15 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Dropdown, { DropdownItem } from "@/components/Dropdown";
-import Icon from "@/components/Icon";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Dropdown, { DropdownItem } from "@/components/dropdown";
+import Icon from "@/components/icon";
 import { conferenceSections, deleteSection } from "./actions";
 import {
   SectionFragment,
   SubmissionFilesFragment,
 } from "@/lib/graphql/generated/graphql";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import SectionForm from "./SectionForm";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
+import SectionForm from "./section-form";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import Link from "next/link";
 
 export default async function SectionsPage({
@@ -35,7 +35,7 @@ export default async function SectionsPage({
         Nova
       </ModalTrigger>
 
-      <div className="-mx-6 sm:mx-0 divide-y dark:divide-gray-600">
+      <div className="-mx-6 sm:mx-0 divide-y dark:divide-border">
         {conference?.sections.map((s) => (
           <Section key={s.id} lng={lng} section={s} />
         ))}
@@ -79,12 +79,12 @@ function Section({
   ];
 
   return (
-    <div className="p-6 sm:p-4 flex justify-between sm:items-center gap-4 dark:text-white">
+    <div className="p-6 sm:p-4 flex justify-between sm:items-center gap-4 dark:text-foreground">
       <div className="flex flex-col w-3/4">
         <span className="text-lg">
           {section.translations[lng as "sk" | "en"].name}
         </span>
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-muted-foreground">
           {section.translations[lng as "sk" | "en"].topic}
         </span>
         <span className="whitespace-nowrap sm:hidden text-sm">
@@ -132,11 +132,13 @@ function Section({
         />
       </Modal>
       <Modal dialogId={updateSectionDialogId} title="Aktualizovat sekciu">
-        <SectionForm
-          dialogId={updateSectionDialogId}
-          conferenceId={section.conference?.id}
-          section={section}
-        />
+        {section.conference && (
+          <SectionForm
+            dialogId={updateSectionDialogId}
+            conferenceId={section.conference.id}
+            section={section}
+          />
+        )}
       </Modal>
     </div>
   );

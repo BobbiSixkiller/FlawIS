@@ -1,16 +1,16 @@
-import { BreadcrumbLabel } from "@/components/BreadcrumbLabels";
-import Heading from "@/components/Heading";
-import Toggle from "@/components/Toggle";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+import Heading from "@/components/heading";
+import Toggle from "@/components/toggle";
 import { redirect } from "next/navigation";
-import Icon from "@/components/Icon";
+import Icon from "@/components/icon";
 import Link from "next/link";
 import { deleteUser, getUser, toggleVerified } from "./actions";
 import { translate } from "@/lib/i18n";
-import ModalTrigger from "@/components/ModalTrigger";
-import Modal from "@/components/Modal";
-import UserForm from "@/app/[lng]/(auth)/register/UserForm";
-import ImpersonateForm from "./ImpersonateForm";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ModalTrigger from "@/components/modal-trigger";
+import Modal from "@/components/modal";
+import UserForm from "@/app/[lng]/(auth)/register/user-form";
+import ImpersonateForm from "./impersonate-form";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 
 export default async function User({
   params,
@@ -66,45 +66,45 @@ export default async function User({
           </ModalTrigger>,
         ]}
       />
-      <div className="mt-6 border-t border-gray-100 dark:border-gray-700">
-        <dl className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="mt-6 border-t border-border dark:border-border">
+        <dl className="divide-y divide-border dark:divide-border">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("name")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user.name}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("email")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user.email}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("org")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user.organization || "N/A"}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("phone")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user.telephone || "N/A"}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("access")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 flex flex-col gap-1">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0 flex flex-col gap-1">
               {user.access.length > 0 ? (
                 <ul>
                   {user.access.map((item, i) => (
@@ -117,7 +117,7 @@ export default async function User({
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 items-center">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("status")}
             </dt>
             <dd
@@ -136,22 +136,22 @@ export default async function User({
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("studyProgramme")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user.studyProgramme ? t(user.studyProgramme) : "N/A"}
             </dd>
           </div>
           <div className="py-6 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium leading-6 text-gray-900 dark:text-white">
+            <dt className="text-sm font-medium leading-6 text-foreground dark:text-foreground">
               {t("cv")}
             </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0">
+            <dd className="mt-1 text-sm leading-6 text-foreground dark:text-muted-foreground sm:col-span-2 sm:mt-0">
               {user?.cvUrl ? (
                 <Link
                   href={`/minio?bucketName=resumes&url=${user.cvUrl}`}
-                  className="text-primary-500 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   CV.pdf
                 </Link>

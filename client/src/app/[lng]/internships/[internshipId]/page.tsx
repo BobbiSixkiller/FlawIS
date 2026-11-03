@@ -2,16 +2,16 @@ import Link from "next/link";
 import { deleteIntern, deleteInternship, getInternship } from "./actions";
 import { notFound } from "next/navigation";
 import { Status } from "@/lib/graphql/generated/graphql";
-import { Application } from "./Application";
-import BackButton from "@/components/BackButton";
-import ModalTrigger from "@/components/ModalTrigger";
-import Icon from "@/components/Icon";
-import Button from "@/components/Button";
-import Modal from "@/components/Modal";
-import InternshipForm from "../InternshipForm";
+import { Application } from "./application";
+import BackButton from "@/components/back-button";
+import ModalTrigger from "@/components/modal-trigger";
+import Icon from "@/components/icon";
+import { Button } from "@/components/ui/button";
+import Modal from "@/components/modal";
+import InternshipForm from "../internship-form";
 import { translate } from "@/lib/i18n";
-import ApplicationForm from "./ApplicationForm";
-import ConfirmDeleteForm from "@/components/ConfirmDeleteForm";
+import ApplicationForm from "./application-form";
+import ConfirmDeleteForm from "@/components/confirm-delete-form";
 import { getOptionalViewer } from "@/lib/optionalViewer";
 import { getInternshipAccess, isObjectId } from "@/lib/internshipAccess";
 import { loginHref, logoutHref } from "@/lib/authRedirect";
@@ -81,14 +81,14 @@ export default async function InternshipPage({
         dangerouslySetInnerHTML={{ __html: internship.description }}
       />
 
-      <p className="text-sm text-gray-500 dark:text-gray-300">
+      <p className="text-sm text-muted-foreground dark:text-muted-foreground">
         {t("applicationsCount", { count: internship.applicationsCount })}
       </p>
 
       {access.canApply && user ? (
         internship.myApplication ? (
           <>
-            <div className="border-t dark:border-gray-600" />
+            <div className="border-t dark:border-border" />
             <Application
               lng={lng}
               application={internship.myApplication}
@@ -134,7 +134,12 @@ export default async function InternshipPage({
           </>
         )
       ) : !user ? (
-        <Button as={Link} href={signInHref} className="w-full">
+        <Button
+          className="w-full"
+          nativeButton={false}
+          role="link"
+          render={<Link href={signInHref} />}
+        >
           <Icon name="inbox-arrow-down" className="size-5 stroke-2 mr-2" />
           {t("signInToApply")}
         </Button>

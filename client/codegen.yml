@@ -8,5 +8,12 @@ generates:
       fragmentMasking: false
     config:
       documentMode: "string"
-      addTypename: true
+      enumType: "native"
+      strictScalars: true
+      scalars:
+        ObjectId: "string"
+        DateTimeISO:
+          input: "string | Date"
+          output: "string"
+        JSONObject: "Record<string, unknown>"
     plugins: []

@@ -1,0 +1,124 @@
+import Avatar from "@/components/avatar";
+import { ApplicationFragment } from "@/lib/graphql/generated/graphql";
+import { translate } from "@/lib/i18n";
+import { displayDate } from "@/lib/utilsClient";
+import Icon from "@/components/icon";
+import Link from "next/link";
+import { ReactNode } from "react";
+
+export async function Application({
+  application,
+  controls,
+  lng,
+}: {
+  application: ApplicationFragment;
+  controls: ReactNode;
+  lng: string;
+}) {
+  const { t } = await translate(lng, ["internships", "common"]);
+
+  return (
+    <div className="p-4 rounded-lg border border-primary bg-accent dark:text-foreground dark:bg-primary-800 shadow-xs space-y-3">
+      <h2 className="text-xl text-primary dark:text-primary font-semibold">
+        {t("application")}
+      </h2>
+
+      <div className="flex items-center flex-wrap gap-6">
+        <div className="relative flex items-center gap-x-4">
+          <Avatar
+            name={application.user.name}
+            avatarUrl={application.user.avatarUrl}
+          />
+          <div className="">
+            <p className="font-semibold text-foreground dark:text-foreground">
+              {application.user.name}
+            </p>
+            <p className="text-muted-foreground dark:text-muted-foreground">
+              {t(application.user.studyProgramme)}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex flex-wrap gap-2">
+            <p>{t("contact")}:</p>
+            <ul className="flex flex-wrap gap-2">
+              <li>
+                <a
+                  className="text-primary dark:text-primary hover:underline inline-flex gap-1 items-center"
+                  href={`mailto:${application.user.email}`}
+                >
+                  <Icon name="envelope" className="size-4" />{" "}
+                  {application.user.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  className="text-primary dark:text-primary hover:underline inline-flex gap-1 items-center"
+                  href={`tel:${application.user.telephone}`}
+                >
+                  <Icon name="phone" className="size-4" />{" "}
+                  {application.user.telephone}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <p>{t("address", { ns: "common" })}:</p>
+            <p>{Object.values(application.user.address).join(", ")}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <p>{t("files")}</p>
+            <ul className="flex flex-wrap gap-2">
+              {application.fileUrls.map((url, i) => {
+                const fileName =
+                  url.split("/").pop()?.split("-").pop() || "File";
+
+                return (
+                  <li key={i}>
+                    <Link
+                      className="text-primary dark:text-primary hover:underline"
+                      href={`/minio?bucketName=internships&url=${url}`}
+                    >
+                      {fileName}
+                    </Link>
+                  </li>
+                );
+              })}
+              {application.organizationFeedbackUrl && (
+                <li>
+                  <Link
+                    className="text-primary dark:text-primary hover:underline"
+                    href={`/minio?bucketName=internships&url=${application.organizationFeedbackUrl}`}
+                  >
+                    {application.organizationFeedbackUrl
+                      .split("/")
+                      .pop()
+                      ?.split("-")
+                      .pop() || "File"}
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-2 justify-between">
+        <div className="flex flex-col">
+          Status: {t(application.status)}
+          <span className="text-sm">
+            {t("updatedAt", {
+              ns: "common",
+              value: displayDate(application.updatedAt, lng),
+            })}
+          </span>
+        </div>
+
+        {controls}
+      </div>
+    </div>
+  );
+}

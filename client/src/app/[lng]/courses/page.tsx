@@ -1,6 +1,6 @@
 import { getCourses } from "../flawis/courses/actions";
-import OfferingList from "@/components/OfferingList";
-import UrlFilter from "@/components/UrlFilter";
+import OfferingList from "@/components/offering-list";
+import UrlFilter from "@/components/url-filter";
 import { translate } from "@/lib/i18n";
 import {
   CourseSortableField,

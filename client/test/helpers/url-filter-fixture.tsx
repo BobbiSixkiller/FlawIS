@@ -11,7 +11,7 @@ import {
 } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import UrlFilter, {
   type UrlFilterConfig,
-} from "../../src/components/UrlFilter";
+} from "../../src/components/url-filter";
 import en from "../../src/lib/i18n/locales/en/common.json";
 
 const i18n = createInstance();
@@ -19,7 +19,7 @@ void i18n.use(initReactI18next).init({
   lng: "en",
   fallbackLng: "en",
   defaultNS: "common",
-  initImmediate: false,
+  initAsync: false,
   resources: { en: { common: en } },
 });
 
@@ -55,6 +55,7 @@ export function UrlFilterFixture({
   );
   const router = useMemo<AppRouterInstance>(
     () => ({
+      bfcacheId: "test",
       back() {},
       forward() {},
       refresh() {},
