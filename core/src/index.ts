@@ -7,6 +7,17 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { connect } from "mongoose";
+import { getModelForClass } from "@typegoose/typegoose";
+import * as ReviewModels from "./entitites/Review";
+import {
+  Form,
+  FormDefinition,
+  FormBinding,
+  FormAnswer,
+  FormAnswerRevision,
+} from "./entitites/Form";
+import { Notification } from "./entitites/Notification";
+import { StoredObject } from "./entitites/StoredObject";
 
 import { ObjectId } from "mongodb";
 import { JSONObject, ObjectIdScalar } from "./util/scalars";
@@ -19,6 +30,7 @@ import { createContext } from "./util/auth";
 import { authChecker } from "./util/auth";
 
 import env from "dotenv";
+import { ActivityMiddleware } from "./middlewares/activity.middleware";
 import { I18nMiddleware } from "./middlewares/i18n.middleware";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
@@ -36,6 +48,9 @@ import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resol
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
 import { CategoryResolver } from "./resolvers/courses/category.resolver";
 import { registerReach360Webhook } from "./routes/reach360Webhook";
+import { ReviewResolver } from "./resolvers/reviews/review.resolver";
+import { registerReviewRoutes } from "./routes/reviews";
+import { RmqService } from "./services/rmq.service";
 import { InvoiceResolver } from "./resolvers/invoice.resolver";
 
 env.config();
@@ -73,15 +88,21 @@ async function main() {
       AttendanceRecordResolver,
       CategoryResolver,
       InvoiceResolver,
+      ReviewResolver,
     ],
     // use document converting middleware
-    globalMiddlewares: [TypegooseMiddleware, I18nMiddleware, ErrorsMiddleware],
+    globalMiddlewares: [
+      TypegooseMiddleware,
+      I18nMiddleware,
+      ErrorsMiddleware,
+      ActivityMiddleware,
+    ],
     // use ObjectId scalar mapping
     scalarsMap: [
       { type: ObjectId, scalar: ObjectIdScalar },
       { type: Object, scalar: JSONObject },
     ],
-    emitSchemaFile: true,
+    emitSchemaFile: "schema.graphql",
     container: Container,
     validate: true,
     authChecker,
@@ -118,14 +139,30 @@ async function main() {
   );
   app.use(cookieParser());
   registerReach360Webhook(app);
+  registerReviewRoutes(app);
   app.use(
     "/graphql",
-    Express.json(),
+    Express.json({ limit: "2mb" }),
     expressMiddleware(server, { context: async (ctx) => createContext(ctx) }),
   );
 
   await mongoDbConnect();
+  // Verify required collections/unique indexes before accepting review writes.
+  const reviewModels = [
+    ...Object.values(ReviewModels),
+    Form,
+    FormDefinition,
+    FormBinding,
+    FormAnswer,
+    FormAnswerRevision,
+    Notification,
+    StoredObject,
+  ];
+  await Promise.all(
+    reviewModels.map((model) => getModelForClass(model as any).init()),
+  );
   cronService.start();
+  Container.get(RmqService).start();
 
   httpServer.listen({ port }, () =>
     console.log(
@@ -134,4 +171,7 @@ async function main() {
   );
 }
 
-main().catch((err) => console.log("MAIN ERROR, ", err));
+main().catch((err) => {
+  console.error("Core startup failed:", err);
+  process.exit(1);
+});

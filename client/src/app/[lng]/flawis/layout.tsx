@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
+import { getReviewContext } from "@/lib/reviews/actions";
 import Dashboard from "@/components/dashboard";
 
 export async function generateMetadata(
@@ -60,7 +61,11 @@ export default async function DashboardLayout({
   params: Promise<{ lng: string }>;
 }) {
   const user = await getMe();
-  if (!user?.access.includes(Access.Admin)) {
+  const reviewContext = user ? await getReviewContext() : null;
+  const isAdmin = Boolean(user?.access.includes(Access.Admin));
+  const canManageLibrary =
+    isAdmin || Boolean(reviewContext?.scopes.some((s) => !s.section));
+  if (!user || (!isAdmin && !reviewContext?.scopes.length)) {
     redirect("/logout");
   }
 
@@ -74,14 +79,42 @@ export default async function DashboardLayout({
         lng={lng}
         user={user}
         navItems={[
-          { title: t("users"), href: "/users", icon: "users" },
+          ...(isAdmin
+            ? [{ title: t("users"), href: "/users", icon: "users" as const }]
+            : []),
           {
             title: t("conferences"),
             href: "/conferences",
             icon: "building-library",
           },
-          { title: t("internships"), href: "/internships", icon: "briefcase" },
-          { title: t("courses"), href: "/courses", icon: "academic-cap" },
+          {
+            title: lng === "en" ? "Reviewers" : "Recenzenti",
+            href: "/reviewers",
+            icon: "users",
+          },
+          ...(canManageLibrary
+            ? [
+                {
+                  title: lng === "en" ? "Forms" : "Formuláre",
+                  href: "/forms",
+                  icon: "folder-open" as const,
+                },
+              ]
+            : []),
+          ...(isAdmin
+            ? [
+                {
+                  title: t("internships"),
+                  href: "/internships",
+                  icon: "briefcase" as const,
+                },
+                {
+                  title: t("courses"),
+                  href: "/courses",
+                  icon: "academic-cap" as const,
+                },
+              ]
+            : []),
         ]}
       >
         {children}

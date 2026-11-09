@@ -17,6 +17,19 @@ enum Access {
   Student
 }
 
+type ActivityEvent {
+  action: String!
+  actor: String!
+  actorName: String
+  changes: JSONObject!
+  conference: ObjectId
+  createdAt: DateTimeISO!
+  id: ObjectId!
+  originalActor: String
+  requestId: String!
+  submission: ObjectId
+}
+
 type Address {
   city: String!
   country: String!
@@ -281,6 +294,7 @@ type Course {
 """Connects a system user with a particular course."""
 type CourseAttendee {
   application: FormSubmission!
+  applicationForm: Form!
   course: ObjectId!
   createdAt: DateTimeISO!
   elearningErrorCode: String
@@ -426,7 +440,15 @@ enum ElearningProvisioningStatus {
   SyncFailed
 }
 
-"""Supported registration form field types"""
+type FeedbackRelease {
+  createdAt: DateTimeISO!
+  feedback: JSONObject!
+  id: ObjectId!
+  round: ObjectId!
+  submission: ObjectId!
+}
+
+"""Supported shared form field types"""
 enum FieldType {
   FileUpload
   RadioGroup
@@ -436,12 +458,23 @@ enum FieldType {
 }
 
 type Form {
-  course: ObjectId!
+  course: ObjectId
   createdAt: DateTimeISO!
+  definition: ObjectId!
   fields: [FormField!]!
   id: ObjectId!
   updatedAt: DateTimeISO!
   version: Int!
+}
+
+type FormDefinition {
+  archived: Boolean!
+  createdAt: DateTimeISO!
+  description: String!
+  id: ObjectId!
+  latestVersion: Int!
+  name: String!
+  updatedAt: DateTimeISO!
 }
 
 type FormField {
@@ -473,6 +506,9 @@ type FormSubmission {
   createdAt: DateTimeISO!
   form: ObjectId!
   formVersion: Int!
+  id: ObjectId!
+  revision: Int!
+  submitted: Boolean!
   updatedAt: DateTimeISO!
 }
 
@@ -480,6 +516,7 @@ input FormSubmissionInput {
   answers: JSONObject!
   form: ObjectId!
   formVersion: Int!
+  revision: Int
 }
 
 interface IMutationResponse {
@@ -687,8 +724,12 @@ type Mutation {
   acceptAuthorInvite: SubmissionMutationResponse!
   activateUser: UserMutationResponse!
   addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
+  archiveLibraryForm(definition: ObjectId!): Boolean!
+  bindCourseRegistrationForm(course: ObjectId!, form: ObjectId!): Form!
   changeCourseAttendeeStatus(id: ObjectId!, status: Status!): CourseAttendeeMutationResponse!
   changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
+  conferenceReviewAction(action: String!, data: JSONObject!, submission: ObjectId!): JSONObject!
+  configureConferenceReviews(conference: ObjectId!, data: JSONObject!): ReviewSettings!
   createCategory(data: CategoryInput!): CategoryMutationResponse!
   createConference(data: ConferenceInput!): ConferenceMutationResponse!
   createCourse(data: CourseInput!): CourseMutationResponse!
@@ -696,9 +737,11 @@ type Mutation {
   createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
   createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
   createInternship(input: InternshipInput!): InternshipMutationResponse!
+  createLibraryForm(description: String! = "", name: String!): FormDefinition!
   createSection(data: SectionInput!): SectionMutationResponse!
   createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
   createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
+  declineReview(token: String!): JSONObject!
   deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
   deleteCategory(id: ObjectId!): CategoryMutationResponse!
   deleteConference(id: ObjectId!): ConferenceMutationResponse!
@@ -711,13 +754,22 @@ type Mutation {
   deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
   deleteTicket(slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   deleteUser(id: ObjectId!): UserMutationResponse!
+  enterReviewReport(answers: JSONObject!, assignment: ObjectId!, expectedRevision: Int): JSONObject!
   googleSignIn(authCode: String!, redirectUri: String!): UserMutationResponse!
+  impersonateUser(id: ObjectId!): UserMutationResponse!
   inviteUsers(input: OrganizationEmailsInput!): String!
   login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
+  publishLibraryForm(definition: ObjectId!, description: String, fields: [FormFieldInput!]!, name: String): Form!
   register(data: RegisterUserInput!): UserMutationResponse!
   removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
+  revokeReviewCoordinator(id: ObjectId!): Boolean!
+  saveReviewReport(answers: JSONObject!, expectedRevision: Int, submit: Boolean! = false, token: String!): JSONObject!
+  saveReviewer(data: JSONObject!, id: ObjectId): Reviewer!
+  setReviewCoordinator(conference: ObjectId!, email: String!, section: ObjectId): Boolean!
+  setReviewerEligibility(conference: ObjectId!, data: JSONObject!, reviewer: ObjectId!): Boolean!
+  stopImpersonation: UserMutationResponse!
   syncCourseElearningAccess(attendeeId: ObjectId!): CourseAttendeeMutationResponse!
   toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
   updateAttendanceHours(hoursAttended: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
@@ -764,24 +816,40 @@ enum PresentationLng {
 }
 
 type Query {
+  assignmentEligibility(reviewer: ObjectId!, submission: ObjectId!): JSONObject!
   attendee(id: ObjectId!): Attendee!
   attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
+  authorReviewFeedback(submission: ObjectId!): [FeedbackRelease!]!
+  authorReviewWorkspace(submission: ObjectId!): JSONObject!
   categories(search: String): [Category!]!
   conference(slug: String!): Conference!
+  conferenceActivity(before: ObjectId, conference: ObjectId!, submission: ObjectId): [ActivityEvent!]!
+  conferenceReviewQueue(after: ObjectId, conference: ObjectId!, delivery: String, first: Int! = 30, reviewer: String, search: String, section: ObjectId, stage: String): JSONObject!
+  conferenceReviewSettings(conference: ObjectId!): ReviewSettings
   conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
   course(id: ObjectId!): Course!
   courseAttendee(id: ObjectId!): CourseAttendee!
   courseReachConfig(courseId: ObjectId!): ReachCourseConfig
   courses(after: String, filter: CourseFilterInput, first: Int! = 20, sort: [CourseSortInput]!): CourseConnection!
   forgotPassword(email: String!): String!
+  formLibrary(search: String! = ""): [FormDefinition!]!
+  formVersions(definition: ObjectId!): [Form!]!
   intern(id: ObjectId!): Intern!
   interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
   internship(id: ObjectId!): Internship!
   internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
   invoice(attendeeId: ObjectId!, ownerType: InvoiceOwnerType!): Invoice
   me: User!
+  reviewAdminContext: JSONObject!
+  reviewCoordinators(conference: ObjectId!): JSONObject!
+  reviewerDirectory(after: ObjectId, archived: Boolean, search: String! = ""): JSONObject!
+  reviewerPortal(token: String!): JSONObject!
+  reviewerProfile(before: ObjectId, conference: ObjectId, reviewer: ObjectId!): JSONObject!
+  reviewers(after: ObjectId, search: String! = ""): [Reviewer!]!
+  revisionPortal(token: String!): JSONObject!
   submission(id: ObjectId!): Submission!
   submissionInvite(token: String!): Submission!
+  submissionReview(submission: ObjectId!): JSONObject!
   textSearchAttendee(slug: String!, text: String!): [Attendee!]!
   textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
@@ -811,6 +879,37 @@ input RegisterUserInput {
   password: String!
   studyProgramme: StudyProgramme
   telephone: String
+}
+
+type ReviewSettings {
+  authorFields: [String!]!
+  conference: ObjectId!
+  enabled: Boolean!
+  form: ObjectId
+  id: ObjectId!
+  instructions: String!
+  questionnaire: Form
+  recommendationField: String
+  remindersEnabled: Boolean!
+  replyTo: String!
+  requiredReviews: Int!
+  sectionRequirements: JSONObject!
+  signature: String!
+  templateFile: ObjectId
+}
+
+type Reviewer {
+  archived: Boolean!
+  createdAt: DateTimeISO!
+  department: String!
+  email: String!
+  expertise: [String!]!
+  id: ObjectId!
+  institution: String!
+  languages: [String!]!
+  name: String!
+  notes: String!
+  updatedAt: DateTimeISO!
 }
 
 """Conference's section entity model type"""
@@ -913,6 +1012,7 @@ type Submission {
   section: Section!
   translations: SubmissionTranslation!
   updatedAt: DateTimeISO!
+  withdrawn: Boolean!
 }
 
 type SubmissionConnection {
@@ -1021,7 +1121,6 @@ type User {
   organization: String
   studyProgramme: StudyProgramme
   telephone: String
-  token: String!
   updatedAt: DateTimeISO!
   verified: Boolean!
 }
@@ -1059,6 +1158,7 @@ input UserInput {
 type UserMutationResponse implements IMutationResponse {
   data: User!
   message: String!
+  token: String
 }
 
 type UserPageInfo {

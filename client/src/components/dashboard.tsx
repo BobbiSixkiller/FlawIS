@@ -35,7 +35,7 @@ export default async function Dashboard({
     >
       <a
         href="#main-content"
-        className="sr-only fixed top-3 left-3 z-[100] rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only"
+        className="fixed top-3 left-3 z-[100] -translate-y-[calc(100%+1rem)] rounded-md bg-primary px-4 py-2 text-primary-foreground focus:translate-y-0"
       >
         {t("skipToContent")}
       </a>

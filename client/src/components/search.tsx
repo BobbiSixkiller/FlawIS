@@ -90,9 +90,21 @@ export default function SearchComponent<
           items={options}
           filter={null}
           open
+          onOpenChange={(value, details) => {
+            if (!value && details.reason === "escape-key") {
+              setOpen(false);
+              setText("");
+            }
+          }}
           value={null}
           inputValue={text}
-          onInputValueChange={setText}
+          onInputValueChange={(value, details) => {
+            if (
+              details.reason === "input-change" ||
+              details.reason === "input-clear"
+            )
+              setText(value);
+          }}
           onValueChange={(option) => {
             if (option) {
               onOptionSelect(option);

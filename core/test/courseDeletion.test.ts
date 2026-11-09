@@ -48,8 +48,7 @@ test("deleting a course cascades attendees and course-owned records", async () =
       },
     };
     const courseSessionRepository = {
-      findAll: async () =>
-        courseSessionIds.map((_id) => ({ _id })),
+      findAll: async () => courseSessionIds.map((_id) => ({ _id })),
       deleteMany: async (filter: unknown, options: unknown) => {
         calls.sessions = { filter, options };
       },
@@ -66,6 +65,9 @@ test("deleting a course cascades attendees and course-owned records", async () =
       },
     };
     const formService = {
+      deleteAnswers: async (context: string, ids: ObjectId[]) => {
+        calls.answers = { context, ids };
+      },
       deleteCourseForms: async (id: ObjectId, session: unknown) => {
         calls.forms = { id, session };
       },
@@ -87,10 +89,8 @@ test("deleting a course cascades attendees and course-owned records", async () =
     assert.deepEqual(calls.attendees.filter, { course: courseId });
     assert.deepEqual(calls.sessions.filter, { course: courseId });
     assert.equal(calls.forms.id, courseId);
-    assert.deepEqual(
-      calls.attendance.filter.$or[0].attendee.$in,
-      attendeeIds,
-    );
+    assert.deepEqual(calls.answers, { context: "COURSE", ids: attendeeIds });
+    assert.deepEqual(calls.attendance.filter.$or[0].attendee.$in, attendeeIds);
     assert.deepEqual(
       calls.attendance.filter.$or[1].session.$in,
       courseSessionIds,

@@ -96,6 +96,11 @@ export class FormFieldInput {
 
 @InputType()
 export class FormSubmissionInput {
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  revision?: number;
+
   @Field(() => ObjectId)
   form: ObjectId;
 

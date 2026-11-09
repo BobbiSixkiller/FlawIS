@@ -2,13 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { I18nModule, I18nService } from 'nestjs-i18n';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { join } from 'path';
+import { RmqModule } from '../rmq/rmq.module';
 import { EmailService } from './email.service';
 
 @Module({
   imports: [
+    RmqModule,
     I18nModule.forRootAsync({
+      imports: [],
       useFactory() {
         return {
           fallbackLanguage: 'sk',

@@ -1,5 +1,6 @@
 import { getModelForClass, types, ReturnModelType } from "@typegoose/typegoose";
 import * as mongoose from "mongoose";
+import { currentSession } from "../util/requestContext";
 import { Service } from "typedi";
 
 @Service()
@@ -10,16 +11,24 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
     this.dataModel = getModelForClass(entity);
   }
 
+  get collectionName() {
+    return this.dataModel.collection.name;
+  }
+
   async aggregate<T>(pipeline: mongoose.PipelineStage[] = []) {
-    return await this.dataModel.aggregate<T>(pipeline);
+    return await this.dataModel
+      .aggregate<T>(pipeline)
+      .session(currentSession() || null);
   }
 
   async exists(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
-    >
+    >,
   ) {
-    return await this.dataModel.exists(filter);
+    return await this.dataModel
+      .exists(filter)
+      .session(currentSession() || null);
   }
 
   async findAll(
@@ -27,9 +36,12 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
     projection?: Object | String | Array<String> | null,
-    options?: mongoose.QueryOptions | null
+    options?: mongoose.QueryOptions | null,
   ) {
-    return await this.dataModel.find(filter, projection, options);
+    return await this.dataModel.find(filter, projection, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async findOne(
@@ -37,9 +49,12 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
     projection?: Object | String | Array<String> | null,
-    options?: mongoose.QueryOptions | null
+    options?: mongoose.QueryOptions | null,
   ) {
-    return await this.dataModel.findOne(filter, projection, options);
+    return await this.dataModel.findOne(filter, projection, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async findOneAndUpdate(
@@ -51,10 +66,13 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
       | mongoose.UpdateQuery<
           types.DocumentType<InstanceType<E>, types.BeAnObject>
         >,
-    options?: mongoose.QueryOptions | null
+    options?: mongoose.QueryOptions | null,
   ) {
     return await this.dataModel
-      .findOneAndUpdate(filter, update, options)
+      .findOneAndUpdate(filter, update, {
+        ...options,
+        session: options?.session || currentSession(),
+      })
       .exec();
   }
 
@@ -62,9 +80,12 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
-    options?: mongoose.QueryOptions | null
+    options?: mongoose.QueryOptions | null,
   ) {
-    return await this.dataModel.findOneAndDelete(filter, options);
+    return await this.dataModel.findOneAndDelete(filter, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async updateMany(
@@ -76,45 +97,57 @@ export class Repository<E extends types.AnyParamConstructor<any>> {
       | mongoose.UpdateQuery<
           types.DocumentType<InstanceType<E>, types.BeAnObject>
         >,
-    options?: mongoose.mongo.UpdateOptions | undefined
+    options?: mongoose.mongo.UpdateOptions | undefined,
   ) {
-    return await this.dataModel.updateMany(filter, update, options);
+    return await this.dataModel.updateMany(filter, update, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async create(
     data: mongoose.AnyKeys<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
-    options?: { session?: mongoose.ClientSession }
+    options?: { session?: mongoose.ClientSession },
   ): Promise<types.DocumentType<InstanceType<E>, types.BeAnObject>> {
     const doc = new this.dataModel(data);
-    return await doc.save({ session: options?.session });
+    return await doc.save({ session: options?.session || currentSession() });
   }
 
   async deleteOne(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
-    options?: { session?: mongoose.ClientSession }
+    options?: { session?: mongoose.ClientSession },
   ) {
-    return await this.dataModel.deleteOne(filter, options);
+    return await this.dataModel.deleteOne(filter, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async deleteMany(
     filter: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
-    options?: { session?: mongoose.ClientSession }
+    options?: { session?: mongoose.ClientSession },
   ) {
-    return await this.dataModel.deleteMany(filter, options);
+    return await this.dataModel.deleteMany(filter, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 
   async countDocuments(
     filter?: mongoose.FilterQuery<
       types.DocumentType<InstanceType<E>, types.BeAnObject>
     >,
-    options?: mongoose.mongo.CountOptions
+    options?: mongoose.mongo.CountOptions,
   ) {
-    return await this.dataModel.countDocuments(filter, options);
+    return await this.dataModel.countDocuments(filter, {
+      ...options,
+      session: options?.session || currentSession(),
+    });
   }
 }

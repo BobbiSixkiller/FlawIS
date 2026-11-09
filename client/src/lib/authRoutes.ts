@@ -16,7 +16,11 @@ function getSubdomainType(host: string): SubdomainType {
 
 const subdomainExtraPublic: Record<SubdomainType, (path: string) => boolean> = {
   flawis: () => false,
-  conferences: (path) => path === "/" || path.split("/").length === 2,
+  conferences: (path) =>
+    path === "/" ||
+    path.split("/").length === 2 ||
+    // Let the portal explain malformed or revoked links; the API verifies the token.
+    /^\/(review|revise)\/[A-Za-z0-9_-]{1,128}$/.test(path),
   internships: (path) => path === "/" || objectIdRegex.test(path),
   courses: (path) => path === "/" || objectIdRegex.test(path),
 };

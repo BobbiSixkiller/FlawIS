@@ -1,4 +1,7 @@
+import { transformIds } from "../middlewares/typegoose.middleware";
+import { currentSession, requestContext } from "./requestContext";
 import mongoose from "mongoose";
+import { randomUUID } from "crypto";
 import type { ClientSession } from "mongoose";
 import { DocumentType } from "@typegoose/typegoose";
 
@@ -34,7 +37,7 @@ export function toDTO<T>(doc: DocumentType<T>): T {
         ret.id = ret._id;
         delete ret._id;
       }
-      return ret;
+      return transformIds(ret);
     },
   }) as T;
 }
@@ -44,6 +47,7 @@ export async function withOptionalTransaction<T>(
   fn: (session: ClientSession | undefined) => Promise<T>,
   retryOn?: (error: unknown) => boolean,
 ): Promise<T> {
+  session = session || currentSession();
   if (session) return fn(session);
 
   const newSession = await mongoose.startSession();
@@ -52,7 +56,15 @@ export async function withOptionalTransaction<T>(
       try {
         let result!: T;
         await newSession.withTransaction(async () => {
-          result = await fn(newSession);
+          const parent = requestContext.getStore();
+          result = await requestContext.run(
+            {
+              requestId: parent?.requestId || randomUUID(),
+              events: parent?.events || new Set(),
+              session: newSession,
+            },
+            () => fn(newSession),
+          );
         });
         return result;
       } catch (error) {

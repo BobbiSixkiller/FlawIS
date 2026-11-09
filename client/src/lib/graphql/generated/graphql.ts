@@ -149,7 +149,7 @@ export enum ElearningProvisioningStatus {
   SyncFailed = 'SyncFailed'
 }
 
-/** Supported registration form field types */
+/** Supported shared form field types */
 export enum FieldType {
   FileUpload = 'FileUpload',
   RadioGroup = 'RadioGroup',
@@ -174,6 +174,7 @@ export type FormSubmissionInput = {
   answers: Record<string, unknown>;
   form: string;
   formVersion: number;
+  revision?: number | null | undefined;
 };
 
 export type InternFilterInput = {
@@ -412,7 +413,7 @@ export enum UserSortableField {
 export type AttendeeFragment = { id: string, hasInvoice: boolean, createdAt: string, updatedAt: string, user:
     | { __typename: 'User', id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> }
     | { __typename: 'UserStub', id: string, name: string, email: string }
-  , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } };
+  , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } };
 
 export type AttendeesQueryVariables = Exact<{
   after?: string | null | undefined;
@@ -425,7 +426,7 @@ export type AttendeesQueryVariables = Exact<{
 export type AttendeesQuery = { attendees: { totalCount: number, edges: Array<{ cursor: string, node: { id: string, hasInvoice: boolean, createdAt: string, updatedAt: string, user:
           | { __typename: 'User', id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> }
           | { __typename: 'UserStub', id: string, name: string, email: string }
-        , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } | null>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
+        , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } | null>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
 
 export type AttendeeQueryVariables = Exact<{
   id: string;
@@ -435,7 +436,7 @@ export type AttendeeQueryVariables = Exact<{
 export type AttendeeQuery = { attendee: { id: string, hasInvoice: boolean, createdAt: string, updatedAt: string, user:
       | { __typename: 'User', id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> }
       | { __typename: 'UserStub', id: string, name: string, email: string }
-    , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } };
+    , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } };
 
 export type TextSearchAttendeeQueryVariables = Exact<{
   text: string;
@@ -457,7 +458,7 @@ export type UpdateInvoiceMutationVariables = Exact<{
 export type UpdateInvoiceMutation = { updateInvoice: { message: string, data: { id: string, hasInvoice: boolean, createdAt: string, updatedAt: string, user:
         | { __typename: 'User', id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> }
         | { __typename: 'UserStub', id: string, name: string, email: string }
-      , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } };
+      , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } };
 
 export type DeleteAttendeeMutationVariables = Exact<{
   id: string;
@@ -467,7 +468,7 @@ export type DeleteAttendeeMutationVariables = Exact<{
 export type DeleteAttendeeMutation = { deleteAttendee: { message: string, data: { id: string, hasInvoice: boolean, createdAt: string, updatedAt: string, user:
         | { __typename: 'User', id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> }
         | { __typename: 'UserStub', id: string, name: string, email: string }
-      , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } };
+      , invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }>, conference: { slug: string, translations: { sk: { logoUrl: string }, en: { logoUrl: string } } } } } };
 
 export type AddressFragment = { street: string, city: string, postal: string, country: string };
 
@@ -486,7 +487,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { message: string, data: { token: string, id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
+export type LoginMutation = { login: { message: string, token: string | null, data: { id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type GoogleSignInMutationVariables = Exact<{
   authCode: string;
@@ -494,7 +495,7 @@ export type GoogleSignInMutationVariables = Exact<{
 }>;
 
 
-export type GoogleSignInMutation = { googleSignIn: { message: string, data: { token: string, id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
+export type GoogleSignInMutation = { googleSignIn: { message: string, token: string | null, data: { id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ForgotPasswordQueryVariables = Exact<{
   email: string;
@@ -508,14 +509,14 @@ export type PasswordResetMutationVariables = Exact<{
 }>;
 
 
-export type PasswordResetMutation = { passwordReset: { message: string, data: { token: string, id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
+export type PasswordResetMutation = { passwordReset: { message: string, token: string | null, data: { id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type RegisterMutationVariables = Exact<{
   data: RegisterUserInput;
 }>;
 
 
-export type RegisterMutation = { register: { message: string, data: { token: string, id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
+export type RegisterMutation = { register: { message: string, token: string | null, data: { id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
 
 export type ResendActivationLinkMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -525,14 +526,19 @@ export type ResendActivationLinkMutation = { resendActivationLink: string };
 export type ActivateUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ActivateUserMutation = { activateUser: { message: string, data: { token: string, id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
+export type ActivateUserMutation = { activateUser: { message: string, token: string | null, data: { id: string, name: string, email: string, organization: string | null, telephone: string | null, access: Array<Access>, verified: boolean, createdAt: string, updatedAt: string, studyProgramme: StudyProgramme | null, cvUrl: string | null, avatarUrl: string | null, address: { street: string, city: string, postal: string, country: string } | null, billings: Array<{ name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } | null> } } };
 
-export type ImpersonateQueryVariables = Exact<{
+export type ImpersonateMutationVariables = Exact<{
   id: string;
 }>;
 
 
-export type ImpersonateQuery = { user: { id: string, access: Array<Access>, token: string } };
+export type ImpersonateMutation = { impersonateUser: { token: string | null, data: { id: string, access: Array<Access> } } };
+
+export type StopImpersonationMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type StopImpersonationMutation = { stopImpersonation: { token: string | null, data: { id: string, access: Array<Access> } } };
 
 export type InvoiceFragment = { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } };
 
@@ -562,7 +568,7 @@ export type ConferenceQueryVariables = Exact<{
 }>;
 
 
-export type ConferenceQuery = { conference: { createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, attending: { id: string, hasInvoice: boolean, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }> } | null, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } };
+export type ConferenceQuery = { conference: { createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, attending: { id: string, hasInvoice: boolean, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }> } | null, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } };
 
 export type SubmissionFilesFragment = { totalCount: number, edges: Array<{ cursor: string, node: { id: string, fileUrl: string | null } } | null> };
 
@@ -661,17 +667,17 @@ export type AddAttendeeMutation = { addAttendee: { message: string, data: { slug
 
 export type CourseListItemFragment = { id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, categories: Array<{ id: string, name: string, slug: string }> };
 
-export type CourseFragment = { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> };
+export type CourseFragment = { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> };
 
-export type FormFragment = { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> };
+export type FormFragment = { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> };
 
-export type FormSubmissionFragment = { form: string, formVersion: number, answers: Record<string, unknown> };
+export type FormSubmissionFragment = { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> };
 
 export type CourseSessionFragment = { id: string, course: string, name: string, description: string | null, start: string, end: string, createdAt: string, updatedAt: string };
 
-export type CourseAttendeeFragment = { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } };
+export type CourseAttendeeFragment = { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } };
 
-export type AttendanceFragment = { attendee: { id: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, elearningErrorCode: string | null, user: { name: string }, application: { form: string, formVersion: number, answers: Record<string, unknown> } }, attendanceRecords: Array<{ id: string, online: boolean | null, hoursAttended: number } | null> };
+export type AttendanceFragment = { attendee: { id: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, elearningErrorCode: string | null, user: { name: string }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } }, attendanceRecords: Array<{ id: string, online: boolean | null, hoursAttended: number } | null> };
 
 export type CategoryFragment = { id: string, name: string, slug: string };
 
@@ -690,7 +696,7 @@ export type CourseQueryVariables = Exact<{
 }>;
 
 
-export type CourseQuery = { course: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, elearningAccess: { status: ElearningProvisioningStatus, launchUrl: string | null } | null, registrationForm: { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } };
+export type CourseQuery = { course: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, elearningAccess: { status: ElearningProvisioningStatus, launchUrl: string | null } | null, registrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } };
 
 export type CourseReachConfigQueryVariables = Exact<{
   courseId: string;
@@ -707,21 +713,21 @@ export type AttendanceQueryVariables = Exact<{
 }>;
 
 
-export type AttendanceQuery = { course: { attendance: { totalCount: number, pageInfo: { hasNextPage: boolean, endCursor: string | null }, edges: Array<{ cursor: string, node: { attendee: { id: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, elearningErrorCode: string | null, user: { name: string }, application: { form: string, formVersion: number, answers: Record<string, unknown> } }, attendanceRecords: Array<{ id: string, online: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ id: string, course: string, name: string, description: string | null, start: string, end: string, createdAt: string, updatedAt: string } | null> } } };
+export type AttendanceQuery = { course: { attendance: { totalCount: number, pageInfo: { hasNextPage: boolean, endCursor: string | null }, edges: Array<{ cursor: string, node: { attendee: { id: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, elearningErrorCode: string | null, user: { name: string }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } }, attendanceRecords: Array<{ id: string, online: boolean | null, hoursAttended: number } | null> } } | null>, sessions: Array<{ id: string, course: string, name: string, description: string | null, start: string, end: string, createdAt: string, updatedAt: string } | null> } } };
 
 export type CreateCourseMutationVariables = Exact<{
   data: CourseInput;
 }>;
 
 
-export type CreateCourseMutation = { createCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
+export type CreateCourseMutation = { createCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
 
 export type DeleteCourseMutationVariables = Exact<{
   id: string;
 }>;
 
 
-export type DeleteCourseMutation = { deleteCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
+export type DeleteCourseMutation = { deleteCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
 
 export type UpdateCourseMutationVariables = Exact<{
   id: string;
@@ -729,7 +735,7 @@ export type UpdateCourseMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCourseMutation = { updateCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, course: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
+export type UpdateCourseMutation = { updateCourse: { message: string, data: { maxAttendees: number, description: string, price: number, isPaid: boolean, createdAt: string, updatedAt: string, id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, registrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, billing: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } } | null, attending: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } | null, categories: Array<{ id: string, name: string, slug: string }> } } };
 
 export type CreateCourseSessionMutationVariables = Exact<{
   data: CourseSessionInput;
@@ -760,7 +766,7 @@ export type CreateCourseAttendeeMutationVariables = Exact<{
 }>;
 
 
-export type CreateCourseAttendeeMutation = { createCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } } };
+export type CreateCourseAttendeeMutation = { createCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } } };
 
 export type UpdateCourseAttendeeMutationVariables = Exact<{
   id: string;
@@ -768,14 +774,14 @@ export type UpdateCourseAttendeeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCourseAttendeeMutation = { updateCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } } };
+export type UpdateCourseAttendeeMutation = { updateCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } } };
 
 export type DeleteCourseAttendeeMutationVariables = Exact<{
   id: string;
 }>;
 
 
-export type DeleteCourseAttendeeMutation = { deleteCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } } };
+export type DeleteCourseAttendeeMutation = { deleteCourseAttendee: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } } };
 
 export type ChangeCourseAttendeeStatusMutationVariables = Exact<{
   id: string;
@@ -783,14 +789,14 @@ export type ChangeCourseAttendeeStatusMutationVariables = Exact<{
 }>;
 
 
-export type ChangeCourseAttendeeStatusMutation = { changeCourseAttendeeStatus: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } } };
+export type ChangeCourseAttendeeStatusMutation = { changeCourseAttendeeStatus: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } } };
 
 export type SyncCourseElearningAccessMutationVariables = Exact<{
   attendeeId: string;
 }>;
 
 
-export type SyncCourseElearningAccessMutation = { syncCourseElearningAccess: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, application: { form: string, formVersion: number, answers: Record<string, unknown> } } } };
+export type SyncCourseElearningAccessMutation = { syncCourseElearningAccess: { message: string, data: { id: string, hasInvoice: boolean, course: string, status: Status, elearningStatus: ElearningProvisioningStatus | null, createdAt: string, updatedAt: string, user: { id: string, name: string, email: string, telephone: string | null, organization: string, avatarUrl: string | null }, applicationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }, application: { id: string, revision: number, submitted: boolean, form: string, formVersion: number, answers: Record<string, unknown> } } } };
 
 export type UpdateAttendanceHoursMutationVariables = Exact<{
   id: string;
@@ -951,28 +957,264 @@ export type InvoiceQueryVariables = Exact<{
 
 export type InvoiceQuery = { invoice: { body: { body: string, comment: string, dueDate: string, issueDate: string, price: number, type: string, vat: number, vatDate: string }, issuer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, variableSymbol: string | null, IBAN: string | null, SWIFT: string | null, address: { street: string, city: string, postal: string, country: string } }, payer: { name: string, ICO: string | null, ICDPH: string | null, DIC: string | null, address: { street: string, city: string, postal: string, country: string } } } | null };
 
-export type SubmissionFragment = { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } };
+export type ReviewerFragment = { id: string, name: string, email: string, institution: string, department: string, languages: Array<string>, expertise: Array<string>, notes: string, archived: boolean, createdAt: string, updatedAt: string };
+
+export type ReviewAdminContextQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReviewAdminContextQuery = { reviewAdminContext: Record<string, unknown> };
+
+export type ReviewersQueryVariables = Exact<{
+  search?: string | null | undefined;
+  after?: string | null | undefined;
+}>;
+
+
+export type ReviewersQuery = { reviewers: Array<{ id: string, name: string, email: string, institution: string, department: string, languages: Array<string>, expertise: Array<string>, notes: string, archived: boolean, createdAt: string, updatedAt: string }> };
+
+export type SaveReviewerMutationVariables = Exact<{
+  id?: string | null | undefined;
+  data: Record<string, unknown>;
+}>;
+
+
+export type SaveReviewerMutation = { saveReviewer: { id: string, name: string, email: string, institution: string, department: string, languages: Array<string>, expertise: Array<string>, notes: string, archived: boolean, createdAt: string, updatedAt: string } };
+
+export type ConferenceReviewSettingsQueryVariables = Exact<{
+  conference: string;
+}>;
+
+
+export type ConferenceReviewSettingsQuery = { conferenceReviewSettings: { id: string, conference: string, enabled: boolean, requiredReviews: number, form: string | null, recommendationField: string | null, authorFields: Array<string>, sectionRequirements: Record<string, unknown>, remindersEnabled: boolean, instructions: string, signature: string, replyTo: string, templateFile: string | null, questionnaire: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> } | null } | null };
+
+export type ConfigureConferenceReviewsMutationVariables = Exact<{
+  conference: string;
+  data: Record<string, unknown>;
+}>;
+
+
+export type ConfigureConferenceReviewsMutation = { configureConferenceReviews: { id: string, enabled: boolean } };
+
+export type ConferenceReviewQueueQueryVariables = Exact<{
+  conference: string;
+  section?: string | null | undefined;
+  after?: string | null | undefined;
+  first?: number | null | undefined;
+  search?: string | null | undefined;
+  stage?: string | null | undefined;
+  reviewer?: string | null | undefined;
+  delivery?: string | null | undefined;
+}>;
+
+
+export type ConferenceReviewQueueQuery = { conferenceReviewQueue: Record<string, unknown> };
+
+export type SubmissionReviewQueryVariables = Exact<{
+  submission: string;
+}>;
+
+
+export type SubmissionReviewQuery = { submissionReview: Record<string, unknown> };
+
+export type ConferenceReviewActionMutationVariables = Exact<{
+  submission: string;
+  action: string;
+  data: Record<string, unknown>;
+}>;
+
+
+export type ConferenceReviewActionMutation = { conferenceReviewAction: Record<string, unknown> };
+
+export type ReviewCoordinatorsQueryVariables = Exact<{
+  conference: string;
+}>;
+
+
+export type ReviewCoordinatorsQuery = { reviewCoordinators: Record<string, unknown> };
+
+export type SetReviewCoordinatorMutationVariables = Exact<{
+  conference: string;
+  email: string;
+  section?: string | null | undefined;
+}>;
+
+
+export type SetReviewCoordinatorMutation = { setReviewCoordinator: boolean };
+
+export type RevokeReviewCoordinatorMutationVariables = Exact<{
+  id: string;
+}>;
+
+
+export type RevokeReviewCoordinatorMutation = { revokeReviewCoordinator: boolean };
+
+export type SetReviewerEligibilityMutationVariables = Exact<{
+  conference: string;
+  reviewer: string;
+  data: Record<string, unknown>;
+}>;
+
+
+export type SetReviewerEligibilityMutation = { setReviewerEligibility: boolean };
+
+export type FormLibraryQueryVariables = Exact<{
+  search?: string | null | undefined;
+}>;
+
+
+export type FormLibraryQuery = { formLibrary: Array<{ id: string, name: string, description: string, archived: boolean, latestVersion: number, createdAt: string, updatedAt: string }> };
+
+export type FormVersionsQueryVariables = Exact<{
+  definition: string;
+}>;
+
+
+export type FormVersionsQuery = { formVersions: Array<{ id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> }> };
+
+export type CreateLibraryFormMutationVariables = Exact<{
+  name: string;
+  description?: string | null | undefined;
+}>;
+
+
+export type CreateLibraryFormMutation = { createLibraryForm: { id: string, name: string } };
+
+export type PublishLibraryFormMutationVariables = Exact<{
+  definition: string;
+  fields: Array<FormFieldInput> | FormFieldInput;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
+}>;
+
+
+export type PublishLibraryFormMutation = { publishLibraryForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> } };
+
+export type ArchiveLibraryFormMutationVariables = Exact<{
+  definition: string;
+}>;
+
+
+export type ArchiveLibraryFormMutation = { archiveLibraryForm: boolean };
+
+export type BindCourseRegistrationFormMutationVariables = Exact<{
+  course: string;
+  form: string;
+}>;
+
+
+export type BindCourseRegistrationFormMutation = { bindCourseRegistrationForm: { id: string, definition: string, version: number, createdAt: string, updatedAt: string, fields: Array<{ id: string, type: FieldType, label: string, required: boolean, placeholder: string | null, helpText: string | null, minFiles: number | null, maxFiles: number | null, selectOptions: Array<{ value: string, text: string }> | null }> } };
+
+export type ConferenceActivityQueryVariables = Exact<{
+  conference: string;
+  submission?: string | null | undefined;
+  before?: string | null | undefined;
+}>;
+
+
+export type ConferenceActivityQuery = { conferenceActivity: Array<{ id: string, actor: string, actorName: string | null, originalActor: string | null, action: string, requestId: string, submission: string | null, changes: Record<string, unknown>, createdAt: string }> };
+
+export type ReviewerPortalQueryVariables = Exact<{
+  token: string;
+}>;
+
+
+export type ReviewerPortalQuery = { reviewerPortal: Record<string, unknown> };
+
+export type SaveReviewReportMutationVariables = Exact<{
+  token: string;
+  answers: Record<string, unknown>;
+  submit?: boolean | null | undefined;
+  expectedRevision?: number | null | undefined;
+}>;
+
+
+export type SaveReviewReportMutation = { saveReviewReport: Record<string, unknown> };
+
+export type DeclineReviewMutationVariables = Exact<{
+  token: string;
+}>;
+
+
+export type DeclineReviewMutation = { declineReview: Record<string, unknown> };
+
+export type RevisionPortalQueryVariables = Exact<{
+  token: string;
+}>;
+
+
+export type RevisionPortalQuery = { revisionPortal: Record<string, unknown> };
+
+export type AuthorReviewFeedbackQueryVariables = Exact<{
+  submission: string;
+}>;
+
+
+export type AuthorReviewFeedbackQuery = { authorReviewFeedback: Array<{ id: string, round: string, feedback: Record<string, unknown>, createdAt: string }> };
+
+export type EnterReviewReportMutationVariables = Exact<{
+  assignment: string;
+  answers: Record<string, unknown>;
+  expectedRevision?: number | null | undefined;
+}>;
+
+
+export type EnterReviewReportMutation = { enterReviewReport: Record<string, unknown> };
+
+export type AuthorReviewWorkspaceQueryVariables = Exact<{
+  submission: string;
+}>;
+
+
+export type AuthorReviewWorkspaceQuery = { authorReviewWorkspace: Record<string, unknown> };
+
+export type ReviewerProfileQueryVariables = Exact<{
+  reviewer: string;
+  conference?: string | null | undefined;
+  before?: string | null | undefined;
+}>;
+
+
+export type ReviewerProfileQuery = { reviewerProfile: Record<string, unknown> };
+
+export type ReviewerDirectoryQueryVariables = Exact<{
+  search?: string | null | undefined;
+  after?: string | null | undefined;
+  archived?: boolean | null | undefined;
+}>;
+
+
+export type ReviewerDirectoryQuery = { reviewerDirectory: Record<string, unknown> };
+
+export type AssignmentEligibilityQueryVariables = Exact<{
+  submission: string;
+  reviewer: string;
+}>;
+
+
+export type AssignmentEligibilityQuery = { assignmentEligibility: Record<string, unknown> };
+
+export type SubmissionFragment = { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } };
 
 export type SubmissionQueryVariables = Exact<{
   id: string;
 }>;
 
 
-export type SubmissionQuery = { submission: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } };
+export type SubmissionQuery = { submission: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } };
 
 export type SubmissionInviteQueryVariables = Exact<{
   token: string;
 }>;
 
 
-export type SubmissionInviteQuery = { submissionInvite: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } };
+export type SubmissionInviteQuery = { submissionInvite: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } };
 
 export type CreateSubmissionMutationVariables = Exact<{
   data: SubmissionInput;
 }>;
 
 
-export type CreateSubmissionMutation = { createSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
+export type CreateSubmissionMutation = { createSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
 
 export type UpdateSubmissionMutationVariables = Exact<{
   id: string;
@@ -980,14 +1222,14 @@ export type UpdateSubmissionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateSubmissionMutation = { updateSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
+export type UpdateSubmissionMutation = { updateSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
 
 export type DeleteSubmissionMutationVariables = Exact<{
   id: string;
 }>;
 
 
-export type DeleteSubmissionMutation = { deleteSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
+export type DeleteSubmissionMutation = { deleteSubmission: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
 
 export type RemoveAuthorMutationVariables = Exact<{
   id: string;
@@ -995,12 +1237,12 @@ export type RemoveAuthorMutationVariables = Exact<{
 }>;
 
 
-export type RemoveAuthorMutation = { removeAuthor: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
+export type RemoveAuthorMutation = { removeAuthor: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
 
 export type AcceptAuthorInviteMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AcceptAuthorInviteMutation = { acceptAuthorInvite: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
+export type AcceptAuthorInviteMutation = { acceptAuthorInvite: { message: string, data: { id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } } } };
 
 export type UsersQueryVariables = Exact<{
   after?: string | null | undefined;
@@ -1258,6 +1500,7 @@ export const SubmissionFragmentDoc = new TypedDocumentString(`
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -1443,6 +1686,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -1600,7 +1844,7 @@ export const CourseListItemFragmentDoc = new TypedDocumentString(`
 export const FormFragmentDoc = new TypedDocumentString(`
     fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -1622,6 +1866,9 @@ export const FormFragmentDoc = new TypedDocumentString(`
     `, {"fragmentName":"Form"}) as unknown as TypedDocumentString<FormFragment, unknown>;
 export const FormSubmissionFragmentDoc = new TypedDocumentString(`
     fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -1642,13 +1889,40 @@ export const CourseAttendeeFragmentDoc = new TypedDocumentString(`
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
   createdAt
   updatedAt
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -1706,7 +1980,7 @@ fragment CourseListItem on Course {
 }
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -1726,6 +2000,9 @@ fragment Form on Form {
   updatedAt
 }
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -1744,6 +2021,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -1772,6 +2052,9 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
     status
     elearningStatus
     elearningErrorCode
+    applicationForm {
+      ...Form
+    }
     application {
       ...FormSubmission
     }
@@ -1782,7 +2065,31 @@ export const AttendanceFragmentDoc = new TypedDocumentString(`
     hoursAttended
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -1822,6 +2129,21 @@ export const ApplicationFragmentDoc = new TypedDocumentString(`
   postal
   country
 }`, {"fragmentName":"Application"}) as unknown as TypedDocumentString<ApplicationFragment, unknown>;
+export const ReviewerFragmentDoc = new TypedDocumentString(`
+    fragment Reviewer on Reviewer {
+  id
+  name
+  email
+  institution
+  department
+  languages
+  expertise
+  notes
+  archived
+  createdAt
+  updatedAt
+}
+    `, {"fragmentName":"Reviewer"}) as unknown as TypedDocumentString<ReviewerFragment, unknown>;
 export const AttendeesDocument = new TypedDocumentString(`
     query attendees($after: String, $first: Int, $filter: AttendeeFilterInput, $sort: [AttendeeSortInput]!) {
   attendees(after: $after, first: $first, filter: $filter, sort: $sort) {
@@ -1995,6 +2317,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -2168,6 +2491,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -2363,6 +2687,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -2539,6 +2864,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -2594,9 +2920,9 @@ export const LoginDocument = new TypedDocumentString(`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     message
+    token
     data {
       ...User
-      token
     }
   }
 }
@@ -2639,9 +2965,9 @@ export const GoogleSignInDocument = new TypedDocumentString(`
     mutation googleSignIn($authCode: String!, $redirectUri: String!) {
   googleSignIn(authCode: $authCode, redirectUri: $redirectUri) {
     message
+    token
     data {
       ...User
-      token
     }
   }
 }
@@ -2689,9 +3015,9 @@ export const PasswordResetDocument = new TypedDocumentString(`
     mutation passwordReset($data: PasswordInput!) {
   passwordReset(data: $data) {
     message
+    token
     data {
       ...User
-      token
     }
   }
 }
@@ -2734,9 +3060,9 @@ export const RegisterDocument = new TypedDocumentString(`
     mutation register($data: RegisterUserInput!) {
   register(data: $data) {
     message
+    token
     data {
       ...User
-      token
     }
   }
 }
@@ -2784,9 +3110,9 @@ export const ActivateUserDocument = new TypedDocumentString(`
     mutation activateUser {
   activateUser {
     message
+    token
     data {
       ...User
-      token
     }
   }
 }
@@ -2826,14 +3152,27 @@ fragment User on User {
   avatarUrl
 }`) as unknown as TypedDocumentString<ActivateUserMutation, ActivateUserMutationVariables>;
 export const ImpersonateDocument = new TypedDocumentString(`
-    query impersonate($id: ObjectId!) {
-  user(id: $id) {
-    id
-    access
+    mutation impersonate($id: ObjectId!) {
+  impersonateUser(id: $id) {
     token
+    data {
+      id
+      access
+    }
   }
 }
-    `) as unknown as TypedDocumentString<ImpersonateQuery, ImpersonateQueryVariables>;
+    `) as unknown as TypedDocumentString<ImpersonateMutation, ImpersonateMutationVariables>;
+export const StopImpersonationDocument = new TypedDocumentString(`
+    mutation stopImpersonation {
+  stopImpersonation {
+    token
+    data {
+      id
+      access
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<StopImpersonationMutation, StopImpersonationMutationVariables>;
 export const ConferencesDocument = new TypedDocumentString(`
     query conferences($after: String, $first: Int, $sort: [ConferenceSortInput]!) {
   conferences(after: $after, first: $first, sort: $sort) {
@@ -2971,6 +3310,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -3267,7 +3607,7 @@ fragment Course on Course {
 }
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -3287,6 +3627,9 @@ fragment Form on Form {
   updatedAt
 }
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3305,6 +3648,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3340,7 +3686,31 @@ export const AttendanceDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3364,6 +3734,9 @@ fragment Attendance on Attendance {
     status
     elearningStatus
     elearningErrorCode
+    applicationForm {
+      ...Form
+    }
     application {
       ...FormSubmission
     }
@@ -3435,7 +3808,7 @@ fragment Course on Course {
 }
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -3455,6 +3828,9 @@ fragment Form on Form {
   updatedAt
 }
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3473,6 +3849,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3540,7 +3919,7 @@ fragment Course on Course {
 }
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -3560,6 +3939,9 @@ fragment Form on Form {
   updatedAt
 }
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3578,6 +3960,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3645,7 +4030,7 @@ fragment Course on Course {
 }
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -3665,6 +4050,9 @@ fragment Form on Form {
   updatedAt
 }
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3683,6 +4071,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3759,7 +4150,31 @@ export const CreateCourseAttendeeDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3778,6 +4193,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3793,7 +4211,31 @@ export const UpdateCourseAttendeeDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3812,6 +4254,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3827,7 +4272,31 @@ export const DeleteCourseAttendeeDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3846,6 +4315,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3861,7 +4333,31 @@ export const ChangeCourseAttendeeStatusDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3880,6 +4376,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -3895,7 +4394,31 @@ export const SyncCourseElearningAccessDocument = new TypedDocumentString(`
     }
   }
 }
-    fragment FormSubmission on FormSubmission {
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}
+fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -3914,6 +4437,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -4326,6 +4852,342 @@ fragment InvoiceBilling on Billing {
   IBAN
   SWIFT
 }`) as unknown as TypedDocumentString<InvoiceQuery, InvoiceQueryVariables>;
+export const ReviewAdminContextDocument = new TypedDocumentString(`
+    query reviewAdminContext {
+  reviewAdminContext
+}
+    `) as unknown as TypedDocumentString<ReviewAdminContextQuery, ReviewAdminContextQueryVariables>;
+export const ReviewersDocument = new TypedDocumentString(`
+    query reviewers($search: String, $after: ObjectId) {
+  reviewers(search: $search, after: $after) {
+    ...Reviewer
+  }
+}
+    fragment Reviewer on Reviewer {
+  id
+  name
+  email
+  institution
+  department
+  languages
+  expertise
+  notes
+  archived
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<ReviewersQuery, ReviewersQueryVariables>;
+export const SaveReviewerDocument = new TypedDocumentString(`
+    mutation saveReviewer($id: ObjectId, $data: JSONObject!) {
+  saveReviewer(id: $id, data: $data) {
+    ...Reviewer
+  }
+}
+    fragment Reviewer on Reviewer {
+  id
+  name
+  email
+  institution
+  department
+  languages
+  expertise
+  notes
+  archived
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<SaveReviewerMutation, SaveReviewerMutationVariables>;
+export const ConferenceReviewSettingsDocument = new TypedDocumentString(`
+    query conferenceReviewSettings($conference: ObjectId!) {
+  conferenceReviewSettings(conference: $conference) {
+    id
+    conference
+    enabled
+    requiredReviews
+    form
+    recommendationField
+    authorFields
+    sectionRequirements
+    remindersEnabled
+    instructions
+    signature
+    replyTo
+    templateFile
+    questionnaire {
+      ...Form
+    }
+  }
+}
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<ConferenceReviewSettingsQuery, ConferenceReviewSettingsQueryVariables>;
+export const ConfigureConferenceReviewsDocument = new TypedDocumentString(`
+    mutation configureConferenceReviews($conference: ObjectId!, $data: JSONObject!) {
+  configureConferenceReviews(conference: $conference, data: $data) {
+    id
+    enabled
+  }
+}
+    `) as unknown as TypedDocumentString<ConfigureConferenceReviewsMutation, ConfigureConferenceReviewsMutationVariables>;
+export const ConferenceReviewQueueDocument = new TypedDocumentString(`
+    query conferenceReviewQueue($conference: ObjectId!, $section: ObjectId, $after: ObjectId, $first: Int, $search: String, $stage: String, $reviewer: String, $delivery: String) {
+  conferenceReviewQueue(
+    conference: $conference
+    section: $section
+    after: $after
+    first: $first
+    search: $search
+    stage: $stage
+    reviewer: $reviewer
+    delivery: $delivery
+  )
+}
+    `) as unknown as TypedDocumentString<ConferenceReviewQueueQuery, ConferenceReviewQueueQueryVariables>;
+export const SubmissionReviewDocument = new TypedDocumentString(`
+    query submissionReview($submission: ObjectId!) {
+  submissionReview(submission: $submission)
+}
+    `) as unknown as TypedDocumentString<SubmissionReviewQuery, SubmissionReviewQueryVariables>;
+export const ConferenceReviewActionDocument = new TypedDocumentString(`
+    mutation conferenceReviewAction($submission: ObjectId!, $action: String!, $data: JSONObject!) {
+  conferenceReviewAction(submission: $submission, action: $action, data: $data)
+}
+    `) as unknown as TypedDocumentString<ConferenceReviewActionMutation, ConferenceReviewActionMutationVariables>;
+export const ReviewCoordinatorsDocument = new TypedDocumentString(`
+    query reviewCoordinators($conference: ObjectId!) {
+  reviewCoordinators(conference: $conference)
+}
+    `) as unknown as TypedDocumentString<ReviewCoordinatorsQuery, ReviewCoordinatorsQueryVariables>;
+export const SetReviewCoordinatorDocument = new TypedDocumentString(`
+    mutation setReviewCoordinator($conference: ObjectId!, $email: String!, $section: ObjectId) {
+  setReviewCoordinator(conference: $conference, email: $email, section: $section)
+}
+    `) as unknown as TypedDocumentString<SetReviewCoordinatorMutation, SetReviewCoordinatorMutationVariables>;
+export const RevokeReviewCoordinatorDocument = new TypedDocumentString(`
+    mutation revokeReviewCoordinator($id: ObjectId!) {
+  revokeReviewCoordinator(id: $id)
+}
+    `) as unknown as TypedDocumentString<RevokeReviewCoordinatorMutation, RevokeReviewCoordinatorMutationVariables>;
+export const SetReviewerEligibilityDocument = new TypedDocumentString(`
+    mutation setReviewerEligibility($conference: ObjectId!, $reviewer: ObjectId!, $data: JSONObject!) {
+  setReviewerEligibility(
+    conference: $conference
+    reviewer: $reviewer
+    data: $data
+  )
+}
+    `) as unknown as TypedDocumentString<SetReviewerEligibilityMutation, SetReviewerEligibilityMutationVariables>;
+export const FormLibraryDocument = new TypedDocumentString(`
+    query formLibrary($search: String) {
+  formLibrary(search: $search) {
+    id
+    name
+    description
+    archived
+    latestVersion
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FormLibraryQuery, FormLibraryQueryVariables>;
+export const FormVersionsDocument = new TypedDocumentString(`
+    query formVersions($definition: ObjectId!) {
+  formVersions(definition: $definition) {
+    ...Form
+  }
+}
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<FormVersionsQuery, FormVersionsQueryVariables>;
+export const CreateLibraryFormDocument = new TypedDocumentString(`
+    mutation createLibraryForm($name: String!, $description: String) {
+  createLibraryForm(name: $name, description: $description) {
+    id
+    name
+  }
+}
+    `) as unknown as TypedDocumentString<CreateLibraryFormMutation, CreateLibraryFormMutationVariables>;
+export const PublishLibraryFormDocument = new TypedDocumentString(`
+    mutation publishLibraryForm($definition: ObjectId!, $fields: [FormFieldInput!]!, $name: String, $description: String) {
+  publishLibraryForm(
+    definition: $definition
+    fields: $fields
+    name: $name
+    description: $description
+  ) {
+    ...Form
+  }
+}
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<PublishLibraryFormMutation, PublishLibraryFormMutationVariables>;
+export const ArchiveLibraryFormDocument = new TypedDocumentString(`
+    mutation archiveLibraryForm($definition: ObjectId!) {
+  archiveLibraryForm(definition: $definition)
+}
+    `) as unknown as TypedDocumentString<ArchiveLibraryFormMutation, ArchiveLibraryFormMutationVariables>;
+export const BindCourseRegistrationFormDocument = new TypedDocumentString(`
+    mutation bindCourseRegistrationForm($course: ObjectId!, $form: ObjectId!) {
+  bindCourseRegistrationForm(course: $course, form: $form) {
+    ...Form
+  }
+}
+    fragment Form on Form {
+  id
+  definition
+  version
+  fields {
+    id
+    type
+    label
+    required
+    placeholder
+    helpText
+    selectOptions {
+      value
+      text
+    }
+    minFiles
+    maxFiles
+  }
+  createdAt
+  updatedAt
+}`) as unknown as TypedDocumentString<BindCourseRegistrationFormMutation, BindCourseRegistrationFormMutationVariables>;
+export const ConferenceActivityDocument = new TypedDocumentString(`
+    query conferenceActivity($conference: ObjectId!, $submission: ObjectId, $before: ObjectId) {
+  conferenceActivity(
+    conference: $conference
+    submission: $submission
+    before: $before
+  ) {
+    id
+    actor
+    actorName
+    originalActor
+    action
+    requestId
+    submission
+    changes
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<ConferenceActivityQuery, ConferenceActivityQueryVariables>;
+export const ReviewerPortalDocument = new TypedDocumentString(`
+    query reviewerPortal($token: String!) {
+  reviewerPortal(token: $token)
+}
+    `) as unknown as TypedDocumentString<ReviewerPortalQuery, ReviewerPortalQueryVariables>;
+export const SaveReviewReportDocument = new TypedDocumentString(`
+    mutation saveReviewReport($token: String!, $answers: JSONObject!, $submit: Boolean, $expectedRevision: Int) {
+  saveReviewReport(
+    token: $token
+    answers: $answers
+    submit: $submit
+    expectedRevision: $expectedRevision
+  )
+}
+    `) as unknown as TypedDocumentString<SaveReviewReportMutation, SaveReviewReportMutationVariables>;
+export const DeclineReviewDocument = new TypedDocumentString(`
+    mutation declineReview($token: String!) {
+  declineReview(token: $token)
+}
+    `) as unknown as TypedDocumentString<DeclineReviewMutation, DeclineReviewMutationVariables>;
+export const RevisionPortalDocument = new TypedDocumentString(`
+    query revisionPortal($token: String!) {
+  revisionPortal(token: $token)
+}
+    `) as unknown as TypedDocumentString<RevisionPortalQuery, RevisionPortalQueryVariables>;
+export const AuthorReviewFeedbackDocument = new TypedDocumentString(`
+    query authorReviewFeedback($submission: ObjectId!) {
+  authorReviewFeedback(submission: $submission) {
+    id
+    round
+    feedback
+    createdAt
+  }
+}
+    `) as unknown as TypedDocumentString<AuthorReviewFeedbackQuery, AuthorReviewFeedbackQueryVariables>;
+export const EnterReviewReportDocument = new TypedDocumentString(`
+    mutation enterReviewReport($assignment: ObjectId!, $answers: JSONObject!, $expectedRevision: Int) {
+  enterReviewReport(
+    assignment: $assignment
+    answers: $answers
+    expectedRevision: $expectedRevision
+  )
+}
+    `) as unknown as TypedDocumentString<EnterReviewReportMutation, EnterReviewReportMutationVariables>;
+export const AuthorReviewWorkspaceDocument = new TypedDocumentString(`
+    query authorReviewWorkspace($submission: ObjectId!) {
+  authorReviewWorkspace(submission: $submission)
+}
+    `) as unknown as TypedDocumentString<AuthorReviewWorkspaceQuery, AuthorReviewWorkspaceQueryVariables>;
+export const ReviewerProfileDocument = new TypedDocumentString(`
+    query reviewerProfile($reviewer: ObjectId!, $conference: ObjectId, $before: ObjectId) {
+  reviewerProfile(reviewer: $reviewer, conference: $conference, before: $before)
+}
+    `) as unknown as TypedDocumentString<ReviewerProfileQuery, ReviewerProfileQueryVariables>;
+export const ReviewerDirectoryDocument = new TypedDocumentString(`
+    query reviewerDirectory($search: String, $after: ObjectId, $archived: Boolean) {
+  reviewerDirectory(search: $search, after: $after, archived: $archived)
+}
+    `) as unknown as TypedDocumentString<ReviewerDirectoryQuery, ReviewerDirectoryQueryVariables>;
+export const AssignmentEligibilityDocument = new TypedDocumentString(`
+    query assignmentEligibility($submission: ObjectId!, $reviewer: ObjectId!) {
+  assignmentEligibility(submission: $submission, reviewer: $reviewer)
+}
+    `) as unknown as TypedDocumentString<AssignmentEligibilityQuery, AssignmentEligibilityQueryVariables>;
 export const SubmissionDocument = new TypedDocumentString(`
     query submission($id: ObjectId!) {
   submission(id: $id) {
@@ -4370,6 +5232,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4424,6 +5287,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4481,6 +5345,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4538,6 +5403,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4595,6 +5461,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4652,6 +5519,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug
@@ -4709,6 +5577,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug

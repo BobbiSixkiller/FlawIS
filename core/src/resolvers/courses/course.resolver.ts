@@ -66,8 +66,8 @@ export class CourseResolver {
 
   @Authorized([Access.Admin])
   @Mutation(() => CourseMutationResponse)
-  async createCourse(@Arg("data") data: CourseInput) {
-    const course = await this.courseService.createCourse(data);
+  async createCourse(@Arg("data") data: CourseInput, @Ctx() { user }: Context) {
+    const course = await this.courseService.createCourse(data, user!.id);
 
     return {
       data: course,
@@ -80,8 +80,12 @@ export class CourseResolver {
 
   @Authorized([Access.Admin])
   @Mutation(() => CourseMutationResponse)
-  async updateCourse(@Arg("id") id: ObjectId, @Arg("data") data: CourseInput) {
-    const course = await this.courseService.updateCourse(id, data);
+  async updateCourse(
+    @Arg("id") id: ObjectId,
+    @Arg("data") data: CourseInput,
+    @Ctx() { user }: Context,
+  ) {
+    const course = await this.courseService.updateCourse(id, data, user!.id);
 
     return {
       data: course,
@@ -125,10 +129,7 @@ export class CourseResolver {
 
   @Authorized()
   @FieldResolver(() => ElearningAccess, { nullable: true })
-  async elearningAccess(
-    @Root() { id }: Course,
-    @Ctx() { user }: Context,
-  ) {
+  async elearningAccess(@Root() { id }: Course, @Ctx() { user }: Context) {
     return await this.reach360Service.getElearningAccess(id, user!.id);
   }
 

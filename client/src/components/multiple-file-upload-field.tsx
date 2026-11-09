@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Spinner from "./spinner";
 import { useFileSource, type FileSources } from "./use-file-source";
 import { useObjectURL } from "./use-object-url";
+import { cn } from "@/lib/utils";
 
 export interface MultipleFileUploadProps extends AriaAttributes {
   name?: string;
@@ -22,6 +23,9 @@ export interface MultipleFileUploadProps extends AriaAttributes {
   maxSize?: number;
   accept?: Accept;
   fileSources?: FileSources;
+  /** Files already stored remotely also count towards the limit. */
+  existingCount?: number;
+  lng?: string;
 }
 export default function MultipleFileUploadField({
   value,
@@ -34,8 +38,15 @@ export default function MultipleFileUploadField({
   fileSources,
   disabled,
   ref,
+  existingCount = 0,
+  lng = "en",
   ...props
 }: MultipleFileUploadProps) {
+  const t = (sk: string, en: string) => (lng === "sk" ? sk : en);
+  const limitError = t(
+    `Najviac ${maxFiles} súborov.`,
+    `Maximum ${maxFiles} files.`,
+  );
   const loading = useFileSource({
     value,
     sources: fileSources,
@@ -53,14 +64,35 @@ export default function MultipleFileUploadField({
       onDrop: (accepted, rejected) => {
         if (rejected.length) {
           onError?.(
-            rejected
-              .flatMap((file) => file.errors.map((error) => error.message))
-              .join(" "),
+            [
+              ...new Set(
+                rejected.flatMap(({ errors }) =>
+                  errors.map((error) =>
+                    error.code === "too-many-files"
+                      ? limitError
+                      : error.code === "file-too-large"
+                        ? t(
+                            `Najviac ${Math.round((maxSize || 0) / 1024 / 1024)} MiB na súbor.`,
+                            `Maximum ${Math.round((maxSize || 0) / 1024 / 1024)} MiB per file.`,
+                          )
+                        : error.code === "file-invalid-type"
+                          ? t(
+                              "Nepodporovaný typ súboru.",
+                              "Unsupported file type.",
+                            )
+                          : error.message,
+                  ),
+                ),
+              ),
+            ].join(" "),
           );
           return;
         }
-        if (maxFiles && (value?.length ?? 0) + accepted.length > maxFiles) {
-          onError?.(`Maximum number of files: ${maxFiles}`);
+        if (
+          maxFiles != null &&
+          existingCount + (value?.length ?? 0) + accepted.length > maxFiles
+        ) {
+          onError?.(limitError);
           return;
         }
         onChange([...(value ?? []), ...accepted]);
@@ -80,9 +112,19 @@ export default function MultipleFileUploadField({
           if (typeof ref === "function") ref(element);
           else if (ref) ref.current = element;
         }}
-        className={`mt-1 flex gap-4 flex-col items-center p-12 border-2 border-dashed rounded-lg transition-all ease-in-out ${isDragAccept ? "border-green-500" : isDragReject || props["aria-invalid"] ? "border-red-500" : isFocused ? "border-primary" : "border-border"} bg-muted dark:bg-card dark:border-border text-muted-foreground outline-hidden`}
+        className={cn(
+          "flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted p-6 text-muted-foreground outline-hidden",
+          (isDragAccept || isFocused) && "border-primary",
+          (isDragReject || props["aria-invalid"]) && "border-destructive",
+          (disabled || loading) && "cursor-not-allowed opacity-50",
+        )}
       >
-        <input {...getInputProps({ name: props.name })} />
+        <input
+          {...getInputProps({
+            name: props.name,
+            "aria-labelledby": props["aria-labelledby"],
+          })}
+        />
         {loading ? (
           <Spinner />
         ) : (
@@ -90,12 +132,19 @@ export default function MultipleFileUploadField({
             <Icon name="plus" className="stroke-2 size-5" />
           </span>
         )}
+        <span>
+          {t(
+            "Presuňte súbory sem alebo ich vyberte",
+            "Drop files here or choose files",
+          )}
+        </span>
       </div>
       {(value ?? []).map((file, index) => (
         <FileRow
           key={`${file.name}-${index}`}
           file={file}
           disabled={disabled}
+          removeLabel={t(`Odobrať ${file.name}`, `Remove ${file.name}`)}
           onDelete={() => onChange((value ?? []).filter((_, i) => i !== index))}
         />
       ))}
@@ -106,10 +155,12 @@ function FileRow({
   file,
   disabled,
   onDelete,
+  removeLabel,
 }: {
   file: File;
   disabled?: boolean;
   onDelete: () => void;
+  removeLabel: string;
 }) {
   const url = useObjectURL(file);
   return (
@@ -129,7 +180,7 @@ function FileRow({
           size="icon"
           variant="ghost"
           className="rounded-full"
-          aria-label={`Remove ${file.name}`}
+          aria-label={removeLabel}
         >
           <Icon name="x-mark" className="stroke-2 size-5" />
         </Button>

@@ -56,7 +56,7 @@ export default async function ParticipantTenantShell({
         }
       />
 
-      <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0">
+      <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0 sm:has-[[data-page-width=wide]]:max-w-3xl sm:has-[[data-page-width=wide]]:px-6">
         {children}
       </main>
 

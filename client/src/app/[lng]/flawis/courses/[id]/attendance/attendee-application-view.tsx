@@ -12,7 +12,6 @@ import {
   Status,
 } from "@/lib/graphql/generated/graphql";
 import { useTranslation } from "@/lib/i18n/client";
-import { deleteFiles } from "@/lib/minio";
 import { createRegistrationSchema } from "@/lib/validation/registration-form-schema";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
@@ -29,9 +28,10 @@ interface AttendeeApplicationViewProps {
 
 export default function AttendeeApplicationView({
   attendee,
-  registrationForm,
+  registrationForm: currentForm,
   dialogId,
 }: AttendeeApplicationViewProps) {
+  const registrationForm = attendee.applicationForm || currentForm;
   const { lng } = useParams<{ lng: string }>();
   const user = useUser();
   const closeDialog = useDialogStore((s) => s.closeDialog);
@@ -90,11 +90,6 @@ export default function AttendeeApplicationView({
             ),
           );
 
-          const existingUrls = existingAnswers[field.id];
-          if (Array.isArray(existingUrls) && existingUrls.length > 0) {
-            await deleteFiles(existingUrls);
-          }
-
           answers[field.id] = newUrls;
         } else {
           answers[field.id] = (val as string) ?? "";
@@ -107,6 +102,7 @@ export default function AttendeeApplicationView({
       application: {
         form: registrationForm.id,
         formVersion: registrationForm.version,
+        revision: attendee.application.revision,
         answers,
       },
     });

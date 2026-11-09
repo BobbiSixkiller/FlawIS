@@ -9,10 +9,15 @@ export async function login(email: string, password: string, url?: string) {
   const res = await executeGqlMutation(
     LoginDocument,
     { email, password },
-    (data) => ({ message: data.login.message, data: data.login.data }),
+    (data) => ({
+      message: data.login.message,
+      data: data.login.data
+        ? { ...data.login.data, token: data.login.token }
+        : null,
+    }),
   );
 
-  if (res.data) {
+  if (res.data?.token) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const cookieStore = await cookies();
 

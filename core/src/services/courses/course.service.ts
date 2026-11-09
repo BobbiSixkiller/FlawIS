@@ -78,7 +78,10 @@ export class CourseService {
     return await this.courseRepository.paginatedCourses(args);
   }
 
-  async createCourse({ formFields, reachCourse, ...data }: CourseInput) {
+  async createCourse(
+    { formFields, reachCourse, ...data }: CourseInput,
+    actor: ObjectId,
+  ) {
     if (reachCourse) {
       await this.reach360Service.validateCourse(reachCourse.courseId);
     }
@@ -102,6 +105,7 @@ export class CourseService {
         formFields,
         course._id,
         session,
+        actor,
       );
 
       return { ...toDTO(course), registrationForm };
@@ -111,12 +115,11 @@ export class CourseService {
   async updateCourse(
     id: ObjectId,
     { formFields, reachCourse, ...data }: CourseInput,
+    actor: ObjectId,
   ) {
     const current = await this.courseRepository.findOne({ _id: id });
     if (!current) {
-      throw new Error(
-        this.i18nService.translate("notFound", { ns: "course" }),
-      );
+      throw new Error(this.i18nService.translate("notFound", { ns: "course" }));
     }
 
     if (data.price > 0 && !data.billing) {
@@ -164,6 +167,7 @@ export class CourseService {
         formFields,
         updated._id,
         session,
+        actor,
       );
 
       return { ...toDTO(updated), registrationForm };
@@ -172,11 +176,9 @@ export class CourseService {
 
   async deleteCourse(id: ObjectId) {
     return withOptionalTransaction(undefined, async (session) => {
-      const course = await this.courseRepository.findOne(
-        { _id: id },
-        null,
-        { session },
-      );
+      const course = await this.courseRepository.findOne({ _id: id }, null, {
+        session,
+      });
       if (!course) {
         throw new Error(
           this.i18nService.translate("notFound", { ns: "course" }),
@@ -216,6 +218,7 @@ export class CourseService {
         { session },
       );
       await this.formService.deleteCourseForms(id, session);
+      await this.formService.deleteAnswers("COURSE", attendeeIds, session);
 
       const deleted = await this.courseRepository.findOneAndDelete(
         { _id: id },

@@ -1,3 +1,8 @@
 .env
 .DS_Store
 
+
+core/dist/
+mail/dist/
+
+mail/*.tsbuildinfo

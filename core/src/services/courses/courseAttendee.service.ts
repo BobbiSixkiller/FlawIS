@@ -84,8 +84,11 @@ export class CourseAttendeeService {
       throw new Error("You are already registered for this course!");
     }
 
-    const form = await this.formService.getForm(application.form);
-    if (form.course.toString() !== course.id.toString()) {
+    const form = await this.formService.getLatestCourseForm(course.id);
+    if (
+      String(form.id) !== String(application.form) ||
+      form.version !== application.formVersion
+    ) {
       throw new Error("Form does not belong to this course!");
     }
 
@@ -97,7 +100,7 @@ export class CourseAttendeeService {
     }
 
     const attendeeId = new ObjectId();
-    const { attendee, invoice } = await withOptionalTransaction(
+    const { attendee } = await withOptionalTransaction(
       undefined,
       async (session) => {
         const invoice = isPaid
@@ -123,6 +126,18 @@ export class CourseAttendeeService {
             })
           : undefined;
 
+        const answer = await this.formService.saveAnswers(
+          {
+            context: "COURSE",
+            owner: course.id,
+            subject: attendeeId,
+            respondent: String(userId),
+            form: application.form,
+            answers: application.answers,
+            submitted: true,
+          },
+          session,
+        );
         const attendee = await this.courseAttendeeRepository.create(
           {
             _id: attendeeId,
@@ -134,11 +149,7 @@ export class CourseAttendeeService {
               organization: user.organization,
               telephone: user.telephone,
             },
-            application: {
-              form: application.form,
-              formVersion: application.formVersion,
-              answers: application.answers,
-            },
+            applicationId: answer.id,
             invoiceId: invoice?._id,
           },
           { session },
@@ -150,22 +161,24 @@ export class CourseAttendeeService {
           { session },
         );
 
+        await this.rmqService.produceMessage(
+          JSON.stringify({
+            locale: this.i18nService.language(),
+            hostname,
+            name: user.name,
+            email: user.email,
+            courseId: course.id,
+            course: course.name,
+            invoice: invoice
+              ? this.invoiceService.toInvoice(invoice)
+              : undefined,
+          }),
+          "mail.courses.applied",
+        );
+
         return { attendee, invoice };
       },
       isDuplicateInvoiceNumberError,
-    );
-
-    this.rmqService.produceMessage(
-      JSON.stringify({
-        locale: this.i18nService.language(),
-        hostname,
-        name: user.name,
-        email: user.email,
-        courseId: course.id,
-        course: course.name,
-        invoice: invoice ? this.invoiceService.toInvoice(invoice) : undefined,
-      }),
-      "mail.courses.applied",
     );
 
     return toDTO(attendee);
@@ -191,26 +204,21 @@ export class CourseAttendeeService {
       throw new Error("Not authorized to update this application!");
     }
 
-    const form = await this.formService.getForm(application.form);
-    if (form.course.toString() !== attendee.course.toString()) {
-      throw new Error("Form does not belong to this course!");
-    }
-
-    const updated = await this.courseAttendeeRepository.findOneAndUpdate(
-      { _id: attendeeId },
-      {
-        $set: {
-          application: {
-            form: application.form,
-            formVersion: application.formVersion,
-            answers: application.answers,
-          },
-        },
-      },
-      { new: true },
-    );
-
-    return toDTO(updated!);
+    const existing = await this.formService.answer("COURSE", attendeeId);
+    if (!existing || String(existing.form) !== String(application.form))
+      throw new Error("Form version mismatch.");
+    await this.formService.saveAnswers({
+      context: "COURSE",
+      owner: attendee.course as ObjectId,
+      subject: attendeeId,
+      respondent: String(userId),
+      form: application.form,
+      answers: application.answers,
+      submitted: true,
+      expectedRevision: application.revision,
+      reopen: true,
+    });
+    return toDTO(attendee);
   }
 
   async updateAttendeeStatus(
@@ -255,10 +263,10 @@ export class CourseAttendeeService {
           course: course.name,
         }),
         `mail.courses.${status.toLowerCase()}` as RoutingKey,
+        session,
       );
 
       await session.commitTransaction();
-
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -307,29 +315,16 @@ export class CourseAttendeeService {
       if (!attendee) {
         throw new Error("Attendee not found!");
       }
-      const [_, __, form] = await Promise.all([
-        this.courseRepository.findOneAndUpdate(
-          { _id: attendee.course },
-          { $inc: { attendeesCount: -1 } },
-          { session, new: true },
-        ),
-        this.attendanceRecordRepository.deleteMany(
-          { attendee: attendee._id },
-          { session },
-        ),
-        this.formService.getForm(attendee.application.form),
-      ]);
-
-      const uploadField = form.fields.find(
-        (f) => f.type === FieldType.FileUpload,
+      await this.courseRepository.findOneAndUpdate(
+        { _id: attendee.course },
+        { $inc: { attendeesCount: -1 } },
+        { session },
       );
-      if (uploadField) {
-        await this.minioService.deleteFiles(
-          attendee.application.answers.get(
-            uploadField.id.toString(),
-          ) as string[],
-        );
-      }
+      await this.attendanceRecordRepository.deleteMany(
+        { attendee: attendee._id },
+        { session },
+      );
+      await this.formService.deleteAnswers("COURSE", [attendee._id], session);
 
       return toDTO(attendee);
     });

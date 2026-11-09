@@ -1,22 +1,22 @@
-FROM node:22-alpine AS development
+FROM node:26.13.0-alpine AS development
 
 WORKDIR /usr/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-FROM node:22-alpine AS production
+FROM node:26.13.0-alpine AS production
 
 WORKDIR /usr/app
 
 COPY package*.json ./
 
-RUN npm install --only=production
+RUN npm ci --omit=dev
 
 COPY . .
 

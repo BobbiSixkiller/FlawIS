@@ -3,6 +3,33 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type AcademicYear {
+  academicYear: String!
+  count: Int!
+}
+
+"""User access inside the FLAWIS system"""
+enum Access {
+  Admin
+  ConferenceAttendee
+  CourseAttendee
+  Organization
+  Student
+}
+
+type ActivityEvent {
+  action: String!
+  actor: String!
+  actorName: String
+  changes: JSONObject!
+  conference: ObjectId
+  createdAt: DateTimeISO!
+  id: ObjectId!
+  originalActor: String
+  requestId: String!
+  submission: ObjectId
+}
+
 type Address {
   city: String!
   country: String!
@@ -10,107 +37,1150 @@ type Address {
   street: String!
 }
 
+input AddressInput {
+  city: String!
+  country: String!
+  postal: String!
+  street: String!
+}
+
+"""represents one row of attendance matrix"""
+type Attendance {
+  attendanceRecords: [AttendanceRecord]!
+  attendee: CourseAttendee!
+}
+
+type AttendanceConnection {
+  edges: [AttendanceEdge]!
+  pageInfo: AttendancePageInfo!
+  sessions: [CourseSession]!
+  totalCount: Int!
+}
+
+type AttendanceEdge {
+  cursor: String!
+  node: Attendance!
+}
+
+type AttendancePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+"""Represents individual attendance for a given course term."""
+type AttendanceRecord {
+  attendee: CourseAttendee!
+  createdAt: DateTimeISO!
+
+  """
+  Hours the person attended a given course term. Can't be more than the hours from start to end of a term.
+  """
+  hoursAttended: Float!
+  id: ObjectId!
+  online: Boolean
+  session: CourseSession!
+  updatedAt: DateTimeISO!
+}
+
+type AttendanceRecordMutationResponse implements IMutationResponse {
+  data: AttendanceRecord!
+  message: String!
+}
+
+"""Attendee model type"""
+type Attendee {
+  conference: Conference!
+  createdAt: DateTimeISO!
+  hasInvoice: Boolean!
+  id: ObjectId!
+  invoice: Invoice
+  submissions: [Submission!]!
+  ticket: Ticket!
+  updatedAt: DateTimeISO!
+  user: UserStubUnion!
+}
+
+"""AttendeeConnection type enabling cursor based pagination"""
+type AttendeeConnection {
+  edges: [AttendeeEdge]!
+  pageInfo: AttendeePageInfo!
+  totalCount: Int!
+}
+
+type AttendeeEdge {
+  cursor: String!
+  node: Attendee!
+}
+
+input AttendeeFilterInput {
+  conferenceSlug: String!
+  passive: Boolean
+  sectionIds: [ObjectId]! = []
+}
+
+"""Conference registration input type"""
+input AttendeeInput {
+  billing: BillingInput!
+  conferenceId: ObjectId!
+  initialSubmission: SubmissionInput
+  ticketId: ObjectId!
+}
+
+type AttendeeMutationResponse implements IMutationResponse {
+  data: Attendee!
+  message: String!
+}
+
+type AttendeePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input AttendeeSortInput {
+  direction: SortDirection!
+  field: AttendeeSortableField!
+}
+
+"""Sortable enum definition for attendees query"""
+enum AttendeeSortableField {
+  ID
+  NAME
+}
+
+type AvailableCategory {
+  count: Int!
+  id: ObjectId!
+  name: String!
+  slug: String!
+}
+
 """Billing information"""
 type Billing {
-  DIC: String!
-  ICDPH: String!
-  ICO: String!
+  DIC: String
+  IBAN: String
+  ICDPH: String
+  ICO: String
+  SWIFT: String
   address: Address!
+  name: String!
+  variableSymbol: String
+}
+
+input BillingInput {
+  DIC: String
+  IBAN: String
+  ICDPH: String
+  ICO: String
+  SWIFT: String
+  address: AddressInput!
+  name: String!
+  variableSymbol: String
+}
+
+"""Course category"""
+type Category {
+  createdAt: DateTimeISO!
+  id: ObjectId!
+  name: String!
+  slug: String!
+  updatedAt: DateTimeISO!
+}
+
+input CategoryInput {
   name: String!
 }
 
+type CategoryMutationResponse implements IMutationResponse {
+  data: Category!
+  message: String!
+}
+
+"""Conference model type"""
+type Conference {
+  attendeesCount: Int!
+  attending: Attendee
+  billing: Billing!
+  createdAt: DateTimeISO!
+  dates: ImportantDates!
+  id: ObjectId!
+  sections: [Section!]!
+  slug: String!
+  tickets: [Ticket!]!
+  translations: ConferenceTranslation!
+  updatedAt: DateTimeISO!
+}
+
+"""ConferenceConnection type enabling cursor based pagination"""
+type ConferenceConnection {
+  edges: [ConferenceEdge]!
+  pageInfo: ConferencePageInfo!
+  totalCount: Int!
+}
+
+type ConferenceEdge {
+  cursor: String!
+  node: Conference!
+}
+
+"""Conference input type"""
+input ConferenceInput {
+  billing: BillingInput!
+  dates: DatesInput!
+  slug: String!
+  translations: ConferenceTranslationInput!
+}
+
+type ConferenceMutationResponse implements IMutationResponse {
+  data: Conference!
+  message: String!
+}
+
+type ConferencePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input ConferenceSortInput {
+  direction: SortDirection!
+  field: ConferenceSortableField!
+}
+
+"""Sortable enum definition for conferences query"""
+enum ConferenceSortableField {
+  ID
+}
+
+type ConferenceTranslation {
+  en: ConferenceTranslations!
+  sk: ConferenceTranslations!
+}
+
+input ConferenceTranslationInput {
+  en: LocalizedConferenceInputs!
+  sk: LocalizedConferenceInputs!
+}
+
+type ConferenceTranslations {
+  logoUrl: String!
+  name: String!
+}
+
+type Course {
+  attendance(after: String, first: Int! = 20, sort: [CourseAttendeeSortInput]!): AttendanceConnection!
+  attendeesCount: Int!
+  attending: CourseAttendee
+  billing: Billing
+  categories: [Category!]!
+  createdAt: DateTimeISO!
+
+  """String representation of HTML describing the course"""
+  description: String!
+  elearningAccess: ElearningAccess
+  end: DateTimeISO!
+  hasElearning: Boolean!
+  id: ObjectId!
+  isPaid: Boolean!
+  maxAttendees: Int!
+  name: String!
+  price: Int!
+  procurer: UserStub
+  registrationEnd: DateTimeISO!
+  registrationForm: Form!
+  start: DateTimeISO!
+  thumbnail: String
+  updatedAt: DateTimeISO!
+}
+
+"""Connects a system user with a particular course."""
+type CourseAttendee {
+  application: FormSubmission!
+  applicationForm: Form!
+  course: ObjectId!
+  createdAt: DateTimeISO!
+  elearningErrorCode: String
+  elearningStatus: ElearningProvisioningStatus
+  grade: String
+  hasInvoice: Boolean!
+  id: ObjectId!
+  invoice: Invoice
+  status: Status!
+  updatedAt: DateTimeISO!
+  user: CourseAttendeeUserStub!
+}
+
+type CourseAttendeeMutationResponse implements IMutationResponse {
+  data: CourseAttendee!
+  message: String!
+}
+
+input CourseAttendeeSortInput {
+  direction: SortDirection!
+  field: CourseAttendeeSortableField!
+}
+
+"""Sortable enum definition for course attendees query"""
+enum CourseAttendeeSortableField {
+  ID
+  NAME
+}
+
+type CourseAttendeeUserStub {
+  avatarUrl: String
+  email: String!
+  id: ObjectId!
+  name: String!
+  organization: String!
+  telephone: String
+}
+
+type CourseConnection {
+  availableCategories: [AvailableCategory!]!
+  edges: [CourseEdge]!
+  pageInfo: CoursePageInfo!
+  totalCount: Int!
+}
+
+type CourseEdge {
+  cursor: String!
+  node: Course!
+}
+
+input CourseFilterInput {
+  categorySlugs: [String]! = []
+}
+
+input CourseInput {
+  billing: BillingInput
+  categories: [ObjectId!]!
+  description: String!
+  end: DateTimeISO!
+
+  """Property describing dynamic registration form of a given course"""
+  formFields: [FormFieldInput!]!
+  maxAttendees: Int!
+  name: String!
+  price: Int!
+  reachCourse: ReachCourseConfigInput
+  registrationEnd: DateTimeISO!
+  start: DateTimeISO!
+  thumbnail: String
+}
+
+type CourseMutationResponse implements IMutationResponse {
+  data: Course!
+  message: String!
+}
+
+type CoursePageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
 """
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
+Scheduled term for a given course that when created also creates corresponding attendance records.
 """
-scalar DateTime
+type CourseSession {
+  course: ObjectId!
+  createdAt: DateTimeISO!
+  description: String
+  end: DateTimeISO!
+  id: ObjectId!
+  name: String!
+  start: DateTimeISO!
+  updatedAt: DateTimeISO!
+}
+
+input CourseSessionInput {
+  course: ObjectId!
+  description: String
+  end: DateTimeISO!
+  name: String!
+  start: DateTimeISO!
+}
+
+type CourseSessionMutationResponse implements IMutationResponse {
+  data: CourseSession!
+  message: String!
+}
+
+input CourseSortInput {
+  direction: SortDirection!
+  field: CourseSortableField!
+}
+
+"""Sortable enum definition for courses query"""
+enum CourseSortableField {
+  ID
+  NAME
+  REGISTRATION_END
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
+"""
+scalar DateTimeISO
+
+input DatesInput {
+  end: DateTimeISO!
+  regEnd: DateTimeISO
+  start: DateTimeISO!
+  submissionDeadline: DateTimeISO
+}
+
+type ElearningAccess {
+  launchUrl: String
+  status: ElearningProvisioningStatus!
+}
+
+"""Current synchronization state of a Reach 360 enrollment."""
+enum ElearningProvisioningStatus {
+  Enrolled
+  PendingInvitation
+  Revoked
+  SyncFailed
+}
+
+type FeedbackRelease {
+  createdAt: DateTimeISO!
+  feedback: JSONObject!
+  id: ObjectId!
+  round: ObjectId!
+  submission: ObjectId!
+}
+
+"""Supported shared form field types"""
+enum FieldType {
+  FileUpload
+  RadioGroup
+  Select
+  Text
+  Textarea
+}
+
+type Form {
+  course: ObjectId
+  createdAt: DateTimeISO!
+  definition: ObjectId!
+  fields: [FormField!]!
+  id: ObjectId!
+  updatedAt: DateTimeISO!
+  version: Int!
+}
+
+type FormDefinition {
+  archived: Boolean!
+  createdAt: DateTimeISO!
+  description: String!
+  id: ObjectId!
+  latestVersion: Int!
+  name: String!
+  updatedAt: DateTimeISO!
+}
+
+type FormField {
+  helpText: String
+  id: ObjectId!
+  label: String!
+  maxFiles: Int
+  minFiles: Int
+  placeholder: String
+  required: Boolean!
+  selectOptions: [SelectOption!]
+  type: FieldType!
+}
+
+input FormFieldInput {
+  helpText: String
+  id: ObjectId
+  label: String!
+  maxFiles: Int
+  minFiles: Int
+  placeholder: String
+  required: Boolean!
+  selectOptions: [SelectOptionInput!]
+  type: FieldType!
+}
+
+type FormSubmission {
+  answers: JSONObject!
+  createdAt: DateTimeISO!
+  form: ObjectId!
+  formVersion: Int!
+  id: ObjectId!
+  revision: Int!
+  submitted: Boolean!
+  updatedAt: DateTimeISO!
+}
+
+input FormSubmissionInput {
+  answers: JSONObject!
+  form: ObjectId!
+  formVersion: Int!
+  revision: Int
+}
 
 interface IMutationResponse {
   message: String!
 }
 
+"""Important dates regarding conference"""
+type ImportantDates {
+  end: DateTimeISO!
+  regEnd: DateTimeISO
+  start: DateTimeISO!
+  submissionDeadline: DateTimeISO
+}
+
+"""Ovject type representing student who applies for an internship"""
+type Intern {
+  createdAt: DateTimeISO!
+  fileUrls: [String!]!
+  id: ObjectId!
+  internship: ObjectId!
+  organization: String!
+  organizationFeedbackUrl: String
+
+  """Term in which the intern prefers to attend the internship"""
+  semester: Semester
+  status: Status!
+  updatedAt: DateTimeISO!
+  user: StudentReference!
+}
+
+"""InternConnection type enabling cursor based pagination"""
+type InternConnection {
+  edges: [InternEdge]!
+  pageInfo: InternPageInfo!
+  totalCount: Int!
+}
+
+type InternEdge {
+  cursor: String!
+  node: Intern!
+}
+
+input InternFilterInput {
+  endDate: DateTimeISO
+  internship: ObjectId
+  startDate: DateTimeISO
+  status: [Status!]
+  user: ObjectId
+}
+
+type InternMutationResponse implements IMutationResponse {
+  data: Intern!
+  message: String!
+}
+
+type InternPageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input InternSortInput {
+  direction: SortDirection!
+  field: InternSortableField!
+}
+
+"""Sortable enum definition for interns query"""
+enum InternSortableField {
+  ID
+  NAME
+}
+
+"""Internship object type"""
+type Internship {
+  academicYear: String!
+  applicationsCount: Int!
+  createdAt: DateTimeISO!
+
+  """String representation of internship listing's HTML page"""
+  description: String!
+  id: ObjectId!
+  myApplication: Intern
+  organization: String!
+  updatedAt: DateTimeISO!
+  user: ObjectId!
+}
+
+"""InternshipConnection type enabling cursor based pagination"""
+type InternshipConnection {
+  academicYears: [AcademicYear!]!
+  edges: [InternshipEdge]!
+  organizations: [OrganizationCount!]!
+  pageInfo: InternshipPageInfo!
+  totalCount: Int!
+}
+
+type InternshipEdge {
+  cursor: String!
+  node: Internship!
+}
+
+input InternshipFilterInput {
+  academicYear: String
+  endDate: DateTimeISO
+  organizations: [String!]
+  startDate: DateTimeISO
+  user: ObjectId
+}
+
+input InternshipInput {
+  description: String!
+}
+
+type InternshipMutationResponse implements IMutationResponse {
+  data: Internship!
+  message: String!
+}
+
+type InternshipPageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input InternshipSortInput {
+  direction: SortDirection!
+  field: InternshipSortableField!
+}
+
+"""Sortable enum definition for interships query"""
+enum InternshipSortableField {
+  CREARTED_AT
+  HAS_APPLICATION
+  ORGANIZATION
+}
+
+"""Invoice entity"""
+type Invoice {
+  body: InvoiceData!
+  issuer: Billing!
+  payer: Billing!
+}
+
+"""The body of an invoice"""
+type InvoiceData {
+  body: String!
+  comment: String!
+  dueDate: DateTimeISO!
+  issueDate: DateTimeISO!
+  price: Float!
+  type: String!
+  vat: Float!
+  vatDate: DateTimeISO!
+}
+
+input InvoiceDataInput {
+  body: String!
+  comment: String!
+  dueDate: DateTimeISO!
+  issueDate: DateTimeISO!
+  price: Float!
+  type: String!
+  vat: Float!
+  vatDate: DateTimeISO!
+}
+
+input InvoiceInput {
+  body: InvoiceDataInput!
+  issuer: BillingInput!
+  payer: BillingInput!
+}
+
+"""The registration type that owns an invoice."""
+enum InvoiceOwnerType {
+  CONFERENCE_ATTENDEE
+  COURSE_ATTENDEE
+}
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+input LocalizedConferenceInputs {
+  logoUrl: String!
+  name: String!
+}
+
+input LocalizedSectionInputs {
+  name: String!
+  topic: String!
+}
+
+input LocalizedSubmissionInputs {
+  abstract: String!
+  keywords: [String!]!
+  name: String!
+}
+
+input LocalizedTicketInputs {
+  description: String!
+  name: String!
+}
+
 type Mutation {
-  activateUser: String!
-  deleteUser(id: ObjectId!): String!
-  login(email: String!, password: String!): User!
+  """Adds currently logged in user as the co-author of a submission"""
+  acceptAuthorInvite: SubmissionMutationResponse!
+  activateUser: UserMutationResponse!
+  addAttendee(data: AttendeeInput!): ConferenceMutationResponse!
+  archiveLibraryForm(definition: ObjectId!): Boolean!
+  bindCourseRegistrationForm(course: ObjectId!, form: ObjectId!): Form!
+  changeCourseAttendeeStatus(id: ObjectId!, status: Status!): CourseAttendeeMutationResponse!
+  changeInternStatus(id: ObjectId!, status: Status!): InternMutationResponse!
+  conferenceReviewAction(action: String!, data: JSONObject!, submission: ObjectId!): JSONObject!
+  configureConferenceReviews(conference: ObjectId!, data: JSONObject!): ReviewSettings!
+  createCategory(data: CategoryInput!): CategoryMutationResponse!
+  createConference(data: ConferenceInput!): ConferenceMutationResponse!
+  createCourse(data: CourseInput!): CourseMutationResponse!
+  createCourseAttendee(application: FormSubmissionInput!, billing: BillingInput, courseId: ObjectId!): CourseAttendeeMutationResponse!
+  createCourseSession(data: CourseSessionInput!): CourseSessionMutationResponse!
+  createIntern(fileUrls: [String]!, internshipId: ObjectId!, semester: Semester!): InternMutationResponse!
+  createInternship(input: InternshipInput!): InternshipMutationResponse!
+  createLibraryForm(description: String! = "", name: String!): FormDefinition!
+  createSection(data: SectionInput!): SectionMutationResponse!
+  createSubmission(data: SubmissionInput!): SubmissionMutationResponse!
+  createTicket(data: TicketInput!, slug: String!): ConferenceMutationResponse!
+  declineReview(token: String!): JSONObject!
+  deleteAttendee(id: ObjectId!): AttendeeMutationResponse!
+  deleteCategory(id: ObjectId!): CategoryMutationResponse!
+  deleteConference(id: ObjectId!): ConferenceMutationResponse!
+  deleteCourse(id: ObjectId!): CourseMutationResponse!
+  deleteCourseAttendee(id: ObjectId!): CourseAttendeeMutationResponse!
+  deleteCourseSession(id: ObjectId!): CourseSessionMutationResponse!
+  deleteIntern(id: ObjectId!): InternMutationResponse!
+  deleteInternship(id: ObjectId!): InternshipMutationResponse!
+  deleteSection(id: ObjectId!): SectionMutationResponse!
+  deleteSubmission(id: ObjectId!): SubmissionMutationResponse!
+  deleteTicket(slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
+  deleteUser(id: ObjectId!): UserMutationResponse!
+  enterReviewReport(answers: JSONObject!, assignment: ObjectId!, expectedRevision: Int): JSONObject!
+  googleSignIn(authCode: String!, redirectUri: String!): UserMutationResponse!
+  impersonateUser(id: ObjectId!): UserMutationResponse!
+  inviteUsers(input: OrganizationEmailsInput!): String!
+  login(email: String!, password: String!): UserMutationResponse!
   passwordReset(data: PasswordInput!): UserMutationResponse!
-  register(data: RegisterInput!): UserMutationResponse!
+  publishLibraryForm(definition: ObjectId!, description: String, fields: [FormFieldInput!]!, name: String): Form!
+  register(data: RegisterUserInput!): UserMutationResponse!
+  removeAuthor(authorId: ObjectId!, id: ObjectId!): SubmissionMutationResponse!
   resendActivationLink: String!
-  toggleVerifiedUser(id: ObjectId!): UserMutationResponse!
+  revokeReviewCoordinator(id: ObjectId!): Boolean!
+  saveReviewReport(answers: JSONObject!, expectedRevision: Int, submit: Boolean! = false, token: String!): JSONObject!
+  saveReviewer(data: JSONObject!, id: ObjectId): Reviewer!
+  setReviewCoordinator(conference: ObjectId!, email: String!, section: ObjectId): Boolean!
+  setReviewerEligibility(conference: ObjectId!, data: JSONObject!, reviewer: ObjectId!): Boolean!
+  stopImpersonation: UserMutationResponse!
+  syncCourseElearningAccess(attendeeId: ObjectId!): CourseAttendeeMutationResponse!
+  toggleVerifiedUser(id: ObjectId!, verified: Boolean!): UserMutationResponse!
+  updateAttendanceHours(hoursAttended: Float!, id: ObjectId!): AttendanceRecordMutationResponse!
+  updateAttendanceOnline(id: ObjectId!, online: Boolean!): AttendanceRecordMutationResponse!
+  updateCategory(data: CategoryInput!, id: ObjectId!): CategoryMutationResponse!
+  updateConferenceDates(data: DatesInput!, slug: String!): ConferenceMutationResponse!
+  updateCourse(data: CourseInput!, id: ObjectId!): CourseMutationResponse!
+  updateCourseAttendee(application: FormSubmissionInput!, id: ObjectId!): CourseAttendeeMutationResponse!
+  updateCourseSession(data: CourseSessionInput!, id: ObjectId!): CourseSessionMutationResponse!
+  updateInternData(fileUrls: [String]!, id: ObjectId!, semester: Semester!): InternMutationResponse!
+  updateInternship(id: ObjectId!, input: InternshipInput!): InternshipMutationResponse!
+  updateInvoice(data: InvoiceInput!, id: ObjectId!): AttendeeMutationResponse!
+  updateOrgFeedback(fileUrl: String, id: ObjectId!): InternMutationResponse!
+  updateSection(data: SectionInput!, id: ObjectId!): SectionMutationResponse!
+  updateSubmission(data: SubmissionInput!, id: ObjectId!): SubmissionMutationResponse!
+  updateTicket(data: TicketInput!, slug: String!, ticketId: ObjectId!): ConferenceMutationResponse!
   updateUser(data: UserInput!, id: ObjectId!): UserMutationResponse!
 }
 
 """Mongo object id scalar type"""
 scalar ObjectId
 
-type PageInfo {
-  endCursor: ObjectId!
-  hasNextPage: Boolean!
+type OrganizationCount {
+  count: Int!
+  organization: String!
+}
+
+"""
+Addresses of the organizations you want to invite to FlawIS/internships
+"""
+input OrganizationEmailsInput {
+  emails: [String!]!
 }
 
 input PasswordInput {
   password: String!
 }
 
+"""Language the speaker will be presenting his submission in"""
+enum PresentationLng {
+  CZ
+  EN
+  SK
+}
+
 type Query {
+  assignmentEligibility(reviewer: ObjectId!, submission: ObjectId!): JSONObject!
+  attendee(id: ObjectId!): Attendee!
+  attendees(after: String, filter: AttendeeFilterInput, first: Int! = 20, sort: [AttendeeSortInput]!): AttendeeConnection!
+  authorReviewFeedback(submission: ObjectId!): [FeedbackRelease!]!
+  authorReviewWorkspace(submission: ObjectId!): JSONObject!
+  categories(search: String): [Category!]!
+  conference(slug: String!): Conference!
+  conferenceActivity(before: ObjectId, conference: ObjectId!, submission: ObjectId): [ActivityEvent!]!
+  conferenceReviewQueue(after: ObjectId, conference: ObjectId!, delivery: String, first: Int! = 30, reviewer: String, search: String, section: ObjectId, stage: String): JSONObject!
+  conferenceReviewSettings(conference: ObjectId!): ReviewSettings
+  conferences(after: String, first: Int! = 20, sort: [ConferenceSortInput]!): ConferenceConnection!
+  course(id: ObjectId!): Course!
+  courseAttendee(id: ObjectId!): CourseAttendee!
+  courseReachConfig(courseId: ObjectId!): ReachCourseConfig
+  courses(after: String, filter: CourseFilterInput, first: Int! = 20, sort: [CourseSortInput]!): CourseConnection!
   forgotPassword(email: String!): String!
+  formLibrary(search: String! = ""): [FormDefinition!]!
+  formVersions(definition: ObjectId!): [Form!]!
+  intern(id: ObjectId!): Intern!
+  interns(after: String, filter: InternFilterInput, first: Int! = 20, sort: [InternSortInput]!): InternConnection!
+  internship(id: ObjectId!): Internship!
+  internships(after: String, filter: InternshipFilterInput, first: Int! = 20, sort: [InternshipSortInput]!): InternshipConnection!
+  invoice(attendeeId: ObjectId!, ownerType: InvoiceOwnerType!): Invoice
   me: User!
+  reviewAdminContext: JSONObject!
+  reviewCoordinators(conference: ObjectId!): JSONObject!
+  reviewerDirectory(after: ObjectId, archived: Boolean, search: String! = ""): JSONObject!
+  reviewerPortal(token: String!): JSONObject!
+  reviewerProfile(before: ObjectId, conference: ObjectId, reviewer: ObjectId!): JSONObject!
+  reviewers(after: ObjectId, search: String! = ""): [Reviewer!]!
+  revisionPortal(token: String!): JSONObject!
+  submission(id: ObjectId!): Submission!
+  submissionInvite(token: String!): Submission!
+  submissionReview(submission: ObjectId!): JSONObject!
+  textSearchAttendee(slug: String!, text: String!): [Attendee!]!
+  textSearchConference(text: String!): [Conference!]!
   textSearchUser(text: String!): [User!]!
   user(id: ObjectId!): User!
-  users(after: ObjectId, first: Int = 20): UserConnection!
+  users(after: String, filter: UserFilterInput, first: Int! = 20, sort: [UserSortInput]!): UserConnection!
+}
+
+type ReachCourseConfig {
+  courseId: String!
+  launchUrl: String!
+}
+
+input ReachCourseConfigInput {
+  courseId: String!
+  launchUrl: String!
 }
 
 """New user input data"""
-input RegisterInput {
+input RegisterUserInput {
+  access: [Access!]
+  address: AddressInput
+  avatarUrl: String
+  cvUrl: String
   email: String!
   name: String!
-  organization: String!
+  organization: String
   password: String!
+  studyProgramme: StudyProgramme
+  telephone: String
+}
+
+type ReviewSettings {
+  authorFields: [String!]!
+  conference: ObjectId!
+  enabled: Boolean!
+  form: ObjectId
+  id: ObjectId!
+  instructions: String!
+  questionnaire: Form
+  recommendationField: String
+  remindersEnabled: Boolean!
+  replyTo: String!
+  requiredReviews: Int!
+  sectionRequirements: JSONObject!
+  signature: String!
+  templateFile: ObjectId
+}
+
+type Reviewer {
+  archived: Boolean!
+  createdAt: DateTimeISO!
+  department: String!
+  email: String!
+  expertise: [String!]!
+  id: ObjectId!
+  institution: String!
+  languages: [String!]!
+  name: String!
+  notes: String!
+  updatedAt: DateTimeISO!
+}
+
+"""Conference's section entity model type"""
+type Section {
+  conference: Conference
+  createdAt: DateTimeISO!
+  id: ID!
+  submissions(after: String, filter: SubmissionFilterInput, first: Int! = 20, sort: [SubmissionSortInput]!): SubmissionConnection!
+  translations: SectionTranslation!
+  updatedAt: DateTimeISO!
+}
+
+"""Section input type"""
+input SectionInput {
+  conference: ObjectId!
+  translations: SectionTranslationInput!
+}
+
+type SectionMutationResponse implements IMutationResponse {
+  data: Section!
+  message: String!
+}
+
+type SectionTranslation {
+  en: SectionTranslations!
+  sk: SectionTranslations!
+}
+
+input SectionTranslationInput {
+  en: LocalizedSectionInputs!
+  sk: LocalizedSectionInputs!
+}
+
+type SectionTranslations {
+  name: String!
+  topic: String!
+}
+
+type SelectOption {
+  text: String!
+  value: String!
+}
+
+input SelectOptionInput {
+  text: String!
+  value: String!
+}
+
+"""Intern during summer or winter or both terms"""
+enum Semester {
+  Both
+  Summer
+  Winter
+}
+
+"""Ascending/descending direction of the sort field"""
+enum SortDirection {
+  ASC
+  DESC
+}
+
+"""Intern status"""
+enum Status {
+  Accepted
+  Applied
+  Eligible
+  Rejected
+}
+
+"""User stub type"""
+type StudentReference {
+  address: Address!
+  avatarUrl: String
+  email: String!
+
+  """User document id"""
+  id: ObjectId!
+  name: String!
+  studyProgramme: StudyProgramme!
   telephone: String!
 }
 
-"""User role inside the FLAWIS system"""
-enum Role {
-  Admin
-  Basic
+"""Student user account StudyProgramme"""
+enum StudyProgramme {
+  Bachelor1
+  Bachelor2
+  Bachelor3
+  Master1
+  Master2
+}
+
+"""Submission entity model type"""
+type Submission {
+  authors: [User!]!
+  conference: Conference!
+  createdAt: DateTimeISO!
+  fileUrl: String
+  id: ObjectId!
+  presentationLng: PresentationLng
+  section: Section!
+  translations: SubmissionTranslation!
+  updatedAt: DateTimeISO!
+  withdrawn: Boolean!
+}
+
+type SubmissionConnection {
+  edges: [SubmissionEdge]!
+  pageInfo: SubmissionPageInfo!
+  totalCount: Int!
+}
+
+type SubmissionEdge {
+  cursor: String!
+  node: Submission!
+}
+
+input SubmissionFilterInput {
+  conferenceId: ObjectId
+  sectionIds: [ObjectId!]
+}
+
+input SubmissionInput {
+  authors: [String]!
+  conference: ObjectId!
+  fileUrl: String
+  presentationLng: PresentationLng!
+  section: ObjectId!
+  translations: SubmissionTranslationInput!
+}
+
+type SubmissionMutationResponse implements IMutationResponse {
+  data: Submission!
+  message: String!
+}
+
+type SubmissionPageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input SubmissionSortInput {
+  direction: SortDirection!
+  field: SubmissionSortableField!
+}
+
+"""Sortable enum definition for submissions query"""
+enum SubmissionSortableField {
+  ID
+}
+
+type SubmissionTranslation {
+  en: SubmissionTranslationContent!
+  sk: SubmissionTranslationContent!
+}
+
+type SubmissionTranslationContent {
+  abstract: String!
+  keywords: [String!]!
+  name: String!
+}
+
+input SubmissionTranslationInput {
+  en: LocalizedSubmissionInputs!
+  sk: LocalizedSubmissionInputs!
+}
+
+"""Conference ticket"""
+type Ticket {
+  id: ObjectId!
+  online: Boolean!
+  price: Int!
+  translations: TicketTranslation!
+  withSubmission: Boolean!
+}
+
+input TicketInput {
+  online: Boolean!
+  price: Int!
+  translations: TicketTranslationInput!
+  withSubmission: Boolean!
+}
+
+type TicketTranslation {
+  en: TicketTranslations!
+  sk: TicketTranslations!
+}
+
+input TicketTranslationInput {
+  en: LocalizedTicketInputs!
+  sk: LocalizedTicketInputs!
+}
+
+type TicketTranslations {
+  description: String!
+  name: String!
 }
 
 """The user model entity"""
 type User {
+  access: [Access!]!
+  address: Address
+  avatarUrl: String
   billings: [Billing]!
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
+  cvUrl: String
   email: String!
   id: ObjectId!
   name: String!
-  organization: String!
-  role: Role!
-  telephone: String!
-  token: String!
-  updatedAt: DateTime!
+  organization: String
+  studyProgramme: StudyProgramme
+  telephone: String
+  updatedAt: DateTimeISO!
   verified: Boolean!
 }
 
 """UserConnection type enabling cursor based pagination"""
 type UserConnection {
   edges: [UserEdge]!
-  pageInfo: PageInfo!
+  pageInfo: UserPageInfo!
+  totalCount: Int!
 }
 
 type UserEdge {
-  cursor: ObjectId!
+  cursor: String!
   node: User!
 }
 
-"""User update input data"""
+input UserFilterInput {
+  access: [Access!]
+}
+
+"""FlawIS user base input"""
 input UserInput {
+  access: [Access!]
+  address: AddressInput
+  avatarUrl: String
+  cvUrl: String
   email: String!
   name: String!
-  organization: String!
+  organization: String
   password: String
-  role: Role
-  telephone: String!
+  studyProgramme: StudyProgramme
+  telephone: String
 }
 
 type UserMutationResponse implements IMutationResponse {
   data: User!
   message: String!
+  token: String
 }
+
+type UserPageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
+
+input UserSortInput {
+  direction: SortDirection!
+  field: UserSortableField!
+}
+
+"""Sortable enum definition for users query"""
+enum UserSortableField {
+  ID
+  NAME
+}
+
+type UserStub {
+  email: String!
+  id: ObjectId!
+  name: String!
+}
+
+union UserStubUnion = User | UserStub

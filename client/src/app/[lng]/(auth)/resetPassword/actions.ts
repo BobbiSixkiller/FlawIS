@@ -14,13 +14,15 @@ export async function resetPassword(data: PasswordInput, token: string) {
     { data },
     (data) => ({
       message: data.passwordReset.message,
-      data: data.passwordReset.data,
+      data: data.passwordReset.data
+        ? { ...data.passwordReset.data, token: data.passwordReset.token }
+        : null,
     }),
     undefined,
     { resettoken: token },
   );
 
-  if (res.data) {
+  if (res.data?.token) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const cookieStore = await cookies();
 

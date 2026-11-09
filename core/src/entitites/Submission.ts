@@ -63,6 +63,10 @@ export class Submission extends TimeStamps {
   @Property()
   fileUrl?: string;
 
+  @Field()
+  @Property({ default: false })
+  withdrawn: boolean;
+
   @Field(() => [User])
   @Property({ ref: () => User })
   authors: Ref<User>[];
