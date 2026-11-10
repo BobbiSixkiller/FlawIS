@@ -1,5 +1,6 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Route } from "@playwright/test";
 import { conferenceSlug } from "./environment.mjs";
+import { openAfterHydration } from "./hydration";
 
 // Shared staging contains real snapshot records. These checks never submit a valid
 // mutation, upload a file, send mail, archive a contact, or change a decision.
@@ -48,33 +49,44 @@ test("invalid reviewer drafts stay local and discarding clears the next dialog",
 }, info) => {
   const lng = info.project.metadata.language;
   const sk = lng === "sk";
-  await page.goto(`/${lng}/reviewers`);
   const add = page.getByRole("button", {
     name: sk ? "Pridať recenzenta" : "Add reviewer",
     exact: true,
   });
   const dialog = page.locator('[data-slot="dialog-content"]');
-  await add.click();
+  await openAfterHydration(page, `/${lng}/reviewers`, add);
   const name = dialog.getByLabel(sk ? "Meno a tituly" : "Name and titles", {
     exact: true,
   });
   const email = dialog.getByLabel("E-mail", { exact: true });
-  const blockedWrites: string[] = [];
-  await page.route("**/*", async (route) => {
-    if (["POST", "PUT", "PATCH", "DELETE"].includes(route.request().method())) {
-      blockedWrites.push(route.request().method());
-      await route.abort();
-    } else await route.continue();
-  });
+  await expect(name).toBeVisible();
   await name.fill("Unsubmitted browser test");
   await email.fill("invalid-email");
-  await dialog
-    .getByRole("button", {
-      name: sk ? "Uložiť zmeny" : "Save changes",
-      exact: true,
-    })
-    .click();
-  await expect(email).toHaveAttribute("aria-invalid", "true");
+  const blockedRequests: string[] = [];
+  const blockRequests = async (route: Route) => {
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(route.request().method())) {
+      // Next.js read actions also use POST; do not label every blocked request
+      // a mutation. Keep the guard scoped to validation after the dialog opens.
+      blockedRequests.push(route.request().method());
+      await route.abort();
+    } else await route.fallback();
+  };
+  await page.route("**/*", blockRequests);
+  try {
+    await dialog
+      .getByRole("button", {
+        name: sk ? "Uložiť zmeny" : "Save changes",
+        exact: true,
+      })
+      .click();
+    await expect(email).toHaveAttribute("aria-invalid", "true");
+    expect(
+      blockedRequests,
+      "Invalid submission must validate locally. Blocked POSTs may also be background read actions.",
+    ).toEqual([]);
+  } finally {
+    await page.unroute("**/*", blockRequests);
+  }
   await expect(name).toHaveValue("Unsubmitted browser test");
   await dialog
     .getByRole("button", { name: sk ? "Zrušiť" : "Cancel", exact: true })
@@ -101,7 +113,6 @@ test("invalid reviewer drafts stay local and discarding clears the next dialog",
   await add.click();
   await expect(name).toHaveValue("");
   await expect(email).toHaveValue("");
-  expect(blockedWrites, "Invalid drafts must not make write requests to shared staging").toEqual([]);
   await page.keyboard.press("Escape");
 });
 
@@ -114,17 +125,15 @@ test("reviewer and form search live in the header and support keyboard dismissal
     ["reviewers", sk ? "Hľadať recenzenta" : "Find a reviewer"],
     ["forms", sk ? "Hľadať formulár" : "Find a form"],
   ]) {
-    await page.goto(`/${lng}/${route}`);
     const trigger = page
       .locator("header")
       .getByRole("button", { name: label, exact: true });
-    await expect(trigger).toBeVisible();
+    await openAfterHydration(page, `/${lng}/${route}`, trigger);
     await expect(
       page
         .locator("#main-content")
         .getByRole("button", { name: label, exact: true }),
     ).toHaveCount(0);
-    await trigger.click();
     const dialog = page.locator('[data-slot="dialog-content"]');
     await expect(dialog.getByRole("combobox")).toBeVisible();
     await expect(

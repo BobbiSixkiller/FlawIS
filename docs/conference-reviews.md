@@ -12,6 +12,8 @@ The reviewer directory exports every matching record, including matches beyond t
 
 The directory, submission queue and form library expose the shared search dialog through their `@headerActions` routes, matching users and conferences. Search selects a reviewer, form or submission; there are no filter controls. Reviewer search includes archived contacts, which remain visibly labelled. A fallback slot clears the previous search control when navigating to another page. Reviewer languages and expertise use the generic multiple-selection combobox, with existing suggestions and custom values. Attachment questions use the shared multiple-file uploader in previews and live answers. The builder configures minimum and maximum counts (up to 20); already uploaded files count toward the maximum. Optional questions can remain empty, with their minimum applying when files are attached.
 
+The reviewer directory's export/import/Add toolbar and the shared header-search trigger stay disabled until their component hydrates, so the first enabled click has an active handler. The existing `useMounted` hook supplies the server/client readiness snapshot; no timer or page-wide readiness flag is needed.
+
 This UX update needs no course reset or production data migration. The one-time course reset instructions below belong to the original shared-form transition.
 
 ## Local development

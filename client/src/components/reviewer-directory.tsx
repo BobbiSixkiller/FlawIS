@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import useMounted from "@/hooks/useMounted";
 import { z } from "zod";
 import { getReviewerDirectory } from "@/lib/reviews/actions";
 import { mutate, tr, errorText } from "@/lib/reviews/ux";
@@ -39,6 +40,7 @@ export default function ReviewerDirectory({
   lng: string;
 }) {
   const t = tr(lng);
+  const mounted = useMounted();
   const [page, setPage] = useState(initial);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -101,7 +103,7 @@ export default function ReviewerDirectory({
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
-            disabled={pending}
+            disabled={!mounted || pending}
             onClick={() =>
               task(async () => {
                 const records = await allRecords(search);
@@ -127,6 +129,7 @@ export default function ReviewerDirectory({
             <>
               <Button
                 variant="outline"
+                disabled={!mounted}
                 onClick={() => {
                   setRows([]);
                   setImporting(true);
@@ -134,7 +137,7 @@ export default function ReviewerDirectory({
               >
                 {t("Importovať CSV", "Import CSV")}
               </Button>
-              <Button onClick={() => setEditing("new")}>
+              <Button disabled={!mounted} onClick={() => setEditing("new")}>
                 {t("Pridať recenzenta", "Add reviewer")}
               </Button>
             </>

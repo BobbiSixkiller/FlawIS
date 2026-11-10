@@ -2,6 +2,7 @@
 import { type ComponentType, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useParams } from "next/navigation";
+import useMounted from "@/hooks/useMounted";
 import { useTranslation } from "@/lib/i18n/client";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import {
@@ -30,6 +31,7 @@ export default function SearchComponent<
 }: SearchComponentProps<TOption, TParams>) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "common");
+  const mounted = useMounted();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [query] = useDebounce(text, 350);
@@ -74,6 +76,7 @@ export default function SearchComponent<
       }}
     >
       <DialogTrigger
+        disabled={!mounted}
         render={
           <Button
             size="icon"
