@@ -36,6 +36,7 @@
 ## Development and delivery
 
 - The normal sequence is local Docker build and checks, merge/push to `staging`, GitHub Actions deployment, verification on staging, then promotion to `master` for production.
+- For remote diagnosis, read `.agents/local/deployment.md` if present before asking for connection details. Keep host addresses, SSH accounts, and access instructions in ignored local notes or a private operations runbook, not public documentation. The local Docker context is not the deployment host.
 - Keep the three existing Compose files for local, staging, and production. Use staging for integration and destructive workflow testing; do not add a separate test stack.
 - Staging is shared with university staff. Destructive checks are an explicit test step, with a snapshot refresh afterwards when needed. Default browser smoke checks preserve records and send no notifications.
 - Each staging deployment resets only its RabbitMQ/Redis volumes, cancels copied unfinished notification jobs after the MongoDB restore, and recreates broker credentials/vhosts before starting the application. Normal restarts retain runtime data. Production retains persistence.

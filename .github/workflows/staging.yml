@@ -154,7 +154,21 @@ jobs:
         run: docker compose -f docker-compose.staging.yml -p flawis-staging build --parallel
 
       - name: Start fresh staging broker and Redis
+        id: runtime_start
         run: docker compose -f docker-compose.staging.yml -p flawis-staging up -d --no-build --wait --wait-timeout 300 rabbitmq redis
+
+      - name: Show staging broker startup diagnostics
+        if: ${{ failure() && steps.runtime_start.outcome == 'failure' }}
+        continue-on-error: true
+        run: |
+          docker compose -f docker-compose.staging.yml -p flawis-staging ps -a rabbitmq redis
+          for SERVICE in rabbitmq redis; do
+            CONTAINER=$(docker compose -f docker-compose.staging.yml -p flawis-staging ps -aq "$SERVICE")
+            if [ -n "$CONTAINER" ]; then
+              docker inspect --format 'name={{.Name}} restartCount={{.RestartCount}} state={{json .State}}' "$CONTAINER"
+              docker logs --tail 200 "$CONTAINER" 2>&1
+            fi
+          done
 
       - name: Initialize staging broker credentials and vhosts
         run: node scripts/staging-runtime.mjs bootstrap

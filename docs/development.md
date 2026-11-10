@@ -58,6 +58,14 @@ Keep only the existing `docker-compose.yml`, `docker-compose.staging.yml`, and `
 
 Staging is shared with a small staff group. Run destructive scenarios as a deliberate testing step and refresh the snapshot afterwards when needed. The workflow restores production MongoDB collections with `mongorestore --drop` and mirrors MinIO objects. Staging-only MongoDB collections and extra MinIO objects still need explicit cleanup; the restore does not remove them.
 
+### Remote diagnosis
+
+Use the approved SSH connection and required network access recorded in the private operations runbook or this checkout's ignored `.agents/local/deployment.md`. Do not commit host/account details, access notes, passwords, or private keys to this public repository.
+
+Run remote Docker inspection inside the SSH session; the laptop's default Docker context is Docker Desktop. Identify the target by Compose project labels (`flawis-staging` for staging) before making changes on the shared host. SSH access does not itself authorize production changes or a deployment.
+
+For staging broker diagnosis, read `docker logs --tail 100 flawis-staging-rabbitmq-1` and `docker inspect --format '{{json .State}}' flawis-staging-rabbitmq-1`. These inspect startup and health-check failures without dumping container environment variables. Review diagnostic output before sharing it publicly.
+
 ### Runtime reset on each staging deployment
 
 The staging workflow uses `scripts/staging-runtime.mjs` to perform these steps, with application services stopped until preparation succeeds:
@@ -69,6 +77,8 @@ The staging workflow uses `scripts/staging-runtime.mjs` to perform these steps, 
 5. Start the application only after cancellation and broker initialization succeed. A failed reset/preparation stops the deployment; it does not force volume removal or start workers against an unprepared snapshot.
 
 Keep mounted runtime volumes and durable messaging enabled during normal operation. `docker restart` and ordinary container recreation retain messages; the staging CI reset is deliberate. Production persistence is unchanged. RabbitMQ's staging hostname is fixed so its node identity survives ordinary recreation.
+
+Run the staging RabbitMQ health check and bootstrap CLI as the `rabbitmq` service user. On a fresh volume, a root health probe can create `/var/lib/rabbitmq/.erlang.cookie` before the broker, causing an `eacces` startup failure. The Compose probe uses `gosu rabbitmq`, and bootstrap uses `docker exec --user rabbitmq`. Increasing the health-check grace period does not prevent that race. If broker/Redis readiness fails, CI records their container state and recent logs before stopping; it does not start application writers against a partially prepared environment.
 
 Each deployment invalidates Redis-backed one-time registration/co-author links and clears rate limits; Redis clearing alone does not sign users out. Unfinished test mail is discarded. No additional GitHub secrets are required: the broker account comes from `RMQ_URI` (AMQP defaults apply when credentials are omitted).
 

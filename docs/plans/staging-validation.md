@@ -11,6 +11,12 @@ Implementation of the agent workflow, verification commands, staging runtime res
 
 After required checks pass, retain any useful operating corrections in docs and delete this plan. If a check cannot run, retain its prerequisite and unresolved status here.
 
+## Staging attempt, 2026-11-10
+
+[Run 42778153669](https://github.com/BobbiSixkiller/FlawIS/actions/runs/42778153669) at `993bf0b7` completed runtime-volume reset, MongoDB restore, unfinished-notification cancellation, MinIO sync, and image builds. It failed at fresh RabbitMQ readiness, so broker bootstrap and application startup were skipped. SSH inspection confirmed `/var/lib/rabbitmq/.erlang.cookie: eacces` during first boot; the root health probe could create the cookie before the broker user. RabbitMQ recovered after one automatic restart, but staging core/client/mail had not started when inspected.
+
+The local fix runs the probe and bootstrap CLI as `rabbitmq` and adds failure diagnostics. An isolated first-boot regression reproduced the old failure and passed with the service-user probe. A separate RabbitMQ 4.1.2 fixture using the unmodified image entrypoint passed fresh-volume startup, definitions import as the service user, both vhost permissions, and an ordinary restart retaining configuration. Disposable fixture containers/volumes were removed. All 18 helper tests and Compose/workflow validation passed. The complete staging deployment still needs a new run containing the fix. Re-running the failed commit does not include local changes. See the development guide for [remote diagnosis](../development.md#remote-diagnosis); connection details stay in private local notes.
+
 ## Historical local evidence, 2026-11-09
 
 - Verification/deployment helper tests: 14 passed at implementation time. Covers inherited integration flags, staging target guards, volume ownership/removal scope, failure propagation, stopped-writer checks, broker initialization, and cancellation scope.

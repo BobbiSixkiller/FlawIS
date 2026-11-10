@@ -135,7 +135,7 @@ export function stagingRuntime(command, { env = process.env, run = docker } = {}
     console.log(`Cancelled ${result.cancelledNotifications} copied notification jobs.`);
   } else {
     // RabbitMQ 4.1's import_definitions reads stdin when no file is supplied.
-    run(['exec', '-i', name, 'rabbitmqctl', 'import_definitions'], {
+    run(['exec', '--user', 'rabbitmq', '-i', name, 'rabbitmqctl', 'import_definitions'], {
       input: JSON.stringify(brokerDefinitions(broker)),
     });
     console.log('Initialized the staging broker account and application/test vhosts.');

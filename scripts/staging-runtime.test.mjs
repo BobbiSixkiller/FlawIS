@@ -124,11 +124,11 @@ test('snapshot and broker maintenance refuse running writers or a production con
   }
 });
 
-test('broker bootstrap imports credentials through stdin and recreates separate application/test permissions', () => {
+test('broker bootstrap runs as the service user, imports credentials through stdin, and recreates separate permissions', () => {
   const f = fixture();
   stagingRuntime('bootstrap', { env, run: f.run });
   const call = f.calls.find(({ args }) => args[0] === 'exec');
-  assert.deepEqual(call.args, ['exec', '-i', 'flawis-staging-rabbitmq-1', 'rabbitmqctl', 'import_definitions']);
+  assert.deepEqual(call.args, ['exec', '--user', 'rabbitmq', '-i', 'flawis-staging-rabbitmq-1', 'rabbitmqctl', 'import_definitions']);
   const definitions = JSON.parse(call.input);
   assert.deepEqual(definitions.vhosts, [{ name: 'staging/app' }, { name: 'flawis-review-tests' }]);
   assert.deepEqual(definitions.permissions.map(({ user, vhost }) => [user, vhost]),
