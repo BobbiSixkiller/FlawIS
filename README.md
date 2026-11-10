@@ -49,6 +49,6 @@ Use [the development guide](docs/development.md) for production image builds, Gr
 - [Development and verification](docs/development.md): local setup, the three Compose environments, deployment sequence, and test commands.
 - [Conference reviews](docs/conference-reviews.md): coordinator/reviewer/author workflows, forms, file access, audit history, notification delivery, and rollout requirements.
 - [Working with Codex](docs/agent-workflow.md): scoped helpers, documentation drift, JSDoc conventions, and plan cleanup. [AGENTS.md](AGENTS.md) is the agent instruction entrypoint.
-- [Active plans](docs/plans/): unfinished work and validation. Completed plans are removed after durable guidance moves into docs.
+- [Plan lifecycle](docs/agent-workflow.md#plans-end-useful-documentation-stays): unfinished work lives in `docs/plans/`; completed plans are removed after durable guidance moves into docs.
 
 The delivery sequence is local Docker checks → `staging` branch deployment and validation → `master` production deployment. Staging is refreshed from a production snapshot; its deployment deliberately resets RabbitMQ/Redis and cancels copied unfinished notification jobs. Ordinary restarts preserve runtime data. Production retains persistence. Follow the [delivery guide](docs/development.md#delivery-sequence) before deploying or running destructive staging scenarios.

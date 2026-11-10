@@ -27,7 +27,7 @@ Both role files pin `gpt-6-luna`, available in the updated local CLI and this Wo
 
 The standalone CLI was updated from 0.147.0 to 0.167.0 on 2026-11-09 with `codex update`. Its refreshed `codex debug models` catalog includes `gpt-6.1-sol`, `gpt-6.1-terra`, `gpt-6-astra`, and `gpt-6-luna`. The existing user default remains `gpt-6.1-sol` at `xhigh`; the project helper pins remain low/medium as above. Restart running CLI sessions after updating. For subsequent upgrades, use `codex update`, verify `codex --version`, refresh the catalog, and run the bounded role checks below before changing pins.
 
-The role files are versioned. For clients requiring explicit role registration, merge [.codex/config.example.toml](../.codex/config.example.toml) into the checkout's `.codex/config.toml`; copy it only when no local config exists. Preserve existing skill exclusions. Keep that machine-specific file out of Git with a `/.codex/config.toml` entry in `.git/info/exclude`. This checkout already has the registrations and exclusion; strict CLI `config/read` resolves both role file paths correctly. No global configuration was changed.
+The role files are versioned. For clients requiring explicit role registration, merge [.codex/config.example.toml](../.codex/config.example.toml) into the checkout's `.codex/config.toml`; copy it only when no local config exists. Preserve existing skill exclusions. Keep that machine-specific file out of Git with a `/.codex/config.toml` entry in `.git/info/exclude`. This checkout already has the role registrations and Git exclusion; strict CLI `config/read` resolves both role file paths correctly. No global configuration was changed.
 
 Use a helper when an independent multi-file read would otherwise fill the main context. A simple `rg` lookup or one-file edit usually costs less without delegation. Start with one helper; two are appropriate only for independent scopes. Reuse a helper for a clarification instead of starting a review chain.
 
@@ -78,6 +78,20 @@ Lead with purpose. TypeScript owns types, so avoid duplicated `{Type}` tags. Add
 
 Machine-specific skill exclusions belong in the trusted checkout's ignored `.codex/config.toml`, not versioned home-directory paths. The versioned role files are separate from that local configuration. Prefer repository skills when a duplicate user-level skill appears.
 
-Verification on 2026-11-09 with Codex CLI 0.147.0: `config/read` reported checkout-local duplicate exclusions as effective, but pre-thread `skills/list` still reported the global copies enabled. Equivalent CLI overrides disabled them correctly. Duplicate-free discovery in a fresh app session remains unverified; do not describe the local configuration as proven deduplication. All five repository skills passed the bundled manifest validator, and the shadcn/frontend-design metadata was recognized.
+On 2026-11-10, at the user's request, the user-level `frontend-design` and `vercel-react-best-practices` skill directories were moved to Trash, retaining recoverable copies. Their stale checkout-local exclusions were removed while preserving agent registrations. A fresh CLI 0.167.0 process with `skills/list` and `forceReload: true` found exactly one enabled repository copy of each in FlawIS and neither skill in user-level discovery outside the repository, with no discovery errors. The three other user skills and five bundled system skills remained available. This resolves the local duplication through removal; it does not establish that the earlier exclusion issue is fixed. An existing app session may retain its previous catalog; reopen the session if stale entries remain.
 
-Rechecking pre-thread discovery after upgrading to 0.167.0 still listed both repository and global frontend skill copies as enabled, with no discovery errors. The upgrade does not resolve that documented limitation; continue preferring repository copies.
+Verification on 2026-11-09 with Codex CLI 0.147.0: `config/read` reported checkout-local duplicate exclusions as effective, but pre-thread `skills/list` still reported the global copies enabled. Equivalent CLI overrides disabled them correctly. At that point, duplicate-free discovery in a fresh app session was unverified. All five repository skills passed the bundled manifest validator, and the shadcn/frontend-design metadata was recognized.
+
+Rechecking pre-thread discovery after upgrading to 0.167.0 still listed both repository and global frontend skill copies as enabled, with no discovery errors. The upgrade did not resolve that configuration limitation.
+
+A fresh app session on 2026-11-10, before removal, confirmed that both repository and user-level `vercel-react-best-practices` entries remained in the supplied skill catalog. The checkout-local exclusions pointed to existing user-level `SKILL.md` files with `enabled = false`, but the host still exposed the duplicate React entry. Fresh-session discovery was checked; duplicate-free discovery had not been achieved. No skill or user-wide configuration was changed during that check.
+
+| Project skill | Entries visible in the fresh session's catalog before removal |
+| --- | --- |
+| `vercel-react-best-practices` | Repository and user copies |
+| `shadcn` | Repository copy |
+| `mongodb-schema-design` | Repository copy |
+| `mongodb-query-optimizer` | Repository copy |
+| `frontend-design` | User copy; repository copy is absent from the supplied catalog and has `allow_implicit_invocation: false` in its metadata |
+
+[OpenAI's skill guidance](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills) explains that equal-name skills remain separate and may both appear in selectors. Its enablement guidance uses file-specific path selectors; a name selector would also match the repository copy.

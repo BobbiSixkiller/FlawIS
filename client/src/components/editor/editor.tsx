@@ -66,7 +66,7 @@ export default function TiptapEditor({
           : {}),
         class: cn([
           className,
-          "prose prose-sm max-w-none dark:prose-invert prose-a:text-primary",
+          "prose prose-sm max-w-none",
           compact ? "min-h-8" : "min-h-96",
           "focus:outline-hidden p-3 shadow-xs text-foreground placeholder:text-muted-foreground rounded-md ring-1 focus-within:ring-2",
           "dark:ring-input dark:bg-card",

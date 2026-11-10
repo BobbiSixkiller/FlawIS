@@ -39,6 +39,7 @@ Avoid running a production build against the development server's live `.next` d
 
 - Shared primitives live in `src/components/ui`; [components.json](components.json) configures shadcn's `base-nova` style with Base UI. Use the existing primitives and Base UI `render` composition.
 - Preserve UK Sans, the university purple accent, semantic theme tokens, dark mode, labelled controls, and keyboard focus behaviour. Theme tokens live in `src/app/globals.css`; shared state variants live in `src/app/shadcn.css`.
+- Shared `.prose` colours use the semantic theme tokens for both rendered rich text and the editor. Use `prose` without `dark:prose-invert` so descriptions, headings, links, lists, tables, and code follow the active theme.
 - Use kebab-case filenames and PascalCase React exports. Put dashboard searches in `@headerActions`, following users/conferences. Use `GenericCombobox` with `multiple` for multi-selection and the shared multiple-file uploader for attachment inputs.
 - Management forms use React Hook Form/Zod, field errors inside dialogs, guarded dirty dismissal, retained input after failure, and focus restoration. Keep action state scoped to the submission/assignment.
 - Localize new copy in Slovak and English. Client checks support the interface; core enforces authorization and workflow prerequisites.
