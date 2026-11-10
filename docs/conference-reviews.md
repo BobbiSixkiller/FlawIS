@@ -1,6 +1,6 @@
 # Conference reviews
 
-The conference workspace now includes a reviewer directory, submission review queue, conference review settings and activity history. The directory and form library live at `/reviewers` and `/forms` on the FlawIS tenant. Each conference has `/conferences/:slug/reviews`, `/review-settings` and `/activity`.
+The conference workspace includes a reviewer directory, submission review queue, conference review settings and activity history. The directory and form library live at `/reviewers` and `/forms` on the FlawIS tenant. Conference routes are `/conferences/:slug/reviews`, `/conferences/:slug/review-settings`, and `/conferences/:slug/activity`.
 
 ## Review workspace UX
 
@@ -16,9 +16,9 @@ This UX update needs no course reset or production data migration. The one-time 
 
 ## Local development
 
-Run `docker compose up --build -d --renew-anon-volumes` after dependency upgrades. The local compose configuration captures outgoing mail in Mailpit instead of sending it externally.
+Follow [local setup and dependency refresh](development.md#setup-and-services). The local Compose configuration captures outgoing mail in Mailpit instead of sending it externally.
 
-- Admin workspace: <http://localhost:3000>
+- Admin workspace: <http://flawis.localhost:3000> (plain `localhost:3000` also works)
 - Conference participant site and private review links: <http://conferences.localhost:3000>
 - Email preview: <http://localhost:8025>
 
@@ -30,16 +30,16 @@ Use existing local accounts and sign in again after the session-token migration.
 2. Enable reviewing in the conference's review settings. Choose the required number of reports (default two), questionnaire version, author-visible questions, email instructions, signature and reply-to address. Set manuscript requirements for individual sections independently of the presentation language. Automatic reminders are opt-in.
 3. Add reviewers to the shared directory, or import a CSV after previewing it. Fields: `name,email,institution,department,languages,expertise,notes`; separate multiple languages and areas of expertise with semicolons. Email addresses identify duplicate contacts. Archive reviewers to keep their history.
 4. The queue includes submissions with at least one registered author holding a ticket with submission rights. Register the existing uploaded manuscript or upload a new version. Upload an anonymous copy and explicitly approve formal checks and anonymity. Anonymization is a manual editorial responsibility; the application does not remove names or project acknowledgements automatically.
-5. Inspect reviewer history and conference eligibility before assigning reviewers and deadlines. Self-review is blocked by author account/email history. Participation, guarantor, department and declared-conflict warnings require a recorded override reason. Only conference coordinators can edit conference eligibility.
+5. Inspect reviewer history and conference eligibility before assigning reviewers and deadlines. Self-review is blocked by author account/email history. Participation, guarantor, department and declared-conflict warnings require a recorded override reason. Administrators and conference coordinators can edit conference eligibility; section-only grants do not allow it.
 6. Preview and send individual or batch invitations. Sending requires the approved anonymous copy. Each invitation attaches that copy and includes a private questionnaire link. Track invitation delivery separately from assignment/report status. Preparing a downloadable package does not send mail.
-7. Reviewers need no account. They can download only their anonymous manuscript, save drafts, decline or submit the report. Submission locks the report; coordinators can reopen it with a reason or enter a report received outside the portal. Cancelling an assignment revokes its link. Tokens are random, stored as hashes for lookup and encrypted only where a reminder needs the original link.
+7. Reviewers need no account. They can download the anonymous manuscript and attachments permitted for their assignment, save drafts, decline or submit the report. Submission locks the report; coordinators can reopen it with a reason or enter a report received outside the portal. Cancelling an assignment revokes its link. Tokens are random, stored as hashes for lookup and encrypted where a reminder needs the original link.
 8. All required active assignments in a round must be submitted before anonymized feedback is automatically released. Only configured textual answers and the recommendation are released; reviewer names, email addresses, internal fields and private attachment references are excluded. Repeated submissions cannot release the same report revisions twice.
 9. Request corrections with instructions and a deadline. Authors can upload DOCX corrections from their signed-in conference workspace or the private correction link. Every upload creates a manuscript version. A coordinator verifies the correction. A further review round is an explicit action; uploading corrections never sends them to reviewers automatically.
 10. Record an editorial decision and reason. Acceptance requires the required reports and no outstanding unverified corrections. Decisions are distinct from reviewer recommendations. Closing a paper revokes reviewer links and outstanding correction requests. Reopening a closed paper does not restore revoked links automatically.
 
 Original manuscript versions, anonymous copies, report revisions, rounds, feedback releases and actions remain available for authorized review. Generic submission deletion now withdraws the submission and preserves its history. Authors who are also administrators or coordinators cannot manage or inspect their own confidential review process. The same restriction applies to the original user behind an impersonated session.
 
-The queue loads submissions in pages. Filters operate on the loaded rows; load additional pages to include them. Batch actions are limited to 50 selected submissions, report failures per paper, and keep successful sends recorded. Copying a personal review link prepares access without sending mail. Sending is explicit; SMTP is not an exactly-once protocol.
+The queue loads submissions in pages. Header search queries the server across eligible submissions before pagination and opens the selected result; it is not restricted to rows already loaded. The page supports a `search` URL parameter, and detail links preserve the queue URL for return navigation. Invitations operate on selected rows from the current page, record per-assignment outcomes, and skip successful sends on retry. Bulk report ZIP export accepts 1–50 submission IDs. Copying a personal review link prepares access without sending mail. Sending is explicit; SMTP is not an exactly-once protocol.
 
 ## Shared forms
 
@@ -70,18 +70,18 @@ Session tokens are now issued only by authentication/explicit impersonation oper
 
 ## Mail transport and deployment
 
-All service images and `.nvmrc` files use Node **26.13.0 LTS**. The worker now uses Nest 12, the current compatible mailer/RabbitMQ adapters, Nodemailer 10, TypeScript 6 and Jest 30. It runs as a Nest application context and does not expose an HTTP server.
+Application Dockerfiles and the root/client/mail `.nvmrc` files pin the same Node runtime; use [the root .nvmrc](../.nvmrc) as the version reference. Core follows the root pin. The [mail worker](../mail/README.md) runs as a Nest application context and does not expose an HTTP server. Its manifest and lockfile define the Nest, mailer/RabbitMQ adapter, Nodemailer, TypeScript, and test dependencies.
 
 Set these variables consistently:
 
-| Variable                    | Used by            | Purpose                                                           |
-| --------------------------- | ------------------ | ----------------------------------------------------------------- |
-| `RMQ_URI`                   | core, mail         | RabbitMQ URI                                                      |
-| `RMQ_EXCHANGE` | core, mail         | Durable topic exchange; default `FlawIS.notifications.v2`         |
-| `NOTIFICATION_SECRET`       | core, client, mail | Encryption/internal authentication secret; falls back to `SECRET` |
-| `CORE_INTERNAL_URL`         | mail               | Core base URL, default `http://core:5000`                         |
-| `API_URI`                   | client             | Core GraphQL URL, default `http://core:5000/graphql`              |
-| `CONFERENCES_PUBLIC_HOST`   | core               | Conference hostname used by scheduled reminders                   |
+| Variable | Used by | Purpose |
+| --- | --- | --- |
+| `RMQ_URI` | core, mail | RabbitMQ URI |
+| `RMQ_EXCHANGE` | core, mail | Durable topic exchange; default `FlawIS.notifications.v2` |
+| `NOTIFICATION_SECRET` | core, client, mail | Encryption/internal authentication secret; falls back to `SECRET` |
+| `CORE_INTERNAL_URL` | mail | Core base URL, default `http://core:5000` |
+| `API_URI` | client | Core GraphQL URL, default `http://core:5000/graphql` |
+| `CONFERENCES_PUBLIC_HOST` | core | Conference hostname used by scheduled reminders |
 
 Staging and production workflows read the optional GitHub environment variable `RMQ_EXCHANGE`, defaulting to `FlawIS.notifications.v2`, and pass the same value to core and mail. Local development reads it from `.env`. This exchange carries all application notification emails.
 
@@ -110,12 +110,12 @@ The reset is deliberately explicit and defaults to a dry run. Run against the ch
 
 ```sh
 cd core
-npm run reset:courses -- --environment=staging --database=flawis-staging
+npm run reset:courses -- --environment=staging --database=flawis
 # Review the counts, environment and database, then apply the same target:
-npm run reset:courses -- --environment=staging --database=flawis-staging --apply
+npm run reset:courses -- --environment=staging --database=flawis --apply
 ```
 
-`MONGODB_URI` must point at the intended deployment. The database argument selects the database explicitly. Take a backup first. Replace the example target with the actual environment/database; the command does not infer it from a URI or hostname.
+`MONGODB_URI` must point at the intended staging deployment. The checked-in staging Compose/workflow uses database `flawis`, despite the staging environment name. The database argument selects it explicitly; `--environment=staging` is a label, not an endpoint guard. Confirm the connection and database and take a backup before applying. For another deployment, replace both targets; the command does not infer them from a URI or hostname. This migration is not run by ordinary local startup or the verification wrapper.
 
 The reset removes courses, categories, sessions, attendees, attendance records, legacy course-owned forms, course bindings/answers/revisions, course attendee test invoices and cancels pending course mail jobs. It preserves user accounts, conferences, submissions, shared invoice counters, reusable form definitions/versions and external Reach resources. It drops the obsolete course/version form indexes.
 

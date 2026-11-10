@@ -21,8 +21,8 @@
 ## Delegation and context
 
 - Use a single agent for small fixes and simple searches. Delegate a bounded, independent multi-file lookup to `explorer` when that avoids a substantial context dump; use `doc_drift` for a scoped factual documentation audit. This is authorization for those read-only tasks, not an instruction to spawn agents on every turn.
-- Both project roles in `.codex/agents/` pin the local CLI's available smaller model, `gpt-5.6-luna`: `low` effort for lookup, `medium` for documentation claims. Keep architecture, implementation, security judgments, and final review with the primary agent. Do not globally downgrade all subagents.
-- If the host exposes only direct spawning, explicitly select an available Luna model (`gpt-6-luna` in the current Work tool catalog), use the role's effort/instructions, and set `fork_turns="none"`. Give an exact question, paths, breadth/stop condition, and concise evidence format. Do not copy the conversation or unrelated manuals into the brief.
+- Both project roles in `.codex/agents/` pin `gpt-6-luna`: `low` effort for lookup, `medium` for documentation claims. Keep architecture, implementation, security judgments, and final review with the primary agent. Do not globally downgrade all subagents.
+- If the host exposes only direct spawning, explicitly select `gpt-6-luna`, use the role's effort/instructions, and set `fork_turns="none"`. Give an exact question, paths, breadth/stop condition, and concise evidence format. Do not copy the conversation or unrelated manuals into the brief.
 - Start with one helper; use two only for independent scopes. Helpers must not edit, run builds/tests, read secrets, or delegate further. Verify their decisive evidence before acting. Reuse the helper for clarification; escalate uncertainty to the primary agent instead of repeating broad audits. If the model is unavailable, do the lookup directly and report the fallback.
 - Configuration details, limitations, and known-answer smoke checks are in `docs/agent-workflow.md`; read them when changing the agent setup.
 

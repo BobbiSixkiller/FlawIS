@@ -1,5 +1,7 @@
 # Developing and verifying FlawIS
 
+Start with the [repository overview](../README.md). Service-specific structure and commands are in the [client](../client/README.md), [core](../core/README.md), and [mail](../mail/README.md) READMEs.
+
 ## Setup and services
 
 Use the Node version recorded in `.nvmrc` and npm. Each service has its own lockfile; there is no root npm workspace.
@@ -14,13 +16,36 @@ npm ci --prefix mail
 
 Use the existing local `.env` for normal Docker development. Copy `.env.example` only when setting up a new checkout; do not replace an existing `.env` or commit secrets.
 
+Compose injects the root `.env` into application containers. Running a service directly from its own directory does not automatically load that root file; configure the host process environment separately. Docker hostnames such as `core`, `mongo`, `minio`, `rabbitmq`, and `redis` resolve inside the Compose network. Host tools need the published ports instead.
+
+| Setting | Local setup |
+| --- | --- |
+| `MONGODB_URI` | The example targets database `flawis` on `mongo:27017` with replica set `rs0`; the Mongo image initializes that replica set |
+| `REDIS_URI` | Core defaults to `redis://redis:6379` when unset |
+| `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY` | Use `minio` inside Compose and credentials matching the local MinIO account configured in `docker-compose.yml` |
+| `SECRET`, `NOTIFICATION_SECRET` | Shared application/internal credentials; notification encryption falls back to `SECRET` when no dedicated secret is set |
+| `API_URI`, `CORE_INTERNAL_URL`, `CLIENT_INTERNAL_URL` | Internal GraphQL, delivery, and PDF-render addresses; local Compose supplies the service addresses |
+| `RMQ_URI`, `RMQ_EXCHANGE` | Connect core/mail to the same broker and durable exchange, default `FlawIS.notifications.v2` |
+| `MAIL_FROM` | Sender for local captured messages; Compose overrides SMTP host/port to Mailpit and clears SMTP authentication |
+| `GOOGLE_*`, `REACH_*` | Configure when using Google sign-in or the [Reach integration](../core/README.md#reach-360-integration) |
+
+`INVOICE_RENDER_SECRET` optionally separates mail/client PDF-render authentication from `SECRET`. Keep shared secrets consistent across their consumers and preserve deployed notification secrets for existing encrypted jobs. Placeholder credentials in `.env.example` are not production configuration.
+
 ```sh
 docker compose up -d --build
 ```
 
-The admin UI is at `http://flawis.localhost:3000`, the conference tenant at `http://conferences.localhost:3000`, core GraphQL at `http://localhost:5001/graphql`, and local Mailpit at `http://localhost:8025`.
+The admin UI is at `http://flawis.localhost:3000` (plain `http://localhost:3000` also maps to the staff tenant), the conference tenant at `http://conferences.localhost:3000`, core GraphQL at `http://localhost:5001/graphql`, local Mailpit at `http://localhost:8025`, and the MinIO console at `http://localhost:9001`. The remaining local ports are MongoDB `27017`, RabbitMQ AMQP `5672`, Redis `6379`, and MinIO API `9000`.
 
 `client/` is Next.js/React/Base UI. `core/` is Express/Apollo/TypeGraphQL with Typegoose/Mongoose on MongoDB 8. `mail/` is a headless NestJS RabbitMQ worker.
+
+After dependency or Node-image upgrades, refresh the anonymous dependency volumes as well as the images:
+
+```sh
+docker compose up -d --build --renew-anon-volumes
+```
+
+This refreshes container `node_modules` while preserving named database, broker, Redis, MinIO, and Mailpit volumes. A local startup does not run the staging snapshot/reset workflow. The local Mongo service sets `GLIBC_TUNABLES=glibc.pthread.rseq=1` for the documented Docker Desktop/MongoDB compatibility workaround in Compose.
 
 ## Delivery sequence
 

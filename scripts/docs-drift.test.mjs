@@ -10,8 +10,20 @@ test('reviews changed documents too; a prose edit does not prove factual accurac
   const reviews = documentationReviews(['mail/src/config.ts', 'docs/conference-reviews.md']);
   assert.deepEqual(reviews.map(({ document, documentChanged }) => ({ document, documentChanged })), [
     { document: 'docs/conference-reviews.md', documentChanged: true },
+    { document: 'mail/README.md', documentChanged: false },
   ]);
   assert.equal(documentationReviews(['docs/development.md'])[0].documentChanged, true);
+});
+
+test('service setup changes flag their own README without unrelated service guides', () => {
+  const documents = documentationReviews(['core/scripts/schema.cjs']).map(({ document }) => document);
+  assert.deepEqual(documents, ['core/README.md']);
+  assert.deepEqual(documentationReviews(['client/README.md']), [
+    { document: 'client/README.md', causes: [], documentChanged: true },
+  ]);
+  const runtime = documentationReviews(['.nvmrc']).map(({ document }) => document);
+  assert.ok(runtime.includes('README.md'));
+  assert.ok(runtime.includes('docs/development.md'));
 });
 
 test('unrelated UI, generated contracts, and vendored reference changes do not trigger broad doc reviews', () => {

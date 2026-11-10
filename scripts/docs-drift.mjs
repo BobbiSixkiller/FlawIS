@@ -36,6 +36,37 @@ const rules = [
       /^scripts\/docs-drift(?:\.test)?\.mjs$/,
     ],
   },
+  {
+    document: 'README.md',
+    matches: [
+      /^(?:\.nvmrc|docker-compose[^/]*\.yml)$/,
+      /^(?:client|core|mail)\/package\.json$/,
+    ],
+  },
+  {
+    document: 'client/README.md',
+    matches: [
+      /^client\/(?:package(?:-lock)?\.json|Dockerfile|components\.json|codegen\.yml|playwright\.config\.ts)$/,
+      /^client\/(?:e2e\/environment\.mjs|src\/proxy\.ts|src\/lib\/reachWebhookProxy\.ts)$/,
+      /^client\/src\/app\/api\//,
+    ],
+  },
+  {
+    document: 'core/README.md',
+    matches: [
+      /^core\/(?:package(?:-lock)?\.json|Dockerfile|src\/index\.ts)$/,
+      /^core\/scripts\/(?:schema\.cjs|reset-courses\.ts)$/,
+      /^core\/src\/services\/(?:redis|minio|reach360|rmq)\.service\.ts$/,
+      /^core\/src\/routes\/(?:reviews|reach360Webhook)\.ts$/,
+    ],
+  },
+  {
+    document: 'mail/README.md',
+    matches: [
+      /^mail\/(?:package(?:-lock)?\.json|Dockerfile|test\/app\.e2e-spec\.ts)$/,
+      /^mail\/src\/(?:main|config|app\.module|email\/email\.service|rmq\/rmq\.module)\.ts$/,
+    ],
+  },
 ];
 
 function git(cwd, args) {

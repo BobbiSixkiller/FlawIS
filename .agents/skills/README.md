@@ -7,7 +7,7 @@ Codex discovers these skills from the repository-wide `.agents/skills` directory
 - `shadcn`: official `shadcn-ui/ui`, revision `8a3536678a528cc012b9e62484290e79d0be410f`. Run its CLI from `client/` and preserve the existing Base UI theme.
 - `mongodb-schema-design` and `mongodb-query-optimizer`: official `mongodb/agent-skills`, revision `155bb9c4b42a9a3e019f47be0669de0e4547d1ea`. Target MongoDB 8.0 through Typegoose/Mongoose.
 
-Keep the complete vendored directories, licenses, and referenced rule files with repository changes so contributors do not need matching user-level installations. New files in the current working tree still need to be included when committing this feature.
+Keep the complete vendored directories, licenses, and referenced rule files in version control so contributors do not need matching user-level installations. These upstream manuals are separate from the project-owned [agent workflow](../../docs/agent-workflow.md) and [development guide](../../docs/development.md).
 
 ## Provenance and local changes
 

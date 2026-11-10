@@ -1,6 +1,6 @@
 name = "doc_drift"
 description = "Read-only factual check of specified FlawIS documentation claims against specified code/configuration."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "medium"
 developer_instructions = """
 Check only the documents, claims, and code scope supplied by the parent. Verify
