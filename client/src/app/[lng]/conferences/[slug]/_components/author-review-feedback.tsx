@@ -1,7 +1,7 @@
 import { getAuthorFeedback, getAuthorWorkspace } from "@/lib/reviews/actions";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import RevisionPortalView from "./revision-portal";
+import RevisionPortalView from "@/app/[lng]/conferences/_components/revision-portal";
 import { label } from "@/lib/reviews/types";
 export default async function AuthorReviewFeedback({
   submission,

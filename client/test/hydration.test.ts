@@ -11,7 +11,7 @@ import { PathParamsContext } from "next/dist/shared/lib/hooks-client-context.sha
 import commonEn from "../src/lib/i18n/locales/en/common.json";
 import commonSk from "../src/lib/i18n/locales/sk/common.json";
 import SearchComponent from "../src/components/search";
-import ReviewerDirectory from "../src/components/reviewer-directory";
+import ReviewerDirectory from "../src/app/[lng]/flawis/reviewers/_components/reviewer-directory";
 
 afterEach(cleanup);
 
@@ -73,7 +73,12 @@ for (const lng of ["en", "sk"]) {
       Environment,
       null,
       createElement(ReviewerDirectory, {
-        initial: { rows: [], totalCount: 0, hasNextPage: false, endCursor: null },
+        initial: {
+          rows: [],
+          totalCount: 0,
+          hasNextPage: false,
+          endCursor: null,
+        },
         search: "",
         canManage: true,
         lng,

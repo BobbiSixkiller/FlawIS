@@ -2,10 +2,10 @@
 import type { ReactNode } from "react";
 import { useWindowScroll } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utilsClient";
-import Breadcrumbs from "./breadcrumbs";
-import Icon from "./icon";
-import { SidebarTrigger } from "./ui/sidebar";
-import { Separator } from "./ui/separator";
+import Breadcrumbs from "@/components/breadcrumbs";
+import Icon from "@/components/icon";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 export default function DashboardHeader({
   actions,
   navigationLabel,

@@ -1,17 +1,19 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import type { UserFragment } from "@/lib/graphql/generated/graphql";
-import { translate } from "@/lib/i18n";
-import { SidebarInset, SidebarProvider } from "./ui/sidebar";
-import AppSidebar, { type NavItem } from "./app-sidebar";
-import DashboardHeader from "./dashboard-header";
-import AccountMenu from "./account-menu";
-import Avatar from "./avatar";
-import LngSwitcher from "./lng-switcher";
-import ThemeToggler from "./theme-toggler";
-import Footer from "./footer";
-import Logo from "./logo";
-import { Snackbar } from "./message";
+import { translate } from "@/lib/i18n/index";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar, {
+  type NavItem,
+} from "@/app/[lng]/flawis/_components/app-sidebar";
+import DashboardHeader from "@/app/[lng]/flawis/_components/dashboard-header";
+import AccountMenu from "@/components/account-menu";
+import Avatar from "@/components/avatar";
+import LngSwitcher from "@/components/lng-switcher";
+import ThemeToggler from "@/components/theme-toggler";
+import Footer from "@/app/[lng]/flawis/_components/footer";
+import Logo from "@/components/logo";
+import { Snackbar } from "@/components/message";
 export default async function Dashboard({
   children,
   navItems,

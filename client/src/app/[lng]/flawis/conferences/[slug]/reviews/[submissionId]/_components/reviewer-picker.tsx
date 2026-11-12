@@ -9,9 +9,10 @@ import {
   ComboboxList,
   ComboboxItem,
   ComboboxEmpty,
-} from "../ui/combobox";
-import { Field, FieldLabel, FieldDescription } from "../ui/field";
-import { errorText, tr } from "@/lib/reviews/ux";
+} from "@/components/ui/combobox";
+import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
+import { errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 export default function ReviewerPicker({
   value,
   onChange,

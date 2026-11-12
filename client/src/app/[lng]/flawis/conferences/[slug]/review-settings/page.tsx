@@ -1,4 +1,4 @@
-import ReviewSettings from "@/components/review-settings";
+import ReviewSettings from "@/app/[lng]/flawis/conferences/[slug]/review-settings/_components/review-settings";
 import { getConference } from "../../actions";
 import {
   getCoordinators,

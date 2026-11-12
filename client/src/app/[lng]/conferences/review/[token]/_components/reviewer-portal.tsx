@@ -10,13 +10,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ConfirmDialog, useUnsavedChanges } from "./reviews/form-dialog";
+import { ConfirmDialog, useUnsavedChanges } from "@/components/form-dialog";
 import { mutate, errorText } from "@/lib/reviews/ux";
-import { AnswerFields, validateAnswerFields } from "./answer-fields";
-import { ReviewError, reviewDate } from "./review-controls";
+import { AnswerFields, validateAnswerFields } from "@/components/answer-fields";
+import { ErrorAlert } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
 import { downloadReviewerFile, uploadReviewFile } from "@/lib/reviews/files";
 import { label, type Portal } from "@/lib/reviews/types";
-import { BreadcrumbLabel } from "./breadcrumb-labels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 export default function ReviewerPortal({
   initial,
   token,
@@ -96,7 +97,7 @@ export default function ReviewerPortal({
           <CardTitle>{t("Recenzný posudok", "Review report")}</CardTitle>
           <CardDescription>
             {t("Termín odovzdania", "Due date")}:{" "}
-            {reviewDate(portal.deadline, lng)}
+            {formatDate(portal.deadline, lng)}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -132,7 +133,7 @@ export default function ReviewerPortal({
               {file.filename}
             </Button>
           ))}
-          <ReviewError message={error} />
+          <ErrorAlert message={error} />
           {saved && (
             <p role="status" className="text-muted-foreground">
               {closed
@@ -155,7 +156,16 @@ export default function ReviewerPortal({
           )}
           <AnswerFields
             lng={lng}
-            authorFields={portal.authorFields}
+            fieldAnnotations={Object.fromEntries(
+              portal.form.fields.map((field) => [
+                field.id,
+                <Badge key={field.id} variant="outline">
+                  {portal.authorFields.includes(field.id)
+                    ? t("Viditeľné autorom", "Visible to authors")
+                    : t("Iba koordinátori", "Coordinators only")}
+                </Badge>,
+              ]),
+            )}
             attachments={portal.attachments}
             errors={fieldErrors}
             onUploadingChange={setUploading}
@@ -209,7 +219,7 @@ export default function ReviewerPortal({
                   );
                   document
                     .querySelector<HTMLElement>(
-                      `[data-review-field="${Object.keys(errors)[0]}"] input:not([type="file"]), [data-review-field="${Object.keys(errors)[0]}"] textarea, [data-review-field="${Object.keys(errors)[0]}"] select, [data-review-field="${Object.keys(errors)[0]}"] [role="radio"], [data-review-field="${Object.keys(errors)[0]}"] [role="button"]`,
+                      `[data-form-field="${Object.keys(errors)[0]}"] input:not([type="file"]), [data-form-field="${Object.keys(errors)[0]}"] textarea, [data-form-field="${Object.keys(errors)[0]}"] select, [data-form-field="${Object.keys(errors)[0]}"] [role="radio"], [data-form-field="${Object.keys(errors)[0]}"] [role="button"]`,
                     )
                     ?.focus();
                 } else setConfirm("submit");
@@ -229,6 +239,7 @@ export default function ReviewerPortal({
       </Card>
       {confirm && !closed && (
         <ConfirmDialog
+          formatError={(error) => errorText(error, lng)}
           lng={lng}
           title={
             confirm === "submit"

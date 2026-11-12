@@ -2,26 +2,27 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useFormContext } from "react-hook-form";
-import { FormDialog, TextField, SelectField } from "./form-dialog";
-import ReviewerPicker from "./reviewer-picker";
+import { FormDialog, TextField, SelectField } from "@/components/form-dialog";
+import ReviewerPicker from "@/app/[lng]/flawis/conferences/[slug]/reviews/[submissionId]/_components/reviewer-picker";
 import { getAssignmentEligibility } from "@/lib/reviews/actions";
 import {
   mutate,
-  tr,
   explain,
   errorText,
   bratislavaDeadline,
 } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import type { Assignment, Detail, Eligibility } from "@/lib/reviews/types";
 import type { ConferenceReviewSettingsQuery } from "@/lib/graphql/generated/graphql";
 import { label } from "@/lib/reviews/types";
 import { uploadReviewFile } from "@/lib/reviews/files";
-import { Input } from "../ui/input";
-import { Checkbox } from "../ui/checkbox";
-import { Alert, AlertDescription } from "../ui/alert";
-import { ReviewField, ReviewError, reviewDate } from "../review-controls";
-import { AnswerFields, validateAnswerFields } from "../answer-fields";
-import ReviewerProfileView from "../reviewer-profile";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FieldControl, ErrorAlert } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
+import { AnswerFields, validateAnswerFields } from "@/components/answer-fields";
+import ReviewerProfileView from "@/app/[lng]/flawis/reviewers/_components/reviewer-profile";
 export type SubmissionAction = {
   kind: string;
   assignment?: Assignment;
@@ -103,7 +104,7 @@ function AssignmentFields({
           form.setValue("reviewerId", v, { shouldDirty: true });
         }}
       />
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       {reviewer && !check && !error && (
         <p role="status">
           {t("Overuje sa spôsobilosť…", "Checking eligibility…")}
@@ -284,6 +285,7 @@ export default function SubmissionActionDialog({
           : `${lng === "sk" ? detail.titleSk || detail.title : detail.title}${assignment ? ` · ${assignment.name}` : ""}`;
   return (
     <FormDialog
+      formatError={(error) => errorText(error, lng)}
       lng={lng}
       title={actionTitle(kind, lng)}
       description={consequences}
@@ -342,13 +344,13 @@ export default function SubmissionActionDialog({
           if (Object.keys(errors).length) {
             document
               .querySelector<HTMLElement>(
-                '[data-review-field="' +
+                '[data-form-field="' +
                   Object.keys(errors)[0] +
-                  '"] input, [data-review-field="' +
+                  '"] input, [data-form-field="' +
                   Object.keys(errors)[0] +
-                  '"] textarea, [data-review-field="' +
+                  '"] textarea, [data-form-field="' +
                   Object.keys(errors)[0] +
-                  '"] select, [data-review-field="' +
+                  '"] select, [data-form-field="' +
                   Object.keys(errors)[0] +
                   '"] [role="radio"]',
               )
@@ -392,9 +394,9 @@ export default function SubmissionActionDialog({
     >
       {(form) => (
         <>
-          <ReviewError message={fileError} />
+          <ErrorAlert message={fileError} />
           {uploadKind && (
-            <ReviewField
+            <FieldControl
               label={t("Súbor rukopisu", "Manuscript file")}
               hint={t(
                 "DOCX alebo PDF, najviac 20 MiB. Nahrávanie sa spustí po potvrdení.",
@@ -422,7 +424,7 @@ export default function SubmissionActionDialog({
                   )}
                 </>
               )}
-            </ReviewField>
+            </FieldControl>
           )}
           {kind === "PREPARE" && (
             <>
@@ -455,7 +457,7 @@ export default function SubmissionActionDialog({
           {["SEND", "REMIND"].includes(kind) && assignment && (
             <>
               <p>
-                {assignment.email} · {reviewDate(assignment.deadline, lng)}
+                {assignment.email} · {formatDate(assignment.deadline, lng)}
               </p>
               <p className="whitespace-pre-line">{settings?.instructions}</p>
               <p>
@@ -466,7 +468,7 @@ export default function SubmissionActionDialog({
               </p>
               <p className="whitespace-pre-line">{settings?.signature}</p>
               {assignment.delivery === "UNKNOWN" && (
-                <ReviewField
+                <FieldControl
                   label={t(
                     "Overil/a som odoslanie a súhlasím s opätovným odoslaním, ktoré môže vytvoriť duplicitný e-mail.",
                     "I checked delivery and accept that resending may duplicate the email.",
@@ -483,7 +485,7 @@ export default function SubmissionActionDialog({
                       }
                     />
                   )}
-                </ReviewField>
+                </FieldControl>
               )}
             </>
           )}
@@ -561,7 +563,7 @@ export default function SubmissionActionDialog({
                 </a>
               ))}
               {!readOnlyReport && (
-                <ReviewField
+                <FieldControl
                   label={t(
                     "Originál doručeného posudku (voliteľné)",
                     "Received report file (optional)",
@@ -589,7 +591,7 @@ export default function SubmissionActionDialog({
                       }}
                     />
                   )}
-                </ReviewField>
+                </FieldControl>
               )}
               <AnswerFields
                 fields={round.questionnaire.fields}

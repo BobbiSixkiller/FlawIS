@@ -1,6 +1,6 @@
 "use client";
-import GenericCombobox from "../generic-combobox";
-import { ReviewField } from "../review-controls";
+import GenericCombobox from "@/components/generic-combobox";
+import { FieldControl } from "@/components/field-controls";
 
 /** Reuse the shared multi-select while allowing conference-specific vocabulary. */
 export default function ReviewerTags({
@@ -23,7 +23,7 @@ export default function ReviewerTags({
     val,
   }));
   return (
-    <ReviewField label={label}>
+    <FieldControl label={label}>
       {(id) => (
         <GenericCombobox
           id={id}
@@ -49,6 +49,6 @@ export default function ReviewerTags({
           }
         />
       )}
-    </ReviewField>
+    </FieldControl>
   );
 }

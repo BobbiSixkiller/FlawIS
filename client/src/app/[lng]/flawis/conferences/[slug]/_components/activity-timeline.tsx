@@ -2,10 +2,10 @@
 import { useState, useTransition } from "react";
 import { getActivity } from "@/lib/reviews/actions";
 import type { ConferenceActivityQuery } from "@/lib/graphql/generated/graphql";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { tr } from "@/lib/reviews/ux";
-import { ReviewError } from "./review-controls";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { localizedText as tr } from "@/lib/i18n/text";
+import { ErrorAlert } from "@/components/field-controls";
 export default function ActivityTimeline({
   initial,
   conference,
@@ -29,7 +29,7 @@ export default function ActivityTimeline({
   });
   return (
     <div className="flex flex-col gap-4">
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       {events.map((event) => (
         <article key={event.id} className="flex flex-col gap-2 border-b pb-3">
           <div className="flex flex-wrap items-center justify-between gap-2">

@@ -1,6 +1,8 @@
 # Client conventions
 
 - Preserve UK Sans, the purple accent, semantic theme tokens, and light/dark support. Use the existing Base UI shadcn primitives in `src/components/ui`.
+- Keep `src/components` for shared controls and cross-feature components. Colocate feature screens and their supporting components in route-local `_components`, at the nearest common owning route when several pages reuse them. A reusable primitive need not have multiple callers. Move files and update imports directly, without compatibility re-exports.
+- Keep shared form builders, dialogs and answer controls independent of feature mutations. Hosts own saving, error translation and domain annotations. The shared `FormBuilder` edits the parent React Hook Form's `formFields`; persisted field IDs and option values are separate from React field-array keys.
 - Inspect users/conferences pages for established navigation and search patterns. Dashboard search belongs in the `@headerActions` parallel route; ensure fallback routes clear stale actions on navigation.
 - Reviewers, forms, and submission reviews currently use search only. Do not add filters to those pages without a task requiring them.
 - Use `GenericCombobox` with `multiple` for multi-selection and the shared multiple-file uploader for attachment inputs. Preserve configured file-count limits across previews and live forms.

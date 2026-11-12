@@ -1,6 +1,6 @@
 import { getConference } from "../../actions";
 import { getActivity } from "@/lib/reviews/actions";
-import ActivityTimeline from "@/components/activity-timeline";
+import ActivityTimeline from "@/app/[lng]/flawis/conferences/[slug]/_components/activity-timeline";
 export const dynamic = "force-dynamic";
 export default async function ActivityPage({
   params,

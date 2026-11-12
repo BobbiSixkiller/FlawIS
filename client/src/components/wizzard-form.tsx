@@ -150,6 +150,7 @@ function WizardBody<TValues extends FieldValues, TOutput extends FieldValues>({
     <div className="flex flex-col gap-6">
       <Stepper activeIndex={step} lng={lng} steps={steps} />
       <form
+        noValidate
         className={className}
         onSubmit={async (event) => {
           event.preventDefault();
@@ -216,7 +217,6 @@ function WizardBody<TValues extends FieldValues, TOutput extends FieldValues>({
           )}
           <Button
             className={steps.length === 1 ? "w-full" : ""}
-
             type="submit"
             disabled={advancing || methods.formState.isSubmitting}
             aria-label={t(last ? "submit" : "next")}

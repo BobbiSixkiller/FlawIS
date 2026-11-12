@@ -2,6 +2,8 @@ import { GraphQLError } from "graphql";
 import { Service } from "typedi";
 import { ObjectId } from "mongodb";
 import { ClientSession } from "mongoose";
+import type { DocumentType } from "@typegoose/typegoose";
+import type { Form } from "../entitites/Form";
 import { Repository } from "../repositories/base.repository";
 import { ReviewFile } from "../entitites/Review";
 import { StoredObject } from "../entitites/StoredObject";
@@ -15,6 +17,21 @@ import {
 } from "../repositories/form.repository";
 import { toDTO, withOptionalTransaction } from "../util/helpers";
 import { validateAnswers } from "../util/formValidation";
+import { sanitizeRichText } from "../util/sanitizeRichText";
+
+/** Sanitize legacy help on read without rewriting an immutable form version. */
+function formDTO(form: DocumentType<Form>) {
+  const result = toDTO(form);
+  return {
+    ...result,
+    fields: result.fields.map((field) => ({
+      ...field,
+      helpText: field.helpText
+        ? sanitizeRichText(field.helpText)
+        : field.helpText,
+    })),
+  };
+}
 
 @Service()
 export class FormService {
@@ -84,6 +101,7 @@ export class FormService {
     if (fields.length > 100) throw new Error("Maximum 100 fields.");
     const normalized = fields.map((f) => ({
       ...f,
+      helpText: f.helpText ? sanitizeRichText(f.helpText) : f.helpText,
       _id: f.id ?? new ObjectId(),
     }));
     const ids = normalized.map((f) => String(f._id));
@@ -138,7 +156,7 @@ export class FormService {
         { new: true, session: s },
       );
       if (!root) throw new Error("Form is missing or archived.");
-      return toDTO(
+      return formDTO(
         await this.forms.create(
           { definition, version: root.latestVersion, fields: normalized },
           { session: s },
@@ -150,7 +168,7 @@ export class FormService {
   async versions(definition: ObjectId) {
     return (
       await this.forms.findAll({ definition }, null, { sort: { version: -1 } })
-    ).map(toDTO);
+    ).map(formDTO);
   }
   async archive(definition: ObjectId) {
     await this.definitions.findOneAndUpdate(
@@ -162,7 +180,7 @@ export class FormService {
   async getForm(id: ObjectId, session?: ClientSession) {
     const form = await this.forms.findOne({ _id: id }, null, { session });
     if (!form) throw new Error("Form not found.");
-    return toDTO(form);
+    return formDTO(form);
   }
 
   async bind(

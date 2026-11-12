@@ -19,7 +19,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -29,20 +29,21 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "../ui/alert-dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Field,
   FieldLabel,
   FieldDescription,
   FieldError,
   FieldGroup,
-} from "../ui/field";
-import { ReviewError, ReviewSelect } from "../review-controls";
-import { toast } from "../ui/toast";
-import { errorText, tr } from "@/lib/reviews/ux";
+} from "@/components/ui/field";
+import { ErrorAlert, SelectControl } from "@/components/field-controls";
+import { toast } from "@/components/ui/toast";
+import { errorMessage } from "@/lib/i18n/text";
+import { localizedText as tr } from "@/lib/i18n/text";
 
 export function useUnsavedChanges(dirty: boolean, lng = "sk") {
   useEffect(() => {
@@ -86,6 +87,9 @@ export function useUnsavedChanges(dirty: boolean, lng = "sk") {
     };
   }, [dirty, lng]);
 }
+/** Validates and retains a draft on failure, guards dirty dismissal, and restores trigger focus.
+ * The caller owns persistence and optional domain error translation.
+ */
 export function FormDialog<T extends FieldValues>({
   title,
   description,
@@ -103,6 +107,7 @@ export function FormDialog<T extends FieldValues>({
   successMessage,
   keepOpen = false,
   onInvalid,
+  formatError,
   readOnly = false,
 }: {
   title: string;
@@ -121,6 +126,7 @@ export function FormDialog<T extends FieldValues>({
   successMessage?: string;
   keepOpen?: boolean;
   onInvalid?: () => void;
+  formatError?: (error: unknown) => string;
   readOnly?: boolean;
 }) {
   const t = tr(lng);
@@ -188,7 +194,7 @@ export function FormDialog<T extends FieldValues>({
                   });
                   if (!keepOpen) onClose();
                 } catch (e) {
-                  setError(errorText(e, lng));
+                  setError(formatError ? formatError(e) : errorMessage(e, lng));
                   const fields = (e as { fields?: Record<string, string> })
                     .fields;
                   if (fields)
@@ -205,7 +211,7 @@ export function FormDialog<T extends FieldValues>({
               <div className="min-h-0 flex-1 overflow-y-auto px-1 pb-1">
                 <fieldset disabled={submitting || busy} className="min-w-0">
                   <FieldGroup>
-                    <ReviewError message={error} />
+                    <ErrorAlert message={error} />
                     {children(form)}
                   </FieldGroup>
                 </fieldset>
@@ -334,7 +340,7 @@ export function SelectField({
   return (
     <Field data-invalid={Boolean(error)}>
       <FieldLabel htmlFor={`review-${name}`}>{label}</FieldLabel>
-      <ReviewSelect
+      <SelectControl
         {...register(name)}
         id={`review-${name}`}
         value={watch(name) || ""}
@@ -355,12 +361,14 @@ export function ConfirmDialog({
   description,
   lng,
   onConfirm,
+  formatError,
   onClose,
 }: {
   title: string;
   description: string;
   lng: string;
   onConfirm: () => Promise<unknown>;
+  formatError?: (error: unknown) => string;
   onClose: () => void;
 }) {
   const [pending, setPending] = useState(false);
@@ -378,7 +386,7 @@ export function ConfirmDialog({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        <ReviewError message={error} />
+        <ErrorAlert message={error} />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={pending}>
             {t("Zrušiť", "Cancel")}
@@ -393,7 +401,7 @@ export function ConfirmDialog({
                 onClose();
                 toast.add({ title: t("Hotovo.", "Done."), type: "success" });
               } catch (e) {
-                setError(errorText(e, lng));
+                setError(formatError ? formatError(e) : errorMessage(e, lng));
               } finally {
                 setPending(false);
               }

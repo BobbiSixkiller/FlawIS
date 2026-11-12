@@ -1,4 +1,4 @@
-import AuthorReviewFeedback from "@/components/author-review-feedback";
+import AuthorReviewFeedback from "@/app/[lng]/conferences/[slug]/_components/author-review-feedback";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import Icon from "@/components/icon";
 import Link from "next/link";

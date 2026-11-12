@@ -1,4 +1,4 @@
-import { translate } from "@/lib/i18n";
+import { translate } from "@/lib/i18n/index";
 export default async function Footer({ lng }: { lng: string }) {
   const { t, i18n } = await translate(lng, "dashboard");
   return (

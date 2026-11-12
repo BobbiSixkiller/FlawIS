@@ -6,7 +6,7 @@ import { cleanup, render, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
 import { Toaster, createToastManager } from "../src/components/ui/toast";
-import { FormDialog, TextField } from "../src/components/reviews/form-dialog";
+import { FormDialog, TextField } from "../src/components/form-dialog";
 import {
   AnswerFields,
   validateAnswerFields,
@@ -197,7 +197,11 @@ test("review answer visibility and upload busy state are explicit and validation
     const [values, setValues] = useState<Record<string, string | string[]>>({});
     return createElement(AnswerFields, {
       fields,
-      authorFields: ["public"],
+      fieldAnnotations: {
+        public: "Visible to authors",
+        private: "Coordinators only",
+        file: "Coordinators only",
+      },
       values,
       onChange: (id, value) =>
         setValues((current) => ({ ...current, [id]: value })),

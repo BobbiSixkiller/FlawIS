@@ -3,11 +3,16 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { z } from "zod";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { Badge } from "./ui/badge";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from "./ui/empty";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
 import {
   Table,
   TableHeader,
@@ -15,11 +20,13 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from "./ui/table";
-import { ReviewError, reviewDate } from "./review-controls";
-import { FormDialog } from "./reviews/form-dialog";
+} from "@/components/ui/table";
+import { ErrorAlert } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
+import { FormDialog } from "@/components/form-dialog";
 import { getReviewDetail } from "@/lib/reviews/actions";
-import { mutate, tr, errorText } from "@/lib/reviews/ux";
+import { mutate, errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import { label, stage, type Queue, type QueueRow } from "@/lib/reviews/types";
 export { bratislavaDeadline } from "@/lib/reviews/ux";
 
@@ -97,7 +104,7 @@ export default function ConferenceReviewWorkspace({
           </AlertDescription>
         </Alert>
       )}
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       {selection.length > 0 && (
         <div className="flex flex-wrap items-center gap-3">
           <span>
@@ -254,7 +261,7 @@ export default function ConferenceReviewWorkspace({
                         </div>
                         {!["SUBMITTED", "DECLINED"].includes(a.status) && (
                           <span className="text-xs">
-                            {reviewDate(a.deadline, lng)}
+                            {formatDate(a.deadline, lng)}
                             {Date.parse(a.deadline) < Date.now()
                               ? ` · ${t("po termíne", "overdue")}`
                               : ""}
@@ -325,6 +332,7 @@ export default function ConferenceReviewWorkspace({
       </div>
       {preview && (
         <FormDialog
+          formatError={(error) => errorText(error, lng)}
           lng={lng}
           title={t("Pozvať recenzentov", "Invite reviewers")}
           description={t(
@@ -405,7 +413,7 @@ export default function ConferenceReviewWorkspace({
                   <p className="font-medium">{row.title}</p>
                   <p>
                     {assignment.name} · {assignment.email} ·{" "}
-                    {reviewDate(assignment.deadline, lng)}
+                    {formatDate(assignment.deadline, lng)}
                   </p>
                   <p role="status">{outcomes[assignment.id]}</p>
                 </div>

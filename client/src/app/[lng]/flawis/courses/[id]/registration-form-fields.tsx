@@ -1,4 +1,5 @@
 "use client";
+import RichTextHelp from "@/components/rich-text-help";
 import type { RegistrationValues } from "@/lib/validation/registration-form-schema";
 import { FormField } from "@/components/form";
 import { AnswerFieldControl } from "@/components/answer-fields";
@@ -22,7 +23,11 @@ export default function RegistrationFormFields({
           key={definition.id}
           name={`field_${definition.id}`}
           label={definition.label}
-          description={definition.helpText || undefined}
+          description={
+            definition.helpText ? (
+              <RichTextHelp html={definition.helpText} />
+            ) : undefined
+          }
         >
           {({ field, controlProps, initialize, onError }) => (
             <AnswerFieldControl

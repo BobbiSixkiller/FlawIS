@@ -3,12 +3,13 @@ import { useState } from "react";
 import useMounted from "@/hooks/useMounted";
 import { z } from "zod";
 import { getReviewerDirectory } from "@/lib/reviews/actions";
-import { mutate, tr, errorText } from "@/lib/reviews/ux";
+import { mutate, errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import type { ReviewerPage, ReviewerRecord } from "@/lib/reviews/types";
 import { reviewerCsv, parseReviewerCsv } from "@/lib/reviews/csv";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Badge } from "./ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableHeader,
@@ -16,12 +17,12 @@ import {
   TableRow,
   TableBody,
   TableCell,
-} from "./ui/table";
-import { Empty, EmptyHeader, EmptyTitle } from "./ui/empty";
-import { ReviewError, ReviewField } from "./review-controls";
-import { FormDialog, TextField, ConfirmDialog } from "./reviews/form-dialog";
-import ReviewerTags from "./reviews/reviewer-tags";
-import ReviewerProfileView from "./reviewer-profile";
+} from "@/components/ui/table";
+import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { ErrorAlert, FieldControl } from "@/components/field-controls";
+import { FormDialog, TextField, ConfirmDialog } from "@/components/form-dialog";
+import ReviewerTags from "@/app/[lng]/flawis/reviewers/_components/reviewer-tags";
+import ReviewerProfileView from "@/app/[lng]/flawis/reviewers/_components/reviewer-profile";
 type ImportRow = {
   data: Record<string, string>;
   existing?: ReviewerRecord;
@@ -144,7 +145,7 @@ export default function ReviewerDirectory({
           )}
         </div>
       </div>
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       <p className="text-sm text-muted-foreground">
         {page.totalCount} {t("recenzentov", "reviewers")}
       </p>
@@ -243,6 +244,7 @@ export default function ReviewerDirectory({
       )}
       {editing && (
         <FormDialog
+          formatError={(error) => errorText(error, lng)}
           key={existing?.id || "new"}
           title={
             existing
@@ -325,6 +327,7 @@ export default function ReviewerDirectory({
       )}
       {archiving && (
         <ConfirmDialog
+          formatError={(error) => errorText(error, lng)}
           lng={lng}
           title={
             archiving.archived
@@ -344,6 +347,7 @@ export default function ReviewerDirectory({
       )}
       {importing && (
         <FormDialog
+          formatError={(error) => errorText(error, lng)}
           title={t("Importovať recenzentov", "Import reviewers")}
           lng={lng}
           wide
@@ -415,7 +419,7 @@ export default function ReviewerDirectory({
         >
           {() => (
             <>
-              <ReviewField
+              <FieldControl
                 label="CSV"
                 hint="name,email,institution,department,languages,expertise,notes"
               >
@@ -447,8 +451,8 @@ export default function ReviewerDirectory({
                             seen.add(row.email);
                             const valid = Boolean(
                               row.name?.trim() &&
-                              z.email().safeParse(row.email).success &&
-                              !duplicate,
+                                z.email().safeParse(row.email).success &&
+                                !duplicate,
                             );
                             return {
                               data: row,
@@ -481,7 +485,7 @@ export default function ReviewerDirectory({
                     }}
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
               <p>
                 {t(
                   "Archivovaní recenzenti zostanú archivovaní. Úspešné riadky sa pri opakovaní preskočia.",

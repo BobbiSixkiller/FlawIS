@@ -77,3 +77,25 @@ test("mobile navigation closes after choosing a link", async (context) => {
   fireEvent.click(link);
   assert.equal(view.queryByRole("dialog"), null);
 });
+
+test("the sidebar shortcut leaves rich-text formatting and input shortcuts alone", (context) => {
+  mockViewport(context);
+  const view = render(createElement(SidebarFixture));
+  const editor = document.createElement("div");
+  editor.contentEditable = "true";
+  editor.setAttribute("contenteditable", "true");
+  view.container.append(editor);
+  fireEvent.keyDown(editor, { key: "b", ctrlKey: true });
+  assert.equal(
+    view.container.querySelector(
+      '[data-slot="sidebar"][data-collapsible="icon"]',
+    ),
+    null,
+  );
+  fireEvent.keyDown(window, { key: "b", ctrlKey: true });
+  assert.ok(
+    view.container.querySelector(
+      '[data-slot="sidebar"][data-collapsible="icon"]',
+    ),
+  );
+});

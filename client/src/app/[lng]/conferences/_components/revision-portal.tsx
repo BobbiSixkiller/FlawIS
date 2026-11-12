@@ -1,6 +1,6 @@
 "use client";
-import { useUnsavedChanges } from "./reviews/form-dialog";
-import { BreadcrumbLabel } from "./breadcrumb-labels";
+import { useUnsavedChanges } from "@/components/form-dialog";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,8 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { ReviewError, ReviewField, reviewDate } from "./review-controls";
+import { ErrorAlert, FieldControl } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
 import { uploadReviewFile } from "@/lib/reviews/files";
 import { getRevisionPortal, getAuthorWorkspace } from "@/lib/reviews/actions";
 import type { RevisionPortal } from "@/lib/reviews/types";
@@ -58,12 +59,12 @@ export default function RevisionPortalView({
         <CardHeader>
           <CardTitle>{t("Oprava príspevku", "Manuscript revision")}</CardTitle>
           <CardDescription>
-            {t("Termín", "Deadline")}: {reviewDate(request.deadline, lng)}
+            {t("Termín", "Deadline")}: {formatDate(request.deadline, lng)}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="mb-6 whitespace-pre-line">{request.instructions}</p>
-          <ReviewError message={error} />
+          <ErrorAlert message={error} />
           {request.status === "CANCELLED" ? (
             <p role="status">
               {t("Výzva bola uzavretá.", "This correction request is closed.")}
@@ -77,7 +78,7 @@ export default function RevisionPortalView({
             </p>
           ) : (
             <FieldGroup>
-              <ReviewField
+              <FieldControl
                 label={t("Opravený rukopis DOCX", "Revised DOCX manuscript")}
                 hint={t("Najviac 20 MiB.", "Maximum 20 MiB.")}
               >
@@ -90,8 +91,8 @@ export default function RevisionPortalView({
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                   />
                 )}
-              </ReviewField>
-              <ReviewField
+              </FieldControl>
+              <FieldControl
                 label={t(
                   "Poznámka pre koordinátora",
                   "Note for the coordinator",
@@ -105,7 +106,7 @@ export default function RevisionPortalView({
                     disabled={pending}
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
             </FieldGroup>
           )}
         </CardContent>

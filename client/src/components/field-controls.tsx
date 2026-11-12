@@ -11,7 +11,7 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-export function ReviewField({
+export function FieldControl({
   label,
   hint,
   error,
@@ -19,14 +19,14 @@ export function ReviewField({
   children,
 }: {
   label: string;
-  hint?: string;
+  hint?: ReactNode;
   error?: string;
   fieldId?: string;
   children: (id: string) => ReactNode;
 }) {
   const id = useId();
   return (
-    <Field data-invalid={Boolean(error)} data-review-field={fieldId}>
+    <Field data-invalid={Boolean(error)} data-form-field={fieldId}>
       <FieldLabel id={`${id}-label`} htmlFor={id}>
         {label}
       </FieldLabel>
@@ -38,7 +38,7 @@ export function ReviewField({
     </Field>
   );
 }
-export function ReviewError({ message }: { message: string }) {
+export function ErrorAlert({ message }: { message: string }) {
   return message ? (
     <Alert variant="destructive">
       <AlertDescription>
@@ -47,7 +47,7 @@ export function ReviewError({ message }: { message: string }) {
     </Alert>
   ) : null;
 }
-export function ReviewSelect({
+export function SelectControl({
   id,
   value,
   onChange,
@@ -83,8 +83,3 @@ export function ReviewSelect({
     </NativeSelect>
   );
 }
-export const reviewDate = (value: string, lng: string) =>
-  new Intl.DateTimeFormat(lng === "en" ? "en-GB" : "sk-SK", {
-    dateStyle: "medium",
-    timeZone: "Europe/Bratislava",
-  }).format(new Date(value));

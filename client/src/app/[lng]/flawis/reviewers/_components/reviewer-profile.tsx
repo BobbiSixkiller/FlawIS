@@ -2,14 +2,16 @@
 import { useState } from "react";
 import { z } from "zod";
 import { getReviewerProfile } from "@/lib/reviews/actions";
-import { mutate, tr, errorText } from "@/lib/reviews/ux";
+import { mutate, errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import type { ReviewerProfile } from "@/lib/reviews/types";
 import { label } from "@/lib/reviews/types";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { FieldSet, FieldLegend } from "./ui/field";
-import { ReviewError, ReviewField, reviewDate } from "./review-controls";
-import { FormDialog, ViewDialog } from "./reviews/form-dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { FieldSet, FieldLegend } from "@/components/ui/field";
+import { ErrorAlert, FieldControl } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
+import { FormDialog, ViewDialog } from "@/components/form-dialog";
 export default function ReviewerProfileView({
   reviewer,
   conference,
@@ -45,7 +47,7 @@ export default function ReviewerProfileView({
   }
   return (
     <>
-      {!profile && <ReviewError message={error} />}
+      {!profile && <ErrorAlert message={error} />}
       <Button variant="ghost" disabled={pending} onClick={load}>
         {pending
           ? t("Načítava sa…", "Loading…")
@@ -61,7 +63,7 @@ export default function ReviewerProfileView({
           onClose={() => setProfile(null)}
         >
           <div className="flex flex-col gap-4">
-            <ReviewError message={error} />
+            <ErrorAlert message={error} />
             <p className="text-sm text-muted-foreground">
               {t(
                 "Zobrazujú sa len príspevky, ku ktorým máte prístup.",
@@ -107,7 +109,7 @@ export default function ReviewerProfileView({
                 <div key={item.id} className="flex flex-col gap-1">
                   <p className="font-medium">{item.title}</p>
                   <p>
-                    {label(item.status, lng)} · {reviewDate(item.deadline, lng)}
+                    {label(item.status, lng)} · {formatDate(item.deadline, lng)}
                     {!item.active ? ` · ${t("Archív", "Archived")}` : ""}
                   </p>
                 </div>
@@ -146,6 +148,7 @@ export default function ReviewerProfileView({
       )}
       {profile && editing && (
         <FormDialog
+          formatError={(error) => errorText(error, lng)}
           lng={lng}
           title={t("Spôsobilosť recenzenta", "Reviewer eligibility")}
           schema={z.object({
@@ -168,7 +171,7 @@ export default function ReviewerProfileView({
                   <FieldLegend>{section.label}</FieldLegend>
                   {(["participatedSections", "guarantorSections"] as const).map(
                     (key) => (
-                      <ReviewField
+                      <FieldControl
                         key={key}
                         label={
                           key === "participatedSections"
@@ -193,13 +196,13 @@ export default function ReviewerProfileView({
                             }
                           />
                         )}
-                      </ReviewField>
+                      </FieldControl>
                     ),
                   )}
                 </FieldSet>
               ))}
               {submission && (
-                <ReviewField
+                <FieldControl
                   label={t(
                     "Konflikt pri tomto príspevku",
                     "Conflict for this submission",
@@ -222,7 +225,7 @@ export default function ReviewerProfileView({
                       }
                     />
                   )}
-                </ReviewField>
+                </FieldControl>
               )}
             </>
           )}

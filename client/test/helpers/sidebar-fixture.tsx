@@ -1,5 +1,5 @@
 import { PathnameContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
-import AppSidebar from "../../src/components/app-sidebar";
+import AppSidebar from "../../src/app/[lng]/flawis/_components/app-sidebar";
 import {
   SidebarProvider,
   SidebarTrigger,

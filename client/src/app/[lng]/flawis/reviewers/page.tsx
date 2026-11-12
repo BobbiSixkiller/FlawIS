@@ -1,4 +1,4 @@
-import ReviewerDirectory from "@/components/reviewer-directory";
+import ReviewerDirectory from "@/app/[lng]/flawis/reviewers/_components/reviewer-directory";
 import { getReviewContext, getReviewerDirectory } from "@/lib/reviews/actions";
 export default async function ReviewersPage({
   params,

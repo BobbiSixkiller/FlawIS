@@ -7,7 +7,7 @@ import { translate } from "@/lib/i18n";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import { getReviewContext } from "@/lib/reviews/actions";
-import Dashboard from "@/components/dashboard";
+import Dashboard from "@/app/[lng]/flawis/_components/dashboard";
 
 export async function generateMetadata(
   {

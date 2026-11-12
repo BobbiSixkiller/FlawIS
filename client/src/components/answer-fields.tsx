@@ -1,14 +1,18 @@
 "use client";
 import { useState, type AriaAttributes, type ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
+import RichTextHelp from "./rich-text-help";
 import { Button } from "@/components/ui/button";
-import { tr } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldGroup } from "@/components/ui/field";
 import MultipleFileUploadField from "./multiple-file-upload-field";
 import RadioGroupField from "./radio-group-field";
-import { ReviewError, ReviewField, ReviewSelect } from "./review-controls";
+import {
+  ErrorAlert,
+  FieldControl,
+  SelectControl,
+} from "@/components/field-controls";
 import { FieldType, type FormFragment } from "@/lib/graphql/generated/graphql";
 
 type Definition = FormFragment["fields"][number];
@@ -42,8 +46,9 @@ export function AnswerFieldControl({
     );
   if (definition.type === FieldType.Select)
     return (
-      <ReviewSelect
+      <SelectControl
         {...props}
+        empty={definition.placeholder || "—"}
         disabled={disabled}
         value={text}
         options={
@@ -84,7 +89,7 @@ export function AnswerFields({
   upload,
   lng = "en",
   errors = {},
-  authorFields,
+  fieldAnnotations,
   attachments = [],
   onUploadingChange,
   preview = false,
@@ -92,7 +97,8 @@ export function AnswerFields({
   lng?: string;
   preview?: boolean;
   errors?: Record<string, string>;
-  authorFields?: string[];
+  /** Caller-owned domain labels, such as who can see an answer. */
+  fieldAnnotations?: Record<string, ReactNode>;
   attachments?: { id: string; filename: string }[];
   onUploadingChange?: (value: boolean) => void;
   fields: Definition[];
@@ -113,24 +119,18 @@ export function AnswerFields({
   const [uploadName, setUploadName] = useState("");
   return (
     <FieldGroup>
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       {fields.map((f) => (
-        <ReviewField
+        <FieldControl
           key={f.id}
           label={`${f.label}${f.required ? " *" : ""}`}
-          hint={f.helpText || undefined}
+          hint={f.helpText ? <RichTextHelp html={f.helpText} /> : undefined}
           error={errors[f.id]}
           fieldId={f.id}
         >
           {(id) => (
             <>
-              {authorFields && (
-                <Badge variant="outline">
-                  {authorFields.includes(f.id)
-                    ? t("Viditeľné autorom", "Visible to authors")
-                    : t("Iba koordinátori", "Coordinators only")}
-                </Badge>
-              )}
+              {fieldAnnotations?.[f.id]}
               <AnswerFieldControl
                 aria-labelledby={`${id}-label`}
                 aria-required={f.required}
@@ -284,7 +284,7 @@ export function AnswerFields({
               />
             </>
           )}
-        </ReviewField>
+        </FieldControl>
       ))}
     </FieldGroup>
   );

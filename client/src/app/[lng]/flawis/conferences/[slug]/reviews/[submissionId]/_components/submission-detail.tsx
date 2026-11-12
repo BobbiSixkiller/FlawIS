@@ -1,10 +1,10 @@
 "use client";
-import { BreadcrumbLabel } from "../breadcrumb-labels";
+import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
@@ -12,23 +12,25 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "../ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
-import { Alert, AlertDescription } from "../ui/alert";
-import { ReviewError, reviewDate } from "../review-controls";
-import { toast } from "../ui/toast";
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ErrorAlert } from "@/components/field-controls";
+import { formatDate } from "@/lib/date";
+import { toast } from "@/components/ui/toast";
 import { getReviewDetail, getActivity } from "@/lib/reviews/actions";
-import { tr, explain, mutate, errorText } from "@/lib/reviews/ux";
+import { explain, mutate, errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import type {
   ConferenceActivityQuery,
   ConferenceReviewSettingsQuery,
 } from "@/lib/graphql/generated/graphql";
 import { label, type Detail, type Assignment } from "@/lib/reviews/types";
-import ActivityTimeline from "../activity-timeline";
+import ActivityTimeline from "@/app/[lng]/flawis/conferences/[slug]/_components/activity-timeline";
 import SubmissionActionDialog, {
   actionTitle,
   type SubmissionAction,
-} from "./submission-actions";
+} from "@/app/[lng]/flawis/conferences/[slug]/reviews/[submissionId]/_components/submission-actions";
 export default function SubmissionDetail({
   initial,
   slug,
@@ -168,7 +170,7 @@ export default function SubmissionDetail({
           </Button>
         </div>
       </div>
-      <ReviewError message={error} />
+      <ErrorAlert message={error} />
       <Tabs
         value={tab}
         onValueChange={(value) => {
@@ -231,7 +233,7 @@ export default function SubmissionDetail({
                 >
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">v{v.number}</Badge>
-                    <span>{reviewDate(v.createdAt, lng)}</span>
+                    <span>{formatDate(v.createdAt, lng)}</span>
                     {v.anonymousApproved && (
                       <Badge variant="secondary">
                         {t("Anonymizácia overená", "Anonymity approved")}
@@ -306,7 +308,7 @@ export default function SubmissionDetail({
                           {a.slot}. {a.name}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {a.email} · {reviewDate(a.deadline, lng)}
+                          {a.email} · {formatDate(a.deadline, lng)}
                         </p>
                       </div>
                       <div className="flex flex-wrap items-start gap-1">
@@ -482,7 +484,7 @@ export default function SubmissionDetail({
                 <div key={r.id} className="flex flex-col gap-2">
                   <div>
                     <Badge variant="outline">{label(r.status, lng)}</Badge> ·{" "}
-                    {reviewDate(r.deadline, lng)}
+                    {formatDate(r.deadline, lng)}
                   </div>
                   <p className="whitespace-pre-line">{r.instructions}</p>
                   {r.note && <p>{r.note}</p>}

@@ -5,7 +5,7 @@ import {
   getReviewDetail,
   getReviewSettings,
 } from "@/lib/reviews/actions";
-import SubmissionDetail from "@/components/reviews/submission-detail";
+import SubmissionDetail from "@/app/[lng]/flawis/conferences/[slug]/reviews/[submissionId]/_components/submission-detail";
 export const dynamic = "force-dynamic";
 export default async function Page({
   params,

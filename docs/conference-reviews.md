@@ -2,6 +2,8 @@
 
 The conference workspace includes a reviewer directory, submission review queue, conference review settings and activity history. The directory and form library live at `/reviewers` and `/forms` on the FlawIS tenant. Conference routes are `/conferences/:slug/reviews`, `/conferences/:slug/review-settings`, and `/conferences/:slug/activity`.
 
+The [2026-11-11 shared-chat comparison](reviews-chat-crosscheck.md) records coverage and gaps against the supplied conversation at commit `22ccb0fe`, including reviewer correction checks and final Word assembly.
+
 ## Review workspace UX
 
 Open a submission at `/conferences/:slug/reviews/:submissionId`. Its manuscript, review rounds, revisions/decision and activity have separate tabs. Management actions open focused dialogs; revision deadlines, assignment deadlines, editorial reasons and manual report answers are scoped to the current action. Dirty dialogs require an explicit discard decision, preserve values after errors and block duplicate saves. Reviewers complete their questionnaire on a full page, with author-visibility labels, attachment progress, draft feedback and confirmation before final submission or decline.
@@ -48,6 +50,12 @@ The queue loads submissions in pages. Header search queries the server across el
 `FormService` in core owns separate repositories for definitions, immutable versions, context bindings, current answers and immutable answer revisions. Both course applications and review rounds use this service and the same frontend answer controls. A new published version does not change existing applications or rounds. Existing applications display their pinned questionnaire, even after the course selects a different version.
 
 The current contexts are `COURSE` and `REVIEW`. Answer writes validate field IDs, required answers, choice values, file ownership and expected revision. Drafts may omit required answers. Submitted review answers require an explicit reopening before modification. Updating a course application preserves its previous answer revisions and files. Removing a course binding does not delete a form used by other contexts.
+
+The library publishing dialog and course wizard use the same shared `FormBuilder`. Its bottom row adds short text, long text, dropdown, single choice and file upload fields, preselecting the type and focusing the label. Library editing adds the final overall-recommendation shortcut (`PUBLISH`, `CONDITIONAL`, `REJECT`) and optional DOCX placeholder details. Course forms can have no fields; library publishing requires at least one. Both hosts use generic Slovak/English labels and the same field validation.
+
+Stored field IDs and choice values remain separate from the editor's row keys. Option values and display text have separate inputs. New optional uploads allow 0–10 files; making one required raises its minimum to at least 1. Existing configured limits are retained, with a maximum of 20. Publishing errors retain the draft, and retrying a new form reuses its already-created definition.
+
+Rich-text help uses the existing editor and is formatted consistently in previews, course registrations and reviewer questionnaires. Preview HTML is parsed through the editor's supported nodes. Core sanitizes help during publication and when returning versions, including legacy help, without rewriting historical records.
 
 ### DOCX report templates
 
@@ -99,7 +107,7 @@ Roll out core, client and mail together:
 
 1. Back up MongoDB, MinIO and RabbitMQ state. Quiesce writes and stop old mail consumers/producers for the cutover.
 2. Inspect/drain the old exchange's queues before retiring them. The new `.v2` topology does not reinterpret the old non-durable exchange, and this change cannot recover messages already lost there. Do not run old and new workers concurrently on the same notification flow.
-3. Complete the unused-course reset below before serving course traffic with the new shared-form model. MongoDB must run as a replica set to support transactions.
+3. Reconcile legacy courses before serving course traffic with the shared-form model. Use the [preserving repair](course-form-compatibility.md) for courses without attendees that must remain available; the reset below is only for course data deliberately being discarded. Courses with applications require an answer migration. MongoDB must run as a replica set to support transactions.
 4. Ensure the existing RabbitMQ data volume and **node identity/hostname** survive ordinary container recreation. Development and staging pin a hostname and volume. Preserve the current production node name when pinning it during rollout; do not invent a new production node name over an existing data directory. Staging CI deliberately resets its RabbitMQ/Redis volumes and cancels copied unfinished notification jobs on each snapshot deployment; see [runtime reset](development.md#runtime-reset-on-each-staging-deployment).
 5. Build and deploy all three services with matching exchange and secret settings. Core creates the new topology; start the worker afterwards. Keep RabbitMQ's data volume on ordinary broker restarts/replacements; staging CI is the explicit reset exception. Core must not expose its `/internal/notifications` endpoints outside the internal network without their shared-secret check.
 6. Verify signup/reset, conference invoices, coauthor invitations, course notifications, internship notifications, and one review invitation using test recipients before enabling real review mail. Appoint conference/section coordinators and upload the official template.
@@ -108,7 +116,7 @@ Local development startup does not deploy to production or staging. Course reset
 
 ### One-time reset of unused courses
 
-The reset is deliberately explicit and defaults to a dry run. Run against the chosen environment using its own connection and storage credentials, with course traffic/mail paused:
+The reset deletes course data and is not a compatibility repair. To retain a course without attendees, use the [preserving repair](course-form-compatibility.md). The reset is deliberately explicit and defaults to a dry run. Run against the chosen environment using its own connection and storage credentials, with course traffic/mail paused:
 
 ```sh
 cd core
@@ -128,6 +136,8 @@ Only objects in the course storage bucket that are referenced by removed records
 Use [the development guide](development.md) for service verification commands, GraphQL regeneration, and staging integration/browser tests. Keep the three existing Compose files. Destructive staging scenarios are a deliberate test step, followed by cleanup or snapshot restoration as needed.
 
 The workflow integration test checks shared-form isolation, optimistic concurrency, rollback, self-review/impersonation conflicts, file scope, exactly-once feedback release, DOCX export, revisions and decision gating. These fixtures use dedicated databases on staging. The transport integration test uses a separate vhost on the existing staging broker; restart durability requires the explicit restart flag. Unit/UI tests cover audit failures, session migration, ciphertext tampering, reset scope, CSV import, progress calculation and shared answer controls.
+
+Local verification on 2026-11-12 for the unified builder and component moves passed client lint/typecheck, 136 unit/interaction tests, and an isolated production Docker build. Core build and 79 tests passed; three opt-in integration suites were skipped. Builder tests cover all field types, stable IDs and choice values, rich help, empty/invalid-field focus, file limits, course wizard navigation/saving, immutable source drafts, and library publishing failure/retry. Browser checks passed for both builders, the reviewer directory, conference review queue/settings/activity, public conference pages and invalid review/revision links in English/Slovak at desktop/light and mobile/dark sizes, including keyboard and scrolling checks. Browser checks saved no forms or courses; publishing and saving were exercised through interaction-test callbacks. Live reviewer submission, author feedback and delivery scenarios were not repeated for this refactor.
 
 Recorded staging verification on 2026-11-10 at `c853292b`: all 90 core tests passed, including the MongoDB workflow and notification transport suites, with none skipped. Fixtures used only the dedicated test databases/vhost and were cleaned up afterwards; no email was sent. Broker restart was not selected in this staging run, so it verifies transport without restart durability. The associated [deployment run](https://github.com/BobbiSixkiller/FlawIS/actions/runs/42783459986) also passed runtime reset, restore, notification cancellation, broker initialization and application startup; the snapshot contained zero unfinished jobs, so it did not exercise nonzero cancellation.
 

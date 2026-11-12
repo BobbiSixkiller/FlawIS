@@ -1,4 +1,4 @@
-import ConferenceReviewWorkspace from "@/components/conference-review-workspace";
+import ConferenceReviewWorkspace from "@/app/[lng]/flawis/conferences/[slug]/reviews/_components/conference-review-workspace";
 import { getConference } from "../../actions";
 import {
   getReviewContext,

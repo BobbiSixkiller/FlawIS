@@ -1,7 +1,7 @@
 import type { Portal } from "@/lib/reviews/types";
-import ReviewerPortal from "@/components/reviewer-portal";
+import ReviewerPortal from "@/app/[lng]/conferences/review/[token]/_components/reviewer-portal";
 import { getPrivatePortal } from "@/lib/reviews/actions";
-import { ReviewError } from "@/components/review-controls";
+import { ErrorAlert } from "@/components/field-controls";
 export const dynamic = "force-dynamic";
 export const metadata = {
   robots: { index: false, follow: false },
@@ -17,7 +17,7 @@ export default async function ReviewPage({
   if (!result.ok)
     return (
       <main className="mx-auto max-w-xl p-8">
-        <ReviewError
+        <ErrorAlert
           message={
             !result.invalid
               ? lng === "en"

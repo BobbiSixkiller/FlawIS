@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { stripPathLocale } from "@/lib/i18n/settings";
-import Icon, { type IconName } from "./icon";
+import Icon, { type IconName } from "@/components/icon";
 import {
   Sidebar,
   SidebarContent,
@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   useSidebar,
-} from "./ui/sidebar";
+} from "@/components/ui/sidebar";
 
 export type NavItem = { title: string; href: string; icon: IconName };
 

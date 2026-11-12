@@ -1,4 +1,4 @@
-import FormLibrary from "@/components/form-library";
+import FormLibrary from "@/app/[lng]/flawis/forms/_components/form-library";
 import { getFormLibrary, getFormVersions } from "@/lib/reviews/actions";
 import { executeGqlFetch } from "@/lib/graphql/actions";
 import { CoursesDocument } from "@/lib/graphql/generated/graphql";

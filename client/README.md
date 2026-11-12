@@ -37,6 +37,9 @@ Avoid running a production build against the development server's live `.next` d
 
 ## UI conventions
 
+- Keep `src/components` for shared primitives, editors, inputs, dialogs, navigation helpers and cross-feature controls. Feature screens and supporting components belong in their owning route's `_components`; use the nearest common route for components reused by several pages. A generic primitive may have only one current caller. Move files and update consumers directly, without compatibility re-exports.
+- Forms and reviewers own their library/directory dialogs. Conference review, review-settings and activity routes own their respective screens; public reviewer and author routes own their portals, with revision UI shared under public `conferences/_components`. Staff shell composition lives under `flawis/_components`. Existing route URLs and `@headerActions` searches remain the navigation contract.
+- `FormBuilder` edits a parent React Hook Form's `formFields` using the shared localized schema. The course wizard and route-local form publishing dialog own persistence and host validation. Generic dialogs and answer controls accept callbacks/annotations; review error translation and author-visibility labels belong in feature callers. See [shared form behavior](../docs/conference-reviews.md#shared-forms).
 - Shared primitives live in `src/components/ui`; [components.json](components.json) configures shadcn's `base-nova` style with Base UI. Use the existing primitives and Base UI `render` composition.
 - Preserve UK Sans, the university purple accent, semantic theme tokens, dark mode, labelled controls, and keyboard focus behaviour. Theme tokens live in `src/app/globals.css`; shared state variants live in `src/app/shadcn.css`.
 - Shared `.prose` colours use the semantic theme tokens for both rendered rich text and the editor. Use `prose` without `dark:prose-invert` so descriptions, headings, links, lists, tables, and code follow the active theme.

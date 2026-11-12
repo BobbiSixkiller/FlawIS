@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useFormContext } from "react-hook-form";
 import { getFormVersions } from "@/lib/reviews/actions";
-import { mutate, tr, errorText } from "@/lib/reviews/ux";
+import { mutate, errorText } from "@/lib/reviews/ux";
+import { localizedText as tr } from "@/lib/i18n/text";
 import { uploadReviewFile } from "@/lib/reviews/files";
 import {
   FieldType,
@@ -12,11 +13,11 @@ import {
   type FormFragment,
   type FormLibraryQuery,
 } from "@/lib/graphql/generated/graphql";
-import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { Input } from "./ui/input";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Badge } from "./ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
@@ -24,14 +25,18 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "./ui/card";
-import { ReviewField, ReviewSelect, ReviewError } from "./review-controls";
+} from "@/components/ui/card";
+import {
+  FieldControl,
+  SelectControl,
+  ErrorAlert,
+} from "@/components/field-controls";
 import {
   FormDialog,
   TextField,
   SelectField,
   ConfirmDialog,
-} from "./reviews/form-dialog";
+} from "@/components/form-dialog";
 type Config = {
   enabled: boolean;
   requiredReviews: string;
@@ -245,6 +250,7 @@ export default function ReviewSettings({
       )}
       {grant && (
         <FormDialog
+          formatError={(error) => errorText(error, lng)}
           title={t("Pridať koordinátora", "Add coordinator")}
           description={t(
             "Zadajte e-mail existujúceho overeného účtu FlawIS.",
@@ -287,6 +293,7 @@ export default function ReviewSettings({
       )}
       {revoke && (
         <ConfirmDialog
+          formatError={(error) => errorText(error, lng)}
           title={t("Odobrať koordinátora", "Remove coordinator")}
           description={`${revoke.person}. ${t("Používateľ stratí toto oprávnenie. História zostane zachovaná.", "The user loses this access grant. History is preserved.")}`}
           lng={lng}
@@ -365,6 +372,7 @@ function SettingsDialog({
   });
   return (
     <FormDialog
+      formatError={(error) => errorText(error, lng)}
       lng={lng}
       title={title}
       schema={schema}
@@ -427,7 +435,7 @@ function SettingsDialog({
         <>
           {group === "workflow" && (
             <>
-              <ReviewField label={t("Povoliť recenzovanie", "Enable reviews")}>
+              <FieldControl label={t("Povoliť recenzovanie", "Enable reviews")}>
                 {(id) => (
                   <Checkbox
                     id={id}
@@ -439,7 +447,7 @@ function SettingsDialog({
                     }
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
               <TextField
                 name="requiredReviews"
                 label={t("Počet požadovaných posudkov", "Required reports")}
@@ -457,7 +465,7 @@ function SettingsDialog({
           )}
           {group === "requirements" &&
             sections.map((s) => (
-              <ReviewField
+              <FieldControl
                 key={s.value}
                 label={s.label}
                 hint={t(
@@ -481,7 +489,7 @@ function SettingsDialog({
                     }
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
             ))}
           {group === "communication" && (
             <>
@@ -500,7 +508,7 @@ function SettingsDialog({
                 type="email"
                 label={t("Adresa pre odpovede", "Reply-to email")}
               />
-              <ReviewField
+              <FieldControl
                 label={t("Automatické pripomienky", "Automatic reminders")}
                 hint={t(
                   "Dva dni pred termínom a dva dni po termíne.",
@@ -518,7 +526,7 @@ function SettingsDialog({
                     }
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
             </>
           )}
           {group === "questionnaire" && (
@@ -529,7 +537,7 @@ function SettingsDialog({
                 lng={lng}
                 onLoadingChange={setLoadingQuestionnaire}
               />
-              <ReviewField
+              <FieldControl
                 label={t("Nová DOCX šablóna", "New DOCX template")}
                 hint={t(
                   "Najviac 20 MiB. Existujúca šablóna zostane, ak nevyberiete novú.",
@@ -544,7 +552,7 @@ function SettingsDialog({
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
               {file && <p>{file.name}</p>}
               {uploading && (
                 <p role="status">
@@ -637,10 +645,10 @@ function QuestionnaireSettings({
   }
   return (
     <>
-      <ReviewError message={error} />
-      <ReviewField label={t("Formulár z knižnice", "Library form")}>
+      <ErrorAlert message={error} />
+      <FieldControl label={t("Formulár z knižnice", "Library form")}>
         {(id) => (
-          <ReviewSelect
+          <SelectControl
             id={id}
             value={definition}
             options={forms.map((f) => ({ value: f.id, label: f.name }))}
@@ -652,7 +660,7 @@ function QuestionnaireSettings({
             )}
           />
         )}
-      </ReviewField>
+      </FieldControl>
       {definition && (
         <Button
           variant="ghost"
@@ -664,11 +672,11 @@ function QuestionnaireSettings({
       )}
       {versions.length > 0 && (
         <>
-          <ReviewField
+          <FieldControl
             label={t("Verzia pre nové kolá", "Version for new rounds")}
           >
             {(id) => (
-              <ReviewSelect
+              <SelectControl
                 id={id}
                 value={form.watch("form")}
                 options={versions.map((v) => ({
@@ -678,7 +686,7 @@ function QuestionnaireSettings({
                 onChange={chooseVersion}
               />
             )}
-          </ReviewField>
+          </FieldControl>
           {!recommendations.length ? (
             <Alert variant="destructive">
               <AlertDescription>
@@ -707,7 +715,7 @@ function QuestionnaireSettings({
           {fields
             .filter((f) => f.type !== FieldType.FileUpload)
             .map((f) => (
-              <ReviewField
+              <FieldControl
                 key={f.id}
                 label={`${t("Viditeľné autorovi", "Visible to author")}: ${f.label}`}
               >
@@ -732,7 +740,7 @@ function QuestionnaireSettings({
                     }
                   />
                 )}
-              </ReviewField>
+              </FieldControl>
             ))}
         </>
       )}
