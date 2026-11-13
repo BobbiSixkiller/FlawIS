@@ -81,16 +81,30 @@ export class ReviewFileService {
     note?: string;
   }) {
     if (
-      !["ORIGINAL", "ANONYMOUS", "REPORT", "REVISION", "TEMPLATE"].includes(
-        input.kind,
-      )
+      ![
+        "ORIGINAL",
+        "ANONYMOUS",
+        "REPORT",
+        "REVISION",
+        "TEMPLATE",
+        "MANUSCRIPT_TEMPLATE",
+      ].includes(input.kind)
     )
       throw new Error("Invalid file kind.");
     const contentType = validateReviewFile(
       input.buffer,
       input.filename,
-      input.kind === "REVISION" || input.kind === "TEMPLATE",
+      ["REVISION", "TEMPLATE", "MANUSCRIPT_TEMPLATE"].includes(input.kind),
     );
+    const isTemplate = ["TEMPLATE", "MANUSCRIPT_TEMPLATE"].includes(input.kind);
+    if (
+      isTemplate &&
+      (input.submission ||
+        input.assignment ||
+        input.reviewerToken ||
+        input.revisionToken)
+    )
+      throw new Error("Templates require conference-level access.");
     let submission = input.submission,
       conference = input.conference,
       actor = input.user ? String(input.user.id) : "";
@@ -117,13 +131,16 @@ export class ReviewFileService {
       submission = review.submission;
       actor = `review-link:${assignment._id}`;
     } else if (input.user) {
-      if (input.kind === "TEMPLATE") {
+      if (isTemplate) {
         if (!conference) throw new Error("Conference is required.");
         await this.access.conference(input.user, conference, undefined, true);
-        new Docxtemplater(new PizZip(input.buffer), {
-          paragraphLoop: true,
-          linebreaks: true,
-        });
+        if (!(await this.conferences.exists({ _id: conference })))
+          throw new Error("Conference not found.");
+        if (input.kind === "TEMPLATE")
+          new Docxtemplater(new PizZip(input.buffer), {
+            paragraphLoop: true,
+            linebreaks: true,
+          });
       } else {
         if (!submission) throw new Error("Submission is required.");
         await this.access.paper(
@@ -205,7 +222,7 @@ export class ReviewFileService {
             bucket: "conference-reviews",
             objectName,
             kind: input.kind,
-            filename: `${input.kind === "REPORT" ? "report" : input.kind === "TEMPLATE" ? "review-template" : "manuscript"}.${extension}`,
+            filename: `${input.kind === "REPORT" ? "report" : input.kind === "TEMPLATE" ? "review-template" : input.kind === "MANUSCRIPT_TEMPLATE" ? "manuscript-template" : "manuscript"}.${extension}`,
             contentType,
             size: input.buffer.length,
             checksum: createHash("sha256").update(input.buffer).digest("hex"),
@@ -292,7 +309,9 @@ export class ReviewFileService {
         }
         await this.activity.record(
           input.user || actor,
-          "submission.file_uploaded",
+          isTemplate
+            ? "conference.template_uploaded"
+            : "submission.file_uploaded",
           conference,
           submission,
           { file: String(file._id), kind: input.kind },

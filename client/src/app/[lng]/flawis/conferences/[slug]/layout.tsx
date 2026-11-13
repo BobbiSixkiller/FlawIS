@@ -64,6 +64,11 @@ export default async function TabsLayout({
             icon: <Icon name="pencil" className="size-5" />,
           },
           {
+            href: `/conferences/${slug}/templates`,
+            name: lng === "en" ? "Templates" : "Šablóny",
+            icon: <Icon name="document-text" className="size-5" />,
+          },
+          {
             href: `/conferences/${slug}/activity`,
             name: lng === "en" ? "Activity" : "História",
             icon: <Icon name="document-text" className="size-5" />,

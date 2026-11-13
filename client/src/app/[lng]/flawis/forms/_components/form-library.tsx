@@ -105,7 +105,7 @@ export default function FormLibrary({
             <CardContent>
               <Badge variant="secondary">v{f.latestVersion}</Badge>
             </CardContent>
-            <CardFooter className="flex-wrap gap-2">
+            <CardFooter className="mt-auto flex-wrap gap-2">
               <Button
                 variant="outline"
                 disabled={pending}

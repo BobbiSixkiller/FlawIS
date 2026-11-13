@@ -6,7 +6,6 @@ import { useFormContext } from "react-hook-form";
 import { getFormVersions } from "@/lib/reviews/actions";
 import { mutate, errorText } from "@/lib/reviews/ux";
 import { localizedText as tr } from "@/lib/i18n/text";
-import { uploadReviewFile } from "@/lib/reviews/files";
 import {
   FieldType,
   type ConferenceReviewSettingsQuery,
@@ -48,7 +47,6 @@ type Config = {
   form: string;
   recommendationField: string;
   authorFields: string[];
-  templateFile: string;
 };
 type Settings = ConferenceReviewSettingsQuery["conferenceReviewSettings"];
 const compatible = (f: FormFragment["fields"][number]) =>
@@ -90,7 +88,7 @@ export default function ReviewSettings({
     workflow: t("Priebeh recenzovania", "Review workflow"),
     requirements: t("Požiadavky sekcií", "Section requirements"),
     communication: t("Komunikácia", "Communication"),
-    questionnaire: t("Dotazník a šablóna", "Questionnaire and template"),
+    questionnaire: t("Dotazník", "Questionnaire"),
   };
   return (
     <div className="flex flex-col gap-5">
@@ -168,22 +166,6 @@ export default function ReviewSettings({
                           "A baseline questionnaire is created on activation",
                         )}
                   </p>
-                  <p>
-                    {settings?.templateFile
-                      ? t("Vlastná DOCX šablóna", "Custom DOCX template")
-                      : t("Základná DOCX šablóna", "Baseline DOCX template")}
-                  </p>
-                  {settings?.templateFile && (
-                    <a
-                      className="underline"
-                      href={`/api/conference-review/files/${settings.templateFile}`}
-                    >
-                      {t(
-                        "Stiahnuť aktuálnu šablónu",
-                        "Download current template",
-                      )}
-                    </a>
-                  )}
                 </div>
               )}
             </CardContent>
@@ -329,10 +311,7 @@ function SettingsDialog({
   onSaved: () => void;
 }) {
   const t = tr(lng);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [loadingQuestionnaire, setLoadingQuestionnaire] = useState(false);
-  const [progress, setProgress] = useState(0);
   const defaults: Config = {
     enabled: settings?.enabled || false,
     requiredReviews: String(settings?.requiredReviews || 2),
@@ -347,7 +326,6 @@ function SettingsDialog({
     form: settings?.form || "",
     recommendationField: settings?.recommendationField || "",
     authorFields: settings?.authorFields || [],
-    templateFile: settings?.templateFile || "",
   };
   const schema = z.object({
     enabled: z.boolean(),
@@ -368,7 +346,6 @@ function SettingsDialog({
     form: z.string(),
     recommendationField: z.string(),
     authorFields: z.array(z.string()),
-    templateFile: z.string(),
   });
   return (
     <FormDialog
@@ -378,9 +355,7 @@ function SettingsDialog({
       schema={schema}
       defaultValues={defaults}
       onClose={onClose}
-      busy={uploading}
       disabled={loadingQuestionnaire}
-      dirty={Boolean(file)}
       onSubmit={async (values) => {
         let data: Record<string, unknown>;
         if (group === "workflow")
@@ -398,26 +373,10 @@ function SettingsDialog({
             remindersEnabled: values.remindersEnabled,
           };
         else {
-          let templateFile = values.templateFile;
-          if (file) {
-            setUploading(true);
-            try {
-              templateFile = (
-                await uploadReviewFile(file, {
-                  kind: "TEMPLATE",
-                  conference,
-                  onProgress: setProgress,
-                })
-              ).id;
-            } finally {
-              setUploading(false);
-            }
-          }
           data = {
             form: values.form || undefined,
             recommendationField: values.recommendationField,
             authorFields: values.authorFields,
-            templateFile: templateFile || undefined,
           };
           if (values.form && !values.recommendationField)
             throw new Error(
@@ -537,42 +496,6 @@ function SettingsDialog({
                 lng={lng}
                 onLoadingChange={setLoadingQuestionnaire}
               />
-              <FieldControl
-                label={t("Nová DOCX šablóna", "New DOCX template")}
-                hint={t(
-                  "Najviac 20 MiB. Existujúca šablóna zostane, ak nevyberiete novú.",
-                  "Maximum 20 MiB. The existing template remains unless replaced.",
-                )}
-              >
-                {(id) => (
-                  <Input
-                    id={id}
-                    type="file"
-                    accept=".docx"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  />
-                )}
-              </FieldControl>
-              {file && <p>{file.name}</p>}
-              {uploading && (
-                <p role="status">
-                  {t("Nahráva sa", "Uploading")} {progress}%
-                </p>
-              )}
-              <details>
-                <summary>
-                  {t("Pomoc s DOCX šablónou", "DOCX template help")}
-                </summary>
-                <p>
-                  {"{paper}, {reviewer}, {recommendation}, {answers}, {date}"}
-                </p>
-                <p>
-                  {t(
-                    "Značku konkrétnej otázky nájdete v knižnici formulárov.",
-                    "Find each question’s placeholder in the form library.",
-                  )}
-                </p>
-              </details>
             </>
           )}
         </>

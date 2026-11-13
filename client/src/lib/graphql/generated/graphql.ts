@@ -78,6 +78,11 @@ export enum ConferenceSortableField {
   Id = 'ID'
 }
 
+export enum ConferenceTemplateKind {
+  Manuscript = 'Manuscript',
+  Review = 'Review'
+}
+
 export type ConferenceTranslationInput = {
   en: LocalizedConferenceInputs;
   sk: LocalizedConferenceInputs;
@@ -550,9 +555,9 @@ export type TicketFragment = { id: string, online: boolean, price: number, withS
 
 export type ConferenceListItemFragment = { id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } };
 
-export type ConferenceFragment = { createdAt: string, updatedAt: string, id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } };
+export type ConferenceFragment = { manuscriptTemplateFile: string | null, createdAt: string, updatedAt: string, id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } };
 
-export type ConferenceRegistrationFragment = { createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } };
+export type ConferenceRegistrationFragment = { manuscriptTemplateFile: string | null, createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } };
 
 export type ConferencesQueryVariables = Exact<{
   after?: string | null | undefined;
@@ -561,14 +566,14 @@ export type ConferencesQueryVariables = Exact<{
 }>;
 
 
-export type ConferencesQuery = { conferences: { totalCount: number, edges: Array<{ cursor: string, node: { id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } } | null>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
+export type ConferencesQuery = { conferences: { totalCount: number, edges: Array<{ cursor: string, node: { manuscriptTemplateFile: string | null, id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } } | null>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
 
 export type ConferenceQueryVariables = Exact<{
   slug: string;
 }>;
 
 
-export type ConferenceQuery = { conference: { createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, attending: { id: string, hasInvoice: boolean, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }> } | null, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } };
+export type ConferenceQuery = { conference: { manuscriptTemplateFile: string | null, createdAt: string, updatedAt: string, id: string, slug: string, sections: Array<{ id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } }>, tickets: Array<{ id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }>, attending: { id: string, hasInvoice: boolean, ticket: { id: string, online: boolean, price: number, withSubmission: boolean, translations: { en: { name: string, description: string }, sk: { name: string, description: string } } }, submissions: Array<{ id: string, presentationLng: PresentationLng | null, fileUrl: string | null, withdrawn: boolean, createdAt: string, updatedAt: string, translations: { sk: { name: string, abstract: string, keywords: Array<string> }, en: { name: string, abstract: string, keywords: Array<string> } }, authors: Array<{ id: string, name: string, email: string }>, conference: { id: string, slug: string }, section: { id: string, conference: { id: string, slug: string } | null, translations: { sk: { name: string, topic: string }, en: { name: string, topic: string } } } }> } | null, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } } };
 
 export type SubmissionFilesFragment = { totalCount: number, edges: Array<{ cursor: string, node: { id: string, fileUrl: string | null } } | null> };
 
@@ -587,7 +592,7 @@ export type TextSearchConferenceQueryVariables = Exact<{
 }>;
 
 
-export type TextSearchConferenceQuery = { textSearchConference: Array<{ createdAt: string, updatedAt: string, id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } }> };
+export type TextSearchConferenceQuery = { textSearchConference: Array<{ manuscriptTemplateFile: string | null, createdAt: string, updatedAt: string, id: string, slug: string, translations: { sk: { name: string, logoUrl: string }, en: { name: string, logoUrl: string } }, dates: { start: string, end: string, regEnd: string | null, submissionDeadline: string | null } }> };
 
 export type CreateConferenceMutationVariables = Exact<{
   data: ConferenceInput;
@@ -664,6 +669,15 @@ export type AddAttendeeMutationVariables = Exact<{
 
 
 export type AddAttendeeMutation = { addAttendee: { message: string, data: { slug: string } } };
+
+export type SetConferenceTemplateMutationVariables = Exact<{
+  conference: string;
+  kind: ConferenceTemplateKind;
+  file?: string | null | undefined;
+}>;
+
+
+export type SetConferenceTemplateMutation = { setConferenceTemplate: boolean };
 
 export type CourseListItemFragment = { id: string, name: string, start: string, end: string, registrationEnd: string, thumbnail: string | null, hasElearning: boolean, categories: Array<{ id: string, name: string, slug: string }> };
 
@@ -1722,6 +1736,7 @@ export const ConferenceListItemFragmentDoc = new TypedDocumentString(`
 export const ConferenceFragmentDoc = new TypedDocumentString(`
     fragment Conference on Conference {
   ...ConferenceListItem
+  manuscriptTemplateFile
   createdAt
   updatedAt
 }
@@ -1810,6 +1825,7 @@ fragment ConferenceListItem on Conference {
 }
 fragment Conference on Conference {
   ...ConferenceListItem
+  manuscriptTemplateFile
   createdAt
   updatedAt
 }`, {"fragmentName":"ConferenceRegistration"}) as unknown as TypedDocumentString<ConferenceRegistrationFragment, unknown>;
@@ -3181,6 +3197,7 @@ export const ConferencesDocument = new TypedDocumentString(`
       cursor
       node {
         ...ConferenceListItem
+        manuscriptTemplateFile
       }
     }
     pageInfo {
@@ -3286,6 +3303,7 @@ fragment ConferenceListItem on Conference {
 }
 fragment Conference on Conference {
   ...ConferenceListItem
+  manuscriptTemplateFile
   createdAt
   updatedAt
 }
@@ -3396,6 +3414,7 @@ export const TextSearchConferenceDocument = new TypedDocumentString(`
 }
 fragment Conference on Conference {
   ...ConferenceListItem
+  manuscriptTemplateFile
   createdAt
   updatedAt
 }`) as unknown as TypedDocumentString<TextSearchConferenceQuery, TextSearchConferenceQueryVariables>;
@@ -3509,6 +3528,11 @@ export const AddAttendeeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AddAttendeeMutation, AddAttendeeMutationVariables>;
+export const SetConferenceTemplateDocument = new TypedDocumentString(`
+    mutation setConferenceTemplate($conference: ObjectId!, $kind: ConferenceTemplateKind!, $file: ObjectId) {
+  setConferenceTemplate(conference: $conference, kind: $kind, file: $file)
+}
+    `) as unknown as TypedDocumentString<SetConferenceTemplateMutation, SetConferenceTemplateMutationVariables>;
 export const CoursesDocument = new TypedDocumentString(`
     query courses($after: String, $first: Int, $sort: [CourseSortInput]!, $filter: CourseFilterInput) {
   courses(after: $after, first: $first, sort: $sort, filter: $filter) {

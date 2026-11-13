@@ -109,7 +109,15 @@ export class ReviewExportService {
     const form = await this.forms.getForm(round.form);
     let template = defaultReportTemplate();
     if (round.templateFile) {
-      const asset = await this.files.authorizedFile(round.templateFile, user);
+      // Paper access above permits section coordinators to generate reports with the pinned
+      // template, without granting them access to download/manage conference templates.
+      const asset = await this.reviews.files.findOne({
+        _id: round.templateFile,
+        conference: paper.conference,
+        kind: "TEMPLATE",
+        submission: { $exists: false },
+      });
+      if (!asset) throw new Error("Review template not found.");
       template = await this.files.bytes(asset);
     }
     const zip = new PizZip();

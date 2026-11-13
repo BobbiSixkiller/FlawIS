@@ -2,6 +2,7 @@ import Express, { Request, Response } from "express";
 import Container from "typedi";
 import { ObjectId } from "mongodb";
 import { createContext, verifyJwt } from "../util/auth";
+import { ConferenceTemplateService } from "../services/conferences/conference-template.service";
 import { ReviewFileService } from "../services/reviews/file.service";
 import { ReviewExportService } from "../services/reviews/export.service";
 import { RmqService } from "../services/rmq.service";
@@ -49,6 +50,25 @@ export function registerReviewRoutes(app: Express.Express) {
         note: String(req.query.note || ""),
       });
       res.json(result);
+    }),
+  );
+  app.get(
+    "/conference-templates/:conference/manuscript",
+    route(async (req, res) => {
+      const conference = asId(req.params.conference);
+      if (!conference) throw new Error("Invalid conference ID.");
+      const file = await Container.get(
+        ConferenceTemplateService,
+      ).manuscriptTemplate(conference);
+      res
+        .set({
+          "Content-Type": file.contentType,
+          "Content-Disposition":
+            'attachment; filename="manuscript-template.docx"',
+          "Cache-Control": "private, no-store",
+          "X-Content-Type-Options": "nosniff",
+        })
+        .send(await Container.get(ReviewFileService).bytes(file));
     }),
   );
   app.get(

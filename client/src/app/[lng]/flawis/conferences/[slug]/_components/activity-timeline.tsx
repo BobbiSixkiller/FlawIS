@@ -117,6 +117,11 @@ function activityLabel(action: string, lng: string) {
   const labels: Record<string, [string, string]> = {
     "submission.viewed": ["Zobrazený príspevok", "Viewed submission"],
     "submission.listed": ["Zobrazený v zozname", "Listed submission"],
+    "conference.template_uploaded": ["Nahranie šablóny", "Template uploaded"],
+    "conference.template_updated": [
+      "Zmena šablóny konferencie",
+      "Conference template changed",
+    ],
     "submission.file_uploaded": ["Nahraný súbor", "Uploaded file"],
     "submission.file_downloaded": ["Stiahnutý súbor", "Downloaded file"],
     "submission.withdrawn": ["Stiahnutý príspevok", "Withdrew submission"],

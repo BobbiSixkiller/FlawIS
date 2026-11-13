@@ -5,6 +5,10 @@ import mongoose from "mongoose";
 import { getModelForClass } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
 import PizZip from "pizzip";
+import Express from "express";
+import cookieParser from "cookie-parser";
+import Container from "typedi";
+import { registerReviewRoutes } from "../src/routes/reviews";
 import { Access, User } from "../src/entitites/User";
 import { Conference } from "../src/entitites/Conference";
 import { Section } from "../src/entitites/Section";
@@ -31,6 +35,10 @@ import {
 import { FormService } from "../src/services/form.service";
 import { ReviewResolver } from "../src/resolvers/reviews/review.resolver";
 import { ReviewService } from "../src/services/reviews/review.service";
+import {
+  ConferenceTemplateService,
+  ConferenceTemplateKind,
+} from "../src/services/conferences/conference-template.service";
 import { ReviewFileService } from "../src/services/reviews/file.service";
 import {
   ReviewExportService,
@@ -168,6 +176,236 @@ test(
         activity,
       );
       await access.grant(admin, conference._id, coordinator.id, section._id);
+      const templates = new ConferenceTemplateService(access, activity);
+      let reportTemplateId: ObjectId;
+      await t.test(
+        "conference templates publish independently of reviews with scoped permissions and atomic audit",
+        async () => {
+          const templateBytes = defaultReportTemplate();
+          const upload = (kind: string, user = admin, extra = {}) =>
+            files.upload({
+              user,
+              conference: conference._id,
+              kind,
+              filename: "official.docx",
+              buffer: templateBytes,
+              ...extra,
+            });
+          await assert.rejects(
+            upload("MANUSCRIPT_TEMPLATE", coordinator),
+            /coordinate/,
+          );
+          await assert.rejects(
+            upload("MANUSCRIPT_TEMPLATE", author),
+            /coordinate/,
+          );
+          const lead = { ...coordinator, id: new ObjectId() };
+          await access.grant(admin, conference._id, lead.id);
+          const manuscript = new ObjectId(
+            (await upload("MANUSCRIPT_TEMPLATE", lead)).id,
+          );
+          await assert.rejects(
+            templates.manuscriptTemplate(conference._id),
+            /not found/,
+          );
+          await templates.setTemplate(
+            lead,
+            conference._id,
+            ConferenceTemplateKind.Manuscript,
+            manuscript,
+          );
+          assert.equal(
+            String((await templates.manuscriptTemplate(conference._id))._id),
+            String(manuscript),
+          );
+          assert.equal(
+            await reviews.settings.findOne({ conference: conference._id }),
+            null,
+          );
+          const app = Express();
+          app.use(cookieParser());
+          Container.set(ConferenceTemplateService, templates);
+          Container.set(ReviewFileService, files);
+          registerReviewRoutes(app);
+          const server = app.listen(0, "127.0.0.1");
+          await new Promise<void>((resolve) =>
+            server.once("listening", resolve),
+          );
+          try {
+            const address = server.address() as { port: number };
+            const origin = `http://127.0.0.1:${address.port}`;
+            const response = await fetch(
+              `${origin}/conference-templates/${conference._id}/manuscript`,
+            );
+            assert.equal(response.status, 200);
+            assert.match(
+              response.headers.get("content-disposition")!,
+              /manuscript-template.docx/,
+            );
+            assert.equal(
+              response.headers.get("cache-control"),
+              "private, no-store",
+            );
+            assert.deepEqual(
+              Buffer.from(await response.arrayBuffer()),
+              templateBytes,
+            );
+            const protectedFile = await fetch(
+              `${origin}/review-files/${manuscript}`,
+            );
+            assert.equal(protectedFile.status, 400);
+            assert.match(((await protectedFile.json()) as { error: string }).error, /Authentication/);
+            assert.equal(
+              (
+                await fetch(
+                  `${origin}/conference-templates/${new ObjectId()}/manuscript`,
+                )
+              ).status,
+              400,
+            );
+          } finally {
+            await new Promise<void>((resolve, reject) =>
+              server.close((error) => (error ? reject(error) : resolve())),
+            );
+            Container.remove(ConferenceTemplateService);
+            Container.remove(ReviewFileService);
+          }
+
+          await assert.rejects(
+            files.authorizedFile(manuscript, author),
+            /coordinate/,
+          );
+          await assert.rejects(
+            templates.setTemplate(
+              coordinator,
+              conference._id,
+              ConferenceTemplateKind.Manuscript,
+              manuscript,
+            ),
+            /coordinate/,
+          );
+          await assert.rejects(
+            templates.setTemplate(
+              admin,
+              new ObjectId(),
+              ConferenceTemplateKind.Manuscript,
+              manuscript,
+            ),
+            /not found/,
+          );
+          const original = new PizZip(defaultReportTemplate());
+          original.file(
+            "word/document.xml",
+            original
+              .file("word/document.xml")!
+              .asText()
+              .replace("REVIEW REPORT", "ORIGINAL OFFICIAL REPORT"),
+          );
+          reportTemplateId = new ObjectId(
+            (
+              await upload("TEMPLATE", admin, {
+                buffer: original.generate({ type: "nodebuffer" }),
+              })
+            ).id,
+          );
+          await assert.rejects(
+            templates.setTemplate(
+              admin,
+              conference._id,
+              ConferenceTemplateKind.Manuscript,
+              reportTemplateId,
+            ),
+            /purpose/,
+          );
+          await assert.rejects(
+            templates.setTemplate(
+              admin,
+              conference._id,
+              ConferenceTemplateKind.Review,
+              manuscript,
+            ),
+            /purpose/,
+          );
+          const other = await conferences.create({
+            slug: "other-template-conference",
+            dates: { start: new Date(), end: new Date() },
+          });
+          await assert.rejects(
+            templates.setTemplate(
+              admin,
+              other._id,
+              ConferenceTemplateKind.Manuscript,
+              manuscript,
+            ),
+            /purpose/,
+          );
+          const replacement = new ObjectId(
+            (await upload("MANUSCRIPT_TEMPLATE")).id,
+          );
+          const originalRecord = activity.record;
+          activity.record = async () => {
+            throw new Error("audit failed");
+          };
+          try {
+            await assert.rejects(
+              templates.setTemplate(
+                admin,
+                conference._id,
+                ConferenceTemplateKind.Manuscript,
+                replacement,
+              ),
+              /audit failed/,
+            );
+            assert.equal(
+              String((await templates.manuscriptTemplate(conference._id))._id),
+              String(manuscript),
+            );
+          } finally {
+            activity.record = originalRecord;
+          }
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Manuscript,
+            replacement,
+          );
+          assert.equal(
+            String((await templates.manuscriptTemplate(conference._id))._id),
+            String(replacement),
+          );
+          await assert.rejects(
+            files.authorizedFile(manuscript),
+            /Authentication/,
+          );
+          assert.deepEqual(
+            await files.bytes(
+              await templates.manuscriptTemplate(conference._id),
+            ),
+            templateBytes,
+          );
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Manuscript,
+            null,
+          );
+          await assert.rejects(
+            templates.manuscriptTemplate(conference._id),
+            /not found/,
+          );
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Review,
+            reportTemplateId,
+          );
+          assert.equal(
+            (await reviews.settings.findOne({ conference: conference._id }))
+              ?.enabled,
+            false,
+          );
+        },
+      );
       const config = await reviews.configure(admin, conference._id, {
         enabled: true,
       });
@@ -529,6 +767,58 @@ test(
           "conferences.example.test",
         );
       const review = await reviews.cases.findOne({ submission: paper._id });
+      await t.test(
+        "replacing and removing report templates preserves the round's pinned report",
+        async () => {
+          const round = await reviews.rounds.findOne({
+            _id: review!.currentRound,
+          });
+          assert.equal(String(round!.templateFile), String(reportTemplateId));
+          const next = await files.upload({
+            user: admin,
+            conference: conference._id,
+            kind: "TEMPLATE",
+            filename: "next.docx",
+            buffer: defaultReportTemplate(),
+          });
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Review,
+            new ObjectId(next.id),
+          );
+          assert.equal(
+            String(
+              (await reviews.settings.findOne({ conference: conference._id }))!
+                .templateFile,
+            ),
+            next.id,
+          );
+          assert.equal(
+            String(
+              (await reviews.rounds.findOne({ _id: round!._id }))!.templateFile,
+            ),
+            String(reportTemplateId),
+          );
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Review,
+            null,
+          );
+          assert.equal(
+            (await reviews.settings.findOne({ conference: conference._id }))!
+              .templateFile,
+            undefined,
+          );
+          assert.equal(
+            String(
+              (await reviews.rounds.findOne({ _id: round!._id }))!.templateFile,
+            ),
+            String(reportTemplateId),
+          );
+        },
+      );
       const assignments = await reviews.assignments.findAll(
         { round: review!.currentRound },
         null,
@@ -584,6 +874,12 @@ test(
         ),
       );
       assert.equal(packageZip.file(/\.docx$/).length, 2);
+      assert.match(
+        new PizZip(packageZip.file("review-form.docx")!.asNodeBuffer())
+          .file("word/document.xml")!
+          .asText(),
+        /ORIGINAL OFFICIAL REPORT/,
+      );
       for (const a of assignments)
         await reviews.action(
           coordinator,

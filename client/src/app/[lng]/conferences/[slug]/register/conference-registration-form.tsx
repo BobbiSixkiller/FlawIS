@@ -1,4 +1,5 @@
 "use client";
+import { ManuscriptTemplateDownload } from "../_components/manuscript-template-download";
 import { z } from "zod";
 
 import { FormField, LocalizedFormField } from "@/components/form/form";
@@ -370,6 +371,7 @@ export default function ConferenceRegistrationForm({
               >
                 {t("registration.submission.notice", { ns: "conferences" })}
               </div>
+              <ManuscriptTemplateDownload conference={conference} lng={lng} />
               <FormField<FormValues, "submission.section">
                 name="submission.section"
                 label={t("registration.submission.section", {

@@ -1,4 +1,5 @@
 "use client";
+import { ManuscriptTemplateDownload } from "./_components/manuscript-template-download";
 import { z } from "zod";
 
 import { FormField, LocalizedFormField } from "@/components/form/form";
@@ -11,10 +12,7 @@ import Select from "@/components/form/select";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import useValidation from "@/hooks/use-validation";
-import {
-  handleAPIErrors,
-  uploadToMinio,
-} from "@/lib/utilsClient";
+import { handleAPIErrors, uploadToMinio } from "@/lib/utilsClient";
 import {
   ConferenceQuery,
   PresentationLng,
@@ -45,7 +43,10 @@ export default function ConferenceSubmissionForm({
 }: {
   lng: string;
   submission?: SubmissionFragment;
-  conference: Pick<ConferenceQuery["conference"], "id" | "slug" | "sections">;
+  conference: Pick<
+    ConferenceQuery["conference"],
+    "id" | "slug" | "sections" | "manuscriptTemplateFile"
+  >;
   dialogId: string;
   attendeeId?: string;
 }) {
@@ -289,6 +290,7 @@ export default function ConferenceSubmissionForm({
               />
             )}
           </FormField>
+          <ManuscriptTemplateDownload conference={conference} lng={lng} />
           <FormField<FormValues, "files">
             name="files"
             label={t("registration.submission.file", {
@@ -317,7 +319,6 @@ export default function ConferenceSubmissionForm({
           </FormField>
 
           <Button
-            
             type="submit"
             className="w-full"
             disabled={methods.formState.isSubmitting}

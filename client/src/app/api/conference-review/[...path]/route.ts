@@ -8,7 +8,7 @@ async function proxy(
   const { path } = await context.params;
   const route = path.join("/");
   if (
-    !/^(files(?:\/[a-f\d]{24}|\/adopt\/[a-f\d]{24})?|exports\/(?:[a-f\d]{24}|bulk))$/i.test(
+    !/^(files(?:\/[a-f\d]{24}|\/adopt\/[a-f\d]{24})?|exports\/(?:[a-f\d]{24}|bulk)|templates\/[a-f\d]{24}\/manuscript)$/i.test(
       route,
     )
   )
@@ -19,7 +19,8 @@ async function proxy(
   );
   const upstreamPath = route
     .replace(/^files/, "review-files")
-    .replace(/^exports/, "review-exports");
+    .replace(/^exports/, "review-exports")
+    .replace(/^templates/, "conference-templates");
   const url = new URL(`${origin}/${upstreamPath}`);
   request.nextUrl.searchParams.forEach((value, key) =>
     url.searchParams.set(key, value),

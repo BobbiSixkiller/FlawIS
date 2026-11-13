@@ -1,3 +1,4 @@
+import { ManuscriptTemplateDownload } from "./_components/manuscript-template-download";
 import AuthorReviewFeedback from "@/app/[lng]/conferences/[slug]/_components/author-review-feedback";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import Icon from "@/components/icon";
@@ -256,6 +257,8 @@ export default async function ConferenceWorkspacePage({
           </h1>
         </div>
       </section>
+
+      <ManuscriptTemplateDownload conference={conference} lng={lng} />
 
       <section
         aria-labelledby="timeline-heading"

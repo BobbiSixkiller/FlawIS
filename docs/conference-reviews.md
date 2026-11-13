@@ -57,22 +57,29 @@ Stored field IDs and choice values remain separate from the editor's row keys. O
 
 Rich-text help uses the existing editor and is formatted consistently in previews, course registrations and reviewer questionnaires. Preview HTML is parsed through the editor's supported nodes. Core sanitizes help during publication and when returning versions, including legacy help, without rewriting historical records.
 
-### DOCX report templates
+### Conference templates
 
-An initial questionnaire and baseline DOCX report are available without an uploaded template. Upload the actual official template in review settings to retain its layout and wording. No official template was included in the exported conversation file.
+Administrators and conference-wide coordinators manage two separate DOCX templates in the conference **Templates / Šablóny** tab (`/conferences/[slug]/templates`). Section coordinators cannot upload or change conference templates; they can generate reports for papers in their scope using the template pinned to the round.
 
-Insert placeholders into the uploaded DOCX:
+- **Manuscript template / Šablóna príspevku:** authors download it from the public conference workspace, registration submission step or manuscript upload form, prepare their manuscript and upload the completed file. It is available independently of review enablement. The app does not enforce the manuscript's Word formatting. Removing the template hides the download without changing submitted papers.
+- **Review report template / Šablóna recenzného posudku:** the app fills an uploaded official template using the reviewer’s online answers, recommendation and paper metadata. A baseline report remains available without an upload. Choosing the default again applies to future rounds.
+
+Both uploads accept nonempty DOCX up to 20 MiB, reject detected macro and `.bin` archive entries and preserve the original file bytes. Review templates additionally validate placeholder syntax. Uploading stages a protected file; saving publishes its reference with an atomic audit event. Failed saves retain the selected file and reuse its successful upload on retry.
+
+The current manuscript reference lives on `Conference.manuscriptTemplateFile`, separate from `ReviewSettings.templateFile`. The public download endpoint resolves the conference's current manuscript reference and checks its purpose and conference. It never accepts an arbitrary file ID. Staged/replaced manuscript files and all review templates remain on the protected file endpoint; old files and round references are retained. No historical documents are rewritten.
+
+Insert placeholders into the review report DOCX (ordinary manuscript templates need no placeholders):
 
 - `{paper}`, `{reviewer}`, `{recommendation}`, `{date}`
 - `{answers}` for all labelled answers
 - `{answer_FIELD_ID}` for one answer; copy the stable field ID from the form version
 - `{publish}`, `{conditional}`, `{reject}` for checked/unchecked recommendation boxes
 
-Templates and questionnaires are pinned to a round. Uploaded templates are validated as DOCX. Packages contain the approved anonymous manuscript and a blank report; exports contain completed DOCX reports, individually or as a ZIP. Private attachment references are not inserted into report text.
+Review report templates and questionnaires are pinned to a round. Uploaded templates are validated as DOCX. Packages contain the approved anonymous manuscript and a blank report; exports contain completed DOCX reports, individually or as a ZIP. Private attachment references are not inserted into report text.
 
 ## Activity and file access
 
-`ActivityService` records actor ID, original actor during impersonation, request correlation, action, conference/submission, changed field names and safe identifiers/reasons. Conference mutations use the same MongoDB transaction as their audit writes. An audit failure rolls back those database changes. Reads, lists, downloads and exports are recorded on a best-effort basis so a logging failure does not prevent reading data. Activity is append-only through application APIs; database administrators still control retention and database permissions.
+`ActivityService` records actor ID, original actor during impersonation, request correlation, action, conference/submission, changed field names and safe identifiers/reasons. Conference mutations use the same MongoDB transaction as their audit writes. An audit failure rolls back those database changes. Authenticated reads, lists, protected downloads and exports are recorded on a best-effort basis so a logging failure does not prevent reading data. The public manuscript-template download is not tied to an actor and is not audited. Activity is append-only through application APIs; database administrators still control retention and database permissions.
 
 Activity access follows coordinator scope and author-conflict rules. Original manuscripts are available to their authors; anonymous manuscripts, reports, packages and review history require independent coordinator access or an appropriate private reviewer link. The generic MinIO helpers authorize reads/deletes through core and cannot write the protected `conference-reviews` bucket. Previously uploaded submission files are also checked against their submission's access policy.
 
@@ -148,3 +155,5 @@ When the Docker development client is running, build with an isolated output mou
 ```sh
 docker compose run --rm --no-deps -e NODE_ENV=production -v /usr/app/.next client npm run build
 ```
+
+Conference-template verification on 2026-11-13: client lint, typecheck, all 140 unit/interaction tests and an isolated production Docker build passed. Core build and staging MongoDB integration checks passed (96 tests passed; the unrelated course-repair and RabbitMQ transport opt-in tests were skipped). The template coverage includes conference/section permissions, disabled-review availability, current-template-only public HTTP downloads, protected raw files, cross-conference/purpose rejection, audit rollback, replacement/removal, round-pinned generation and Word formatting. Browser checks passed all eight SK/EN × light/dark × desktop/mobile combinations for the new dialogs, invalid-file focus, dirty dismissal, keyboard focus restoration, mobile overflow and form-card alignment. Authenticated staging inspection reproduced a 22 px desktop form-footer gap; a temporary browser application of the same CSS reduced it to zero in both languages/themes and preserved mobile layout. No application records were changed by the browser checks, no notifications were sent, and no deployment was performed. Documentation drift reminders and the scoped factual documentation audit were reviewed.

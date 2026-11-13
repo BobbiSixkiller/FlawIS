@@ -48,6 +48,7 @@ import { CourseAttendeeResolver } from "./resolvers/courses/courseAttendee.resol
 import { AttendanceRecordResolver } from "./resolvers/courses/attendanceRecord.resolver";
 import { CategoryResolver } from "./resolvers/courses/category.resolver";
 import { registerReach360Webhook } from "./routes/reach360Webhook";
+import { ConferenceTemplateResolver } from "./resolvers/conferences/conference-template.resolver";
 import { ReviewResolver } from "./resolvers/reviews/review.resolver";
 import { registerReviewRoutes } from "./routes/reviews";
 import { RmqService } from "./services/rmq.service";
@@ -89,6 +90,7 @@ async function main() {
       CategoryResolver,
       InvoiceResolver,
       ReviewResolver,
+      ConferenceTemplateResolver,
     ],
     // use document converting middleware
     globalMiddlewares: [

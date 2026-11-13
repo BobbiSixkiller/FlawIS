@@ -1,6 +1,6 @@
 # FlawIS core
 
-Express/Apollo GraphQL service for users, conferences and submissions, courses and attendance, internships, invoices, reusable forms, and conference review workflows. TypeGraphQL defines the API, TypeDI supplies services, and Typegoose/Mongoose persists data in MongoDB. Core also exposes protected review/file/notification endpoints and the Reach webhook receiver.
+Express/Apollo GraphQL service for users, conferences and submissions, courses and attendance, internships, invoices, reusable forms, and conference review workflows. TypeGraphQL defines the API, TypeDI supplies services, and Typegoose/Mongoose persists data in MongoDB. Core also exposes protected review/file/notification endpoints and the Reach webhook receiver. The public `GET /conference-templates/:conference/manuscript` endpoint serves only the current published manuscript template; template management and review files remain protected. See [conference templates](../docs/conference-reviews.md#conference-templates).
 
 ## Development and checks
 

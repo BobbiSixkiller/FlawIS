@@ -203,6 +203,7 @@ type Conference {
   createdAt: DateTimeISO!
   dates: ImportantDates!
   id: ObjectId!
+  manuscriptTemplateFile: ObjectId
   sections: [Section!]!
   slug: String!
   tickets: [Ticket!]!
@@ -248,6 +249,11 @@ input ConferenceSortInput {
 """Sortable enum definition for conferences query"""
 enum ConferenceSortableField {
   ID
+}
+
+enum ConferenceTemplateKind {
+  Manuscript
+  Review
 }
 
 type ConferenceTranslation {
@@ -767,6 +773,7 @@ type Mutation {
   revokeReviewCoordinator(id: ObjectId!): Boolean!
   saveReviewReport(answers: JSONObject!, expectedRevision: Int, submit: Boolean! = false, token: String!): JSONObject!
   saveReviewer(data: JSONObject!, id: ObjectId): Reviewer!
+  setConferenceTemplate(conference: ObjectId!, file: ObjectId, kind: ConferenceTemplateKind!): Boolean!
   setReviewCoordinator(conference: ObjectId!, email: String!, section: ObjectId): Boolean!
   setReviewerEligibility(conference: ObjectId!, data: JSONObject!, reviewer: ObjectId!): Boolean!
   stopImpersonation: UserMutationResponse!
