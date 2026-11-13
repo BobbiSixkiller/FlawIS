@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import { parsePhone } from "@/lib/phone";
 import { useState, type AriaAttributes, type Ref } from "react";
 interface PhoneInputProps extends AriaAttributes {

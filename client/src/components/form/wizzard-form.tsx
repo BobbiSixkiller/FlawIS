@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   Children,
   useEffect,
@@ -18,8 +18,8 @@ import {
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { FormContainer, FormError } from "./form";
-import Icon from "./icon";
-import Spinner from "./spinner";
+import Icon from "../icon";
+import Spinner from "../spinner";
 import Stepper from "./stepper";
 
 interface WizzardStepProps<

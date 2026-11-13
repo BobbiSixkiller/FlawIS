@@ -1,9 +1,9 @@
 import { z } from "zod";
 import FormBuilder, {
   type FormBuilderValues,
-} from "../../src/components/form-builder";
-import { FormContainer, FormField } from "../../src/components/form";
-import WizzardForm, { WizzardStep } from "../../src/components/wizzard-form";
+} from "../../src/components/form/form-builder";
+import { FormContainer, FormField } from "../../src/components/form/form";
+import WizzardForm, { WizzardStep } from "../../src/components/form/wizzard-form";
 import { Input } from "../../src/components/ui/input";
 import { createFormFieldsSchema } from "../../src/lib/validation/form-builder-schema";
 

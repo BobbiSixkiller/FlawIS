@@ -1,16 +1,16 @@
 "use client";
 import { z } from "zod";
-import { PasswordInput } from "@/components/password-input";
+import { PasswordInput } from "@/components/form/password-input";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 import { compareFields } from "@/lib/validation/form-validation";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
+import { FormContainer } from "@/components/form/form";
 import Spinner from "@/components/spinner";
-import useValidation from "@/hooks/useValidation";
-import { useTranslation } from "@/lib/i18n/client";
+import useValidation from "@/hooks/use-validation";
+import { useTranslation } from "@/hooks/use-translation";
 import { useMessageStore } from "@/stores/messageStore";
 import { resetPassword } from "./actions";
 

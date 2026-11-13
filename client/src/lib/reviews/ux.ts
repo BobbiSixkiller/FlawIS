@@ -1,6 +1,6 @@
+import { localizedText as tr } from "@/lib/i18n/text";
 import { reviewMutation } from "./actions";
-export const tr = (lng: string) => (sk: string, en: string) =>
-  lng === "en" ? en : sk;
+
 export async function mutate<T = unknown>(
   operation: string,
   args: Record<string, unknown>,

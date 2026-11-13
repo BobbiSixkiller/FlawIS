@@ -1,21 +1,21 @@
 "use client";
 import { z } from "zod";
 
-import { FormField } from "@/components/form";
+import { FormField } from "@/components/form/form";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
-import MultipleFileUploadField from "@/components/multiple-file-upload-field";
-import Select from "@/components/select";
+import { FormContainer } from "@/components/form/form";
+import MultipleFileUploadField from "@/components/form/multiple-file-upload-field";
+import Select from "@/components/form/select";
 import Spinner from "@/components/spinner";
-import useValidation from "@/hooks/useValidation";
+import useValidation from "@/hooks/use-validation";
 import { uploadOrDelete } from "@/lib/utilsClient";
 import {
   ApplicationFragment,
   Semester,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteFiles } from "@/lib/minio";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";

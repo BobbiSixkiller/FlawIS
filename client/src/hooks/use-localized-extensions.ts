@@ -1,13 +1,13 @@
 "use client";
 
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import Underline from "@tiptap/extension-underline";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function useLocalizedExtensions() {
   const { lng } = useParams<{ lng: string }>();

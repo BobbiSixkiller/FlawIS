@@ -3,7 +3,7 @@ import ForgotPasswordForm from "./forgot-password-form";
 import { FormMessage } from "@/components/message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 
 export default async function ForgotPassword({
   params,

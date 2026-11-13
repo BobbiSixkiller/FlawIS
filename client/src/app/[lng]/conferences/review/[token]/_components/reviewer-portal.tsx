@@ -10,10 +10,11 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ConfirmDialog, useUnsavedChanges } from "@/components/form-dialog";
+import { ConfirmDialog } from "@/components/form/form-dialog";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { mutate, errorText } from "@/lib/reviews/ux";
-import { AnswerFields, validateAnswerFields } from "@/components/answer-fields";
-import { ErrorAlert } from "@/components/field-controls";
+import { AnswerFields, validateAnswerFields } from "@/components/form/answer-fields";
+import { ErrorAlert } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
 import { downloadReviewerFile, uploadReviewFile } from "@/lib/reviews/files";
 import { label, type Portal } from "@/lib/reviews/types";

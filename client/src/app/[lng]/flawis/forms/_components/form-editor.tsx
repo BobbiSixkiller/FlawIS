@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { z } from "zod";
-import FormBuilder from "@/components/form-builder";
-import { FormDialog, TextField } from "@/components/form-dialog";
+import FormBuilder from "@/components/form/form-builder";
+import { FormDialog, TextField } from "@/components/form/form-dialog";
 import {
   FieldType,
   type FormFieldInput,

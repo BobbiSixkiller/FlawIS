@@ -3,28 +3,29 @@ import { z } from "zod";
 import Icon from "@/components/icon";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
-import FormBuilder from "@/components/form-builder";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
+import FormBuilder from "@/components/form/form-builder";
 import { builderMessages, editableFormFields } from "@/lib/forms/builder";
 import { createFormFieldsSchema } from "@/lib/validation/form-builder-schema";
 import { compareFields } from "@/lib/validation/form-validation";
 
-import TiptapEditor from "@/components/editor/editor";
-import useDefaultContent from "@/components/editor/use-default-content";
-import GenericCombobox from "@/components/generic-combobox";
-import ImageFileInput from "@/components/image-file-input";
+import TiptapEditor from "@/components/form/editor/editor";
+import useDefaultContent from "@/hooks/use-default-content";
+import GenericCombobox from "@/components/form/generic-combobox";
+import ImageFileInput from "@/components/form/image-file-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import WizzardForm, { WizzardStep } from "@/components/wizzard-form";
-import useValidation from "@/hooks/useValidation";
-import { cn, handleAPIErrors, uploadOrDelete } from "@/lib/utilsClient";
+import WizzardForm, { WizzardStep } from "@/components/form/wizzard-form";
+import useValidation from "@/hooks/use-validation";
+import { handleAPIErrors, uploadOrDelete } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import {
   CategoryFragment,
   CourseFragment,
   ReachCourseConfigInput,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   normalizeVariableSymbolPrefix,
   VARIABLE_SYMBOL_PREFIX_MAX_LENGTH,

@@ -1,17 +1,17 @@
 "use client";
 import { z } from "zod";
 
-import { FormField, LocalizedFormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField, LocalizedFormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 import { compareFields } from "@/lib/validation/form-validation";
 
-import ImageFileInput from "@/components/image-file-input";
+import ImageFileInput from "@/components/form/image-file-input";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import WizzardForm, { WizzardStep } from "@/components/wizzard-form";
-import useValidation from "@/hooks/useValidation";
+import WizzardForm, { WizzardStep } from "@/components/form/wizzard-form";
+import useValidation from "@/hooks/use-validation";
 import { uploadToMinio } from "@/lib/utilsClient";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   normalizeVariableSymbolPrefix,
   VARIABLE_SYMBOL_PREFIX_MAX_LENGTH,

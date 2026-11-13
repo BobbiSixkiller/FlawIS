@@ -6,7 +6,7 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/spinner";
 import { InvoiceOwnerType } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useMessageStore } from "@/stores/messageStore";
 
 function filenameFromHeaders(response: Response) {

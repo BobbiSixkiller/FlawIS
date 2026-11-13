@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import useMounted from "@/hooks/useMounted";
+import useMounted from "@/hooks/use-mounted";
 import { z } from "zod";
 import { getReviewerDirectory } from "@/lib/reviews/actions";
 import { mutate, errorText } from "@/lib/reviews/ux";
@@ -19,8 +19,8 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import { ErrorAlert, FieldControl } from "@/components/field-controls";
-import { FormDialog, TextField, ConfirmDialog } from "@/components/form-dialog";
+import { ErrorAlert, FieldControl } from "@/components/form/field-controls";
+import { FormDialog, TextField, ConfirmDialog } from "@/components/form/form-dialog";
 import ReviewerTags from "@/app/[lng]/flawis/reviewers/_components/reviewer-tags";
 import ReviewerProfileView from "@/app/[lng]/flawis/reviewers/_components/reviewer-profile";
 type ImportRow = {

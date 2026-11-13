@@ -1,6 +1,6 @@
 "use client";
 
-import Toggle from "@/components/toggle";
+import Toggle from "@/components/form/toggle";
 import Icon from "@/components/icon";
 import { setOnlineAttendance } from "./actions";
 import { useMessageStore } from "@/stores/messageStore";

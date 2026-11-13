@@ -1,12 +1,12 @@
 "use client";
 
-import useOnClickOutside from "@/hooks/useOnClickOutside";
-import { cn } from "@/lib/utilsClient";
+import useOnClickOutside from "@/hooks/use-on-click-outside";
+import { cn } from "@/lib/utils";
 import {
   Field,
   FieldDescription as Description,
   FieldLabel as Label,
-} from "./ui/field";
+} from "../ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
 import get from "lodash/get.js";
 import {

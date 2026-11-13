@@ -2,8 +2,8 @@
 import type { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
-import useUser from "@/hooks/useUser";
+import { FormContainer } from "@/components/form/form";
+import useUser from "@/hooks/use-user";
 import { uploadToMinio } from "@/lib/utilsClient";
 import {
   AttendanceFragment,
@@ -11,7 +11,7 @@ import {
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { createRegistrationSchema } from "@/lib/validation/registration-form-schema";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";

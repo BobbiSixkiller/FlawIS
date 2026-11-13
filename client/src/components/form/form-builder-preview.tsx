@@ -3,7 +3,7 @@
 import { generateHTML, generateJSON } from "@tiptap/core";
 import { useMemo } from "react";
 import type { FormFieldInput } from "@/lib/graphql/generated/graphql";
-import useLocalizedExtensions from "./editor/extensions";
+import useLocalizedExtensions from "../../hooks/use-localized-extensions";
 import { AnswerFields } from "./answer-fields";
 
 /** Parses draft help through the editor's supported nodes before rendering HTML. */

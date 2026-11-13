@@ -6,14 +6,14 @@ import { LinkSelector } from "./selectors/link-selector";
 import { items, NodeSelector } from "./selectors/node-selector";
 import { TextButtons } from "./selectors/text-buttons";
 
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import {
   useEffect,
   useImperativeHandle,
   type AriaAttributes,
   type Ref,
 } from "react";
-import useLocalizedExtensions from "./extensions";
+import useLocalizedExtensions from "../../../hooks/use-localized-extensions";
 import { SlashCommandExtension } from "./slash-command";
 import CommandsDropdown from "./selectors/commands-dropdown";
 

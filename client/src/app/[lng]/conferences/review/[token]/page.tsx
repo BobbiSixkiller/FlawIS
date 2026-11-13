@@ -1,7 +1,7 @@
 import type { Portal } from "@/lib/reviews/types";
 import ReviewerPortal from "@/app/[lng]/conferences/review/[token]/_components/reviewer-portal";
 import { getPrivatePortal } from "@/lib/reviews/actions";
-import { ErrorAlert } from "@/components/field-controls";
+import { ErrorAlert } from "@/components/form/field-controls";
 export const dynamic = "force-dynamic";
 export const metadata = {
   robots: { index: false, follow: false },

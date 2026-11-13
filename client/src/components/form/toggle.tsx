@@ -1,6 +1,6 @@
 "use client";
 import { type ReactNode, useId, useState } from "react";
-import { Switch } from "./ui/switch";
+import { Switch } from "../ui/switch";
 export default function Toggle({
   label,
   name,

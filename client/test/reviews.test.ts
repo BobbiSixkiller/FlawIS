@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { parseReviewerCsv, reviewerCsv } from "../src/lib/reviews/csv";
 import { stage, type QueueRow } from "../src/lib/reviews/types";
 import { isSubdomainPublicPath } from "../src/lib/authRoutes";
-import { AnswerFields } from "../src/components/answer-fields";
+import { AnswerFields } from "../src/components/form/answer-fields";
 import {
   FieldType,
   type FormFragment,

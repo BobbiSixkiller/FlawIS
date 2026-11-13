@@ -5,7 +5,7 @@ import type { ConferenceActivityQuery } from "@/lib/graphql/generated/graphql";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { localizedText as tr } from "@/lib/i18n/text";
-import { ErrorAlert } from "@/components/field-controls";
+import { ErrorAlert } from "@/components/form/field-controls";
 export default function ActivityTimeline({
   initial,
   conference,

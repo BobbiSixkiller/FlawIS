@@ -3,7 +3,7 @@ import Icon from "@/components/icon";
 import { useEffect, useState } from "react";
 import { items } from "./node-selector";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function CommandsDropdown({ editor }: { editor?: Editor }) {
   const storage = editor?.storage.SlashCommand;

@@ -1,5 +1,5 @@
 import { validation } from "@/lib/validation/form-validation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 

@@ -1,6 +1,6 @@
 import type { FieldErrors } from "react-hook-form";
 import { z } from "zod";
-import { FormContainer, LocalizedFormField } from "../../src/components/form";
+import { FormContainer, LocalizedFormField } from "../../src/components/form/form";
 import { Textarea } from "@/components/ui/textarea";
 
 const translation = z.object({ name: z.string() });

@@ -30,13 +30,13 @@ import {
   FieldControl,
   SelectControl,
   ErrorAlert,
-} from "@/components/field-controls";
+} from "@/components/form/field-controls";
 import {
   FormDialog,
   TextField,
   SelectField,
   ConfirmDialog,
-} from "@/components/form-dialog";
+} from "@/components/form/form-dialog";
 type Config = {
   enabled: boolean;
   requiredReviews: string;

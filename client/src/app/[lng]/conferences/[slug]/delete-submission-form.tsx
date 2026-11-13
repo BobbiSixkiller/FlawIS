@@ -3,7 +3,7 @@
 import { useContext, useTransition } from "react";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import Spinner from "@/components/spinner";
 import { useDialogStore } from "@/stores/dialogStore";
 import { deleteSubmission } from "./actions";

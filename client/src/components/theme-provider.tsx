@@ -1,10 +1,9 @@
 "use client";
+import { ThemeContext } from "@/hooks/use-theme-preference";
 
 import {
-  createContext,
   ReactNode,
   useCallback,
-  useContext,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -16,14 +15,6 @@ import { themePreferenceUsesDark, ThemePreference } from "@/lib/theme";
 import { setThemePreferenceCookie } from "@/lib/themeAction";
 
 const systemDarkQuery = "(prefers-color-scheme: dark)";
-
-type ThemeContextValue = {
-  preference: ThemePreference;
-  pending: boolean;
-  setPreference: (preference: ThemePreference) => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyTheme(preference: ThemePreference) {
   const dark = themePreferenceUsesDark(
@@ -102,14 +93,4 @@ export default function ThemeProvider({
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
-}
-
-export function useThemePreference() {
-  const context = useContext(ThemeContext);
-
-  if (!context) {
-    throw new Error("useThemePreference must be used within ThemeProvider");
-  }
-
-  return context;
 }

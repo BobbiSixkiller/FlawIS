@@ -12,7 +12,7 @@ import {
   ErrorAlert,
   FieldControl,
   SelectControl,
-} from "@/components/field-controls";
+} from "@/components/form/field-controls";
 import { FieldType, type FormFragment } from "@/lib/graphql/generated/graphql";
 
 type Definition = FormFragment["fields"][number];

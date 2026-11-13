@@ -9,7 +9,7 @@ import {
 import resourcesToBackend from "i18next-resources-to-backend";
 // import LocizeBackend from 'i18next-locize-backend'
 import LanguageDetector from "i18next-browser-languagedetector";
-import { cookieName, getOptions, languages } from "./settings";
+import { cookieName, getOptions, languages } from "../lib/i18n/settings";
 
 const runsOnServerSide = typeof window === "undefined";
 
@@ -20,8 +20,8 @@ i18next
   .use(
     resourcesToBackend(
       (language: string, namespace: string) =>
-        import(`./locales/${language}/${namespace}.json`)
-    )
+        import(`../lib/i18n/locales/${language}/${namespace}.json`),
+    ),
   )
   // .use(LocizeBackend) // locize backend could be used on client side, but prefer to keep it in sync with server side
   .init({
@@ -38,7 +38,7 @@ i18next
 export function useTranslation(
   lng: string,
   ns: string | string[],
-  options?: any
+  options?: any,
 ) {
   const ret = useTranslationOrg(ns, options);
   const { i18n } = ret;

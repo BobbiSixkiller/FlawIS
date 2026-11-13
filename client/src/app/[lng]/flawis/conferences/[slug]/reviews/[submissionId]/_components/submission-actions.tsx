@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useFormContext } from "react-hook-form";
-import { FormDialog, TextField, SelectField } from "@/components/form-dialog";
+import { FormDialog, TextField, SelectField } from "@/components/form/form-dialog";
 import ReviewerPicker from "@/app/[lng]/flawis/conferences/[slug]/reviews/[submissionId]/_components/reviewer-picker";
 import { getAssignmentEligibility } from "@/lib/reviews/actions";
 import {
@@ -19,9 +19,9 @@ import { uploadReviewFile } from "@/lib/reviews/files";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FieldControl, ErrorAlert } from "@/components/field-controls";
+import { FieldControl, ErrorAlert } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
-import { AnswerFields, validateAnswerFields } from "@/components/answer-fields";
+import { AnswerFields, validateAnswerFields } from "@/components/form/answer-fields";
 import ReviewerProfileView from "@/app/[lng]/flawis/reviewers/_components/reviewer-profile";
 export type SubmissionAction = {
   kind: string;

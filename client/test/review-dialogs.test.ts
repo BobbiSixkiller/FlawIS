@@ -6,11 +6,11 @@ import { cleanup, render, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
 import { Toaster, createToastManager } from "../src/components/ui/toast";
-import { FormDialog, TextField } from "../src/components/form-dialog";
+import { FormDialog, TextField } from "../src/components/form/form-dialog";
 import {
   AnswerFields,
   validateAnswerFields,
-} from "../src/components/answer-fields";
+} from "../src/components/form/answer-fields";
 import {
   FieldType,
   type FormFragment,

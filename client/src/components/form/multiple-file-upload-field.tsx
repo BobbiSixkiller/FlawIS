@@ -4,9 +4,9 @@ import Icon from "@/components/icon";
 import { type AriaAttributes, type Ref } from "react";
 import { useDropzone, type Accept } from "react-dropzone";
 import { Button } from "@/components/ui/button";
-import Spinner from "./spinner";
-import { useFileSource, type FileSources } from "./use-file-source";
-import { useObjectURL } from "./use-object-url";
+import Spinner from "../spinner";
+import { useFileSource, type FileSources } from "../../hooks/use-file-source";
+import { useObjectURL } from "../../hooks/use-object-url";
 import { cn } from "@/lib/utils";
 
 export interface MultipleFileUploadProps extends AriaAttributes {

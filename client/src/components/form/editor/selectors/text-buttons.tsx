@@ -1,10 +1,10 @@
 import Icon from "@/components/icon";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import { SelectorItem } from "./node-selector";
 import { Button } from "@/components/ui/button";
 import { Editor } from "@tiptap/core";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 
 export const TextButtons = ({ editor }: { editor: Editor }) => {
   const { lng } = useParams<{ lng: string }>();

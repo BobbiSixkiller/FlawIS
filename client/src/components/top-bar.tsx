@@ -1,11 +1,11 @@
 "use client";
 
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import Breadcrumbs from "./breadcrumbs";
 import Icon from "./icon";
 import { ReactNode, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./ui/sheet";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useParams, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useWindowScroll } from "@uidotdev/usehooks";

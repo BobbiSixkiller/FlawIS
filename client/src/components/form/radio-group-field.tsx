@@ -1,5 +1,5 @@
 "use client";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import type { AriaAttributes, Ref } from "react";
 export interface RadioGroupProps extends AriaAttributes {
   id?: string;

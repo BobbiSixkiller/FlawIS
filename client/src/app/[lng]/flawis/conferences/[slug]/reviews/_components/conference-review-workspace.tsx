@@ -21,9 +21,9 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { ErrorAlert } from "@/components/field-controls";
+import { ErrorAlert } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
-import { FormDialog } from "@/components/form-dialog";
+import { FormDialog } from "@/components/form/form-dialog";
 import { getReviewDetail } from "@/lib/reviews/actions";
 import { mutate, errorText } from "@/lib/reviews/ux";
 import { localizedText as tr } from "@/lib/i18n/text";

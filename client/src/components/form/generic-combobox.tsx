@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import type { GqlMutationResponse } from "@/lib/graphql/actions";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import isEqual from "lodash/isEqual.js";
 import {
   type AriaAttributes,
@@ -22,8 +22,8 @@ import {
   ComboboxList,
   ComboboxTrigger,
   useComboboxAnchor,
-} from "./ui/combobox";
-import Spinner from "./spinner";
+} from "../ui/combobox";
+import Spinner from "../spinner";
 import { Button } from "@/components/ui/button";
 
 export interface GenericComboboxProps<TOption, TValue> extends AriaAttributes {

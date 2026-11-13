@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import { createElement, createRef } from "react";
-import { PasswordInput } from "../src/components/password-input";
+import { PasswordInput } from "../src/components/form/password-input";
 import { Button } from "../src/components/ui/button";
 
 afterEach(cleanup);

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ErrorAlert } from "@/components/field-controls";
+import { ErrorAlert } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
 import { toast } from "@/components/ui/toast";
 import { getReviewDetail, getActivity } from "@/lib/reviews/actions";

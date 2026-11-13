@@ -10,7 +10,7 @@ import {
 import { getFormVersions } from "@/lib/reviews/actions";
 import { mutate, errorText } from "@/lib/reviews/ux";
 import { localizedText as tr } from "@/lib/i18n/text";
-import { AnswerFields } from "@/components/answer-fields";
+import { AnswerFields } from "@/components/form/answer-fields";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,13 +22,13 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import { ErrorAlert } from "@/components/field-controls";
+import { ErrorAlert } from "@/components/form/field-controls";
 import {
   FormDialog,
   SelectField,
   ViewDialog,
   ConfirmDialog,
-} from "@/components/form-dialog";
+} from "@/components/form/form-dialog";
 type Definition = FormLibraryQuery["formLibrary"][number];
 type Editor = { definition?: Definition; version?: FormFragment };
 export default function FormLibrary({

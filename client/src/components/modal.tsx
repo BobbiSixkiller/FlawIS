@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import Spinner from "./spinner";
 import { useDialogStore } from "@/stores/dialogStore";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 interface ModalProps {
   dialogId: string;
   isInterceptingRoute?: boolean;

@@ -1,7 +1,7 @@
 import ResetPasswordForm from "./reset-password-form";
 import { FormMessage } from "@/components/message";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Trans } from "react-i18next/TransWithoutContext";
 

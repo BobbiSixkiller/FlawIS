@@ -17,20 +17,20 @@ import {
 import { FormField } from "./form";
 import { firstErrorPath } from "./wizzard-form";
 import { ErrorAlert } from "./field-controls";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { NativeSelect } from "./ui/native-select";
-import { Checkbox } from "./ui/checkbox";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { NativeSelect } from "../ui/native-select";
+import { Checkbox } from "../ui/checkbox";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
-} from "./ui/card";
-import { FieldGroup } from "./ui/field";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import Icon from "./icon";
+} from "../ui/card";
+import { FieldGroup } from "../ui/field";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
+import Icon from "../icon";
 
 const HelpEditor = dynamic(() => import("./editor/editor"), { ssr: false });
 const Preview = dynamic(() => import("./form-builder-preview"), { ssr: false });

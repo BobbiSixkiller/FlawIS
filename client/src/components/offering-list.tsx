@@ -14,13 +14,13 @@ import {
   CourseListItemFragment,
   CoursesQueryVariables,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utilsClient";
+import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import {
   conferenceOfferingModel,
   courseOfferingModel,
   OfferingCardModel,
-} from "@/components/offering-model";
+} from "@/lib/offering-model";
 
 type OfferingListProps =
   | {

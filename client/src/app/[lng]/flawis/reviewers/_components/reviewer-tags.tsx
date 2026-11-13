@@ -1,6 +1,6 @@
 "use client";
-import GenericCombobox from "@/components/generic-combobox";
-import { FieldControl } from "@/components/field-controls";
+import GenericCombobox from "@/components/form/generic-combobox";
+import { FieldControl } from "@/components/form/field-controls";
 
 /** Reuse the shared multi-select while allowing conference-specific vocabulary. */
 export default function ReviewerTags({

@@ -2,7 +2,7 @@
 
 import { useEffect, useTransition } from "react";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { activate, resendActivationLink } from "@/app/[lng]/(auth)/actions";
 

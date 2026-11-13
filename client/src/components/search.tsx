@@ -2,8 +2,8 @@
 import { type ComponentType, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useParams } from "next/navigation";
-import useMounted from "@/hooks/useMounted";
-import { useTranslation } from "@/lib/i18n/client";
+import useMounted from "@/hooks/use-mounted";
+import { useTranslation } from "@/hooks/use-translation";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import {
   Combobox,

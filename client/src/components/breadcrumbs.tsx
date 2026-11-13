@@ -4,10 +4,10 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { getLocalizedPath, stripPathLocale } from "@/lib/i18n/settings";
 import { Button } from "@/components/ui/button";
-import { useBreadcrumbLabels } from "./breadcrumb-labels";
+import { useBreadcrumbLabels } from "@/hooks/use-breadcrumb-labels";
 
 const linkClassName =
   "flex min-h-9 items-center rounded-sm text-primary outline-hidden hover:underline focus-visible:ring-2 focus-visible:ring-ring dark:text-primary";

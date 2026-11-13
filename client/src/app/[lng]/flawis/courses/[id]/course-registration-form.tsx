@@ -2,21 +2,21 @@
 import { createRegistrationSchema } from "@/lib/validation/registration-form-schema";
 import { z } from "zod";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 
 import BillingInput from "@/app/[lng]/conferences/[slug]/register/billing-input";
 import { Input } from "@/components/ui/input";
-import WizzardForm, { WizzardStep } from "@/components/wizzard-form";
-import useUser from "@/hooks/useUser";
-import useValidation from "@/hooks/useValidation";
+import WizzardForm, { WizzardStep } from "@/components/form/wizzard-form";
+import useUser from "@/hooks/use-user";
+import useValidation from "@/hooks/use-validation";
 import { uploadToMinio } from "@/lib/utilsClient";
 import {
   CourseFragment,
   FieldType,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams, useRouter } from "next/navigation";

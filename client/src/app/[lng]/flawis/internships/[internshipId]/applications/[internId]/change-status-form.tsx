@@ -3,7 +3,7 @@
 import { Status } from "@/lib/graphql/generated/graphql";
 import { useParams } from "next/navigation";
 import { useTransition } from "react";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useMessageStore } from "@/stores/messageStore";
 import { useDialogStore } from "@/stores/dialogStore";
 import { Button } from "@/components/ui/button";

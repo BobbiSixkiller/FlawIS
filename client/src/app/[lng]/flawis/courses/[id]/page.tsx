@@ -5,7 +5,7 @@ import ModalTrigger from "@/components/modal-trigger";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import Modal from "@/components/modal";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { redirect } from "next/navigation";
 import CloseButton from "@/components/close-button";
 import Link from "next/link";

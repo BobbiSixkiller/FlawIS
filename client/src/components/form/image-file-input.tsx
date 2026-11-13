@@ -3,8 +3,8 @@
 import Icon from "@/components/icon";
 import { type ComponentPropsWithRef, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { useFileSource } from "./use-file-source";
-import { useObjectURL } from "./use-object-url";
+import { useFileSource } from "../../hooks/use-file-source";
+import { useObjectURL } from "../../hooks/use-object-url";
 
 interface ImageFileInputProps
   extends Omit<

@@ -1,4 +1,4 @@
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 
 const escape = (value: string) =>
   value.replace(

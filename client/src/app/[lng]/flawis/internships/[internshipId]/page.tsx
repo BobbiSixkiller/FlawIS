@@ -9,7 +9,7 @@ import Icon from "@/components/icon";
 import Modal from "@/components/modal";
 import InternshipForm from "@/app/[lng]/internships/internship-form";
 import { translate } from "@/lib/i18n";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 
 export default async function InternshipPage({
   params,

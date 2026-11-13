@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utilsClient";
+import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import { ReactElement } from "react";
 
 export default function Stepper<TStepProps extends { name: string }>({

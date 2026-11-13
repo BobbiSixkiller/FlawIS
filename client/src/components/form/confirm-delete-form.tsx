@@ -2,9 +2,9 @@
 
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import Spinner from "./spinner";
+import Spinner from "../spinner";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { GqlMutationResponse } from "@/lib/graphql/actions";

@@ -2,6 +2,8 @@
 
 - Preserve UK Sans, the purple accent, semantic theme tokens, and light/dark support. Use the existing Base UI shadcn primitives in `src/components/ui`.
 - Keep `src/components` for shared controls and cross-feature components. Colocate feature screens and their supporting components in route-local `_components`, at the nearest common owning route when several pages reuse them. A reusable primitive need not have multiple callers. Move files and update imports directly, without compatibility re-exports.
+- Group shared form composition, builders, dialogs, answer/input controls and the rich-text editor in `src/components/form`. Keep shadcn primitives in `src/components/ui` and non-React form helpers in `src/lib/forms` or `src/lib/validation`.
+- Put reusable application hooks in `src/hooks`, using kebab-case filenames and `useX` exports. Keep private context helpers with their owning component, shadcn context adapters with their primitives, and Zustand store factories in `src/stores`. Components use PascalCase exports and kebab-case filenames. Import modules directly; use `cn` from `@/lib/utils`.
 - Keep shared form builders, dialogs and answer controls independent of feature mutations. Hosts own saving, error translation and domain annotations. The shared `FormBuilder` edits the parent React Hook Form's `formFields`; persisted field IDs and option values are separate from React field-array keys.
 - Inspect users/conferences pages for established navigation and search patterns. Dashboard search belongs in the `@headerActions` parallel route; ensure fallback routes clear stale actions on navigation.
 - Reviewers, forms, and submission reviews currently use search only. Do not add filters to those pages without a task requiring them.

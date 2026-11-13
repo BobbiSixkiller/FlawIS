@@ -9,7 +9,8 @@ import {
   FormFragment,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { cn, formatDatetimeLocal } from "@/lib/utilsClient";
+import { formatDatetimeLocal } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import ModalTrigger from "@/components/modal-trigger";
 import Modal from "@/components/modal";
 import {
@@ -31,10 +32,10 @@ import {
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import ChangeStatusForm from "../../../internships/[internshipId]/applications/[internId]/change-status-form";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { deleteCourseAttendee, deleteCourseSession } from "../actions";
 import CourseSessionForm from "../course-session-form";
-import useUser from "@/hooks/useUser";
+import useUser from "@/hooks/use-user";
 import HoursAttended from "./hours-attended";
 import OnlineSwitch from "./online-switch";
 import AttendeeApplicationView from "./attendee-application-view";

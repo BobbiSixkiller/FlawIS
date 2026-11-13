@@ -1,5 +1,5 @@
 "use client";
-import { useUnsavedChanges } from "@/components/form-dialog";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { ErrorAlert, FieldControl } from "@/components/field-controls";
+import { ErrorAlert, FieldControl } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
 import { uploadReviewFile } from "@/lib/reviews/files";
 import { getRevisionPortal, getAuthorWorkspace } from "@/lib/reviews/actions";

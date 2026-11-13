@@ -3,7 +3,7 @@ import { FormMessage } from "@/components/message";
 import { Trans } from "react-i18next/TransWithoutContext";
 import GoogleSignIn from "../google-signin";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { getSubdomain } from "@/lib/utilsServer";
 

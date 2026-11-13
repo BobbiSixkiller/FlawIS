@@ -9,9 +9,9 @@ import { label } from "@/lib/reviews/types";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FieldSet, FieldLegend } from "@/components/ui/field";
-import { ErrorAlert, FieldControl } from "@/components/field-controls";
+import { ErrorAlert, FieldControl } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
-import { FormDialog, ViewDialog } from "@/components/form-dialog";
+import { FormDialog, ViewDialog } from "@/components/form/form-dialog";
 export default function ReviewerProfileView({
   reviewer,
   conference,

@@ -7,8 +7,8 @@ import userEvent from "@testing-library/user-event";
 import { Environment, initialized } from "./helpers/form-fixtures";
 import ReviewerTags from "../src/app/[lng]/flawis/reviewers/_components/reviewer-tags";
 import SearchComponent from "../src/components/search";
-import MultipleFileUploadField from "../src/components/multiple-file-upload-field";
-import { validateAnswerFields } from "../src/components/answer-fields";
+import MultipleFileUploadField from "../src/components/form/multiple-file-upload-field";
+import { validateAnswerFields } from "../src/components/form/answer-fields";
 import {
   FieldType,
   type FormFragment,
