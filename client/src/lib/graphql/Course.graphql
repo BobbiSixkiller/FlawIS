@@ -34,7 +34,7 @@ fragment Course on Course {
 
 fragment Form on Form {
   id
-  course
+  definition
   version
   fields {
     id
@@ -55,6 +55,9 @@ fragment Form on Form {
 }
 
 fragment FormSubmission on FormSubmission {
+  id
+  revision
+  submitted
   form
   formVersion
   answers
@@ -85,6 +88,9 @@ fragment CourseAttendee on CourseAttendee {
   course
   status
   elearningStatus
+  applicationForm {
+    ...Form
+  }
   application {
     ...FormSubmission
   }
@@ -101,6 +107,9 @@ fragment Attendance on Attendance {
     status
     elearningStatus
     elearningErrorCode
+    applicationForm {
+      ...Form
+    }
     application {
       ...FormSubmission
     }

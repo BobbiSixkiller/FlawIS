@@ -1,3 +1,11 @@
 .env
 .DS_Store
 
+# Checkout-local operational notes; never publish infrastructure access details.
+/.agents/local/
+
+
+core/dist/
+mail/dist/
+
+mail/*.tsbuildinfo

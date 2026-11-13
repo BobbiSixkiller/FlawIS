@@ -1,26 +1,24 @@
 "use client";
+import { ManuscriptTemplateDownload } from "./_components/manuscript-template-download";
 import { z } from "zod";
 
-import { FormField, LocalizedFormField } from "@/components/form";
+import { FormField, LocalizedFormField } from "@/components/form/form";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
-import GenericCombobox from "@/components/generic-combobox";
-import MultipleFileUploadField from "@/components/multiple-file-upload-field";
-import Select from "@/components/select";
+import { FormContainer } from "@/components/form/form";
+import GenericCombobox from "@/components/form/generic-combobox";
+import MultipleFileUploadField from "@/components/form/multiple-file-upload-field";
+import Select from "@/components/form/select";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import useValidation from "@/hooks/useValidation";
-import {
-  handleAPIErrors,
-  uploadToMinio,
-} from "@/lib/utilsClient";
+import useValidation from "@/hooks/use-validation";
+import { handleAPIErrors, uploadToMinio } from "@/lib/utilsClient";
 import {
   ConferenceQuery,
   PresentationLng,
   SubmissionFragment,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteFiles } from "@/lib/minio";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
@@ -45,7 +43,10 @@ export default function ConferenceSubmissionForm({
 }: {
   lng: string;
   submission?: SubmissionFragment;
-  conference: Pick<ConferenceQuery["conference"], "id" | "slug" | "sections">;
+  conference: Pick<
+    ConferenceQuery["conference"],
+    "id" | "slug" | "sections" | "manuscriptTemplateFile"
+  >;
   dialogId: string;
   attendeeId?: string;
 }) {
@@ -289,6 +290,7 @@ export default function ConferenceSubmissionForm({
               />
             )}
           </FormField>
+          <ManuscriptTemplateDownload conference={conference} lng={lng} />
           <FormField<FormValues, "files">
             name="files"
             label={t("registration.submission.file", {
@@ -317,7 +319,6 @@ export default function ConferenceSubmissionForm({
           </FormField>
 
           <Button
-            
             type="submit"
             className="w-full"
             disabled={methods.formState.isSubmitting}

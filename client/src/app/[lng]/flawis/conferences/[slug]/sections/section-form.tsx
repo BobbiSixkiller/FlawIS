@@ -1,13 +1,13 @@
 "use client";
 import { z } from "zod";
 
-import { LocalizedFormField } from "@/components/form";
+import { LocalizedFormField } from "@/components/form/form";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
+import { FormContainer } from "@/components/form/form";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import useValidation from "@/hooks/useValidation";
+import useValidation from "@/hooks/use-validation";
 import { SectionFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";

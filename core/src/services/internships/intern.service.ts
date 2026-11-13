@@ -23,7 +23,7 @@ export class InternService {
     private readonly userRepository: UserRepository,
     private readonly i18nService: I18nService,
     private readonly rmqService: RmqService,
-    private readonly minioService: MinioService
+    private readonly minioService: MinioService,
   ) {}
 
   async getInterns(args: InternArgs, ctxUser: CtxUser) {
@@ -34,7 +34,7 @@ export class InternService {
     if (isOrganization && args.filter?.internship) {
       await this.internshipService.assertCanManageInternship(
         args.filter.internship,
-        ctxUser
+        ctxUser,
       );
     } else if (!isAdmin) {
       throw new Error("Not allowed!");
@@ -47,7 +47,7 @@ export class InternService {
     const intern = await this.getInternOrThrow(id);
     await this.internshipService.assertCanManageInternship(
       intern.internship as ObjectId,
-      ctxUser
+      ctxUser,
     );
 
     return toDTO(intern);
@@ -77,7 +77,7 @@ export class InternService {
     internshipId: ObjectId,
     fileUrls: string[],
     semester: Semester,
-    hostname: string
+    hostname: string,
   ): Promise<Intern> {
     if (
       ctxUser.access.includes(Access.Admin) ||
@@ -105,21 +105,21 @@ export class InternService {
           createdAt: { $gte: startDate, $lte: endDate },
           status: { $ne: Status.Rejected },
         },
-        { session }
+        { session },
       );
 
       if (count >= 2) {
         throw new Error(
           this.i18nService.translate("applicationLimitReached", {
             ns: "intern",
-          })
+          }),
         );
       }
 
       // Fetch internship (ensure it exists)
       const internship = await this.internshipService.getInternship(
         internshipId,
-        ctxUser
+        ctxUser,
       );
 
       // Create the document within the transaction
@@ -139,7 +139,7 @@ export class InternService {
           fileUrls,
           semester,
         },
-        { session }
+        { session },
       );
 
       await this.rmqService.produceMessage(
@@ -151,7 +151,8 @@ export class InternService {
           internshipId: internship.id,
           organization: internship.organization,
         }),
-        "mail.internships.applied"
+        "mail.internships.applied",
+        session,
       );
 
       await session.commitTransaction();
@@ -169,12 +170,12 @@ export class InternService {
     status: Status,
     id: ObjectId,
     ctxUser: CtxUser,
-    hostname: string
+    hostname: string,
   ) {
     const existingIntern = await this.getInternOrThrow(id);
     await this.internshipService.assertCanManageInternship(
       existingIntern.internship as ObjectId,
-      ctxUser
+      ctxUser,
     );
 
     const session = await mongoose.startSession();
@@ -184,11 +185,11 @@ export class InternService {
       const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { status },
-        session
+        session,
       );
       if (!intern) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "intern" })
+          this.i18nService.translate("notFound", { ns: "intern" }),
         );
       }
 
@@ -201,7 +202,8 @@ export class InternService {
           internshipId: intern.internship,
           organization: intern.organization,
         }),
-        `mail.internships.${status.toLowerCase()}` as RoutingKey
+        `mail.internships.${status.toLowerCase()}` as RoutingKey,
+        session,
       );
 
       await session.commitTransaction();
@@ -219,7 +221,7 @@ export class InternService {
     fileUrls: string[],
     id: ObjectId,
     user: CtxUser,
-    semester: Semester
+    semester: Semester,
   ) {
     const existingIntern = await this.getInternOrThrow(id);
     const isAdmin = user.access.includes(Access.Admin);
@@ -240,11 +242,11 @@ export class InternService {
       const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { $set: { fileUrls, semester } },
-        session
+        session,
       );
       if (!intern) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "intern" })
+          this.i18nService.translate("notFound", { ns: "intern" }),
         );
       }
       await session.commitTransaction();
@@ -272,7 +274,7 @@ export class InternService {
     }
     if (isAdmin && existingIntern.status !== Status.Rejected) {
       throw new Error(
-        this.i18nService.translate("deleteRejectedOnly", { ns: "intern" })
+        this.i18nService.translate("deleteRejectedOnly", { ns: "intern" }),
       );
     }
 
@@ -282,11 +284,11 @@ export class InternService {
     try {
       const intern = await this.internRepository.findOneAndDelete(
         { _id: id },
-        { session }
+        { session },
       );
       if (!intern) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "intern" })
+          this.i18nService.translate("notFound", { ns: "intern" }),
         );
       }
       await this.minioService.deleteFiles(intern.fileUrls);
@@ -308,12 +310,12 @@ export class InternService {
   async updateOrganizationFeedbackUrl(
     id: ObjectId,
     user: CtxUser,
-    fileUrl: string
+    fileUrl: string,
   ) {
     const existingIntern = await this.getInternOrThrow(id);
     await this.internshipService.assertCanManageInternship(
       existingIntern.internship as ObjectId,
-      user
+      user,
     );
 
     const session = await mongoose.startSession();
@@ -323,11 +325,11 @@ export class InternService {
       const intern = await this.internRepository.findOneAndUpdate(
         { _id: id },
         { organizationFeedbackUrl: fileUrl },
-        session
+        session,
       );
       if (!intern) {
         throw new Error(
-          this.i18nService.translate("notFound", { ns: "intern" })
+          this.i18nService.translate("notFound", { ns: "intern" }),
         );
       }
       await session.commitTransaction();
@@ -360,20 +362,22 @@ export class InternService {
         },
       });
 
-      admins.forEach((admin) =>
-        this.rmqService.produceMessage(
-          JSON.stringify({
-            locale: this.i18nService.language(),
-            name: admin.name,
-            email: admin.email,
-            hostname:
-              process.env.NODE_ENV === "production"
-                ? "flawis.flaw.uniba.sk"
-                : "flawis-staging.flaw.uniba.sk",
-            count,
-          }),
-          "mail.internships.admin"
-        )
+      await Promise.all(
+        admins.map((admin) =>
+          this.rmqService.produceMessage(
+            JSON.stringify({
+              locale: this.i18nService.language(),
+              name: admin.name,
+              email: admin.email,
+              hostname:
+                process.env.NODE_ENV === "production"
+                  ? "flawis.flaw.uniba.sk"
+                  : "flawis-staging.flaw.uniba.sk",
+              count,
+            }),
+            "mail.internships.admin",
+          ),
+        ),
       );
     }
   }
@@ -384,10 +388,10 @@ export class InternService {
 
     for (const data of internshipsWithEligibleInterns) {
       console.log(
-        `Sending notification to ${data.user.email} of ${data.internship.organization}`
+        `Sending notification to ${data.user.email} of ${data.internship.organization}`,
       );
 
-      this.rmqService.produceMessage(
+      await this.rmqService.produceMessage(
         JSON.stringify({
           locale: data.internship.language,
           name: data.user.name,
@@ -400,7 +404,7 @@ export class InternService {
               : "internships-staging.flaw.uniba.sk",
           count: data.count,
         }),
-        "mail.internships.org"
+        "mail.internships.org",
       );
     }
   }
@@ -413,5 +417,4 @@ export class InternService {
 
     return intern;
   }
-
 }

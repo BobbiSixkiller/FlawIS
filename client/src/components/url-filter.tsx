@@ -2,13 +2,13 @@
 
 import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
 import { Switch } from "@base-ui/react/switch";
-import { overlayPosition, type OverlayAnchor } from "./overlay-position";
+import { overlayPosition, type OverlayAnchor } from "../lib/overlay-position";
 import { useOptimistic, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import Icon from "@/components/icon";
-import { useTranslation } from "@/lib/i18n/client";
-import { cn } from "@/lib/utilsClient";
+import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 
 export type UrlFilterConfig = {
   label: string;

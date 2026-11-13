@@ -264,7 +264,7 @@ test("administrators can update after the deadline without an author filter", as
   assert.deepEqual(receivedFilter, { _id: submissionId });
 });
 
-test("replacing a submission file removes the previous MinIO object after the update", async () => {
+test("replacing a submission file preserves the previous manuscript", async () => {
   const conferenceId = new ObjectId();
   const sectionId = new ObjectId();
   const submissionId = new ObjectId();
@@ -318,10 +318,10 @@ test("replacing a submission file removes the previous MinIO object after the up
     data,
   );
 
-  assert.deepEqual(deletedUrls, [[oldUrl]]);
+  assert.deepEqual(deletedUrls, []);
 });
 
-test("deleting a submission removes its current MinIO object", async () => {
+test("deleting a submission preserves its manuscript history", async () => {
   const conferenceId = new ObjectId();
   const submissionId = new ObjectId();
   const fileUrl = "http://minio:9000/conference/submission.pdf";
@@ -347,7 +347,7 @@ test("deleting a submission removes its current MinIO object", async () => {
 
   await instance.deleteSubmission(submissionId, user([Access.Admin]));
 
-  assert.deepEqual(deletedUrls, [[fileUrl]]);
+  assert.deepEqual(deletedUrls, []);
 });
 
 test("administrators can send co-author invitations from the FLAWIS dashboard", async () => {
@@ -361,8 +361,7 @@ test("administrators can send co-author invitations from the FLAWIS dashboard", 
     translations: submissionInput(conferenceId, sectionId).translations,
   });
   let invitation:
-    | { routingKey: string; message: Record<string, unknown> }
-    | undefined;
+    { routingKey: string; message: Record<string, unknown> } | undefined;
 
   const instance = service({
     submissionRepository: {
@@ -450,14 +449,17 @@ test("invitation preview identifies a different signed-in account", async () => 
     },
   });
 
-  await assert.rejects(instance.getSubmissionInvite("token", user()), (error) => {
-    assert.equal((error as Error).message, "inviteEmailMismatch");
-    assert.equal(
-      (error as GraphQLError).extensions.code,
-      "INVITATION_EMAIL_MISMATCH",
-    );
-    return true;
-  });
+  await assert.rejects(
+    instance.getSubmissionInvite("token", user()),
+    (error) => {
+      assert.equal((error as Error).message, "inviteEmailMismatch");
+      assert.equal(
+        (error as GraphQLError).extensions.code,
+        "INVITATION_EMAIL_MISMATCH",
+      );
+      return true;
+    },
+  );
 });
 
 test("co-author acceptance does not consume a token for a different account", async () => {

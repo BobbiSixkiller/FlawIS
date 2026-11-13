@@ -78,7 +78,7 @@ export async function impersonate(id: string) {
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const cookieStore = await cookies();
 
-  cookieStore.set("accessToken", res.data.user.token, {
+  cookieStore.set("accessToken", res.data.impersonateUser.token!, {
     httpOnly: true,
     expires, //accesstoken expires in 24 hours
     secure: process.env.NODE_ENV !== "development",
@@ -93,13 +93,13 @@ export async function impersonate(id: string) {
   //check for staging env
   if (process.env.API_URI) {
     redirect(
-      res.data.user.access.includes(Access.ConferenceAttendee)
+      res.data.impersonateUser.data.access.includes(Access.ConferenceAttendee)
         ? "https://conferences-staging.flaw.uniba.sk"
         : "https://internships-staging.flaw.uniba.sk",
     );
   } else {
     redirect(
-      res.data.user.access.includes(Access.ConferenceAttendee)
+      res.data.impersonateUser.data.access.includes(Access.ConferenceAttendee)
         ? "https://conferences.flaw.uniba.sk"
         : "https://internships.flaw.uniba.sk",
     );

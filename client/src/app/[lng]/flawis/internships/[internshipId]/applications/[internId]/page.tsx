@@ -10,7 +10,7 @@ import Modal from "@/components/modal";
 import { translate } from "@/lib/i18n";
 import ChangeStatusForm from "./change-status-form";
 import { redirect } from "next/navigation";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { deleteIntern } from "@/app/[lng]/internships/[internshipId]/actions";
 import { changeInternStatus } from "./actions";
 import {

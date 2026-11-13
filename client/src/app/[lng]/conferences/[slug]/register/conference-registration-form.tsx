@@ -1,8 +1,9 @@
 "use client";
+import { ManuscriptTemplateDownload } from "../_components/manuscript-template-download";
 import { z } from "zod";
 
-import { FormField, LocalizedFormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField, LocalizedFormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 
 import {
   ConferenceQuery,
@@ -10,18 +11,18 @@ import {
   SubmissionFragment,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { addAttendee } from "./actions";
 import Ticket from "./ticket";
 
-import GenericCombobox from "@/components/generic-combobox";
+import GenericCombobox from "@/components/form/generic-combobox";
 import { Input } from "@/components/ui/input";
-import Select from "@/components/select";
+import Select from "@/components/form/select";
 import { Textarea } from "@/components/ui/textarea";
-import WizzardForm, { WizzardStep } from "@/components/wizzard-form";
-import useValidation from "@/hooks/useValidation";
+import WizzardForm, { WizzardStep } from "@/components/form/wizzard-form";
+import useValidation from "@/hooks/use-validation";
 import { handleAPIErrors } from "@/lib/utilsClient";
 import {
   conferenceWorkspaceHref,
@@ -370,6 +371,7 @@ export default function ConferenceRegistrationForm({
               >
                 {t("registration.submission.notice", { ns: "conferences" })}
               </div>
+              <ManuscriptTemplateDownload conference={conference} lng={lng} />
               <FormField<FormValues, "submission.section">
                 name="submission.section"
                 label={t("registration.submission.section", {

@@ -1,7 +1,7 @@
 "use client";
 
 import Icon from "@/components/icon";
-import useMounted from "@/hooks/useMounted";
+import useMounted from "@/hooks/use-mounted";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";

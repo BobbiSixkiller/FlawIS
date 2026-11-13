@@ -28,7 +28,15 @@ export function createRegistrationSchema(
     } else if (field.type === FieldType.FileUpload) {
       const files = z
         .array(z.file({ error: v.required }))
-        .min(field.minFiles ?? 1, t("minFiles", { value: field.minFiles ?? 1 }))
+        .refine(
+          (files) =>
+            (!field.required && files.length === 0) ||
+            files.length >=
+              Math.max(field.required ? 1 : 0, field.minFiles ?? 1),
+          t("minFiles", {
+            value: Math.max(field.required ? 1 : 0, field.minFiles ?? 1),
+          }),
+        )
         .max(
           field.maxFiles ?? 10,
           t("maxFiles", { value: field.maxFiles ?? 10 }),

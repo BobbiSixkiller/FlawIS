@@ -1,25 +1,26 @@
 "use client";
 import type { z } from "zod";
-import { PasswordInput } from "@/components/password-input";
+import { PasswordInput } from "@/components/form/password-input";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useEffect } from "react";
 import { Trans } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FormContainer } from "@/components/form";
-import AvatarInput from "@/components/image-file-input";
+import { FormContainer } from "@/components/form/form";
+import AvatarInput from "@/components/form/image-file-input";
 import { Input } from "@/components/ui/input";
-import MultipleFileUploadField from "@/components/multiple-file-upload-field";
-import PhoneInput from "@/components/phone-input";
-import Select from "@/components/select";
+import MultipleFileUploadField from "@/components/form/multiple-file-upload-field";
+import PhoneInput from "@/components/form/phone-input";
+import Select from "@/components/form/select";
 import Spinner from "@/components/spinner";
-import useUser from "@/hooks/useUser";
-import { cn, uploadOrDelete } from "@/lib/utilsClient";
+import useUser from "@/hooks/use-user";
+import { uploadOrDelete } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import {
   Access,
   AddressFragment,

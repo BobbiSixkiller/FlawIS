@@ -1,17 +1,17 @@
 "use client";
 import { z } from "zod";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
-import useValidation from "@/hooks/useValidation";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
+import useValidation from "@/hooks/use-validation";
 import { compareFields } from "@/lib/validation/form-validation";
 
 import { Button } from "@/components/ui/button";
-import { FormContainer } from "@/components/form";
+import { FormContainer } from "@/components/form/form";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/spinner";
 import { ConferenceFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";

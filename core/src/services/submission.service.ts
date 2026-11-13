@@ -20,6 +20,7 @@ import { CtxUser } from "../util/types";
 import { I18nService } from "./i18n.service";
 import { MinioService } from "./minio.service";
 import { RmqService } from "./rmq.service";
+import { ManuscriptHistoryService } from "./reviews/manuscript-history.service";
 import { TokenService } from "./token.service";
 
 type SubmissionTokenPayload = {
@@ -47,6 +48,7 @@ export class SubmissionService {
     private readonly rmqService: RmqService,
     private readonly minioService: MinioService,
     private readonly i18nService: I18nService,
+    private readonly history?: ManuscriptHistoryService,
   ) {}
 
   async getSubmissions(args: SubmissionArgs) {
@@ -73,9 +75,10 @@ export class SubmissionService {
     user: CtxUser,
     expectedSubmissionId?: ObjectId,
   ) {
-    const decoded = await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(
-      token,
-    );
+    const decoded =
+      await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(
+        token,
+      );
     const payload = this.validateInvitePayload(
       decoded.payload,
       user,
@@ -98,6 +101,7 @@ export class SubmissionService {
       options.session,
     );
     await this.assertUniqueNames(data, undefined, options.session);
+    await this.history?.validateUpload(data.fileUrl, undefined, user);
 
     const submission = await this.submissionRepository.create(
       {
@@ -145,6 +149,8 @@ export class SubmissionService {
     );
     await this.assertUniqueNames(data, id);
 
+    await this.history?.validateUpload(data.fileUrl, existing!.fileUrl, user);
+    await this.history?.capture(toDTO(existing!), user);
     const submission = await this.submissionRepository.findOneAndUpdate(
       {
         _id: id,
@@ -156,16 +162,8 @@ export class SubmissionService {
     if (!submission) this.throwNotAllowed();
 
     const result = toDTO(submission!);
-    if (existing!.fileUrl && existing!.fileUrl !== result.fileUrl) {
-      await this.deleteFilesQuietly([existing!.fileUrl]);
-    }
-    await this.sendCoAuthorInvites(
-      hostname,
-      user,
-      conference,
-      result,
-      authors,
-    );
+    // Manuscripts are immutable versions; replacement never deletes prior files.
+    await this.sendCoAuthorInvites(hostname, user, conference, result, authors);
     return result;
   }
 
@@ -188,21 +186,23 @@ export class SubmissionService {
     }
     await this.assertParticipantCanSubmit(user, conference!);
 
+    if (this.history) return this.history.withdraw(toDTO(existing!), user);
+
     const submission = await this.submissionRepository.findOneAndDelete({
       _id: id,
       ...(isAdmin ? {} : { authors: user.id }),
     });
     if (!submission) this.throwNotAllowed();
     const result = toDTO(submission!);
-    if (result.fileUrl) {
-      await this.deleteFilesQuietly([result.fileUrl]);
-    }
+
     return result;
   }
 
   async addCoAuthor(token: string, user: CtxUser) {
     const inspected =
-      await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(token);
+      await this.tokenService.inspectOneTimeToken<SubmissionTokenPayload>(
+        token,
+      );
     const payload = this.validateInvitePayload(inspected.payload, user);
 
     const submission = await this.submissionRepository.findOne({
@@ -226,10 +226,17 @@ export class SubmissionService {
       { new: true },
     );
     if (!updated) this.throwNotFound();
+    if (this.history) await this.history.rememberAuthors(toDTO(updated!));
     return toDTO(updated!);
   }
 
   async removeAuthor(submissionId: ObjectId, authorId: ObjectId) {
+    if (this.history) {
+      const previous = await this.submissionRepository.findOne({
+        _id: submissionId,
+      });
+      if (previous) await this.history.rememberAuthors(toDTO(previous));
+    }
     const submission = await this.submissionRepository.findOneAndUpdate(
       { _id: submissionId },
       { $pull: { authors: authorId } },
@@ -246,6 +253,7 @@ export class SubmissionService {
     submission: Submission,
     authors: string[] = [],
   ) {
+    await this.history?.capture(submission, user);
     await Promise.all(
       authors.map((email) =>
         this.sendAddAuthorLink(hostname, email, user, conference, submission),
@@ -266,7 +274,7 @@ export class SubmissionService {
     );
     const locale = this.localeKey();
 
-    this.rmqService.produceMessage(
+    await this.rmqService.produceMessage(
       JSON.stringify({
         locale: this.i18nService.language(),
         hostname,
@@ -291,11 +299,9 @@ export class SubmissionService {
     session?: ClientSession,
   ) {
     const [conference, section] = await Promise.all([
-      this.conferenceRepository.findOne(
-        { _id: conferenceId },
-        null,
-        { session },
-      ),
+      this.conferenceRepository.findOne({ _id: conferenceId }, null, {
+        session,
+      }),
       this.sectionRepository.findOne({ _id: sectionId }, null, { session }),
     ]);
     if (!conference) {
@@ -417,10 +423,7 @@ export class SubmissionService {
     return user.access.includes(Access.Admin);
   }
 
-  private isAuthor(
-    submission: Pick<Submission, "authors">,
-    userId: ObjectId,
-  ) {
+  private isAuthor(submission: Pick<Submission, "authors">, userId: ObjectId) {
     return submission.authors.some((author) => sameId(author, userId));
   }
 

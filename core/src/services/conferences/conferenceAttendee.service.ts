@@ -30,7 +30,7 @@ function isDuplicateAttendeeError(error: unknown) {
     mongoError.code === 11000 &&
     Boolean(
       mongoError.keyPattern?.["conference._id"] ||
-        mongoError.keyPattern?.["user._id"],
+      mongoError.keyPattern?.["user._id"],
     )
   );
 }
@@ -99,9 +99,7 @@ export class ConferenceAttendeeService {
       (candidate) => candidate.id.toString() === data.ticketId.toString(),
     );
     if (!ticket) {
-      throw new Error(
-        this.i18nService.translate("notFound", { ns: "ticket" }),
-      );
+      throw new Error(this.i18nService.translate("notFound", { ns: "ticket" }));
     }
     if (data.initialSubmission && !ticket.withSubmission) {
       throw new Error(
@@ -187,13 +185,12 @@ export class ConferenceAttendeeService {
         isDuplicateInvoiceNumberError,
       );
 
-      this.rmqService.produceMessage(
+      await this.rmqService.produceMessage(
         JSON.stringify({
           locale,
           name: user.name,
           email: user.email,
-          conferenceName:
-            conference.translations[this.localeKey(locale)].name,
+          conferenceName: conference.translations[this.localeKey(locale)].name,
           conferenceLogo:
             conference.translations[this.localeKey(locale)].logoUrl,
           invoice: this.invoiceService.toInvoice(result.invoice),
@@ -220,10 +217,7 @@ export class ConferenceAttendeeService {
     }
   }
 
-  async updateInvoice(
-    attendeeId: ObjectId,
-    data: InvoiceInput,
-  ) {
+  async updateInvoice(attendeeId: ObjectId, data: InvoiceInput) {
     const attendee = await this.getAttendee(attendeeId);
     const result = await this.invoiceService.updateInvoice(
       InvoiceOwnerType.CONFERENCE_ATTENDEE,
@@ -299,7 +293,9 @@ export class ConferenceAttendeeService {
 
   private throwAlreadyRegistered(
     name: string,
-    conference: { translations: { sk: { name: string }; en: { name: string } } },
+    conference: {
+      translations: { sk: { name: string }; en: { name: string } };
+    },
     locale: string,
   ): never {
     throw new Error(

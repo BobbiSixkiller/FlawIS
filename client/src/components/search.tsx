@@ -2,7 +2,8 @@
 import { type ComponentType, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import useMounted from "@/hooks/use-mounted";
+import { useTranslation } from "@/hooks/use-translation";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import {
   Combobox,
@@ -30,6 +31,7 @@ export default function SearchComponent<
 }: SearchComponentProps<TOption, TParams>) {
   const { lng } = useParams<{ lng: string }>();
   const { t } = useTranslation(lng, "common");
+  const mounted = useMounted();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [query] = useDebounce(text, 350);
@@ -74,6 +76,7 @@ export default function SearchComponent<
       }}
     >
       <DialogTrigger
+        disabled={!mounted}
         render={
           <Button
             size="icon"
@@ -90,9 +93,21 @@ export default function SearchComponent<
           items={options}
           filter={null}
           open
+          onOpenChange={(value, details) => {
+            if (!value && details.reason === "escape-key") {
+              setOpen(false);
+              setText("");
+            }
+          }}
           value={null}
           inputValue={text}
-          onInputValueChange={setText}
+          onInputValueChange={(value, details) => {
+            if (
+              details.reason === "input-change" ||
+              details.reason === "input-clear"
+            )
+              setText(value);
+          }}
           onValueChange={(option) => {
             if (option) {
               onOptionSelect(option);

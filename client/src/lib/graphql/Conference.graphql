@@ -88,6 +88,7 @@ fragment ConferenceListItem on Conference {
 
 fragment Conference on Conference {
   ...ConferenceListItem
+  manuscriptTemplateFile
   createdAt
   updatedAt
 }
@@ -109,6 +110,7 @@ query conferences($after: String, $first: Int, $sort: [ConferenceSortInput]!) {
       cursor
       node {
         ...ConferenceListItem
+        manuscriptTemplateFile
       }
     }
     pageInfo {
@@ -284,4 +286,12 @@ mutation addAttendee($data: AttendeeInput!) {
       slug
     }
   }
+}
+
+mutation setConferenceTemplate(
+  $conference: ObjectId!
+  $kind: ConferenceTemplateKind!
+  $file: ObjectId
+) {
+  setConferenceTemplate(conference: $conference, kind: $kind, file: $file)
 }

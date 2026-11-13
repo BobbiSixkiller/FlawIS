@@ -7,7 +7,9 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       MONGODB_URI: "mongodb://mongo:27017/flawis?replicaSet=rs0"
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      CONFERENCES_PUBLIC_HOST: ${STAGING_CONFERENCES_PUBLIC_HOST:-conferences-staging.flaw.uniba.sk}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE:-FlawIS.notifications.v2}
+      NOTIFICATION_SECRET: ${NOTIFICATION_SECRET:-${SECRET}}
       RMQ_URI: ${RMQ_URI}
       REDIS_URI: ${REDIS_URI}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
@@ -43,6 +45,7 @@ services:
     environment:
       SECRET: ${SECRET}
       INVOICE_RENDER_SECRET: ${INVOICE_RENDER_SECRET:-}
+      NOTIFICATION_SECRET: ${NOTIFICATION_SECRET:-${SECRET}}
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:?NEXT_SERVER_ACTIONS_ENCRYPTION_KEY is required}
       API_URI: http://core:5000/graphql
       REACH_WEBHOOK_UPSTREAM_URL: http://core:5000/integrations/reach/webhooks
@@ -68,14 +71,16 @@ services:
       NODE_ENV: staging
       SECRET: ${SECRET}
       INVOICE_RENDER_SECRET: ${INVOICE_RENDER_SECRET:-}
+      NOTIFICATION_SECRET: ${NOTIFICATION_SECRET:-${SECRET}}
       CLIENT_INTERNAL_URL: http://client:3000
+      CORE_INTERNAL_URL: http://core:5000
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_FROM: ${MAIL_FROM}
       MAIL_USER: ${MAIL_USER}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       RMQ_URI: ${RMQ_URI}
-      RMQ_EXCHANGE: ${RMQ_EXCHANGE}
+      RMQ_EXCHANGE: ${RMQ_EXCHANGE:-FlawIS.notifications.v2}
     depends_on:
       client:
         condition: service_started
@@ -108,13 +113,16 @@ services:
 
   rabbitmq:
     image: rabbitmq:4.1.2
+    # Stable between ordinary restarts/recreations; CI explicitly resets its volume.
+    hostname: flawis-rabbitmq-staging
     restart: unless-stopped
     ports:
       - "5673:5672"
     volumes:
       - rabbitmq_data_staging:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      # A root probe can create the Erlang cookie before first boot, blocking the broker user.
+      test: ["CMD", "gosu", "rabbitmq", "rabbitmq-diagnostics", "-q", "check_running"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -162,6 +170,7 @@ volumes:
   mongo_config_staging: {}
   minio_storage_staging: {}
   rabbitmq_data_staging: {}
+  # Both runtime volumes are intentionally removed by the staging deploy workflow.
   redis_data_staging:
     name: flawis_staging_redis_data
 

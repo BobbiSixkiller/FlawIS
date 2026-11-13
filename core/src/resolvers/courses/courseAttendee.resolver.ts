@@ -25,6 +25,8 @@ import { Context } from "../../util/auth";
 import { Access } from "../../entitites/User";
 import { UserService } from "../../services/user.service";
 import { Invoice } from "../../entitites/Invoice";
+import { FormService } from "../../services/form.service";
+import { Form, FormSubmission } from "../../entitites/Form";
 import { InvoiceService } from "../../services/invoice.service";
 
 @Service()
@@ -34,7 +36,22 @@ export class CourseAttendeeResolver {
     private readonly courseAttendeeService: CourseAttendeeService,
     private readonly userService: UserService,
     private readonly invoiceService: InvoiceService,
+    private readonly formService?: FormService,
   ) {}
+
+  @FieldResolver(() => FormSubmission)
+  async application(@Root() attendee: CourseAttendee) {
+    const answer = await this.formService!.answer("COURSE", attendee.id);
+    if (!answer) throw new Error("Course application answers not found.");
+    return answer;
+  }
+
+  @FieldResolver(() => Form)
+  async applicationForm(@Root() attendee: CourseAttendee) {
+    const answer = await this.formService!.answer("COURSE", attendee.id);
+    if (!answer) throw new Error("Course application answers not found.");
+    return this.formService!.getForm(answer.form);
+  }
 
   @Authorized([Access.Admin])
   @Query(() => CourseAttendee)

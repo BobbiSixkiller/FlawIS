@@ -168,6 +168,13 @@ test("dynamic fields keep text normalization, file limits, and permissive attend
     field_text: "",
     field_file: [],
   });
+  const optional = createRegistrationSchema(
+    [{ ...fields[1], required: false, minFiles: 2, maxFiles: 3 }],
+    t,
+  );
+  assert.equal(optional.safeParse({ field_file: [] }).success, true);
+  assert.equal(optional.safeParse({ field_file: [file] }).success, false);
+  assert.equal(optional.safeParse({ field_file: [file, file] }).success, true);
 });
 
 test("cross-field date errors run despite unfinished fields in future wizard steps", () => {

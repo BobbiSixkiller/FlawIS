@@ -1,0 +1,61 @@
+"use client";
+
+import i18next from "i18next";
+import { useEffect } from "react";
+import {
+  initReactI18next,
+  useTranslation as useTranslationOrg,
+} from "react-i18next";
+import resourcesToBackend from "i18next-resources-to-backend";
+// import LocizeBackend from 'i18next-locize-backend'
+import LanguageDetector from "i18next-browser-languagedetector";
+import { cookieName, getOptions, languages } from "../lib/i18n/settings";
+
+const runsOnServerSide = typeof window === "undefined";
+
+// on client side the normal singleton is ok
+i18next
+  .use(initReactI18next)
+  .use(LanguageDetector)
+  .use(
+    resourcesToBackend(
+      (language: string, namespace: string) =>
+        import(`../lib/i18n/locales/${language}/${namespace}.json`),
+    ),
+  )
+  // .use(LocizeBackend) // locize backend could be used on client side, but prefer to keep it in sync with server side
+  .init({
+    ...getOptions(),
+    lng: undefined, // let detect the language on client side
+    detection: {
+      order: ["path", "htmlTag", "cookie", "navigator"],
+      lookupCookie: cookieName,
+      caches: [],
+    },
+    preload: runsOnServerSide ? languages : [],
+  });
+
+export function useTranslation(
+  lng: string,
+  ns: string | string[],
+  options?: any,
+) {
+  const ret = useTranslationOrg(ns, options);
+  const { i18n } = ret;
+
+  useEffect(() => {
+    if (runsOnServerSide || !lng) return;
+
+    document.documentElement.lang = lng;
+    document.documentElement.dir = i18n.dir(lng);
+
+    if (i18n.resolvedLanguage === lng) return;
+    void i18n.changeLanguage(lng);
+  }, [lng, i18n]);
+
+  if (runsOnServerSide && lng && i18n.resolvedLanguage !== lng) {
+    void i18n.changeLanguage(lng);
+  }
+
+  return ret;
+}

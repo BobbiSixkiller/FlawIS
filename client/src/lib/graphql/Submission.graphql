@@ -19,6 +19,7 @@ fragment Submission on Submission {
     email
   }
   fileUrl
+  withdrawn
   conference {
     id
     slug

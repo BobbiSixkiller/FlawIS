@@ -1,15 +1,15 @@
 "use client";
 import { z } from "zod";
 
-import { FormField } from "@/components/form";
+import { FormField } from "@/components/form/form";
 
 import { Button } from "@/components/ui/button";
-import Editor from "@/components/editor/editor";
-import useDefaultContent from "@/components/editor/use-default-content";
-import { FormContainer } from "@/components/form";
+import Editor from "@/components/form/editor/editor";
+import useDefaultContent from "@/hooks/use-default-content";
+import { FormContainer } from "@/components/form/form";
 import Spinner from "@/components/spinner";
-import useValidation from "@/hooks/useValidation";
-import { useTranslation } from "@/lib/i18n/client";
+import useValidation from "@/hooks/use-validation";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";

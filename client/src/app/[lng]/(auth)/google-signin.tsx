@@ -2,7 +2,7 @@
 
 import Icon from "@/components/icon";
 import { useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import { googleOAuthHref } from "@/lib/authRedirect";
 
 export default function GoogleSignIn() {

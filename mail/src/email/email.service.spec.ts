@@ -232,7 +232,7 @@ describe('mail delivery error handling', () => {
     jest.restoreAllMocks();
   });
 
-  it('acknowledges a permanent SMTP rejection after logging it once', async () => {
+  it('surfaces a permanent SMTP rejection to the notification transport', async () => {
     const { message, sendMail, service } = fixture();
     const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
     const errorLog = jest
@@ -248,7 +248,7 @@ describe('mail delivery error handling', () => {
 
     await expect(
       service.sendResetLink({ ...message, token: 'reset-token' }),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow('Recipient address rejected');
 
     expect(sendMail).toHaveBeenCalledTimes(1);
     expect(log).not.toHaveBeenCalled();
@@ -290,6 +290,124 @@ describe('mail delivery error handling', () => {
         recipient: message.email,
         attempt: 1,
       }),
+    );
+  });
+});
+
+describe('durable notification outcomes', () => {
+  const originalFetch = global.fetch;
+  const originalSecret = process.env.NOTIFICATION_SECRET;
+  beforeEach(() => {
+    process.env.NOTIFICATION_SECRET = 'isolated-test-secret';
+  });
+  afterEach(() => {
+    global.fetch = originalFetch;
+    if (originalSecret === undefined) delete process.env.NOTIFICATION_SECRET;
+    else process.env.NOTIFICATION_SECRET = originalSecret;
+    jest.restoreAllMocks();
+  });
+  function transport() {
+    const sendMail = jest
+      .fn()
+      .mockResolvedValue({ accepted: ['reviewer@example.test'] });
+    const publish = jest.fn().mockResolvedValue(undefined);
+    const service = new EmailService(
+      { sendMail } as any,
+      {} as any,
+      { publish } as any,
+    );
+    const message = {
+      locale: 'sk' as const,
+      hostname: 'conferences.example.test',
+      name: 'Reviewer',
+      email: 'reviewer@example.test',
+      subject: 'Review',
+      text: 'Please review.',
+      _notificationId: '000000000000000000000001',
+      _notificationAttempt: 1,
+    };
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ claimed: true }), { status: 200 }),
+      ) as any;
+    return { service, sendMail, publish, message };
+  }
+  it('claims a job and publishes a persistent successful outcome after SMTP accepts it', async () => {
+    const { service, sendMail, publish, message } = transport();
+    await service.sendReview(message);
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(publish).toHaveBeenCalledWith(
+      expect.any(String),
+      'notification.result',
+      expect.objectContaining({
+        success: true,
+        id: message._notificationId,
+        attempt: 1,
+      }),
+      expect.objectContaining({ persistent: true }),
+    );
+  });
+  it('does not send cancelled, duplicate or expired jobs', async () => {
+    const { service, sendMail, publish, message } = transport();
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ claimed: false }), { status: 200 }),
+      ) as any;
+    await service.sendReview(message);
+    expect(sendMail).not.toHaveBeenCalled();
+    expect(publish).not.toHaveBeenCalled();
+  });
+  it('requeues when the claim service is unavailable without attempting SMTP', async () => {
+    const { service, sendMail, message } = transport();
+    global.fetch = jest
+      .fn()
+      .mockResolvedValue(new Response('', { status: 503 })) as any;
+    await expect(service.sendReview(message)).rejects.toThrow(
+      'claim notification',
+    );
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+  it('records permanent SMTP failure instead of acknowledging success', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { service, sendMail, publish, message } = transport();
+    sendMail.mockRejectedValue(
+      Object.assign(new Error('Mailbox rejected'), { responseCode: 550 }),
+    );
+    await service.sendReview(message);
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(publish).toHaveBeenCalledWith(
+      expect.any(String),
+      'notification.result',
+      expect.objectContaining({
+        success: false,
+        retryable: false,
+        uncertain: false,
+      }),
+      expect.any(Object),
+    );
+  });
+  it('marks a lost SMTP DATA acknowledgement uncertain and avoids automatic duplicate mail', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { service, sendMail, publish, message } = transport();
+    sendMail.mockRejectedValue(
+      Object.assign(new Error('Connection lost'), {
+        command: 'DATA',
+        code: 'ECONNRESET',
+      }),
+    );
+    await service.sendReview(message);
+    expect(sendMail).toHaveBeenCalledTimes(1);
+    expect(publish).toHaveBeenCalledWith(
+      expect.any(String),
+      'notification.result',
+      expect.objectContaining({
+        success: false,
+        retryable: false,
+        uncertain: true,
+      }),
+      expect.any(Object),
     );
   });
 });

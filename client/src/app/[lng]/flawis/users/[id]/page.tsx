@@ -1,6 +1,6 @@
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import Heading from "@/components/heading";
-import Toggle from "@/components/toggle";
+import Toggle from "@/components/form/toggle";
 import { redirect } from "next/navigation";
 import Icon from "@/components/icon";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import ModalTrigger from "@/components/modal-trigger";
 import Modal from "@/components/modal";
 import UserForm from "@/app/[lng]/(auth)/register/user-form";
 import ImpersonateForm from "./impersonate-form";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 
 export default async function User({
   params,

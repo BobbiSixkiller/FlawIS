@@ -1,3 +1,4 @@
+import { getReviewContext } from "@/lib/reviews/actions";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import { getConference } from "../actions";
 import Heading from "@/components/heading";
@@ -8,7 +9,7 @@ import ModalTrigger from "@/components/modal-trigger";
 import Modal from "@/components/modal";
 import UpdateDatesForm from "./update-dates-form";
 import { redirect } from "next/navigation";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { deleteConference } from "./actions";
 
 export default async function ConferencePage({
@@ -17,6 +18,8 @@ export default async function ConferencePage({
   params: Promise<{ slug: string; lng: string }>;
 }) {
   const { lng, slug } = await params;
+  if (!(await getReviewContext()).isAdmin)
+    redirect(`/conferences/${slug}/reviews`);
   const conference = await getConference(slug);
   if (!conference) {
     redirect("/conferences");

@@ -20,7 +20,7 @@ export class ConferenceTranslations {
 
 @ObjectType()
 export class ConferenceTranslation extends LocalesType(
-  ConferenceTranslations
+  ConferenceTranslations,
 ) {}
 
 @ObjectType()
@@ -109,6 +109,11 @@ export class Conference extends TimeStamps {
   @Field(() => [Ticket])
   @Property({ type: () => Ticket, default: [] })
   tickets: Ticket[];
+
+  /** The currently published author download; historical uploads stay in protected storage. */
+  @Field(() => ObjectId, { nullable: true })
+  @Property({ type: () => ObjectId })
+  manuscriptTemplateFile?: ObjectId;
 
   @Field(() => Int)
   attendeesCount: number;

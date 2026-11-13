@@ -1,73 +1,43 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# FlawIS mail worker
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Headless NestJS application that consumes RabbitMQ notification jobs and sends email through Nodemailer and the Nest mailer adapter. It uses Handlebars templates and Slovak/English translations. It starts with `NestFactory.createApplicationContext`; there is no HTTP server or health URL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Development and checks
 
-## Description
+Use the [root setup](../README.md), the Node version in [../.nvmrc](../.nvmrc), and `npm ci` in this directory for host-side tooling. Local Compose starts the worker with the application services and routes SMTP to Mailpit at `mailpit:1025`. Read captured messages at <http://localhost:8025>.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Command from `mail/` | Purpose |
+| --- | --- |
+| `npm run start:dev` | Watch-mode worker; requires broker, core, and mail configuration |
+| `npm run build` | Clean and compile the Nest application |
+| `npm run start:prod` | Run the compiled worker |
+| `npm run lint` / `npm run typecheck` | Static checks |
+| `npm test -- --runInBand` | Unit tests |
+| `npm run test:e2e -- --runInBand` | Nest module integration test with mocked RabbitMQ, SMTP, and core responses |
 
-## Installation
+The `test:e2e` name does not imply live delivery testing. From the repository root, `node scripts/verify.mjs mail` runs lint, typecheck, both test commands, and clears inherited integration flags. Add `--build` for the production Docker image/runtime check. See [verification](../docs/development.md#routine-verification).
 
-```bash
-$ npm install
-```
+## Configuration
 
-## Running the app
+Compose injects the root `.env`; a host-started worker needs its environment configured separately. Start from [../.env.example](../.env.example).
 
-```bash
-# development
-$ npm run start
+| Variable | Purpose |
+| --- | --- |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` | Required SMTP host, port, and sender |
+| `MAIL_USER`, `MAIL_PASSWORD` | SMTP authentication when both values are set; local Mailpit uses neither |
+| `RMQ_URI` | Required RabbitMQ connection URI |
+| `RMQ_EXCHANGE` | Shared durable topic exchange; default `FlawIS.notifications.v2` |
+| `NOTIFICATION_SECRET` | Authentication for internal delivery operations; falls back to `SECRET` |
+| `CORE_INTERNAL_URL` | Core base URL; default `http://core:5000` |
+| `CLIENT_INTERNAL_URL` | Invoice PDF rendering service; default `http://client:3000` |
+| `INVOICE_RENDER_SECRET` | Shared mail/client PDF-render authentication secret; falls back to `SECRET` |
 
-# watch mode
-$ npm run start:dev
+The application secret settings must agree across the services that use them. Keep the notification secret stable so core can read previously encrypted outbox payloads. The dead-letter exchange derives from `${RMQ_EXCHANGE}.dead`; it has no separate environment variable.
 
-# production mode
-$ npm run start:prod
-```
+## Delivery behaviour
 
-## Test
+Core persists encrypted notification requests and publishes persistent jobs with publisher confirmations. The worker claims each job through core before contacting SMTP, then publishes a persistent delivery result. Templates live in `src/email/templates/`, translations in `src/email/locales/`, handlers in `src/email/email.service.ts`, and broker setup in `src/rmq/`.
 
-```bash
-# unit tests
-$ npm run test
+“Queued” is distinct from “sent”. Transient failures have bounded retries; ambiguous delivery is marked `UNKNOWN` and needs investigation before explicit resend. SMTP acceptance is not proof of mailbox receipt. See [the notification contract and coordinated rollout](../docs/conference-reviews.md#mail-transport-and-deployment).
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+Staging deployment deliberately resets its broker/Redis state and cancels copied unfinished jobs before startup. Ordinary restarts preserve durable messages. Use controlled recipients or a confirmed mail sink for staging delivery checks; the snapshot may contain real addresses. [Transport fixtures](../docs/development.md#staging-integration-tests) use the separate test vhost and simulate delivery results without sending email.

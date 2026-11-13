@@ -16,12 +16,17 @@ export async function register({
   const res = await executeGqlMutation(
     RegisterDocument,
     { data },
-    (data) => ({ message: data.register.message, data: data.register.data }),
+    (data) => ({
+      message: data.register.message,
+      data: data.register.data
+        ? { ...data.register.data, token: data.register.token }
+        : null,
+    }),
     {},
     { token },
   );
 
-  if (res.data) {
+  if (res.data?.token) {
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const cookieStore = await cookies();
 
@@ -45,7 +50,9 @@ export async function addUser(data: RegisterUserInput) {
     { data },
     (data) => ({
       message: data.register.message,
-      data: data.register.data,
+      data: data.register.data
+        ? { ...data.register.data, token: data.register.token }
+        : null,
     }),
     { revalidateTags: () => ["users"] },
   );

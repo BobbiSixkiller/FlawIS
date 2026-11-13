@@ -47,7 +47,7 @@ function sanitizeObjectPath(path: string): string {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "") // remove accents
         .replace(/\s+/g, "_")
-        .replace(/[^\w\-_.@]+/g, "") // keep safe filename chars
+        .replace(/[^\w\-_.@]+/g, ""), // keep safe filename chars
   );
 
   parts[parts.length - 1] = uuid() + "-" + parts[parts.length - 1];
@@ -65,11 +65,15 @@ async function ensureBucketExists(bucketName: string): Promise<void> {
 export async function uploadFile(
   bucketName: string,
   path: string,
-  file: File
+  file: File,
 ): Promise<string> {
+  const { authorizeUpload } = await import("@/lib/storageAuthorization");
+  await authorizeUpload();
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   const sanitizedBucketName = sanitizeBucketName(bucketName);
+  if (sanitizedBucketName === "conference-reviews")
+    throw new Error("Use the protected conference file endpoint.");
 
   // Ensure the bucket exists
   await ensureBucketExists(sanitizedBucketName);
@@ -77,17 +81,27 @@ export async function uploadFile(
   const objectName = sanitizeObjectPath(path);
 
   await minioClient.putObject(sanitizedBucketName, objectName, buffer);
-  return `http://minio:9000/${sanitizedBucketName}/${objectName}`;
+  const url = `http://minio:9000/${sanitizedBucketName}/${objectName}`;
+  const { registerStorage } = await import("@/lib/storageAuthorization");
+  await registerStorage(url);
+  return url;
 }
 
 export async function downloadFile(
   bucketName: string,
-  objectName: string
+  objectName: string,
 ): Promise<Readable> {
+  const { authorizeStorage } = await import("@/lib/storageAuthorization");
+  await authorizeStorage(
+    [`http://minio:9000/${bucketName}/${objectName.replace(/^\//, "")}`],
+    "READ",
+  );
   return minioClient.getObject(bucketName, objectName);
 }
 
 export async function deleteFiles(urls: string[]) {
+  const { authorizeStorage } = await import("@/lib/storageAuthorization");
+  await authorizeStorage(urls, "DELETE");
   const minioObjects = urls.map((url) => {
     const paths = url.replace("http://minio:9000/", "").split("/");
     const bucketName = paths.shift() || "";
@@ -101,7 +115,7 @@ export async function deleteFiles(urls: string[]) {
       await minioClient.removeObject(bucketName, objectName);
 
       console.log(
-        `File '${objectName}' deleted from '${bucketName}' successfully.`
+        `File '${objectName}' deleted from '${bucketName}' successfully.`,
       );
     }
   } catch (error) {

@@ -14,7 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
-import { overlayPosition, type OverlayAnchor } from "./overlay-position";
+import { overlayPosition, type OverlayAnchor } from "../lib/overlay-position";
 export type DropdownItem = ReactElement;
 interface DropdownProps {
   trigger: ReactNode;

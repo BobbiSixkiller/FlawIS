@@ -106,7 +106,10 @@ function fixture(price: number) {
         producedMessages.push(JSON.parse(message));
       },
     } as any,
-    { getForm: async () => ({ course: courseId }) } as any,
+    {
+      getLatestCourseForm: async () => ({ id: formId, version: 1 }),
+      saveAnswers: async () => ({ id: new ObjectId() }),
+    } as any,
     {} as any,
     invoiceService,
   );
@@ -189,10 +192,7 @@ test("a paid course creates and publishes a complete invoice snapshot", async ()
         }),
       ),
     );
-    assert.equal(
-      fixtureData.createdData()?.invoiceId,
-      invoice._id,
-    );
+    assert.equal(fixtureData.createdData()?.invoiceId, invoice._id);
   });
 });
 

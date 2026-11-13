@@ -1,6 +1,5 @@
 import { deleteFiles } from "@/lib/minio";
 import { minioDownloadHref } from "@/lib/minioUrl";
-export { cn } from "./utils";
 
 
 export function capitalizeFirstLetter(string: string) {

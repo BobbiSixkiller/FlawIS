@@ -20,7 +20,7 @@ export class MinioService {
   private async ensureBucketExists(bucketName: string): Promise<void> {
     try {
       const bucketExists = await this.client.bucketExists(
-        bucketName.toLowerCase()
+        bucketName.toLowerCase(),
       );
       if (bucketExists) {
         return;
@@ -32,9 +32,36 @@ export class MinioService {
     }
   }
 
+  async upload(
+    bucketName: string,
+    objectName: string,
+    buffer: Buffer,
+    contentType: string,
+  ) {
+    await this.ensureBucketExists(bucketName);
+    await this.client.putObject(bucketName, objectName, buffer, buffer.length, {
+      "Content-Type": contentType,
+    });
+  }
+
+  async buffer(bucketName: string, objectName: string) {
+    const stream = await this.downloadFile(bucketName, objectName);
+    const chunks: Buffer[] = [];
+    let size = 0;
+    for await (const chunk of stream) {
+      size += chunk.length;
+      if (size > 25 * 1024 * 1024) {
+        stream.destroy();
+        throw new Error("File exceeds the supported size.");
+      }
+      chunks.push(Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+
   public async downloadFile(
     bucketName: string,
-    objectName: string
+    objectName: string,
   ): Promise<Readable> {
     try {
       return await this.client.getObject(bucketName, objectName);

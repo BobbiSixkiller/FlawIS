@@ -11,7 +11,7 @@ import SessionPolling from "@/components/session-polling";
 import ThemeToggler from "@/components/theme-toggler";
 import { UserFragment } from "@/lib/graphql/generated/graphql";
 import { translate } from "@/lib/i18n";
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 
 export default async function ParticipantTenantShell({
   children,
@@ -56,7 +56,7 @@ export default async function ParticipantTenantShell({
         }
       />
 
-      <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0">
+      <main className="flex w-full flex-1 flex-col gap-6 p-6 py-12 sm:max-w-md sm:px-0 sm:has-[[data-page-width=wide]]:max-w-3xl sm:has-[[data-page-width=wide]]:px-6">
         {children}
       </main>
 

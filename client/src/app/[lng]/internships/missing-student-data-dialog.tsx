@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { Access, UserFragment } from "@/lib/graphql/generated/graphql";
 import Modal from "@/components/modal";
 import UserForm from "../(auth)/register/user-form";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 
 export default function MissingStudentDataDialog({

@@ -1,6 +1,6 @@
 "use client";
 
-import useUser from "@/hooks/useUser";
+import useUser from "@/hooks/use-user";
 import { Access } from "@/lib/graphql/generated/graphql";
 import { useEffect, useState, useTransition } from "react";
 import { setAttendedHours } from "./actions";

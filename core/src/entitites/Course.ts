@@ -2,13 +2,7 @@ import { Index, Ref } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { prop as Property } from "@typegoose/typegoose";
 import { ObjectId } from "mongodb";
-import {
-  Field,
-  Float,
-  Int,
-  ObjectType,
-  registerEnumType,
-} from "type-graphql";
+import { Field, Float, Int, ObjectType, registerEnumType } from "type-graphql";
 import { Billing } from "./Billing";
 import { Invoice, LegacyInvoiceSnapshot } from "./Invoice";
 import { UserStub } from "./User";
@@ -235,8 +229,10 @@ export class CourseAttendee extends TimeStamps {
   status: Status;
 
   @Field(() => FormSubmission)
-  @Property({ type: () => FormSubmission, _id: false })
   application: FormSubmission;
+
+  @Property()
+  applicationId: ObjectId;
 
   @Field(() => Invoice, { nullable: true })
   @Property({ type: () => LegacyInvoiceSnapshot, _id: false })

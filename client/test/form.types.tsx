@@ -3,7 +3,7 @@ import {
   FormContainer,
   FormField,
   type FormFieldRenderArgs,
-} from "../src/components/form";
+} from "../src/components/form/form";
 import { Input } from "@/components/ui/input";
 
 const schema = z.object({

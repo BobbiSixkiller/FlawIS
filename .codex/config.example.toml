@@ -1,0 +1,9 @@
+# Merge these registrations into .codex/config.toml when the client needs them.
+# Keep machine-specific skill exclusions in that ignored local file.
+[agents.explorer]
+description = "Bounded read-only FlawIS file, symbol, and call-site lookup."
+config_file = "agents/explorer.toml"
+
+[agents.doc_drift]
+description = "Read-only factual check of specified FlawIS documentation claims."
+config_file = "agents/doc_drift.toml"

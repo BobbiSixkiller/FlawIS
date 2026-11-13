@@ -9,7 +9,7 @@ import ModalTrigger from "@/components/modal-trigger";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import Modal from "@/components/modal";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import Link from "next/link";
 
 import CourseApplication from "../../flawis/courses/[id]/course-application";

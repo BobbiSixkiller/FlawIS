@@ -1,5 +1,5 @@
 # Development Stage
-FROM node:24-alpine AS development
+FROM node:26.13.0-alpine AS development
 
 # Set working directory
 WORKDIR /usr/app
@@ -16,7 +16,7 @@ ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 RUN npm run lint && npm run typecheck && npm run build
 
 # Production Stage
-FROM node:24-alpine AS production
+FROM node:26.13.0-alpine AS production
 
 # Set working directory
 WORKDIR /usr/app

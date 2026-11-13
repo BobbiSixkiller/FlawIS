@@ -133,7 +133,7 @@ export class UserService {
 
     const user = await this.userRepository.create({
       ...data,
-      access: data.access ? data.access : access,
+      access: isAdmin && data.access ? data.access : access,
       verified: isAdmin,
       organization: isUniba
         ? "Univerzita Komenského v Bratislave, Právnická fakulta"
@@ -157,13 +157,16 @@ export class UserService {
     });
 
     if (!isAdmin) {
-      this.rmqService.produceMessage(
+      await this.rmqService.produceMessage(
         JSON.stringify({
           locale: this.i18nService.language(),
           name: user.name,
           email: user.email,
           hostname,
-          token: signJwt({ id: user.id }, { expiresIn: 3600 }),
+          token: signJwt(
+            { id: user.id, purpose: "activation" },
+            { expiresIn: 3600 },
+          ),
         }),
         "mail.registration",
       );
@@ -185,7 +188,10 @@ export class UserService {
 
   async googleSignIn(authCode: string, redirectUri: string) {
     try {
-      const { tokens } = await this.googleOAuthClient.getToken({ code: authCode, redirect_uri: redirectUri });
+      const { tokens } = await this.googleOAuthClient.getToken({
+        code: authCode,
+        redirect_uri: redirectUri,
+      });
       this.googleOAuthClient.setCredentials(tokens);
 
       const ticket = await this.googleOAuthClient.verifyIdToken({
@@ -221,9 +227,12 @@ export class UserService {
     const user = await this.userRepository.findOne({ email });
     if (!user) throw new Error(this.i18nService.translate("notRegistered"));
 
-    const token = signJwt({ id: user.id }, { expiresIn: "1h" });
+    const token = signJwt(
+      { id: user.id, purpose: "password-reset" },
+      { expiresIn: "1h" },
+    );
 
-    this.rmqService.produceMessage(
+    await this.rmqService.produceMessage(
       JSON.stringify({
         locale: this.i18nService.language(),
         email: user.email,
@@ -237,10 +246,13 @@ export class UserService {
     return this.i18nService.translate("resetLinkSent");
   }
 
-  resendActivationLink(user: CtxUser, hostname: string) {
-    const token = signJwt({ id: user.id }, { expiresIn: "1h" });
+  async resendActivationLink(user: CtxUser, hostname: string) {
+    const token = signJwt(
+      { id: user.id, purpose: "activation" },
+      { expiresIn: "1h" },
+    );
 
-    this.rmqService.produceMessage(
+    await this.rmqService.produceMessage(
       JSON.stringify({
         locale: this.i18nService.language(),
         name: user?.name,
@@ -255,8 +267,8 @@ export class UserService {
   }
 
   async activateUser(token: string) {
-    const user: CtxUser | null = verifyJwt(token);
-    if (!user) {
+    const user = verifyJwt<CtxUser & { purpose?: string }>(token);
+    if (!user || user.purpose !== "activation") {
       throw new Error(this.i18nService.translate("invalidActivationToken"));
     }
 
@@ -273,7 +285,8 @@ export class UserService {
 
   async resetPassword(token: string, password: string) {
     const payload: ResetToken = verifyJwt(token as string);
-    if (!payload) throw new Error(this.i18nService.translate("invalidToken"));
+    if (!payload || payload.purpose !== "password-reset")
+      throw new Error(this.i18nService.translate("invalidToken"));
 
     const user = await this.userRepository.findOne({ _id: payload.id });
     if (!user) throw new Error(this.i18nService.translate("notFound"));
@@ -331,7 +344,9 @@ export class UserService {
       }
 
       // 3) assign only allowed props
-      Object.assign(doc, data);
+      const safeData = { ...data };
+      if (!isAdmin) delete safeData.access;
+      Object.assign(doc, safeData);
 
       // 4) save (runs your @pre("save") hooks)
       const saved = await doc.save({ session });

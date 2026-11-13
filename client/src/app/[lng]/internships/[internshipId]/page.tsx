@@ -11,7 +11,7 @@ import Modal from "@/components/modal";
 import InternshipForm from "../internship-form";
 import { translate } from "@/lib/i18n";
 import ApplicationForm from "./application-form";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { getOptionalViewer } from "@/lib/optionalViewer";
 import { getInternshipAccess, isObjectId } from "@/lib/internshipAccess";
 import { loginHref, logoutHref } from "@/lib/authRedirect";

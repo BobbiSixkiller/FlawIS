@@ -15,7 +15,7 @@ import * as Joi from 'joi';
         MAIL_PORT: Joi.string().required(),
         MAIL_FROM: Joi.string().required(),
         RMQ_URI: Joi.string().required(),
-        RMQ_EXCHANGE: Joi.string().required(),
+        RMQ_EXCHANGE: Joi.string().default('FlawIS.notifications.v2'),
       }),
     }),
     RmqModule,

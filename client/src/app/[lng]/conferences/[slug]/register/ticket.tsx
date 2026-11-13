@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utilsClient";
+import { cn } from "@/lib/utils";
 import { SubmissionFragment } from "@/lib/graphql/generated/graphql";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { AriaAttributes, Ref } from "react";

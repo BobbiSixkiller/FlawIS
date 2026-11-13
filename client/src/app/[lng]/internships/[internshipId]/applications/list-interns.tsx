@@ -9,7 +9,7 @@ import {
 } from "@/lib/graphql/generated/graphql";
 import DynamicImageClient from "@/components/dynamic-image-client";
 import { displayDate } from "@/lib/utilsClient";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";

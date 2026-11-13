@@ -1,18 +1,18 @@
 "use client";
 import { z } from "zod";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 import { compareFields } from "@/lib/validation/form-validation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import TiptapEditor from "@/components/editor/editor";
-import { FormContainer } from "@/components/form";
-import useValidation from "@/hooks/useValidation";
+import TiptapEditor from "@/components/form/editor/editor";
+import { FormContainer } from "@/components/form/form";
+import useValidation from "@/hooks/use-validation";
 import { handleAPIErrors } from "@/lib/utilsClient";
 import { CourseSessionFragment } from "@/lib/graphql/generated/graphql";
 import { useDialogStore } from "@/stores/dialogStore";

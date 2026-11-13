@@ -9,6 +9,7 @@ import {
   getSupportedLocale,
   localeHeaderName,
 } from "@/lib/i18n/settings";
+import { Toaster } from "@/components/ui/toast";
 import ThemeProvider from "@/components/theme-provider";
 import {
   getThemePreference,
@@ -82,7 +83,14 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${UKsans.variable} font-sans`}>
-        <ThemeProvider initialPreference={theme}>{children}</ThemeProvider>
+        <ThemeProvider initialPreference={theme}>
+          {children}
+          <Toaster
+            closeLabel={
+              lng === "en" ? "Dismiss notification" : "Zavrieť oznámenie"
+            }
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

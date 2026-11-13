@@ -12,11 +12,11 @@ import {
   useState,
 } from "react";
 
-import { cn } from "@/lib/utilsClient";
-import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/use-translation";
 import { ThemePreference } from "@/lib/theme";
 
-import { useThemePreference } from "./theme-provider";
+import { useThemePreference } from "@/hooks/use-theme-preference";
 
 const options = [
   { value: "light", icon: "sun" },

@@ -6,7 +6,7 @@ import ModalTrigger from "@/components/modal-trigger";
 import Modal from "@/components/modal";
 import { redirect } from "next/navigation";
 import TicketForm from "./ticket-form";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import { deleteTicket } from "./actions";
 
 export default async function TicketsPage({

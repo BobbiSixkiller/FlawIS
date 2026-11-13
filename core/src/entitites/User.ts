@@ -3,7 +3,6 @@ import { ObjectId } from "mongodb";
 import { Index, pre, prop as Property } from "@typegoose/typegoose";
 import { TimeStamps } from "@typegoose/typegoose/lib/defaultClasses";
 import { hash } from "bcrypt";
-import { signJwt } from "../util/auth";
 import { Address, Billing } from "./Billing";
 
 export enum Access {
@@ -100,22 +99,6 @@ export class User extends TimeStamps {
   createdAt: Date;
   @Field()
   updatedAt: Date;
-
-  @Field()
-  token(): string {
-    return (
-      "Bearer " +
-      signJwt(
-        {
-          id: this.id,
-          email: this.email,
-          name: this.name,
-          access: this.access,
-        },
-        { expiresIn: "24h" }
-      )
-    );
-  }
 }
 
 @ObjectType()

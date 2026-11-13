@@ -2,22 +2,21 @@
 import { createRegistrationSchema } from "@/lib/validation/registration-form-schema";
 import { z } from "zod";
 
-import { FormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 
 import BillingInput from "@/app/[lng]/conferences/[slug]/register/billing-input";
 import { Input } from "@/components/ui/input";
-import WizzardForm, { WizzardStep } from "@/components/wizzard-form";
-import useUser from "@/hooks/useUser";
-import useValidation from "@/hooks/useValidation";
+import WizzardForm, { WizzardStep } from "@/components/form/wizzard-form";
+import useUser from "@/hooks/use-user";
+import useValidation from "@/hooks/use-validation";
 import { uploadToMinio } from "@/lib/utilsClient";
 import {
   CourseFragment,
   FieldType,
   Status,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
-import { deleteFiles } from "@/lib/minio";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams, useRouter } from "next/navigation";
@@ -51,6 +50,9 @@ export default function CourseRegistrationForm({
   const canEdit =
     !course.attending || course.attending.status === Status.Applied;
 
+  const registrationForm =
+    course.attending?.applicationForm || course.registrationForm;
+
   // Pre-fill existing answers when updating
   const registrationFormDefaults = useMemo(() => {
     if (!course.attending?.application?.answers) return {};
@@ -60,31 +62,31 @@ export default function CourseRegistrationForm({
       string | string[]
     >;
     const defaults: Record<string, string | string[]> = {};
-    course.registrationForm.fields.forEach((field) => {
+    registrationForm.fields.forEach((field) => {
       const val = answers[field.id];
       if (val !== undefined && field.type !== FieldType.FileUpload) {
         defaults[`field_${field.id}`] = val;
       }
     });
     return defaults;
-  }, [course.attending, course.registrationForm.fields]);
+  }, [course.attending, registrationForm.fields]);
 
   const { t: validationT } = useTranslation(lng, "validation");
   const dynamicFieldsSchema = useMemo(
-    () => createRegistrationSchema(course.registrationForm.fields, validationT),
-    [course.registrationForm.fields, validationT],
+    () => createRegistrationSchema(registrationForm.fields, validationT),
+    [registrationForm.fields, validationT],
   );
 
   // Default values for file upload fields
   const fileFieldDefaults = useMemo(() => {
     const defaults: Record<string, File[] | undefined> = {};
-    course.registrationForm.fields
+    registrationForm.fields
       .filter((f) => f.type === FieldType.FileUpload)
       .forEach((f) => {
         defaults[`field_${f.id}`] = undefined;
       });
     return defaults;
-  }, [course.registrationForm.fields]);
+  }, [registrationForm.fields]);
 
   const billingSchema = z.object({
     billing: z.object({
@@ -129,7 +131,7 @@ export default function CourseRegistrationForm({
 
         // Upload files for FILE_UPLOAD fields and collect all answers
         await Promise.all(
-          course.registrationForm.fields.map(async (field) => {
+          registrationForm.fields.map(async (field) => {
             const fieldName = `field_${field.id}`;
             const val = valsMap[fieldName];
 
@@ -137,8 +139,7 @@ export default function CourseRegistrationForm({
               if (val === undefined) {
                 const existing = (
                   course.attending?.application?.answers as
-                    | Record<string, string | string[]>
-                    | undefined
+                    Record<string, string | string[]> | undefined
                 )?.[field.id];
                 answers[field.id] = Array.isArray(existing) ? existing : [];
                 return;
@@ -150,13 +151,6 @@ export default function CourseRegistrationForm({
                 ),
               );
 
-              // Only delete old files after new ones are safely uploaded
-              const existingUrls =
-                course.attending?.application.answers?.[field.id];
-              if (Array.isArray(existingUrls) && existingUrls.length > 0) {
-                await deleteFiles(existingUrls);
-              }
-
               answers[field.id] = newUrls;
             } else {
               answers[field.id] = (val as string) ?? "";
@@ -165,8 +159,9 @@ export default function CourseRegistrationForm({
         );
 
         const application = {
-          form: course.registrationForm.id,
-          formVersion: course.registrationForm.version,
+          form: registrationForm.id,
+          formVersion: registrationForm.version,
+          revision: course.attending?.application.revision,
           answers,
         };
 
@@ -366,7 +361,7 @@ export default function CourseRegistrationForm({
       <WizzardStep<FormValues, FormOutput>
         name="Registracny formular"
         id="registration"
-        fields={course.registrationForm.fields.map(
+        fields={registrationForm.fields.map(
           (field) => `field_${field.id}` as const,
         )}
       >
@@ -379,7 +374,7 @@ export default function CourseRegistrationForm({
             )}
             <RegistrationFormFields
               lng={lng}
-              fields={course.registrationForm.fields}
+              fields={registrationForm.fields}
               canEdit={canEdit}
               existingAnswers={
                 course.attending?.application.answers as Record<

@@ -4,7 +4,7 @@ import type {
   BillingInput,
   UserFragment,
 } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useParams } from "next/navigation";
 import {
   Combobox,

@@ -1,18 +1,18 @@
 "use client";
 import { z } from "zod";
 
-import { FormField, LocalizedFormField } from "@/components/form";
-import { inputChange, inputValue } from "@/components/form-values";
+import { FormField, LocalizedFormField } from "@/components/form/form";
+import { inputChange, inputValue } from "@/lib/forms/form-values";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FormContainer } from "@/components/form";
+import { FormContainer } from "@/components/form/form";
 import { Input } from "@/components/ui/input";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import useValidation from "@/hooks/useValidation";
+import useValidation from "@/hooks/use-validation";
 import { TicketFragment } from "@/lib/graphql/generated/graphql";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useParams } from "next/navigation";

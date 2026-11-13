@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import { useMessageStore } from "@/stores/messageStore";
 import { cn } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";

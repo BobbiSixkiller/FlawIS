@@ -1,3 +1,5 @@
+import { ManuscriptTemplateDownload } from "./_components/manuscript-template-download";
+import AuthorReviewFeedback from "@/app/[lng]/conferences/[slug]/_components/author-review-feedback";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
 import Icon from "@/components/icon";
 import Link from "next/link";
@@ -61,7 +63,7 @@ function SubmissionCard({
           </h3>
         </div>
 
-        {editable ? (
+        {editable && !submission.withdrawn ? (
           <div className="flex shrink-0 gap-1">
             <ModalTrigger
               dialogId={updateDialogId}
@@ -132,7 +134,7 @@ function SubmissionCard({
         </p>
       )}
 
-      {editable ? (
+      {editable && !submission.withdrawn ? (
         <>
           <Modal dialogId={updateDialogId} title={t("submission.update")}>
             <SubmissionForm
@@ -151,6 +153,13 @@ function SubmissionCard({
           </Modal>
         </>
       ) : null}
+      {submission.withdrawn ? (
+        <p className="mt-4 text-muted-foreground">
+          {lng === "en" ? "Submission withdrawn." : "Príspevok bol stiahnutý."}
+        </p>
+      ) : (
+        <AuthorReviewFeedback submission={submission.id} lng={lng} />
+      )}
     </article>
   );
 }
@@ -248,6 +257,8 @@ export default async function ConferenceWorkspacePage({
           </h1>
         </div>
       </section>
+
+      <ManuscriptTemplateDownload conference={conference} lng={lng} />
 
       <section
         aria-labelledby="timeline-heading"

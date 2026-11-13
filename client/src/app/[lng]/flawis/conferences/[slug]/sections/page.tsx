@@ -9,7 +9,7 @@ import {
 import ModalTrigger from "@/components/modal-trigger";
 import Modal from "@/components/modal";
 import SectionForm from "./section-form";
-import ConfirmDeleteForm from "@/components/confirm-delete-form";
+import ConfirmDeleteForm from "@/components/form/confirm-delete-form";
 import Link from "next/link";
 
 export default async function SectionsPage({

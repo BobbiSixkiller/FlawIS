@@ -1,7 +1,7 @@
 "use client";
 
 import { getMe } from "@/app/[lng]/(auth)/actions";
-import { usePageVisibility } from "@/hooks/usePageVisibility";
+import { usePageVisibility } from "@/hooks/use-page-visibility";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 

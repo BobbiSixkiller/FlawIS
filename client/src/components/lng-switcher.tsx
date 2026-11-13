@@ -7,7 +7,7 @@ import {
   languages,
   localePreferenceMaxAge,
 } from "@/lib/i18n/settings";
-import { useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/hooks/use-translation";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";

@@ -53,6 +53,9 @@ export class UserConnection extends CreateConnection(User) {}
 
 @ObjectType({ implements: IMutationResponse })
 export class UserMutationResponse extends IMutationResponse {
+  @Field({ nullable: true })
+  token?: string;
+
   @Field(() => User)
   data: User;
 }
@@ -164,7 +167,7 @@ export class OrganizationEmailsInput {
     {
       each: true,
       message: () => "Niektora email adresa ma chybny format!",
-    }
+    },
   )
   emails: string[];
 }

@@ -1,0 +1,240 @@
+fragment Reviewer on Reviewer {
+  id
+  name
+  email
+  institution
+  department
+  languages
+  expertise
+  notes
+  archived
+  createdAt
+  updatedAt
+}
+query reviewAdminContext {
+  reviewAdminContext
+}
+query reviewers($search: String, $after: ObjectId) {
+  reviewers(search: $search, after: $after) {
+    ...Reviewer
+  }
+}
+mutation saveReviewer($id: ObjectId, $data: JSONObject!) {
+  saveReviewer(id: $id, data: $data) {
+    ...Reviewer
+  }
+}
+query conferenceReviewSettings($conference: ObjectId!) {
+  conferenceReviewSettings(conference: $conference) {
+    id
+    conference
+    enabled
+    requiredReviews
+    form
+    recommendationField
+    authorFields
+    sectionRequirements
+    remindersEnabled
+    instructions
+    signature
+    replyTo
+    templateFile
+    questionnaire {
+      ...Form
+    }
+  }
+}
+mutation configureConferenceReviews(
+  $conference: ObjectId!
+  $data: JSONObject!
+) {
+  configureConferenceReviews(conference: $conference, data: $data) {
+    id
+    enabled
+  }
+}
+query conferenceReviewQueue(
+  $conference: ObjectId!
+  $section: ObjectId
+  $after: ObjectId
+  $first: Int
+  $search: String
+  $stage: String
+  $reviewer: String
+  $delivery: String
+) {
+  conferenceReviewQueue(
+    conference: $conference
+    section: $section
+    after: $after
+    first: $first
+    search: $search
+    stage: $stage
+    reviewer: $reviewer
+    delivery: $delivery
+  )
+}
+query submissionReview($submission: ObjectId!) {
+  submissionReview(submission: $submission)
+}
+mutation conferenceReviewAction(
+  $submission: ObjectId!
+  $action: String!
+  $data: JSONObject!
+) {
+  conferenceReviewAction(submission: $submission, action: $action, data: $data)
+}
+query reviewCoordinators($conference: ObjectId!) {
+  reviewCoordinators(conference: $conference)
+}
+mutation setReviewCoordinator(
+  $conference: ObjectId!
+  $email: String!
+  $section: ObjectId
+) {
+  setReviewCoordinator(
+    conference: $conference
+    email: $email
+    section: $section
+  )
+}
+mutation revokeReviewCoordinator($id: ObjectId!) {
+  revokeReviewCoordinator(id: $id)
+}
+mutation setReviewerEligibility(
+  $conference: ObjectId!
+  $reviewer: ObjectId!
+  $data: JSONObject!
+) {
+  setReviewerEligibility(
+    conference: $conference
+    reviewer: $reviewer
+    data: $data
+  )
+}
+query formLibrary($search: String) {
+  formLibrary(search: $search) {
+    id
+    name
+    description
+    archived
+    latestVersion
+    createdAt
+    updatedAt
+  }
+}
+query formVersions($definition: ObjectId!) {
+  formVersions(definition: $definition) {
+    ...Form
+  }
+}
+mutation createLibraryForm($name: String!, $description: String) {
+  createLibraryForm(name: $name, description: $description) {
+    id
+    name
+  }
+}
+mutation publishLibraryForm(
+  $definition: ObjectId!
+  $fields: [FormFieldInput!]!
+  $name: String
+  $description: String
+) {
+  publishLibraryForm(
+    definition: $definition
+    fields: $fields
+    name: $name
+    description: $description
+  ) {
+    ...Form
+  }
+}
+mutation archiveLibraryForm($definition: ObjectId!) {
+  archiveLibraryForm(definition: $definition)
+}
+mutation bindCourseRegistrationForm($course: ObjectId!, $form: ObjectId!) {
+  bindCourseRegistrationForm(course: $course, form: $form) {
+    ...Form
+  }
+}
+query conferenceActivity(
+  $conference: ObjectId!
+  $submission: ObjectId
+  $before: ObjectId
+) {
+  conferenceActivity(
+    conference: $conference
+    submission: $submission
+    before: $before
+  ) {
+    id
+    actor
+    actorName
+    originalActor
+    action
+    requestId
+    submission
+    changes
+    createdAt
+  }
+}
+query reviewerPortal($token: String!) {
+  reviewerPortal(token: $token)
+}
+mutation saveReviewReport(
+  $token: String!
+  $answers: JSONObject!
+  $submit: Boolean
+  $expectedRevision: Int
+) {
+  saveReviewReport(
+    token: $token
+    answers: $answers
+    submit: $submit
+    expectedRevision: $expectedRevision
+  )
+}
+mutation declineReview($token: String!) {
+  declineReview(token: $token)
+}
+query revisionPortal($token: String!) {
+  revisionPortal(token: $token)
+}
+query authorReviewFeedback($submission: ObjectId!) {
+  authorReviewFeedback(submission: $submission) {
+    id
+    round
+    feedback
+    createdAt
+  }
+}
+
+mutation enterReviewReport(
+  $assignment: ObjectId!
+  $answers: JSONObject!
+  $expectedRevision: Int
+) {
+  enterReviewReport(
+    assignment: $assignment
+    answers: $answers
+    expectedRevision: $expectedRevision
+  )
+}
+
+query authorReviewWorkspace($submission: ObjectId!) {
+  authorReviewWorkspace(submission: $submission)
+}
+query reviewerProfile(
+  $reviewer: ObjectId!
+  $conference: ObjectId
+  $before: ObjectId
+) {
+  reviewerProfile(reviewer: $reviewer, conference: $conference, before: $before)
+}
+
+query reviewerDirectory($search: String, $after: ObjectId, $archived: Boolean) {
+  reviewerDirectory(search: $search, after: $after, archived: $archived)
+}
+query assignmentEligibility($submission: ObjectId!, $reviewer: ObjectId!) {
+  assignmentEligibility(submission: $submission, reviewer: $reviewer)
+}

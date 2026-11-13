@@ -5,7 +5,7 @@ import {
   conferenceOfferingModel,
   courseOfferingModel,
   offeringHref,
-} from "../src/components/offering-model";
+} from "../src/lib/offering-model";
 
 test("offering URLs use explicit attendee and admin bases", () => {
   assert.equal(offeringHref("", "event"), "/event");

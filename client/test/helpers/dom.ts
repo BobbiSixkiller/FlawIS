@@ -11,6 +11,7 @@ for (const name of [
   "HTMLInputElement",
   "HTMLTextAreaElement",
   "HTMLButtonElement",
+  "HTMLAnchorElement",
   "HTMLSelectElement",
   "Node",
   "NodeFilter",
@@ -53,3 +54,8 @@ Object.assign(globalThis, {
   IS_REACT_ACT_ENVIRONMENT: true,
 });
 HTMLElement.prototype.scrollIntoView = () => {};
+// JSDOM has no layout; ProseMirror still queries caret geometry while typing.
+dom.window.document.elementFromPoint = () => null;
+dom.window.Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
+dom.window.Range.prototype.getBoundingClientRect = () =>
+  new dom.window.DOMRect();

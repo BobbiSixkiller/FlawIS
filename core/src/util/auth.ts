@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Request, Response } from "express";
 import { verify, sign, SignOptions } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
@@ -16,6 +17,7 @@ export interface Context {
   res: Response;
   user: CtxUser | null;
   locale: string;
+  requestId: string;
 }
 
 // check whether hostname is set on incoming request
@@ -28,13 +30,14 @@ export function createContext({
     res: res as Response,
     locale: req.cookies.NEXT_locale,
     user: null,
+    requestId: randomUUID(),
   };
 
   if (req.cookies.accessToken) {
     const token = req.cookies.accessToken.split("Bearer ")[1];
     if (token) {
-      const decoded: CtxUser | null = verifyJwt(token);
-      if (decoded && ObjectId.isValid(decoded.id)) {
+      const decoded = verifyJwt<CtxUser & { sessionVersion?: number }>(token);
+      if (decoded?.sessionVersion === 2 && ObjectId.isValid(decoded.id)) {
         appContext.user = { ...decoded, id: new ObjectId(decoded.id) };
       }
     }
@@ -61,7 +64,7 @@ export function verifyJwt<T>(token: string) {
 
 export const authChecker: AuthChecker<Context> = (
   { args, context: { user } },
-  roles
+  roles,
 ) => {
   //checks for user inside the context
   if (roles.length === 0) {
@@ -76,3 +79,23 @@ export const authChecker: AuthChecker<Context> = (
   //no roles matched
   return false;
 };
+
+export function issueSessionToken(
+  user: Pick<CtxUser, "id" | "name" | "email" | "access">,
+  originalActorId?: string,
+) {
+  return (
+    "Bearer " +
+    signJwt(
+      {
+        sessionVersion: 2,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        access: user.access,
+        ...(originalActorId ? { originalActorId } : {}),
+      },
+      { expiresIn: "24h" },
+    )
+  );
+}

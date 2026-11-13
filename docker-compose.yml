@@ -7,6 +7,9 @@ services:
     command: npm run dev
     env_file:
       - ./.env
+    environment:
+      NODE_ENV: development
+      CONFERENCES_PUBLIC_HOST: conferences.localhost:3000
     depends_on:
       minio:
         condition: service_healthy
@@ -35,6 +38,8 @@ services:
     env_file:
       - ./.env
     environment:
+      NODE_ENV: development
+      API_URI: http://core:5000/graphql
       REACH_WEBHOOK_UPSTREAM_URL: http://core:5000/integrations/reach/webhooks
     depends_on:
       - core
@@ -53,7 +58,17 @@ services:
     env_file:
       - ./.env
     command: npm run start:dev
+    environment:
+      NODE_ENV: development
+      CORE_INTERNAL_URL: http://core:5000
+      CLIENT_INTERNAL_URL: http://client:3000
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_USER: ""
+      MAIL_PASSWORD: ""
     depends_on:
+      mailpit:
+        condition: service_started
       client:
         condition: service_started
       rabbitmq:
@@ -62,6 +77,16 @@ services:
       - ./mail:/usr/app
       - /usr/app/node_modules
     restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_DATABASE: /data/mailpit.db
+    volumes:
+      - mailpit_data:/data
 
   minio:
     image: minio/minio:latest
@@ -82,7 +107,10 @@ services:
       retries: 3
       start_period: 10s
   rabbitmq:
+    hostname: flawis-rabbitmq-dev
     image: rabbitmq:4.1.3-alpine
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     restart: unless-stopped
     ports:
       - "5672:5672"
@@ -128,6 +156,8 @@ services:
       start_period: 30s
 
 volumes:
+  mailpit_data: {}
+  rabbitmq_data: {}
   mongo_data: {}
   mongo_config: {}
   minio_storage: {}
