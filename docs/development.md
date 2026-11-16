@@ -163,7 +163,7 @@ cp .env.e2e.example .env.e2e.local  # new setup only
 npm run test:browser -- --project=public
 ```
 
-The public checks verify the English and Slovak login pages without credentials. The authenticated checks require the review feature to have been deployed to staging and an account with access to reviewers/forms. Prefer a dedicated test account.
+The public checks verify English and Slovak auth pages without credentials, including registration and password recovery, language switching, invalid login validation, and concurrent SK/EN requests. They cover desktop/light and mobile/dark appearance and reject console errors and hydration failures. The authenticated checks require the review feature to have been deployed to staging and an account with access to reviewers/forms. Prefer a dedicated test account.
 
 ```sh
 npm run test:browser:login

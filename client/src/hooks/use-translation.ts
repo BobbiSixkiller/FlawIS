@@ -5,15 +5,15 @@ import { useEffect } from "react";
 import {
   initReactI18next,
   useTranslation as useTranslationOrg,
+  type UseTranslationOptions,
 } from "react-i18next";
 import resourcesToBackend from "i18next-resources-to-backend";
-// import LocizeBackend from 'i18next-locize-backend'
 import LanguageDetector from "i18next-browser-languagedetector";
 import { cookieName, getOptions, languages } from "../lib/i18n/settings";
 
 const runsOnServerSide = typeof window === "undefined";
 
-// on client side the normal singleton is ok
+// Share translation resources, but never select a request's language on the server singleton.
 i18next
   .use(initReactI18next)
   .use(LanguageDetector)
@@ -23,7 +23,6 @@ i18next
         import(`../lib/i18n/locales/${language}/${namespace}.json`),
     ),
   )
-  // .use(LocizeBackend) // locize backend could be used on client side, but prefer to keep it in sync with server side
   .init({
     ...getOptions(),
     lng: undefined, // let detect the language on client side
@@ -35,12 +34,13 @@ i18next
     preload: runsOnServerSide ? languages : [],
   });
 
+/** Bind SSR and initial hydration to the route locale; sync browser language after mount. */
 export function useTranslation(
   lng: string,
   ns: string | string[],
-  options?: any,
+  options?: Omit<UseTranslationOptions<string>, "lng">,
 ) {
-  const ret = useTranslationOrg(ns, options);
+  const ret = useTranslationOrg(ns, { ...options, lng });
   const { i18n } = ret;
 
   useEffect(() => {
@@ -52,10 +52,6 @@ export function useTranslation(
     if (i18n.resolvedLanguage === lng) return;
     void i18n.changeLanguage(lng);
   }, [lng, i18n]);
-
-  if (runsOnServerSide && lng && i18n.resolvedLanguage !== lng) {
-    void i18n.changeLanguage(lng);
-  }
 
   return ret;
 }

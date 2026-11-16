@@ -19,7 +19,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "public", testMatch: /login\.spec\.ts/ },
+    { name: "public", testMatch: /(?:login|auth-localization)\.spec\.ts/ },
     { name: "session", testMatch: /auth\.setup\.ts/ },
     ...["en", "sk"].flatMap((language) =>
       ["desktop", "mobile"].map((size) => ({
