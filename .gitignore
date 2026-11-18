@@ -1,5 +1,6 @@
 .env
 .DS_Store
+/node_modules/
 
 # Checkout-local operational notes; never publish infrastructure access details.
 /.agents/local/

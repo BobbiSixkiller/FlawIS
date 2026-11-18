@@ -8,14 +8,28 @@ export interface SlashCommandStorage {
   position: { top: number; left: number };
   selectedIndex: number;
 }
+
 interface SlashCommandOptions {
   items: SelectorItem[];
-  onUpdate: ((filter: string | null, position: SlashCommandStorage["position"] | null, selectedIndex?: number) => void) | null;
+  onUpdate:
+    | ((
+        filter: string | null,
+        position: SlashCommandStorage["position"] | null,
+        selectedIndex?: number,
+      ) => void)
+    | null;
 }
+
 declare module "@tiptap/core" {
-  interface Storage { SlashCommand: SlashCommandStorage }
+  interface Storage {
+    SlashCommand: SlashCommandStorage;
+  }
 }
-export const SlashCommandExtension = Extension.create<SlashCommandOptions, SlashCommandStorage>({
+
+export const SlashCommandExtension = Extension.create<
+  SlashCommandOptions,
+  SlashCommandStorage
+>({
   name: "SlashCommand",
 
   addOptions() {
@@ -47,15 +61,17 @@ export const SlashCommandExtension = Extension.create<SlashCommandOptions, Slash
 
             const filteredItems = this.options.items.filter(
               (item: SelectorItem) =>
-                item.name.toLowerCase().includes(storage.filter.toLowerCase())
+                item.name.toLowerCase().includes(storage.filter.toLowerCase()),
             );
 
             // Handle "/"
             if (event.key === "/" && !storage.visible) {
               const { $anchor } = state.selection;
               const position = view.coordsAtPos($anchor.pos);
+
               // Adjust for editor container offsets
               const editorRect = view.dom.getBoundingClientRect();
+
               const dropdownPosition = {
                 top: position.top + 30 - editorRect.top, // Relative to editor
                 left: position.left - editorRect.left, // Relative to editor
@@ -69,25 +85,33 @@ export const SlashCommandExtension = Extension.create<SlashCommandOptions, Slash
             }
 
             // Handle keyboard navigation
-            if (event.key === "ArrowDown" && storage.visible && filteredItems.length) {
+            if (
+              event.key === "ArrowDown" &&
+              storage.visible &&
+              filteredItems.length
+            ) {
               storage.selectedIndex =
                 (storage.selectedIndex + 1) % filteredItems.length;
               this.options.onUpdate?.(
                 storage.filter,
                 storage.position,
-                storage.selectedIndex
+                storage.selectedIndex,
               );
               return true;
             }
 
-            if (event.key === "ArrowUp" && storage.visible && filteredItems.length) {
+            if (
+              event.key === "ArrowUp" &&
+              storage.visible &&
+              filteredItems.length
+            ) {
               storage.selectedIndex =
                 (storage.selectedIndex - 1 + filteredItems.length) %
                 filteredItems.length;
               this.options.onUpdate?.(
                 storage.filter,
                 storage.position,
-                storage.selectedIndex
+                storage.selectedIndex,
               );
               return true;
             }

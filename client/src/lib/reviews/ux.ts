@@ -10,6 +10,7 @@ export async function mutate<T = unknown>(
     throw Object.assign(new Error(result.error.message), result.error);
   return result.value as T;
 }
+
 export const messages: Record<string, [string, string]> = {
   REVIEWS_DISABLED: [
     "Najskôr povoľte recenzovanie v nastaveniach.",
@@ -56,8 +57,8 @@ export const messages: Record<string, [string, string]> = {
     "A revision request is already open.",
   ],
   ACCEPTANCE_BLOCKED: [
-    "Vyžadujú sa všetky posudky a overenie opráv.",
-    "All required reports and verified corrections are needed.",
+    "Pred prijatím overte aktuálny rukopis a opravy, vyriešte záporné odporúčania a uzavrite každý posudok.",
+    "Verify the current manuscript and corrections, resolve negative recommendations, and close each report before accepting.",
   ],
   REVIEWER_INACTIVE: [
     "Vyberte aktívneho recenzenta.",
@@ -94,6 +95,7 @@ export const messages: Record<string, [string, string]> = {
 };
 export const explain = (code: string, lng: string) =>
   messages[code]?.[lng === "en" ? 1 : 0] || code;
+
 export const errorText = (error: unknown, lng: string) => {
   const e = error as { code?: string; message?: string };
   return e.code && messages[e.code]
@@ -104,6 +106,7 @@ export const errorText = (error: unknown, lng: string) => {
           "Request failed. Try again.",
         );
 };
+
 export function bratislavaDeadline(date: string) {
   const offset =
     new Intl.DateTimeFormat("en", {

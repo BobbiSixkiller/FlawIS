@@ -1,0 +1,29 @@
+{
+  "printWidth": 80,
+  "singleQuote": false,
+  "semi": true,
+  "trailingComma": "all",
+  "proseWrap": "preserve",
+  "overrides": [
+    {
+      "files": ["**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}"],
+      "options": {
+        "plugins": ["@luzixu/prettier-plugin-block-padding"],
+        "blockPaddingRules": [
+          "types",
+          "interfaces",
+          "enums",
+          "classes",
+          "multiline-blocks",
+          "multiline-expressions",
+          "multiline-class-members",
+          "property-method-boundaries"
+        ]
+      }
+    },
+    {
+      "files": "mail/**/*.{js,cjs,mjs,ts,tsx}",
+      "options": { "singleQuote": true }
+    }
+  ]
+}

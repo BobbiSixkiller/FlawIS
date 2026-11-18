@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import { useFileSource } from "../../hooks/use-file-source";
 import { useObjectURL } from "../../hooks/use-object-url";
 
-interface ImageFileInputProps
-  extends Omit<
-    ComponentPropsWithRef<"input">,
-    "value" | "onChange" | "onLoad" | "onError"
-  > {
+interface ImageFileInputProps extends Omit<
+  ComponentPropsWithRef<"input">,
+  "value" | "onChange" | "onLoad" | "onError"
+> {
   value?: File | null;
   onChange: (file: File | null) => void;
   onLoad?: (file: File | null) => void;
@@ -19,6 +18,7 @@ interface ImageFileInputProps
   bucket?: string;
   buttonLabel?: ReactNode;
 }
+
 export default function ImageFileInput({
   value,
   onChange,
@@ -31,6 +31,7 @@ export default function ImageFileInput({
   ...props
 }: ImageFileInputProps) {
   const preview = useObjectURL(value);
+
   const loading = useFileSource({
     value,
     sources: { [bucket]: avatarUrl },
@@ -38,6 +39,7 @@ export default function ImageFileInput({
     onError,
     convert: (files) => files[0] ?? null,
   });
+
   return (
     <div className="flex gap-4 items-center">
       <div className="size-16 rounded-full relative">

@@ -15,7 +15,7 @@ import {
   SubmissionArgs,
   SubmissionInput,
 } from "../resolvers/types/submission.types";
-import { toDTO } from "../util/helpers";
+import { toDTO, withOptionalTransaction } from "../util/helpers";
 import { CtxUser } from "../util/types";
 import { I18nService } from "./i18n.service";
 import { MinioService } from "./minio.service";
@@ -64,9 +64,11 @@ export class SubmissionService {
   async getAuthorizedSubmission(id: ObjectId, user: CtxUser) {
     const submission = await this.submissionRepository.findOne({ _id: id });
     if (!submission) this.throwNotFound();
+
     if (!this.isAdmin(user) && !this.isAuthor(submission!, user.id)) {
       this.throwNotAllowed();
     }
+
     return toDTO(submission!);
   }
 
@@ -101,16 +103,30 @@ export class SubmissionService {
       options.session,
     );
     await this.assertUniqueNames(data, undefined, options.session);
-    await this.history?.validateUpload(data.fileUrl, undefined, user);
 
-    const submission = await this.submissionRepository.create(
-      {
-        ...data,
-        authors: [user.id],
-      },
-      { session: options.session },
-    );
-    const result = toDTO(submission);
+    const save = async () => {
+      await this.history?.validateUpload(
+        data.fileUrl,
+        undefined,
+        user,
+        data.conference,
+      );
+
+      const submission = await this.submissionRepository.create(
+        {
+          ...data,
+          authors: [user.id],
+        },
+        { session: options.session },
+      );
+      const result = toDTO(submission);
+      await this.history?.capture(result, user);
+      return result;
+    };
+
+    const result = this.history
+      ? await withOptionalTransaction(options.session, save)
+      : await save();
 
     if (!options.deferNotifications) {
       await this.sendCoAuthorInvites(
@@ -135,9 +151,11 @@ export class SubmissionService {
     if (!existing) this.throwNotFound();
 
     const isAdmin = this.isAdmin(user);
+
     if (!isAdmin && !this.isAuthor(existing!, user.id)) {
       this.throwNotAllowed();
     }
+
     if (!sameId(existing!.conference, data.conference)) {
       this.throwSectionMismatch();
     }
@@ -149,19 +167,35 @@ export class SubmissionService {
     );
     await this.assertUniqueNames(data, id);
 
-    await this.history?.validateUpload(data.fileUrl, existing!.fileUrl, user);
-    await this.history?.capture(toDTO(existing!), user);
-    const submission = await this.submissionRepository.findOneAndUpdate(
-      {
-        _id: id,
-        ...(isAdmin ? {} : { authors: user.id }),
-      },
-      { $set: data },
-      { new: true, runValidators: true },
-    );
-    if (!submission) this.throwNotAllowed();
+    const save = async () => {
+      if (data.fileUrl !== undefined)
+        await this.history?.validateUpload(
+          data.fileUrl,
+          existing!.fileUrl,
+          user,
+          data.conference,
+          id,
+        );
+      await this.history?.capture(toDTO(existing!), user, true);
+      const submission = await this.submissionRepository.findOneAndUpdate(
+        {
+          _id: id,
+          ...(this.history ? { fileUrl: existing!.fileUrl ?? null } : {}),
+          ...(isAdmin ? {} : { authors: user.id }),
+        },
+        { $set: data },
+        { new: true, runValidators: true },
+      );
+      if (!submission) this.throwNotAllowed();
 
-    const result = toDTO(submission!);
+      const result = toDTO(submission!);
+      await this.history?.capture(result, user);
+      return result;
+    };
+
+    const result = this.history
+      ? await withOptionalTransaction(undefined, save)
+      : await save();
     // Manuscripts are immutable versions; replacement never deletes prior files.
     await this.sendCoAuthorInvites(hostname, user, conference, result, authors);
     return result;
@@ -172,6 +206,7 @@ export class SubmissionService {
     if (!existing) this.throwNotFound();
 
     const isAdmin = this.isAdmin(user);
+
     if (!isAdmin && !this.isAuthor(existing!, user.id)) {
       this.throwNotAllowed();
     }
@@ -179,11 +214,13 @@ export class SubmissionService {
     const conference = await this.conferenceRepository.findOne({
       _id: existing!.conference,
     });
+
     if (!conference) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "conference" }),
       );
     }
+
     await this.assertParticipantCanSubmit(user, conference!);
 
     if (this.history) return this.history.withdraw(toDTO(existing!), user);
@@ -212,11 +249,13 @@ export class SubmissionService {
     const conference = await this.conferenceRepository.findOne({
       _id: submission!.conference,
     });
+
     if (!conference) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "conference" }),
       );
     }
+
     await this.assertParticipantCanSubmit(user, conference!);
 
     await this.tokenService.verifyOneTimeToken<SubmissionTokenPayload>(token);
@@ -237,6 +276,7 @@ export class SubmissionService {
       });
       if (previous) await this.history.rememberAuthors(toDTO(previous));
     }
+
     const submission = await this.submissionRepository.findOneAndUpdate(
       { _id: submissionId },
       { $pull: { authors: authorId } },
@@ -253,7 +293,6 @@ export class SubmissionService {
     submission: Submission,
     authors: string[] = [],
   ) {
-    await this.history?.capture(submission, user);
     await Promise.all(
       authors.map((email) =>
         this.sendAddAuthorLink(hostname, email, user, conference, submission),
@@ -304,16 +343,19 @@ export class SubmissionService {
       }),
       this.sectionRepository.findOne({ _id: sectionId }, null, { session }),
     ]);
+
     if (!conference) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "conference" }),
       );
     }
+
     if (!section) {
       throw new Error(
         this.i18nService.translate("notFound", { ns: "section" }),
       );
     }
+
     if (!sameId(section!.conference, conference!.id)) {
       this.throwSectionMismatch();
     }
@@ -362,6 +404,7 @@ export class SubmissionService {
       null,
       { session },
     );
+
     if (!attendee?.ticket.withSubmission) {
       throw new Error(
         this.i18nService.translate("submissionTicketRequired", {
@@ -371,6 +414,7 @@ export class SubmissionService {
     }
 
     const deadline = conference.dates.submissionDeadline;
+
     if (deadline && Date.now() > new Date(deadline).getTime()) {
       throw new Error(
         this.i18nService.translate("deadlinePassed", { ns: "submission" }),
@@ -410,6 +454,7 @@ export class SubmissionService {
         data.translations.sk.name,
       );
     }
+
     if (enExists) {
       this.throwNameExists(
         "translations.en.name",

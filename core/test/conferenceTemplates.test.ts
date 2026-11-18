@@ -17,6 +17,7 @@ test("conference templates accept only nonempty DOCX without embedded macros/pro
     validateReviewFile(defaultReportTemplate(), "template.docx", true),
     /wordprocessingml/,
   );
+
   for (const [bytes, filename] of [
     [Buffer.from("%PDF-"), "x.pdf"],
     [Buffer.alloc(0), "x.docx"],
@@ -24,6 +25,7 @@ test("conference templates accept only nonempty DOCX without embedded macros/pro
     [Buffer.from("not a zip"), "x.docx"],
   ] as const)
     assert.throws(() => validateReviewFile(bytes, filename, true));
+
   const zip = new PizZip(defaultReportTemplate());
   zip.file("word/vbaProject.bin", "macro");
   assert.throws(
@@ -40,6 +42,7 @@ test("template upload rejects submission scope and private links before writing 
     {} as any,
     {} as any,
   );
+
   for (const kind of ["MANUSCRIPT_TEMPLATE", "TEMPLATE"]) {
     for (const scope of [
       { submission: new ObjectId() },
@@ -55,7 +58,7 @@ test("template upload rejects submission scope and private links before writing 
           filename: "x.docx",
           buffer: defaultReportTemplate(),
         }),
-        /conference-level/,
+        kind === "TEMPLATE" ? /Invalid file kind/ : /conference-level/,
       );
     }
   }
@@ -70,6 +73,7 @@ test("official report placeholders retain surrounding Word formatting", () => {
       .asText()
       .replace("<w:r>", "<w:r><w:rPr><w:b/></w:rPr>"),
   );
+
   const xml = new PizZip(
     renderReport(zip.generate({ type: "nodebuffer" }), {
       paper: "Paper title",
@@ -81,6 +85,7 @@ test("official report placeholders retain surrounding Word formatting", () => {
   )
     .file("word/document.xml")!
     .asText();
+
   assert.match(xml, /<w:b\/>/);
   for (const value of [
     "Paper title",

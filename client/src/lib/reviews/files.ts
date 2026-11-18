@@ -8,13 +8,26 @@ export async function uploadReviewFile(
     reviewerToken?: string;
     revisionToken?: string;
     note?: string;
+    tracked?: File;
+    requestId?: string;
+    sourceVersion?: string;
+    responses?: Record<
+      string,
+      { authorStatus?: string; response?: string; location?: string }
+    >;
     onProgress?: (percent: number) => void;
   },
 ) {
-  if (file.size > 20 * 1024 * 1024)
+  if ([file, options.tracked].some((f) => f && f.size > 20 * 1024 * 1024))
     throw new Error("Maximum file size: 20 MiB.");
   const params = new URLSearchParams({ kind: options.kind });
-  for (const key of ["submission", "conference", "note", "assignment"] as const)
+  for (const key of [
+    "submission",
+    "conference",
+    "requestId",
+    "sourceVersion",
+    "assignment",
+  ] as const)
     if (options[key]) params.set(key, options[key]!);
   const headers = new Headers();
   if (options.reviewerToken)
@@ -23,6 +36,11 @@ export async function uploadReviewFile(
     headers.set("x-revision-token", options.revisionToken);
   const form = new FormData();
   form.set("file", file);
+  if (options.tracked) form.set("tracked", options.tracked);
+  if (options.note) form.set("note", options.note);
+  if (options.responses)
+    form.set("responses", JSON.stringify(options.responses));
+
   if (options.onProgress) {
     return new Promise<{ id: string }>((resolve, reject) => {
       const request = new XMLHttpRequest();
@@ -38,6 +56,7 @@ export async function uploadReviewFile(
       request.onload = () => {
         try {
           const data = JSON.parse(request.responseText);
+
           if (request.status >= 200 && request.status < 300) resolve(data);
           else reject(new Error(data.error || "File upload failed."));
         } catch {
@@ -50,6 +69,7 @@ export async function uploadReviewFile(
       request.send(form);
     });
   }
+
   const response = await fetch(`/api/conference-review/files?${params}`, {
     method: "POST",
     headers,
@@ -59,9 +79,26 @@ export async function uploadReviewFile(
   if (!response.ok) throw new Error(result.error || "File upload failed.");
   return result as { id: string };
 }
-export async function downloadReviewerFile(id: string, token: string) {
-  const response = await fetch(`/api/conference-review/files/${id}`, {
-    headers: { "x-review-token": token },
+
+export async function downloadReviewerFile(
+  id: string,
+  token: string,
+  proof = false,
+) {
+  return downloadReviewDocument(
+    "/api/conference-review/files/" + id,
+    token,
+    proof,
+  );
+}
+
+export async function downloadReviewDocument(
+  path: string,
+  token: string,
+  proof: boolean,
+) {
+  const response = await fetch(path, {
+    headers: { [proof ? "x-revision-token" : "x-review-token"]: token },
   });
   if (!response.ok)
     throw new Error((await response.json()).error || "Download failed.");

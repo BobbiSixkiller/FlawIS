@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Service } from "typedi";
 import { Conference } from "../../entitites/Conference";
-import { ReviewFile, ReviewSettings } from "../../entitites/Review";
+import { ReviewFile } from "../../entitites/Review";
 import { Repository } from "../../repositories/base.repository";
 import { CtxUser } from "../../util/types";
 import { withOptionalTransaction } from "../../util/helpers";
@@ -17,7 +17,6 @@ export enum ConferenceTemplateKind {
 export class ConferenceTemplateService {
   private readonly conferences = new Repository(Conference);
   private readonly files = new Repository(ReviewFile);
-  private readonly settings = new Repository(ReviewSettings);
 
   constructor(
     private readonly access: ReviewAccessService,
@@ -34,43 +33,32 @@ export class ConferenceTemplateService {
     file: ObjectId | null,
   ) {
     await this.access.conference(user, conference, undefined, true);
-    if (!Object.values(ConferenceTemplateKind).includes(kind))
-      throw new Error("Invalid template kind.");
+    if (kind !== ConferenceTemplateKind.Manuscript)
+      throw new Error("New review rounds use the built-in report layout.");
     return withOptionalTransaction(undefined, async (session) => {
       if (!(await this.conferences.exists({ _id: conference })))
         throw new Error("Conference not found.");
+
       if (
         file &&
         !(await this.files.exists({
           _id: file,
           conference,
-          kind:
-            kind === ConferenceTemplateKind.Manuscript
-              ? "MANUSCRIPT_TEMPLATE"
-              : "TEMPLATE",
+          kind: "MANUSCRIPT_TEMPLATE",
           submission: { $exists: false },
         }))
       )
         throw new Error(
           "Template must belong to this conference and match its purpose.",
         );
-      if (kind === ConferenceTemplateKind.Manuscript) {
-        await this.conferences.findOneAndUpdate(
-          { _id: conference },
-          file
-            ? { $set: { manuscriptTemplateFile: file } }
-            : { $unset: { manuscriptTemplateFile: 1 } },
-          { session, runValidators: true },
-        );
-      } else {
-        await this.settings.findOneAndUpdate(
-          { conference },
-          file
-            ? { $set: { templateFile: file } }
-            : { $unset: { templateFile: 1 } },
-          { session, upsert: Boolean(file), runValidators: true },
-        );
-      }
+
+      await this.conferences.findOneAndUpdate(
+        { _id: conference },
+        file
+          ? { $set: { manuscriptTemplateFile: file } }
+          : { $unset: { manuscriptTemplateFile: 1 } },
+        { session, runValidators: true },
+      );
       await this.activity.record(
         user,
         "conference.template_updated",

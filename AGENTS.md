@@ -6,6 +6,7 @@
 - `core/`: Express/Apollo, TypeGraphQL, Typegoose/Mongoose. Read `core/AGENTS.md` for API, persistence, or integration tests.
 - `mail/`: NestJS RabbitMQ worker. Read `mail/AGENTS.md` for messaging and email changes.
 - Each service owns its npm manifest and lockfile; there is no root npm workspace. Use npm and the Node version in `.nvmrc`.
+- Use the root Prettier commands on files you edit. See the [formatting guide](docs/development.md#formatting).
 
 ## Working agreements
 

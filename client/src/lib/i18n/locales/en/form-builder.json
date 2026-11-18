@@ -20,7 +20,6 @@
   "minFiles": "Minimum files",
   "maxFiles": "Maximum files",
   "optionalFiles": "Optional fields may be left empty. The minimum applies when files are attached.",
-  "template": "DOCX template placeholder",
   "requiredLabel": "Enter a field label (up to 200 characters).",
   "invalidType": "Choose a field type.",
   "requiredOption": "Enter a value and display text (up to 200 characters each).",

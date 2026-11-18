@@ -21,173 +21,106 @@ import { setConferenceTemplate } from "../actions";
 export default function ConferenceTemplates({
   conference,
   manuscript,
-  review,
   lng,
 }: {
   conference: string;
   manuscript?: string | null;
-  review?: string | null;
   lng: string;
 }) {
   const t = localizedText(lng);
   const router = useRouter();
   const mounted = useMounted();
-  const [editing, setEditing] = useState<ConferenceTemplateKind | null>(null);
-  const [removing, setRemoving] = useState<ConferenceTemplateKind | null>(null);
-  const templates = {
-    [ConferenceTemplateKind.Manuscript]: {
-      title: t("Šablóna príspevku", "Manuscript template"),
-      description: t(
-        "Autori si stiahnu šablónu, pripravia v nej príspevok a nahrajú dokončený súbor. Dostupná je aj pri vypnutom recenzovaní.",
-        "Authors download this template, write their manuscript in it and upload the completed file. It is available even when reviews are disabled.",
-      ),
-      file: manuscript,
-      href: `/api/conference-review/templates/${conference}/manuscript`,
-      empty: t("Šablóna zatiaľ nie je nahraná.", "No template uploaded yet."),
-    },
-    [ConferenceTemplateKind.Review]: {
-      title: t("Šablóna recenzného posudku", "Review report template"),
-      description: t(
-        "Aplikácia vyplní oficiálny DOCX posudok z odpovedí recenzenta, odporúčania a údajov o príspevku. Nová šablóna sa použije pre nové kolá; existujúce kolá si ponechajú pôvodnú.",
-        "The app generates the official DOCX report from the reviewer’s answers, recommendation and submission details. A new template applies to new rounds; existing rounds keep their original template.",
-      ),
-      file: review,
-      href: `/api/conference-review/files/${review}`,
-      empty: t(
-        "Používa sa základná šablóna aplikácie.",
-        "Using the app’s default report template.",
-      ),
-    },
-  };
-  const save = async (kind: ConferenceTemplateKind, file: string | null) => {
-    const result = await setConferenceTemplate({ conference, kind, file });
+  const [editing, setEditing] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const title = t("Šablóna príspevku", "Manuscript template");
+  const description = t(
+    "Autori si stiahnu túto šablónu. Pri odovzdaní dokumentu DOCX aplikácia skontroluje rozmery strany a okraje každej sekcie.",
+    "Authors download this template. When they submit a DOCX, the app checks the page size and margins of every section.",
+  );
+
+  async function save(file: string | null) {
+    const result = await setConferenceTemplate({
+      conference,
+      kind: ConferenceTemplateKind.Manuscript,
+      file,
+    });
     if (!result.ok) throw new Error(templateError(result.message, lng));
     router.refresh();
-  };
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-2xl font-semibold">{t("Šablóny", "Templates")}</h1>
-      <div className="grid gap-4 lg:grid-cols-2">
-        {Object.values(ConferenceTemplateKind).map((kind) => {
-          const template = templates[kind];
-          return (
-            <Card key={kind}>
-              <CardHeader>
-                <CardTitle>{template.title}</CardTitle>
-                <CardDescription>{template.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-3">
-                {template.file ? (
-                  <a
-                    className="w-fit underline underline-offset-4"
-                    href={template.href}
-                  >
-                    {t(
-                      "Stiahnuť aktuálnu šablónu",
-                      "Download current template",
-                    )}
-                  </a>
-                ) : (
-                  <p className="text-muted-foreground">{template.empty}</p>
-                )}
-                {kind === ConferenceTemplateKind.Review && (
-                  <details className="text-sm">
-                    <summary className="cursor-pointer">
-                      {t(
-                        "Ako pripraviť šablónu posudku",
-                        "Prepare a review report template",
-                      )}
-                    </summary>
-                    <p className="mt-2">
-                      {t(
-                        "Do Word dokumentu vložte značky na miesta, ktoré má aplikácia vyplniť. Zachová sa rozloženie aj formátovanie dokumentu.",
-                        "Insert placeholders in the Word document where the app should fill in values. The document’s layout and formatting are preserved.",
-                      )}
-                    </p>
-                    <p className="mt-2 break-words font-mono">
-                      {
-                        "{paper}, {reviewer}, {recommendation}, {answers}, {date}, {publish}, {conditional}, {reject}"
-                      }
-                    </p>
-                    <p className="mt-2">
-                      {t(
-                        "Značku konkrétnej otázky nájdete v knižnici formulárov. Recenzent vypĺňa online formulár, nie túto šablónu.",
-                        "Find each question’s placeholder in the form library. The reviewer completes the online form, not this template.",
-                      )}
-                    </p>
-                  </details>
-                )}
-              </CardContent>
-              <CardFooter className="mt-auto flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                disabled={!mounted}
-                  aria-label={`${t("Nahrať", "Upload")} · ${template.title}`}
-                  onClick={() => setEditing(kind)}
-                >
-                  {template.file
-                    ? t("Nahradiť šablónu", "Replace template")
-                    : t("Nahrať šablónu", "Upload template")}
-                </Button>
-                {template.file && (
-                  <Button
-                    variant="ghost"
-                  disabled={!mounted}
-                    aria-label={`${t("Odstrániť", "Remove")} · ${template.title}`}
-                    onClick={() => setRemoving(kind)}
-                  >
-                    {kind === ConferenceTemplateKind.Review
-                      ? t("Použiť základnú šablónu", "Use default template")
-                      : t("Odstrániť", "Remove")}
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {manuscript ? (
+            <a
+              className="underline underline-offset-4"
+              href={
+                "/api/conference-review/templates/" + conference + "/manuscript"
+              }
+            >
+              {t("Stiahnuť aktuálnu šablónu", "Download current template")}
+            </a>
+          ) : (
+            <p>
+              {t("Šablóna zatiaľ nie je nahraná.", "No template uploaded yet.")}
+            </p>
+          )}
+        </CardContent>
+        <CardFooter className="flex-wrap gap-2">
+          <Button disabled={!mounted} onClick={() => setEditing(true)}>
+            {manuscript
+              ? t("Nahradiť", "Replace")
+              : t("Nahrať šablónu", "Upload template")}
+          </Button>
+          {manuscript && (
+            <Button
+              variant="outline"
+              disabled={!mounted}
+              onClick={() => setRemoving(true)}
+            >
+              {t("Odstrániť", "Remove")}
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
       {editing && (
         <TemplateEditor
           lng={lng}
-          title={templates[editing].title}
-          description={templates[editing].description}
-          onClose={() => setEditing(null)}
+          title={title}
+          description={description}
+          onClose={() => setEditing(false)}
+          onSave={save}
           onUpload={async (file, onProgress) => {
             try {
               return await uploadReviewFile(file, {
                 conference,
-                kind:
-                  editing === ConferenceTemplateKind.Manuscript
-                    ? "MANUSCRIPT_TEMPLATE"
-                    : "TEMPLATE",
+                kind: "MANUSCRIPT_TEMPLATE",
                 onProgress,
               });
-            } catch (error) {
+            } catch (e) {
               throw new Error(
-                templateError(error instanceof Error ? error.message : "", lng),
+                templateError(e instanceof Error ? e.message : "", lng),
               );
             }
           }}
-          onSave={(id) => save(editing, id)}
         />
       )}
       {removing && (
         <ConfirmDialog
           lng={lng}
-          title={templates[removing].title}
-          description={
-            removing === ConferenceTemplateKind.Manuscript
-              ? t(
-                  "Autori už nebudú mať k dispozícii šablónu na stiahnutie. Odovzdané príspevky zostanú zachované.",
-                  "Authors will no longer have a template to download. Submitted manuscripts are preserved.",
-                )
-              : t(
-                  "Nové kolá použijú základnú šablónu. Existujúce kolá a posudky zostanú zachované.",
-                  "New rounds will use the default template. Existing rounds and reports are preserved.",
-                )
-          }
-          onClose={() => setRemoving(null)}
-          onConfirm={() => save(removing, null)}
+          title={title}
+          description={t(
+            "Odstrániť túto šablónu pre nové príspevky?",
+            "Remove this template for new submissions?",
+          )}
+          onClose={() => setRemoving(false)}
+          onConfirm={() => save(null)}
         />
       )}
     </div>
@@ -198,8 +131,8 @@ function templateError(message: string, lng: string) {
   const t = localizedText(lng);
   if (/DOCX|Multi error|zip|macro/i.test(message))
     return t(
-      "Skontrolujte DOCX súbor a jeho značky. Dokument nesmie obsahovať makrá ani vložené programy.",
-      "Check the DOCX file and its placeholders. Documents must not contain macros or embedded programs.",
+      "Skontrolujte formát a nastavenie strán súboru DOCX. Dokument nesmie obsahovať makrá ani vložené programy.",
+      "Check the DOCX file and its page layout. Documents must not contain macros or embedded programs.",
     );
   if (/20 MiB|1 byte/i.test(message))
     return t(

@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import assert from "node:assert/strict";
 import test from "node:test";
 import mongoose from "mongoose";
@@ -34,6 +36,8 @@ import {
 } from "../src/repositories/form.repository";
 import { FormService } from "../src/services/form.service";
 import { ReviewResolver } from "../src/resolvers/reviews/review.resolver";
+import { ManuscriptHistoryService } from "../src/services/reviews/manuscript-history.service";
+import { PublicationService } from "../src/services/reviews/publication.service";
 import { ReviewService } from "../src/services/reviews/review.service";
 import {
   ConferenceTemplateService,
@@ -51,9 +55,10 @@ import { unseal } from "../src/util/secrets";
 import { toDTO } from "../src/util/helpers";
 
 const uri = process.env.REVIEW_TEST_MONGODB_URI;
+
 test(
   "MongoDB 8: shared forms and the complete confidential review workflow",
-  { skip: !uri, timeout: 90000 },
+  { skip: !uri, timeout: 240000 },
   async (t) => {
     assert.equal(process.env.REVIEW_TEST_ENVIRONMENT, "staging");
     assert.equal(new URL(uri!).protocol, "mongodb:");
@@ -66,6 +71,7 @@ test(
     process.env.SECRET = "isolated-integration-test-secret";
     await mongoose.connect(uri!, { dbName: "flawis_reviews_test" });
     await mongoose.connection.dropDatabase();
+
     try {
       const models = [
         User,
@@ -83,10 +89,12 @@ test(
         ...Object.values(ReviewModels),
       ] as any[];
       await Promise.all(models.map((model) => getModelForClass(model).init()));
+
       const users = new Repository(User),
         conferences = new Repository(Conference),
         sections = new Repository(Section),
         submissions = new Repository(Submission);
+
       const admin = toDTO(
         await users.create({
           name: "Coordinator",
@@ -95,6 +103,7 @@ test(
           verified: true,
         }),
       );
+
       const author = toDTO(
         await users.create({
           name: "Paper Author",
@@ -103,6 +112,7 @@ test(
           verified: true,
         }),
       );
+
       const coordinator = toDTO(
         await users.create({
           name: "Section coordinator",
@@ -111,6 +121,7 @@ test(
           verified: true,
         }),
       );
+
       const conference = await conferences.create({
         slug: "review-test",
         dates: { start: new Date(), end: new Date() },
@@ -151,9 +162,11 @@ test(
         new AnswerRepository(),
         new AnswerRevisionRepository(),
       );
+
       const access = new ReviewAccessService(),
         activity = new ActivityService(),
         mail = new RmqService();
+
       const reviews = new ReviewService(access, activity, forms, mail);
       const buffers = new Map<string, Buffer>();
       const storage = {
@@ -167,6 +180,11 @@ test(
         },
         deleteFiles: async () => {},
       } as any;
+      const handover = process.env.BPF_HANDOVER_DIRECTORY;
+      const sample = (name: string, fallback: Buffer) =>
+        handover
+          ? readFileSync(join(handover, "02_Vzorovy_pripad", name))
+          : fallback;
       const files = new ReviewFileService(storage, reviews, access, activity);
       const exports = new ReviewExportService(
         reviews,
@@ -182,6 +200,7 @@ test(
         "conference templates publish independently of reviews with scoped permissions and atomic audit",
         async () => {
           const templateBytes = defaultReportTemplate();
+
           const upload = (kind: string, user = admin, extra = {}) =>
             files.upload({
               user,
@@ -191,6 +210,7 @@ test(
               buffer: templateBytes,
               ...extra,
             });
+
           await assert.rejects(
             upload("MANUSCRIPT_TEMPLATE", coordinator),
             /coordinate/,
@@ -231,6 +251,7 @@ test(
           await new Promise<void>((resolve) =>
             server.once("listening", resolve),
           );
+
           try {
             const address = server.address() as { port: number };
             const origin = `http://127.0.0.1:${address.port}`;
@@ -254,7 +275,10 @@ test(
               `${origin}/review-files/${manuscript}`,
             );
             assert.equal(protectedFile.status, 400);
-            assert.match(((await protectedFile.json()) as { error: string }).error, /Authentication/);
+            assert.match(
+              ((await protectedFile.json()) as { error: string }).error,
+              /Authentication/,
+            );
             assert.equal(
               (
                 await fetch(
@@ -301,13 +325,26 @@ test(
               .asText()
               .replace("REVIEW REPORT", "ORIGINAL OFFICIAL REPORT"),
           );
-          reportTemplateId = new ObjectId(
-            (
-              await upload("TEMPLATE", admin, {
-                buffer: original.generate({ type: "nodebuffer" }),
-              })
-            ).id,
+          const bytes = original.generate({ type: "nodebuffer" });
+          const legacy = await reviews.files.create({
+            conference: conference._id,
+            bucket: "conference-reviews",
+            objectName: "historical-layout.docx",
+            kind: "TEMPLATE",
+            filename: "historical.docx",
+            contentType:
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            size: bytes.length,
+            checksum: "historical",
+          });
+          await storage.upload(
+            legacy.bucket,
+            legacy.objectName,
+            bytes,
+            legacy.contentType,
           );
+          reportTemplateId = legacy._id;
+          await assert.rejects(upload("TEMPLATE"), /Invalid file kind/);
           await assert.rejects(
             templates.setTemplate(
               admin,
@@ -324,7 +361,7 @@ test(
               ConferenceTemplateKind.Review,
               manuscript,
             ),
-            /purpose/,
+            /built-in/,
           );
           const other = await conferences.create({
             slug: "other-template-conference",
@@ -346,6 +383,7 @@ test(
           activity.record = async () => {
             throw new Error("audit failed");
           };
+
           try {
             await assert.rejects(
               templates.setTemplate(
@@ -363,6 +401,7 @@ test(
           } finally {
             activity.record = originalRecord;
           }
+
           await templates.setTemplate(
             admin,
             conference._id,
@@ -393,16 +432,11 @@ test(
             templates.manuscriptTemplate(conference._id),
             /not found/,
           );
-          await templates.setTemplate(
-            admin,
-            conference._id,
-            ConferenceTemplateKind.Review,
-            reportTemplateId,
-          );
-          assert.equal(
-            (await reviews.settings.findOne({ conference: conference._id }))
-              ?.enabled,
-            false,
+          // Simulate a conference configured before report layout uploads were retired.
+          await reviews.settings.findOneAndUpdate(
+            { conference: conference._id },
+            { $set: { templateFile: reportTemplateId, enabled: false } },
+            { upsert: true },
           );
         },
       );
@@ -472,6 +506,7 @@ test(
         "queue filters precede pagination and exclude other coordinator scopes",
         async () => {
           const extra = [];
+
           for (let i = 0; i < 35; i++)
             extra.push(
               await submissions.create({
@@ -484,6 +519,7 @@ test(
                 },
               }),
             );
+
           const hidden = await submissions.create({
             conference: conference._id,
             section: new ObjectId(),
@@ -531,10 +567,12 @@ test(
             30,
             { search: "Review paper", stage: "MISSING_FILE" },
           );
+
           assert.deepEqual(
             matching.rows.map((r) => r.submissionId),
             [String(paper._id)],
           );
+
           assert.equal(matching.totalCount, 1);
           const second = await reviews.queue(
             coordinator,
@@ -575,6 +613,7 @@ test(
           activity.record = async () => {
             throw new Error("audit unavailable");
           };
+
           try {
             await assert.rejects(
               resolver.setReviewCoordinator(
@@ -605,6 +644,7 @@ test(
               ),
               /audit unavailable/,
             );
+
             assert.equal(
               await reviews.eligibility.countDocuments({
                 reviewer: reviewer!._id,
@@ -621,11 +661,13 @@ test(
         form.fields.every((f) => ObjectId.isValid(String(f.id))),
         "stable nested field IDs survive DTO conversion",
       );
+
       await t.test(
         "forms can be bound to multiple domains without sharing responses",
         async () => {
           const courseId = new ObjectId(),
             attendeeId = new ObjectId();
+
           await forms.bind("COURSE", courseId, form.id);
           const answer = await forms.saveAnswers({
             context: "COURSE",
@@ -661,12 +703,35 @@ test(
           );
         },
       );
+
+      if (handover) {
+        const template = await files.upload({
+          user: admin,
+          conference: conference._id,
+          kind: "MANUSCRIPT_TEMPLATE",
+          filename: "BPF.docx",
+          buffer: readFileSync(
+            join(
+              handover,
+              "01_Pravidla_a_sablony",
+              "01_BPF_2026_Sablona_prispevku_EN_B5.docx",
+            ),
+          ),
+        });
+        await templates.setTemplate(
+          admin,
+          conference._id,
+          ConferenceTemplateKind.Manuscript,
+          new ObjectId(template.id),
+        );
+      }
+
       await files.upload({
         user: author,
         submission: paper._id,
         kind: "ORIGINAL",
         filename: "original.docx",
-        buffer: defaultReportTemplate(),
+        buffer: sample("01_Original.docx", defaultReportTemplate()),
       });
       const reviewer1 = await reviews.saveReviewer(admin, {
         name: "Reviewer One",
@@ -696,7 +761,7 @@ test(
               {
                 reviewerId: self!._id,
                 slot: 1,
-                deadline: "2026-12-20",
+                deadline: new Date(Date.now() + 7 * 86400000).toISOString(),
                 reason: "verified",
               },
               "conferences.example.test",
@@ -720,6 +785,7 @@ test(
           activity.record = async () => {
             throw new Error("Audit unavailable");
           };
+
           try {
             await assert.rejects(
               reviews.action(
@@ -729,7 +795,7 @@ test(
                 {
                   reviewerId: reviewer1!._id,
                   slot: 1,
-                  deadline: "2026-12-20",
+                  deadline: new Date(Date.now() + 7 * 86400000).toISOString(),
                   reason: "Checked",
                 },
                 "conferences.example.test",
@@ -753,6 +819,7 @@ test(
           }
         },
       );
+
       for (const [index, reviewer] of [reviewer1, reviewer2].entries())
         await reviews.action(
           coordinator,
@@ -761,61 +828,30 @@ test(
           {
             reviewerId: reviewer!._id,
             slot: index + 1,
-            deadline: "2026-12-20",
+            deadline: new Date(Date.now() + 7 * 86400000).toISOString(),
             reason: "Department and section eligibility checked",
           },
           "conferences.example.test",
         );
+
       const review = await reviews.cases.findOne({ submission: paper._id });
       await t.test(
-        "replacing and removing report templates preserves the round's pinned report",
+        "new rounds ignore historical conference layouts and older rounds retain their pinned report",
         async () => {
-          const round = await reviews.rounds.findOne({
+          const round = (await reviews.rounds.findOne({
             _id: review!.currentRound,
-          });
-          assert.equal(String(round!.templateFile), String(reportTemplateId));
-          const next = await files.upload({
-            user: admin,
-            conference: conference._id,
-            kind: "TEMPLATE",
-            filename: "next.docx",
-            buffer: defaultReportTemplate(),
-          });
-          await templates.setTemplate(
-            admin,
-            conference._id,
-            ConferenceTemplateKind.Review,
-            new ObjectId(next.id),
+          }))!;
+          assert.equal(round.templateFile, undefined);
+          await assert.rejects(
+            reviews.configure(admin, conference._id, {
+              templateFile: reportTemplateId,
+            }),
+            /built-in/,
           );
-          assert.equal(
-            String(
-              (await reviews.settings.findOne({ conference: conference._id }))!
-                .templateFile,
-            ),
-            next.id,
-          );
-          assert.equal(
-            String(
-              (await reviews.rounds.findOne({ _id: round!._id }))!.templateFile,
-            ),
-            String(reportTemplateId),
-          );
-          await templates.setTemplate(
-            admin,
-            conference._id,
-            ConferenceTemplateKind.Review,
-            null,
-          );
-          assert.equal(
-            (await reviews.settings.findOne({ conference: conference._id }))!
-              .templateFile,
-            undefined,
-          );
-          assert.equal(
-            String(
-              (await reviews.rounds.findOne({ _id: round!._id }))!.templateFile,
-            ),
-            String(reportTemplateId),
+          // Restore a historical round fixture to exercise its saved layout through real downloads.
+          await reviews.rounds.findOneAndUpdate(
+            { _id: round._id },
+            { $set: { templateFile: reportTemplateId } },
           );
         },
       );
@@ -839,7 +875,7 @@ test(
         submission: paper._id,
         kind: "ANONYMOUS",
         filename: "anonymous.docx",
-        buffer: defaultReportTemplate(),
+        buffer: sample("02_Anonymizovany.docx", defaultReportTemplate()),
       });
       await reviews.action(
         coordinator,
@@ -859,12 +895,14 @@ test(
         "conferences.example.test",
       );
       assert.match(link.url!, /\/review\/[A-Za-z0-9_-]{43}$/);
+
       assert.equal(
         await new Repository(Notification).countDocuments({
           assignmentId: { $exists: true },
         }),
         messagesBeforeLink,
       );
+
       const packageZip = new PizZip(
         await exports.export(
           coordinator,
@@ -873,13 +911,8 @@ test(
           assignments[0]._id,
         ),
       );
-      assert.equal(packageZip.file(/\.docx$/).length, 2);
-      assert.match(
-        new PizZip(packageZip.file("review-form.docx")!.asNodeBuffer())
-          .file("word/document.xml")!
-          .asText(),
-        /ORIGINAL OFFICIAL REPORT/,
-      );
+      assert.equal(packageZip.file(/\.docx$/).length, 1);
+      assert.equal(packageZip.file("review-form.docx"), null);
       for (const a of assignments)
         await reviews.action(
           coordinator,
@@ -893,8 +926,10 @@ test(
         null,
         { sort: { slot: 1 } },
       );
+
       const token1 = unseal(stored[0].tokenEncrypted!),
         token2 = unseal(stored[1].tokenEncrypted!);
+
       const portal = await reviews.portal(token1);
       assert.equal(portal.assignmentId, String(stored[0]._id));
       assert.ok(!JSON.stringify(portal).includes(author.email));
@@ -998,6 +1033,10 @@ test(
           const report = new PizZip(reports.file(/\.docx$/)[0].asNodeBuffer());
           assert.match(
             report.file("word/document.xml")!.asText(),
+            /ORIGINAL OFFICIAL REPORT/,
+          );
+          assert.match(
+            report.file("word/document.xml")!.asText(),
             /Clear and useful/,
           );
         },
@@ -1025,8 +1064,10 @@ test(
         paper._id,
         "REQUEST_REVISION",
         {
-          instructions: "Please clarify the conclusion.",
-          deadline: "2026-12-28",
+          reportPoints: {
+            [String(assignments[1]._id)]: "Please clarify the conclusion.",
+          },
+          deadline: new Date(Date.now() + 7 * 86400000).toISOString(),
         },
         "conferences.example.test",
       );
@@ -1040,27 +1081,49 @@ test(
       const invitationCount = await new Repository(Notification).countDocuments(
         { assignmentId: { $exists: true } },
       );
+      await assert.rejects(
+        files.upload({
+          revisionToken,
+          kind: "REVISION",
+          filename: "single.docx",
+          buffer: sample("05_Oprava_cista.docx", defaultReportTemplate()),
+        }),
+        /both the clean/,
+      );
+      const tracked = new PizZip(defaultReportTemplate());
+      tracked.file("word/settings.xml", "<settings/>");
       await files.upload({
+        tracked: {
+          filename: "tracked.docx",
+          buffer: sample(
+            "06_Oprava_sledovane_zmeny.docx",
+            tracked.generate({ type: "nodebuffer" }),
+          ),
+        },
         revisionToken,
         kind: "REVISION",
         filename: "corrected.docx",
-        buffer: defaultReportTemplate(),
+        buffer: sample("05_Oprava_cista.docx", defaultReportTemplate()),
         note: "Conclusion clarified.",
       });
       const correction = await reviews.revisions.findOne({
         submission: paper._id,
       });
       assert.equal(correction!.status, "RECEIVED");
+      assert.equal(correction!.instructions, "Please clarify the conclusion.");
+      assert.equal(correction!.points!.length, 1);
       assert.equal(
         await reviews.versions.countDocuments({ submission: paper._id }),
         2,
       );
+
       assert.equal(
         await new Repository(Notification).countDocuments({
           assignmentId: { $exists: true },
         }),
         invitationCount,
       );
+
       await assert.rejects(
         reviews.action(
           coordinator,
@@ -1071,13 +1134,175 @@ test(
         ),
         /verify outstanding/,
       );
+      await t.test(
+        "the original reviewer checks only anonymous correction files without changing the report",
+        async () => {
+          const hostname = "conferences.example.test";
+
+          assert.equal(
+            (await reviews.cases.findOne({
+              submission: paper._id,
+            }))!.currentVersion!.toString(),
+            String(correction!.receivedVersion),
+          );
+
+          const checkData = {
+            requestId: correction!._id,
+            checkAssignment: assignments[1]._id,
+            deadline: new Date(Date.now() + 86400000).toISOString(),
+          };
+          await assert.rejects(
+            reviews.action(
+              coordinator,
+              paper._id,
+              "REQUEST_REVIEWER_CHECK",
+              checkData,
+              hostname,
+            ),
+            /anonymous revision/,
+          );
+
+          if (handover) {
+            await files.draftAnonymous(
+              coordinator,
+              paper._id,
+              correction!.receivedVersion!,
+            );
+            const diff = await files.compare(
+              coordinator,
+              paper._id,
+              correction!.receivedVersion,
+            );
+            assert.ok(
+              diff.rows.some(
+                (r) => r.changed && r.after?.includes("15 minutes"),
+              ),
+            );
+          } else
+            await files.upload({
+              user: coordinator,
+              submission: paper._id,
+              sourceVersion: correction!.receivedVersion,
+              kind: "ANONYMOUS",
+              filename: "anonymous.docx",
+              buffer: defaultReportTemplate(),
+              tracked: {
+                filename: "blind-tracked.docx",
+                buffer: tracked.generate({ type: "nodebuffer" }),
+              },
+            });
+
+          await reviews.action(
+            coordinator,
+            paper._id,
+            "PREPARE",
+            { notes: "Both correction files checked" },
+            hostname,
+          );
+          await assert.rejects(
+            reviews.action(
+              coordinator,
+              paper._id,
+              "REQUEST_REVIEWER_CHECK",
+              { ...checkData, pointIds: ["foreign-point"] },
+              hostname,
+            ),
+            /unresolved points/,
+          );
+          await reviews.action(
+            coordinator,
+            paper._id,
+            "REQUEST_REVIEWER_CHECK",
+            checkData,
+            hostname,
+          );
+          const check = (await reviews.revisions.findOne({
+            parentRequest: correction!._id,
+            kind: "CHECK",
+          }))!;
+          const job = await new Repository(Notification).findOne(
+            { routingKey: "mail.review", submissionId: paper._id },
+            null,
+            { sort: { _id: -1 } },
+          );
+          const token = JSON.parse(unseal(job!.payload)).url.split("/").pop();
+          assert.equal(
+            (await reviews.revisionPortal(token)).id,
+            String(check._id),
+          );
+          assert.ok(
+            !(await reviews.authorWorkspace(author, paper._id)).revisions.some(
+              (r) => r.id === String(check._id),
+            ),
+          );
+          await files.authorizedFile(
+            check.trackedFile!,
+            undefined,
+            undefined,
+            token,
+          );
+          const revision = (await reviews.versions.findOne({
+            _id: correction!.receivedVersion,
+          }))!;
+          await assert.rejects(
+            files.authorizedFile(revision.file, undefined, undefined, token),
+            /access denied/,
+          );
+          await assert.rejects(
+            reviews.action(
+              coordinator,
+              paper._id,
+              "VERIFY_REVISION",
+              { requestId: correction!._id },
+              hostname,
+            ),
+            /reviewer check/,
+          );
+          await assert.rejects(
+            reviews.submitReviewerCheck(token, {}),
+            /each requested point/,
+          );
+          const saved = await forms.answer("REVIEW", assignments[1]._id);
+          await reviews.submitReviewerCheck(
+            token,
+            Object.fromEntries(check.points!.map((p) => [p.id, "VERIFIED"])),
+          );
+          assert.deepEqual(
+            await forms.answer("REVIEW", assignments[1]._id),
+            saved,
+          );
+          assert.equal(
+            (await reviews.revisions.findOne({ _id: correction!._id }))!
+              .points![0].status,
+            "VERIFIED",
+          );
+          const receipt = new PizZip(await exports.receipt(token2));
+          assert.match(
+            receipt.file("word/document.xml")!.asText(),
+            /Clear and useful/,
+          );
+        },
+      );
       await reviews.action(
         coordinator,
         paper._id,
         "VERIFY_REVISION",
-        { requestId: correction!._id },
+        {
+          requestId: correction!._id,
+          checks: Object.fromEntries(
+            correction!.points!.map((p) => [p.id, "VERIFIED"]),
+          ),
+        },
         "conferences.example.test",
       );
+      for (const assignment of assignments)
+        await reviews.action(
+          coordinator,
+          paper._id,
+          "CLOSE_REPORT",
+          { assignmentId: assignment._id },
+          "conferences.example.test",
+        );
       await reviews.action(
         coordinator,
         paper._id,
@@ -1086,14 +1311,533 @@ test(
         "conferences.example.test",
       );
       await assert.rejects(reviews.portal(token1), /invalid or expired/);
+      const bpf = await reviews.configure(admin, conference._id, {
+        useBpfQuestionnaire: true,
+      });
+      const bpfForm = await forms.getForm(bpf!.form!);
+      assert.equal(bpfForm.fields.length, 10);
+      assert.equal(
+        String(
+          (await reviews.rounds.findOne({ _id: review!.currentRound }))!.form,
+        ),
+        String(form.id),
+      );
+      const pub = new PublicationService(
+        reviews,
+        access,
+        exports,
+        storage,
+        activity,
+      );
+      const final = await files.upload({
+        user: coordinator,
+        submission: paper._id,
+        kind: "FINAL",
+        filename: "final.docx",
+        buffer: sample("07_Finalny_clanok.docx", defaultReportTemplate()),
+      });
+      await files.upload({
+        user: coordinator,
+        submission: paper._id,
+        kind: "PROOF_PDF",
+        filename: "proof.pdf",
+        buffer: sample("08_Autorska_korektura.pdf", Buffer.from("%PDF-1.4")),
+      });
+      await reviews.action(
+        coordinator,
+        paper._id,
+        "REQUEST_PROOF",
+        { deadline: new Date(Date.now() + 86400000).toISOString() },
+        "conferences.example.test",
+      );
+      const proof = (await reviews.revisions.findOne({
+        submission: paper._id,
+        kind: "PROOF",
+      }))!;
+      assert.equal(String(proof.manuscriptFile), final.id);
+      await assert.rejects(
+        reviews.approveAuthorProof(proof._id, coordinator),
+        /Author proof access/,
+      );
+      await assert.rejects(
+        reviews.action(
+          coordinator,
+          paper._id,
+          "NO_PROOF_RESPONSE",
+          {},
+          "conferences.example.test",
+        ),
+        /delivery/,
+      );
+      await reviews.approveAuthorProof(proof._id, author);
+      const current = (await reviews.cases.findOne({ submission: paper._id }))!;
+      const approved = await pub.approve(
+        coordinator,
+        paper._id,
+        current.revision,
+      );
+      const pkg = new PizZip(await pub.download(coordinator, paper._id));
+      assert.ok(pkg.file("00_Vydavatelsky_suhrn.xlsx"));
+      assert.equal(pkg.file(/Posudok_.*docx$/).length, 2);
+      assert.equal(pkg.file(/Autorska_korektura.pdf$/).length, 1);
+      await submissions.findOneAndUpdate(
+        { _id: paper._id },
+        { $set: { "translations.en.name": "A different title" } },
+      );
+      await assert.rejects(pub.download(coordinator, paper._id), /superseded/);
+      await submissions.findOneAndUpdate(
+        { _id: paper._id },
+        { $set: { "translations.en.name": paper.translations.en.name } },
+      );
+
+      if (handover) {
+        assert.deepEqual(
+          pkg.file(/01_Finalny_clanok.docx$/)[0].asNodeBuffer(),
+          sample("07_Finalny_clanok.docx", Buffer.alloc(0)),
+        );
+        assert.deepEqual(
+          pkg.file(/Autorska_korektura.pdf$/)[0].asNodeBuffer(),
+          sample("08_Autorska_korektura.pdf", Buffer.alloc(0)),
+        );
+        const proceedings = new PizZip(
+          await pub.proceedings(coordinator, [paper._id]),
+        );
+        assert.ok(proceedings.file("word/document.xml"));
+      }
+
+      await pub.deliver(coordinator, paper._id, approved.id);
+      await files.upload({
+        user: coordinator,
+        submission: paper._id,
+        kind: "FINAL",
+        filename: "updated.docx",
+        buffer: sample("05_Oprava_cista.docx", defaultReportTemplate()),
+      });
+      await assert.rejects(
+        pub.download(coordinator, paper._id),
+        /current closed author proof/,
+      );
+      await assert.rejects(
+        reviews.approveAuthorProof(proof._id, author),
+        /superseded/,
+      );
       assert.equal(
         (await reviews.cases.findOne({ submission: paper._id }))!.decision,
         "ACCEPTED",
       );
+
       assert.ok(
         (await new Repository(ReviewModels.ActivityEvent).countDocuments({
           submission: paper._id,
         })) > 10,
+      );
+
+      await t.test(
+        "author uploads use the manuscript template pinned to the first version",
+        async () => {
+          const history = new ManuscriptHistoryService(
+            files,
+            reviews,
+            activity,
+          );
+
+          const sample = defaultReportTemplate(),
+            altered = new PizZip(sample);
+
+          const xml = altered.file("word/document.xml")!.asText();
+
+          altered.file(
+            "word/document.xml",
+            xml.replace(
+              /(<w:pgSz[^>]*w:w=")\d+"/,
+              (_match, prefix) => prefix + '9000"',
+            ),
+          );
+
+          const other = altered.generate({ type: "nodebuffer" });
+
+          const publish = async (bytes: Buffer) => {
+            const file = await files.upload({
+              user: admin,
+              conference: conference._id,
+              kind: "MANUSCRIPT_TEMPLATE",
+              filename: "instructions.docx",
+              buffer: bytes,
+            });
+            await templates.setTemplate(
+              admin,
+              conference._id,
+              ConferenceTemplateKind.Manuscript,
+              new ObjectId(file.id),
+            );
+            return file.id;
+          };
+
+          const template = await publish(sample);
+          await assert.rejects(
+            files.stageManuscript(
+              author,
+              conference._id,
+              undefined,
+              "wrong.docx",
+              other,
+            ),
+            /page size/,
+          );
+          const first = await files.stageManuscript(
+            author,
+            conference._id,
+            undefined,
+            "article.docx",
+            sample,
+          );
+          await assert.rejects(
+            files.legacyPermission(coordinator, [first.url], "READ"),
+            /protected/,
+          );
+          await files.legacyPermission(author, [first.url], "READ");
+          await history.validateUpload(
+            first.url,
+            undefined,
+            author,
+            conference._id,
+          );
+          const otherPaper = await submissions.create({
+            conference: conference._id,
+            section: section._id,
+            authors: [author.id],
+            translations: paper.translations,
+            fileUrl: first.url,
+          });
+          await history.capture(toDTO(otherPaper), author);
+          await publish(other);
+          assert.equal(
+            String(
+              (await files.paperTemplate(
+                conference._id,
+                otherPaper._id,
+                author,
+              ))!._id,
+            ),
+            template,
+          );
+          await assert.rejects(
+            files.stageManuscript(
+              author,
+              conference._id,
+              otherPaper._id,
+              "wrong.docx",
+              other,
+            ),
+            /page size/,
+          );
+          const second = await files.stageManuscript(
+            author,
+            conference._id,
+            otherPaper._id,
+            "revision.docx",
+            sample,
+          );
+          await history.validateUpload(
+            second.url,
+            first.url,
+            author,
+            conference._id,
+            otherPaper._id,
+          );
+          await history.capture(
+            { ...toDTO(otherPaper), fileUrl: second.url },
+            author,
+          );
+          const versions = await reviews.versions.findAll(
+            { submission: otherPaper._id },
+            null,
+            { sort: { number: 1 } },
+          );
+
+          assert.deepEqual(
+            versions.map((v) => String(v.template)),
+            [template, template],
+          );
+
+          assert.equal(
+            String(versions[1].parentVersion),
+            String(versions[0]._id),
+          );
+          await assert.rejects(
+            files.legacyPermission(author, [first.url], "DELETE"),
+            /cannot be deleted/,
+          );
+          await templates.setTemplate(
+            admin,
+            conference._id,
+            ConferenceTemplateKind.Manuscript,
+            null,
+          );
+        },
+      );
+      await t.test(
+        "BPF uses the published online form, formal checklist, conditional answer and coordinator-selected feedback",
+        async () => {
+          const host = "conferences.example.test",
+            deadline = new Date(Date.now() + 7 * 86400000).toISOString();
+
+          await reviews.action(
+            coordinator,
+            paper._id,
+            "DECIDE",
+            { decision: "PENDING", reason: "Another round" },
+            host,
+          );
+          await reviews.action(coordinator, paper._id, "NEXT_ROUND", {}, host);
+
+          for (const [i, reviewer] of [reviewer1, reviewer2].entries())
+            await reviews.action(
+              coordinator,
+              paper._id,
+              "ASSIGN",
+              {
+                reviewerId: reviewer!._id,
+                slot: i + 1,
+                deadline,
+                reason: "Eligibility checked",
+              },
+              host,
+            );
+
+          await files.upload({
+            user: coordinator,
+            submission: paper._id,
+            kind: "ANONYMOUS",
+            filename: "anonymous.docx",
+            buffer: defaultReportTemplate(),
+          });
+          await assert.rejects(
+            reviews.action(
+              coordinator,
+              paper._id,
+              "PREPARE",
+              { abstractWords: "201" },
+              host,
+            ),
+            /150–200/,
+          );
+          await reviews.action(
+            coordinator,
+            paper._id,
+            "PREPARE",
+            {
+              language: "EN",
+              pageSize: "B5",
+              abstractWords: "160",
+              keywordCount: "5",
+              contacts: "yes",
+              bibliography: "yes",
+            },
+            host,
+          );
+          const latest = (await reviews.cases.findOne({
+            submission: paper._id,
+          }))!;
+          const assignments = await reviews.assignments.findAll(
+            { round: latest.currentRound },
+            null,
+            { sort: { slot: 1 } },
+          );
+          const answers = Object.fromEntries(
+            bpfForm.fields
+              .filter((f) => f.required)
+              .map((f) => [String(f.id), f.selectOptions?.[0].value || ""]),
+          );
+          answers[bpf!.recommendationField!] = "CONDITIONAL";
+
+          for (const a of assignments) {
+            const link = await reviews.action(
+              coordinator,
+              paper._id,
+              "PREPARE_LINK",
+              { assignmentId: a._id },
+              host,
+            );
+            const token = link.url!.split("/").pop()!;
+            await reviews.saveReport(token, answers, undefined, false, host);
+            await assert.rejects(
+              reviews.saveReport(token, answers, 1, true, host),
+              /Describe the changes/,
+            );
+            await reviews.saveReport(
+              token,
+              {
+                ...answers,
+                [bpf!.recommendationField!]:
+                  a.slot === 1 ? "CONDITIONAL" : "REJECT",
+                [String(bpfForm.fields[bpfForm.fields.length - 1].id)]:
+                  "Clarify the observation unit.",
+              },
+              1,
+              true,
+              host,
+            );
+          }
+
+          const newReport = new PizZip(
+            await exports.report(coordinator, paper._id, assignments[0]._id),
+          );
+          assert.match(
+            newReport.file("word/document.xml")!.asText(),
+            /REVIEW REPORT/,
+          );
+          assert.doesNotMatch(
+            newReport.file("word/document.xml")!.asText(),
+            /ORIGINAL OFFICIAL REPORT/,
+          );
+
+          assert.equal(
+            await reviews.releases.countDocuments({
+              round: latest.currentRound,
+            }),
+            0,
+          );
+
+          await assert.rejects(
+            reviews.action(
+              coordinator,
+              paper._id,
+              "CLOSE_REPORT",
+              { assignmentId: assignments[0]._id },
+              host,
+            ),
+            /conditions/,
+          );
+          const act = (action: string, data: Record<string, unknown>) =>
+            reviews.action(coordinator, paper._id, action, data, host);
+
+          const correct = async (
+            request: NonNullable<
+              Awaited<ReturnType<typeof reviews.revisions.findOne>>
+            >,
+          ) => {
+            const clean = sample(
+              "05_Oprava_cista.docx",
+              defaultReportTemplate(),
+            );
+            const tracked = new PizZip(clean);
+            tracked.file("word/settings.xml", "<settings/>");
+            const upload = {
+              user: author,
+              submission: paper._id,
+              requestId: request._id,
+              kind: "REVISION",
+              filename: "clean.docx",
+              buffer: clean,
+              tracked: {
+                filename: "tracked.docx",
+                buffer: sample(
+                  "06_Oprava_sledovane_zmeny.docx",
+                  tracked.generate({ type: "nodebuffer" }),
+                ),
+              },
+            };
+
+            const responses = Object.fromEntries(
+              request.points!.map((p) => [
+                p.id,
+                {
+                  authorStatus: "addressed",
+                  response: "Clarified",
+                  location: "Methods",
+                },
+              ]),
+            );
+
+            await assert.rejects(
+              files.upload({
+                ...upload,
+                responses: {
+                  [request.points![0].id]: {
+                    authorStatus: "addressed",
+                    response: "Clarified",
+                  },
+                },
+              }),
+              /each correction|every correction/,
+            );
+            const receipt = await files.upload({ ...upload, responses });
+            assert.deepEqual(
+              await files.upload({ ...upload, responses }),
+              receipt,
+            );
+            await assert.rejects(
+              files.upload({ ...upload, responses, note: "A changed receipt" }),
+              /different correction/,
+            );
+          };
+
+          await act("REQUEST_REVISION", {
+            deadline,
+            reportPoints: {
+              [String(assignments[0]._id)]:
+                "Define the observation unit.\n\nExplain the counting rule.",
+            },
+          });
+          const request = (await reviews.revisions.findOne({
+            submission: paper._id,
+            round: latest.currentRound,
+            status: "REQUESTED",
+          }))!;
+          await correct(request);
+          const [first, second] = request.points!;
+          await act("VERIFY_REVISION", {
+            requestId: request._id,
+            checks: { [first.id]: "VERIFIED", [second.id]: "NEEDS_CHANGES" },
+          });
+          await assert.rejects(
+            act("REQUEST_REVISION", {
+              deadline,
+              instructions: "Unrelated request",
+            }),
+            /follow-up/,
+          );
+          await act("REQUEST_REVISION", {
+            deadline,
+            parentRequest: String(request._id),
+          });
+          const followup = (await reviews.revisions.findOne({
+            parentRequest: request._id,
+            kind: "POST_REVIEW",
+          }))!;
+
+          assert.deepEqual(
+            followup.points!.map((p) => p.id),
+            [second.id],
+          );
+
+          await correct(followup);
+          await act("VERIFY_REVISION", {
+            requestId: followup._id,
+            checks: { [second.id]: "VERIFIED" },
+            language: "EN",
+            pageSize: "B5",
+            abstractWords: 160,
+            keywordCount: 5,
+            contacts: "yes",
+            bibliography: "yes",
+          });
+          for (const a of assignments)
+            await act("CLOSE_REPORT", { assignmentId: a._id });
+          await act("SET_PARTICIPATION", { participation: "yes" });
+          await assert.rejects(
+            act("DECIDE", {
+              decision: "ACCEPTED",
+              reason: "Verify negative recommendation gate",
+            }),
+            /negative recommendations/,
+          );
+          await act("DECIDE", {
+            decision: "REJECTED",
+            reason: "Negative report upheld",
+          });
+        },
       );
     } finally {
       await mongoose.disconnect();

@@ -20,15 +20,21 @@ import {
 } from "@/components/ui/table";
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { ErrorAlert, FieldControl } from "@/components/form/field-controls";
-import { FormDialog, TextField, ConfirmDialog } from "@/components/form/form-dialog";
+import {
+  FormDialog,
+  TextField,
+  ConfirmDialog,
+} from "@/components/form/form-dialog";
 import ReviewerTags from "@/app/[lng]/flawis/reviewers/_components/reviewer-tags";
 import ReviewerProfileView from "@/app/[lng]/flawis/reviewers/_components/reviewer-profile";
+
 type ImportRow = {
   data: Record<string, string>;
   existing?: ReviewerRecord;
   status: "new" | "update" | "invalid" | "saved" | "failed";
   error?: string;
 };
+
 export default function ReviewerDirectory({
   initial,
   search,
@@ -50,9 +56,11 @@ export default function ReviewerDirectory({
   const [importing, setImporting] = useState(false);
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [previewing, setPreviewing] = useState(false);
+
   async function task(fn: () => Promise<unknown>) {
     setPending(true);
     setError("");
+
     try {
       await fn();
     } catch (e) {
@@ -61,12 +69,15 @@ export default function ReviewerDirectory({
       setPending(false);
     }
   }
+
   async function reload() {
     setPage(await getReviewerDirectory(search));
   }
+
   async function allRecords(query: string, status?: boolean) {
     let result = await getReviewerDirectory(query, undefined, status);
     const records = [...result.rows];
+
     while (result.hasNextPage) {
       result = await getReviewerDirectory(
         query,
@@ -75,8 +86,10 @@ export default function ReviewerDirectory({
       );
       records.push(...result.rows);
     }
+
     return records;
   }
+
   const schema = z.object({
     name: z.string().trim().min(1, t("Zadajte meno.", "Enter a name.")),
     email: z.email(t("Zadajte platný e-mail.", "Enter a valid email.")),
@@ -86,6 +99,7 @@ export default function ReviewerDirectory({
     expertise: z.array(z.string()),
     notes: z.string(),
   });
+
   const existing = editing && editing !== "new" ? editing : null;
   return (
     <div className="flex flex-col gap-5">
@@ -108,11 +122,13 @@ export default function ReviewerDirectory({
             onClick={() =>
               task(async () => {
                 const records = await allRecords(search);
+
                 const url = URL.createObjectURL(
                   new Blob(["\uFEFF", reviewerCsv(records)], {
                     type: "text/csv;charset=utf-8",
                   }),
                 );
+
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = "reviewers.csv";
@@ -372,9 +388,11 @@ export default function ReviewerDirectory({
           )}
           onSubmit={async () => {
             const next = [...rows];
+
             for (let i = 0; i < next.length; i++) {
               const row = next[i];
               if (!["new", "update", "failed"].includes(row.status)) continue;
+
               try {
                 await mutate("reviewer", {
                   id: row.existing?.id,
@@ -406,8 +424,10 @@ export default function ReviewerDirectory({
                   error: errorText(e, lng),
                 };
               }
+
               setRows([...next]);
             }
+
             if (next.some((r) => r.status === "failed"))
               throw new Error(
                 t(
@@ -435,6 +455,7 @@ export default function ReviewerDirectory({
                       const file = e.target.files?.[0];
                       if (!file) return;
                       setPreviewing(true);
+
                       try {
                         const data = parseReviewerCsv(await file.text());
                         const existing = new Map(
@@ -444,6 +465,7 @@ export default function ReviewerDirectory({
                           ]),
                         );
                         const seen = new Set<string>();
+
                         setRows(
                           data.map((row) => {
                             row.email = row.email.trim().toLowerCase();
@@ -451,8 +473,8 @@ export default function ReviewerDirectory({
                             seen.add(row.email);
                             const valid = Boolean(
                               row.name?.trim() &&
-                                z.email().safeParse(row.email).success &&
-                                !duplicate,
+                              z.email().safeParse(row.email).success &&
+                              !duplicate,
                             );
                             return {
                               data: row,
