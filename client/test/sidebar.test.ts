@@ -1,9 +1,11 @@
 import "./helpers/dom";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import assert from "node:assert/strict";
 import { afterEach, test, type TestContext } from "node:test";
 import { createElement } from "react";
 import { SidebarFixture } from "./helpers/sidebar-fixture";
+import ThemeToggler from "../src/components/theme-toggler";
+import { ThemeContext } from "../src/hooks/use-theme-preference";
 
 afterEach(cleanup);
 
@@ -49,7 +51,7 @@ test("sidebar links identify the active section on localized and subdomain paths
   );
 });
 
-test("desktop collapse retains navigation and persists its state", (context) => {
+test("desktop collapse retains navigation and footer controls and persists its state", (context) => {
   mockViewport(context);
   const view = render(createElement(SidebarFixture));
   fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
@@ -59,6 +61,7 @@ test("desktop collapse retains navigation and persists its state", (context) => 
     ),
   );
   assert.ok(view.getByRole("link", { name: "Users" }));
+  assert.ok(view.getByRole("button", { name: "Preferences" }));
   assert.match(document.cookie, /sidebar_state=false/);
   fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
   assert.match(document.cookie, /sidebar_state=true/);
@@ -77,6 +80,26 @@ test("mobile navigation closes after choosing a link", async (context) => {
 
   fireEvent.click(link);
   assert.equal(view.queryByRole("dialog"), null);
+});
+
+test("Escape closes the theme picker before the mobile sidebar", async (context) => {
+  mockViewport(context, true);
+  const footer = createElement(
+    ThemeContext.Provider,
+    { value: { preference: "light", pending: false, setPreference() {} } },
+    createElement(ThemeToggler, { lng: "en" }),
+  );
+  const view = render(createElement(SidebarFixture, { footer }));
+  fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
+  const trigger = await view.findByRole("button", { name: /theme:/i });
+  fireEvent.click(trigger);
+  const selected = await view.findByRole("radio", { checked: true });
+  await waitFor(() => assert.ok(document.activeElement === selected));
+  fireEvent.keyDown(selected, { key: "Escape" });
+  await waitFor(() => assert.ok(document.activeElement === trigger));
+  assert.ok(view.getByRole("dialog"));
+  fireEvent.keyDown(trigger, { key: "Escape" });
+  await waitFor(() => assert.ok(!view.queryByRole("dialog")));
 });
 
 test("the sidebar shortcut leaves rich-text formatting and input shortcuts alone", (context) => {

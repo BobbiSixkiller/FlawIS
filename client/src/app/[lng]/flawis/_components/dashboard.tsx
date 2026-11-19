@@ -54,6 +54,12 @@ export default async function Dashboard({
         }
         navigationLabel={t("navigation")}
         homeLabel={t("home")}
+        footer={
+          <>
+            <LngSwitcher variant="sidebar" />
+            <ThemeToggler lng={lng} />
+          </>
+        }
       />
       <SidebarInset className="min-w-0 bg-background">
         <DashboardHeader
@@ -61,8 +67,6 @@ export default async function Dashboard({
           actions={
             <>
               {headerActions}
-              <ThemeToggler lng={lng} />
-              <LngSwitcher />
               <AccountMenu
                 avatar={<Avatar name={user.name} avatarUrl={user.avatarUrl} />}
               />

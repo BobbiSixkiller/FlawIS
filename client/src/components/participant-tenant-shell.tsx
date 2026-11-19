@@ -43,7 +43,7 @@ export default async function ParticipantTenantShell({
         actions={
           <>
             <ThemeToggler lng={lng} />
-            <LngSwitcher />
+            <LngSwitcher align="center" />
             <AccountMenu
               avatar={
                 user ? (

@@ -101,8 +101,9 @@ export default function ThemeToggler({
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     collapseAfterSelectionRef.current = false;
 
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && expandedRef.current) {
       event.preventDefault();
+      event.stopPropagation();
       collapse({ restoreFocus: true });
     }
   }

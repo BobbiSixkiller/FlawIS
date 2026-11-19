@@ -19,19 +19,17 @@ export default function DashboardHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex h-16 min-w-0 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14 max-[23rem]:gap-0.5 max-[23rem]:px-2 sm:gap-3 sm:px-6",
+        "sticky top-0 z-20 flex h-16 min-w-0 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-14 sm:px-6",
         (y ?? 0) > 0 && "shadow-bottom",
       )}
     >
       <SidebarTrigger aria-label={navigationLabel} />
       <Separator
         orientation="vertical"
-        className="hidden h-5 data-vertical:self-center sm:block"
+        className="h-5 data-vertical:self-center"
       />
       <Breadcrumbs homeElement={<Icon name="home" className="size-4" />} />
-      <div className="ml-auto flex shrink-0 items-center gap-2 max-[23rem]:gap-0.5">
-        {actions}
-      </div>
+      <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>
     </header>
   );
 }
