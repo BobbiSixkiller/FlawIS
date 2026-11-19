@@ -64,9 +64,11 @@ export default function ConferenceReviewWorkspace({
       .filter((a) => a.active && a.status === "ASSIGNED")
       .map((a) => ({ row, assignment: a })),
   );
+
   function navigate(next: URLSearchParams) {
     start(() => router.push(`${base}?${next}`, { scroll: false }));
   }
+
   const trail = (params.get("trail") || "").split(",").filter(Boolean);
   return (
     <div className="flex flex-col gap-5">
@@ -131,6 +133,23 @@ export default function ConferenceReviewWorkspace({
             }
           >
             {t("Exportovať posudky ZIP", "Export reports ZIP")}
+          </Button>
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={
+              <a
+                href={
+                  "/api/conference-review/exports/bulk?proceedings=1&submissions=" +
+                  selection.join(",")
+                }
+              />
+            }
+          >
+            {t(
+              "Zborník DOCX v poradí výberu",
+              "Proceedings DOCX in selection order",
+            )}
           </Button>
           <Button variant="ghost" onClick={() => setSelection([])}>
             {t("Zrušiť výber", "Clear selection")}
@@ -305,8 +324,10 @@ export default function ConferenceReviewWorkspace({
           onClick={() => {
             const next = new URLSearchParams(params);
             const previous = trail.pop();
+
             if (previous) next.set("after", previous);
             else next.delete("after");
+
             next.set("trail", trail.join(","));
             setSelection([]);
             navigate(next);
@@ -360,8 +381,10 @@ export default function ConferenceReviewWorkspace({
           onSubmit={async () => {
             const done = [...successes];
             const failed: string[] = [];
+
             for (const { row, assignment } of recipients) {
               if (done.includes(assignment.id)) continue;
+
               try {
                 const detail = await getReviewDetail(row.submissionId);
                 await mutate("review", {
@@ -373,6 +396,7 @@ export default function ConferenceReviewWorkspace({
                   },
                 });
                 done.push(assignment.id);
+
                 setOutcomes((current) => ({
                   ...current,
                   [assignment.id]: t(
@@ -382,14 +406,17 @@ export default function ConferenceReviewWorkspace({
                 }));
               } catch (e) {
                 failed.push(row.submissionId);
+
                 setOutcomes((current) => ({
                   ...current,
                   [assignment.id]: errorText(e, lng),
                 }));
               }
             }
+
             setSuccesses(done);
             setSelection([...new Set(failed)]);
+
             if (failed.length) {
               setError(
                 t(

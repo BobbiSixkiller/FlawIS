@@ -10,17 +10,22 @@ import { JSONObject } from "../util/scalars";
 export class Reviewer extends TimeStamps {
   @Field(() => ObjectId) id: ObjectId;
   @Field() @Property({ required: true, trim: true }) name: string;
+
   @Field()
   @Property({ required: true, trim: true, lowercase: true })
   email: string;
+
   @Field() @Property({ default: "" }) institution: string;
   @Field() @Property({ default: "" }) department: string;
+
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })
   languages: string[];
+
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })
   expertise: string[];
+
   @Field() @Property({ default: "" }) notes: string;
   @Field() @Property({ default: false }) archived: boolean;
   @Field() createdAt: Date;
@@ -44,21 +49,27 @@ export class ReviewSettings extends TimeStamps {
   @Field(() => ObjectId) id: ObjectId;
   @Field(() => ObjectId) @Property({ required: true }) conference: ObjectId;
   @Field() @Property({ default: false }) enabled: boolean;
+
   @Field(() => Int)
   @Property({ default: 2, min: 1, max: 10 })
   requiredReviews: number;
+
   @Field(() => ObjectId, { nullable: true }) @Property() form?: ObjectId;
   @Field({ nullable: true }) @Property() recommendationField?: string;
+
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })
   authorFields: string[];
+
   @Field(() => JSONObject)
   @Property({ type: () => Object, allowMixed: Severity.ALLOW, default: {} })
   sectionRequirements: Record<string, string>;
+
   @Field() @Property({ default: false }) remindersEnabled: boolean;
   @Field() @Property({ default: "" }) instructions: string;
   @Field() @Property({ default: "" }) signature: string;
   @Field() @Property({ default: "" }) replyTo: string;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   templateFile?: ObjectId;
@@ -68,10 +79,13 @@ export class ReviewSettings extends TimeStamps {
 export class ReviewerEligibility extends TimeStamps {
   @Property({ required: true }) conference: ObjectId;
   @Property({ required: true }) reviewer: ObjectId;
+
   @Property({ type: () => [ObjectId], default: [] })
   participatedSections: ObjectId[];
+
   @Property({ type: () => [ObjectId], default: [] })
   guarantorSections: ObjectId[];
+
   @Property({ type: () => [ObjectId], default: [] }) conflicts: ObjectId[];
 }
 
@@ -87,20 +101,28 @@ export class SubmissionReview extends TimeStamps {
   @Property({ type: () => [String], default: [] }) authorEmails: string[];
   @Field(() => Int) @Property({ default: 0 }) revision: number;
   @Field(() => Int) @Property({ default: 0 }) roundNumber: number;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   currentRound?: ObjectId;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   currentVersion?: ObjectId;
+
   @Field()
   @Property({
     default: "PENDING",
     enum: ["PENDING", "ACCEPTED", "REJECTED", "WITHDRAWN"],
   })
   decision: string;
+
+  @Property() proof?: ObjectId;
+  @Property() publication?: ObjectId;
+  @Property() deliveredAt?: Date;
   @Field() @Property({ default: "" }) decisionReason: string;
   @Field() @Property({ default: "" }) formalNotes: string;
+  @Property() participationConfirmed?: boolean;
   @Field() @Property({ default: false }) formalApproved: boolean;
   @Field() createdAt: Date;
   @Field() updatedAt: Date;
@@ -113,10 +135,21 @@ export class ManuscriptVersion extends TimeStamps {
   @Field(() => ObjectId) @Property({ required: true }) submission: ObjectId;
   @Field(() => Int) @Property({ required: true }) number: number;
   @Field(() => ObjectId) @Property({ required: true }) file: ObjectId;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   anonymousFile?: ObjectId;
+
   @Field() @Property({ default: false }) anonymousApproved: boolean;
+
+  @Property({ type: () => Object, allowMixed: Severity.ALLOW })
+  formalChecks?: Record<string, string | number>;
+
+  @Property() proofPdf?: ObjectId;
+  @Property() anonymousTrackedFile?: ObjectId;
+  @Property() trackedFile?: ObjectId;
+  @Property() parentVersion?: ObjectId;
+  @Property() template?: ObjectId;
   @Property() uploadedBy: string;
   @Property() approvedBy?: ObjectId;
   @Field() createdAt: Date;
@@ -125,22 +158,28 @@ export class ManuscriptVersion extends TimeStamps {
 @ObjectType()
 @Index({ review: 1, number: 1 }, { unique: true })
 export class ReviewRound extends TimeStamps {
+  @Property() bpf?: boolean;
   @Field(() => ObjectId) id: ObjectId;
   @Field(() => ObjectId) @Property({ required: true }) review: ObjectId;
   @Field(() => Int) @Property({ required: true }) number: number;
   @Field(() => Int) @Property({ required: true }) requiredReviews: number;
   @Field(() => ObjectId) @Property({ required: true }) form: ObjectId;
   @Field() @Property({ required: true }) recommendationField: string;
+
   @Field(() => [String])
   @Property({ type: () => [String], default: [] })
   authorFields: string[];
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   templateFile?: ObjectId;
+
   @Field(() => ObjectId, { nullable: true }) @Property() manuscript?: ObjectId;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   anonymousFile?: ObjectId;
+
   @Field({ nullable: true }) @Property() startedAt?: Date;
 }
 
@@ -170,6 +209,8 @@ export class ReviewAssignment extends TimeStamps {
   @Field() @Property({ default: "" }) conflictReason: string;
   @Field({ nullable: true }) @Property() recommendation?: string;
   @Field({ nullable: true }) @Property() submittedAt?: Date;
+  @Property() closedVersion?: ObjectId;
+  @Property() closedAt?: Date;
   @Property() tokenHash?: string;
   @Property() tokenEncrypted?: string;
   @Property() expiresAt?: Date;
@@ -185,25 +226,68 @@ export class FeedbackRelease extends TimeStamps {
   @Field(() => ObjectId) @Property({ required: true }) submission: ObjectId;
   @Field(() => ObjectId) @Property({ required: true }) round: ObjectId;
   @Property({ required: true }) fingerprint: string;
+
   @Field(() => JSONObject)
   @Property({ allowMixed: Severity.ALLOW, type: () => Object })
   feedback: Record<string, unknown>;
+
   @Field() createdAt: Date;
+}
+
+export interface CorrectionPoint {
+  id: string;
+  text: string;
+  assignment?: string;
+  status: "PENDING" | "VERIFIED" | "NEEDS_CHANGES";
+  authorStatus?: "addressed" | "notAddressed";
+  response?: string;
+  location?: string;
 }
 
 @ObjectType()
 @Index({ tokenHash: 1 }, { unique: true })
 @Index({ submission: 1, createdAt: -1 })
 export class RevisionRequest extends TimeStamps {
+  @Property() versionNumber?: number;
+  @Property() templateConference?: ObjectId;
+  @Property() attribution?: string;
+
+  @Property({ type: () => Object, allowMixed: Severity.ALLOW })
+  reportDates?: Record<string, string>;
+
+  @Property() kind?: string;
+  @Property() round?: ObjectId;
+  @Property() sourceVersion?: ObjectId;
+  @Property() assignment?: ObjectId;
+  @Property() reportSubmittedAt?: Date;
+  @Property() trackedFile?: ObjectId;
+  @Property() manuscriptFile?: ObjectId;
+  @Property() proofPdf?: ObjectId;
+  @Property() notification?: ObjectId;
+
+  @Property({ type: () => [String], default: undefined })
+  carriedAssignments?: string[];
+
+  @Property() parentRequest?: ObjectId;
+
+  @Property({
+    type: () => [Object],
+    allowMixed: Severity.ALLOW,
+    default: undefined,
+  })
+  points?: CorrectionPoint[];
+
   @Field(() => ObjectId) id: ObjectId;
   @Field(() => ObjectId) @Property({ required: true }) submission: ObjectId;
   @Field() @Property({ required: true }) instructions: string;
   @Field() @Property({ required: true }) deadline: Date;
   @Field() @Property({ default: "REQUESTED" }) status: string;
   @Field() @Property({ default: "" }) note: string;
+
   @Field(() => ObjectId, { nullable: true })
   @Property()
   receivedVersion?: ObjectId;
+
   @Property({ required: true }) tokenHash: string;
   @Property() expiresAt: Date;
   @Field() createdAt: Date;
@@ -224,6 +308,7 @@ export class ReviewFile extends TimeStamps {
   @Field() @Property({ required: true }) contentType: string;
   @Field(() => Int) @Property({ required: true }) size: number;
   @Property({ required: true }) checksum: string;
+  @Property() signature?: string;
   @Property() actor: string;
 }
 
@@ -239,8 +324,10 @@ export class ActivityEvent extends TimeStamps {
   @Field({ nullable: true }) @Property() originalActor?: string;
   @Field() @Property({ required: true }) action: string;
   @Field() @Property({ required: true }) requestId: string;
+
   @Field(() => JSONObject)
   @Property({ allowMixed: Severity.ALLOW, type: () => Object, default: {} })
   changes: Record<string, unknown>;
+
   @Field() createdAt: Date;
 }

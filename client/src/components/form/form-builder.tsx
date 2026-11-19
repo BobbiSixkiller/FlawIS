@@ -36,6 +36,7 @@ const HelpEditor = dynamic(() => import("./editor/editor"), { ssr: false });
 const Preview = dynamic(() => import("./form-builder-preview"), { ssr: false });
 
 export type FormBuilderValues = { formFields: FormFieldInput[] };
+
 /** A caller-owned shortcut; the builder always assigns a fresh question ID. */
 export type FormBuilderPreset = {
   key: string;
@@ -47,11 +48,9 @@ export type FormBuilderPreset = {
 export default function FormBuilder({
   lng,
   presets = [],
-  showTemplatePlaceholders = false,
 }: {
   lng: string;
   presets?: FormBuilderPreset[];
-  showTemplatePlaceholders?: boolean;
 }) {
   const t = builderMessages(lng);
   const form = useFormContext<FormBuilderValues>();
@@ -61,32 +60,39 @@ export default function FormBuilder({
     setFocus,
     formState: { errors, submitCount },
   } = form;
+
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: "formFields",
     keyName: "rowKey",
   });
+
   const values = useWatch({ control, name: "formFields" }) ?? [];
   const [tab, setTab] = useState("fields");
   const [previousSubmit, setPreviousSubmit] = useState(submitCount);
+
   if (previousSubmit !== submitCount) {
     setPreviousSubmit(submitCount);
     if (errors.formFields) setTab("fields");
   }
+
   const [previewValues, setPreviewValues] = useState<
     Record<string, string | string[]>
   >({});
   const lastSubmit = useRef(submitCount);
   const addFieldRef = useRef<HTMLButtonElement>(null);
   const addOptionRefs = useRef(new Map<number, HTMLButtonElement>());
+
   useEffect(() => {
     if (lastSubmit.current === submitCount) return;
     lastSubmit.current = submitCount;
     if (!errors.formFields) return;
     const path = firstErrorPath(errors);
+
     if (path === "formFields" || path?.startsWith("formFields.")) {
       const timer = setTimeout(() => {
         const options = /^formFields\.(\d+)\.selectOptions$/.exec(path);
+
         if (path === "formFields") addFieldRef.current?.focus();
         else if (options)
           addOptionRefs.current.get(Number(options[1]))?.focus();
@@ -95,6 +101,7 @@ export default function FormBuilder({
             path.replace(/\.id$/, ".label") as `formFields.${number}.label`,
           );
       }, 0);
+
       return () => clearTimeout(timer);
     }
   }, [submitCount, errors, setFocus]);
@@ -102,12 +109,15 @@ export default function FormBuilder({
   function add(field: FormFieldInput) {
     append(field, { focusName: `formFields.${fields.length}.label` });
   }
+
   function changeType(index: number, type: FieldType) {
     const current = values[index];
+
     setValue(`formFields.${index}.type`, type, {
       shouldDirty: true,
       shouldValidate: true,
     });
+
     setValue(
       `formFields.${index}.selectOptions`,
       isChoiceField(type)
@@ -130,6 +140,7 @@ export default function FormBuilder({
       { shouldDirty: true },
     );
   }
+
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(String(value))}>
       <TabsList>
@@ -352,12 +363,6 @@ export default function FormBuilder({
                   <Icon name="trash" />
                   {t.remove}
                 </Button>
-                {showTemplatePlaceholders && value.id && (
-                  <details className="text-xs text-muted-foreground">
-                    <summary>{t.template}</summary>
-                    <code>{`{answer_${value.id}}`}</code>
-                  </details>
-                )}
               </CardFooter>
             </Card>
           );
@@ -416,15 +421,18 @@ function OptionsEditor({
   addButtonRef: Ref<HTMLButtonElement>;
 }) {
   const t = builderMessages(lng);
+
   const {
     control,
     formState: { errors },
   } = useFormContext<FormBuilderValues>();
+
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: `formFields.${index}.selectOptions`,
     keyName: "rowKey",
   });
+
   const error = errors.formFields?.[index]?.selectOptions;
   return (
     <FieldGroup>

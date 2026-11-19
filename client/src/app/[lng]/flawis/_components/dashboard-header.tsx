@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/breadcrumbs";
 import Icon from "@/components/icon";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+
 export default function DashboardHeader({
   actions,
   navigationLabel,
@@ -22,10 +23,7 @@ export default function DashboardHeader({
         (y ?? 0) > 0 && "shadow-bottom",
       )}
     >
-      <SidebarTrigger
-        aria-label={navigationLabel}
-        className="size-10 shrink-0"
-      />
+      <SidebarTrigger aria-label={navigationLabel} />
       <Separator
         orientation="vertical"
         className="h-5 data-vertical:self-center"

@@ -22,21 +22,20 @@ export default function AccountMenu({
     return (
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-lg"
         className="rounded-full"
         aria-label={t("login")}
         nativeButton={false}
         role="link"
         render={<Link href={signInHref} />}
       >
-        <Icon name="arrow-right-start-on-rectangle" className="size-5" />
+        <Icon name="arrow-right-start-on-rectangle" />
       </Button>
     );
   }
 
   return (
     <Dropdown
-      anchor={{ gap: 6, to: "bottom" }}
       trigger={
         <>
           <span className="sr-only">{t("profile")}: </span>
@@ -44,8 +43,8 @@ export default function AccountMenu({
         </>
       }
       triggerProps={{
-        size: "icon",
-        className: "flex h-fit w-fit items-center rounded-full",
+        size: "icon-lg",
+        className: "rounded-full border-0",
       }}
       items={[
         <Link href="/profile" prefetch={false} key="profile">

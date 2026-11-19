@@ -1,0 +1,22 @@
+# Generated output and local artifacts
+**/.next/
+**/build/
+**/coverage/
+**/dist/
+**/out/
+**/.cache/
+**/.env*
+/client/next-env.d.ts
+/client/playwright/.auth/
+/client/playwright-report/
+/client/test-results/
+/client/src/lib/graphql/generated/
+/core/schema.gql
+/core/schema.graphql
+/.agents/local/
+/.codex/config.toml
+
+# Preserve tool-managed files and email template whitespace
+**/package-lock.json
+/mail/src/email/templates/**/*.hbs
+/.agents/skills/

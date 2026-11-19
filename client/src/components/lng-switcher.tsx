@@ -49,9 +49,9 @@ export default function LngSwitcher({
         aria-label={t(lng)}
         render={
           inSidebar ? (
-            <SidebarMenuButton className="h-9" />
+            <SidebarMenuButton />
           ) : (
-            <Button variant="ghost" size="icon" className="rounded-full" />
+            <Button variant="ghost" size="icon-lg" className="rounded-full" />
           )
         }
       >
@@ -59,8 +59,8 @@ export default function LngSwitcher({
           alt=""
           priority
           src={`/images/${lng}.svg`}
-          width={inSidebar ? 16 : 36}
-          height={inSidebar ? 16 : 36}
+          width={20}
+          height={20}
           className="shrink-0"
         />
         {inSidebar && (
@@ -80,7 +80,6 @@ export default function LngSwitcher({
         side={inSidebar && !isMobile ? "right" : "bottom"}
         align="end"
         sideOffset={4}
-        className="w-max min-w-44"
       >
         {languages.map((locale) => (
           <DropdownMenuItem

@@ -12,7 +12,7 @@ import Select from "@/components/form/select";
 import Spinner from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import useValidation from "@/hooks/use-validation";
-import { handleAPIErrors, uploadToMinio } from "@/lib/utilsClient";
+import { handleAPIErrors } from "@/lib/utilsClient";
 import {
   ConferenceQuery,
   PresentationLng,
@@ -23,7 +23,7 @@ import { deleteFiles } from "@/lib/minio";
 import { useDialogStore } from "@/stores/dialogStore";
 import { useMessageStore } from "@/stores/messageStore";
 import omit from "lodash/omit.js";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createSubmission, updateSubmission } from "./actions";
 
 async function deleteUploadedFile(url: string) {
@@ -56,6 +56,34 @@ export default function ConferenceSubmissionForm({
 
   const closeDialog = useDialogStore((s) => s.closeDialog);
   const setMessage = useMessageStore((s) => s.setMessage);
+  const submissionId = submission?.id;
+  const [pinned, setPinned] = useState<string | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!submissionId) return;
+    const controller = new AbortController();
+
+    fetch(
+      "/api/conference-review/templates/" +
+        conference.id +
+        "/manuscript?submission=" +
+        submissionId +
+        "&metadata=1",
+      { signal: controller.signal },
+    )
+      .then(async (r) => {
+        if (r.ok) {
+          const data = await r.json();
+          if (!controller.signal.aborted) setPinned(data.template);
+        }
+      })
+      .catch(() => {});
+
+    return () => controller.abort();
+  }, [submissionId, conference.id]);
+
+  const template =
+    pinned === undefined ? conference.manuscriptTemplateFile : pinned;
   const originalFile = useRef<File | null>(null);
 
   const schema = z.object({
@@ -83,7 +111,9 @@ export default function ConferenceSubmissionForm({
       }),
     }),
   });
+
   type FormValues = z.input<typeof schema>;
+
   return (
     <FormContainer
       schema={schema}
@@ -111,9 +141,6 @@ export default function ConferenceSubmissionForm({
         <form
           className="space-y-6 w-80 sm:w-96"
           onSubmit={methods.handleSubmit(async (vals) => {
-            const selectedSection = conference.sections.find(
-              (section) => section.id === vals.section,
-            );
             const selectedFile = vals.files[0];
             const keepsExistingFile =
               Boolean(submission?.fileUrl) &&
@@ -125,13 +152,23 @@ export default function ConferenceSubmissionForm({
 
             if (selectedFile && !keepsExistingFile) {
               try {
-                uploadedUrl = await uploadToMinio(
-                  conference.slug,
-                  selectedSection
-                    ? `${selectedSection.translations.sk.name}/${selectedFile.name}`
-                    : selectedFile.name,
-                  selectedFile,
+                const response = await fetch(
+                  "/api/conference-review/templates/" +
+                    conference.id +
+                    "/stage" +
+                    (submission ? "?submission=" + submission.id : ""),
+                  {
+                    method: "POST",
+                    headers: {
+                      "content-type": "application/octet-stream",
+                      "x-file-name": encodeURIComponent(selectedFile.name),
+                    },
+                    body: selectedFile,
+                  },
                 );
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error);
+                uploadedUrl = result.url as string;
                 fileUrl = uploadedUrl;
               } catch (error) {
                 return methods.setError("files", {
@@ -144,6 +181,7 @@ export default function ConferenceSubmissionForm({
             }
 
             let res;
+
             if (submission) {
               res = await updateSubmission(
                 {
@@ -290,7 +328,11 @@ export default function ConferenceSubmissionForm({
               />
             )}
           </FormField>
-          <ManuscriptTemplateDownload conference={conference} lng={lng} />
+          <ManuscriptTemplateDownload
+            conference={{ id: conference.id, manuscriptTemplateFile: template }}
+            submission={submission?.id}
+            lng={lng}
+          />
           <FormField<FormValues, "files">
             name="files"
             label={t("registration.submission.file", {
@@ -303,8 +345,12 @@ export default function ConferenceSubmissionForm({
                 {...controlProps}
                 maxFiles={1}
                 accept={{
-                  "application/pdf": [".pdf"],
-                  "application/msword": [".doc"],
+                  ...(template
+                    ? {}
+                    : {
+                        "application/pdf": [".pdf"],
+                        "application/msword": [".doc"],
+                      }),
                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                     [".docx"],
                 }}

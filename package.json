@@ -1,0 +1,12 @@
+{
+  "name": "flawis-tooling",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write --ignore-unknown",
+    "format:check": "prettier --check --ignore-unknown"
+  },
+  "devDependencies": {
+    "@luzixu/prettier-plugin-block-padding": "0.0.26",
+    "prettier": "3.9.10"
+  }
+}

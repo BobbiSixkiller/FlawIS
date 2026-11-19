@@ -51,9 +51,9 @@ export default function TopBar({
             aria-expanded={drawerState.visible}
             className="shrink-0 rounded-full lg:hidden"
             variant="ghost"
-            size="icon"
+            size="icon-lg"
           >
-            <Icon name="bars3" className="size-5" />
+            <Icon name="bars3" />
           </Button>
         )}
         <Breadcrumbs

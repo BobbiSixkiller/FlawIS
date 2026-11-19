@@ -14,12 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import Icon from "./icon";
 import Spinner from "./spinner";
+
 interface SearchComponentProps<TOption, TParams> {
   fetchOptions: (params: TParams) => Promise<TOption[]>;
   onOptionSelect: (option: TOption) => void;
   Option: ComponentType<{ data: TOption; active: boolean }>;
   placeholder?: string;
 }
+
 export default function SearchComponent<
   TOption extends { id: string },
   TParams extends { text: string },
@@ -35,11 +37,13 @@ export default function SearchComponent<
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [query] = useDebounce(text, 350);
+
   const [result, setResult] = useState<{
     query: string;
     options: TOption[];
     error: boolean;
   }>({ query: "", options: [], error: false });
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
@@ -47,12 +51,15 @@ export default function SearchComponent<
         setOpen((value) => !value);
       }
     }
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
   useEffect(() => {
     if (!open || !query.trim()) return;
     let active = true;
+
     fetchOptions({ text: query } as TParams)
       .then((options) => {
         if (active) setResult({ query, options, error: false });
@@ -60,10 +67,12 @@ export default function SearchComponent<
       .catch(() => {
         if (active) setResult({ query, options: [], error: true });
       });
+
     return () => {
       active = false;
     };
   }, [query, open, fetchOptions]);
+
   const loading =
     Boolean(text.trim()) && (query !== text || result.query !== query);
   const options = !loading && text.trim() ? result.options : [];
@@ -79,13 +88,14 @@ export default function SearchComponent<
         disabled={!mounted}
         render={
           <Button
-            size="icon"
+            size="icon-lg"
             variant="outline"
+            className="rounded-full"
             aria-label={placeholder ?? t("search")}
           />
         }
       >
-        <Icon name="magnifying-glass" className="size-4" />
+        <Icon name="magnifying-glass" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogTitle>{placeholder ?? t("search")}</DialogTitle>

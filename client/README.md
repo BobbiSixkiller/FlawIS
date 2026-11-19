@@ -15,14 +15,14 @@ node scripts/verify.mjs client --build
 
 The first runs lint, typecheck, and unit/interaction tests. `--build` additionally builds the production Docker target and checks its Node runtime. Direct commands from `client/` are:
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Next.js development server; needs the application environment and dependencies |
-| `npm run lint` | ESLint with no warnings allowed |
-| `npm run typecheck` | Generate route types, then run the configured TypeScript compiler |
-| `npm test` | Node test runner through `tsx`, including React interaction tests |
-| `npm run build` / `npm start` | Build / serve the production Next.js application |
-| `npm run codegen` | Generate client contracts from `../core/schema.graphql` and GraphQL documents |
+| Command                       | Purpose                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| `npm run dev`                 | Next.js development server; needs the application environment and dependencies |
+| `npm run lint`                | ESLint with no warnings allowed                                                |
+| `npm run typecheck`           | Generate route types, then run the configured TypeScript compiler              |
+| `npm test`                    | Node test runner through `tsx`, including React interaction tests              |
+| `npm run build` / `npm start` | Build / serve the production Next.js application                               |
+| `npm run codegen`             | Generate client contracts from `../core/schema.graphql` and GraphQL documents  |
 
 Compose injects the root environment; running Next.js on the host needs its own environment and reachable service endpoints. Container DNS names such as `core` and `minio` are Docker-network addresses. `API_URI` selects core GraphQL; its Docker default is `http://core:5000/graphql`.
 
@@ -31,7 +31,7 @@ Avoid running a production build against the development server's live `.next` d
 ## Routes and contracts
 
 - `src/app/[lng]/flawis/` contains staff routes. `@headerActions` supplies route-specific search controls in the dashboard header. `src/proxy.ts` composes localization, authentication, and hostname-based routing for staff and participant portals.
-- Conference templates have a dedicated `/conferences/[slug]/templates` tab for administrators and conference-wide coordinators. Manuscript downloads appear in the public conference workspace and submission forms independently of review enablement. See [template behavior](../docs/conference-reviews.md#conference-templates).
+- Conference templates have a dedicated `/conferences/[slug]/templates` tab for administrators and conference-wide coordinators. Authors download the manuscript template from the conference workspace and submission forms. Paper edits and correction requests offer the pinned version. Reviewers complete their questionnaire online. Staff manage formal checks, correction points, proofs and editorial handoff in submission review details. See [template behavior](../docs/conference-reviews.md#conference-templates).
 - Conference review details use dedicated pages; reviewer management, settings, and form editing use dialogs. Reviewers/forms/review queues expose header search without additional filter controls. See [conference reviews](../docs/conference-reviews.md).
 - `src/app/api/conference-review/` proxies protected review operations to core. Other API routes forward Reach webhooks and render invoice PDFs for the mail worker.
 - GraphQL documents live in `src/lib/graphql/`; generated contracts live in `src/lib/graphql/generated/`. Regenerate from core rather than editing generated files. The [shared regeneration sequence](../docs/development.md#routine-verification) updates both schema files and client types.

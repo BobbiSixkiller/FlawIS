@@ -15,6 +15,7 @@ import { localizedText as tr } from "@/lib/i18n/text";
 import { errorText } from "@/lib/reviews/ux";
 
 type FormMetadata = { name: string; description: string };
+
 type Publish = FormMetadata & { definition: string; fields: FormFieldInput[] };
 
 /** Owns the library publication lifecycle; a failed publish reuses the created definition. */
@@ -38,6 +39,7 @@ export default function FormEditor({
 }) {
   const t = tr(lng);
   const [createdId, setCreatedId] = useState(editor.definition?.id);
+
   const schema = z.object({
     name: z
       .string()
@@ -47,6 +49,7 @@ export default function FormEditor({
     description: z.string().max(5000),
     formFields: createFormFieldsSchema(lng, 1),
   });
+
   return (
     <FormDialog
       wide
@@ -71,10 +74,12 @@ export default function FormEditor({
       submitLabel={t("Publikovať novú verziu", "Publish new version")}
       onSubmit={async ({ formFields, ...metadata }) => {
         let definition = createdId;
+
         if (!definition) {
           definition = (await createDefinition(metadata)).id;
           setCreatedId(definition);
         }
+
         await publishVersion({ ...metadata, definition, fields: formFields });
         onSaved();
       }}
@@ -89,7 +94,6 @@ export default function FormEditor({
           />
           <FormBuilder
             lng={lng}
-            showTemplatePlaceholders
             presets={[
               {
                 key: "recommendation",

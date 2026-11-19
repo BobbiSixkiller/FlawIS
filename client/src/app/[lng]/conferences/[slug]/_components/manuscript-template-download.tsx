@@ -2,10 +2,12 @@ import { localizedText } from "@/lib/i18n/text";
 
 export function ManuscriptTemplateDownload({
   conference,
+  submission,
   lng,
 }: {
   conference: { id: string; manuscriptTemplateFile?: string | null };
   lng: string;
+  submission?: string;
 }) {
   if (!conference.manuscriptTemplateFile) return null;
   const t = localizedText(lng);
@@ -13,7 +15,10 @@ export function ManuscriptTemplateDownload({
     <div className="rounded-xl border bg-muted/40 p-4 text-sm text-foreground">
       <a
         className="font-medium underline underline-offset-4"
-        href={`/api/conference-review/templates/${conference.id}/manuscript`}
+        href={
+          `/api/conference-review/templates/${conference.id}/manuscript` +
+          (submission ? "?submission=" + submission : "")
+        }
       >
         {t(
           "Stiahnuť šablónu príspevku (DOCX)",

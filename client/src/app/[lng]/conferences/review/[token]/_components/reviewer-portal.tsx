@@ -11,14 +11,19 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/form/form-dialog";
+import { bpfConditionsId, reportFields } from "@/lib/reviews/types";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { mutate, errorText } from "@/lib/reviews/ux";
-import { AnswerFields, validateAnswerFields } from "@/components/form/answer-fields";
+import {
+  AnswerFields,
+  validateAnswerFields,
+} from "@/components/form/answer-fields";
 import { ErrorAlert } from "@/components/form/field-controls";
 import { formatDate } from "@/lib/date";
 import { downloadReviewerFile, uploadReviewFile } from "@/lib/reviews/files";
 import { label, type Portal } from "@/lib/reviews/types";
 import { BreadcrumbLabel } from "@/components/breadcrumb-labels";
+
 export default function ReviewerPortal({
   initial,
   token,
@@ -42,9 +47,16 @@ export default function ReviewerPortal({
   useUnsavedChanges(dirty, lng);
   const [pending, start] = useTransition();
   const closed = portal.status === "SUBMITTED" || portal.status === "DECLINED";
+  const fields = reportFields(
+    portal.form.fields,
+    portal.recommendationField,
+    values,
+  );
+
   function task(operation: () => Promise<unknown>) {
     start(async () => {
       setError("");
+
       try {
         await operation();
       } catch (e) {
@@ -52,9 +64,10 @@ export default function ReviewerPortal({
       }
     });
   }
+
   async function save(submit: boolean) {
     if (submit) {
-      const errors = validateAnswerFields(portal.form.fields, values, lng);
+      const errors = validateAnswerFields(fields, values, lng);
       setFieldErrors(errors);
       if (Object.keys(errors).length)
         throw new Error(
@@ -64,6 +77,7 @@ export default function ReviewerPortal({
           ),
         );
     }
+
     const result = await mutate<{ answer: NonNullable<Portal["answer"]> }>(
       "report",
       {
@@ -73,11 +87,13 @@ export default function ReviewerPortal({
         expectedRevision: portal.answer?.revision,
       },
     );
+
     setPortal((current) => ({
       ...current,
       answer: result.answer,
       status: submit ? "SUBMITTED" : "STARTED",
     }));
+
     setValues(result.answer.answers);
     setSaved(true);
     setLastSaved(
@@ -85,6 +101,7 @@ export default function ReviewerPortal({
     );
     setConfirm(null);
   }
+
   return (
     <div data-page-width="wide" className="mx-auto flex w-full flex-col gap-6">
       <BreadcrumbLabel
@@ -125,6 +142,17 @@ export default function ReviewerPortal({
               )}
             </Button>
           )}
+          {portal.status === "SUBMITTED" && (
+            <Button
+              variant="link"
+              onClick={() => task(() => downloadReviewerFile("receipt", token))}
+            >
+              {t(
+                "Stiahnuť hotový posudok (DOCX)",
+                "Download completed report (DOCX)",
+              )}
+            </Button>
+          )}
           {portal.attachments?.map((file) => (
             <Button
               key={file.id}
@@ -162,7 +190,12 @@ export default function ReviewerPortal({
                 field.id,
                 <Badge key={field.id} variant="outline">
                   {portal.authorFields.includes(field.id)
-                    ? t("Viditeľné autorom", "Visible to authors")
+                    ? fields.some((f) => f.id === bpfConditionsId)
+                      ? t(
+                          "Koordinátor môže zdieľať s autormi",
+                          "Coordinator may share with authors",
+                        )
+                      : t("Viditeľné autorom", "Visible to authors")
                     : t("Iba koordinátori", "Coordinators only")}
                 </Badge>,
               ]),
@@ -170,7 +203,7 @@ export default function ReviewerPortal({
             attachments={portal.attachments}
             errors={fieldErrors}
             onUploadingChange={setUploading}
-            fields={portal.form.fields}
+            fields={fields}
             values={values}
             disabled={closed || pending || uploading}
             onChange={(key, value) => {
@@ -205,12 +238,9 @@ export default function ReviewerPortal({
             <Button
               disabled={pending || uploading}
               onClick={() => {
-                const errors = validateAnswerFields(
-                  portal.form.fields,
-                  values,
-                  lng,
-                );
+                const errors = validateAnswerFields(fields, values, lng);
                 setFieldErrors(errors);
+
                 if (Object.keys(errors).length) {
                   setError(
                     t(

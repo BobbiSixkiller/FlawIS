@@ -31,6 +31,7 @@ import SubmissionActionDialog, {
   actionTitle,
   type SubmissionAction,
 } from "@/app/[lng]/flawis/conferences/[slug]/reviews/[submissionId]/_components/submission-actions";
+
 export default function SubmissionDetail({
   initial,
   slug,
@@ -52,6 +53,9 @@ export default function SubmissionDetail({
   const [detail, setDetail] = useState(initial);
   const [action, setAction] = useState<SubmissionAction | null>(null);
   const [error, setError] = useState("");
+  const [comparison, setComparison] = useState<
+    { before: string | null; after: string | null; changed: boolean }[] | null
+  >(null);
   const [pending, setPending] = useState(false);
   const [activity, setActivity] = useState<
     ConferenceActivityQuery["conferenceActivity"] | null
@@ -67,13 +71,16 @@ export default function SubmissionDetail({
   const round = detail.rounds.find((r) => r.id === detail.review?.currentRound);
   const active = round?.assignments.filter((a) => a.active) || [];
   const completed = active.filter((a) => a.status === "SUBMITTED").length;
+
   async function reload() {
     setDetail(await getReviewDetail(initial.submissionId));
     setActivity(null);
   }
+
   async function task(fn: () => Promise<unknown>) {
     setPending(true);
     setError("");
+
     try {
       await fn();
     } catch (e) {
@@ -82,6 +89,7 @@ export default function SubmissionDetail({
       setPending(false);
     }
   }
+
   function actionButton(
     kind: string,
     secondary = true,
@@ -105,6 +113,7 @@ export default function SubmissionDetail({
       </div>
     );
   }
+
   const nextInvitation = active.find((a) => a.status === "ASSIGNED");
   const next =
     detail.review?.decision && detail.review.decision !== "PENDING"
@@ -233,6 +242,15 @@ export default function SubmissionDetail({
                 >
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">v{v.number}</Badge>
+                    {v.kind && (
+                      <span>
+                        {v.kind === "FINAL"
+                          ? t("Finálny rukopis", "Final manuscript")
+                          : v.kind === "REVISION"
+                            ? t("Opravený rukopis", "Corrected manuscript")
+                            : t("Pôvodný rukopis", "Original manuscript")}
+                      </span>
+                    )}
                     <span>{formatDate(v.createdAt, lng)}</span>
                     {v.anonymousApproved && (
                       <Badge variant="secondary">
@@ -247,6 +265,51 @@ export default function SubmissionDetail({
                     >
                       {t("Originál", "Original")}
                     </a>
+                    {v.parentVersion && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          task(async () => {
+                            const response = await fetch(
+                              "/api/conference-review/exports/" +
+                                detail.submissionId +
+                                "?compare=" +
+                                v.id,
+                            );
+                            const result = await response.json();
+                            if (!response.ok) throw new Error(result.error);
+                            setComparison(result.rows);
+                          })
+                        }
+                      >
+                        {t(
+                          "Porovnať s predchádzajúcou verziou",
+                          "Compare with previous version",
+                        )}
+                      </Button>
+                    )}
+                    {v.anonymousTrackedFile && (
+                      <a
+                        className="underline"
+                        href={
+                          "/api/conference-review/files/" +
+                          v.anonymousTrackedFile
+                        }
+                      >
+                        {t(
+                          "Anonymizované sledované zmeny",
+                          "Anonymous tracked changes",
+                        )}
+                      </a>
+                    )}
+                    {v.trackedFile && (
+                      <a
+                        className="underline"
+                        href={"/api/conference-review/files/" + v.trackedFile}
+                      >
+                        {t("Sledované zmeny", "Tracked changes")}
+                      </a>
+                    )}
                     {v.anonymousFile && (
                       <a
                         className="underline"
@@ -258,6 +321,25 @@ export default function SubmissionDetail({
                   </div>
                 </div>
               ))}
+              {comparison && (
+                <section>
+                  <h3>{t("Zmenené odseky", "Changed paragraphs")}</h3>
+                  {comparison
+                    .filter((row) => row.changed)
+                    .map((row, i) => (
+                      <div className="grid gap-3 sm:grid-cols-2" key={i}>
+                        <del>{row.before}</del>
+                        <ins>{row.after}</ins>
+                      </div>
+                    ))}
+                  {!comparison.some((row) => row.changed) && (
+                    <p>{t("Text je zhodný.", "The text is identical.")}</p>
+                  )}
+                  <Button variant="outline" onClick={() => setComparison(null)}>
+                    {t("Zatvoriť", "Close")}
+                  </Button>
+                </section>
+              )}
               {!detail.versions.length && (
                 <p>
                   {t(
@@ -270,6 +352,9 @@ export default function SubmissionDetail({
             <CardFooter className="flex-wrap items-start gap-3">
               {!detail.versions.length && actionButton("ADOPT")}
               {actionButton("ORIGINAL")}
+              {detail.review?.currentVersion &&
+                !detail.blockers.ANONYMOUS &&
+                actionButton("DRAFT_ANONYMOUS")}
               {actionButton("ANONYMOUS")}
               {actionButton("PREPARE")}
             </CardFooter>
@@ -352,6 +437,13 @@ export default function SubmissionDetail({
                         r.id === detail.review?.currentRound &&
                         detail.review?.decision === "PENDING" && (
                           <>
+                            {a.status === "SUBMITTED" &&
+                              (a.closedVersion ===
+                              detail.review?.currentVersion ? (
+                                <Badge>{t("Uzavreté", "Closed")}</Badge>
+                              ) : (
+                                actionButton("CLOSE_REPORT", true, a)
+                              ))}
                             {!["SUBMITTED", "DECLINED"].includes(a.status) && (
                               <>
                                 <Button
@@ -394,6 +486,7 @@ export default function SubmissionDetail({
                                         result.url,
                                       );
                                       await reload();
+
                                       toast.add({
                                         title: t(
                                           "Odkaz skopírovaný. E-mail sa neodoslal.",
@@ -467,6 +560,68 @@ export default function SubmissionDetail({
           ))}
         </TabsContent>
         <TabsContent value="decision" className="flex flex-col gap-4 pt-4">
+          {detail.review?.decision === "ACCEPTED" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {t(
+                    "Autorská korektúra a vydanie",
+                    "Author proof and publication",
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-2">
+                {actionButton("FINAL")}
+                {actionButton("PROOF_PDF")}
+                {actionButton("REQUEST_PROOF")}
+                {detail.revisions
+                  .filter((r) => r.kind === "PROOF")
+                  .map((p) => (
+                    <Badge key={p.id}>
+                      {label(p.status, lng)} · {formatDate(p.deadline, lng)}
+                    </Badge>
+                  ))}
+                {detail.revisions.some(
+                  (r) =>
+                    r.id === detail.review?.proof && r.status === "REQUESTED",
+                ) && (
+                  <>
+                    {actionButton("RECORD_PROOF_APPROVAL")}
+                    {actionButton("NO_PROOF_RESPONSE")}
+                  </>
+                )}
+                {detail.revisions.some(
+                  (r) =>
+                    r.id === detail.review?.proof &&
+                    ["APPROVED", "NO_RESPONSE"].includes(r.status),
+                ) && actionButton("APPROVE_PUBLICATION")}
+              </CardContent>
+              {detail.review.publication && (
+                <CardFooter className="flex-wrap gap-2">
+                  <a
+                    href={
+                      "/api/conference-review/exports/" +
+                      detail.submissionId +
+                      "?publication=1"
+                    }
+                  >
+                    {t(
+                      "Stiahnuť vydavateľský balík",
+                      "Download publication package",
+                    )}
+                  </a>
+                  {detail.review.deliveredAt ? (
+                    <Badge>
+                      {t("Odovzdané", "Delivered")} ·{" "}
+                      {formatDate(detail.review.deliveredAt, lng)}
+                    </Badge>
+                  ) : (
+                    actionButton("DELIVER_PUBLICATION")
+                  )}
+                </CardFooter>
+              )}
+            </Card>
+          )}
           <Card>
             <CardHeader>
               <CardTitle>
@@ -480,35 +635,100 @@ export default function SubmissionDetail({
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {detail.revisions.map((r) => (
-                <div key={r.id} className="flex flex-col gap-2">
-                  <div>
-                    <Badge variant="outline">{label(r.status, lng)}</Badge> ·{" "}
-                    {formatDate(r.deadline, lng)}
-                  </div>
-                  <p className="whitespace-pre-line">{r.instructions}</p>
-                  {r.note && <p>{r.note}</p>}
-                  {r.receivedVersion &&
-                    detail.versions.find((v) => v.id === r.receivedVersion) && (
-                      <a
-                        className="underline"
-                        href={`/api/conference-review/files/${detail.versions.find((v) => v.id === r.receivedVersion)!.file}`}
+              {detail.revisions
+                .filter((r) => r.kind !== "PROOF")
+                .map((r) => (
+                  <div key={r.id} className="flex flex-col gap-2">
+                    <div>
+                      <Badge variant="outline">{label(r.status, lng)}</Badge> ·{" "}
+                      {formatDate(r.deadline, lng)}
+                    </div>
+                    <p className="whitespace-pre-line">{r.instructions}</p>
+                    {r.points?.map((p) => (
+                      <div key={p.id}>
+                        <p>{p.text}</p>
+                        <p className="text-muted-foreground">
+                          {p.response} {p.location} · {label(p.status, lng)}
+                        </p>
+                      </div>
+                    ))}
+                    {r.status === "NEEDS_CHANGES" &&
+                      r.receivedVersion === detail.review?.currentVersion && (
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            setAction({
+                              kind: "REQUEST_REVISION",
+                              parentRequest: r.id,
+                            })
+                          }
+                        >
+                          {t(
+                            "Opätovne vyžiadať neoverené opravy",
+                            "Request unresolved corrections again",
+                          )}
+                        </Button>
+                      )}
+                    {r.note && <p>{r.note}</p>}
+                    {r.receivedVersion &&
+                      detail.versions.find(
+                        (v) => v.id === r.receivedVersion,
+                      ) && (
+                        <a
+                          className="underline"
+                          href={`/api/conference-review/files/${detail.versions.find((v) => v.id === r.receivedVersion)!.file}`}
+                        >
+                          {t("Opravený rukopis", "Revised manuscript")}
+                        </a>
+                      )}
+                    {r.status === "CHECK_PENDING" && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setAction({ kind: "REVOKE_CHECK", requestId: r.id })
+                        }
                       >
-                        {t("Opravený rukopis", "Revised manuscript")}
-                      </a>
+                        {actionTitle("REVOKE_CHECK", lng)}
+                      </Button>
                     )}
-                  {r.status === "RECEIVED" && (
-                    <Button
-                      className="w-fit"
-                      onClick={() =>
-                        setAction({ kind: "VERIFY_REVISION", requestId: r.id })
-                      }
-                    >
-                      {actionTitle("VERIFY_REVISION", lng)}
-                    </Button>
-                  )}
-                </div>
-              ))}
+                    {r.status === "REQUESTED" && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setAction({ kind: "STAFF_RECEIPT", requestId: r.id })
+                        }
+                      >
+                        {actionTitle("STAFF_RECEIPT", lng)}
+                      </Button>
+                    )}
+                    {r.status === "RECEIVED" && r.kind === "POST_REVIEW" && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setAction({
+                            kind: "REQUEST_REVIEWER_CHECK",
+                            requestId: r.id,
+                          })
+                        }
+                      >
+                        {actionTitle("REQUEST_REVIEWER_CHECK", lng)}
+                      </Button>
+                    )}
+                    {r.status === "RECEIVED" && (
+                      <Button
+                        className="w-fit"
+                        onClick={() =>
+                          setAction({
+                            kind: "VERIFY_REVISION",
+                            requestId: r.id,
+                          })
+                        }
+                      >
+                        {actionTitle("VERIFY_REVISION", lng)}
+                      </Button>
+                    )}
+                  </div>
+                ))}
             </CardContent>
             <CardFooter className="flex-wrap items-start gap-3">
               {actionButton("REQUEST_REVISION")}
@@ -535,7 +755,26 @@ export default function SubmissionDetail({
                 </p>
               )}
             </CardContent>
-            <CardFooter>{actionButton("DECIDE", false)}</CardFooter>
+            <CardFooter className="flex-wrap gap-2">
+              {detail.rounds[0]?.bpf && (
+                <>
+                  <Badge variant="outline">
+                    {detail.review?.participationConfirmed
+                      ? t(
+                          "Účasť autora potvrdená",
+                          "Author participation confirmed",
+                        )
+                      : t(
+                          "Účasť autora nepotvrdená",
+                          "Author participation unconfirmed",
+                        )}
+                  </Badge>
+                  {detail.review?.decision === "PENDING" &&
+                    actionButton("SET_PARTICIPATION")}
+                </>
+              )}
+              {actionButton("DECIDE", false)}
+            </CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="activity" className="pt-4">

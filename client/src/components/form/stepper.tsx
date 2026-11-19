@@ -19,9 +19,11 @@ export default function Stepper<TStepProps extends { name: string }>({
     if (activeIndex === stepIndex) {
       return "border-primary";
     }
+
     if (activeIndex > stepIndex) {
       return "border-primary dark:border-primary-400";
     }
+
     return "border-border";
   }
 
@@ -39,7 +41,8 @@ export default function Stepper<TStepProps extends { name: string }>({
               className={cn([
                 "text-sm md:text-base",
                 i === activeIndex && "text-primary dark:text-primary",
-                i > activeIndex && "text-muted-foreground dark:text-muted-foreground",
+                i > activeIndex &&
+                  "text-muted-foreground dark:text-muted-foreground",
                 i < activeIndex && "text-primary dark:text-primary",
               ])}
             >

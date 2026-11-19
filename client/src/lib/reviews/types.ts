@@ -2,7 +2,9 @@ import type {
   FormFragment,
   ReviewerFragment,
 } from "@/lib/graphql/generated/graphql";
+
 export type ReviewerRecord = ReviewerFragment;
+
 export type ReviewContext = {
   isAdmin: boolean;
   scopes: {
@@ -14,7 +16,12 @@ export type ReviewContext = {
     section: string | null;
   }[];
 };
+
 export type ReviewCase = {
+  participationConfirmed?: boolean;
+  proof?: string;
+  publication?: string;
+  deliveredAt?: string;
   id: string;
   revision: number;
   decision: string;
@@ -25,6 +32,7 @@ export type ReviewCase = {
   currentRound?: string;
   roundNumber: number;
 };
+
 export type Assignment = {
   attachments?: { id: string; filename: string; size: number }[];
   id: string;
@@ -38,10 +46,12 @@ export type Assignment = {
   active: boolean;
   recommendation?: string;
   submittedAt?: string;
+  closedVersion?: string;
   conflictReason: string;
   answer?: Answer | null;
   delivery?: string;
 };
+
 export type Answer = {
   id: string;
   form: string;
@@ -50,6 +60,7 @@ export type Answer = {
   submitted: boolean;
   answers: Record<string, string | string[]>;
 };
+
 export type QueueFilters = {
   search?: string;
   stage?: string;
@@ -57,13 +68,16 @@ export type QueueFilters = {
   delivery?: string;
   section?: string;
 };
+
 export type ReviewerPage = {
   rows: ReviewerRecord[];
   totalCount: number;
   hasNextPage: boolean;
   endCursor: string | null;
 };
+
 export type Eligibility = { blocked: string | null; warnings: string[] };
+
 export type QueueRow = {
   stage?: string;
   submissionId: string;
@@ -78,21 +92,32 @@ export type QueueRow = {
   assignments: Assignment[];
   ownPaper: boolean;
 };
+
 export type Queue = {
   totalCount: number;
   rows: QueueRow[];
   hasNextPage: boolean;
   endCursor: string | null;
 };
+
 export type Version = {
+  template?: string;
+  kind?: string;
+  formalChecks?: Record<string, string | number>;
+  anonymousTrackedFile?: string;
   id: string;
   number: number;
   file: string;
+  trackedFile?: string;
+  parentVersion?: string;
   anonymousFile?: string;
   anonymousApproved: boolean;
   createdAt: string;
 };
+
 export type Round = {
+  bpf?: boolean;
+  recommendationField?: string;
   id: string;
   number: number;
   requiredReviews: number;
@@ -102,7 +127,24 @@ export type Round = {
   startedAt?: string;
   assignments: Assignment[];
 };
+
+export type CorrectionPoint = {
+  assignment?: string;
+  id: string;
+  text: string;
+  status: "PENDING" | "VERIFIED" | "NEEDS_CHANGES";
+  authorStatus?: "addressed" | "notAddressed";
+  response?: string;
+  location?: string;
+};
+
 export type Correction = {
+  manuscriptFile?: string;
+  proofPdf?: string;
+  kind?: string;
+  points?: CorrectionPoint[];
+  parentRequest?: string;
+  sourceVersion?: string;
   id: string;
   instructions: string;
   deadline: string;
@@ -110,6 +152,7 @@ export type Correction = {
   note: string;
   receivedVersion?: string;
 };
+
 export type Detail = {
   blockers: Record<string, string | null>;
   conferenceId: string;
@@ -124,7 +167,24 @@ export type Detail = {
   rounds: Round[];
   revisions: Correction[];
 };
+
+export const bpfConditionsId = "00000000000000000000bf26";
+
+/** Show the conditional publication requirements on the published questionnaire. */
+export function reportFields(
+  fields: FormFragment["fields"],
+  recommendation: string | undefined,
+  answers: Answer["answers"],
+) {
+  if (!recommendation || answers[recommendation] !== "CONDITIONAL")
+    return fields;
+  return fields.map((field) =>
+    field.id === bpfConditionsId ? { ...field, required: true } : field,
+  );
+}
+
 export type Portal = {
+  recommendationField?: string;
   authorFields: string[];
   attachments?: { id: string; filename: string; size: number }[];
   assignmentId: string;
@@ -134,13 +194,22 @@ export type Portal = {
   form: FormFragment;
   answer: Answer | null;
 };
+
 export type RevisionPortal = {
+  templateUrl?: string;
+  versionNumber?: number;
+  trackedFile?: string;
+  manuscriptFile?: string;
+  proofPdf?: string;
+  kind?: string;
+  points?: CorrectionPoint[];
   id: string;
   instructions: string;
   deadline: string;
   status: string;
   note: string;
 };
+
 export function stage(row: QueueRow): string {
   if (row.stage) return row.stage;
   if (row.review?.decision && row.review.decision !== "PENDING")
@@ -160,6 +229,7 @@ export function stage(row: QueueRow): string {
     return "IN_REVIEW";
   return row.review?.formalApproved ? "READY" : "PREPARATION";
 }
+
 export const statusLabels: Record<string, [string, string]> = {
   OWN_PAPER: ["Vlastný príspevok", "Your submission"],
   NOT_SENT: ["Neodoslané", "Not sent"],
@@ -186,6 +256,11 @@ export const statusLabels: Record<string, [string, string]> = {
   SENT: ["Odoslané", "Sent"],
   FAILED: ["Odoslanie zlyhalo", "Send failed"],
   UNKNOWN: ["Overiť odoslanie", "Verify delivery"],
+  NEEDS_CHANGES: ["Vyžaduje úpravy", "Needs changes"],
+  APPROVED: ["Schválené autorom", "Author approved"],
+  NO_RESPONSE: ["Bez odpovede", "No response"],
+  CHECK_PENDING: ["Čaká na recenzenta", "Awaiting reviewer"],
+  CHECK_SUBMITTED: ["Overenie odovzdané", "Reviewer check received"],
   REQUESTED: ["Oprava vyžiadaná", "Revision requested"],
   RECEIVED: ["Oprava doručená", "Revision received"],
   VERIFIED: ["Oprava overená", "Revision verified"],
@@ -198,6 +273,7 @@ export type AuthorWorkspace = {
   reason: string;
   revisions: Correction[];
 };
+
 export type ReviewerProfile = {
   history: {
     id: string;

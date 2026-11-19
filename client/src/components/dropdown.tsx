@@ -6,7 +6,6 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { cn } from "@/lib/utils";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +14,9 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import { overlayPosition, type OverlayAnchor } from "../lib/overlay-position";
+
 export type DropdownItem = ReactElement;
+
 interface DropdownProps {
   trigger: ReactNode;
   triggerProps?: ButtonProps;
@@ -23,9 +24,11 @@ interface DropdownProps {
   anchor?: OverlayAnchor;
   buttonWidth?: boolean;
 }
+
 function Item({ item }: { item: DropdownItem }) {
   // Resolve streamed Server Component children only once the menu opens.
   const resolved = Children.toArray(item)[0];
+
   if (
     !isValidElement<{
       href?: string;
@@ -34,6 +37,7 @@ function Item({ item }: { item: DropdownItem }) {
     }>(resolved)
   )
     return null;
+
   const props = resolved.props;
   const nativeButton =
     props.nativeButton ??
@@ -47,6 +51,7 @@ function Item({ item }: { item: DropdownItem }) {
     />
   );
 }
+
 export default function Dropdown({
   trigger,
   triggerProps,
@@ -61,7 +66,7 @@ export default function Dropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         {...overlayPosition(anchor)}
-        className={cn("min-w-44", buttonWidth ? "w-(--anchor-width)" : "w-max")}
+        className={buttonWidth ? "w-(--anchor-width)" : undefined}
       >
         {items.map((item, index) => (
           <Item key={item.key ?? index} item={item} />

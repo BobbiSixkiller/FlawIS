@@ -20,7 +20,6 @@
   "minFiles": "Najmenej súborov",
   "maxFiles": "Najviac súborov",
   "optionalFiles": "Nepovinné pole môže zostať prázdne. Minimum platí až po priložení súborov.",
-  "template": "Značka pre DOCX šablónu",
   "requiredLabel": "Zadajte názov poľa (najviac 200 znakov).",
   "invalidType": "Vyberte typ poľa.",
   "requiredOption": "Zadajte hodnotu a zobrazený text (najviac 200 znakov každý).",

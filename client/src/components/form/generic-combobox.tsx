@@ -85,13 +85,16 @@ export default function GenericCombobox<
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState(false);
+
   const [remote, setRemote] = useState<{
     query: string;
     options: TOption[];
     loading: boolean;
     error: boolean;
   }>({ query: "", options: [], loading: false, error: false });
+
   const debounced = useDebouncedCallback(setQuery, 350);
+
   const selected = useMemo(() => {
     const values = multiple
       ? Array.isArray(fieldValue)
@@ -110,9 +113,11 @@ export default function GenericCombobox<
       );
     });
   }, [fieldValue, multiple, defaultOptions, getOptionValue]);
+
   useEffect(() => {
     if (!fetchOptions || !query) return;
     let active = true;
+
     fetchOptions(query)
       .then((options) => {
         if (active) setRemote({ query, options, loading: false, error: false });
@@ -121,10 +126,12 @@ export default function GenericCombobox<
         if (active)
           setRemote({ query, options: [], loading: false, error: true });
       });
+
     return () => {
       active = false;
     };
   }, [query, fetchOptions]);
+
   const options =
     fetchOptions && query
       ? remote.query === query
@@ -143,22 +150,28 @@ export default function GenericCombobox<
     allowCreateNewOptions && text.trim() ? [newOption, ...options] : options;
   const loading =
     creating || (Boolean(fetchOptions && query) && remote.query !== query);
+
   function clearQuery() {
     debounced.cancel();
     setText("");
     setQuery("");
   }
+
   async function handleChange(next: TOption | TOption[] | null) {
     const values = Array.isArray(next) ? next : next ? [next] : [];
     const last = values.at(-1);
+
     if (last && last.id == null && createOption) {
       setCreating(true);
+
       try {
         const result = await createOption(last.val);
+
         if (!result.success) {
           onError?.(result.message, result.errors);
           return;
         }
+
         if (!result.data) return;
         const resolved = [...values.slice(0, -1), result.data];
         onChange(
@@ -176,8 +189,10 @@ export default function GenericCombobox<
           : getOptionValue(values[0] ?? null),
       );
     }
+
     clearQuery();
   }
+
   return (
     <Combobox<TOption, boolean>
       multiple={multiple}
@@ -188,6 +203,7 @@ export default function GenericCombobox<
           details.cancel();
           return;
         }
+
         void handleChange(value);
       }}
       disabled={disabled}
@@ -207,6 +223,7 @@ export default function GenericCombobox<
         )
           return;
         setText(value);
+
         if (fetchOptions) debounced(value);
         else setQuery(value);
       }}
@@ -230,7 +247,10 @@ export default function GenericCombobox<
                   itemErrors?.[index] && "border-destructive text-destructive",
                 )}
               >
-                <span className="min-w-0 truncate" title={getOptionLabel(option)}>
+                <span
+                  className="min-w-0 truncate"
+                  title={getOptionLabel(option)}
+                >
                   {getOptionLabel(option)}
                 </span>
               </ComboboxChip>

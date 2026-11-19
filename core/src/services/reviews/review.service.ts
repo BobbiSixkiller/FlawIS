@@ -2,6 +2,11 @@ import { createHash, randomBytes } from "crypto";
 import { ObjectId } from "mongodb";
 import { ClientSession } from "mongoose";
 import { reviewQueuePipeline, QueueFilters } from "./queue.pipeline";
+import {
+  bpfQuestionnaire,
+  bpfFormalChecks,
+  conditionsId,
+} from "./bpf-questionnaire";
 import { reviewFormView } from "./form-view";
 import { reviewBlockers, reviewError, blockerMessages } from "./workflow";
 import { Service } from "typedi";
@@ -13,6 +18,7 @@ import { User } from "../../entitites/User";
 import { Section } from "../../entitites/Section";
 import { Submission } from "../../entitites/Submission";
 import {
+  CorrectionPoint,
   FeedbackRelease,
   ManuscriptVersion,
   RevisionRequest,
@@ -37,6 +43,28 @@ export const hashToken = (token: string) =>
   createHash("sha256").update(token).digest("hex");
 export const recommendations = ["PUBLISH", "CONDITIONAL", "REJECT"];
 const id = (value: unknown) => new ObjectId(String(value));
+
+function authorCorrection(request: RevisionRequest & { _id: ObjectId }) {
+  return {
+    id: String(request._id),
+    versionNumber: request.versionNumber,
+    templateUrl: request.templateConference
+      ? "/api/conference-review/templates/" +
+        request.templateConference +
+        "/manuscript?submission=" +
+        request.submission
+      : undefined,
+    kind: request.kind,
+    manuscriptFile: request.manuscriptFile,
+    proofPdf: request.proofPdf,
+    instructions: request.instructions,
+    deadline: request.deadline,
+    status: request.status,
+    note: request.note,
+    points: request.points?.map(({ assignment, ...point }) => point),
+  };
+}
+
 const plain = <T>(doc: any): T => (doc?.toJSON ? (toDTO(doc) as T) : doc);
 const dataAnswers = (value: any): Record<string, string | string[]> =>
   value instanceof Map ? Object.fromEntries(value) : value || {};
@@ -115,9 +143,11 @@ export class ReviewService {
 
   async saveReviewer(user: CtxUser, data: any, reviewerId?: ObjectId) {
     await this.access.library(user);
+
     const email = String(data.email ?? "")
       .trim()
       .toLowerCase();
+
     if (!/^\S+@\S+\.\S+$/.test(email) || !String(data.name || "").trim())
       throw new Error("Name and a valid email are required.");
     if (
@@ -174,20 +204,43 @@ export class ReviewService {
     if (!(await this.conferences.exists({ _id: conference })))
       throw new Error("Conference not found.");
     const previous = await this.settings.findOne({ conference });
+    if (data.templateFile)
+      throw new Error("New review rounds use the built-in report layout.");
     const changedFields = Object.keys(data);
     data = { ...(previous ? plain<any>(previous) : {}), ...data };
     let form =
       data.form || previous?.form
         ? await this.forms.getForm(id(data.form || previous!.form))
         : null;
+
+    if (data.useBpfQuestionnaire) {
+      if (!form?.fields.some((f) => String(f.id) === conditionsId)) {
+        const preset = bpfQuestionnaire();
+        const definition = await this.forms.createDefinition(
+          "BPF · Scientific paper review",
+          "BPF conference questionnaire",
+          user.id,
+        );
+        form = await this.forms.publish(definition.id, preset.fields);
+        data.recommendationField = String(preset.recommendation.id);
+        data.authorFields = preset.fields
+          .filter(
+            (f) => f.type === FieldType.Textarea || f === preset.recommendation,
+          )
+          .map((f) => String(f.id));
+      }
+    }
+
     if (!form && data.enabled) {
       const definition = await this.forms.createDefinition(
         "Conference review / Recenzný posudok",
         "Reusable review questionnaire",
         user.id,
       );
+
       const recommendationId = new ObjectId(),
         commentsId = new ObjectId();
+
       form = await this.forms.publish(definition.id, [
         {
           id: recommendationId,
@@ -219,9 +272,11 @@ export class ReviewService {
       data.recommendationField = String(recommendationId);
       data.authorFields = [String(recommendationId), String(commentsId)];
     }
+
     const recommendationField =
       data.recommendationField ||
       (await this.settings.findOne({ conference }))?.recommendationField;
+
     if (form) {
       const field = form.fields.find(
         (f) => String(f.id) === recommendationField,
@@ -240,17 +295,9 @@ export class ReviewService {
         if (!form.fields.some((f) => String(f.id) === fieldId))
           throw new Error("Unknown author-visible field.");
     }
+
     if (data.replyTo && !/^\S+@\S+\.\S+$/.test(String(data.replyTo)))
       throw new Error("Invalid reply-to email.");
-    if (
-      data.templateFile &&
-      !(await this.files.exists({
-        _id: id(data.templateFile),
-        conference,
-        kind: "TEMPLATE",
-      }))
-    )
-      throw new Error("Template must belong to this conference.");
     const sectionRequirements =
       data.sectionRequirements ?? previous?.sectionRequirements ?? {};
     const requirements = Object.entries(sectionRequirements);
@@ -263,6 +310,7 @@ export class ReviewService {
       )
     )
       throw new Error("Invalid formal requirements.");
+
     if (
       (await new Repository(Section).countDocuments({
         conference,
@@ -272,6 +320,7 @@ export class ReviewService {
       throw new Error(
         "Formal requirements must reference conference sections.",
       );
+
     const count = Number(data.requiredReviews ?? 2);
     if (!Number.isInteger(count) || count < 1 || count > 10)
       throw new Error("Required reviews must be between 1 and 10.");
@@ -290,9 +339,6 @@ export class ReviewService {
             instructions: String(data.instructions || "").slice(0, 10000),
             signature: String(data.signature || "").slice(0, 5000),
             replyTo: String(data.replyTo || ""),
-            ...(data.templateFile
-              ? { templateFile: id(data.templateFile) }
-              : {}),
           },
         },
         { new: true, upsert: true, runValidators: true, session },
@@ -326,9 +372,11 @@ export class ReviewService {
     const sections = scopes
       .filter((s) => String(s.conference) === String(conference) && s.section)
       .map((s) => s.section!);
+
     if (section) await this.access.conference(user, conference, section);
     else if (!wide && !sections.length)
       throw new Error("Coordinator access required.");
+
     const [active, config] = await Promise.all([
       this.attendees.findAll(
         { "conference._id": conference, "ticket.withSubmission": true },
@@ -432,6 +480,24 @@ export class ReviewService {
           review.authorEmails.includes(a.email.toLowerCase()),
       ),
       correctionOpen: Boolean(correction),
+      decisionReady:
+        (!round?.bpf || !!review?.participationConfirmed) &&
+        !(
+          version &&
+          (await this.revisions.exists({
+            submission: paper._id,
+            receivedVersion: version._id,
+            status: "NEEDS_CHANGES",
+          }))
+        ) &&
+        !!review?.formalApproved &&
+        !!active &&
+        !!version &&
+        assignments.every(
+          (a) =>
+            a.recommendation !== "REJECT" &&
+            String(a.closedVersion) === String(version._id),
+        ),
     });
   }
 
@@ -543,6 +609,14 @@ export class ReviewService {
     const config = await this.settings.findOne({
       conference: paper.conference,
     });
+    const versionFiles = new Map(
+      (
+        await this.files.findAll(
+          { _id: { $in: versions.map((v) => v.file) }, submission },
+          { kind: 1 },
+        )
+      ).map((f) => [String(f._id), f.kind]),
+    );
     return {
       blockers: await this.blockers(paper, review, config),
       conferenceId: String(paper.conference),
@@ -558,7 +632,10 @@ export class ReviewService {
         organization: a.organization,
       })),
       review: review ? plain(review) : null,
-      versions: versions.map((v) => plain(v)),
+      versions: versions.map((v) => ({
+        ...plain<object>(v),
+        kind: versionFiles.get(String(v.file)),
+      })),
       rounds: reports,
       revisions: revisions.map((r) => {
         const { tokenHash, ...safe } = plain<any>(r);
@@ -577,6 +654,7 @@ export class ReviewService {
       { _id: { $in: paper.authors } },
       { email: 1 },
     );
+
     if (!review)
       review = await this.cases.create(
         {
@@ -600,6 +678,7 @@ export class ReviewService {
         },
         { new: true, session },
       ))!;
+
     return review;
   }
 
@@ -611,6 +690,7 @@ export class ReviewService {
     hostname: string,
   ) {
     const paper = await this.access.paper(user, submission);
+
     if (
       action !== "DECIDE" &&
       !(await this.attendees.exists({
@@ -622,6 +702,7 @@ export class ReviewService {
       throw new Error(
         "Only submissions of active participants can be reviewed.",
       );
+
     return withOptionalTransaction(undefined, async (session) => {
       const review = await this.ensureCase(paper, session);
       const expected = Number(data.expectedRevision ?? review.revision);
@@ -653,13 +734,25 @@ export class ReviewService {
       if (blocked) reviewError(blocked, blockerMessages[blocked]);
       const outcome: { url?: string } = {};
       const open = review.decision === "PENDING";
-      if (!open && action !== "DECIDE")
+      const proofAction = [
+        "REQUEST_PROOF",
+        "NO_PROOF_RESPONSE",
+        "RECORD_PROOF_APPROVAL",
+      ].includes(action);
+      if (proofAction && review.decision !== "ACCEPTED")
+        throw new Error("Accept the manuscript before preparing publication.");
+      if (!open && action === "DECIDE" && data.decision !== "PENDING")
+        throw new Error(
+          "Reopen the submission before recording another decision.",
+        );
+      if (!open && action !== "DECIDE" && !proofAction)
         throw new Error("This submission is closed.");
       let round = review.currentRound
         ? await this.rounds.findOne({ _id: review.currentRound }, null, {
             session,
           })
         : null;
+
       if (
         ["ASSIGN", "NEXT_ROUND"].includes(action) &&
         (!round || action === "NEXT_ROUND")
@@ -683,9 +776,11 @@ export class ReviewService {
             number: review.roundNumber + 1,
             requiredReviews: config.requiredReviews,
             form: config.form,
+            bpf: (await this.forms.getForm(config.form)).fields.some(
+              (f) => String(f.id) === conditionsId,
+            ),
             recommendationField: config.recommendationField,
             authorFields: config.authorFields,
-            templateFile: config.templateFile,
           },
           { session },
         );
@@ -696,7 +791,28 @@ export class ReviewService {
           { session },
         );
       }
-      if (action === "PREPARE") {
+
+      const formalForm = round?.form || config.form;
+      const checkBpfFormal =
+        (action === "PREPARE" || action === "VERIFY_REVISION") &&
+        formalForm &&
+        (await this.forms.getForm(formalForm)).fields.some(
+          (f) => String(f.id) === conditionsId,
+        );
+      const formalChecks =
+        action === "PREPARE" && checkBpfFormal
+          ? bpfFormalChecks(data)
+          : undefined;
+
+      if (action === "SET_PARTICIPATION") {
+        if (!round?.bpf || !["yes", "no"].includes(data.participation))
+          throw new Error("Choose the author's participation status.");
+        await this.cases.findOneAndUpdate(
+          { _id: review._id },
+          { $set: { participationConfirmed: data.participation === "yes" } },
+          { session },
+        );
+      } else if (action === "PREPARE") {
         const version = await this.versions.findOne(
           { _id: review.currentVersion, submission },
           null,
@@ -715,7 +831,13 @@ export class ReviewService {
           );
         await this.versions.findOneAndUpdate(
           { _id: version._id },
-          { $set: { anonymousApproved: true, approvedBy: user.id } },
+          {
+            $set: {
+              anonymousApproved: true,
+              approvedBy: user.id,
+              ...(formalChecks ? { formalChecks } : {}),
+            },
+          },
           { session },
         );
         await this.cases.findOneAndUpdate(
@@ -751,8 +873,10 @@ export class ReviewService {
             "Confirm eligibility with an override reason.",
             { reason: "An override reason is required." },
           );
+
         const slot = Number(data.slot),
           deadline = new Date(data.deadline);
+
         if (
           !Number.isInteger(slot) ||
           slot < 1 ||
@@ -794,6 +918,7 @@ export class ReviewService {
           null,
           { session },
         );
+
         if (!round?.startedAt) {
           if (
             !review.formalApproved ||
@@ -816,9 +941,11 @@ export class ReviewService {
           );
           round!.anonymousFile = version.anonymousFile;
         }
+
         const token = assignment.tokenEncrypted
           ? unseal(assignment.tokenEncrypted)
           : randomBytes(32).toString("base64url");
+
         if (!assignment.tokenHash)
           await this.assignments.findOneAndUpdate(
             { _id: assignment._id },
@@ -835,6 +962,7 @@ export class ReviewService {
             },
             { session },
           );
+
         if (action === "PREPARE_LINK")
           outcome.url = `${this.origin(hostname)}/sk/review/${token}`;
         else {
@@ -879,6 +1007,7 @@ export class ReviewService {
           String(assignment.round) !== String(review.currentRound)
         )
           throw new Error("Assignment is not in the current round.");
+
         if (action === "CANCEL")
           await this.assignments.findOneAndUpdate(
             { _id: assignment._id },
@@ -914,7 +1043,12 @@ export class ReviewService {
             { _id: assignment._id },
             {
               $set: { status: "STARTED" },
-              $unset: { recommendation: 1, submittedAt: 1 },
+              $unset: {
+                recommendation: 1,
+                submittedAt: 1,
+                closedVersion: 1,
+                closedAt: 1,
+              },
             },
             { session },
           );
@@ -922,8 +1056,10 @@ export class ReviewService {
       } else if (action === "REQUEST_REVISION") {
         const instructions = String(data.instructions || "").trim(),
           deadline = new Date(data.deadline);
-        if (!instructions || !Number.isFinite(deadline.getTime()))
-          throw new Error("Instructions and a deadline are required.");
+
+        if (!Number.isFinite(deadline.getTime()))
+          throw new Error("A correction deadline is required.");
+
         if (
           await this.revisions.exists({
             submission,
@@ -931,11 +1067,146 @@ export class ReviewService {
           })
         )
           throw new Error("A correction request is already open.");
+
+        if (!review.currentVersion || deadline <= new Date())
+          throw new Error(
+            "A current manuscript and future deadline are required.",
+          );
+        const reports = round
+          ? await this.assignments.findAll({
+              round: round._id,
+              active: true,
+              status: "SUBMITTED",
+            })
+          : [];
+        const parent = data.parentRequest
+          ? await this.revisions.findOne({
+              _id: id(data.parentRequest),
+              submission,
+              status: "NEEDS_CHANGES",
+              receivedVersion: review.currentVersion,
+              round: round?._id,
+            })
+          : null;
+        if (data.parentRequest && !parent)
+          throw new Error("This follow-up is stale.");
+
+        if (
+          !parent &&
+          (await this.revisions.exists({
+            submission,
+            round: round?._id,
+            receivedVersion: review.currentVersion,
+            status: "NEEDS_CHANGES",
+          }))
+        )
+          throw new Error(
+            "Use the unresolved correction points to create a follow-up request.",
+          );
+
+        const kind =
+          parent?.kind || (reports.length ? "POST_REVIEW" : "FORMAL");
+        const points: CorrectionPoint[] = parent
+          ? (parent.points || [])
+              .filter((p) => p.status === "NEEDS_CHANGES")
+              .map(({ id, text, assignment }) => ({
+                id,
+                text,
+                assignment,
+                status: "PENDING",
+              }))
+          : instructions
+              .split(/\r?\n\s*\r?\n/)
+              .filter(Boolean)
+              .map((text) => ({
+                id: String(new ObjectId()),
+                text,
+                status: "PENDING",
+              }));
+
+        if (!parent)
+          for (const report of reports) {
+            const text = data.reportPoints?.[String(report._id)];
+
+            if (typeof text === "string" && text.trim()) {
+              if (text.length > 25000)
+                throw new Error("Correction instructions are too long.");
+
+              points.push(
+                ...text
+                  .trim()
+                  .split(/\r?\n\s*\r?\n/)
+                  .map((text) => ({
+                    id: String(new ObjectId()),
+                    text,
+                    assignment: String(report._id),
+                    status: "PENDING" as const,
+                  })),
+              );
+            }
+          }
+
+        if (data.assignmentId && !parent) {
+          if (!reports.some((a) => String(a._id) === String(data.assignmentId)))
+            throw new Error("Select a submitted report from this round.");
+          for (const point of points)
+            point.assignment = String(data.assignmentId);
+        }
+
+        const authorInstructions = points.map((p) => p.text).join("\n\n");
+        if (
+          !points.length ||
+          points.length > 80 ||
+          authorInstructions.length > 25000
+        )
+          throw new Error(
+            "Use up to 80 correction points and 25000 characters.",
+          );
         const token = randomBytes(32).toString("base64url");
+        const source = await this.versions.findOne({
+          _id: review.currentVersion,
+          submission,
+        });
+        const template =
+          source?.template ||
+          (await this.conferences.findOne({ _id: review.conference }))
+            ?.manuscriptTemplateFile;
         await this.revisions.create(
           {
             submission,
-            instructions,
+            kind,
+            points,
+            versionNumber: source?.number,
+            templateConference: template ? review.conference : undefined,
+            reportDates:
+              parent?.reportDates ||
+              Object.fromEntries(
+                reports.map((a) => [
+                  String(a._id),
+                  a.submittedAt?.toISOString(),
+                ]),
+              ),
+            carriedAssignments: parent
+              ? [
+                  ...new Set([
+                    ...(parent.carriedAssignments || []),
+                    ...(parent.points || [])
+                      .filter(
+                        (p) =>
+                          p.status === "VERIFIED" &&
+                          p.assignment &&
+                          !points.some(
+                            (open) => open.assignment === p.assignment,
+                          ),
+                      )
+                      .map((p) => p.assignment!),
+                  ]),
+                ]
+              : [],
+            round: round?._id,
+            sourceVersion: review.currentVersion,
+            parentRequest: parent?._id,
+            instructions: authorInstructions,
             deadline,
             tokenHash: hashToken(token),
             expiresAt: new Date(deadline.getTime() + 30 * 86400000),
@@ -951,7 +1222,7 @@ export class ReviewService {
             email: author.email,
             name: author.name,
             subject: "Výzva na opravu príspevku",
-            text: `${instructions}\n\n${config.signature}`,
+            text: `${points.map((p) => p.text).join("\n\n")}\n\nTermín / Deadline: ${deadline.toISOString().slice(0, 10)}\n\n${config.signature}`,
             url: `${this.origin(hostname)}/sk/revise/${token}`,
             conferenceId: review.conference,
             submissionId: submission,
@@ -959,13 +1230,356 @@ export class ReviewService {
           },
           session,
         );
-      } else if (action === "VERIFY_REVISION") {
-        const request = await this.revisions.findOneAndUpdate(
-          { _id: id(data.requestId), submission, status: "RECEIVED" },
-          { $set: { status: "VERIFIED" } },
-          { new: true, session },
+      } else if (action === "REQUEST_PROOF") {
+        const version = await this.versions.findOne({
+          _id: review.currentVersion,
+          submission,
+        });
+        const author = await this.users.findOne({ _id: paper.authors[0] });
+        const deadline = new Date(data.deadline);
+        if (
+          !version ||
+          !author ||
+          !Number.isFinite(+deadline) ||
+          deadline <= new Date()
+        )
+          throw new Error("Choose a manuscript and future proof deadline.");
+        const file = await this.files.findOne({
+          _id: version.file,
+          submission,
+        });
+        if (!file?.filename.endsWith(".docx"))
+          throw new Error("Upload the final DOCX manuscript first.");
+        if (review.proof)
+          await this.revisions.findOneAndUpdate(
+            { _id: review.proof, status: "REQUESTED" },
+            { $set: { status: "CANCELLED" } },
+          );
+        const token = randomBytes(32).toString("base64url");
+        const url = this.origin(hostname) + "/sk/revise/" + token;
+        const instructions =
+          "Skontrolujte finálny rukopis a potvrďte súhlas s vydaním. / Check the final manuscript and approve it for publication.";
+        const notification = await this.sendMessage(
+          {
+            hostname,
+            email: author.email,
+            name: author.name,
+            subject: "Autorská korektúra / Final author proof",
+            text: instructions + " " + deadline.toISOString().slice(0, 10),
+            url,
+            conferenceId: review.conference,
+            submissionId: submission,
+            replyTo: config.replyTo,
+          },
+          session,
         );
-        if (!request) throw new Error("No received correction to verify.");
+        const proof = await this.revisions.create(
+          {
+            submission,
+            kind: "PROOF",
+            versionNumber: version.number,
+            attribution: await this.proofAttribution(submission),
+            round: round?._id,
+            sourceVersion: version._id,
+            manuscriptFile: file._id,
+            proofPdf: version.proofPdf,
+            notification: id(notification),
+            instructions,
+            deadline,
+            expiresAt: new Date(+deadline + 30 * 86400000),
+            tokenHash: hashToken(token),
+          },
+          { session },
+        );
+        await this.cases.findOneAndUpdate(
+          { _id: review._id },
+          {
+            $set: { proof: proof._id },
+            $unset: { publication: 1, deliveredAt: 1 },
+          },
+          { session },
+        );
+      } else if (
+        action === "NO_PROOF_RESPONSE" ||
+        action === "RECORD_PROOF_APPROVAL"
+      ) {
+        const proof = await this.revisions.findOne({
+          _id: review.proof,
+          submission,
+          sourceVersion: review.currentVersion,
+          kind: "PROOF",
+          status: "REQUESTED",
+        });
+        if (!proof) throw new Error("No current proof to close.");
+        await this.checkProof(proof);
+        const sent = await this.notifications.findOne({
+          _id: proof.notification,
+          state: "SENT",
+        });
+        if (
+          !sent?.sentAt ||
+          sent.sentAt > proof.deadline ||
+          (action === "NO_PROOF_RESPONSE" && proof.deadline >= new Date())
+        )
+          throw new Error(
+            "Confirm delivery before closing proof. No-response closure also requires an elapsed deadline.",
+          );
+        if (
+          action === "RECORD_PROOF_APPROVAL" &&
+          !String(data.reason || "").trim()
+        )
+          throw new Error("Record the author's confirmation.");
+        await this.revisions.findOneAndUpdate(
+          { _id: proof._id },
+          {
+            $set: {
+              status:
+                action === "NO_PROOF_RESPONSE" ? "NO_RESPONSE" : "APPROVED",
+              note: String(data.reason || "").slice(0, 5000),
+            },
+          },
+          { session },
+        );
+      } else if (action === "VERIFY_REVISION") {
+        const request = await this.revisions.findOne({
+          _id: id(data.requestId),
+          submission,
+          status: "RECEIVED",
+          receivedVersion: review.currentVersion,
+        });
+        if (
+          !request ||
+          (request.round && String(request.round) !== String(round?._id))
+        )
+          throw new Error("No current received correction to verify.");
+
+        if (
+          await this.revisions.exists({
+            kind: "CHECK",
+            parentRequest: request._id,
+            status: "CHECK_PENDING",
+            expiresAt: { $gt: new Date() },
+          })
+        )
+          throw new Error("Wait for the reviewer check or revoke it first.");
+
+        const points = (request.points || []).map((p) => {
+          const status = data.checks?.[p.id];
+          if (status !== "VERIFIED" && status !== "NEEDS_CHANGES")
+            throw new Error("Check every correction point.");
+          return { ...p, status };
+        });
+
+        const status = points.some((p) => p.status === "NEEDS_CHANGES")
+          ? "NEEDS_CHANGES"
+          : "VERIFIED";
+        await this.revisions.findOneAndUpdate(
+          { _id: request._id },
+          { $set: { points, status } },
+          { session },
+        );
+        if (checkBpfFormal && status === "VERIFIED")
+          await this.versions.findOneAndUpdate(
+            { _id: review.currentVersion, submission },
+            { $set: { formalChecks: bpfFormalChecks(data) } },
+            { session },
+          );
+        if (status === "VERIFIED")
+          await this.cases.findOneAndUpdate(
+            { _id: review._id },
+            { $set: { formalApproved: true } },
+            { session },
+          );
+      } else if (action === "REVOKE_CHECK") {
+        if (
+          !(await this.revisions.findOneAndUpdate(
+            {
+              _id: id(data.requestId),
+              submission,
+              kind: "CHECK",
+              status: "CHECK_PENDING",
+            },
+            { $set: { status: "CANCELLED" } },
+            { new: true, session },
+          ))
+        )
+          throw new Error("No active reviewer check.");
+      } else if (action === "REQUEST_REVIEWER_CHECK") {
+        const request = await this.revisions.findOne({
+          _id: id(data.requestId),
+          kind: "POST_REVIEW",
+          status: "RECEIVED",
+          submission,
+          receivedVersion: review.currentVersion,
+          round: review.currentRound,
+        });
+        const assignment = await this.assignments.findOne({
+          _id: id(data.checkAssignment),
+          active: true,
+          status: "SUBMITTED",
+          round: review.currentRound,
+          review: review._id,
+        });
+        const version = await this.versions.findOne({
+          _id: review.currentVersion,
+          submission,
+          anonymousApproved: true,
+        });
+        const deadline = new Date(data.deadline);
+        if (
+          !request ||
+          !assignment?.submittedAt ||
+          !version?.anonymousFile ||
+          !version.anonymousTrackedFile ||
+          !Number.isFinite(+deadline) ||
+          deadline <= new Date() ||
+          review.authorEmails.includes(assignment.email.toLowerCase())
+        )
+          throw new Error(
+            "Select the original reviewer and approve both anonymous revision files first.",
+          );
+        const eligible = (request.points || []).filter(
+          (p) =>
+            p.status !== "VERIFIED" &&
+            (!p.assignment || p.assignment === String(assignment._id)),
+        );
+        const ids: unknown = data.pointIds;
+        if (
+          ids !== undefined &&
+          (!Array.isArray(ids) ||
+            new Set(ids).size !== ids.length ||
+            !ids.every((id) => eligible.some((p) => p.id === id)))
+        )
+          throw new Error(
+            "Select unresolved points for the original reviewer.",
+          );
+        const points = Array.isArray(ids)
+          ? eligible.filter((p) => ids.includes(p.id))
+          : eligible;
+
+        if (
+          await this.revisions.exists({
+            kind: "CHECK",
+            parentRequest: request._id,
+            assignment: { $ne: assignment._id },
+            status: "CHECK_PENDING",
+            expiresAt: { $gt: new Date() },
+            "points.id": { $in: points.map((p) => p.id) },
+          })
+        )
+          throw new Error(
+            "A selected correction point is already being checked.",
+          );
+
+        if (
+          !points?.length ||
+          (request.reportDates &&
+            request.reportDates[String(assignment._id)] !==
+              assignment.submittedAt.toISOString())
+        )
+          throw new Error("No current correction points for this reviewer.");
+        const token = randomBytes(32).toString("base64url");
+        await this.revisions.updateMany(
+          {
+            kind: "CHECK",
+            parentRequest: request._id,
+            assignment: assignment._id,
+            status: "CHECK_PENDING",
+          },
+          { $set: { status: "CANCELLED" } },
+        );
+        const check = await this.revisions.create(
+          {
+            submission,
+            kind: "CHECK",
+            versionNumber: version.number,
+            status: "CHECK_PENDING",
+            instructions: points.map((p) => p.text).join("\n\n"),
+            points,
+            deadline,
+            expiresAt: new Date(+deadline + 14 * 86400000),
+            tokenHash: hashToken(token),
+            assignment: assignment._id,
+            reportSubmittedAt: assignment.submittedAt,
+            parentRequest: request._id,
+            round: review.currentRound,
+            sourceVersion: version._id,
+            manuscriptFile: version.anonymousFile,
+            trackedFile: version.anonymousTrackedFile,
+          },
+          { session },
+        );
+        await this.sendMessage(
+          {
+            hostname,
+            email: assignment.email,
+            name: assignment.name,
+            subject: "Overenie opráv / Check manuscript corrections",
+            text:
+              check.instructions + "\n" + deadline.toISOString().slice(0, 10),
+            url: this.origin(hostname) + "/sk/revise/" + token,
+            conferenceId: review.conference,
+            submissionId: submission,
+            replyTo: config.replyTo,
+          },
+          session,
+        );
+      } else if (action === "CLOSE_REPORT") {
+        const a = await this.assignments.findOne({
+          _id: id(data.assignmentId),
+          round: round?._id,
+          review: review._id,
+          active: true,
+          status: "SUBMITTED",
+        });
+        if (!round || !a || !review.currentVersion)
+          throw new Error("A current submitted report is required.");
+
+        if (
+          String(round.manuscript) !== String(review.currentVersion) &&
+          !(await this.revisions.exists({
+            submission,
+            round: round._id,
+            status: "VERIFIED",
+            receivedVersion: review.currentVersion,
+          }))
+        )
+          throw new Error(
+            "The current manuscript has not been reviewed or verified.",
+          );
+
+        if (a.recommendation === "CONDITIONAL") {
+          const verified = await this.revisions.findAll({
+            submission,
+            round: round._id,
+            status: "VERIFIED",
+            receivedVersion: review.currentVersion,
+            $or: [
+              { "points.assignment": String(a._id) },
+              { carriedAssignments: String(a._id) },
+            ],
+          });
+          if (
+            !verified.some(
+              (r) =>
+                r.reportDates?.[String(a._id)] === a.submittedAt?.toISOString(),
+            )
+          )
+            throw new Error(
+              "Verify the conditions of this report on the current manuscript first.",
+            );
+        }
+
+        await this.assignments.findOneAndUpdate(
+          { _id: a._id },
+          {
+            $set: {
+              closedVersion: review.currentVersion,
+              closedAt: new Date(),
+            },
+          },
+          { session },
+        );
       } else if (action === "DECIDE") {
         if (
           !["PENDING", "ACCEPTED", "REJECTED", "WITHDRAWN"].includes(
@@ -975,6 +1589,33 @@ export class ReviewService {
           throw new Error("Invalid editorial decision.");
         if (!String(data.reason || "").trim())
           throw new Error("Record the reason for this decision.");
+
+        if (data.decision === "REJECTED") {
+          if (
+            !round ||
+            (await this.assignments.countDocuments({
+              round: round._id,
+              active: true,
+              status: "SUBMITTED",
+            })) !== round.requiredReviews
+          )
+            throw new Error(
+              "Complete the required reports before recording rejection.",
+            );
+
+          // Rejection closes conditional reports with the coordinator's recorded decision.
+          await this.assignments.updateMany(
+            { round: round._id, active: true, status: "SUBMITTED" },
+            {
+              $set: {
+                closedVersion: review.currentVersion,
+                closedAt: new Date(),
+              },
+            },
+            { session },
+          );
+        }
+
         if (data.decision === "ACCEPTED") {
           const completed = round
             ? await this.assignments.countDocuments(
@@ -987,6 +1628,7 @@ export class ReviewService {
                 { session },
               )
             : 0;
+
           if (
             !round ||
             completed < round.requiredReviews ||
@@ -999,6 +1641,7 @@ export class ReviewService {
               "Complete the required reports and verify outstanding corrections first.",
             );
         }
+
         await this.cases.findOneAndUpdate(
           { _id: review._id },
           {
@@ -1006,9 +1649,11 @@ export class ReviewService {
               decision: data.decision,
               decisionReason: String(data.reason).slice(0, 10000),
             },
+            $unset: { proof: 1, publication: 1, deliveredAt: 1 },
           },
           { session },
         );
+
         if (data.decision !== "PENDING") {
           await this.assignments.updateMany(
             { review: review._id },
@@ -1021,7 +1666,9 @@ export class ReviewService {
             { session },
           );
         }
+
         const author = await this.users.findOne({ _id: paper.authors[0] });
+
         if (author)
           await this.sendMessage(
             {
@@ -1038,6 +1685,7 @@ export class ReviewService {
           );
       } else if (action !== "NEXT_ROUND")
         throw new Error("Unknown review action.");
+
       await this.activity.record(
         user,
         `review.${action.toLowerCase()}`,
@@ -1089,6 +1737,7 @@ export class ReviewService {
         ? String(round.anonymousFile)
         : null,
       form: reviewFormView(form),
+      recommendationField: round.recommendationField,
       authorFields: [
         ...new Set([...round.authorFields, round.recommendationField]),
       ].filter((fieldId) =>
@@ -1145,11 +1794,13 @@ export class ReviewService {
         })
       : await this.tokenAssignment(token);
     if (!assignment) throw new Error("Assignment not found.");
+
     if (onBehalf) {
       const owner = await this.cases.findOne({ _id: assignment.review });
       if (!owner) throw new Error("Submission not found.");
       await this.access.paper(onBehalf.user, owner.submission);
     }
+
     return withOptionalTransaction(undefined, async (session) => {
       const current = await this.assignments.findOne(
         {
@@ -1189,6 +1840,7 @@ export class ReviewService {
       );
       let savedAnswer:
         Awaited<ReturnType<FormService["saveAnswers"]>> | undefined;
+
       if (decline) {
         await this.assignments.findOneAndUpdate(
           { _id: assignment._id, status: { $ne: "SUBMITTED" } },
@@ -1204,12 +1856,30 @@ export class ReviewService {
           assignment._id,
           session,
         );
+
         if (existing?.submitted)
           return {
             success: true,
             revision: existing.revision,
             answer: existing,
           };
+
+        if (
+          submit &&
+          answers[round.recommendationField] === "CONDITIONAL" &&
+          !String(answers[conditionsId] || "").trim() &&
+          (await this.forms.getForm(round.form)).fields.some(
+            (f) => String(f.id) === conditionsId,
+          )
+        )
+          reviewError(
+            "VALIDATION_FAILED",
+            "Describe the changes required for publication.",
+            {
+              [conditionsId]: "Describe the changes required for publication.",
+            },
+          );
+
         const response = await this.forms.saveAnswers(
           {
             context: "REVIEW",
@@ -1244,6 +1914,7 @@ export class ReviewService {
         if (submit)
           await this.releaseFeedback(review, round, hostname, session);
       }
+
       await this.activity.record(
         onBehalf?.user || `review-link:${assignment._id}`,
         decline
@@ -1294,6 +1965,10 @@ export class ReviewService {
       .join("|");
     if (await this.releases.exists({ round: round._id, fingerprint })) return;
     const form = await this.forms.getForm(round.form);
+
+    // BPF coordinators select and edit the author-facing points in the correction request.
+    if (form.fields.some((field) => String(field.id) === conditionsId)) return;
+
     const feedback = {
       round: round.number,
       reports: assignments.map((a, index) => ({
@@ -1327,6 +2002,7 @@ export class ReviewService {
     const conference = await this.conferences.findOne({
       _id: review.conference,
     });
+
     if (author && conference)
       await this.sendMessage(
         {
@@ -1341,6 +2017,7 @@ export class ReviewService {
         },
         session,
       );
+
     await this.activity.record(
       "system",
       "review.feedback_released",
@@ -1375,9 +2052,13 @@ export class ReviewService {
     });
     if (!paper) throw new Error("Author access required.");
     const review = await this.cases.findOne({ submission });
-    const requests = await this.revisions.findAll({ submission }, null, {
-      sort: { createdAt: -1 },
-    });
+    const requests = await this.revisions.findAll(
+      { submission, kind: { $ne: "CHECK" } },
+      null,
+      {
+        sort: { createdAt: -1 },
+      },
+    );
     await this.activity.read(
       user,
       "review.author_workspace_viewed",
@@ -1387,13 +2068,7 @@ export class ReviewService {
     return {
       decision: review?.decision || "PENDING",
       reason: review?.decisionReason || "",
-      revisions: requests.map((r) => ({
-        id: String(r._id),
-        instructions: r.instructions,
-        deadline: r.deadline,
-        status: r.status,
-        note: r.note,
-      })),
+      revisions: requests.map(authorCorrection),
     };
   }
 
@@ -1422,6 +2097,7 @@ export class ReviewService {
       { sort: { _id: -1 }, limit: 100 },
     );
     const history = [];
+
     for (const assignment of records) {
       const review = await this.cases.findOne({ _id: assignment.review });
       if (
@@ -1429,8 +2105,10 @@ export class ReviewService {
         (conference && String(review.conference) !== String(conference))
       )
         continue;
+
       try {
         const paper = await this.access.paper(user, review.submission);
+
         history.push({
           id: String(assignment._id),
           submission: String(review.submission),
@@ -1445,6 +2123,7 @@ export class ReviewService {
         /* Own papers and other coordinator scopes stay confidential. */
       }
     }
+
     const eligibility = conference
       ? await this.eligibility.findOne({ conference, reviewer })
       : null;
@@ -1464,16 +2143,210 @@ export class ReviewService {
     };
   }
 
+  async currentReviewerCheck(check: RevisionRequest) {
+    if (
+      check.kind !== "CHECK" ||
+      !["CHECK_PENDING", "CHECK_SUBMITTED"].includes(check.status)
+    )
+      throw new Error("This reviewer check is closed.");
+    const review = await this.cases.findOne({
+      submission: check.submission,
+      currentRound: check.round,
+      currentVersion: check.sourceVersion,
+      decision: "PENDING",
+    });
+    const assignment =
+      review &&
+      (await this.assignments.findOne({
+        _id: check.assignment,
+        round: check.round,
+        review: review._id,
+        status: "SUBMITTED",
+        active: true,
+        submittedAt: check.reportSubmittedAt,
+      }));
+
+    if (
+      !assignment ||
+      review!.authorEmails.includes(assignment.email.toLowerCase()) ||
+      !(await this.versions.exists({
+        _id: check.sourceVersion,
+        anonymousFile: check.manuscriptFile,
+        anonymousTrackedFile: check.trackedFile,
+        anonymousApproved: true,
+      })) ||
+      !(await this.revisions.exists({
+        _id: check.parentRequest,
+        status: "RECEIVED",
+        receivedVersion: check.sourceVersion,
+      }))
+    )
+      throw new Error("This reviewer check is stale.");
+
+    return review!;
+  }
+
+  async submitReviewerCheck(token: string, checks: Record<string, unknown>) {
+    return withOptionalTransaction(undefined, async (session) => {
+      const check = await this.revisionToken(token);
+      const review = await this.currentReviewerCheck(check);
+      if (check.status === "CHECK_SUBMITTED") return { success: true };
+      await this.cases.findOneAndUpdate(
+        { _id: review._id },
+        { $inc: { revision: 1 } },
+        { session },
+      );
+
+      const points = (check.points || []).map((p) => {
+        const status = checks?.[p.id];
+        if (status !== "VERIFIED" && status !== "NEEDS_CHANGES")
+          throw new Error("Check each requested point.");
+        return { ...p, status };
+      });
+
+      const request = await this.revisions.findOne({
+        _id: check.parentRequest,
+      });
+      await this.revisions.findOneAndUpdate(
+        { _id: check.parentRequest },
+        {
+          $set: {
+            points: request!.points?.map(
+              (p) => points.find((c) => c.id === p.id) || p,
+            ),
+          },
+        },
+        { session },
+      );
+      await this.revisions.findOneAndUpdate(
+        { _id: check._id },
+        { $set: { status: "CHECK_SUBMITTED", points } },
+        { session },
+      );
+      await this.activity.record(
+        "review-check:" + check.id,
+        "review.corrections_checked",
+        review.conference,
+        check.submission,
+        { request: String(request!._id), assignment: String(check.assignment) },
+        session,
+      );
+      return { success: true };
+    });
+  }
+
+  private async proofAttribution(submission: ObjectId) {
+    const paper = await this.submissions.findOne({ _id: submission });
+    if (!paper) throw new Error("Manuscript not found.");
+    const authors = await this.users.findAll({ _id: { $in: paper.authors } });
+
+    const names = paper.authors.map((id) => {
+      const author = authors.find((a) => String(a._id) === String(id));
+      return [
+        String(id),
+        author?.name,
+        author?.organization,
+        author?.email.toLowerCase(),
+      ];
+    });
+
+    return createHash("sha256")
+      .update(
+        JSON.stringify([
+          paper.translations.en.name,
+          paper.translations.sk.name,
+          names,
+        ]),
+      )
+      .digest("hex");
+  }
+
+  /** A proof is valid only for the recipient, attribution and files originally offered. */
+  async checkProof(proof: RevisionRequest) {
+    if (
+      !proof.attribution ||
+      proof.attribution !== (await this.proofAttribution(proof.submission)) ||
+      !(await this.cases.exists({
+        submission: proof.submission,
+        decision: "ACCEPTED",
+        proof: proof.id,
+        currentVersion: proof.sourceVersion,
+      }))
+    )
+      throw new Error("This proof has been superseded.");
+  }
+
+  async approveAuthorProof(
+    requestId: ObjectId,
+    user?: CtxUser,
+    token?: string,
+  ) {
+    return withOptionalTransaction(undefined, async (session) => {
+      const request = token
+        ? await this.revisionToken(token)
+        : await this.revisions.findOne({ _id: requestId });
+
+      if (
+        !request ||
+        !request._id.equals(requestId) ||
+        request.kind !== "PROOF" ||
+        (!token &&
+          (!user ||
+            !(await this.submissions.exists({
+              _id: request.submission,
+              authors: user.id,
+            }))))
+      )
+        throw new Error("Author proof access required.");
+
+      if (!["REQUESTED", "APPROVED"].includes(request.status))
+        throw new Error("This proof is closed.");
+      await this.checkProof(request);
+      if (request.status === "APPROVED") return authorCorrection(request);
+      const current = await this.cases.findOneAndUpdate(
+        {
+          submission: request.submission,
+          decision: "ACCEPTED",
+          currentVersion: request.sourceVersion,
+          proof: request._id,
+        },
+        { $inc: { revision: 1 } },
+        { session },
+      );
+      if (!current) throw new Error("This proof has been superseded.");
+
+      if (request.status !== "APPROVED") {
+        await this.revisions.findOneAndUpdate(
+          { _id: request._id },
+          { $set: { status: "APPROVED" } },
+          { session },
+        );
+        await this.activity.record(
+          token ? "author-proof-link:" + request.id : user!,
+          "submission.proof_approved",
+          current.conference,
+          request.submission,
+          { version: String(request.sourceVersion) },
+          session,
+        );
+      }
+
+      return authorCorrection({ ...request.toObject(), status: "APPROVED" });
+    });
+  }
+
   async revisionPortal(token: string) {
     const request = await this.revisionToken(token);
-    return {
-      id: String(request._id),
-      instructions: request.instructions,
-      deadline: request.deadline,
-      status: request.status,
-      note: request.note,
-    };
+    if (request.kind === "PROOF") await this.checkProof(request);
+
+    if (request.kind === "CHECK") {
+      await this.currentReviewerCheck(request);
+      return { ...authorCorrection(request), trackedFile: request.trackedFile };
+    }
+
+    return authorCorrection(request);
   }
+
   async revisionToken(token: string) {
     if (!/^[\w-]{43}$/.test(token))
       reviewError("INVALID_REVISION_LINK", "Invalid correction link.");
@@ -1494,11 +2367,13 @@ export class ReviewService {
       enabled: true,
       remindersEnabled: true,
     });
+
     for (const config of configs) {
       const cases = await this.cases.findAll({
         conference: config.conference,
         decision: "PENDING",
       });
+
       for (const review of cases) {
         if (!review.currentRound) continue;
         const assignments = await this.assignments.findAll({
@@ -1511,6 +2386,7 @@ export class ReviewService {
         const conference = await this.conferences.findOne({
           _id: config.conference,
         });
+
         for (const a of assignments) {
           const delta = a.deadline.getTime() - Date.now();
           const field =
@@ -1578,6 +2454,7 @@ export class ReviewService {
 
   private origin(hostname: string) {
     let host = hostname.replace(/^flawis/, "conferences");
+
     if (
       process.env.NODE_ENV === "development" &&
       /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)
@@ -1585,10 +2462,12 @@ export class ReviewService {
       host =
         process.env.CONFERENCES_PUBLIC_HOST || "conferences.localhost:3000";
     }
+
     if (!/^[a-z0-9.:-]+$/i.test(host))
       throw new Error("Invalid public hostname.");
     return `${process.env.NODE_ENV === "development" ? "http" : "https"}://${host}`;
   }
+
   async sendMessage(data: Record<string, unknown>, session?: ClientSession) {
     return this.mail.produceMessage(
       JSON.stringify({ locale: "sk", ...data }),

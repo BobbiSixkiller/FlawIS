@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { getConference } from "../../actions";
-import { getReviewContext, getReviewSettings } from "@/lib/reviews/actions";
+import { getReviewContext } from "@/lib/reviews/actions";
 import ConferenceTemplates from "./_components/conference-templates";
 
 export const dynamic = "force-dynamic";
+
 export default async function TemplatesPage({
   params,
 }: {
@@ -20,13 +21,11 @@ export default async function TemplatesPage({
     !context.scopes.some((s) => s.conference === conference.id && !s.section)
   )
     redirect(`/conferences/${slug}/reviews`);
-  const settings = await getReviewSettings(conference.id);
   return (
     <ConferenceTemplates
       conference={conference.id}
       lng={lng}
       manuscript={conference.manuscriptTemplateFile}
-      review={settings?.templateFile}
     />
   );
 }

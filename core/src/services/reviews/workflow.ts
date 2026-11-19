@@ -22,6 +22,7 @@ export type WorkflowState = {
   required: number;
   incomplete: boolean;
   correctionOpen: boolean;
+  decisionReady: boolean;
 };
 
 /** The detail screen and mutation boundary use the same prerequisite rules. */
@@ -73,7 +74,10 @@ export function reviewBlockers(
     REQUEST_REVISION: common || (s.correctionOpen ? "REVISION_OPEN" : null),
     ACCEPTED:
       (!s.enabled ? "REVIEWS_DISABLED" : null) ||
-      (s.assigned < s.required || s.incomplete || s.correctionOpen
+      (!s.decisionReady ||
+      s.assigned < s.required ||
+      s.incomplete ||
+      s.correctionOpen
         ? "ACCEPTANCE_BLOCKED"
         : null),
     DECIDE: !s.enabled ? "REVIEWS_DISABLED" : null,
@@ -96,5 +100,5 @@ export const blockerMessages: Record<string, string> = {
   ROUND_INCOMPLETE: "Complete or cancel the current round first.",
   REVISION_OPEN: "A correction request is already open.",
   ACCEPTANCE_BLOCKED:
-    "Complete the required reports and verify outstanding corrections first.",
+    "Close the required reports, resolve negative recommendations, and verify outstanding corrections on the current manuscript first.",
 };

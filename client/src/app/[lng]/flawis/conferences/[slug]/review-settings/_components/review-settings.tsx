@@ -36,6 +36,7 @@ import {
   SelectField,
   ConfirmDialog,
 } from "@/components/form/form-dialog";
+
 type Config = {
   enabled: boolean;
   requiredReviews: string;
@@ -48,7 +49,9 @@ type Config = {
   recommendationField: string;
   authorFields: string[];
 };
+
 type Settings = ConferenceReviewSettingsQuery["conferenceReviewSettings"];
+
 const compatible = (f: FormFragment["fields"][number]) =>
   f.required &&
   [FieldType.Select, FieldType.RadioGroup].includes(f.type) &&
@@ -61,7 +64,9 @@ const groups = [
   "communication",
   "questionnaire",
 ] as const;
+
 type Group = (typeof groups)[number];
+
 export default function ReviewSettings({
   conference,
   settings,
@@ -82,6 +87,7 @@ export default function ReviewSettings({
   const t = tr(lng);
   const router = useRouter();
   const [editing, setEditing] = useState<Group | null>(null);
+  const [bpf, setBpf] = useState(false);
   const [grant, setGrant] = useState(false);
   const [revoke, setRevoke] = useState<(typeof grants)[number] | null>(null);
   const titles = {
@@ -98,8 +104,8 @@ export default function ReviewSettings({
       <Alert>
         <AlertDescription>
           {t(
-            "Počet recenzentov, dotazník a šablóna sa použijú pre nové kolá. Existujúce kolá si ponechajú pôvodné nastavenia.",
-            "Reviewer count, questionnaire and template apply to new rounds. Existing rounds retain their original settings.",
+            "Počet recenzentov a dotazník sa použijú pre nové kolá. Existujúce kolá si ponechajú pôvodné nastavenia.",
+            "Reviewer count and questionnaire apply to new rounds. Existing rounds retain their original settings.",
           )}
         </AlertDescription>
       </Alert>
@@ -169,7 +175,12 @@ export default function ReviewSettings({
                 </div>
               )}
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex-wrap gap-2">
+              {group === "questionnaire" && (
+                <Button variant="outline" onClick={() => setBpf(true)}>
+                  {t("Použiť dotazník BPF", "Use BPF questionnaire")}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 aria-label={`${t("Upraviť", "Edit")} ${titles[group]}`}
@@ -216,6 +227,25 @@ export default function ReviewSettings({
           </Button>
         </CardFooter>
       </Card>
+      {bpf && (
+        <ConfirmDialog
+          lng={lng}
+          title={t("Použiť dotazník BPF", "Use BPF questionnaire")}
+          description={t(
+            "Nové kolá použijú štyri kritériá, odporúčanie a podmienky publikovania.",
+            "New rounds will use the four BPF criteria, recommendation and publication conditions.",
+          )}
+          onClose={() => setBpf(false)}
+          onConfirm={async () => {
+            await mutate("settings", {
+              conference,
+              data: { useBpfQuestionnaire: true },
+            });
+            setBpf(false);
+            router.refresh();
+          }}
+        />
+      )}
       {editing && (
         <SettingsDialog
           key={`${editing}:${settings?.id}`}
@@ -289,6 +319,7 @@ export default function ReviewSettings({
     </div>
   );
 }
+
 function SettingsDialog({
   group,
   title,
@@ -327,6 +358,7 @@ function SettingsDialog({
     recommendationField: settings?.recommendationField || "",
     authorFields: settings?.authorFields || [],
   };
+
   const schema = z.object({
     enabled: z.boolean(),
     requiredReviews: z
@@ -347,6 +379,7 @@ function SettingsDialog({
     recommendationField: z.string(),
     authorFields: z.array(z.string()),
   });
+
   return (
     <FormDialog
       formatError={(error) => errorText(error, lng)}
@@ -358,6 +391,7 @@ function SettingsDialog({
       disabled={loadingQuestionnaire}
       onSubmit={async (values) => {
         let data: Record<string, unknown>;
+
         if (group === "workflow")
           data = {
             enabled: values.enabled,
@@ -386,6 +420,7 @@ function SettingsDialog({
               ),
             );
         }
+
         await mutate("settings", { conference, data });
         onSaved();
       }}
@@ -503,6 +538,7 @@ function SettingsDialog({
     </FormDialog>
   );
 }
+
 function QuestionnaireSettings({
   forms,
   initial,
@@ -523,6 +559,7 @@ function QuestionnaireSettings({
   const selected = versions.find((v) => v.id === form.watch("form"));
   const fields = selected?.fields || [];
   const recommendations = fields.filter(compatible);
+
   const chooseVersion = (id: string) => {
     const fields = versions.find((v) => v.id === id)?.fields || [];
     form.setValue("form", id, { shouldDirty: true });
@@ -535,6 +572,7 @@ function QuestionnaireSettings({
         : "",
       { shouldDirty: true },
     );
+
     form.setValue(
       "authorFields",
       form
@@ -545,15 +583,18 @@ function QuestionnaireSettings({
       { shouldDirty: true },
     );
   };
+
   async function load(value: string) {
     if (!value && initial) return;
     setPending(true);
     onLoadingChange(true);
     setError("");
+
     try {
       const result = value ? await getFormVersions(value) : [];
       setDefinition(value);
       setVersions(result);
+
       if (value !== definition) {
         form.setValue("form", result[0]?.id || "", { shouldDirty: true });
         form.setValue("recommendationField", "", { shouldDirty: true });
@@ -566,6 +607,7 @@ function QuestionnaireSettings({
       onLoadingChange(false);
     }
   }
+
   return (
     <>
       <ErrorAlert message={error} />
