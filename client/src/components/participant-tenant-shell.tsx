@@ -43,6 +43,7 @@ export default async function ParticipantTenantShell({
         actions={
           <>
             <ThemeToggler lng={lng} />
+            <LngSwitcher />
             <AccountMenu
               avatar={
                 user ? (
@@ -51,7 +52,6 @@ export default async function ParticipantTenantShell({
               }
               signInHref={signInHref}
             />
-            <LngSwitcher />
           </>
         }
       />

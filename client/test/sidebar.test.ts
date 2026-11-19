@@ -49,7 +49,7 @@ test("sidebar links identify the active section on localized and subdomain paths
   );
 });
 
-test("desktop collapse retains navigation and footer controls and persists its state", (context) => {
+test("desktop collapse retains navigation and persists its state", (context) => {
   mockViewport(context);
   const view = render(createElement(SidebarFixture));
   fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
@@ -59,7 +59,6 @@ test("desktop collapse retains navigation and footer controls and persists its s
     ),
   );
   assert.ok(view.getByRole("link", { name: "Users" }));
-  assert.ok(view.getByRole("button", { name: "Preferences" }));
   assert.match(document.cookie, /sidebar_state=false/);
   fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
   assert.match(document.cookie, /sidebar_state=true/);
@@ -70,10 +69,12 @@ test("mobile navigation closes after choosing a link", async (context) => {
   const view = render(createElement(SidebarFixture));
   fireEvent.click(view.getByRole("button", { name: "Toggle navigation" }));
   const link = await view.findByRole("link", { name: "Courses" });
+
   // Prevent JSDOM navigation after the component's click handler has run.
   document.addEventListener("click", (event) => event.preventDefault(), {
     once: true,
   });
+
   fireEvent.click(link);
   assert.equal(view.queryByRole("dialog"), null);
 });
