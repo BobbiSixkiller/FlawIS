@@ -56,7 +56,7 @@ export default function AppSidebar({
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup className="group-data-[collapsible=icon]:px-3">
+        <SidebarGroup className="group-data-[collapsible=icon]:px-2.5">
           <SidebarGroupContent>
             <nav aria-label={navigationLabel}>
               <SidebarMenu className="gap-2">
@@ -91,7 +91,7 @@ export default function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="relative z-30 items-start overflow-visible border-t border-sidebar-border group-data-[collapsible=icon]:px-3">
+      <SidebarFooter className="relative z-30 items-start overflow-visible border-t border-sidebar-border group-data-[collapsible=icon]:px-2.5">
         {footer}
       </SidebarFooter>
       <SidebarRail />

@@ -14,6 +14,7 @@ import ThemeToggler from "@/components/theme-toggler";
 import Footer from "@/app/[lng]/flawis/_components/footer";
 import Logo from "@/components/logo";
 import { Snackbar } from "@/components/message";
+
 export default async function Dashboard({
   children,
   navItems,
@@ -56,9 +57,7 @@ export default async function Dashboard({
         footer={
           <>
             <LngSwitcher variant="sidebar" />
-            <div className="relative h-9 w-8 shrink-0">
-              <ThemeToggler lng={lng} className="absolute top-0 -left-0.5" />
-            </div>
+            <ThemeToggler lng={lng} />
           </>
         }
       />
