@@ -7,7 +7,6 @@ import Icon, { type IconName } from "@/components/icon";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -23,13 +22,11 @@ export type NavItem = { title: string; href: string; icon: IconName };
 export default function AppSidebar({
   navItems,
   logo,
-  footer,
   navigationLabel,
   homeLabel,
 }: {
   navItems: NavItem[];
   logo: ReactNode;
-  footer: ReactNode;
   navigationLabel: string;
   homeLabel: string;
 }) {
@@ -91,9 +88,6 @@ export default function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="relative z-30 items-start overflow-visible border-t border-sidebar-border group-data-[collapsible=icon]:px-2.5">
-        {footer}
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

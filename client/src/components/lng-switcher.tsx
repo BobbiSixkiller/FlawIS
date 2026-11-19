@@ -11,8 +11,6 @@ import { useTranslation } from "@/hooks/use-translation";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useIsMobile } from "@/hooks/use-mobile";
-import Icon from "./icon";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -20,7 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { SidebarMenuButton } from "./ui/sidebar";
 
 function saveLocalePreference(lng: string) {
   const { hostname, protocol } = window.location;
@@ -31,56 +28,34 @@ function saveLocalePreference(lng: string) {
   document.cookie = `${cookieName}=${encodeURIComponent(lng)}; Path=/; Max-Age=${localePreferenceMaxAge}; SameSite=Lax${domain}${secure}`;
 }
 
-export default function LngSwitcher({
-  variant = "compact",
-}: {
-  variant?: "compact" | "sidebar";
-}) {
+export default function LngSwitcher() {
   const path = usePathname();
   const { lng } = useParams<{ lng: string }>();
 
   const { t } = useTranslation(lng, "dashboard");
-  const isMobile = useIsMobile();
-  const inSidebar = variant === "sidebar";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t(lng)}
         render={
-          inSidebar ? (
-            <SidebarMenuButton />
-          ) : (
-            <Button variant="ghost" size="icon-lg" className="rounded-full" />
-          )
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="rounded-full border-0"
+          />
         }
       >
         <Image
           alt=""
           priority
           src={`/images/${lng}.svg`}
-          width={20}
-          height={20}
-          className="shrink-0"
+          width={36}
+          height={36}
+          className="size-full rounded-full"
         />
-        {inSidebar && (
-          <>
-            <span className="group-data-[collapsible=icon]:sr-only">
-              {t(lng)}
-            </span>
-            <Icon
-              name="chevron-right"
-              className="ml-auto group-data-[collapsible=icon]:hidden"
-              aria-hidden="true"
-            />
-          </>
-        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        side={inSidebar && !isMobile ? "right" : "bottom"}
-        align="end"
-        sideOffset={4}
-      >
+      <DropdownMenuContent align="end">
         {languages.map((locale) => (
           <DropdownMenuItem
             key={locale}

@@ -23,7 +23,6 @@ export function SidebarFixture({
           navigationLabel="Navigation"
           homeLabel="Home"
           logo={<span>Faculty of Law</span>}
-          footer={<button type="button">Preferences</button>}
         />
         <SidebarTrigger aria-label="Toggle navigation" />
       </SidebarProvider>

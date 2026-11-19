@@ -58,18 +58,30 @@ export default async function AuthLayout({
   return (
     <ScrollWrapper id="auth-scroll" className="h-dvh bg-background">
       <div className="relative flex min-h-full flex-col md:flex-row">
-        <aside
-          aria-label={t("facultyName")}
+        <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 px-4 pt-4 md:px-8 md:pt-8">
+          <div className="@container flex min-w-0 flex-1">
+            <Link
+              href="/"
+              aria-label={t("facultyName")}
+              className="inline-flex rounded-sm focus-visible:outline-white"
+            >
+              <Logo
+                lng={lng}
+                inverted
+                className="items-center gap-2 whitespace-nowrap [&>img]:size-11 md:gap-4 md:[&>img]:size-14 [&>div]:hidden @min-[12rem]:[&>div]:flex"
+              />
+            </Link>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 rounded-full bg-background p-1 md:bg-transparent md:p-0">
+            <ThemeToggler lng={lng} />
+            <LngSwitcher />
+          </div>
+        </header>
+
+        <div
+          aria-hidden="true"
           className="relative h-[clamp(10rem,24svh,12.5rem)] shrink-0 overflow-hidden md:sticky md:top-0 md:h-dvh md:w-5/12 md:self-start"
         >
-          <Link
-            href="/"
-            aria-label={t("facultyName")}
-            className="absolute bottom-5 left-6 z-10 max-w-[calc(100%-3rem)] rounded-sm focus-visible:outline-white md:top-8 md:bottom-auto md:left-8 md:max-w-[calc(100%-4rem)]"
-          >
-            <Logo lng={lng} inverted className="gap-3 md:gap-4" />
-          </Link>
-
           <Image
             priority
             alt=""
@@ -78,18 +90,10 @@ export default async function AuthLayout({
             className="object-cover object-[center_45%] md:object-center"
             sizes="(max-width: 767px) 100vw, 42vw"
           />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/10 to-black/50 md:hidden"
-          />
-        </aside>
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/55 to-transparent md:hidden" />
+        </div>
 
-        <div className="flex min-w-0 flex-1 flex-col items-center px-6 pt-6 pb-8 md:relative md:py-24">
-          <header className="absolute top-3 right-4 z-20 flex items-center gap-2 rounded-full bg-background p-1 md:top-8 md:right-6 md:rounded-none md:bg-transparent md:p-0">
-            <ThemeToggler lng={lng} />
-            <LngSwitcher />
-          </header>
-
+        <div className="flex min-w-0 flex-1 flex-col items-center px-6 pt-6 pb-8 md:py-24">
           <main className="w-full max-w-96 md:my-auto">
             {children}
 
